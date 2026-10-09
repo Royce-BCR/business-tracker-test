@@ -24,6 +24,8 @@
     --g-growth: #6fae86;
     --g-finance: #d09a5e;
     --g-operations: #c6b89d;
+    --g-revenue: #6aa5c9;
+    --g-organisation: #b58fb0;
 
     --sans: 'Inter', 'Segoe UI', system-ui, Arial, sans-serif;
     --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
@@ -97,7 +99,8 @@
   .g-growth   .nav-label, .tab.g-growth   { --accent: var(--g-growth); }
   .g-finance  .nav-label, .tab.g-finance  { --accent: var(--g-finance); }
   .g-operations .nav-label, .tab.g-operations { --accent: var(--g-operations); }
-  .g-system .nav-label, .tab.g-system { --accent: #9aa0a6; }
+  .g-revenue .nav-label, .tab.g-revenue { --accent: var(--g-revenue); }
+  .g-organisation .nav-label, .tab.g-organisation { --accent: var(--g-organisation); }
   .nav-label { color: var(--accent); }
 
   .tab {
@@ -120,15 +123,6 @@
     color: #fff;
     border-left-color: var(--accent);
     font-weight: 500;
-  }
-  .tab .soon {
-    font-size: 8.5px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #8a847a;
-    border: 1px solid #3a3d41;
-    padding: 1px 5px;
-    border-radius: 20px;
   }
   .save-status {
     position: fixed;
@@ -500,6 +494,43 @@
   .lp-f.missing input { border-color: #efc66b; background: #fffaf0; }
   .lp-qsum { background: #faf8f4; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; line-height: 1.5; color: var(--slate); }
   .lp-qsum b { display: block; font-size: 13px; color: var(--ink); margin-bottom: 2px; }
+
+  /* suppliers: list page + the same editor panel (earth-toned band) */
+  .lp-panel.lc-sup { --lc-edge: #8a7048; --lc-tint: rgba(198,184,157,0.3); --lc-line: rgba(138,112,72,0.4); }
+  .lp-panel input[type="checkbox"] { width: auto; padding: 0; }
+  .sup-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+  .sup-pill { display: inline-block; font-size: 12px; font-weight: 500; line-height: 1.3; padding: 2px 9px; border-radius: 999px; background: #efece6; color: var(--slate); border: 1px solid var(--line); white-space: nowrap; }
+  .sup-st { display: inline-block; font-size: 12px; font-weight: 600; line-height: 1.3; padding: 2px 10px; border-radius: 999px; border: 1px solid #9fcfa8; background: #d5ecd9; color: #1e5c2e; white-space: nowrap; }
+  .sup-st.off { border-color: #d3cfc6; background: #eceae5; color: #5a564e; }
+  .sup-count { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .crm-filters .sup-cat-btn { padding: 6px 12px; font-size: 12px; }
+  .crm-filters .crm-colmenu { max-height: 280px; overflow-y: auto; min-width: 210px; }
+  .crm-colmenu .sup-menu-clear { display: block; margin: 6px 0 2px; font-size: 12px; }
+  .suppliers-table th { font-size: 12px; text-transform: none; letter-spacing: 0; }
+  .suppliers-table td { font-size: 12.5px; }
+  .suppliers-table td.code-cell { font-size: 12px; }
+  .suppliers-table td.sup-cell { white-space: nowrap; text-overflow: ellipsis; }
+  .suppliers-table td.sup-name { font-weight: 600; }
+  .suppliers-table td.sup-dim { color: var(--muted); }
+  .suppliers-table tr.sup-row { cursor: pointer; }
+  .suppliers-table tr.sup-row:focus-visible { outline: 2px solid #8a7048; outline-offset: -2px; }
+  .suppliers-table.lp-on tr.sup-row:not(.sup-active) td { opacity: 0.45; }
+  .suppliers-table tr.sup-active td { background: rgba(198,184,157,0.22); box-shadow: inset 0 2px 0 #8a7048, inset 0 -2px 0 #8a7048; }
+  .suppliers-table tr.sup-active td:first-child { box-shadow: inset 0 2px 0 #8a7048, inset 0 -2px 0 #8a7048, inset 2px 0 0 #8a7048; }
+  .suppliers-table tr.sup-active td:last-child { box-shadow: inset 0 2px 0 #8a7048, inset 0 -2px 0 #8a7048, inset -2px 0 0 #8a7048; }
+  @media (max-width: 700px) { #suppliersTableWrap.fitmode > table { min-width: 860px !important; } }   /* phones: keep the columns readable and scroll sideways */
+  .sup-empty { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 13px; }
+  .lp-contact-top .sp-primary { font-size: 12px; font-weight: 600; color: #1e5c2e; background: #d5ecd9; border: 1px solid #9fcfa8; padding: 1px 9px; border-radius: 999px; }
+  .sp-link { background: none; border: none; padding: 0; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--slate); text-decoration: underline; cursor: pointer; }
+  .sp-link:hover { color: var(--ink); }
+  .sp-link.danger { color: #b3453f; }
+  .lp-contact-top .sp-ctl { display: flex; align-items: center; gap: 8px; }
+  .sp-check { display: flex; align-items: center; gap: 9px; font-size: 13px; padding: 5px 0; cursor: pointer; }
+  .sp-q-empty { font-size: 13px; color: var(--muted); line-height: 1.55; background: #faf8f4; border: 1px dashed var(--stone-deep); border-radius: 10px; padding: 14px 16px; }
+  .sp-q-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .sp-q-row .k { color: var(--muted); font-size: 12px; }
+  .sp-foot { padding: 18px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .sp-foot .btn { font-size: 12px; }
   /* tiers: badge (image or short label), settings card */
   .tier-img { width: 20px; height: 20px; object-fit: contain; vertical-align: middle; border-radius: 3px; }
   .tier-pill { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 999px; background: #efe6d6; color: #7a5a2c; vertical-align: middle; }
@@ -970,35 +1001,40 @@
     <div class="nav-label">Command</div>
     <div class="tab g-command active" data-tab="today">Today <span class="tab-count" id="todayBadge" hidden></span></div>
     <div class="tab g-command" data-tab="dashboard">Dashboard</div>
-    <div class="tab g-command" data-tab="businessplan">Business Plan</div>
   </div>
 
   <div class="nav-group g-growth">
     <div class="nav-label">Growth</div>
     <div class="tab g-growth" data-tab="leads">Leads</div>
     <div class="tab g-growth" data-tab="salespipeline">Sales Pipeline</div>
-    <div class="tab g-growth" data-tab="projectpipeline">Project Pipeline</div>
     <div class="tab g-growth" data-tab="crm">CRM</div>
+  </div>
+
+  <div class="nav-group g-revenue">
+    <div class="nav-label">Revenue</div>
+    <div class="tab g-revenue" data-tab="quotations">Quotations</div>
+    <div class="tab g-revenue" data-tab="revenue">Revenue Forecast</div>
   </div>
 
   <div class="nav-group g-finance">
     <div class="nav-label">Finance</div>
-    <div class="tab g-finance" data-tab="pricing">Pricing Model</div>
-    <div class="tab g-finance" data-tab="revenue">Revenue Forecast</div>
     <div class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</div>
     <div class="tab g-finance" data-tab="transactions">Transactions</div>
+    <div class="tab g-finance" data-tab="pricing">Pricing Model</div>
   </div>
 
   <div class="nav-group g-operations">
     <div class="nav-label">Operations</div>
-    <div class="tab g-operations" data-tab="admin">Setup &amp; Admin</div>
-    <div class="tab g-operations" data-tab="actions">Actions</div>
-    <div class="tab g-operations" data-tab="suppliers">Suppliers <span class="soon">Soon</span></div>
+    <div class="tab g-operations" data-tab="suppliers">Suppliers</div>
+    <div class="tab g-operations" data-tab="projectpipeline">Project Pipeline</div>
   </div>
 
-  <div class="nav-group g-system">
-    <div class="nav-label">System</div>
-    <div class="tab g-system" data-tab="settings">Settings</div>
+  <div class="nav-group g-organisation">
+    <div class="nav-label">Organisation</div>
+    <div class="tab g-organisation" data-tab="admin">Setup &amp; Admin</div>
+    <div class="tab g-organisation" data-tab="businessplan">Business Plan</div>
+    <div class="tab g-organisation" data-tab="actions">Actions</div>
+    <div class="tab g-organisation" data-tab="settings">Settings</div>
   </div>
 
   <div class="logout-bar" id="logoutBar"></div>
@@ -1214,6 +1250,9 @@
     <div class="section-label">CRM task options</div>
     <div class="card" id="taskOptionsCard"></div>
 
+    <div class="section-label">Supply categories</div>
+    <div class="card" id="supplyCatsCard"></div>
+
     <div class="section-label">Cash &amp; payment terms</div>
     <div class="card">
       <div class="assumptions-grid" id="financeSettingsGrid"></div>
@@ -1278,22 +1317,25 @@ create policy "app update" on tracker_data for update using (true) with check (t
     </div>
   </div>
 
-  <!-- SUPPLIERS (placeholder) -->
-  <div class="panel" id="panel-suppliers">
+  <!-- QUOTATIONS (placeholder) -->
+  <div class="panel" id="panel-quotations">
     <div class="page-head">
-      <h2>Suppliers &amp; Supply Chain</h2>
-      <div class="desc">Relationships, not just purchasing.</div>
+      <h2>Quotations</h2>
+      <div class="desc">Quotations will be built here. Quick estimates and project quotes, with approval and sending.</div>
     </div>
-    <div class="placeholder">
-      <div class="tag">Coming soon</div>
-      <h3>Supplier &amp; supply-chain management</h3>
-      <p>A handle on the merchants and trades the business depends on — reliability, terms, and backups.</p>
-      <ul>
-        <li>Supplier · what they supply · account terms · reliability notes</li>
-        <li>Primary vs backup for each material line</li>
-        <li>Trade-account status (credit checks, limits, lead times)</li>
-      </ul>
+  </div>
+
+  <!-- SUPPLIERS -->
+  <div class="panel" id="panel-suppliers">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Suppliers</h2>
+        <div class="desc">The merchants and trades we buy from — contacts, terms and notes in one place. Click a supplier to open it. Suppliers are made inactive rather than deleted, so their history stays.</div>
+      </div>
+      <button class="btn" data-sp="new">+ New supplier</button>
     </div>
+    <div class="crm-filters"><input type="search" id="supSearch" class="crm-search" placeholder="Search suppliers…" autocomplete="off" aria-label="Search suppliers"><span id="supFilters" class="crm-filters-dyn"></span><span class="sup-count" id="supCount"></span></div>
+    <div class="table-scroll" id="suppliersTableWrap"></div>
   </div>
 
   <!-- SETUP & ADMIN -->
@@ -1493,9 +1535,41 @@ function ensureStageModel(o, legacyProb){
   return o;
 }
 
+/* ---------- suppliers: categories are referenced by hidden id, like pipeline stages ---------- */
+const SEED_SUPPLY_CATS = [ ['sc_timber','Timber'], ['sc_fixings','Fixings & hardware'], ['sc_roofing','Roofing'], ['sc_concrete','Concrete & groundworks'],
+  ['sc_glazing','Glazing'], ['sc_plant','Plant & hire'], ['sc_paint','Paint & finishes'], ['sc_electrical','Electrical'], ['sc_other','Other'] ];
+/* Normalises the category list and every supplier (idempotent; used by defaultState() and mergeDefaults() so old backups load cleanly).
+   A supplier: { id, status 'Active'|'Inactive', name, categoryIds[], address, postcode, website, phone, email, accountNo, paymentTerms (days or ''),
+   vatNo, contacts[{ id, name, role, phone, email, primary }], notes[{ date, note, created }] }. The code (SUP-001) comes from the stable id. */
+function ensureSupplierModel(o){
+  const str = v => v == null ? '' : String(v);
+  let cats = Array.isArray(o.supplyCategories) ? o.supplyCategories.filter(c => c && typeof c === 'object' && c.id) : [];
+  if(!cats.length) cats = SEED_SUPPLY_CATS.map(([id, name]) => ({ id, name }));
+  cats = sortByOrder(cats).map(c => ({ id: String(c.id), name: str(c.name).trim() || 'Category' }));
+  renumberStages(cats); o.supplyCategories = cats;
+  const known = new Set(cats.map(c => c.id));
+  o.suppliers = (Array.isArray(o.suppliers) ? o.suppliers : []).filter(s => s && typeof s === 'object');
+  let maxId = 0; o.suppliers.forEach(s => { const n = Math.floor(Number(s.id)); if(n > 0) maxId = Math.max(maxId, n); });
+  const used = new Set();
+  o.suppliers.forEach(s => {
+    let n = Math.floor(Number(s.id)); if(!(n > 0) || used.has(n)) n = ++maxId;
+    used.add(n); s.id = n;
+    s.status = s.status === 'Inactive' ? 'Inactive' : 'Active';
+    ['name', 'address', 'postcode', 'website', 'phone', 'email', 'accountNo', 'vatNo'].forEach(k => { s[k] = str(s[k]); });
+    const pt = parseFloat(s.paymentTerms); s.paymentTerms = (s.paymentTerms === '' || s.paymentTerms == null || isNaN(pt)) ? '' : Math.max(0, Math.round(pt));
+    s.categoryIds = [...new Set((Array.isArray(s.categoryIds) ? s.categoryIds : []).map(String).filter(id => known.has(id)))];
+    s.contacts = (Array.isArray(s.contacts) ? s.contacts : []).filter(c => c && typeof c === 'object').map((c, i) => ({
+      id: (typeof c.id === 'string' && c.id) ? c.id : newContactId() + i, name: str(c.name), role: str(c.role), phone: str(c.phone), email: str(c.email), primary: !!c.primary }));
+    if(s.contacts.length){ const first = s.contacts.find(c => c.primary) || s.contacts[0]; s.contacts.forEach(c => { c.primary = (c === first); }); }
+    s.notes = (Array.isArray(s.notes) ? s.notes : []).filter(n => n && typeof n === 'object').map(n => ({ date: str(n.date), note: str(n.note), created: Number(n.created) || 0 }));
+  });
+  if(!(Number(o.nextSupplierId) > maxId)) o.nextSupplierId = maxId + 1;
+  return o;
+}
+
 /* ---------- default state ---------- */
 function defaultState(){
-  return ensureTaskModel(ensureStageModel({
+  return ensureSupplierModel(ensureTaskModel(ensureStageModel({
     startingCash: 2000,
     settings: {
       tradeAccountDays: 30,
@@ -1627,8 +1701,9 @@ function defaultState(){
       { dateRaised: '2026-09-01', action: 'Prioritise outdoor structure / BBQ area leads in the pipeline', owner: 'TBC', owner2: '', deadline: '', priority: 2, status: 'Not Started', notes: 'Strong niche — suits higher-end clients and Lynton\'s creative style' }
     ],
     archivedActions: [],
-    crmTasks: [], nextTaskNo: 1, crmPrefs: { hiddenCols: [] }
-  }));
+    crmTasks: [], nextTaskNo: 1, crmPrefs: { hiddenCols: [] },
+    suppliers: [], nextSupplierId: 1
+  })));
 }
 
 let state = null;
@@ -1654,7 +1729,7 @@ function mergeDefaults(loaded){
   out.tableModes = Object.assign({}, loaded.tableModes || {});
   out.colWidths = Object.assign({}, loaded.colWidths || {});
   out.settings = Object.assign({}, d.settings, loaded.settings || {});
-  ['goals','pricingTiers','pipeline','capability','network','milestones','admin','actions','archivedActions','leads','projects','transactions','tiers','crmTasks'].forEach(k => {
+  ['goals','pricingTiers','pipeline','capability','network','milestones','admin','actions','archivedActions','leads','projects','transactions','tiers','crmTasks','suppliers'].forEach(k => {
     if(!Array.isArray(out[k])) out[k] = d[k];
   });
   // stages: seed/normalise the configurable lists and convert any old stage NAMES on records to stage IDs
@@ -1663,6 +1738,7 @@ function mergeDefaults(loaded){
   ensureStageModel(out, (loaded.settings || {}).stageProbability);
   ensureTaskModel(out);   // old backups with no tasks / options / timelines get the seeded defaults
   normaliseLeadContacts(out.leads);   // old backups: blank phone / email, no additional contacts
+  ensureSupplierModel(out);   // old backups: no suppliers, seeded supply categories
   return out;
 }
 /* ---------- storage layer: cloud (Supabase REST) with localStorage fallback ---------- */
@@ -2823,8 +2899,8 @@ function normalisePostcodeInput(v){
   return m ? (m[1] + ' ' + m[2]).toUpperCase() : v.toUpperCase();
 }
 /* newest first by date, then most recently added; entries without a timestamp fall back to array position */
-function sortedComms(l){
-  return (l.comms||[]).map((c,ci)=>({c,ci})).sort((a,b)=>
+function sortedComms(l, key){
+  return (l[key || 'comms']||[]).map((c,ci)=>({c,ci})).sort((a,b)=>
     (b.c.date||'').localeCompare(a.c.date||'') || ((b.c.created||0) - (a.c.created||0)) || (b.ci - a.ci));
 }
 const LEADS_TABLE_ID = 'leadsTableWrap';
@@ -2868,13 +2944,13 @@ function leadDetailHtml(l, i){
 
 function renderLeads(){
   const leadStages = state.pipelineStages.lead;
-  let html = rtTable('leadsTableWrap', ['','Code','Tier','Project name','Contact','Company','Postcode','Last contacted','Lead status',''], 'leads-table' + (lp ? ' lp-on' : ''));
+  let html = rtTable('leadsTableWrap', ['','Code','Tier','Project name','Contact','Company','Postcode','Last contacted','Lead status',''], 'leads-table' + (lp && lp.kind === 'lead' ? ' lp-on' : ''));
   state.leads.forEach((l,i) => {
     if(l.lost) return;   // lost leads live in the Lost leads bar below; i stays the real index into state.leads
     const isOpen = expandedLeads.has(l.id);
     const isCommercial = l.leadType === 'Commercial';
     const last = leadLastContact(l);
-    const active = lp && lp.id === l.id ? ' lead-active' : '';
+    const active = lp && lp.kind === 'lead' && lp.id === l.id ? ' lead-active' : '';
     const qd = leadQualDone(l);
     html += `<tr class="lead-row ${isCommercial?'lead-com':'lead-res'}${active}">
       <td><button class="icon-btn expand${isOpen?' open':''}" data-action="toggle-lead" data-id="${l.id}" title="Detail & comms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></td>
@@ -2907,7 +2983,7 @@ const LP_SECTIONS = [['contact','Contact'],['project','Project'],['location','Lo
 let lp = null;            // { id, idx, type, opener } while open
 let lpInputTimer = null;
 function lpEl(id){ return document.getElementById(id); }
-function lpLead(){ if(!lp) return null; const i = state.leads.findIndex(l => l.id === lp.id && !l.lost); return i < 0 ? null : { l: state.leads[i], i }; }
+function lpLead(){ if(!lp || lp.kind !== 'lead') return null; const i = state.leads.findIndex(l => l.id === lp.id && !l.lost); return i < 0 ? null : { l: state.leads[i], i }; }
 function lpTypeOf(l){ return l.leadType === 'Commercial' ? 'com' : 'res'; }
 function lpFieldHtml(label, inner, extra){ return `<div class="lp-f"${extra || ''}><label>${label}</label>${inner}</div>`; }
 function lpInput(i, f, v, o){
@@ -2993,34 +3069,43 @@ function lpGo(sec, smooth){
   body.scrollTo({ top: Math.max(0, el.offsetTop - 4), behavior: smooth ? 'smooth' : 'auto' });
   el.classList.remove('lp-flash'); void el.offsetWidth; el.classList.add('lp-flash');
 }
-function openLeadPanel(id, sec, withTimeline){
-  const i = state.leads.findIndex(l => l.id === id && !l.lost); if(i < 0) return;
+/* the shared shell: Leads and Suppliers both open here (same slide-in, dimmed page, header band, jump chips, autosave indicator).
+   next = { kind, id, ... } becomes `lp`; cfg = { cls, label, code, chips: [[key, name]], head, body, sec, refresh } */
+function lpOpen(next, cfg){
   const panel = lpEl('lpPanel'), ae = document.activeElement;
-  if(lp && lp.id !== id){ if(ae && panel.contains(ae)) ae.blur(); clearTimeout(lpInputTimer); }   // switching leads: commit what was typed first
+  if(lp && (lp.kind !== next.kind || lp.id !== next.id)){ if(ae && panel.contains(ae)) ae.blur(); clearTimeout(lpInputTimer); }   // switching records: commit what was typed first
   const opener = lp ? lp.opener : ((ae && ae !== document.body && !panel.contains(ae)) ? ae : null);
   const wasOpen = !!lp;
-  lp = { id, idx: i, type: lpTypeOf(state.leads[i]), opener, timeline: !!withTimeline };
-  panel.className = 'lp-panel lc-' + lp.type;
-  lpEl('lpCode').textContent = recordCode(id, 'lead');
+  lp = Object.assign(next, { opener });
+  panel.className = 'lp-panel ' + cfg.cls; panel.setAttribute('aria-label', cfg.label);
+  lpEl('lpCode').textContent = cfg.code;
   lpEl('lpSaved').textContent = ''; lpEl('lpSaved').classList.remove('warn');
-  lpEl('lpChips').innerHTML = LP_SECTIONS.concat(lp.timeline ? [['timeline', 'Timeline']] : []).map(([k, n]) => `<button type="button" data-lp="jump" data-sec="${k}">${n}</button>`).join('');
-  lpEl('lpHeadInfo').innerHTML = lpHeadHtml(state.leads[i]);
-  lpEl('lpBody').innerHTML = lpBodyHtml(state.leads[i], i);
+  lpEl('lpChips').innerHTML = cfg.chips.map(([k, n]) => `<button type="button" data-lp="jump" data-sec="${k}">${n}</button>`).join('');
+  lpEl('lpHeadInfo').innerHTML = cfg.head;
+  lpEl('lpBody').innerHTML = cfg.body;
   lpEl('lpBody').scrollTop = 0;
   panel.hidden = false; lpEl('lpBackdrop').hidden = false;
   if(!wasOpen) document.body.classList.add('lp-open');
-  renderLeads();   // accent the lead's row, dim the others
-  if(sec) lpGo(sec, false);
+  cfg.refresh();   // accent the record's row, dim the others
+  if(cfg.sec) lpGo(cfg.sec, false);
   panel.focus({ preventScroll: true });
+}
+function openLeadPanel(id, sec, withTimeline){
+  const i = state.leads.findIndex(l => l.id === id && !l.lost); if(i < 0) return;
+  const l = state.leads[i], type = lpTypeOf(l), timeline = !!withTimeline;
+  lpOpen({ kind: 'lead', id, idx: i, type, timeline }, {
+    cls: 'lc-' + type, label: 'Edit lead', code: recordCode(id, 'lead'),
+    chips: LP_SECTIONS.concat(timeline ? [['timeline', 'Timeline']] : []), head: lpHeadHtml(l), body: lpBodyHtml(l, i), sec, refresh: renderLeads });
 }
 function closeLeadPanel(){
   if(!lp) return;
   const panel = lpEl('lpPanel'), ae = document.activeElement;
   if(ae && panel.contains(ae) && ae.blur) ae.blur();   // fires 'change' so a half-finished edit is saved
   clearTimeout(lpInputTimer);
-  const { id, opener } = lp; lp = null;
+  const { id, opener, kind } = lp; lp = null;
   panel.hidden = true; lpEl('lpBackdrop').hidden = true;
   document.body.classList.remove('lp-open');
+  if(kind === 'supplier'){ supOnClose(id); const row = document.querySelector(`#suppliersTableWrap tr[data-sup="${id}"]`); const to = (opener && document.contains(opener)) ? opener : row; if(to && to.focus) to.focus({ preventScroll: true }); return; }
   renderLeads();
   const back = (opener && document.contains(opener)) ? opener : document.querySelector(`.lc[data-lead-card="${id}"]`);
   if(back && back.focus) back.focus({ preventScroll: true });
@@ -3028,6 +3113,7 @@ function closeLeadPanel(){
 /* called after every render(): keeps the open panel in step with the data without rebuilding fields the user is typing in */
 function lpSync(){
   if(!lp) return;
+  if(lp.kind === 'supplier'){ supSync(); return; }
   const hit = lpLead();
   if(!hit){ closeLeadPanel(); return; }   // promoted, lost, deleted or reloaded away
   const { l, i } = hit, type = lpTypeOf(l);
@@ -3160,6 +3246,7 @@ const RT_SPECS = {
   pipelineStages:    { cols: [[200,100],[140,90],[128,104],[128,104],[64,48],[100,70],[34,34]], parent: 'pipelineTableWrap' },
   projectsTableWrap: { cols: [[34,34],[100,80],[240,120],[120,90],[200,120],[150,100],[34,34]], nested: ['projectPayments'] },
   projectPayments:   { cols: [[90,72],[220,100],[128,104],[100,72],[128,104],[128,104],[34,34]], parent: 'projectsTableWrap' },
+  suppliersTableWrap: { cols: [[84,64],[210,110],[200,110],[160,90],[120,84],[200,100],[132,72],[92,72]] },
   crmTableWrap:      { cols: [] }   // CRM task list: columns come from the visible-columns menu (see rtCols)
 };
 function rtCols(key){ return key === CRM_TABLE_ID ? crmVisibleCols().map(c => [c.w, c.min]) : RT_SPECS[key].cols; }
@@ -3216,6 +3303,280 @@ document.addEventListener('pointerdown', (e) => {
   document.body.style.cursor = 'col-resize';
   document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
   h.addEventListener('dblclick', () => { widths[idx] = cols[idx][0]; applyAll(); save(); }, { once: true });
+});
+
+/* ---------- Suppliers ----------
+   The list page (searchable, filterable, resizable table) and its editor, which is the same slide-over panel the Leads use (lpOpen).
+   Fields carry data-tab="supplier" / "suppliercontact" / "suppliernote" so they save through applyFieldChange() → render() → saveState(). */
+const SUP_SECTIONS = [['details','Details'],['contacts','Contacts'],['categories','Categories'],['quotes','Quotes & orders'],['notes','Notes']];
+const supUi = { q: '', status: 'active', cats: new Set(), catOpen: false };   // session-only view state
+function supCode(s){ return 'SUP-' + String(s.id || 0).padStart(3, '0'); }
+function supFind(id){ return state.suppliers.find(s => s.id === id) || null; }
+function supOpenId(){ return lp && lp.kind === 'supplier' ? lp.id : 0; }
+function supCatsOf(s){ return state.supplyCategories.filter(c => s.categoryIds.includes(c.id)); }
+function supMainContact(s){ return s.contacts.find(c => c.primary) || s.contacts[0] || null; }
+function supPhone(s){ const c = supMainContact(s); return (c && c.phone) || s.phone || ''; }
+function supEmail(s){ const c = supMainContact(s); return (c && c.email) || s.email || ''; }
+function supPillsHtml(s){ const cs = supCatsOf(s); return cs.length ? `<div class="sup-pills">${cs.map(c => `<span class="sup-pill">${escHtml(c.name)}</span>`).join('')}</div>` : ''; }
+function supStatusHtml(s){ return `<span class="sup-st${s.status === 'Inactive' ? ' off' : ''}">${s.status}</span>`; }
+function supTermsText(s){ return s.paymentTerms === '' ? '' : s.paymentTerms + (s.paymentTerms === 1 ? ' day' : ' days'); }
+function supSearchText(s){
+  return [supCode(s), s.name, s.address, s.postcode, s.website, s.phone, s.email, s.accountNo, s.vatNo, ...supCatsOf(s).map(c => c.name),
+    ...s.contacts.flatMap(c => [c.name, c.role, c.phone, c.email])].join(' ').toLowerCase();
+}
+function supFiltered(){
+  const q = supUi.q.trim().toLowerCase(), open = supOpenId();
+  return state.suppliers.filter(s => {
+    if(s.id === open) return true;   // the one being edited stays in the list until the panel closes, even if an edit moves it out of the filter
+    if(supUi.status === 'active' && s.status !== 'Active') return false;
+    if(supUi.status === 'inactive' && s.status !== 'Inactive') return false;
+    if(supUi.cats.size && !s.categoryIds.some(id => supUi.cats.has(id))) return false;
+    return !q || supSearchText(s).includes(q);
+  }).sort((a, b) => cmpText(a.name, b.name) || a.id - b.id);
+}
+function renderSupFilters(){
+  const el = document.getElementById('supFilters'); if(!el) return;
+  const sel = state.supplyCategories.filter(c => supUi.cats.has(c.id));
+  const lab = !sel.length ? 'All categories' : (sel.length === 1 ? sel[0].name : `${sel[0].name} +${sel.length - 1}`);
+  const menu = supUi.catOpen ? `<div class="crm-colmenu">${state.supplyCategories.length
+    ? state.supplyCategories.map(c => `<label><input type="checkbox" data-sp="cat-filter" data-cat="${escAttr(c.id)}"${supUi.cats.has(c.id) ? ' checked' : ''}> ${escHtml(c.name)}</label>`).join('')
+    : '<div class="lp-empty">No categories yet — add some in Settings.</div>'}${supUi.cats.size ? '<button type="button" class="sp-link sup-menu-clear" data-sp="cat-clear">Clear selection</button>' : ''}</div>` : '';
+  el.innerHTML = `<span class="crm-colwrap"><button type="button" class="btn secondary sup-cat-btn" data-sp="cat-toggle" aria-haspopup="true" aria-expanded="${supUi.catOpen}">${escHtml(lab)} ▾</button>${menu}</span>
+    <div class="view-toggle" role="group" aria-label="Status">${[['active', 'Active'], ['inactive', 'Inactive'], ['all', 'All']].map(([v, n]) => `<button type="button" data-sp="status" data-v="${v}" class="${supUi.status === v ? 'active' : ''}">${n}</button>`).join('')}</div>`;
+}
+function renderSuppliers(){
+  const wrap = document.getElementById('suppliersTableWrap'); if(!wrap) return;
+  supUi.cats = new Set([...supUi.cats].filter(id => state.supplyCategories.some(c => c.id === id)));   // a deleted category drops out of the filter
+  renderSupFilters();
+  const list = supFiltered(), open = supOpenId();
+  const dash = '<span class="v">—</span>';
+  let html = rtTable('suppliersTableWrap', ['Code', 'Supplier', 'Categories', 'Main contact', 'Phone', 'Email', 'Payment terms', 'Status'], 'suppliers-table' + (open ? ' lp-on' : ''));
+  if(!list.length){
+    html += `<tr><td colspan="8"><div class="sup-empty">${state.suppliers.length ? 'No suppliers match these filters.' : 'No suppliers yet — add the first with “+ New supplier”.'}</div></td></tr>`;
+  } else list.forEach(s => {
+    const c = supMainContact(s), cell = (v, cls) => `<td class="sup-cell${v ? '' : ' sup-dim'}${cls ? ' ' + cls : ''}"${v ? ` title="${escAttr(v)}"` : ''}>${v ? escHtml(v) : '—'}</td>`;
+    html += `<tr class="sup-row${open === s.id ? ' sup-active' : ''}" data-sp="open" data-id="${s.id}" data-sup="${s.id}" tabindex="0">
+      <td class="code-cell">${supCode(s)}</td>
+      <td class="sup-cell sup-name${s.name ? '' : ' sup-dim'}"${s.name ? ` title="${escAttr(s.name)}"` : ''}>${escHtml(s.name || '(no name yet)')}</td>
+      <td>${supPillsHtml(s) || '<span class="sup-dim">—</span>'}</td>
+      ${cell(c ? c.name : '')}${cell(supPhone(s))}${cell(supEmail(s))}${cell(supTermsText(s))}
+      <td>${supStatusHtml(s)}</td></tr>`;
+  });
+  wrap.innerHTML = html + '</tbody></table>';
+  rtApply(wrap);
+  const cnt = document.getElementById('supCount');
+  if(cnt) cnt.textContent = state.suppliers.length ? `${list.length} of ${state.suppliers.length} supplier${state.suppliers.length !== 1 ? 's' : ''}` : '';
+}
+
+/* ---- the editor panel ---- */
+function supFieldHtml(label, i, f, v, o){ return lpFieldHtml(label, lpInput(i, f, v, Object.assign({ tab: 'supplier' }, o || {}))); }
+function supEmailFieldHtml(label, i, v, o){
+  return lpFieldHtml(label, lpInput(i, 'email', v, Object.assign({ tab: 'supplier', inputmode: 'email', email: true, ph: 'name@example.com' }, o || {})) +
+    `<div class="lp-warn"${emailLooksOff(v) ? '' : ' hidden'}>This doesn't look like an email address — it will still be saved.</div>`);
+}
+function supContactHtml(s, i, c, ci){
+  const o = { tab: 'suppliercontact', cidx: ci };
+  return `<div class="lp-contact"><div class="lp-contact-top"><span>Contact ${ci + 1}</span><span class="sp-ctl">
+      ${c.primary ? '<span class="sp-primary">Primary</span>' : `<button type="button" class="sp-link" data-sp="primary" data-id="${s.id}" data-cid="${escAttr(c.id)}">Make primary</button>`}
+      <button class="icon-btn" data-sp="del-contact" data-id="${s.id}" data-cid="${escAttr(c.id)}" title="Remove this contact" aria-label="Remove contact">${X_SVG}</button></span></div>
+    ${lpFieldHtml('Name', lpInput(i, 'name', c.name, o))}
+    ${lpFieldHtml('Role (optional)', lpInput(i, 'role', c.role, Object.assign({ ph: 'e.g. Sales desk' }, o)))}
+    ${lpFieldHtml('Phone', lpInput(i, 'phone', c.phone, Object.assign({ type: 'tel', inputmode: 'tel' }, o)))}
+    ${lpFieldHtml('Email', lpInput(i, 'email', c.email, Object.assign({ inputmode: 'email', email: true, ph: 'name@example.com' }, o)) +
+      `<div class="lp-warn"${emailLooksOff(c.email) ? '' : ' hidden'}>This doesn't look like an email address — it will still be saved.</div>`)}
+  </div>`;
+}
+/* Quotes & orders: nothing names a supplier yet. When quote lines do, return one { ref, detail, amount } per line here and the section fills itself in. */
+function supplierQuoteLines(id){ return []; }
+function supQuotesHtml(s){
+  const lines = supplierQuoteLines(s.id);
+  if(!lines.length) return '<div class="sp-q-empty">Recent quotes and orders with this supplier will appear here once quotes name them.</div>';
+  return lines.map(l => `<div class="sp-q-row"><span>${escHtml(l.ref)}${l.detail ? ` <span class="k">${escHtml(l.detail)}</span>` : ''}</span><span>${escHtml(l.amount || '')}</span></div>`).join('');
+}
+function supNotesHtml(s, i){
+  const notes = sortedComms(s, 'notes');
+  return `<div class="lc-note-add sp-note-add" data-sup="${s.id}"><input type="date" data-sc="date" value="${fmt(new Date())}" aria-label="Date"><input type="text" data-sc="note" placeholder="Add a note…" aria-label="Note" maxlength="300"><button class="btn" data-sp="note-add" data-id="${s.id}">Add</button></div>
+    <div class="comms-scroll">${notes.length ? notes.map(({ c, ci }) => `<div class="comm-entry">
+        <input type="date" class="comm-date" data-tab="suppliernote" data-idx="${i}" data-nidx="${ci}" data-field="date" value="${escAttr(c.date)}" aria-label="Date">
+        <input class="comm-note" data-tab="suppliernote" data-idx="${i}" data-nidx="${ci}" data-field="note" value="${escAttr(c.note)}" placeholder="Note" aria-label="Note">
+        <button class="icon-btn" data-sp="del-note" data-id="${s.id}" data-nidx="${ci}" title="Delete note" aria-label="Delete note">${X_SVG}</button></div>`).join('')
+      : '<div class="lp-empty">No notes yet — add the first one above.</div>'}</div>`;
+}
+function supFootHtml(s){
+  return `<div class="sp-foot"><button type="button" class="btn secondary" data-sp="toggle-status" data-id="${s.id}">${s.status === 'Active' ? 'Make inactive' : 'Make active'}</button>
+    <button type="button" class="sp-link danger" data-sp="delete" data-id="${s.id}">Delete supplier…</button></div>`;
+}
+function supBodyHtml(s, i){
+  return `<section class="lp-sec" id="lp-sec-details" data-sec="details"><h3>Details</h3>
+      <div class="lp-f${s.name ? '' : ' missing'}" data-qf="name"><label>Supplier name (required)</label>${lpInput(i, 'name', s.name, { tab: 'supplier', ph: 'e.g. Jewson' })}<div class="lp-warn"${s.name ? ' hidden' : ''}>A supplier needs a name.</div></div>
+      ${lpFieldHtml('Status', `<select data-tab="supplier" data-idx="${i}" data-field="status"><option${s.status === 'Active' ? ' selected' : ''}>Active</option><option${s.status === 'Inactive' ? ' selected' : ''}>Inactive</option></select>`)}
+      ${lpFieldHtml('Address', `<textarea rows="3" data-tab="supplier" data-idx="${i}" data-field="address" placeholder="Street, town">${escHtml(s.address)}</textarea>`)}
+      ${supFieldHtml('Postcode', i, 'postcode', s.postcode, { cls: 'lp-pc' })}
+      ${supFieldHtml('Website', i, 'website', s.website, { inputmode: 'url', ph: 'www.example.com' })}
+      ${supFieldHtml('Main phone', i, 'phone', s.phone, { type: 'tel', inputmode: 'tel' })}
+      ${supEmailFieldHtml('General email', i, s.email)}
+      ${supFieldHtml('Account number', i, 'accountNo', s.accountNo)}
+      ${lpFieldHtml('Payment terms (days)', `<input type="number" min="0" step="1" inputmode="numeric" data-tab="supplier" data-idx="${i}" data-field="paymentTerms" value="${s.paymentTerms}" placeholder="e.g. 30">`)}
+      ${supFieldHtml('VAT number', i, 'vatNo', s.vatNo, { ph: 'GB…' })}
+    </section>
+    <section class="lp-sec" id="lp-sec-contacts" data-sec="contacts"><h3>Contacts</h3>
+      ${s.contacts.length ? s.contacts.map((c, ci) => supContactHtml(s, i, c, ci)).join('') : '<div class="lp-empty">No contacts yet.</div>'}
+      <button class="btn secondary" data-sp="add-contact" data-id="${s.id}">+ Add contact</button>
+    </section>
+    <section class="lp-sec" id="lp-sec-categories" data-sec="categories"><h3>Categories</h3>
+      ${state.supplyCategories.length ? state.supplyCategories.map(c => `<label class="sp-check"><input type="checkbox" data-sp="cat" data-id="${s.id}" data-cat="${escAttr(c.id)}"${s.categoryIds.includes(c.id) ? ' checked' : ''}> ${escHtml(c.name)}</label>`).join('')
+        : '<div class="lp-empty">No categories yet — add some under Settings → Supply categories.</div>'}
+    </section>
+    <section class="lp-sec" id="lp-sec-quotes" data-sec="quotes"><h3>Quotes &amp; orders</h3><div id="spQuotes">${supQuotesHtml(s)}</div></section>
+    <section class="lp-sec" id="lp-sec-notes" data-sec="notes"><h3>Notes</h3><div id="spNotes">${supNotesHtml(s, i)}</div></section>
+    ${supFootHtml(s)}`;
+}
+function supHeadHtml(s){
+  return `<div class="lp-title${s.name ? '' : ' empty'}">${escHtml(s.name || 'New supplier')}</div><div class="lp-sub">${supStatusHtml(s)}${supPillsHtml(s)}</div>`;
+}
+function supRenderBody(keepScroll){
+  const s = supFind(lp && lp.id); if(!s) return;
+  const body = lpEl('lpBody'), top = body.scrollTop;
+  body.innerHTML = supBodyHtml(s, state.suppliers.indexOf(s));
+  if(keepScroll) body.scrollTop = top;
+}
+function supRenderNotes(){
+  const s = supFind(lp && lp.id), box = lpEl('spNotes'); if(!s || !box) return;
+  box.innerHTML = supNotesHtml(s, state.suppliers.indexOf(s));
+}
+function openSupplierPanel(id, sec){
+  const s = supFind(id); if(!s) return;
+  const i = state.suppliers.indexOf(s);
+  lpOpen({ kind: 'supplier', id, idx: i }, { cls: 'lc-sup', label: 'Edit supplier', code: supCode(s), chips: SUP_SECTIONS, head: supHeadHtml(s), body: supBodyHtml(s, i), sec, refresh: renderSuppliers });
+}
+/* called after every render() while the supplier panel is open: header, status controls and the name warning follow the data without rebuilding fields being typed in */
+function supSync(){
+  const i = state.suppliers.findIndex(s => s.id === lp.id);
+  if(i < 0){ closeLeadPanel(); return; }   // deleted
+  const s = state.suppliers[i];
+  if(i !== lp.idx){ lp.idx = i; supRenderBody(true); }
+  lpEl('lpHeadInfo').innerHTML = supHeadHtml(s);
+  const body = lpEl('lpBody');
+  const sel = body.querySelector('select[data-field="status"]'); if(sel && document.activeElement !== sel) sel.value = s.status;
+  const tog = body.querySelector('[data-sp="toggle-status"]'); if(tog) tog.textContent = s.status === 'Active' ? 'Make inactive' : 'Make active';
+}
+/* closing: a brand-new supplier that was never filled in is discarded (its code is handed back); one with details but no name is kept and flagged */
+function supOnClose(id){
+  const s = supFind(id);
+  if(s && !s.name.trim()){
+    const blank = !s.address && !s.postcode && !s.website && !s.phone && !s.email && !s.accountNo && !s.vatNo && s.paymentTerms === '' && !s.categoryIds.length && !s.contacts.length && !s.notes.length;
+    if(blank){
+      state.suppliers.splice(state.suppliers.indexOf(s), 1);
+      if(s.id === state.nextSupplierId - 1) state.nextSupplierId--;
+      render(); saveState(); return;
+    }
+    showToast('Saved without a name — add one so it is easy to find');
+  }
+  renderSuppliers();
+}
+function newSupplier(){
+  const s = { id: state.nextSupplierId++, status: 'Active', name: '', categoryIds: [], address: '', postcode: '', website: '', phone: '', email: '', accountNo: '', paymentTerms: '', vatNo: '', contacts: [], notes: [] };
+  state.suppliers.push(s); render(); saveState();
+  openSupplierPanel(s.id, 'details');
+  const n = lpEl('lpBody').querySelector('input[data-field="name"]'); if(n) n.focus();
+}
+function applySupplierField(el){
+  const s = state.suppliers[Number(el.dataset.idx)]; if(!s) return;
+  const tab = el.dataset.tab, f = el.dataset.field, v = el.value;
+  if(tab === 'supplier'){
+    if(f === 'name'){ if(v.trim()) s.name = v.trim(); }   // a name is required: clearing the box never wipes the saved one
+    else if(f === 'status') s.status = v === 'Inactive' ? 'Inactive' : 'Active';
+    else if(f === 'paymentTerms'){ const n = parseFloat(v); s.paymentTerms = (v === '' || isNaN(n)) ? '' : Math.max(0, Math.round(n)); }
+    else if(f === 'postcode') s.postcode = normalisePostcodeInput(v);
+    else if(['address', 'website', 'phone', 'email', 'accountNo', 'vatNo'].includes(f)) s[f] = v;
+  } else if(tab === 'suppliercontact'){
+    const c = s.contacts[Number(el.dataset.cidx)]; if(c && ['name', 'role', 'phone', 'email'].includes(f)) c[f] = v;
+  } else if(tab === 'suppliernote'){
+    const n = s.notes[Number(el.dataset.nidx)]; if(n && ['date', 'note'].includes(f)) n[f] = v;
+  }
+}
+/* nothing points at suppliers yet. When quote lines, orders or transactions start naming one, push a short description of each reference here — delete is then blocked automatically */
+function supplierReferences(id){
+  const refs = [];
+  return refs;
+}
+async function deleteSupplier(id){
+  const s = supFind(id); if(!s) return;
+  const label = s.name || supCode(s), refs = supplierReferences(id);
+  if(refs.length){ alert(`“${label}” can't be deleted because it is used by ${refs.join(', ')}. Make it inactive instead — it keeps its history and drops off the default list.`); return; }
+  const ok = await showConfirm(`Delete “${label}”?`, 'This permanently removes the supplier with its contacts and notes, and cannot be undone. Making it inactive keeps everything and just hides it from the default list.');
+  if(!ok) return;
+  const at = state.suppliers.findIndex(x => x.id === id); if(at < 0) return;
+  state.suppliers.splice(at, 1); render(); saveState(); showToast('Supplier deleted');
+}
+function addSupplierNote(box){
+  if(!box) return;
+  const s = supFind(Number(box.dataset.sup)); if(!s) return;
+  const dateEl = box.querySelector('[data-sc="date"]'), noteEl = box.querySelector('[data-sc="note"]'), note = noteEl.value.trim();
+  if(!note){ noteEl.focus(); return; }
+  s.notes.push({ date: dateEl.value || fmt(new Date()), note, created: Date.now() });   // created stamp keeps same-day notes newest first
+  render(); saveState(); supRenderNotes();
+  const again = document.querySelector('#spNotes [data-sc="note"]'); if(again) again.focus();
+}
+document.getElementById('supSearch').addEventListener('input', (e) => { supUi.q = e.target.value; renderSuppliers(); });
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  if(supUi.catOpen && !t.closest('.crm-colwrap')){ supUi.catOpen = false; renderSupFilters(); }
+  const b = t.closest('[data-sp]'); if(!b) return;
+  const a = b.dataset.sp, id = Number(b.dataset.id), s = supFind(id);
+  if(a === 'open'){ if(t.closest('.col-handle')) return; openSupplierPanel(id); }
+  else if(a === 'new') newSupplier();
+  else if(a === 'cat-toggle'){ supUi.catOpen = !supUi.catOpen; renderSupFilters(); }
+  else if(a === 'cat-clear'){ supUi.cats.clear(); renderSuppliers(); }
+  else if(a === 'cat-filter'){
+    if(b.checked) supUi.cats.add(b.dataset.cat); else supUi.cats.delete(b.dataset.cat);
+    renderSuppliers();
+    const again = document.querySelector(`#supFilters input[data-cat="${b.dataset.cat}"]`); if(again) again.focus();
+  }
+  else if(a === 'status'){ supUi.status = b.dataset.v; renderSuppliers(); }
+  else if(!s) return;
+  else if(a === 'cat'){
+    const cid = b.dataset.cat, has = s.categoryIds.includes(cid);
+    if(b.checked && !has) s.categoryIds.push(cid); else if(!b.checked && has) s.categoryIds = s.categoryIds.filter(x => x !== cid);
+    render(); saveState();
+  }
+  else if(a === 'add-contact'){
+    s.contacts.push({ id: newContactId(), name: '', role: '', phone: '', email: '', primary: s.contacts.length === 0 });
+    render(); saveState(); supRenderBody(true);
+    const cards = document.querySelectorAll('#lpBody .lp-contact'), last = cards[cards.length - 1];
+    if(last){ const f = last.querySelector('input'); if(f) f.focus(); }
+  }
+  else if(a === 'primary'){ s.contacts.forEach(c => { c.primary = (c.id === b.dataset.cid); }); render(); saveState(); supRenderBody(true); }
+  else if(a === 'del-contact'){
+    const ci = s.contacts.findIndex(c => c.id === b.dataset.cid); if(ci < 0) return;
+    const gone = s.contacts.splice(ci, 1)[0], promoted = (gone.primary && s.contacts.length) ? s.contacts[0] : null;
+    if(promoted) promoted.primary = true;   // there is always one primary while any contact exists
+    render(); saveState(); supRenderBody(true);
+    showToast('Contact removed', () => { const x = supFind(id); if(!x) return; if(promoted) promoted.primary = false; x.contacts.splice(Math.min(ci, x.contacts.length), 0, gone); render(); saveState(); if(supOpenId() === id) supRenderBody(true); });
+  }
+  else if(a === 'note-add') addSupplierNote(b.closest('.sp-note-add'));
+  else if(a === 'del-note'){
+    const ni = Number(b.dataset.nidx); if(!s.notes[ni]) return;
+    const gone = s.notes.splice(ni, 1)[0];
+    render(); saveState(); supRenderNotes();
+    showToast('Note removed', () => { const x = supFind(id); if(!x) return; x.notes.push(gone); render(); saveState(); if(supOpenId() === id) supRenderNotes(); });
+  }
+  else if(a === 'toggle-status'){ s.status = s.status === 'Active' ? 'Inactive' : 'Active'; render(); saveState(); }
+  else if(a === 'delete') deleteSupplier(id);
+});
+document.addEventListener('keydown', (e) => {
+  const t = e.target;
+  if(e.key === 'Enter' && t.dataset && t.dataset.sc === 'note'){ e.preventDefault(); addSupplierNote(t.closest('.sp-note-add')); }
+  else if((e.key === 'Enter' || e.key === ' ') && t.matches && t.matches('tr.sup-row')){ e.preventDefault(); openSupplierPanel(Number(t.dataset.id)); }
+});
+document.addEventListener('input', (e) => {   // the name is required: show the hint straight away while typing
+  const el = e.target; if(!lp || lp.kind !== 'supplier' || !el.dataset || el.dataset.tab !== 'supplier' || el.dataset.field !== 'name') return;
+  const w = lpEl('lpBody').querySelector('[data-qf="name"]'), empty = !el.value.trim();
+  if(w){ w.classList.toggle('missing', empty); const h = w.querySelector('.lp-warn'); if(h) h.hidden = !empty; }
+});
+document.addEventListener('change', (e) => {   // leaving the name box empty puts the saved name back
+  const el = e.target; if(!el.dataset || el.dataset.tab !== 'supplier' || el.dataset.field !== 'name' || el.value.trim()) return;
+  const s = state.suppliers[Number(el.dataset.idx)]; if(s && s.name) el.value = s.name;
 });
 
 /* ---------- Project Pipeline ---------- */
@@ -3289,8 +3650,8 @@ const UP_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strok
 const DOWN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
 const X_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 let _focusListItem = null;   // id of a just-added stage/reason, focused after the re-render
-/* pl = 'lead' | 'sales' | 'project' | 'reasons' — one editor for all four lists */
-function listFor(pl){ return pl === 'reasons' ? state.lostReasons : state.pipelineStages[pl]; }
+/* pl = 'lead' | 'sales' | 'project' | 'reasons' | 'supplycats' — one editor for all five lists */
+function listFor(pl){ return pl === 'reasons' ? state.lostReasons : (pl === 'supplycats' ? state.supplyCategories : state.pipelineStages[pl]); }
 function stageRowsHtml(pl){
   const list = listFor(pl), hasPct = pl === 'sales';
   return `<div class="stage-head${hasPct?' has-pct':''}"><span>Order</span><span>Name</span>${hasPct?'<span>Win %</span>':''}<span></span></div>
@@ -3319,21 +3680,27 @@ function renderStageCards(){
     <p style="font-size:12.5px;color:var(--muted);margin:0 0 4px;line-height:1.55;">The reasons offered when you mark a lead as lost.</p>
     <div style="max-width:420px;">${stageRowsHtml('reasons')}
     <button class="btn secondary" data-action="stage-add" data-pl="reasons">+ Add reason</button></div>`;
+  document.getElementById('supplyCatsCard').innerHTML = `
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 4px;line-height:1.55;">The categories offered on each supplier. Rename, reorder, add or delete them — suppliers keep their place because they follow a category's hidden id, not its name. Deleting a category in use asks where to move those suppliers.</p>
+    <div style="max-width:420px;">${stageRowsHtml('supplycats')}
+    <button class="btn secondary" data-action="stage-add" data-pl="supplycats">+ Add category</button></div>`;
   if(_focusListItem){
     const el = document.querySelector(`#panel-settings input[data-tab="stagename"][data-id="${_focusListItem}"]`);
     if(el){ el.focus(); el.select(); }
     _focusListItem = null;
   }
 }
+function newSupplyCatId(){ let id; do { id = 'sc_' + Math.random().toString(36).slice(2,8); } while(state.supplyCategories.some(c => c.id === id)); return id; }
 function stageHolders(pl, id){
   if(pl === 'lead') return state.leads.filter(l => l.stageId === id || l.lostStageId === id);
   if(pl === 'sales') return state.pipeline.filter(r => r.stageId === id);
   if(pl === 'project') return state.projects.filter(p => p.stageId === id);
+  if(pl === 'supplycats') return state.suppliers.filter(s => s.categoryIds.includes(id));
   return state.leads.filter(l => l.lost && l.lostReason === id);   // reasons
 }
 function addStageItem(pl){
-  const id = pl === 'reasons' ? 'lr_' + Math.random().toString(36).slice(2,8) : newStageId(state);
-  const item = { id, name: pl === 'reasons' ? 'New reason' : 'New stage' };
+  const id = pl === 'reasons' ? 'lr_' + Math.random().toString(36).slice(2,8) : (pl === 'supplycats' ? newSupplyCatId() : newStageId(state));
+  const item = { id, name: pl === 'reasons' ? 'New reason' : (pl === 'supplycats' ? 'New category' : 'New stage') };
   if(pl === 'sales') item.pct = 0;
   const list = listFor(pl); list.push(item); renumberStages(list);
   _focusListItem = id; render(); saveState();
@@ -3345,18 +3712,19 @@ function moveStageItem(pl, id, dir){
 }
 async function deleteStageItem(pl, id){
   const list = listFor(pl), idx = list.findIndex(x => x.id === id); if(idx < 0) return;
-  const item = list[idx], noun = pl === 'reasons' ? 'reason' : 'stage';
+  const item = list[idx], noun = pl === 'reasons' ? 'reason' : (pl === 'supplycats' ? 'category' : 'stage');
   if(list.length <= 1){ alert(`A list needs at least one ${noun} — add another before deleting “${item.name}”.`); return; }
   const holders = stageHolders(pl, id), n = holders.length;
   if(n){
     const others = list.filter(x => x.id !== id);
-    const holds = pl === 'reasons' ? 'lost lead' : 'record';
+    const holds = pl === 'reasons' ? 'lost lead' : (pl === 'supplycats' ? 'supplier' : 'record');
     const opts = others.map(x => `<option value="${escHtml(x.id)}">${escHtml(x.name)}</option>`).join('');
-    const ok = await showConfirm(`Delete “${item.name}”?`, `${n} ${holds}${n!==1?'s':''} ${pl==='reasons' ? (n!==1?'use':'uses') + ' this reason' : (n!==1?'are':'is') + ' in this stage'}. Move ${n!==1?'them':'it'} to:`, `<select id="stageMoveTo">${opts}</select>`);
+    const ok = await showConfirm(`Delete “${item.name}”?`, `${n} ${holds}${n!==1?'s':''} ${pl==='reasons' ? (n!==1?'use':'uses') + ' this reason' : (pl==='supplycats' ? (n!==1?'use':'uses') + ' this category' : (n!==1?'are':'is') + ' in this stage')}. Move ${n!==1?'them':'it'} to:`, `<select id="stageMoveTo">${opts}</select>`);
     if(!ok) return;
     const dest = others.some(x => x.id === _confirmExtraValue) ? _confirmExtraValue : others[0].id;
     holders.forEach(r => {
       if(pl === 'reasons') r.lostReason = dest;
+      else if(pl === 'supplycats') r.categoryIds = [...new Set(r.categoryIds.map(c => c === id ? dest : c))];
       else { if(r.stageId === id) r.stageId = dest; if(r.lostStageId === id) r.lostStageId = dest; }
     });
   }
@@ -4562,6 +4930,7 @@ function render(){
   renderDashboard();
   renderBusinessPlan();
   renderLeads();
+  renderSuppliers();
   renderPipeline();
   renderProjects();
   renderAllPipelineViews();
@@ -4651,6 +5020,7 @@ function applyFieldChange(el){
     else { l.postcodeManual = true; l.postcode = normalisePostcodeInput(value); }
   }
   else if(tab==='leadcontact'){ const l = state.leads[Number(el.dataset.idx)], c = l && l.contacts && l.contacts[Number(el.dataset.cidx)]; if(c) c[field] = value; }
+  else if(tab==='supplier' || tab==='suppliercontact' || tab==='suppliernote') applySupplierField(el);
   else { const idx = Number(el.dataset.idx); if(state[tab] && state[tab][idx]) state[tab][idx][field] = value; }
   render();
   saveState();
