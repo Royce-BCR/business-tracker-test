@@ -888,8 +888,52 @@
   tr.archiving td { background: #f0eee9 !important; }
 
   /* modal */
-  #qtTermsCard input:not([type=checkbox]), #qtTermsCard select { border: 1px solid var(--line); background: #fff; padding: 7px 8px; }
-  #qtTermsCard .lp-f > label { text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; }
+  #qtBizCard input, #qtBizCard textarea, #qtTermsCard input:not([type=checkbox]), #qtTermsCard select { border: 1px solid var(--line); background: #fff; padding: 7px 8px; }
+  #qtBizCard .lp-f > label, #qtTermsCard .lp-f > label { text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; }
+  .q-fixed { font-size: 13.5px; font-weight: 600; padding: 7px 0; }
+  .terms-doc .t-biz { margin-bottom: 2px; }
+  .terms-doc .t-bn { font-family: var(--serif); font-size: 24px; font-weight: 600; }
+  .terms-doc .t-tag { font-size: 12.5px; color: var(--muted); font-style: italic; }
+  .quotes-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; font-size: 12.5px; }
+  .quotes-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .quotes-table td { padding: 9px 10px; border-bottom: 1px solid #efece6; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+  .quotes-table tr.sup-row { cursor: pointer; } .quotes-table tr.sup-row:hover { background: #faf8f4; }
+  .q-strong { font-weight: 600; } .q-num { text-align: right; font-variant-numeric: tabular-nums; }
+  .q-st { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: #eceae5; color: #5a564e; }
+  .q-st-Sent { background: #e6ecf5; color: #4a6b8a; } .q-st-Accepted { background: #d5ecd9; color: #1e5c2e; } .q-st-Declined { background: #f3dedb; color: #8a3a34; } .q-st-Expired { background: #fbf1cf; color: #8a5a1c; }
+  .qb-scroll { overflow-x: auto; }
+  .qb-head .qb-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+  .qb-ref { font-family: var(--serif); font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .qb-mode { font-family: inherit; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: #fbf1cf; color: #8a5a1c; }
+  .qb-mode.new { background: #d5ecd9; color: #1e5c2e; }
+  .qb-acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .qb-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0 18px; }
+  .qb-grid .qb-wide { grid-column: span 3; }
+  .qb-head input, .qb-head select, .qb-head textarea { border: 1px solid var(--line); background: #fff; padding: 7px 8px; }
+  .qb-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .qb-tile { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .qb-tile.big { border-color: var(--secondary, #a8763e); }
+  .qb-tl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+  .qb-tv { font-family: var(--serif); font-size: 20px; font-weight: 600; margin-top: 2px; } .qb-ts { font-size: 11.5px; color: var(--muted); min-height: 14px; }
+  .qb-sec-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; } .qb-sec-h h3 { margin: 0; font-family: var(--serif); font-size: 17px; }
+  .qb-sec-tools { display: flex; gap: 8px; align-items: center; } .qb-sec-tools select { width: auto; border: 1px solid var(--line); background: #fff; padding: 7px 8px; }
+  .qb-table { border-collapse: separate; border-spacing: 0; min-width: 100%; font-size: 12.5px; }
+  .qb-table th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); padding: 8px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; background: #faf8f4; position: sticky; top: 0; }
+  .qb-table td { padding: 4px 5px; border-bottom: 1px solid #efece6; background: #fff; vertical-align: middle; }
+  .qb-table input, .qb-table select { border: 1px solid var(--line); background: #fff; padding: 6px 6px; min-width: 70px; } .qb-table input.qb-n { min-width: 62px; width: 72px; text-align: right; }
+  .qb-table input[type=checkbox] { width: auto; min-width: 0; }
+  .qb-sticky-l { position: sticky; left: 0; z-index: 2; min-width: 240px; box-shadow: 1px 0 0 var(--line); } .qb-sticky-r { position: sticky; right: 0; z-index: 2; box-shadow: -1px 0 0 var(--line); }
+  .qb-table th.qb-sticky-l, .qb-table th.qb-sticky-r { z-index: 3; }
+  .qb-desc input { min-width: 230px; } .qb-calc { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; padding-right: 8px !important; } .qb-cost { font-weight: 700; } .qb-c { text-align: center; } .qb-dim { color: var(--muted); }
+  .qb-pc { position: relative; } .qb-pc.best { background: #e4f0e6; } .qb-pc.best input { border-color: #9fcfa8; background: #f3faf4; } .qb-pc.sel input { font-weight: 700; }
+  .qb-stale { position: absolute; top: 1px; right: 3px; font-size: 9px; background: #fbf1cf; color: #8a5a1c; border-radius: 4px; padding: 0 4px; } .qb-stale[hidden] { display: none; }
+  .qb-supcol { position: relative; padding-right: 20px !important; } .qb-x { border: 0; background: none; cursor: pointer; color: var(--muted); font-size: 14px; position: absolute; right: 3px; top: 4px; }
+  .qb-rowacts { white-space: nowrap; } .qb-ra { display: flex; gap: 4px; align-items: center; flex-wrap: nowrap; } .qb-ra .btn { white-space: nowrap; width: auto; } .qb-sm { padding: 4px 8px; font-size: 11.5px; }
+  .qb-narrow { min-width: 0; } .qb-warn { color: #8a5a1c; font-size: 12px; } .qb-warnrow td { background: #fbf6e6 !important; }
+  .qb-sum { width: 100%; max-width: 420px; border-collapse: collapse; } .qb-sum td { padding: 6px 4px; border-bottom: 1px solid #efece6; } .qb-sum-strong td { font-weight: 700; }
+  .q-tl-d { display: inline-block; width: 100px; color: var(--muted); } .q-tl-n { font-size: 13px; }
+  .ql-price { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; } .ql-pr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 0; }
+  @media (max-width: 700px) { .qb-grid { grid-template-columns: 1fr; } .qb-grid .qb-wide { grid-column: span 1; } }
   .q-help { font-size: 12px; color: var(--muted); margin: 4px 0 0; line-height: 1.45; }
   .q-err { font-size: 12px; color: #b3453f; margin: 4px 0 0; }
   .q-err:empty { display: none; }
@@ -1259,7 +1303,7 @@
 
   <div class="nav-group g-revenue">
     <div class="nav-label">Revenue</div>
-    <div class="tab g-revenue" data-tab="quotations">Quotations</div>
+    <div class="tab g-revenue" data-tab="quotations">Quotes</div>
     <div class="tab g-revenue" data-tab="revenue">Revenue Forecast</div>
   </div>
 
@@ -1537,6 +1581,9 @@
         </section>
 
         <section class="set-sec" data-sec="quotes">
+    <div class="section-label">Business details</div>
+    <div class="card" id="qtBizCard"></div>
+
     <div class="section-label">Quotes and terms</div>
     <div class="card" id="qtTermsCard"></div>
 
@@ -1614,12 +1661,20 @@ create policy "app update" on tracker_data for update using (true) with check (t
     </div>
   </div>
 
-  <!-- QUOTATIONS (placeholder) -->
+  <!-- QUOTES -->
   <div class="panel" id="panel-quotations">
-    <div class="page-head">
-      <h2>Quotations</h2>
-      <div class="desc">Quotations will be built here. Quick estimates and project quotes, with approval and sending.</div>
+    <div id="quoteListView">
+      <div class="page-head crm-head">
+        <div>
+          <h2>Quotes</h2>
+          <div class="desc">Build a quote from supplier prices, labour and delivery. Click a quote to open the builder.</div>
+        </div>
+        <button class="btn" data-qba="new">+ New quote</button>
+      </div>
+      <div class="crm-filters"><input type="search" id="quoteSearch" class="crm-search" placeholder="Search quotes…" autocomplete="off" aria-label="Search quotes"><span id="quoteFilters" class="crm-filters-dyn"></span><span class="sup-count" id="quoteCount"></span></div>
+      <div class="qb-scroll" id="quoteListWrap"></div>
     </div>
+    <div id="quoteBuilderView" hidden></div>
   </div>
 
   <!-- SUPPLIERS -->
@@ -1885,6 +1940,7 @@ function ensureSupplierModel(o){
    complaintDays, complaintDayType 'working'|'calendar', vatRegistered, vatNumber, vatRate, labourRateHour/HalfDay/Day, labourProfitPct, materialsMarkupPct).
    Trade payment days reuses the existing settings.tradeAccountDays. state.quoteUnits = [{ id, name }]; state.lineCategories = [{ id, name, wastagePct }].
    Idempotent; used by defaultState() and mergeDefaults() so old backups get the defaults and nothing is dropped. */
+const BIZ_DEFAULTS = { bizTagline: 'Outdoor spaces. Built to last.', bizAddress: 'Orchard Hill, Cuttsheath Road, Buckover, Wotton-Under-Edge, GL12 8QL', bizPhone: '07384 903680', bizEmail: 'brookwood.rural@gmail.com' };
 const SEED_UNITS = ['each','m','m2','m3','kg','bag','pack','hour','day','load'];
 const SEED_LINE_CATS = [['lc_timber','Timber'],['lc_fixings','Fixings'],['lc_concrete','Concrete and aggregates'],['lc_paint','Paint and finishes'],['lc_plant','Plant hire'],['lc_labour','Labour'],['lc_delivery','Delivery'],['lc_other','Other']];
 const INSURANCE_ACTION_TITLE = 'Set up and confirm insurance levels';
@@ -1894,6 +1950,7 @@ function ensureQuoteModel(o, seedAction){
   const st = (o.settings && typeof o.settings === 'object') ? o.settings : (o.settings = {});
   const str = v => v == null ? '' : String(v);
   const intOr = (v, def, min) => { const n = Math.round(Number(v)); return (v === '' || v == null || isNaN(n) || n < min) ? def : n; };
+  Object.keys(BIZ_DEFAULTS).forEach(k => { st[k] = typeof st[k] === 'string' ? st[k] : BIZ_DEFAULTS[k]; });   // missing = the default; a saved blank stays blank
   st.quotePrefix = str(st.quotePrefix).trim() || 'BWR';
   st.quoteValidityDays = intOr(st.quoteValidityDays, 30, 1);
   st.guaranteeMonths = intOr(st.guaranteeMonths, 12, 1);
@@ -1928,7 +1985,7 @@ function ensureQuoteModel(o, seedAction){
 
 /* ---------- default state ---------- */
 function defaultState(){
-  return ensureQuoteModel(ensureSupplierModel(ensureTaskModel(ensureStageModel({
+  return ensureQuoteDocModel(ensureQuoteModel(ensureSupplierModel(ensureTaskModel(ensureStageModel({
     startingCash: 2000,
     settings: {
       tradeAccountDays: 30,
@@ -2063,8 +2120,9 @@ function defaultState(){
     archivedActions: [],
     crmTasks: [], nextTaskNo: 1, crmPrefs: { hiddenCols: [] },
     suppliers: [], nextSupplierId: 1,
-    branding: defaultBranding()
-  }))), true);
+    branding: defaultBranding(),
+    quotes: [], nextQuoteId: 1, nextJobNumber: 1
+  }))), true), true);
 }
 
 let state = null;
@@ -2102,7 +2160,10 @@ function mergeDefaults(loaded){
   normaliseLeadContacts(out.leads);   // old backups: blank phone / email, no additional contacts
   ensureSupplierModel(out);   // old backups: no suppliers, seeded supply categories
   out.settings.insuranceActionSeeded = !!(loaded.settings && loaded.settings.insuranceActionSeeded);   // the flag comes from the saved data, never from the defaults
+  if(!Array.isArray(loaded.quotes)){ out.quotes = []; out.nextQuoteId = 1; out.nextJobNumber = 1; }   // old backups: no quotes yet (not the sample ones from the defaults)
+  out.settings.quoteSampleSeeded = !!(loaded.settings && loaded.settings.quoteSampleSeeded);
   ensureQuoteModel(out, true);   // old backups: quote settings, units and line categories get defaults; the insurance Action is added once
+  ensureQuoteDocModel(out, true);   // quotes: normalise, and load the sample quote once
   out.branding = normaliseBranding(loaded.branding);   // old backups: default name and font, no logos
   return out;
 }
@@ -3756,6 +3817,7 @@ function closeLeadPanel(){
   const { id, opener, kind } = lp; lp = null;
   panel.hidden = true; lpEl('lpBackdrop').hidden = true;
   document.body.classList.remove('lp-open');
+  if(kind === 'qline'){ renderQuotes(); const back = (opener && document.contains(opener)) ? opener : null; if(back && back.focus) back.focus({ preventScroll: true }); return; }
   if(kind === 'supplier'){ supOnClose(id); const row = document.querySelector(`#suppliersTableWrap tr[data-sup="${id}"]`); const to = (opener && document.contains(opener)) ? opener : row; if(to && to.focus) to.focus({ preventScroll: true }); return; }
   renderLeads();
   const back = (opener && document.contains(opener)) ? opener : document.querySelector(`.lc[data-lead-card="${id}"]`);
@@ -3765,6 +3827,7 @@ function closeLeadPanel(){
 function lpSync(){
   if(!lp) return;
   if(lp.kind === 'supplier'){ supSync(); return; }
+  if(lp.kind === 'qline'){ qlSync(); return; }
   const hit = lpLead();
   if(!hit){ closeLeadPanel(); return; }   // promoted, lost, deleted or reloaded away
   const { l, i } = hit, type = lpTypeOf(l);
@@ -4040,7 +4103,7 @@ function supContactHtml(s, i, c, ci){
   </div>`;
 }
 /* Quotes & orders: nothing names a supplier yet. When quote lines do, return one { ref, detail, amount } per line here and the section fills itself in. */
-function supplierQuoteLines(id){ return []; }
+function supplierQuoteLines(id){ return qSupplierUses(id); }
 function supQuotesHtml(s){
   const lines = supplierQuoteLines(s.id);
   if(!lines.length) return '<div class="sp-q-empty">Recent quotes and orders with this supplier will appear here once quotes name them.</div>';
@@ -4161,7 +4224,7 @@ function applySupplierField(el){
 }
 /* nothing points at suppliers yet. When quote lines, orders or transactions start naming one, push a short description of each reference here — delete is then blocked automatically */
 function supplierReferences(id){
-  const refs = [];
+  const refs = qSupplierUses(id).map(u => 'quote ' + u.ref);
   return refs;
 }
 async function deleteSupplier(id){
@@ -4415,7 +4478,8 @@ const QS_FIELD = {   // key -> kind. 'int' needs a whole number >= min (blank / 
   quotePrefix: { k: 'text' }, quoteValidityDays: { k: 'int', min: 1 }, paymentTermsDays: { k: 'int', min: 0 }, guaranteeMonths: { k: 'int', min: 1 },
   insuranceCover: { k: 'free' }, complaintDays: { k: 'int', min: 1 }, complaintDayType: { k: 'sel' }, vatNumber: { k: 'vatno' }, vatRate: { k: 'num', min: 0, max: 100 },
   tradeAccountDays: { k: 'int', min: 0 }, labourRateHour: { k: 'opt' }, labourRateHalfDay: { k: 'opt' }, labourRateDay: { k: 'opt' },
-  labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' }
+  labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' },
+  bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
 };
 function qtF(label, field, o){
   o = o || {}; const v = state.settings[field];
@@ -4424,6 +4488,14 @@ function qtF(label, field, o){
 function renderQuoteSettings(){
   const t = document.getElementById('qtTermsCard'); if(!t) return;
   const s = state.settings, vatOn = s.vatRegistered || qtVatPending;
+  const bn = String((state.branding && state.branding.name) || '').trim();
+  document.getElementById('qtBizCard').innerHTML = `<div class="assumptions-grid">
+      <div class="lp-f"><label>Business name</label><div class="q-fixed">${bn ? escHtml(bn) : '<span class="qb-dim">Not set</span>'}</div><p class="q-help">This is the Branding name. Change it under General &gt; Branding.</p></div>
+      <div class="lp-f"><label>Tagline</label><input type="text" autocomplete="off" data-q="bizTagline" value="${escAttr(s.bizTagline)}"></div>
+      <div class="lp-f"><label>Phone</label><input type="text" autocomplete="off" inputmode="tel" data-q="bizPhone" value="${escAttr(s.bizPhone)}"></div>
+      <div class="lp-f"><label>Email</label><input type="text" autocomplete="off" inputmode="email" data-q="bizEmail" value="${escAttr(s.bizEmail)}"></div>
+      <div class="lp-f" style="grid-column:span 2;"><label>Address</label><textarea rows="2" data-q="bizAddress">${escHtml(s.bizAddress)}</textarea></div></div>
+    <p class="q-help" style="margin-top:10px;">Used by quotes and the terms preview, and later by the PDF.</p>`;
   t.innerHTML = `<div class="assumptions-grid">
       ${qtF('Quote number prefix', 'quotePrefix', { type: 'text' })}
       ${qtF('Quote validity (days)', 'quoteValidityDays')}
@@ -4484,16 +4556,21 @@ function quoteTermsDoc(st){
     ['If something goes wrong', [`Tell us first. We will reply within ${cd} ${dayWord}${cd === 1 ? '' : 's'} and aim to put things right quickly and fairly.`]],
     ['Photos, data and law', ['We may photograph finished work for our portfolio but will not use your name or address without permission. We use your details only to quote for and carry out the work, and keep them securely. These terms are governed by the law of England and Wales.']]
   ];
+  const bn = String((state.branding && state.branding.name) || '').trim(), oneLine = v => String(v || '').replace(/\s*[\r\n]+\s*/g, ', ').trim();
+  const contact = [bn, oneLine(st.bizAddress), String(st.bizEmail || '').trim(), String(st.bizPhone || '').trim()];
+  const rtc = 'If we agree this job at your home or away from our premises, including after a site visit, you can cancel within 14 days of agreeing it, without giving a reason. Tell us by letter, email or text at ' + (contact.every(Boolean) ? contact.join(', ') : '[business name, address, email, phone]') + '. We will not start in those 14 days unless you ask us to in writing. If you ask us to start and then cancel, you pay a fair amount for work done and materials ordered up to then. Any payments you have made will be refunded within 14 days.';
   return {
-    heading: 'Brookwood Rural - Terms of Business',
+    business: { name: bn, tagline: String(st.bizTagline || '').trim(), address: oneLine(st.bizAddress), phone: String(st.bizPhone || '').trim(), email: String(st.bizEmail || '').trim() },
+    heading: 'Terms of Business',
     sections: secs.map(([title, paras], i) => ({ num: i + 1, title, paras })),
     acceptance: { text: "Accepting: sign below, or reply 'accepted' by email quoting the quotation reference. By accepting, you agree to these terms.", fields: ['Name', 'Signature', 'Date'] },
-    rightToCancel: { title: 'Right to cancel (private customers)', text: 'If we agree this job at your home or away from our premises, including after a site visit, you can cancel within 14 days of agreeing it, without giving a reason. Tell us by letter, email or text at [business name, address, email, phone]. We will not start in those 14 days unless you ask us to in writing. If you ask us to start and then cancel, you pay a fair amount for work done and materials ordered up to then. Any payments you have made will be refunded within 14 days.' },
+    rightToCancel: { title: 'Right to cancel (private customers)', text: rtc },
     footer: 'Draft. Figures come from Settings.'
   };
 }
 function quoteTermsHtml(d){
-  return `<h2 id="termsHeading">${escHtml(d.heading)}</h2>
+  return `<div class="t-biz"><div class="t-bn">${escHtml(d.business.name || '[business name]')}</div>${d.business.tagline ? `<div class="t-tag">${escHtml(d.business.tagline)}</div>` : ''}</div>
+    <h2 id="termsHeading">${escHtml(d.heading)}</h2>
     ${d.sections.map(x => `<h4>${x.num} ${escHtml(x.title)}</h4>${x.paras.map(p => `<p>${escHtml(p)}</p>`).join('')}`).join('')}
     <p class="t-accept"><strong>${escHtml(d.acceptance.text)}</strong></p>
     <div class="t-sign">${d.acceptance.fields.map(f => `<span>${escHtml(f)}</span>`).join('')}</div>
@@ -4563,6 +4640,574 @@ document.addEventListener('click', (e) => {
 });
 document.getElementById('termsOverlay').addEventListener('click', (e) => { if(e.target.id === 'termsOverlay') termsClose(); });
 document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ const o = document.getElementById('termsOverlay'); if(o && !o.hidden) termsClose(); } });
+
+/* ---------- Quotes (Quote Centre step 2) ----------
+   state.quotes[] = { id, jobNumber, version, refOverride, customer, address, project, date, status, vatMode:'settings', mode:'template'|'new', notes,
+   linkedIds[], timeline[{date,note,created,kind}], supplierCols[supplierId], recoverUnpaid,
+   lines[{ id, description, categoryId, unitId, unitName, qty, wastagePct, wastageManual, prices[{supplierId,price,date,note}], selectedSupplierId, costOverride,
+           markupPct, vatRate, customerGroup, showOnQuote, deliveryDropId }],
+   labour[{ id, description, basis, qty, rate, customerGroup, showOnQuote }],
+   drops[{ id, label, supplierId, date, method, charge, chargeManual, paymentDueDate, dueManual }] }
+   state.nextQuoteId / state.nextJobNumber hand out ids. Template mode reproduces the Excel exactly; new mode is the tidier set of rules. */
+const QUOTE_STATUSES = ['Draft', 'Sent', 'Accepted', 'Declined', 'Expired'];
+const PACK_UNITS = ['pack', 'bag', 'box'];
+const LAB_BASES = [['hour', 'Hour'], ['halfday', 'Half-day'], ['day', 'Day'], ['fixed', 'Fixed £']];
+const QUOTE_SAMPLE_SUPPLIERS = ['Decking Delivery', 'Kellaway Building Supplies', 'Travis Perkins', 'Selco', 'Screwfix'];
+function qRand(p){ return p + Math.random().toString(36).slice(2, 9); }
+function r2(n){ n = Number(n) || 0; return Math.round(Number((n * 100).toPrecision(12))) / 100; }
+function qm(n){ return '£' + Number(n || 0).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function qpct(n){ return (Math.round((Number(n) || 0) * 10) / 10) + '%'; }
+function addDaysIso(iso, n){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if(!m) return ''; return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + n)).toISOString().slice(0, 10); }
+function qNumOr(v, d){ const n = parseFloat(v); return (isNaN(n) || n < 0) ? d : n; }
+function qFind(id){ return (state.quotes || []).find(q => q.id === id) || null; }
+function qRef(q){ const o = String(q.refOverride || '').trim(); return o || (state.settings.quotePrefix + String(q.jobNumber).padStart(3, '0') + q.version); }
+function qVatOn(){ return !!state.settings.vatRegistered; }
+
+/* ---- model: normalise every quote, seed the sample quote once ---- */
+function qNewLine(q, o){
+  const st = state.settings, units = state.quoteUnits || [];
+  const u = units.find(x => x.id === 'un_each') || units[0];
+  const l = Object.assign({ id: qRand('ln_'), description: '', categoryId: '', unitId: u ? u.id : '', unitName: u ? u.name : '', qty: 1, wastagePct: 0, wastageManual: false, prices: [], selectedSupplierId: '',
+    costOverride: '', markupPct: st.materialsMarkupPct === '' ? 0 : st.materialsMarkupPct, vatRate: st.vatRate, customerGroup: '', showOnQuote: true, deliveryDropId: '' }, o || {});
+  return l;
+}
+function qNormLine(l, supIds){
+  const cats = state.lineCategories || [], units = state.quoteUnits || [], str = v => v == null ? '' : String(v);
+  const out = {
+    id: str(l.id) || qRand('ln_'), description: str(l.description), categoryId: cats.some(c => c.id === l.categoryId) ? l.categoryId : '',
+    unitId: units.some(u => u.id === l.unitId) ? l.unitId : '', unitName: str(l.unitName), qty: qNumOr(l.qty, 0),
+    wastagePct: qNumOr(l.wastagePct, 0), wastageManual: !!l.wastageManual,
+    prices: (Array.isArray(l.prices) ? l.prices : []).filter(p => p && typeof p === 'object' && Number(p.supplierId) > 0 && p.price !== '' && p.price != null && !isNaN(Number(p.price)))
+      .map(p => ({ supplierId: Number(p.supplierId), price: Number(p.price), date: /^\d{4}-\d{2}-\d{2}$/.test(p.date || '') ? p.date : fmt(new Date()), note: str(p.note) })),
+    selectedSupplierId: Number(l.selectedSupplierId) > 0 ? Number(l.selectedSupplierId) : '',
+    costOverride: (l.costOverride === '' || l.costOverride == null || isNaN(Number(l.costOverride)) || Number(l.costOverride) < 0) ? '' : Number(l.costOverride),
+    markupPct: qNumOr(l.markupPct, 0), vatRate: qNumOr(l.vatRate, state.settings.vatRate), customerGroup: str(l.customerGroup), showOnQuote: l.showOnQuote !== false,
+    deliveryDropId: str(l.deliveryDropId)
+  };
+  if(!out.unitId){ const u = units.find(x => x.name.toLowerCase() === out.unitName.toLowerCase()); if(u) out.unitId = u.id; }
+  const u = units.find(x => x.id === out.unitId); if(u) out.unitName = u.name;
+  return out;
+}
+function ensureQuoteDocModel(o, seed){
+  const str = v => v == null ? '' : String(v), iso = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : '';
+  o.quotes = (Array.isArray(o.quotes) ? o.quotes : []).filter(q => q && typeof q === 'object');
+  if(!(Number(o.nextQuoteId) > 0)) o.nextQuoteId = 1;
+  if(!(Number(o.nextJobNumber) > 0)) o.nextJobNumber = 1;
+  const prev = state; state = o;   // the helpers read state.settings / units / categories
+  try{
+    if(seed && !o.settings.quoteSampleSeeded && !o.quotes.length) qSeedSample(o);
+    let maxId = 0; o.quotes.forEach(q => { const n = Math.floor(Number(q.id)); if(n > 0) maxId = Math.max(maxId, n); });
+    const used = new Set();
+    o.quotes.forEach(q => {
+      let n = Math.floor(Number(q.id)); if(!(n > 0) || used.has(n)) n = ++maxId; used.add(n); q.id = n;
+      q.jobNumber = Math.max(1, Math.floor(Number(q.jobNumber)) || 0) || 1;
+      q.version = Math.max(0, Math.floor(Number(q.version)) || 0);
+      q.refOverride = str(q.refOverride); q.customer = str(q.customer); q.address = str(q.address); q.project = str(q.project);
+      q.date = iso(q.date) || fmt(new Date());
+      q.status = QUOTE_STATUSES.includes(q.status) ? q.status : 'Draft';
+      q.vatMode = 'settings'; q.mode = q.mode === 'template' ? 'template' : 'new'; q.notes = str(q.notes);
+      q.linkedIds = migrateLinkedIds(q); delete q.linkedId;
+      q.timeline = (Array.isArray(q.timeline) ? q.timeline : []).filter(t => t && typeof t === 'object').map(t => ({ date: iso(t.date) || fmt(new Date()), note: str(t.note), created: Number(t.created) || 0, kind: str(t.kind) }));
+      q.recoverUnpaid = !!q.recoverUnpaid;
+      q.drops = (Array.isArray(q.drops) ? q.drops : []).filter(d => d && typeof d === 'object').map(d => ({
+        id: str(d.id) || qRand('dr_'), label: str(d.label), supplierId: Number(d.supplierId) > 0 ? Number(d.supplierId) : '', date: iso(d.date), method: d.method === 'collect' ? 'collect' : 'delivered',
+        charge: qNumOr(d.charge, 0), chargeManual: !!d.chargeManual, paymentDueDate: iso(d.paymentDueDate), dueManual: !!d.dueManual }));
+      q.lines = (Array.isArray(q.lines) ? q.lines : []).filter(l => l && typeof l === 'object').map(l => qNormLine(l));
+      q.lines.forEach(l => { if(l.deliveryDropId && !q.drops.some(d => d.id === l.deliveryDropId)) l.deliveryDropId = ''; });
+      q.labour = (Array.isArray(q.labour) ? q.labour : []).filter(r => r && typeof r === 'object').map(r => ({
+        id: str(r.id) || qRand('lb_'), description: str(r.description), basis: LAB_BASES.some(b => b[0] === r.basis) ? r.basis : 'day', qty: qNumOr(r.qty, 0),
+        rate: (r.rate === '' || r.rate == null || isNaN(Number(r.rate)) || Number(r.rate) < 0) ? '' : Number(r.rate), customerGroup: str(r.customerGroup), showOnQuote: r.showOnQuote !== false }));
+      const sup = new Set((o.suppliers || []).map(s => s.id));
+      const cols = new Set((Array.isArray(q.supplierCols) ? q.supplierCols : []).map(Number).filter(n => sup.has(n)));
+      q.lines.forEach(l => l.prices.forEach(p => { if(sup.has(p.supplierId)) cols.add(p.supplierId); }));
+      q.lines.forEach(l => { l.prices = l.prices.filter(p => sup.has(p.supplierId)); });
+      q.supplierCols = [...cols];
+    });
+    if(!(Number(o.nextQuoteId) > maxId)) o.nextQuoteId = maxId + 1;
+    const maxJob = o.quotes.reduce((a, q) => Math.max(a, q.jobNumber), 0);
+    if(!(Number(o.nextJobNumber) > maxJob)) o.nextJobNumber = maxJob + 1;
+    if(seed) o.settings.quoteSampleSeeded = true;
+  } finally { state = prev; }
+  return o;
+}
+/* the first quote (Guy Nunn), loaded once; its suppliers are matched by name or created */
+function qSeedSample(o){
+  if(!Array.isArray(o.suppliers)) o.suppliers = [];
+  const sid = {};
+  QUOTE_SAMPLE_SUPPLIERS.forEach(name => {
+    let s = o.suppliers.find(x => String(x.name).trim().toLowerCase() === name.toLowerCase());
+    if(!s){ s = { id: o.nextSupplierId++, status: 'Active', name, categoryIds: [], address: '', postcode: '', website: '', phone: '', email: '', accountNo: '', paymentTerms: '', vatNo: '', contacts: [], notes: [] }; o.suppliers.push(s); }
+    sid[name] = s.id;
+  });
+  ensureSupplierModel(o);
+  const DD = sid['Decking Delivery'], KB = sid['Kellaway Building Supplies'], TP = sid['Travis Perkins'], SC = sid['Screwfix'];
+  const day = '2026-10-09', P = (id, price) => ({ supplierId: id, price, date: day, note: '' });
+  const line = (description, categoryId, unitId, qty, wastagePct, prices) => ({ id: qRand('ln_'), description, categoryId, unitId, qty, wastagePct, wastageManual: true, prices, selectedSupplierId: '',
+    costOverride: '', markupPct: 15, vatRate: 20, customerGroup: '', showOnQuote: true, deliveryDropId: '' });
+  const dropId = qRand('dr_');
+  o.quotes.push({ id: o.nextQuoteId++, jobNumber: 1, version: 0, refOverride: 'BWR001', customer: 'Guy Nunn', address: 'The Rowans, 17 Gloucester Road, Rudgeway, Bristol, BS35 3SF',
+    project: 'Step Replacement', date: day, status: 'Draft', vatMode: 'settings', mode: 'template', notes: '', linkedIds: [], recoverUnpaid: false,
+    timeline: [{ date: day, note: 'Quote created (sample from the Excel)', created: Date.now(), kind: 'created' }],
+    supplierCols: [DD, KB, TP, SC],
+    lines: [
+      line('Reclaimed Railway Sleepers - 230mm x 160mm x 2.6m', 'lc_timber', 'un_each', 5, 5, [P(DD, 41.66), P(KB, 34.99)]),
+      line('8x2 Timber Lengths - 3.6m', 'lc_timber', 'un_each', 2, 0, [P(DD, 16.83), P(KB, 17.72), P(TP, 27.06)]),
+      line('Sleeper Internal Corner Plates / Brackets - Galvanised 85mm x 85mm x 80mm x 2.5mm Angle Bracket', 'lc_fixings', 'un_each', 22, 5, [P(DD, 1.29), P(KB, 2.09), P(TP, 1.02), P(SC, 0.84)]),
+      line('Agricultural Round Timber Fence Posts - 100mm x 1.8m', 'lc_timber', 'un_each', 3, 5, [P(DD, 8.24)]),
+      line('(Turbo TX Double-Countersunk) Multipurpose Screws 5mm x 50mm 200 Pack', 'lc_fixings', 'un_pack', 1, 5, [P(DD, 6.47), P(KB, 6.65), P(TP, 10.80), P(SC, 9.99)]),
+      line('(Turbo TX Double-Countersunk) Multipurpose Screws 5mm x 90mm 100 Pack', 'lc_fixings', 'un_pack', 1, 5, [P(DD, 5.86), P(KB, 6.64), P(TP, 9.16), P(SC, 8.74)]),
+      line('Light Lift Bag 6mm Clean Limestone Chippings', 'lc_concrete', 'un_bag', 4, 5, [P(DD, 5.83), P(KB, 3.94), P(TP, 3.00)])
+    ],
+    labour: [{ id: qRand('lb_'), description: 'Labour', basis: 'day', qty: 3, rate: 300, customerGroup: '', showOnQuote: true }],
+    drops: [{ id: dropId, label: 'Delivery', supplierId: DD, date: '', method: 'delivered', charge: 41.67, chargeManual: true, paymentDueDate: '', dueManual: false }] });
+  o.quotes[o.quotes.length - 1].lines.forEach(l => { l.deliveryDropId = dropId; });
+}
+
+/* ---- the sums. qCalc never changes the quote ---- */
+function qUnitName(l){ const u = (state.quoteUnits || []).find(x => x.id === l.unitId); return u ? u.name : (l.unitName || ''); }
+function qIsPack(l){ return PACK_UNITS.includes(qUnitName(l).trim().toLowerCase()); }
+function qQtyOrder(q, l){
+  const qty = Math.max(0, Number(l.qty) || 0), w = Math.max(0, Number(l.wastagePct) || 0) / 100;
+  if(q.mode !== 'template' && qIsPack(l)) return qty;   // packs, bags and boxes are bought whole: no wastage, no rounding up
+  return Math.ceil(Number((qty * (1 + w)).toFixed(6)));
+}
+function qCheapest(l){ let best = null; l.prices.forEach(p => { if(Number(p.price) > 0 && (!best || p.price < best.price)) best = p; }); return best; }
+function qSelected(q, l){
+  const ch = qCheapest(l); if(q.mode === 'template') return ch;
+  const s = l.selectedSupplierId ? l.prices.find(p => p.supplierId === l.selectedSupplierId && Number(p.price) > 0) : null; return s || ch;
+}
+function qCalc(q){
+  const st = state.settings, tpl = q.mode === 'template', defRate = Number(st.vatRate) || 0, lines = {}, labour = {}, drops = {};
+  let matCost = 0, matRaw = 0, matRounded = 0, vatRaw = 0, vatRoundedSum = 0;
+  q.lines.forEach(l => {
+    const qo = qQtyOrder(q, l), sel = qSelected(q, l), ov = l.costOverride !== '' ? Number(l.costOverride) : null;
+    const costEach = ov !== null ? ov : (sel ? sel.price : 0), lineCost = qo * costEach, rate = (Number(l.vatRate) || 0) / 100;
+    const raw = lineCost * (1 + (Number(l.markupPct) || 0) / 100), priceEx = tpl ? raw : r2(raw);
+    const vat = tpl ? raw * rate : r2(priceEx * rate), inc = tpl ? raw * (1 + rate) : r2(priceEx + vat);
+    lines[l.id] = { qtyOrder: qo, costEach, lineCost, priceEx, vat, priceInc: inc, priceEach: qo > 0 ? r2(priceEx / qo) : 0, selSupplierId: sel ? sel.supplierId : '', cheapestId: (qCheapest(l) || {}).supplierId || '' };
+    matCost += lineCost; matRaw += priceEx; matRounded += priceEx; vatRaw += vat; vatRoundedSum += vat;
+  });
+  let labourEx = 0, labourVat = 0;
+  q.labour.forEach(r => {
+    const rate = r.rate === '' ? 0 : Number(r.rate), amt = tpl ? (r.basis === 'fixed' ? rate : (Number(r.qty) || 0) * rate) : r2(r.basis === 'fixed' ? rate : (Number(r.qty) || 0) * rate);
+    labour[r.id] = { amount: amt }; labourEx += amt; labourVat += tpl ? 0 : r2(amt * defRate / 100);
+  });
+  let delEx = 0, delVat = 0;
+  q.drops.forEach(d => {
+    const ch = Number(d.charge) || 0; delEx += ch; delVat += tpl ? 0 : r2(ch * defRate / 100);
+    let ot = 0; q.lines.forEach(l => { if(l.deliveryDropId === d.id) ot += lines[l.id].lineCost; });
+    drops[d.id] = { orderTotal: ot };
+  });
+  const materialsEx = r2(matRaw), labourR = r2(labourEx), delR = r2(delEx);
+  const totalEx = r2(materialsEx + labourR + delR);
+  const vat = tpl ? r2(vatRaw + (labourR + delR) * defRate / 100) : r2(vatRoundedSum + labourVat + delVat);
+  const totalInc = r2(totalEx + vat);
+  const labourCost = labourR / (1 + (Number(st.labourProfitPct) || 0) / 100), marginBefore = totalEx - matCost - delR, marginAfter = marginBefore - labourCost;
+  return { lines, labour, drops, materialsCost: matCost, materialsEx, labourEx: labourR, deliveryEx: delR, totalEx, vat, totalInc, labourCost,
+    marginBefore, marginAfter, pctBefore: totalEx ? marginBefore / totalEx * 100 : 0, pctAfter: totalEx ? marginAfter / totalEx * 100 : 0 };
+}
+/* delivery drops: charge and payment due date follow the supplier unless typed over */
+function qAutoDrops(q){
+  const c = qCalc(q);
+  q.drops.forEach(d => {
+    const sup = d.supplierId ? supFind(d.supplierId) : null, ot = c.drops[d.id].orderTotal;
+    if(d.method === 'collect'){ d.charge = 0; d.chargeManual = false; }
+    else if(!d.chargeManual){
+      let ch = (sup && sup.deliveryCharge !== '') ? sup.deliveryCharge : 0;
+      if(sup && sup.freeDeliveryOver !== '' && sup.freeDeliveryOver > 0 && ot >= sup.freeDeliveryOver) ch = 0;
+      d.charge = ch;
+    }
+    if(!d.dueManual){
+      const days = (sup && sup.paymentTerms !== '') ? sup.paymentTerms : (Number(state.settings.tradeAccountDays) || 0);
+      d.paymentDueDate = d.date ? addDaysIso(d.date, days) : '';
+    }
+  });
+}
+function qPriceStale(p){
+  const sup = supFind(p.supplierId), v = sup ? Number(sup.priceValidityDays) : 0; if(!v || !p.date) return false;
+  return (Date.now() - new Date(p.date + 'T00:00:00').getTime()) / 86400000 > v;
+}
+function qDropWarning(q, d, c){
+  const sup = d.supplierId ? supFind(d.supplierId) : null, ot = c.drops[d.id] ? c.drops[d.id].orderTotal : 0;
+  if(sup && sup.minOrder !== '' && sup.minOrder > 0 && ot > 0 && ot < sup.minOrder) return `${sup.name} has a minimum order of ${qm(sup.minOrder)}; this drop is ${qm(ot)}.`;
+  return '';
+}
+
+/* ---- list page ---- */
+const qUi = { q: '', status: 'all', openId: 0 };
+function qLinkedText(q){
+  const code = (q.linkedIds || [])[0]; if(!code) return '';
+  const hit = activeRecordCodes().find(r => r.code === code); return hit ? `${code} · ${hit.name}` : code;
+}
+function renderQuotes(){
+  const wrap = document.getElementById('quoteListWrap'); if(!wrap) return;
+  const open = qFind(qUi.openId);
+  if(qUi.openId && !open) qUi.openId = 0;
+  document.getElementById('quoteListView').hidden = !!qUi.openId;
+  document.getElementById('quoteBuilderView').hidden = !qUi.openId;
+  const vatOn = qVatOn();
+  const sf = document.getElementById('quoteFilters');
+  sf.innerHTML = `<div class="view-toggle" role="group" aria-label="Status">${[['all', 'All']].concat(QUOTE_STATUSES.map(s => [s, s])).map(([v, n]) => `<button type="button" data-qba="filter" data-v="${v}" class="${qUi.status === v ? 'active' : ''}">${n}</button>`).join('')}</div>`;
+  const s = qUi.q.trim().toLowerCase();
+  const list = state.quotes.filter(q => (qUi.status === 'all' || q.status === qUi.status) && (!s || [qRef(q), q.customer, q.project, q.status, qLinkedText(q)].join(' ').toLowerCase().includes(s)))
+    .sort((a, b) => b.date.localeCompare(a.date) || b.jobNumber - a.jobNumber || b.version - a.version);
+  const heads = ['Reference', 'Customer', 'Project', 'Version', 'Status', 'Total ex VAT'].concat(vatOn ? ['Total inc VAT'] : []).concat(['Date', 'Linked lead']);
+  let html = `<table class="quotes-table"><thead><tr>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+  if(!list.length) html += `<tr><td colspan="${heads.length}"><div class="sup-empty">${state.quotes.length ? 'No quotes match these filters.' : 'No quotes yet — start one with “+ New quote”.'}</div></td></tr>`;
+  list.forEach(q => {
+    const c = qCalc(q);
+    html += `<tr class="sup-row" data-qba="open" data-id="${q.id}" tabindex="0"><td class="code-cell">${escHtml(qRef(q))}</td><td class="q-strong">${escHtml(q.customer || '—')}</td><td>${escHtml(q.project || '—')}</td>
+      <td>${q.version}</td><td><span class="q-st q-st-${q.status}">${q.status}</span></td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
+      <td>${escHtml(q.date)}</td><td>${escHtml(qLinkedText(q) || '—')}</td></tr>`;
+  });
+  wrap.innerHTML = html + '</tbody></table>';
+  const cnt = document.getElementById('quoteCount'); if(cnt) cnt.textContent = state.quotes.length ? `${list.length} of ${state.quotes.length} quote${state.quotes.length !== 1 ? 's' : ''}` : '';
+  if(qUi.openId) qbRender();
+}
+
+/* ---- builder page ---- */
+function qbOpts(list, sel, blank){ return (blank !== undefined ? `<option value="">${escHtml(blank)}</option>` : '') + list.map(([v, n]) => `<option value="${escAttr(v)}"${String(v) === String(sel) ? ' selected' : ''}>${escHtml(n)}</option>`).join(''); }
+function qbIn(kind, id, f, v, o){
+  o = o || {};
+  const num = o.num ? ' type="number" step="any" min="0" inputmode="decimal"' : ' type="text"';
+  return `<input${num} autocomplete="off" data-qb="${kind}" ${id ? `data-id="${escAttr(id)}" ` : ''}${o.sid ? `data-sid="${o.sid}" ` : ''}data-f="${f}" value="${escAttr(v == null ? '' : v)}"${o.ph ? ` placeholder="${escAttr(o.ph)}"` : ''}${o.cls ? ` class="${o.cls}"` : ''}${o.aria ? ` aria-label="${escAttr(o.aria)}"` : ''}>`;
+}
+function qbSel(kind, id, f, html, o){ o = o || {}; return `<select data-qb="${kind}" ${id ? `data-id="${escAttr(id)}" ` : ''}data-f="${f}"${o.cls ? ` class="${o.cls}"` : ''}${o.aria ? ` aria-label="${escAttr(o.aria)}"` : ''}>${html}</select>`; }
+function qbSupName(id){ const s = supFind(id); return s ? s.name : '(removed supplier)'; }
+function qbHeaderHtml(q){
+  const leadOpts = [['', 'Not linked']].concat(state.leads.filter(l => !l.lost || (q.linkedIds || []).includes(recordCode(l.id, 'lead'))).map(l => [recordCode(l.id, 'lead'), recordCode(l.id, 'lead') + ' · ' + boardTitle('lead', l)]));
+  const clash = state.quotes.some(x => x.id !== q.id && x.jobNumber === q.jobNumber && x.version === q.version && !String(x.refOverride || '').trim());
+  const f = (label, inner, help) => `<div class="lp-f"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
+  return `<div class="card qb-head"><div class="qb-top">
+      <button type="button" class="btn secondary" data-qba="back">← All quotes</button>
+      <div class="qb-ref"><span id="qbRef">${escHtml(qRef(q))}</span><span class="qb-mode ${q.mode}" title="${q.mode === 'template' ? 'Reproduces the Excel exactly' : 'The new, tidier rules'}">${q.mode === 'template' ? 'Template rules (matches the Excel)' : 'New rules'}</span></div>
+      <div class="qb-acts">${q.mode === 'template' ? '<button type="button" class="btn secondary" data-qba="use-new">Use new rules</button>' : ''}
+        ${q.status !== 'Draft' ? '<button type="button" class="btn secondary" data-qba="new-version">New version</button>' : ''}
+        <button type="button" class="btn secondary" data-qba="del-quote" style="color:#b3453f;border-color:#e3c4c1;">Delete quote</button></div></div>
+    <div class="qb-grid">
+      ${f('Status', qbSel('hdr', '', 'status', qbOpts(QUOTE_STATUSES.map(s => [s, s]), q.status)))}
+      ${f('Quote date', `<input type="date" data-qb="hdr" data-f="date" value="${escAttr(q.date)}">`)}
+      ${f('Job number', qbIn('hdr', '', 'jobNumber', q.jobNumber, { num: true }), `Version ${q.version}. A new version is only made from a quote that has been sent; Draft edits keep the same version. From version 10 onwards the reference (job + version digit) becomes ambiguous.${clash ? ' <b style="color:#b3453f">Another quote has the same job number and version.</b>' : ''}`)}
+      ${f('Reference override (optional)', qbIn('hdr', '', 'refOverride', q.refOverride, { ph: 'Shown instead of ' + state.settings.quotePrefix + String(q.jobNumber).padStart(3, '0') + q.version }))}
+      ${f('Linked lead', qbSel('hdr', '', 'link', qbOpts(leadOpts, (q.linkedIds || [])[0] || '')), 'Choosing a lead fills any blank customer, address and project.')}
+      ${f('Customer', qbIn('hdr', '', 'customer', q.customer))}
+      ${f('Project', qbIn('hdr', '', 'project', q.project))}
+      <div class="lp-f qb-wide"><label>Customer address</label><textarea rows="2" data-qb="hdr" data-f="address">${escHtml(q.address)}</textarea></div>
+      <div class="lp-f qb-wide"><label>Notes</label><textarea rows="2" data-qb="hdr" data-f="notes">${escHtml(q.notes)}</textarea></div>
+    </div></div>`;
+}
+function qbTilesHtml(){
+  const vatOn = qVatOn(), t = (k, l, extra) => `<div class="qb-tile${extra ? ' ' + extra : ''}"><div class="qb-tl">${l}</div><div class="qb-tv" data-qc="tile|${k}">—</div><div class="qb-ts" data-qc="tile|${k}Pct"></div></div>`;
+  return `<div class="qb-tiles">${t('totalEx', 'Total ex VAT', 'big')}${vatOn ? t('vat', 'VAT') + t('totalInc', 'Total inc VAT', 'big') : ''}${t('materialsCost', 'Materials cost')}${t('labour', 'Labour')}${t('delivery', 'Delivery')}
+    ${t('marginAfter', 'Margin after wages')}${t('marginBefore', 'Margin before wages')}</div>
+    <p class="q-help" style="margin:-4px 0 14px;">Margin after wages = total ex VAT − materials cost − delivery − labour cost (labour price ÷ (1 + labour profit share %)). Margin before wages leaves the labour cost in. Margins are shown on price.</p>`;
+}
+function qbMaterialsHtml(q){
+  const vatOn = qVatOn(), tpl = q.mode === 'template', cats = state.lineCategories.map(c => [c.id, c.name]), units = state.quoteUnits.map(u => [u.id, u.name]);
+  const cols = q.supplierCols, dropOpts = [['', '—']].concat(q.drops.map((d, i) => [d.id, d.label || ('Drop ' + (i + 1))]));
+  const supOpts = () => [['', 'Cheapest']].concat(cols.map(id => [id, qbSupName(id)]));   // a supplier with no price on a line falls back to the cheapest
+  const avail = state.suppliers.filter(s => s.status === 'Active' && !cols.includes(s.id)).map(s => [s.id, s.name]);
+  let h = `<tr><th class="qb-sticky-l">Description</th><th>Category</th><th>Unit</th><th>Qty</th><th>Waste %</th><th>To order</th>${cols.map(id => `<th class="qb-supcol">${escHtml(qbSupName(id))}<button class="qb-x" data-qba="del-supcol" data-sid="${id}" title="Remove this supplier column" aria-label="Remove supplier column">×</button></th>`).join('')}
+    <th>Supplier</th><th class="qb-sticky-r">Cost each</th><th>Cost total</th><th>Markup %</th><th>Price ex VAT</th>${vatOn ? '<th>VAT</th><th>Price inc VAT</th>' : ''}<th>Customer group</th><th>Show</th><th>Drop</th><th></th></tr>`;
+  let body = q.lines.map((l, i) => `<tr data-line="${l.id}">
+    <td class="qb-sticky-l"><div class="qb-desc">${qbIn('line', l.id, 'description', l.description, { ph: 'Description', aria: 'Description' })}</div></td>
+    <td>${qbSel('line', l.id, 'categoryId', qbOpts(cats, l.categoryId, '—'), { aria: 'Category' })}</td>
+    <td>${qbSel('line', l.id, 'unitId', qbOpts(units, l.unitId, l.unitName || '—'), { aria: 'Unit' })}</td>
+    <td>${qbIn('line', l.id, 'qty', l.qty, { num: true, cls: 'qb-n', aria: 'Qty' })}</td><td>${qbIn('line', l.id, 'wastagePct', l.wastagePct, { num: true, cls: 'qb-n', aria: 'Wastage %' })}</td>
+    <td class="qb-calc" data-qc="${l.id}|qtyOrder">—</td>
+    ${cols.map(sid => `<td class="qb-pc" data-qpc data-lid="${l.id}" data-sid="${sid}">${qbIn('price', l.id, 'price', '', { num: true, sid, cls: 'qb-n', aria: 'Price from ' + qbSupName(sid) })}<span class="qb-stale" hidden title="Older than this supplier's price validity">stale</span></td>`).join('')}
+    <td>${tpl ? '<span class="qb-dim" title="Template rules always use the cheapest price">Cheapest</span>' : qbSel('line', l.id, 'selectedSupplierId', qbOpts(supOpts(l), l.selectedSupplierId), { aria: 'Selected supplier' })}</td>
+    <td class="qb-sticky-r qb-calc qb-cost" data-qc="${l.id}|costEach">—</td><td class="qb-calc" data-qc="${l.id}|lineCost">—</td>
+    <td>${qbIn('line', l.id, 'markupPct', l.markupPct, { num: true, cls: 'qb-n', aria: 'Markup %' })}</td><td class="qb-calc" data-qc="${l.id}|priceEx">—</td>
+    ${vatOn ? `<td class="qb-calc" data-qc="${l.id}|vat">—</td><td class="qb-calc" data-qc="${l.id}|priceInc">—</td>` : ''}
+    <td>${qbIn('line', l.id, 'customerGroup', l.customerGroup, { aria: 'Customer group' })}</td>
+    <td class="qb-c"><input type="checkbox" data-qb="line" data-id="${l.id}" data-f="showOnQuote"${l.showOnQuote ? ' checked' : ''} aria-label="Show on quote"></td>
+    <td>${qbSel('line', l.id, 'deliveryDropId', qbOpts(dropOpts, l.deliveryDropId), { aria: 'Delivery drop' })}</td>
+    <td class="qb-rowacts"><div class="qb-ra"><button class="icon-btn" data-qba="line-up" data-id="${l.id}" title="Move up"${i === 0 ? ' disabled' : ''}>${UP_SVG}</button><button class="icon-btn" data-qba="line-down" data-id="${l.id}" title="Move down"${i === q.lines.length - 1 ? ' disabled' : ''}>${DOWN_SVG}</button>
+      <button class="btn secondary qb-sm" data-qba="line-edit" data-id="${l.id}">Edit</button><button class="btn secondary qb-sm" data-qba="line-dup" data-id="${l.id}">Duplicate</button><button class="icon-btn" data-qba="line-del" data-id="${l.id}" title="Delete line" aria-label="Delete line">${X_SVG}</button></div></td></tr>`).join('');
+  if(!q.lines.length) body = `<tr><td colspan="30"><div class="sup-empty">No lines yet — add the first with “+ Add line”.</div></td></tr>`;
+  return `<div class="card"><div class="qb-sec-h"><h3>Materials</h3><div class="qb-sec-tools">
+      ${avail.length ? `<select id="qbAddSup" aria-label="Add a supplier column"><option value="">+ Add supplier column…</option>${avail.map(([v, n]) => `<option value="${v}">${escHtml(n)}</option>`).join('')}</select>` : ''}
+      <button class="btn" data-qba="add-line">+ Add line</button></div></div>
+    <p class="q-help" style="margin:0 0 8px;">${tpl ? 'Template rules: quantity to order is rounded up for every line (packs and bags too) and the cheapest supplier price is used.' : 'Quantity to order is rounded up to a whole unit after wastage, except units named pack, bag or box: wastage is not applied to those and they are not rounded up.'} Type a price per supplier; prices older than a supplier's price validity show a stale tag.</p>
+    <div class="qb-scroll"><table class="qb-table"><thead>${h}</thead><tbody>${body}</tbody></table></div></div>`;
+}
+function qbLabourHtml(q){
+  const rows = q.labour.map((r, i) => `<tr><td>${qbIn('lab', r.id, 'description', r.description, { aria: 'Labour description' })}</td>
+    <td>${qbSel('lab', r.id, 'basis', qbOpts(LAB_BASES, r.basis), { aria: 'Basis' })}</td><td>${qbIn('lab', r.id, 'qty', r.qty, { num: true, cls: 'qb-n', aria: 'Qty' })}</td>
+    <td>${qbIn('lab', r.id, 'rate', r.rate, { num: true, cls: 'qb-n', aria: 'Rate £', ph: 'Rate' })}</td><td class="qb-calc" data-qc="${r.id}|amount">—</td>
+    <td>${qbIn('lab', r.id, 'customerGroup', r.customerGroup, { aria: 'Customer group' })}</td>
+    <td class="qb-c"><input type="checkbox" data-qb="lab" data-id="${r.id}" data-f="showOnQuote"${r.showOnQuote ? ' checked' : ''} aria-label="Show on quote"></td>
+    <td><button class="icon-btn" data-qba="lab-del" data-id="${r.id}" aria-label="Delete labour row">${X_SVG}</button></td></tr>`).join('');
+  return `<div class="card"><div class="qb-sec-h"><h3>Labour</h3><button class="btn" data-qba="add-lab">+ Add labour</button></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Description</th><th>Basis</th><th>Qty</th><th>Rate (£)</th><th>Amount</th><th>Customer group</th><th>Show</th><th></th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="8"><div class="sup-empty">No labour yet.</div></td></tr>'}</tbody></table></div>
+    <label class="q-check" style="margin-top:12px;"><input type="checkbox" data-qb="hdr" data-f="recoverUnpaid"${q.recoverUnpaid ? ' checked' : ''}> Recover unpaid time inside labour</label>
+    <p class="q-help">Stored for now; the calculation comes in a later step. Labour rates default from Settings > Quotes &amp; pricing.</p></div>`;
+}
+function qbDeliveryHtml(q){
+  const sups = state.suppliers.filter(s => s.status === 'Active' || q.drops.some(d => d.supplierId === s.id)).map(s => [s.id, s.name]);
+  const rows = q.drops.map((d, i) => `<tr><td>${qbIn('drop', d.id, 'label', d.label, { ph: 'Drop ' + (i + 1), aria: 'Label' })}</td>
+    <td>${qbSel('drop', d.id, 'supplierId', qbOpts(sups, d.supplierId, '—'), { aria: 'Supplier' })}</td>
+    <td>${qbSel('drop', d.id, 'method', qbOpts([['delivered', 'Delivered'], ['collect', 'Collect']], d.method), { aria: 'Method' })}</td>
+    <td><input type="date" data-qb="drop" data-id="${d.id}" data-f="date" value="${escAttr(d.date)}" aria-label="Drop date"></td>
+    <td>${qbIn('drop', d.id, 'charge', d.charge, { num: true, cls: 'qb-n', aria: 'Charge ex VAT' })}</td>
+    <td><input type="date" data-qb="drop" data-id="${d.id}" data-f="paymentDueDate" value="${escAttr(d.paymentDueDate)}" aria-label="Payment due"></td>
+    <td class="qb-calc" data-qc="${d.id}|orderTotal">—</td><td><button class="icon-btn" data-qba="drop-del" data-id="${d.id}" aria-label="Delete drop">${X_SVG}</button></td></tr>
+    <tr class="qb-warnrow" data-qwarn="${d.id}" hidden><td colspan="8"></td></tr>`).join('');
+  return `<div class="card"><div class="qb-sec-h"><h3>Delivery</h3><button class="btn" data-qba="add-drop">+ Add drop</button></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Label</th><th>Supplier</th><th>Method</th><th>Date</th><th>Charge ex VAT (£)</th><th>Payment due</th><th>Order (cost)</th><th></th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="8"><div class="sup-empty">No delivery drops yet.</div></td></tr>'}</tbody></table></div>
+    <p class="q-help">The charge comes from the supplier (free above its free-delivery threshold, nothing when collecting) until you type over it. Payment due = drop date + the supplier's payment days, or the trade days in Settings. Tag lines to a drop in the materials table.</p></div>`;
+}
+function qbSummaryHtml(q){
+  const vatOn = qVatOn(), r = (l, k, strong) => `<tr${strong ? ' class="qb-sum-strong"' : ''}><td>${l}</td><td class="q-num" data-qc="sum|${k}">—</td></tr>`;
+  return `<div class="card"><div class="qb-sec-h"><h3>Summary</h3></div><table class="qb-sum"><tbody>${r('Materials ex VAT', 'materialsEx')}${r('Labour', 'labourEx')}${r('Delivery', 'deliveryEx')}${r('Total ex VAT', 'totalEx', true)}${vatOn ? r('VAT', 'vat') + r('Total inc VAT', 'totalInc', true) : ''}</tbody></table>
+    ${vatOn ? '' : '<p class="q-help">VAT is switched off in Settings, so only ex-VAT figures are shown.</p>'}</div>`;
+}
+function qbTimelineHtml(q){
+  const items = sortedComms(q, 'timeline');
+  return `<div class="card"><div class="qb-sec-h"><h3>Timeline</h3></div>
+    <div class="lc-note-add" style="margin-bottom:10px;"><input type="date" id="qbTlDate" value="${fmt(new Date())}" aria-label="Date"><input type="text" id="qbTlNote" placeholder="Add a note…" maxlength="300" aria-label="Note"><button class="btn" data-qba="tl-add">Add</button></div>
+    <div class="comms-scroll">${items.length ? items.map(({ c }) => `<div class="comm-entry"><span class="comm-date q-tl-d">${escHtml(c.date)}</span><span class="q-tl-n">${escHtml(c.note)}</span></div>`).join('') : '<div class="lp-empty">Nothing yet.</div>'}</div></div>`;
+}
+function qbRender(){
+  const q = qFind(qUi.openId), box = document.getElementById('quoteBuilderView'); if(!q || !box) return;
+  const ae = document.activeElement; if(ae && box.contains(ae) && ae.blur) ae.blur();   // commit a half-finished edit before the page is rebuilt
+  const sc = box.querySelector('.qb-scroll'), sl = sc ? sc.scrollLeft : 0, sy = window.scrollY;
+  qAutoDrops(q);
+  box.innerHTML = qbHeaderHtml(q) + qbTilesHtml() + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbSummaryHtml(q) + qbTimelineHtml(q);
+  const ns = box.querySelector('.qb-scroll'); if(ns) ns.scrollLeft = sl;
+  qbRefresh(); window.scrollTo(0, sy);
+  document.getElementById('quoteListView').hidden = true; box.hidden = false;
+}
+function qbGet(q, el){
+  const k = el.dataset.qb, f = el.dataset.f, id = el.dataset.id;
+  if(k === 'hdr'){ if(f === 'link') return (q.linkedIds || [])[0] || ''; return q[f]; }
+  if(k === 'line'){ const l = q.lines.find(x => x.id === id); return l ? l[f] : undefined; }
+  if(k === 'price'){ const l = q.lines.find(x => x.id === id), p = l && l.prices.find(x => String(x.supplierId) === el.dataset.sid); return p ? p[f] : ''; }
+  if(k === 'lab'){ const r = q.labour.find(x => x.id === id); return r ? r[f] : undefined; }
+  if(k === 'drop'){ const d = q.drops.find(x => x.id === id); return d ? d[f] : undefined; }
+}
+/* recompute and repaint every calculated cell, tile and total; fields follow the data (unless someone is typing in them) */
+function qbRefresh(){
+  const q = qFind(qUi.openId); if(!q) return;
+  const c = qCalc(q), v = {};
+  q.lines.forEach(l => { const x = c.lines[l.id]; v[l.id + '|qtyOrder'] = String(x.qtyOrder); v[l.id + '|costEach'] = qm(x.costEach); v[l.id + '|lineCost'] = qm(x.lineCost); v[l.id + '|priceEx'] = qm(x.priceEx); v[l.id + '|vat'] = qm(x.vat); v[l.id + '|priceInc'] = qm(x.priceInc); });
+  q.labour.forEach(r => { v[r.id + '|amount'] = qm(c.labour[r.id].amount); });
+  q.drops.forEach(d => { v[d.id + '|orderTotal'] = qm(c.drops[d.id].orderTotal); });
+  Object.assign(v, { 'tile|totalEx': qm(c.totalEx), 'tile|vat': qm(c.vat), 'tile|totalInc': qm(c.totalInc), 'tile|materialsCost': qm(c.materialsCost), 'tile|labour': qm(c.labourEx), 'tile|delivery': qm(c.deliveryEx),
+    'tile|marginAfter': qm(c.marginAfter), 'tile|marginAfterPct': qpct(c.pctAfter) + ' of price', 'tile|marginBefore': qm(c.marginBefore), 'tile|marginBeforePct': qpct(c.pctBefore) + ' of price',
+    'sum|materialsEx': qm(c.materialsEx), 'sum|labourEx': qm(c.labourEx), 'sum|deliveryEx': qm(c.deliveryEx), 'sum|totalEx': qm(c.totalEx), 'sum|vat': qm(c.vat), 'sum|totalInc': qm(c.totalInc) });
+  const root = document.getElementById('quoteBuilderView');
+  root.querySelectorAll('[data-qc]').forEach(el => { const t = v[el.dataset.qc]; if(t !== undefined && el.textContent !== t) el.textContent = t; });
+  root.querySelectorAll('[data-qpc]').forEach(td => {
+    const l = q.lines.find(x => x.id === td.dataset.lid); if(!l) return;
+    const sid = Number(td.dataset.sid), p = l.prices.find(x => x.supplierId === sid), x = c.lines[l.id];
+    td.classList.toggle('best', !!p && x.cheapestId === sid); td.classList.toggle('sel', !!p && x.selSupplierId === sid);
+    const stale = td.querySelector('.qb-stale'); if(stale) stale.hidden = !(p && qPriceStale(p));
+    td.title = p ? ('Entered ' + p.date + (p.note ? ' — ' + p.note : '')) : '';
+  });
+  root.querySelectorAll('[data-qwarn]').forEach(tr => {
+    const d = q.drops.find(x => x.id === tr.dataset.qwarn), w = d ? qDropWarning(q, d, c) : '';
+    tr.hidden = !w; tr.firstElementChild.innerHTML = w ? `<span class="qb-warn">⚠ ${escHtml(w)}</span>` : '';
+  });
+  const ref = document.getElementById('qbRef'); if(ref) ref.textContent = qRef(q);
+  qbSyncInputs(q, document);
+}
+function qbSyncInputs(q, scope){
+  (scope || document).querySelectorAll('[data-qb]').forEach(el => {
+    if(el === document.activeElement || !el.dataset.f) return;
+    const val = qbGet(q, el); if(val === undefined) return;
+    if(el.type === 'checkbox'){ el.checked = !!val; return; }
+    const s = val == null ? '' : String(val); if(el.value !== s) el.value = s;
+  });
+}
+function qbTouch(q, rebuild){
+  qAutoDrops(q); saveState();
+  if(rebuild) qbRender(); else qbRefresh();
+  if(lp && lp.kind === 'qline') qlSync();
+}
+function qbUndoable(msg, restore){ showToast(msg, () => { restore(); qAutoDrops(qFind(qUi.openId) || { drops: [], lines: [], labour: [] }); saveState(); qbRender(); }); }
+function qSetStatus(q, to){
+  if(q.status === to) return;
+  q.timeline.push({ date: fmt(new Date()), note: `Status changed from ${q.status} to ${to}`, created: Date.now(), kind: 'status' });
+  q.status = to;
+}
+function qCreate(){
+  const q = { id: state.nextQuoteId++, jobNumber: state.nextJobNumber++, version: 0, refOverride: '', customer: '', address: '', project: '', date: fmt(new Date()), status: 'Draft', vatMode: 'settings', mode: 'new', notes: '',
+    linkedIds: [], recoverUnpaid: false, supplierCols: [], lines: [], labour: [], drops: [], timeline: [{ date: fmt(new Date()), note: 'Quote created', created: Date.now(), kind: 'created' }] };
+  state.quotes.push(q); saveState(); qUi.openId = q.id; renderQuotes();
+}
+function qNewVersion(q){
+  const c = JSON.parse(JSON.stringify(q)), map = {}, today = fmt(new Date());
+  c.id = state.nextQuoteId++; c.version = q.version + 1; c.status = 'Draft'; c.refOverride = ''; c.date = today;
+  c.drops.forEach(d => { const n = qRand('dr_'); map[d.id] = n; d.id = n; });
+  c.lines.forEach(l => { l.id = qRand('ln_'); if(l.deliveryDropId) l.deliveryDropId = map[l.deliveryDropId] || ''; });
+  c.labour.forEach(r => { r.id = qRand('lb_'); });
+  c.timeline = [{ date: today, note: `Created as version ${c.version} from ${qRef(q)}`, created: Date.now(), kind: 'version' }];
+  q.timeline.push({ date: today, note: `Superseded by version ${c.version} (${qRef(c)})`, created: Date.now(), kind: 'superseded' });
+  state.quotes.push(c); saveState(); qUi.openId = c.id; renderQuotes();
+  showToast(c.version >= 10 ? 'New version created. From version 10 the displayed reference becomes ambiguous.' : `New version created (${qRef(c)}), as a Draft`);
+}
+function qbChange(el){
+  const q = qFind(qUi.openId); if(!q) return;
+  const k = el.dataset.qb, f = el.dataset.f, id = el.dataset.id, v = el.type === 'checkbox' ? el.checked : el.value;
+  let rebuild = false;
+  if(k === 'hdr'){
+    if(f === 'status'){ qSetStatus(q, QUOTE_STATUSES.includes(v) ? v : q.status); rebuild = true; }
+    else if(f === 'jobNumber'){ const n = Math.floor(Number(v)); if(n >= 1 && n <= 999) q.jobNumber = n; rebuild = true; }
+    else if(f === 'link'){
+      q.linkedIds = v ? [v] : [];
+      const lead = state.leads.find(l => recordCode(l.id, 'lead') === v);
+      if(lead){ const name = lead.contact || lead.company || ''; let filled = false;
+        if(!q.customer.trim() && name){ q.customer = name; filled = true; } if(!q.address.trim() && lead.address){ q.address = lead.address; filled = true; } if(!q.project.trim() && lead.projectName){ q.project = lead.projectName; filled = true; }
+        if(filled) showToast('Filled the blank customer details from the lead'); }
+      rebuild = true;
+    }
+    else if(f === 'recoverUnpaid') q.recoverUnpaid = !!v;
+    else if(f === 'date'){ if(/^\d{4}-\d{2}-\d{2}$/.test(v)) q.date = v; }
+    else if(['customer', 'address', 'project', 'notes', 'refOverride'].includes(f)) q[f] = String(v).trim();
+    if(f === 'refOverride' || f === 'jobNumber') rebuild = true;
+  } else if(k === 'line'){
+    const l = q.lines.find(x => x.id === id); if(!l) return;
+    if(['description', 'customerGroup'].includes(f)) l[f] = String(v).trim();
+    else if(f === 'categoryId'){ l.categoryId = v; if(!l.wastageManual){ const c = state.lineCategories.find(x => x.id === v); l.wastagePct = c && c.wastagePct !== '' ? c.wastagePct : 0; } }
+    else if(f === 'unitId'){ l.unitId = v; const u = state.quoteUnits.find(x => x.id === v); l.unitName = u ? u.name : l.unitName; }
+    else if(f === 'qty') l.qty = qNumOr(v, 0);
+    else if(f === 'wastagePct'){ l.wastagePct = qNumOr(v, 0); l.wastageManual = true; }
+    else if(f === 'markupPct' || f === 'vatRate') l[f] = qNumOr(v, 0);
+    else if(f === 'costOverride') l.costOverride = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
+    else if(f === 'showOnQuote') l.showOnQuote = !!v;
+    else if(f === 'deliveryDropId') l.deliveryDropId = v;
+    else if(f === 'selectedSupplierId') l.selectedSupplierId = v === '' ? '' : Number(v);
+  } else if(k === 'price'){
+    const l = q.lines.find(x => x.id === id); if(!l) return; const sid = Number(el.dataset.sid), at = l.prices.findIndex(p => p.supplierId === sid);
+    if(f === 'price'){
+      if(v === '' || isNaN(Number(v)) || Number(v) < 0){ if(at >= 0) l.prices.splice(at, 1); if(l.selectedSupplierId === sid) l.selectedSupplierId = ''; }
+      else if(at >= 0){ if(l.prices[at].price !== Number(v)){ l.prices[at].price = Number(v); l.prices[at].date = fmt(new Date()); } }
+      else l.prices.push({ supplierId: sid, price: Number(v), date: fmt(new Date()), note: '' });
+    } else if(at >= 0){ if(f === 'note') l.prices[at].note = String(v).trim(); else if(f === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(v)) l.prices[at].date = v; }
+  } else if(k === 'lab'){
+    const r = q.labour.find(x => x.id === id); if(!r) return;
+    if(f === 'description' || f === 'customerGroup') r[f] = String(v).trim();
+    else if(f === 'basis'){ r.basis = v; const st = state.settings, def = v === 'hour' ? st.labourRateHour : v === 'halfday' ? st.labourRateHalfDay : v === 'day' ? st.labourRateDay : ''; if(def !== '' && def != null) r.rate = def; }
+    else if(f === 'qty') r.qty = qNumOr(v, 0);
+    else if(f === 'rate') r.rate = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
+    else if(f === 'showOnQuote') r.showOnQuote = !!v;
+  } else if(k === 'drop'){
+    const d = q.drops.find(x => x.id === id); if(!d) return;
+    if(f === 'label') d.label = String(v).trim();
+    else if(f === 'supplierId'){ d.supplierId = v === '' ? '' : Number(v); d.chargeManual = false; d.dueManual = false; }
+    else if(f === 'method'){ d.method = v === 'collect' ? 'collect' : 'delivered'; d.chargeManual = false; }
+    else if(f === 'date'){ d.date = /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : ''; d.dueManual = false; }
+    else if(f === 'charge'){ d.charge = qNumOr(v, 0); d.chargeManual = true; }
+    else if(f === 'paymentDueDate'){ d.paymentDueDate = /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : ''; d.dueManual = !!d.paymentDueDate; }
+    rebuild = f === 'label' || f === 'supplierId';
+  }
+  qbTouch(q, rebuild);
+}
+function qbMove(q, list, id, dir){ const i = list.findIndex(x => x.id === id), j = i + dir; if(i < 0 || j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; qbTouch(q, true); }
+function qbAction(a, b){
+  if(a === 'filter'){ qUi.status = b.dataset.v; renderQuotes(); return; }
+  if(a === 'new'){ qCreate(); return; }
+  if(a === 'open'){ qUi.openId = Number(b.dataset.id); renderQuotes(); window.scrollTo(0, 0); return; }
+  const q = qFind(qUi.openId); if(!q) return; const id = b.dataset.id;
+  if(a === 'back'){ if(lp && lp.kind === 'qline') closeLeadPanel(); qUi.openId = 0; renderQuotes(); return; }
+  if(a === 'add-line'){ const l = qNewLine(q); q.lines.push(l); qbTouch(q, true); const el = document.querySelector(`#quoteBuilderView [data-id="${l.id}"][data-f="description"]`); if(el) el.focus(); return; }
+  if(a === 'line-del'){ const i = q.lines.findIndex(l => l.id === id); if(i < 0) return; const [gone] = q.lines.splice(i, 1); qbTouch(q, true); qbUndoable('Line deleted', () => { q.lines.splice(Math.min(i, q.lines.length), 0, gone); }); return; }
+  if(a === 'line-dup'){ const i = q.lines.findIndex(l => l.id === id); if(i < 0) return; const c = JSON.parse(JSON.stringify(q.lines[i])); c.id = qRand('ln_'); q.lines.splice(i + 1, 0, c); qbTouch(q, true); return; }
+  if(a === 'line-up' || a === 'line-down'){ qbMove(q, q.lines, id, a === 'line-up' ? -1 : 1); return; }
+  if(a === 'line-edit'){ openQuoteLinePanel(q.id, id); return; }
+  if(a === 'del-supcol'){
+    const sid = Number(b.dataset.sid), snap = q.lines.map(l => ({ l, p: l.prices.filter(p => p.supplierId === sid), sel: l.selectedSupplierId }));
+    q.supplierCols = q.supplierCols.filter(x => x !== sid); q.lines.forEach(l => { l.prices = l.prices.filter(p => p.supplierId !== sid); if(l.selectedSupplierId === sid) l.selectedSupplierId = ''; });
+    qbTouch(q, true); qbUndoable('Supplier column removed', () => { q.supplierCols.push(sid); snap.forEach(s => { s.l.prices.push(...s.p); s.l.selectedSupplierId = s.sel; }); }); return;
+  }
+  if(a === 'add-lab'){ const st = state.settings; q.labour.push({ id: qRand('lb_'), description: 'Labour', basis: 'day', qty: 1, rate: st.labourRateDay === '' ? '' : st.labourRateDay, customerGroup: '', showOnQuote: true }); qbTouch(q, true); return; }
+  if(a === 'lab-del'){ const i = q.labour.findIndex(r => r.id === id); if(i < 0) return; const [gone] = q.labour.splice(i, 1); qbTouch(q, true); qbUndoable('Labour row deleted', () => { q.labour.splice(Math.min(i, q.labour.length), 0, gone); }); return; }
+  if(a === 'add-drop'){ q.drops.push({ id: qRand('dr_'), label: 'Drop ' + (q.drops.length + 1), supplierId: '', date: '', method: 'delivered', charge: 0, chargeManual: false, paymentDueDate: '', dueManual: false }); qbTouch(q, true); return; }
+  if(a === 'drop-del'){
+    const i = q.drops.findIndex(d => d.id === id); if(i < 0) return; const [gone] = q.drops.splice(i, 1), tagged = q.lines.filter(l => l.deliveryDropId === id);
+    tagged.forEach(l => { l.deliveryDropId = ''; }); qbTouch(q, true);
+    qbUndoable('Delivery drop deleted', () => { q.drops.splice(Math.min(i, q.drops.length), 0, gone); tagged.forEach(l => { l.deliveryDropId = id; }); }); return;
+  }
+  if(a === 'tl-add'){
+    const n = document.getElementById('qbTlNote'), d = document.getElementById('qbTlDate'); if(!n || !n.value.trim()){ if(n) n.focus(); return; }
+    q.timeline.push({ date: d.value || fmt(new Date()), note: n.value.trim(), created: Date.now(), kind: 'note' }); saveState(); qbRender(); return;
+  }
+  if(a === 'new-version'){ qNewVersion(q); return; }
+  if(a === 'use-new'){
+    showConfirm('Switch this quote to the new rules?', 'Template rules match your Excel exactly. The new rules round every line to pence, leave packs and bags unrounded and let you pick the supplier per line. Totals can change by a few pence or more. This cannot be switched back.').then(ok => {
+      if(!ok) return; q.mode = 'new'; q.timeline.push({ date: fmt(new Date()), note: 'Switched from template rules to the new rules', created: Date.now(), kind: 'mode' }); qbTouch(q, true);
+    }); return;
+  }
+  if(a === 'del-quote'){
+    showConfirm(`Delete ${qRef(q)}?`, 'This permanently removes the quote with its lines, labour and timeline.').then(ok => {
+      if(!ok) return; const i = state.quotes.indexOf(q); if(i < 0) return; if(lp && lp.kind === 'qline') closeLeadPanel();
+      state.quotes.splice(i, 1); qUi.openId = 0; saveState(); renderQuotes();
+      showToast('Quote deleted', () => { state.quotes.splice(Math.min(i, state.quotes.length), 0, q); saveState(); renderQuotes(); });
+    }); return;
+  }
+}
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.dataset || !state || !el.isConnected) return;   // a field rebuilt away mid-edit must not write its old value back
+  if(el.id === 'qbAddSup'){ const q = qFind(qUi.openId); if(q && el.value){ q.supplierCols.push(Number(el.value)); qbTouch(q, true); } return; }
+  if(el.dataset.qb) qbChange(el);
+});
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-qba]'); if(!b || !state) return;
+  qbAction(b.dataset.qba, b);
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Enter' && e.target.dataset && e.target.dataset.qba === 'open'){ qbAction('open', e.target); } });
+document.getElementById('quoteSearch').addEventListener('input', (e) => { qUi.q = e.target.value; renderQuotes(); });
+
+/* ---- the side panel: one quote line ---- */
+function qLineOf(){ const q = lp && lp.kind === 'qline' ? qFind(lp.qid) : null; return q ? { q, l: q.lines.find(x => x.id === lp.id) || null } : { q: null, l: null }; }
+function qlHeadHtml(q, l){ return `<div class="lp-title${l.description ? '' : ' empty'}">${escHtml(l.description || 'New line')}</div><div class="lp-sub"><span>${escHtml(qRef(q))}</span><span class="qb-mode ${q.mode}">${q.mode === 'template' ? 'Template rules' : 'New rules'}</span></div>`; }
+function qlBodyHtml(q, l){
+  const cats = state.lineCategories.map(c => [c.id, c.name]), units = state.quoteUnits.map(u => [u.id, u.name]), vatOn = qVatOn();
+  const dropOpts = [['', '—']].concat(q.drops.map((d, i) => [d.id, d.label || ('Drop ' + (i + 1))])), f = (label, inner, help) => `<div class="lp-f"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
+  const prices = q.supplierCols.map(sid => `<div class="ql-price"><b>${escHtml(qbSupName(sid))}</b><div class="ql-pr">${qbIn('price', l.id, 'price', '', { num: true, sid, ph: 'Price ex VAT each', aria: 'Price' })}
+    <input type="date" data-qb="price" data-id="${l.id}" data-sid="${sid}" data-f="date" aria-label="Date entered"></div>${qbIn('price', l.id, 'note', '', { sid, ph: 'Note (optional)', aria: 'Price note' })}</div>`).join('');
+  return `<section class="lp-sec" id="lp-sec-line" data-sec="line"><h3>Line</h3>
+      ${f('Description', `<textarea rows="3" data-qb="line" data-id="${l.id}" data-f="description">${escHtml(l.description)}</textarea>`)}
+      ${f('Category', qbSel('line', l.id, 'categoryId', qbOpts(cats, l.categoryId, '—')))}
+      ${f('Unit', qbSel('line', l.id, 'unitId', qbOpts(units, l.unitId, l.unitName || '—')), 'Units named pack, bag or box are never rounded up or given wastage (new rules).')}
+      ${f('Quantity', qbIn('line', l.id, 'qty', l.qty, { num: true }))}
+      ${f('Wastage %', qbIn('line', l.id, 'wastagePct', l.wastagePct, { num: true }), 'Starts from the category default; type to override.')}
+      ${f('Quantity to order', `<div class="qb-calc" data-qc="${l.id}|qtyOrder">—</div>`)}
+      ${f('Cost each override (£)', qbIn('line', l.id, 'costOverride', l.costOverride, { num: true, ph: 'Blank = use the supplier price' }))}
+      ${f('Markup %', qbIn('line', l.id, 'markupPct', l.markupPct, { num: true }), 'Price = cost × (1 + markup%).')}
+      ${f('VAT rate %', qbIn('line', l.id, 'vatRate', l.vatRate, { num: true }), vatOn ? '' : 'VAT is switched off in Settings, so this is not shown on the quote yet.')}
+      ${f('Customer group', qbIn('line', l.id, 'customerGroup', l.customerGroup))}
+      ${f('Delivery drop', qbSel('line', l.id, 'deliveryDropId', qbOpts(dropOpts, l.deliveryDropId)))}
+      <label class="q-check"><input type="checkbox" data-qb="line" data-id="${l.id}" data-f="showOnQuote"${l.showOnQuote ? ' checked' : ''}> Show on quote</label>
+    </section>
+    <section class="lp-sec" id="lp-sec-prices" data-sec="prices"><h3>Supplier prices</h3>
+      ${q.supplierCols.length ? prices : '<div class="lp-empty">Add a supplier column on the quote to enter prices.</div>'}</section>`;
+}
+function openQuoteLinePanel(qid, lid){
+  const q = qFind(qid), l = q && q.lines.find(x => x.id === lid); if(!l) return;
+  lpOpen({ kind: 'qline', id: lid, qid }, { cls: 'lc-sup', label: 'Edit quote line', code: qRef(q), chips: [['line', 'Line'], ['prices', 'Supplier prices']], head: qlHeadHtml(q, l), body: qlBodyHtml(q, l), sec: '', refresh: () => {} });
+  qbRefresh();
+}
+function qlSync(){
+  const { q, l } = qLineOf(); if(!l){ closeLeadPanel(); return; }
+  lpEl('lpHeadInfo').innerHTML = qlHeadHtml(q, l);
+  qbSyncInputs(q, lpEl('lpBody'));
+  const c = qCalc(q), x = c.lines[l.id], el = lpEl('lpBody').querySelector(`[data-qc="${l.id}|qtyOrder"]`); if(el && x) el.textContent = String(x.qtyOrder);
+}
+/* suppliers: quotes that use a supplier (blocks deleting it; fills the supplier's "Quotes & orders" section) */
+function qSupplierUses(id){
+  const out = [];
+  (state.quotes || []).forEach(q => {
+    const c = qCalc(q); let total = 0, used = q.drops.some(d => d.supplierId === id);
+    q.lines.forEach(l => { if(l.prices.some(p => p.supplierId === id)) used = true; if(c.lines[l.id].selSupplierId === id) total += c.lines[l.id].lineCost; });
+    if(used) out.push({ ref: qRef(q), detail: [q.customer, q.project].filter(Boolean).join(' — '), amount: total ? qm(total) : '', q });
+  });
+  return out;
+}
 
 function renderTransactions(){
   const txns = state.transactions;
@@ -6208,6 +6853,7 @@ function render(){
   renderBusinessPlan();
   renderLeads();
   renderSuppliers();
+  renderQuotes();
   renderPipeline();
   renderProjects();
   renderAllPipelineViews();
