@@ -934,6 +934,24 @@
   .q-tl-d { display: inline-block; width: 100px; color: var(--muted); } .q-tl-n { font-size: 13px; }
   .ql-price { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; } .ql-pr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 0; }
   @media (max-width: 700px) { .qb-grid { grid-template-columns: 1fr; } .qb-grid .qb-wide { grid-column: span 1; } }
+  .qb-banner { background: #eaf1e8; border: 1px solid #b9d3b4; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .qb-banner.warn { background: #fbf1cf; border-color: #e5cf86; } .qb-banner-btns { margin-left: auto; display: flex; gap: 8px; }
+  .qb-locked .qb-table input:disabled, .qb-locked .qb-table select:disabled { background: #f6f4ef; color: var(--ink); opacity: 0.85; }
+  .qb-deal { margin-top: 6px; font-size: 13px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .qb-autorow td { background: #f6f9f4 !important; } .qb-ov { font-size: 11px; color: #8a5a1c; margin-left: 6px; } .qb-ov[hidden] { display: none; }
+  .qb-unalloc { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; } .qb-unalloc.ok { background: #e4f0e6; color: #1e5c2e; } .qb-unalloc.bad { background: #f8e3e0; color: #8a3a34; }
+  .q-over { color: #b3453f; font-weight: 700; } .q-under { color: #1e7a3a; font-weight: 700; } .qb-avs th { text-align: right; font-size: 11px; color: var(--muted); } .qb-avs td:first-child { text-align: left; }
+  .qb-dimrow td { color: var(--muted); font-size: 12px; } .q-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+  .qb-flash td { animation: qflash 1.8s ease; } @keyframes qflash { 0%, 60% { background: #fbf1cf; } 100% { background: transparent; } }
+  .q-chip { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border: 1px solid var(--line); background: #faf8f4; border-radius: 10px; padding: 8px 12px; margin: 10px 0; font-size: 13px; } .q-chip-ref { font-weight: 700; }
+  .sl-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px; } .sl-tag.paid { background: #d5ecd9; color: #1e5c2e; } .sl-tag.unpaid { background: #fbf1cf; color: #8a5a1c; }
+  .sl-sum { font-size: 11.5px; color: var(--muted); } .sl-btn { white-space: nowrap; width: 100%; text-align: left; } .sl-note { margin: 8px 0; }
+  .sl-log { display: grid; grid-template-columns: 130px 70px minmax(0,1fr) 34px; gap: 6px; margin-bottom: 6px; align-items: center; } .sl-log input { border: 1px solid var(--line); background: #fff; padding: 6px; }
+  .q-age { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; } .q-age-ok { background: #d5ecd9; color: #1e5c2e; } .q-age-stale { background: #fbf1cf; color: #8a5a1c; } .q-age-expired { background: #f8e3e0; color: #8a3a34; }
+  tr.cf-ifwon td { font-style: italic; color: var(--muted); border-top: 1px dashed #c9c4b8; background: repeating-linear-gradient(135deg, transparent 0 6px, rgba(168,118,62,0.06) 6px 12px); }
+  .gantt-drops { position: absolute; top: -1px; display: flex; gap: 3px; z-index: 3; }
+  .gantt-drop { display: inline-flex; align-items: center; gap: 3px; height: 14px; padding: 0 4px; border-radius: 4px; background: #fff; border: 1px solid #a8763e; color: #7a5128; cursor: pointer; font-size: 9px; white-space: nowrap; }
+  .gantt-drop.collect { border-style: dashed; border-color: #4f7cac; color: #2f4f78; } .gantt-drop svg { width: 10px; height: 10px; } .gantt-drop em { font-style: normal; max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
   .q-help { font-size: 12px; color: var(--muted); margin: 4px 0 0; line-height: 1.45; }
   .q-err { font-size: 12px; color: #b3453f; margin: 4px 0 0; }
   .q-err:empty { display: none; }
@@ -1521,6 +1539,7 @@
     </div>
     <div class="card"><div class="assumptions-grid two" id="cashflowAssumptionsGrid"></div></div>
     <div class="table-scroll" id="cashflowTableWrap"></div>
+    <div id="cashflowQuoteBox"></div>
   </div>
 
   <!-- TRANSACTIONS -->
@@ -1671,8 +1690,12 @@ create policy "app update" on tracker_data for update using (true) with check (t
         </div>
         <button class="btn" data-qba="new">+ New quote</button>
       </div>
-      <div class="crm-filters"><input type="search" id="quoteSearch" class="crm-search" placeholder="Search quotes…" autocomplete="off" aria-label="Search quotes"><span id="quoteFilters" class="crm-filters-dyn"></span><span class="sup-count" id="quoteCount"></span></div>
-      <div class="qb-scroll" id="quoteListWrap"></div>
+      <div class="view-toggle" id="quoteTabs" role="group" aria-label="Quotes view" style="margin-bottom:12px;"></div>
+      <div id="quoteListTab">
+        <div class="crm-filters"><input type="search" id="quoteSearch" class="crm-search" placeholder="Search quotes…" autocomplete="off" aria-label="Search quotes"><span id="quoteFilters" class="crm-filters-dyn"></span><span class="sup-count" id="quoteCount"></span></div>
+        <div class="qb-scroll" id="quoteListWrap"></div>
+      </div>
+      <div id="quoteAgeingView" hidden></div>
     </div>
     <div id="quoteBuilderView" hidden></div>
   </div>
@@ -1956,6 +1979,7 @@ function ensureQuoteModel(o, seedAction){
   st.guaranteeMonths = intOr(st.guaranteeMonths, 12, 1);
   st.insuranceCover = str(st.insuranceCover).trim();
   st.complaintDays = intOr(st.complaintDays, 3, 1);
+  st.hoursPerDay = intOr(st.hoursPerDay, 8, 1);
   st.complaintDayType = st.complaintDayType === 'calendar' ? 'calendar' : 'working';
   st.vatNumber = str(st.vatNumber).trim();
   st.vatRegistered = st.vatRegistered === true && !!st.vatNumber;   // ON only ever with a VAT number
@@ -1970,6 +1994,9 @@ function ensureQuoteModel(o, seedAction){
   let cats = Array.isArray(o.lineCategories) ? o.lineCategories.filter(c => c && typeof c === 'object' && c.id) : [];
   if(!cats.length && !Array.isArray(o.lineCategories)) cats = SEED_LINE_CATS.map(([id, name]) => ({ id, name, wastagePct: '' }));
   o.lineCategories = cats.map(c => ({ id: String(c.id), name: str(c.name).trim() || 'Category', wastagePct: qNum(c.wastagePct, 0, 100) }));
+  // stage line types: which stage lines are Unpaid (matched by name inside the stage label)
+  if(Array.isArray(o.stageLineTypes)) o.stageLineTypes = o.stageLineTypes.filter(t => t && typeof t === 'object' && t.id).map(t => ({ id: String(t.id), name: str(t.name).trim(), paid: t.paid === true }));
+  else o.stageLineTypes = SEED_STAGE_TYPES.map(([id, name, paid]) => ({ id, name, paid }));
   // seed the insurance Action once (by title, in live and archived Actions); a flag stops it coming back if someone deletes it
   if(seedAction){
     const have = (Array.isArray(o.actions) ? o.actions : []).concat(Array.isArray(o.archivedActions) ? o.archivedActions : []).some(a => a && String(a.action || '').trim() === INSURANCE_ACTION_TITLE);
@@ -2162,6 +2189,7 @@ function mergeDefaults(loaded){
   out.settings.insuranceActionSeeded = !!(loaded.settings && loaded.settings.insuranceActionSeeded);   // the flag comes from the saved data, never from the defaults
   if(!Array.isArray(loaded.quotes)){ out.quotes = []; out.nextQuoteId = 1; out.nextJobNumber = 1; }   // old backups: no quotes yet (not the sample ones from the defaults)
   out.settings.quoteSampleSeeded = !!(loaded.settings && loaded.settings.quoteSampleSeeded);
+  out.settings.quoteLinkSeeded = !!(loaded.settings && loaded.settings.quoteLinkSeeded);
   ensureQuoteModel(out, true);   // old backups: quote settings, units and line categories get defaults; the insurance Action is added once
   ensureQuoteDocModel(out, true);   // quotes: normalise, and load the sample quote once
   out.branding = normaliseBranding(loaded.branding);   // old backups: default name and font, no logos
@@ -2496,6 +2524,7 @@ function getMonthRange(){
   state.projects.forEach(p => {
     (p.paymentLines||[]).forEach(pl => { if(pl.dueDate) dates.push(toDate(pl.dueDate)); if(pl.paidDate) dates.push(toDate(pl.paidDate)); });
   });
+  qAllCashItems().forEach(i => dates.push(toDate(i.date)));   // quote cash movements
   if(dates.length === 0){
     const today = new Date(); const months = [];
     const n = (state.settings && state.settings.forecastMonths) || 6;
@@ -2931,10 +2960,11 @@ function salesDetailHtml(r, i){
           <span class="detail-meta">${roll.start?fmtDisplay(roll.start):'—'} → ${roll.end?fmtDisplay(roll.end):'—'} · ${roll.durationDays||0} days span · total cost ${money(roll.totalCost)}</span>
         </div>
         ${recTasksHtml('sales', r)}
+        ${quoteChipHtml(r.id)}
         <div class="detail-notes"><label>Notes</label><input data-tab="pipeline" data-idx="${i}" data-field="notes" value="${escAttr(r.notes||'')}"></div>
         <div class="stage-label-row">Stages — each carries its own dates &amp; cost; the project rolls up from these</div>
         <div class="table-scroll" style="box-shadow:none;border-radius:9px;">
-        ${rtTable('pipelineStages', ['Stage','Kind','Start','End','Days','Cost (£)',''])}`;
+        ${rtTable('pipelineStages', ['Stage','Kind','Start','End','Days','Cost (£)','Time',''])}`;
       (r.stages||[]).forEach((s, si) => {
         const sDays = (s.start && (s.end||s.start)) ? Math.round((toDate(s.end||s.start)-toDate(s.start))/86400000)+1 : 0;
         html += `<tr>
@@ -2945,10 +2975,12 @@ function salesDetailHtml(r, i){
           <td><input type="date" data-tab="stages" data-proj="${i}" data-sidx="${si}" data-field="end" value="${s.end||''}"></td>
           <td class="computed">${sDays||'—'}</td>
           <td><input type="number" step="1" data-tab="stages" data-proj="${i}" data-sidx="${si}" data-field="cost" value="${s.cost||0}"></td>
+          <td><button type="button" class="btn secondary qb-sm sl-btn" data-qba="stage-open" data-pl="sales" data-rid="${r.id}" data-sid="${slEnsure(s).id}" title="Planned time, paid / unpaid and time logged">${slSummaryHtml(s)}</button></td>
           <td><button class="icon-btn" data-action="del-stage" data-proj="${i}" data-sidx="${si}" title="Delete stage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
         </tr>`;
       });
       html += `</tbody></table></div>
+        ${slQuoteNoteHtml(r.id)}
         <div class="btn-row" style="margin-top:10px;">
           <button class="btn secondary" data-action="add-stage" data-proj="${i}">+ Add stage</button>
           <button class="btn secondary" data-action="add-visit" data-proj="${i}">+ Add site visit</button>
@@ -3365,6 +3397,7 @@ function renderGanttView(pl){
   }
   let lo = today, hi = today;
   dated.forEach(x => { if(x.s < lo) lo = x.s; if(x.e > hi) hi = x.e; });
+  dated.forEach(x => qDropsFor(x.id).forEach(({ d }) => { const dt = toDate(d.date); if(dt < lo) lo = dt; if(dt > hi) hi = dt; }));   // delivery drops from the linked quote
   const sc = ganttScale(zoom, lo, hi), W = sc.total * sc.px, o = { px: sc.px, start: sc.start };
   const ticks = arr => arr.map(t => `<div class="gantt-tick" style="left:${t.left}px;width:${t.w}px" title="${escHtml(t.label)}">${escHtml(t.label)}</div>`).join('');
   const todayX = dayIdx(today, sc.start) * sc.px + Math.round(sc.px / 2);
@@ -3380,7 +3413,7 @@ function renderGanttView(pl){
     body += `<div class="gantt-row"><div class="gantt-label">${x.kids.length
         ? `<button class="icon-btn expand${open ? ' open' : ''}" data-action="gantt-toggle" data-pl="${pl}" data-id="${x.id}" title="${open ? 'Hide' : 'Show'} ${pl === 'sales' ? 'stages' : 'milestones &amp; sub-stages'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>`
         : '<span class="gantt-nochev"></span>'}<span class="code-cell">${x.code}</span>${tierBadgeSmall(x.id, x.r)}<span class="gantt-name" data-action="open-detail" data-pl="${pl}" data-id="${x.id}" title="${escHtml(x.name)}">${escHtml(x.name)}</span></div>
-      <div class="gantt-track" style="width:${W}px">${bars}</div></div>`;
+      <div class="gantt-track" style="width:${W}px">${bars}${qGanttMarkers(x.id, o)}</div></div>`;
     if(open) x.kids.forEach(it => {
       body += `<div class="gantt-row child"><div class="gantt-label child"><span title="${escHtml(it.label)}">${escHtml(it.label)}</span></div>
         <div class="gantt-track" style="width:${W}px">${ganttBar(pl, x, it, o)}</div></div>`;
@@ -3644,6 +3677,7 @@ function leadDetailHtml(l, i){
       <div class="lc-col">${recTasksHtml('lead', l, { compact: true, limit: 4 })}</div>
       <div class="lc-col">${commsBlockHtml('lead', l, i, 'comms', { inlineAdd: true })}</div>
     </div>
+    ${quoteChipHtml(l.id)}
     <div class="lc-foot">
       ${leadQualified(l)
         ? `<button class="promote-btn" data-action="promote-lead" data-id="${l.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Promote to sales</button>`
@@ -3817,6 +3851,7 @@ function closeLeadPanel(){
   const { id, opener, kind } = lp; lp = null;
   panel.hidden = true; lpEl('lpBackdrop').hidden = true;
   document.body.classList.remove('lp-open');
+  if(kind === 'stline'){ render(); return; }
   if(kind === 'qline'){ renderQuotes(); const back = (opener && document.contains(opener)) ? opener : null; if(back && back.focus) back.focus({ preventScroll: true }); return; }
   if(kind === 'supplier'){ supOnClose(id); const row = document.querySelector(`#suppliersTableWrap tr[data-sup="${id}"]`); const to = (opener && document.contains(opener)) ? opener : row; if(to && to.focus) to.focus({ preventScroll: true }); return; }
   renderLeads();
@@ -3828,6 +3863,7 @@ function lpSync(){
   if(!lp) return;
   if(lp.kind === 'supplier'){ supSync(); return; }
   if(lp.kind === 'qline'){ qlSync(); return; }
+  if(lp.kind === 'stline'){ slSync(); return; }
   const hit = lpLead();
   if(!hit){ closeLeadPanel(); return; }   // promoted, lost, deleted or reloaded away
   const { l, i } = hit, type = lpTypeOf(l);
@@ -3957,7 +3993,7 @@ function restoreLead(id){
 const RT_SPECS = {
   leadsTableWrap:    { cols: [[34,34],[66,56],[64,44],[200,90],[170,90],[170,90],[110,76],[126,84],[236,130],[34,34]] },
   pipelineTableWrap: { cols: [[34,34],[104,80],[220,120],[104,84],[140,110],[130,104],[64,52],[100,72],[116,100],[116,100],[100,72],[34,34]], nested: ['pipelineStages'] },
-  pipelineStages:    { cols: [[200,100],[140,90],[128,104],[128,104],[64,48],[100,70],[34,34]], parent: 'pipelineTableWrap' },
+  pipelineStages:    { cols: [[200,100],[140,90],[128,104],[128,104],[64,48],[100,70],[210,150],[34,34]], parent: 'pipelineTableWrap' },
   projectsTableWrap: { cols: [[34,34],[100,80],[240,120],[120,90],[200,120],[150,100],[34,34]], nested: ['projectPayments'] },
   projectPayments:   { cols: [[90,72],[220,100],[128,104],[100,72],[128,104],[128,104],[34,34]], parent: 'projectsTableWrap' },
   suppliersTableWrap: { cols: [[84,64],[190,110],[180,110],[150,90],[116,84],[180,100],[112,72],[104,72],[84,64],[92,72]] },
@@ -4313,6 +4349,7 @@ function projectDetailHtml(p, i){
       let html = `<div class="detail-box">
         <div class="detail-head"><span class="detail-code" style="background:var(--green);">${recordCode(p.id,'project')}</span><span>${escAttr(p.name)}</span><span class="detail-meta">Stage: ${escHtml(stageName('project', p.stageId))}</span></div>
         ${recTasksHtml('project', p)}
+        ${quoteChipHtml(p.id)}${projStageTimeHtml(p)}
         <div class="stage-label-row">Delivery milestones</div>
         <div class="milestone-grid">
           ${projStages.filter(st => st.key).map(st => `<div><label>${escHtml(st.name)}</label><input type="date" data-tab="projmilestone" data-idx="${i}" data-field="${st.key}" value="${m[st.key]||''}"></div>`).join('')}
@@ -4479,7 +4516,7 @@ const QS_FIELD = {   // key -> kind. 'int' needs a whole number >= min (blank / 
   insuranceCover: { k: 'free' }, complaintDays: { k: 'int', min: 1 }, complaintDayType: { k: 'sel' }, vatNumber: { k: 'vatno' }, vatRate: { k: 'num', min: 0, max: 100 },
   tradeAccountDays: { k: 'int', min: 0 }, labourRateHour: { k: 'opt' }, labourRateHalfDay: { k: 'opt' }, labourRateDay: { k: 'opt' },
   labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' },
-  bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
+  hoursPerDay: { k: 'int', min: 1 }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
 };
 function qtF(label, field, o){
   o = o || {}; const v = state.settings[field];
@@ -4519,7 +4556,15 @@ function renderQuoteSettings(){
       ${qtF('Per hour', 'labourRateHour', { step: '0.01', ph: 'Not set' })}${qtF('Per half-day', 'labourRateHalfDay', { step: '0.01', ph: 'Not set' })}${qtF('Per day', 'labourRateDay', { step: '0.01', ph: 'Not set' })}</div>
     <div class="assumptions-grid" style="margin-top:14px;">
       ${qtF('Labour profit share (%)', 'labourProfitPct', { step: '0.1', help: 'Share of labour charged as profit, on top of wages. 0 means labour is priced at cost.' })}
-      ${qtF('Default markup on materials cost (%)', 'materialsMarkupPct', { step: '0.1', ph: 'Not set', help: 'price = cost × (1 + markup%)' })}</div>`;
+      ${qtF('Default markup on materials cost (%)', 'materialsMarkupPct', { step: '0.1', ph: 'Not set', help: 'price = cost × (1 + markup%)' })}
+      ${qtF('Hours per day', 'hoursPerDay', { help: 'Converts planned and logged hours to days on pipeline stage lines.' })}</div>
+    <div class="q-sub">Stage line types (paid / unpaid)</div>
+    <p class="q-help" style="margin:0;">${SLT_NOTE}</p>
+    <div class="q-list"><div class="q-row has-w q-head"><span>Name contains</span><span>Tag</span><span></span></div>${(state.stageLineTypes || []).map(x => `<div class="q-row has-w">
+      <input type="text" data-ql="stype" data-id="${escAttr(x.id)}" data-lf="name" value="${escAttr(x.name)}" aria-label="Name">
+      <select data-ql="stype" data-id="${escAttr(x.id)}" data-lf="paid" aria-label="Paid or unpaid"><option value="paid"${x.paid ? ' selected' : ''}>Paid</option><option value="unpaid"${x.paid ? '' : ' selected'}>Unpaid</option></select>
+      <button class="icon-btn" data-qa="stype-del" data-id="${escAttr(x.id)}" title="Remove" aria-label="Remove ${escAttr(x.name)}">${X_SVG}</button></div>`).join('')}</div>
+    <button class="btn secondary" style="margin-top:10px;" data-qa="stype-add">+ Add type</button>`;
   const rows = (list, kind, w) => list.map(x => `<div class="q-row${w ? ' has-w' : ''}">
       <input type="text" data-ql="${kind}" data-id="${escAttr(x.id)}" data-lf="name" value="${escAttr(x.name)}" aria-label="Name">
       ${w ? `<div class="q-pct"><input type="number" min="0" max="100" step="0.1" data-ql="${kind}" data-id="${escAttr(x.id)}" data-lf="wastage" value="${x.wastagePct}" placeholder="0" aria-label="Default wastage %">%</div>` : ''}
@@ -4611,21 +4656,23 @@ function qtApplyField(el){
   if(f === 'paymentTermsDays' || f === 'tradeAccountDays') renderSettings();   // the same setting is also shown under Finance
 }
 function qtListChange(el){
-  const list = el.dataset.ql === 'unit' ? state.quoteUnits : state.lineCategories, it = list.find(x => x.id === el.dataset.id); if(!it) return;
+  const k = el.dataset.ql, list = k === 'unit' ? state.quoteUnits : (k === 'stype' ? state.stageLineTypes : state.lineCategories), it = list.find(x => x.id === el.dataset.id); if(!it) return;
   if(el.dataset.lf === 'name'){ const v = el.value.trim(); if(v) it.name = v; else el.value = it.name; }
+  else if(el.dataset.lf === 'paid') it.paid = el.value === 'paid';
   else it.wastagePct = qNum(el.value, 0, 100);
   if(el.dataset.lf === 'wastage') el.value = it.wastagePct;
   saveState();
+  if(k === 'stype'){ renderPipeline(); renderQuotes(); }
 }
 function qtListAction(a, id){
-  const kind = a.split('-')[0], list = kind === 'unit' ? state.quoteUnits : state.lineCategories;
+  const kind = a.split('-')[0], list = kind === 'unit' ? state.quoteUnits : (kind === 'stype' ? state.stageLineTypes : state.lineCategories);
   if(a.endsWith('-add')){
-    const nid = (kind === 'unit' ? 'un_' : 'lc_') + Math.random().toString(36).slice(2, 8);
-    list.push(kind === 'unit' ? { id: nid, name: 'new unit' } : { id: nid, name: 'New category', wastagePct: '' });
+    const nid = (kind === 'unit' ? 'un_' : kind === 'stype' ? 'slt_' : 'lc_') + Math.random().toString(36).slice(2, 8);
+    list.push(kind === 'unit' ? { id: nid, name: 'new unit' } : (kind === 'stype' ? { id: nid, name: 'New type', paid: false } : { id: nid, name: 'New category', wastagePct: '' }));
     _qtFocus = nid; renderQuoteSettings(); saveState();
   } else {
     const at = list.findIndex(x => x.id === id); if(at < 0) return;
-    const [gone] = list.splice(at, 1); renderQuoteSettings(); saveState();
+    const [gone] = list.splice(at, 1); renderQuoteSettings(); saveState(); if(kind === 'stype'){ renderPipeline(); renderQuotes(); }
     showToast(`Removed “${gone.name}”`, () => { list.splice(Math.min(at, list.length), 0, gone); renderQuoteSettings(); saveState(); });
   }
 }
@@ -4709,6 +4756,10 @@ function ensureQuoteDocModel(o, seed){
       q.linkedIds = migrateLinkedIds(q); delete q.linkedId;
       q.timeline = (Array.isArray(q.timeline) ? q.timeline : []).filter(t => t && typeof t === 'object').map(t => ({ date: iso(t.date) || fmt(new Date()), note: str(t.note), created: Number(t.created) || 0, kind: str(t.kind) }));
       q.recoverUnpaid = !!q.recoverUnpaid;
+      q.unpaidOverride = (q.unpaidOverride === '' || q.unpaidOverride == null || isNaN(Number(q.unpaidOverride)) || Number(q.unpaidOverride) < 0) ? '' : Number(q.unpaidOverride);
+      q.acceptedDate = iso(q.acceptedDate); q.asSold = (q.asSold && typeof q.asSold === 'object') ? q.asSold : null;
+      q.payments = Array.isArray(q.payments) ? q.payments.filter(r => r && typeof r === 'object').map(r => ({ id: str(r.id) || qRand('pm_'), label: str(r.label), mode: r.mode === 'amount' ? 'amount' : 'percent', value: qNumOr(r.value, 0),
+        dueMode: ['afterEnd', 'completion', 'acceptance', 'date'].includes(r.dueMode) ? r.dueMode : 'afterEnd', date: iso(r.date), days: (r.days === '' || r.days == null || isNaN(Number(r.days)) || Number(r.days) < 0) ? '' : Math.round(Number(r.days)) })) : [qNewPayment()];
       q.drops = (Array.isArray(q.drops) ? q.drops : []).filter(d => d && typeof d === 'object').map(d => ({
         id: str(d.id) || qRand('dr_'), label: str(d.label), supplierId: Number(d.supplierId) > 0 ? Number(d.supplierId) : '', date: iso(d.date), method: d.method === 'collect' ? 'collect' : 'delivered',
         charge: qNumOr(d.charge, 0), chargeManual: !!d.chargeManual, paymentDueDate: iso(d.paymentDueDate), dueManual: !!d.dueManual }));
@@ -4726,7 +4777,9 @@ function ensureQuoteDocModel(o, seed){
     if(!(Number(o.nextQuoteId) > maxId)) o.nextQuoteId = maxId + 1;
     const maxJob = o.quotes.reduce((a, q) => Math.max(a, q.jobNumber), 0);
     if(!(Number(o.nextJobNumber) > maxJob)) o.nextJobNumber = maxJob + 1;
-    if(seed) o.settings.quoteSampleSeeded = true;
+    (o.pipeline || []).concat(o.projects || []).forEach(r => { if(r && Array.isArray(r.stages)) r.stages.forEach(slEnsure); });   // stage lines: ids, paid tag, planned time, time log
+    if(seed && !o.settings.quoteLinkSeeded) qSeedLink(o);
+    if(seed){ o.settings.quoteSampleSeeded = true; o.settings.quoteLinkSeeded = true; }
   } finally { state = prev; }
   return o;
 }
@@ -4792,6 +4845,8 @@ function qCalc(q){
     const rate = r.rate === '' ? 0 : Number(r.rate), amt = tpl ? (r.basis === 'fixed' ? rate : (Number(r.qty) || 0) * rate) : r2(r.basis === 'fixed' ? rate : (Number(r.qty) || 0) * rate);
     labour[r.id] = { amount: amt }; labourEx += amt; labourVat += tpl ? 0 : r2(amt * defRate / 100);
   });
+  const un = qUnpaid(q);
+  if(q.recoverUnpaid){ labourEx += un.amount; labourVat += tpl ? 0 : r2(un.amount * defRate / 100); }   // the automatic "Unpaid time recovered" row
   let delEx = 0, delVat = 0;
   q.drops.forEach(d => {
     const ch = Number(d.charge) || 0; delEx += ch; delVat += tpl ? 0 : r2(ch * defRate / 100);
@@ -4803,7 +4858,7 @@ function qCalc(q){
   const vat = tpl ? r2(vatRaw + (labourR + delR) * defRate / 100) : r2(vatRoundedSum + labourVat + delVat);
   const totalInc = r2(totalEx + vat);
   const labourCost = labourR / (1 + (Number(st.labourProfitPct) || 0) / 100), marginBefore = totalEx - matCost - delR, marginAfter = marginBefore - labourCost;
-  return { lines, labour, drops, materialsCost: matCost, materialsEx, labourEx: labourR, deliveryEx: delR, totalEx, vat, totalInc, labourCost,
+  return { lines, labour, drops, unpaid: un, materialsCost: matCost, materialsEx, labourEx: labourR, deliveryEx: delR, totalEx, vat, totalInc, labourCost,
     marginBefore, marginAfter, pctBefore: totalEx ? marginBefore / totalEx * 100 : 0, pctAfter: totalEx ? marginAfter / totalEx * 100 : 0 };
 }
 /* delivery drops: charge and payment due date follow the supplier unless typed over */
@@ -4828,13 +4883,14 @@ function qPriceStale(p){
   return (Date.now() - new Date(p.date + 'T00:00:00').getTime()) / 86400000 > v;
 }
 function qDropWarning(q, d, c){
-  const sup = d.supplierId ? supFind(d.supplierId) : null, ot = c.drops[d.id] ? c.drops[d.id].orderTotal : 0;
-  if(sup && sup.minOrder !== '' && sup.minOrder > 0 && ot > 0 && ot < sup.minOrder) return `${sup.name} has a minimum order of ${qm(sup.minOrder)}; this drop is ${qm(ot)}.`;
-  return '';
+  const sup = d.supplierId ? supFind(d.supplierId) : null, ot = c.drops[d.id] ? c.drops[d.id].orderTotal : 0, w = [];
+  if(sup && sup.minOrder !== '' && sup.minOrder > 0 && ot > 0 && ot < sup.minOrder) w.push(`${sup.name} has a minimum order of ${qm(sup.minOrder)}; this drop is ${qm(ot)}.`);
+  const inst = qInstallStart(q); if(d.date && inst && d.date > inst) w.push(`This drop (${d.date}) is after the first install stage starts (${inst}).`);
+  return w.join(' ');
 }
 
 /* ---- list page ---- */
-const qUi = { q: '', status: 'all', openId: 0 };
+const qUi = { q: '', status: 'all', openId: 0, tab: 'quotes', ageSup: '', unlock: new Set() };
 function qLinkedText(q){
   const code = (q.linkedIds || [])[0]; if(!code) return '';
   const hit = activeRecordCodes().find(r => r.code === code); return hit ? `${code} · ${hit.name}` : code;
@@ -4846,6 +4902,9 @@ function renderQuotes(){
   document.getElementById('quoteListView').hidden = !!qUi.openId;
   document.getElementById('quoteBuilderView').hidden = !qUi.openId;
   const vatOn = qVatOn();
+  document.getElementById('quoteTabs').innerHTML = [['quotes', 'Quotes'], ['ageing', 'Price ageing']].map(([v, n]) => `<button type="button" data-qba="tab" data-v="${v}" class="${qUi.tab === v ? 'active' : ''}">${n}</button>`).join('');
+  document.getElementById('quoteListTab').hidden = qUi.tab !== 'quotes'; document.getElementById('quoteAgeingView').hidden = qUi.tab !== 'ageing';
+  if(qUi.tab === 'ageing') renderQuoteAgeing();
   const sf = document.getElementById('quoteFilters');
   sf.innerHTML = `<div class="view-toggle" role="group" aria-label="Status">${[['all', 'All']].concat(QUOTE_STATUSES.map(s => [s, s])).map(([v, n]) => `<button type="button" data-qba="filter" data-v="${v}" class="${qUi.status === v ? 'active' : ''}">${n}</button>`).join('')}</div>`;
   const s = qUi.q.trim().toLowerCase();
@@ -4875,7 +4934,8 @@ function qbIn(kind, id, f, v, o){
 function qbSel(kind, id, f, html, o){ o = o || {}; return `<select data-qb="${kind}" ${id ? `data-id="${escAttr(id)}" ` : ''}data-f="${f}"${o.cls ? ` class="${o.cls}"` : ''}${o.aria ? ` aria-label="${escAttr(o.aria)}"` : ''}>${html}</select>`; }
 function qbSupName(id){ const s = supFind(id); return s ? s.name : '(removed supplier)'; }
 function qbHeaderHtml(q){
-  const leadOpts = [['', 'Not linked']].concat(state.leads.filter(l => !l.lost || (q.linkedIds || []).includes(recordCode(l.id, 'lead'))).map(l => [recordCode(l.id, 'lead'), recordCode(l.id, 'lead') + ' · ' + boardTitle('lead', l)]));
+  const leadOpts = [['', 'Not linked']].concat(activeRecordCodes().map(r => [r.code, r.code + ' · ' + r.name]));
+  (q.linkedIds || []).forEach(c => { if(!leadOpts.some(o => o[0] === c)) leadOpts.push([c, c]); });
   const clash = state.quotes.some(x => x.id !== q.id && x.jobNumber === q.jobNumber && x.version === q.version && !String(x.refOverride || '').trim());
   const f = (label, inner, help) => `<div class="lp-f"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
   return `<div class="card qb-head"><div class="qb-top">
@@ -4889,12 +4949,12 @@ function qbHeaderHtml(q){
       ${f('Quote date', `<input type="date" data-qb="hdr" data-f="date" value="${escAttr(q.date)}">`)}
       ${f('Job number', qbIn('hdr', '', 'jobNumber', q.jobNumber, { num: true }), `Version ${q.version}. A new version is only made from a quote that has been sent; Draft edits keep the same version. From version 10 onwards the reference (job + version digit) becomes ambiguous.${clash ? ' <b style="color:#b3453f">Another quote has the same job number and version.</b>' : ''}`)}
       ${f('Reference override (optional)', qbIn('hdr', '', 'refOverride', q.refOverride, { ph: 'Shown instead of ' + state.settings.quotePrefix + String(q.jobNumber).padStart(3, '0') + q.version }))}
-      ${f('Linked lead', qbSel('hdr', '', 'link', qbOpts(leadOpts, (q.linkedIds || [])[0] || '')), 'Choosing a lead fills any blank customer, address and project.')}
+      ${f('Linked lead / project', qbSel('hdr', '', 'link', qbOpts(leadOpts, (q.linkedIds || [])[0] || '')), 'Choosing one fills any blank customer, address and project.')}
       ${f('Customer', qbIn('hdr', '', 'customer', q.customer))}
       ${f('Project', qbIn('hdr', '', 'project', q.project))}
       <div class="lp-f qb-wide"><label>Customer address</label><textarea rows="2" data-qb="hdr" data-f="address">${escHtml(q.address)}</textarea></div>
       <div class="lp-f qb-wide"><label>Notes</label><textarea rows="2" data-qb="hdr" data-f="notes">${escHtml(q.notes)}</textarea></div>
-    </div></div>`;
+    </div>${qbDealHtml(q)}</div>`;
 }
 function qbTilesHtml(){
   const vatOn = qVatOn(), t = (k, l, extra) => `<div class="qb-tile${extra ? ' ' + extra : ''}"><div class="qb-tl">${l}</div><div class="qb-tv" data-qc="tile|${k}">—</div><div class="qb-ts" data-qc="tile|${k}Pct"></div></div>`;
@@ -4932,19 +4992,6 @@ function qbMaterialsHtml(q){
     <p class="q-help" style="margin:0 0 8px;">${tpl ? 'Template rules: quantity to order is rounded up for every line (packs and bags too) and the cheapest supplier price is used.' : 'Quantity to order is rounded up to a whole unit after wastage, except units named pack, bag or box: wastage is not applied to those and they are not rounded up.'} Type a price per supplier; prices older than a supplier's price validity show a stale tag.</p>
     <div class="qb-scroll"><table class="qb-table"><thead>${h}</thead><tbody>${body}</tbody></table></div></div>`;
 }
-function qbLabourHtml(q){
-  const rows = q.labour.map((r, i) => `<tr><td>${qbIn('lab', r.id, 'description', r.description, { aria: 'Labour description' })}</td>
-    <td>${qbSel('lab', r.id, 'basis', qbOpts(LAB_BASES, r.basis), { aria: 'Basis' })}</td><td>${qbIn('lab', r.id, 'qty', r.qty, { num: true, cls: 'qb-n', aria: 'Qty' })}</td>
-    <td>${qbIn('lab', r.id, 'rate', r.rate, { num: true, cls: 'qb-n', aria: 'Rate £', ph: 'Rate' })}</td><td class="qb-calc" data-qc="${r.id}|amount">—</td>
-    <td>${qbIn('lab', r.id, 'customerGroup', r.customerGroup, { aria: 'Customer group' })}</td>
-    <td class="qb-c"><input type="checkbox" data-qb="lab" data-id="${r.id}" data-f="showOnQuote"${r.showOnQuote ? ' checked' : ''} aria-label="Show on quote"></td>
-    <td><button class="icon-btn" data-qba="lab-del" data-id="${r.id}" aria-label="Delete labour row">${X_SVG}</button></td></tr>`).join('');
-  return `<div class="card"><div class="qb-sec-h"><h3>Labour</h3><button class="btn" data-qba="add-lab">+ Add labour</button></div>
-    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Description</th><th>Basis</th><th>Qty</th><th>Rate (£)</th><th>Amount</th><th>Customer group</th><th>Show</th><th></th></tr></thead>
-    <tbody>${rows || '<tr><td colspan="8"><div class="sup-empty">No labour yet.</div></td></tr>'}</tbody></table></div>
-    <label class="q-check" style="margin-top:12px;"><input type="checkbox" data-qb="hdr" data-f="recoverUnpaid"${q.recoverUnpaid ? ' checked' : ''}> Recover unpaid time inside labour</label>
-    <p class="q-help">Stored for now; the calculation comes in a later step. Labour rates default from Settings > Quotes &amp; pricing.</p></div>`;
-}
 function qbDeliveryHtml(q){
   const sups = state.suppliers.filter(s => s.status === 'Active' || q.drops.some(d => d.supplierId === s.id)).map(s => [s.id, s.name]);
   const rows = q.drops.map((d, i) => `<tr><td>${qbIn('drop', d.id, 'label', d.label, { ph: 'Drop ' + (i + 1), aria: 'Label' })}</td>
@@ -4976,7 +5023,7 @@ function qbRender(){
   const ae = document.activeElement; if(ae && box.contains(ae) && ae.blur) ae.blur();   // commit a half-finished edit before the page is rebuilt
   const sc = box.querySelector('.qb-scroll'), sl = sc ? sc.scrollLeft : 0, sy = window.scrollY;
   qAutoDrops(q);
-  box.innerHTML = qbHeaderHtml(q) + qbTilesHtml() + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbSummaryHtml(q) + qbTimelineHtml(q);
+  box.innerHTML = qbBannerHtml(q) + qbHeaderHtml(q) + qbTilesHtml() + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qAsSoldHtml(q) + '<div id="qbActual"></div><div id="qbCash"></div>' + qbTimelineHtml(q);
   const ns = box.querySelector('.qb-scroll'); if(ns) ns.scrollLeft = sl;
   qbRefresh(); window.scrollTo(0, sy);
   document.getElementById('quoteListView').hidden = true; box.hidden = false;
@@ -4988,6 +5035,7 @@ function qbGet(q, el){
   if(k === 'price'){ const l = q.lines.find(x => x.id === id), p = l && l.prices.find(x => String(x.supplierId) === el.dataset.sid); return p ? p[f] : ''; }
   if(k === 'lab'){ const r = q.labour.find(x => x.id === id); return r ? r[f] : undefined; }
   if(k === 'drop'){ const d = q.drops.find(x => x.id === id); return d ? d[f] : undefined; }
+  if(k === 'pay'){ const r = q.payments.find(x => x.id === id); return r ? r[f] : undefined; }
 }
 /* recompute and repaint every calculated cell, tile and total; fields follow the data (unless someone is typing in them) */
 function qbRefresh(){
@@ -4998,7 +5046,7 @@ function qbRefresh(){
   q.drops.forEach(d => { v[d.id + '|orderTotal'] = qm(c.drops[d.id].orderTotal); });
   Object.assign(v, { 'tile|totalEx': qm(c.totalEx), 'tile|vat': qm(c.vat), 'tile|totalInc': qm(c.totalInc), 'tile|materialsCost': qm(c.materialsCost), 'tile|labour': qm(c.labourEx), 'tile|delivery': qm(c.deliveryEx),
     'tile|marginAfter': qm(c.marginAfter), 'tile|marginAfterPct': qpct(c.pctAfter) + ' of price', 'tile|marginBefore': qm(c.marginBefore), 'tile|marginBeforePct': qpct(c.pctBefore) + ' of price',
-    'sum|materialsEx': qm(c.materialsEx), 'sum|labourEx': qm(c.labourEx), 'sum|deliveryEx': qm(c.deliveryEx), 'sum|totalEx': qm(c.totalEx), 'sum|vat': qm(c.vat), 'sum|totalInc': qm(c.totalInc) });
+    'unpaid|hours': hrs(c.unpaid.hours), 'sum|materialsEx': qm(c.materialsEx), 'sum|labourEx': qm(c.labourEx), 'sum|deliveryEx': qm(c.deliveryEx), 'sum|totalEx': qm(c.totalEx), 'sum|vat': qm(c.vat), 'sum|totalInc': qm(c.totalInc) });
   const root = document.getElementById('quoteBuilderView');
   root.querySelectorAll('[data-qc]').forEach(el => { const t = v[el.dataset.qc]; if(t !== undefined && el.textContent !== t) el.textContent = t; });
   root.querySelectorAll('[data-qpc]').forEach(td => {
@@ -5014,6 +5062,7 @@ function qbRefresh(){
   });
   const ref = document.getElementById('qbRef'); if(ref) ref.textContent = qRef(q);
   qbSyncInputs(q, document);
+  qbLiveParts(q, c); qbLock(q);
 }
 function qbSyncInputs(q, scope){
   (scope || document).querySelectorAll('[data-qb]').forEach(el => {
@@ -5029,6 +5078,11 @@ function qbTouch(q, rebuild){
   if(lp && lp.kind === 'qline') qlSync();
 }
 function qbUndoable(msg, restore){ showToast(msg, () => { restore(); qAutoDrops(qFind(qUi.openId) || { drops: [], lines: [], labour: [] }); saveState(); qbRender(); }); }
+function qApplyStatus(q, to){
+  const from = q.status, today = fmt(new Date()); qSetStatus(q, to);
+  if(to === 'Accepted'){ q.acceptedDate = today; q.asSold = qSnapshot(q); q.timeline.push({ date: today, note: 'As-sold snapshot taken (locked)', created: Date.now() + 1, kind: 'asSold' }); }
+  else if(from === 'Accepted'){ q.asSold = null; q.acceptedDate = ''; q.timeline.push({ date: today, note: 'As-sold snapshot removed', created: Date.now() + 1, kind: 'asSold' }); }
+}
 function qSetStatus(q, to){
   if(q.status === to) return;
   q.timeline.push({ date: fmt(new Date()), note: `Status changed from ${q.status} to ${to}`, created: Date.now(), kind: 'status' });
@@ -5036,12 +5090,12 @@ function qSetStatus(q, to){
 }
 function qCreate(){
   const q = { id: state.nextQuoteId++, jobNumber: state.nextJobNumber++, version: 0, refOverride: '', customer: '', address: '', project: '', date: fmt(new Date()), status: 'Draft', vatMode: 'settings', mode: 'new', notes: '',
-    linkedIds: [], recoverUnpaid: false, supplierCols: [], lines: [], labour: [], drops: [], timeline: [{ date: fmt(new Date()), note: 'Quote created', created: Date.now(), kind: 'created' }] };
+    linkedIds: [], recoverUnpaid: false, unpaidOverride: '', acceptedDate: '', asSold: null, payments: [qNewPayment()], supplierCols: [], lines: [], labour: [], drops: [], timeline: [{ date: fmt(new Date()), note: 'Quote created', created: Date.now(), kind: 'created' }] };
   state.quotes.push(q); saveState(); qUi.openId = q.id; renderQuotes();
 }
 function qNewVersion(q){
   const c = JSON.parse(JSON.stringify(q)), map = {}, today = fmt(new Date());
-  c.id = state.nextQuoteId++; c.version = q.version + 1; c.status = 'Draft'; c.refOverride = ''; c.date = today;
+  c.id = state.nextQuoteId++; c.version = q.version + 1; c.status = 'Draft'; c.refOverride = ''; c.date = today; c.asSold = null; c.acceptedDate = '';   // a new version is not sold yet
   c.drops.forEach(d => { const n = qRand('dr_'); map[d.id] = n; d.id = n; });
   c.lines.forEach(l => { l.id = qRand('ln_'); if(l.deliveryDropId) l.deliveryDropId = map[l.deliveryDropId] || ''; });
   c.labour.forEach(r => { r.id = qRand('lb_'); });
@@ -5055,17 +5109,29 @@ function qbChange(el){
   const k = el.dataset.qb, f = el.dataset.f, id = el.dataset.id, v = el.type === 'checkbox' ? el.checked : el.value;
   let rebuild = false;
   if(k === 'hdr'){
-    if(f === 'status'){ qSetStatus(q, QUOTE_STATUSES.includes(v) ? v : q.status); rebuild = true; }
+    if(f === 'status'){
+      const to = QUOTE_STATUSES.includes(v) ? v : q.status;
+      if(to === 'Sent' && q.status !== 'Sent'){
+        const pa = qPayAlloc(q, qCalc(q));
+        if(Math.abs(pa.unallocated) >= 0.005){ showToast(`Not marked as Sent: ${qm(Math.abs(pa.unallocated))} of the payment schedule is ${pa.unallocated < 0 ? 'over-allocated' : 'unallocated'}. Fix it in Customer payment schedule first.`); qbRender(); const u = document.getElementById('qbUnalloc'); if(u) u.scrollIntoView({ block: 'center' }); return; }
+      }
+      if(q.status === 'Accepted' && to !== 'Accepted' && q.asSold){
+        showConfirm('Move this quote out of Accepted?', 'The locked as-sold snapshot will be removed. Accepting it again takes a fresh snapshot.').then(ok => { if(ok) qApplyStatus(q, to); qbTouch(q, true); });
+        return;
+      }
+      qApplyStatus(q, to); rebuild = true;
+    }
     else if(f === 'jobNumber'){ const n = Math.floor(Number(v)); if(n >= 1 && n <= 999) q.jobNumber = n; rebuild = true; }
     else if(f === 'link'){
       q.linkedIds = v ? [v] : [];
-      const lead = state.leads.find(l => recordCode(l.id, 'lead') === v);
+      const hit = v ? dealRecord(linkedRoot(v)) : null, lead = hit ? hit.rec : null;
       if(lead){ const name = lead.contact || lead.company || ''; let filled = false;
         if(!q.customer.trim() && name){ q.customer = name; filled = true; } if(!q.address.trim() && lead.address){ q.address = lead.address; filled = true; } if(!q.project.trim() && lead.projectName){ q.project = lead.projectName; filled = true; }
         if(filled) showToast('Filled the blank customer details from the lead'); }
       rebuild = true;
     }
-    else if(f === 'recoverUnpaid') q.recoverUnpaid = !!v;
+    else if(f === 'recoverUnpaid'){ q.recoverUnpaid = !!v; rebuild = true; }
+    else if(f === 'unpaidOverride') q.unpaidOverride = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
     else if(f === 'date'){ if(/^\d{4}-\d{2}-\d{2}$/.test(v)) q.date = v; }
     else if(['customer', 'address', 'project', 'notes', 'refOverride'].includes(f)) q[f] = String(v).trim();
     if(f === 'refOverride' || f === 'jobNumber') rebuild = true;
@@ -5095,6 +5161,14 @@ function qbChange(el){
     else if(f === 'qty') r.qty = qNumOr(v, 0);
     else if(f === 'rate') r.rate = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
     else if(f === 'showOnQuote') r.showOnQuote = !!v;
+  } else if(k === 'pay'){
+    const r = q.payments.find(x => x.id === id); if(!r) return;
+    if(f === 'label') r.label = String(v).trim();
+    else if(f === 'mode') r.mode = v === 'amount' ? 'amount' : 'percent';
+    else if(f === 'value') r.value = qNumOr(v, 0);
+    else if(f === 'dueMode'){ r.dueMode = ['afterEnd', 'completion', 'acceptance', 'date'].includes(v) ? v : 'afterEnd'; rebuild = true; }
+    else if(f === 'date') r.date = isoOk(v);
+    else if(f === 'days') r.days = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Math.round(Number(v));
   } else if(k === 'drop'){
     const d = q.drops.find(x => x.id === id); if(!d) return;
     if(f === 'label') d.label = String(v).trim();
@@ -5107,12 +5181,37 @@ function qbChange(el){
   }
   qbTouch(q, rebuild);
 }
+function qGoDeal(q){
+  const d = qDeal(q); if(!d) return;
+  if(d.pl === 'sales'){ activateTab('salespipeline'); expandedProjects.add(d.rec.id); render(); const t = document.querySelector(`#pipelineTableWrap [data-action="toggle-project"][data-id="${d.rec.id}"]`), tr = t && t.closest('tr'); if(tr && tr.nextElementSibling) tr.nextElementSibling.scrollIntoView({ block: 'start' }); }
+  else if(d.pl === 'project'){ activateTab('projectpipeline'); expandedProjectsP.add(d.rec.id); render(); }
+  else { activateTab('leads'); expandedLeads.add(d.rec.id); render(); }
+}
 function qbMove(q, list, id, dir){ const i = list.findIndex(x => x.id === id), j = i + dir; if(i < 0 || j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; qbTouch(q, true); }
 function qbAction(a, b){
   if(a === 'filter'){ qUi.status = b.dataset.v; renderQuotes(); return; }
   if(a === 'new'){ qCreate(); return; }
   if(a === 'open'){ qUi.openId = Number(b.dataset.id); renderQuotes(); window.scrollTo(0, 0); return; }
+  if(a === 'tab'){ qUi.tab = b.dataset.v; renderQuotes(); return; }
+  if(a === 'age-check'){ qAgeCheck(b); return; }
+  if(a === 'stage-open'){ openStageLinePanel(b.dataset.pl, Number(b.dataset.rid), b.dataset.sid); return; }
+  if(a === 'sl-log-add'){ slLogAdd(); return; }
+  if(a === 'sl-log-del'){ slLogDel(b.dataset.lid); return; }
+  if(a === 'open-quote'){ qUi.openId = Number(b.dataset.id); qUi.tab = 'quotes'; activateTab('quotations'); renderQuotes(); window.scrollTo(0, 0); return; }
+  if(a === 'open-drop'){
+    qUi.openId = Number(b.dataset.qid); qUi.tab = 'quotes'; activateTab('quotations'); renderQuotes();
+    const el = document.querySelector(`#quoteBuilderView [data-qb="drop"][data-id="${b.dataset.id}"][data-f="label"]`), tr = el && el.closest('tr');
+    if(tr){ tr.scrollIntoView({ block: 'center' }); tr.classList.add('qb-flash'); setTimeout(() => tr.classList.remove('qb-flash'), 1800); }
+    return;
+  }
   const q = qFind(qUi.openId); if(!q) return; const id = b.dataset.id;
+  if(a === 'open-pipeline'){ qGoDeal(q); return; }
+  if(a === 'unlock'){ qUi.unlock.add(q.id); qbRender(); return; }
+  if(a === 'relock'){ qUi.unlock.delete(q.id); qbRender(); return; }
+  if(a === 'unpaid-reset'){ q.unpaidOverride = ''; qbTouch(q, true); return; }
+  if(a === 'add-allowance'){ q.labour.push({ id: qRand('lb_'), description: 'Allowance (site visit and quoting)', basis: 'fixed', qty: 1, rate: '', customerGroup: '', showOnQuote: true }); qbTouch(q, true); const el = document.querySelector(`#quoteBuilderView [data-qb="lab"][data-id="${q.labour[q.labour.length - 1].id}"][data-f="rate"]`); if(el) el.focus(); return; }
+  if(a === 'add-pay'){ q.payments.push(qNewPayment({ label: 'Payment ' + (q.payments.length + 1), mode: 'amount', value: 0 })); qbTouch(q, true); return; }
+  if(a === 'pay-del'){ const i = q.payments.findIndex(r => r.id === id); if(i < 0) return; const [gone] = q.payments.splice(i, 1); qbTouch(q, true); qbUndoable('Payment row deleted', () => { q.payments.splice(Math.min(i, q.payments.length), 0, gone); }); return; }
   if(a === 'back'){ if(lp && lp.kind === 'qline') closeLeadPanel(); qUi.openId = 0; renderQuotes(); return; }
   if(a === 'add-line'){ const l = qNewLine(q); q.lines.push(l); qbTouch(q, true); const el = document.querySelector(`#quoteBuilderView [data-id="${l.id}"][data-f="description"]`); if(el) el.focus(); return; }
   if(a === 'line-del'){ const i = q.lines.findIndex(l => l.id === id); if(i < 0) return; const [gone] = q.lines.splice(i, 1); qbTouch(q, true); qbUndoable('Line deleted', () => { q.lines.splice(Math.min(i, q.lines.length), 0, gone); }); return; }
@@ -5208,6 +5307,390 @@ function qSupplierUses(id){
   });
   return out;
 }
+
+
+/* ---------- Quote Centre step 3: time on stage lines, unpaid time, as-sold lock, payments, cash flow, Gantt drops, price ageing ----------
+   Stage lines (state.pipeline[].stages / state.projects[].stages) gain, additively: id, paidMode 'auto'|'paid'|'unpaid', plannedValue + plannedUnit ('days'|'hours'),
+   log[{ id, date, hours, note }]. state.stageLineTypes [{ id, name, paid }] decides Paid / Unpaid for 'auto' by matching the type name inside the stage label.
+   Quotes gain: payments[], unpaidOverride, acceptedDate, asSold. Quotes hold money; stage lines hold time and dates. */
+const SEED_STAGE_TYPES = [['slt_site_visit', 'Site visit', false], ['slt_quoting', 'Quoting', false], ['slt_estimating', 'Estimating', false], ['slt_supply_run', 'Supply run', false], ['slt_collection', 'Collection', false]];
+const SLT_NOTE = 'A stage line is tagged Unpaid when its name contains one of these (and you have not tagged it by hand). Anything else is Paid.';
+function hpd(){ const n = Number(state.settings.hoursPerDay); return n >= 1 ? n : 8; }
+function isoOk(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : ''; }
+function slEnsure(s){
+  if(!s || typeof s !== 'object') return s;
+  if(!s.id) s.id = qRand('sl_');
+  if(!['auto', 'paid', 'unpaid'].includes(s.paidMode)) s.paidMode = 'auto';
+  const pv = Number(s.plannedValue); s.plannedValue = (s.plannedValue === '' || s.plannedValue == null || isNaN(pv) || pv < 0) ? '' : pv;
+  s.plannedUnit = s.plannedUnit === 'hours' ? 'hours' : 'days';
+  s.log = (Array.isArray(s.log) ? s.log : []).filter(x => x && typeof x === 'object').map(x => ({ id: x.id || qRand('lg_'), date: isoOk(x.date) || fmt(new Date()), hours: qNumOr(x.hours, 0), note: String(x.note == null ? '' : x.note) }));
+  return s;
+}
+function slType(s){ const lbl = String(s.label || '').toLowerCase(); return (state.stageLineTypes || []).find(t => t.name.trim() && lbl.includes(t.name.trim().toLowerCase())) || null; }
+function slPaid(s){ if(s.paidMode === 'paid') return true; if(s.paidMode === 'unpaid') return false; const t = slType(s); return t ? !!t.paid : true; }
+function slPlannedHours(s){ const v = Number(s.plannedValue); if(!(v > 0)) return 0; return s.plannedUnit === 'hours' ? v : v * hpd(); }
+function slLogged(s){ return (s.log || []).reduce((a, x) => a + (Number(x.hours) || 0), 0); }
+function hrs(n){ return (Math.round(n * 100) / 100) + ' h'; }
+function dys(n){ return (Math.round(n * 100) / 100) + ' d'; }
+function slLoggedText(s){ const h = slLogged(s); return h ? `${hrs(h)} (${dys(h / hpd())})` : 'none logged'; }
+
+/* ---- the deal a quote is linked to, and its stage lines ---- */
+function qDeal(q){ for(const c of (q.linkedIds || [])){ const hit = dealRecord(linkedRoot(c)); if(hit) return hit; } return null; }
+function qStageLines(q){ const d = qDeal(q); return d && Array.isArray(d.rec.stages) ? d.rec.stages : []; }
+function qInstallStart(q){
+  const ds = qStageLines(q).filter(s => s.start && (s.kind === 'onsite' || /install/i.test(s.label || ''))).map(s => s.start).sort();
+  return ds[0] || '';
+}
+function qLastEnd(q){ const ds = qStageLines(q).map(s => s.end || s.start).filter(Boolean).sort(); return ds.length ? ds[ds.length - 1] : ''; }
+function qLatestForRoot(root){
+  const latest = {};
+  state.quotes.forEach(q => { if(!(q.linkedIds || []).some(c => linkedRoot(c) === root)) return; const b = latest[q.jobNumber]; if(!b || q.version > b.version) latest[q.jobNumber] = q; });
+  return Object.values(latest).sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id)[0] || null;
+}
+function qLive(){   // quotes that count for cash flow: the highest Sent / Accepted version of each job
+  const best = {};
+  state.quotes.forEach(q => { if(q.status !== 'Sent' && q.status !== 'Accepted') return; const b = best[q.jobNumber]; if(!b || q.version > b.version) best[q.jobNumber] = q; });
+  return Object.values(best);
+}
+function dealHasLiveQuote(root){ return qLive().some(q => (q.linkedIds || []).some(c => linkedRoot(c) === root)); }
+
+/* ---- unpaid time ---- */
+function qUnpaid(q){
+  let hours = 0; qStageLines(q).filter(s => !slPaid(s)).forEach(s => { const lg = slLogged(s); hours += lg > 0 ? lg : slPlannedHours(s); });
+  const rate = Number(state.settings.labourRateHour), rateMissing = !(rate > 0), auto = rateMissing ? 0 : r2(hours * rate);
+  const overridden = q.unpaidOverride !== '' && q.unpaidOverride != null && !isNaN(Number(q.unpaidOverride));
+  return { hours, rate: rateMissing ? 0 : rate, rateMissing, auto, overridden, amount: overridden ? Number(q.unpaidOverride) : auto };
+}
+
+/* ---- payments (money in) ---- */
+function qPayable(q, c){ return qVatOn() ? c.totalInc : c.totalEx; }
+function qAcceptedDate(q){ return q.acceptedDate || q.date; }
+function qPayDate(q, r){
+  if(r.dueMode === 'date') return r.date || '';
+  if(r.dueMode === 'acceptance') return qAcceptedDate(q);
+  const end = qLastEnd(q); if(r.dueMode === 'completion') return end;
+  return end ? addDaysIso(end, r.days === '' ? (Number(state.settings.paymentTermsDays) || 0) : Number(r.days)) : '';
+}
+function qPayAlloc(q, c){
+  const payable = qPayable(q, c);
+  const rows = q.payments.map(r => ({ row: r, amount: r.mode === 'percent' ? r2(payable * (Number(r.value) || 0) / 100) : r2(Number(r.value) || 0), date: qPayDate(q, r) }));
+  const allocated = r2(rows.reduce((a, x) => a + x.amount, 0));
+  return { payable, rows, allocated, unallocated: r2(payable - allocated) };
+}
+function qNewPayment(o){ return Object.assign({ id: qRand('pm_'), label: 'Final payment', mode: 'percent', value: 100, dueMode: 'afterEnd', date: '', days: '' }, o || {}); }
+
+/* ---- cash movements (outflows to suppliers, inflows from the customer) ---- */
+function supColour(id){ const P = ['#4f7cac', '#a8763e', '#7a6fa8', '#4f8a5b', '#8a5a7a', '#2f7f86', '#c9822f', '#9a5a4a']; const i = state.suppliers.findIndex(s => s.id === id); return i < 0 ? '#8b867c' : P[i % P.length]; }
+function qCashItems(q, c){
+  c = c || qCalc(q);
+  const out = [], vatOn = qVatOn(), defRate = (Number(state.settings.vatRate) || 0) / 100, trade = Number(state.settings.tradeAccountDays) || 0, anchor = addDaysIso(qAcceptedDate(q), trade);
+  const gross = l => c.lines[l.id].lineCost * (vatOn ? 1 + (Number(l.vatRate) || 0) / 100 : 1);
+  q.drops.forEach((d, i) => {
+    const tagged = q.lines.filter(l => l.deliveryDropId === d.id), mat = tagged.reduce((a, l) => a + gross(l), 0), del = (Number(d.charge) || 0) * (vatOn ? 1 + defRate : 1), amt = r2(mat + del);
+    if(amt > 0) out.push({ kind: 'out', date: d.paymentDueDate || anchor, estimated: !d.paymentDueDate, amount: amt, label: (d.method === 'collect' ? 'Collection: ' : 'Delivery: ') + (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop ' + (i + 1))), supplierId: d.supplierId || '', qid: q.id, ref: qRef(q), status: q.status });
+  });
+  const un = q.lines.filter(l => !l.deliveryDropId), unAmt = r2(un.reduce((a, l) => a + gross(l), 0));
+  if(unAmt > 0) out.push({ kind: 'out', date: anchor, estimated: true, amount: unAmt, label: 'Materials not on a drop', supplierId: '', qid: q.id, ref: qRef(q), status: q.status });
+  qPayAlloc(q, c).rows.forEach(p => { if(p.amount !== 0 && p.date) out.push({ kind: 'in', date: p.date, estimated: false, amount: p.amount, label: p.row.label || 'Customer payment', supplierId: '', qid: q.id, ref: qRef(q), status: q.status }); });
+  return out;
+}
+function qAllCashItems(){ const items = []; qLive().forEach(q => qCashItems(q).forEach(i => items.push(i))); return items.sort((a, b) => a.date.localeCompare(b.date)); }
+function qMonthly(items){
+  const m = {}; items.forEach(i => { const k = i.date.slice(0, 7), r = m[k] || (m[k] = { key: k, inn: 0, out: 0 }); if(i.kind === 'in') r.inn += i.amount; else r.out += i.amount; });
+  return Object.values(m).sort((a, b) => a.key.localeCompare(b.key));
+}
+
+/* ---- as sold ---- */
+function qLabourDays(r){ const q = Number(r.qty) || 0; return r.basis === 'day' ? q : r.basis === 'halfday' ? q * 0.5 : r.basis === 'hour' ? q / hpd() : 0; }
+function qSnapshot(q){
+  const c = qCalc(q), rows = q.labour.map(r => ({ description: r.description, basis: r.basis, qty: r.qty, rate: r.rate, amount: c.labour[r.id].amount, days: qLabourDays(r), hours: qLabourDays(r) * hpd() }));
+  const un = c.unpaid; if(q.recoverUnpaid && (un.hours > 0 || un.amount)) rows.push({ description: 'Unpaid time recovered', basis: 'hour', qty: un.hours, rate: un.rate, amount: un.amount, days: 0, hours: 0 });
+  const dayRow = q.labour.find(r => r.basis === 'day' && r.rate !== ''), dayRate = dayRow ? Number(dayRow.rate) : (Number(state.settings.labourRateDay) > 0 ? Number(state.settings.labourRateDay) : 0);
+  const days = rows.reduce((a, r) => a + r.days, 0);
+  return { date: fmt(new Date()), mode: q.mode, labourRows: rows, labourDays: days, labourHours: days * hpd(), dayRate, labourEx: c.labourEx, materialsCost: c.materialsCost, materialsEx: c.materialsEx, deliveryEx: c.deliveryEx,
+    totalEx: c.totalEx, vat: c.vat, totalInc: c.totalInc, marginAfter: c.marginAfter, marginBefore: c.marginBefore, pctAfter: c.pctAfter, pctBefore: c.pctBefore };
+}
+function qActual(q){
+  const lines = qStageLines(q), paid = lines.filter(s => slPaid(s)), unpaid = lines.filter(s => !slPaid(s));
+  const paidH = paid.reduce((a, s) => a + slLogged(s), 0), unpaidH = unpaid.reduce((a, s) => a + slLogged(s), 0), unpaidPlan = unpaid.reduce((a, s) => a + slPlannedHours(s), 0);
+  return { paidDays: paidH / hpd(), unpaidH, unpaidPlan, drops: r2(q.drops.reduce((a, d) => a + (Number(d.charge) || 0), 0)) };
+}
+function qActualHtml(q){
+  const s = q.asSold; if(!s) return '';
+  const a = qActual(q), vd = a.paidDays - s.labourDays, vm = s.dayRate > 0 ? vd * s.dayRate : null, dd = a.drops - s.deliveryEx;
+  const col = v => Math.abs(v) < 0.005 ? '' : (v > 0 ? ' q-over' : ' q-under'), word = v => Math.abs(v) < 0.005 ? 'on plan' : (v > 0 ? 'over' : 'under');
+  const row = (l, sold, act, vr, cls, w) => `<tr><td>${l}</td><td class="q-num">${sold}</td><td class="q-num">${act}</td><td class="q-num${cls}">${vr}</td><td class="${cls.trim()}">${w}</td></tr>`;
+  return `<div class="card"><div class="qb-sec-h"><h3>Actual vs sold</h3></div>
+    <p class="q-help" style="margin:0 0 8px;">As sold on ${escHtml(s.date)} (frozen). Logged days come from the Paid stage lines on the linked deal, at ${hpd()} hours per day.</p>
+    <table class="qb-sum qb-avs"><thead><tr><th></th><th>Sold</th><th>Actual</th><th>Variance</th><th></th></tr></thead><tbody>
+      ${row('Labour days', dys(s.labourDays), dys(a.paidDays), (vd > 0 ? '+' : '') + dys(vd), col(vd), word(vd))}
+      ${row('Labour £ (variance × day rate' + (s.dayRate > 0 ? ' ' + qm(s.dayRate) : ', no day rate set') + ')', qm(s.labourEx), '', vm === null ? '—' : (vm > 0 ? '+' : vm < 0 ? '−' : '') + qm(Math.abs(vm)), vm === null ? '' : col(vm), vm === null ? '' : word(vm))}
+      ${row('Unpaid hours logged', '', hrs(a.unpaidH) + (a.unpaidPlan ? ' of ' + hrs(a.unpaidPlan) + ' planned' : ''), '', '', '')}
+      ${row('Delivery (ex VAT) vs drops entered', qm(s.deliveryEx), qm(a.drops), (dd > 0 ? '+' : dd < 0 ? '−' : '') + qm(Math.abs(dd)), col(dd), word(dd))}
+      ${row('Actual materials', qm(s.materialsCost) + ' cost', 'to come', '', '', '')}
+    </tbody></table></div>`;
+}
+function qAsSoldHtml(q){
+  const s = q.asSold; if(!s) return '';
+  return `<div class="card"><div class="qb-sec-h"><h3>As sold</h3><span class="qb-mode">Locked ${escHtml(s.date)}</span></div>
+    <table class="qb-sum"><tbody>
+      <tr><td>Labour (${dys(s.labourDays)} · ${hrs(s.labourHours)})</td><td class="q-num">${qm(s.labourEx)}</td></tr>
+      ${s.labourRows.map(r => `<tr class="qb-dimrow"><td>&nbsp;&nbsp;${escHtml(r.description || 'Labour')}: ${r.basis === 'fixed' ? 'fixed' : (Math.round(r.qty * 100) / 100) + ' × ' + escHtml(r.basis)}</td><td class="q-num">${qm(r.amount)}</td></tr>`).join('')}
+      <tr><td>Materials cost / price ex VAT</td><td class="q-num">${qm(s.materialsCost)} / ${qm(s.materialsEx)}</td></tr><tr><td>Delivery ex VAT</td><td class="q-num">${qm(s.deliveryEx)}</td></tr>
+      <tr class="qb-sum-strong"><td>Total ex VAT</td><td class="q-num">${qm(s.totalEx)}</td></tr><tr><td>VAT</td><td class="q-num">${qm(s.vat)}</td></tr><tr class="qb-sum-strong"><td>Total inc VAT</td><td class="q-num">${qm(s.totalInc)}</td></tr>
+      <tr><td>Margin after wages</td><td class="q-num">${qm(s.marginAfter)} (${qpct(s.pctAfter)})</td></tr><tr><td>Margin before wages</td><td class="q-num">${qm(s.marginBefore)} (${qpct(s.pctBefore)})</td></tr></tbody></table></div>`;
+}
+
+/* ---- seed: Guy Nunn's deal, stage lines, drops (once, onto the step 2 sample quote) ---- */
+function qSeedLink(o){
+  const q = o.quotes.find(x => String(x.refOverride).trim() === 'BWR001' && x.customer === 'Guy Nunn'); if(!q) return;
+  const NAME = 'Guy Nunn - Step Replacement', has = r => String(r.name || r.projectName || '').trim().toLowerCase() === NAME.toLowerCase();
+  let deal = (o.pipeline || []).find(has), pl = 'sales';
+  if(!deal){ deal = (o.projects || []).find(has); if(deal) pl = 'project'; }
+  if(!deal){
+    const all = [].concat(o.leads || [], o.pipeline || [], o.projects || []).map(r => Number(r.id) || 0), id = Math.max(Number(o.nextRecordId) || 0, Number(o.nextPipelineId) || 0, ...all) + 1;
+    o.nextRecordId = id + 1; o.nextPipelineId = id + 1;
+    const sales = (o.pipelineStages && o.pipelineStages.sales) || [], st = sales.find(s => s.id === 'stg_sales_quoted') || sales[0];
+    const S = (label, kind, start, end, plannedValue, plannedUnit) => ({ id: qRand('sl_'), label, kind, start, end, cost: 0, paidMode: 'auto', plannedValue, plannedUnit, log: [] });
+    deal = { id, name: NAME, type: 'real', tier: 'Needs re-scoping', stageId: st ? st.id : '', probability: 0.5, quoteValue: 0, notes: 'Sample deal for quote BWR001 (quotes hold the money; stage lines hold time and dates).',
+      contact: 'Guy Nunn', company: '', leadType: 'Residential', phone: '', email: '', contacts: [], source: '', projectName: 'Step Replacement', address: q.address, postcode: 'BS35 3SF', postcodeManual: false,
+      estValue: '', tierId: '', tierManual: false, budget: '', decisionMaker: '', timeline: '', competition: '', comms: [], contractSigned: '',
+      stages: [ S('Site visit', 'scope', '2026-10-05', '2026-10-05', 2, 'hours'), S('Quoting', 'scope', '2026-10-08', '2026-10-09', 3, 'hours'), S('Supply and delivery', 'materials', '2026-10-16', '2026-10-16', '', 'days'),
+        S('Install', 'onsite', '2026-10-19', '2026-10-21', 3, 'days'), S('Completion', 'other', '2026-10-21', '2026-10-21', '', 'days') ] };
+    o.pipeline.push(deal);
+  }
+  const code = recordCode(deal.id, pl);
+  if(!(q.linkedIds || []).length) q.linkedIds = [code];
+  // drops: only reshape the pristine single "Delivery" drop from step 2 (the £41.67 stays on the Decking Delivery drop, so the template totals do not move)
+  const sup = n => (o.suppliers.find(s => String(s.name).trim().toLowerCase() === n.toLowerCase()) || {}).id || '';
+  if(q.drops.length === 1 && q.drops[0].label === 'Delivery' && !q.drops[0].date){
+    const mk = (label, name, method, charge) => ({ id: qRand('dr_'), label, supplierId: sup(name), date: '2026-10-16', method, charge, chargeManual: true, paymentDueDate: '', dueManual: false });
+    const dd = mk('Decking Delivery: sleepers, timber, posts, screws', 'Decking Delivery', 'delivered', 41.67), tp = mk('Travis Perkins: chippings', 'Travis Perkins', 'delivered', 0), sf = mk('Screwfix: brackets (collect)', 'Screwfix', 'collect', 0);
+    q.drops = [dd, tp, sf];
+    q.lines.forEach(l => { l.deliveryDropId = /bracket/i.test(l.description) ? sf.id : (/chippings/i.test(l.description) ? tp.id : dd.id); });
+    qAutoDrops(q);
+  }
+}
+
+/* ---- builder additions ---- */
+function qLocked(q){ return q.status === 'Accepted' && !qUi.unlock.has(q.id); }
+function qbBannerHtml(q){
+  if(q.status !== 'Accepted') return '';
+  return qLocked(q)
+    ? `<div class="qb-banner"><b>This quote is Accepted.</b> The as-sold figures below are locked. To change the price, make a New version instead.
+        <span class="qb-banner-btns"><button class="btn" data-qba="new-version">New version</button><button class="btn secondary" data-qba="unlock">Edit anyway</button></span></div>`
+    : `<div class="qb-banner warn"><b>Warning: you are editing an Accepted quote.</b> The as-sold snapshot does not change, so the quote and what was sold will drift apart. A New version is safer.
+        <span class="qb-banner-btns"><button class="btn" data-qba="new-version">New version</button><button class="btn secondary" data-qba="relock">Lock again</button></span></div>`;
+}
+function qbDealHtml(q){
+  const d = qDeal(q); if(!d) return '';
+  const label = d.pl === 'lead' ? 'lead' : d.pl === 'sales' ? 'sales deal' : 'project', stages = (d.rec.stages || []).length;
+  return `<div class="qb-deal">Linked ${label}: <b>${escHtml(boardTitle(d.pl, d.rec))}</b> (${recordCode(d.rec.id, d.pl)})${stages ? ` · ${stages} stage line${stages !== 1 ? 's' : ''}` : d.pl === 'lead' ? ' · no stage lines until it is promoted to Sales' : ''}
+    <button type="button" class="btn secondary qb-sm" data-qba="open-pipeline">Open pipeline</button></div>`;
+}
+function qbLabourHtml(q){
+  const un = qUnpaid(q), unpaidRow = q.recoverUnpaid ? `<tr class="qb-autorow"><td><b>Unpaid time recovered</b><div class="q-help">${hrs(un.hours)} of unpaid stage-line time (logged hours, else planned) × the hourly labour rate${un.rateMissing ? '' : ' of ' + qm(un.rate)}</div></td>
+      <td>Auto</td><td class="qb-calc" data-qc="unpaid|hours">${hrs(un.hours)}</td><td class="qb-calc">${un.rateMissing ? '—' : qm(un.rate)}</td>
+      <td class="qb-calc"><input type="number" step="any" min="0" class="qb-n" data-qb="hdr" data-f="unpaidOverride" value="${q.unpaidOverride === '' ? '' : escAttr(q.unpaidOverride)}" placeholder="${un.amount ? un.amount.toFixed(2) : '0.00'}" aria-label="Unpaid time recovered amount">
+        <span class="qb-ov" data-qc="unpaid|ov"${un.overridden ? '' : ' hidden'}>overridden <button type="button" class="sp-link" data-qba="unpaid-reset">reset</button></span></td><td></td><td></td><td></td></tr>` : '';
+  const rows = q.labour.map((r, i) => `<tr><td>${qbIn('lab', r.id, 'description', r.description, { aria: 'Labour description' })}</td>
+    <td>${qbSel('lab', r.id, 'basis', qbOpts(LAB_BASES, r.basis), { aria: 'Basis' })}</td><td>${qbIn('lab', r.id, 'qty', r.qty, { num: true, cls: 'qb-n', aria: 'Qty' })}</td>
+    <td>${qbIn('lab', r.id, 'rate', r.rate, { num: true, cls: 'qb-n', aria: 'Rate £', ph: 'Rate' })}</td><td class="qb-calc" data-qc="${r.id}|amount">—</td>
+    <td>${qbIn('lab', r.id, 'customerGroup', r.customerGroup, { aria: 'Customer group' })}</td>
+    <td class="qb-c"><input type="checkbox" data-qb="lab" data-id="${r.id}" data-f="showOnQuote"${r.showOnQuote ? ' checked' : ''} aria-label="Show on quote"></td>
+    <td><button class="icon-btn" data-qba="lab-del" data-id="${r.id}" aria-label="Delete labour row">${X_SVG}</button></td></tr>`).join('');
+  const unpaidNote = q.recoverUnpaid
+    ? (un.rateMissing ? `<p class="qb-warn" style="margin:8px 0 0;">⚠ Set the hourly labour rate in Settings &gt; Quotes &amp; pricing &gt; Labour and margin. Until then the recovered row counts as £0.</p>` : '')
+    : `<p class="q-help" id="qbUnpaidInfo" style="margin:10px 0 0;">${un.hours > 0 ? `<b>Unpaid time (not charged):</b> ${hrs(un.hours)}${un.rateMissing ? ', set the hourly labour rate in Settings to see its cost' : `, ${qm(r2(un.hours * un.rate))} at the labour rate of ${qm(un.rate)} an hour`}.` : 'No unpaid stage-line time on the linked deal yet.'}</p>`;
+  return `<div class="card"><div class="qb-sec-h"><h3>Labour</h3><div class="qb-sec-tools"><button class="btn secondary" data-qba="add-allowance">Add flat allowance</button><button class="btn" data-qba="add-lab">+ Add labour</button></div></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Description</th><th>Basis</th><th>Qty</th><th>Rate (£)</th><th>Amount</th><th>Customer group</th><th>Show</th><th></th></tr></thead>
+    <tbody>${rows}${unpaidRow}${(!rows && !unpaidRow) ? '<tr><td colspan="8"><div class="sup-empty">No labour yet.</div></td></tr>' : ''}</tbody></table></div>
+    <label class="q-check" style="margin-top:12px;"><input type="checkbox" data-qb="hdr" data-f="recoverUnpaid"${q.recoverUnpaid ? ' checked' : ''}> Recover unpaid time inside labour</label>${unpaidNote}
+    <p class="q-help">Labour rates default from Settings &gt; Quotes &amp; pricing. With the switch on, an automatic row adds the unpaid time from the linked deal's stage lines; type an amount to override it.</p></div>`;
+}
+function qbPaymentsHtml(q){
+  const rows = q.payments.map(r => `<tr><td>${qbIn('pay', r.id, 'label', r.label, { aria: 'Payment label' })}</td>
+    <td>${qbSel('pay', r.id, 'mode', qbOpts([['percent', '%'], ['amount', '£']], r.mode), { aria: '% or £' })}</td><td>${qbIn('pay', r.id, 'value', r.value, { num: true, cls: 'qb-n', aria: 'Amount' })}</td>
+    <td>${qbSel('pay', r.id, 'dueMode', qbOpts([['afterEnd', 'Days after the last stage ends'], ['completion', 'On completion (last stage end)'], ['acceptance', 'On acceptance'], ['date', 'A set date']], r.dueMode), { aria: 'Due' })}</td>
+    <td>${r.dueMode === 'date' ? `<input type="date" data-qb="pay" data-id="${r.id}" data-f="date" value="${escAttr(r.date)}" aria-label="Due date">` : (r.dueMode === 'afterEnd' ? qbIn('pay', r.id, 'days', r.days, { num: true, cls: 'qb-n', ph: String(Number(state.settings.paymentTermsDays) || 0), aria: 'Days' }) : '')}</td>
+    <td class="qb-calc" data-qc="${r.id}|payAmt">—</td><td class="qb-calc" data-qc="${r.id}|payDate">—</td>
+    <td><button class="icon-btn" data-qba="pay-del" data-id="${r.id}" aria-label="Delete payment row">${X_SVG}</button></td></tr>`).join('');
+  return `<div class="card"><div class="qb-sec-h"><h3>Customer payment schedule</h3><button class="btn" data-qba="add-pay">+ Add payment</button></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Label</th><th></th><th>Amount</th><th>Due</th><th>Days / date</th><th>£</th><th>Due date</th><th></th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="8"><div class="sup-empty">No payments yet.</div></td></tr>'}</tbody></table></div>
+    <div class="qb-unalloc" id="qbUnalloc" role="status">—</div>
+    <p class="q-help">Rows must add up to the total ${qVatOn() ? 'inc VAT' : '(VAT is off, so ex VAT)'}. A quote cannot be marked Sent while any of it is unallocated. The due date follows the linked deal's stage lines.</p></div>`;
+}
+function qbCashHtml(q, c){
+  const items = qCashItems(q, c), months = qMonthly(items); if(!items.length) return '';
+  let cum = 0;
+  return `<div class="card"><div class="qb-sec-h"><h3>Cash by month (this project)</h3></div>
+    <p class="q-help" style="margin:0 0 8px;">${q.status === 'Accepted' ? 'This quote is Accepted, so these movements are in the Cash Flow Forecast.' : q.status === 'Sent' ? 'This quote is Sent, so these movements show in the Cash Flow Forecast as “if won”.' : 'Preview only: ' + q.status + ' quotes do not appear in the Cash Flow Forecast.'} Outflows are paid on each drop's payment due date${qVatOn() ? ', with VAT' : ''}.</p>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Month</th><th>In</th><th>Out</th><th>Net</th><th>Running net</th></tr></thead><tbody>
+    ${months.map(m => { const net = m.inn - m.out; cum += net; return `<tr><td>${monthLabel(toDate(m.key + '-01'))}</td><td class="qb-calc">${qm(m.inn)}</td><td class="qb-calc">${qm(m.out)}</td><td class="qb-calc${net < 0 ? ' q-over' : ''}"><b>${net < 0 ? '−' : ''}${qm(Math.abs(net))}</b></td><td class="qb-calc">${cum < 0 ? '−' : ''}${qm(Math.abs(cum))}</td></tr>`; }).join('')}
+    </tbody></table></div>
+    <div class="qb-scroll" style="margin-top:10px;"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>What</th><th>In / out</th><th>Amount</th></tr></thead><tbody>
+    ${items.sort((a, b) => a.date.localeCompare(b.date)).map(i => `<tr><td>${escHtml(i.date)}${i.estimated ? ' <span class="qb-dim">(est.)</span>' : ''}</td><td>${i.supplierId ? `<i class="q-dot" style="background:${supColour(i.supplierId)}"></i>` : ''}${escHtml(i.label)}</td><td>${i.kind === 'in' ? 'In' : 'Out'}</td><td class="qb-calc">${qm(i.amount)}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+}
+/* the parts of the builder that are recalculated live (no inputs inside, so they are simply rewritten) */
+function qbLiveParts(q, c){
+  const el = document.getElementById('qbActual'); if(el) el.innerHTML = qActualHtml(q);
+  const ce = document.getElementById('qbCash'); if(ce) ce.innerHTML = qbCashHtml(q, c);
+  const pa = qPayAlloc(q, c);
+  pa.rows.forEach(x => { const a = document.querySelector(`[data-qc="${x.row.id}|payAmt"]`), d = document.querySelector(`[data-qc="${x.row.id}|payDate"]`); if(a) a.textContent = qm(x.amount); if(d) d.textContent = x.date || 'set the stage dates'; });
+  const ua = document.getElementById('qbUnalloc');
+  if(ua){ const z = Math.abs(pa.unallocated) < 0.005; ua.className = 'qb-unalloc ' + (z ? 'ok' : 'bad'); ua.textContent = z ? `Fully allocated: ${qm(pa.payable)}` : `Unallocated: ${pa.unallocated < 0 ? '−' : ''}${qm(Math.abs(pa.unallocated))} of ${qm(pa.payable)}`; }
+  const un = c.unpaid, ov = document.querySelector('[data-qc="unpaid|ov"]'); if(ov) ov.hidden = !un.overridden;
+  const inf = document.getElementById('qbUnpaidInfo');
+  if(inf) inf.innerHTML = un.hours > 0 ? `<b>Unpaid time (not charged):</b> ${hrs(un.hours)}${un.rateMissing ? ', set the hourly labour rate in Settings to see its cost' : `, ${qm(r2(un.hours * un.rate))} at the labour rate of ${qm(un.rate)} an hour`}.` : 'No unpaid stage-line time on the linked deal yet.';
+}
+function qbLock(q){
+  const box = document.getElementById('quoteBuilderView'), lock = qLocked(q);
+  box.querySelectorAll('[data-qb]').forEach(el => { if(el.dataset.f === 'status' || el.closest('#lpBody')) return; el.disabled = lock; });
+  box.querySelectorAll('[data-qba]').forEach(b => { if(['add-line', 'line-up', 'line-down', 'line-dup', 'line-del', 'del-supcol', 'add-lab', 'add-allowance', 'lab-del', 'add-drop', 'drop-del', 'add-pay', 'pay-del', 'use-new', 'unpaid-reset'].includes(b.dataset.qba)) b.disabled = lock; });
+  const sp = document.getElementById('qbAddSup'); if(sp) sp.disabled = lock;
+  box.classList.toggle('qb-locked', lock);
+}
+
+/* ---- pipeline: stage line time (table cell + shared side panel) ---- */
+function slSummaryHtml(s){
+  const paid = slPaid(s), plan = slPlannedHours(s), lg = slLogged(s);
+  return `<span class="sl-tag ${paid ? 'paid' : 'unpaid'}">${paid ? 'Paid' : 'Unpaid'}</span> <span class="sl-sum">${plan ? hrs(plan) + ' planned' : 'no plan'} · ${lg ? hrs(lg) + ' logged' : 'none logged'}</span>`;
+}
+function slQuoteNoteHtml(root){
+  const q = qLatestForRoot(root); if(!q) return '';
+  return `<div class="q-help sl-note">Quote costs are held on <b>${escHtml(qRef(q))}</b> once a quote is linked. The Cost (£) on these stage lines is left as it is but is not counted again in the cash flow.</div>`;
+}
+function slFind(pl, rid, sid){ const rec = findRec(pl, rid); return { rec, s: rec ? (rec.stages || []).find(x => x.id === sid) || null : null }; }
+function slHeadHtml(s, rec, pl){ return `<div class="lp-title">${escHtml(s.label || 'Stage line')}</div><div class="lp-sub"><span>${escHtml(boardTitle(pl || (lp && lp.pl) || 'sales', rec))}</span><span class="sl-tag ${slPaid(s) ? 'paid' : 'unpaid'}">${slPaid(s) ? 'Paid' : 'Unpaid'}</span></div>`; }
+function slBodyHtml(s, rec, pl){
+  pl = pl || lp.pl; const root = rec.id, t = slType(s), f = (label, inner, help) => `<div class="lp-f"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
+  const at = `data-sl data-pl="${pl}" data-rid="${rec.id}" data-sid="${s.id}"`;
+  const log = (s.log || []).slice().sort((a, b) => b.date.localeCompare(a.date)).map(x => `<div class="sl-log"><input type="date" ${at} data-lf="date" data-lid="${x.id}" value="${escAttr(x.date)}" aria-label="Date"><input type="number" step="any" min="0" ${at} data-lf="hours" data-lid="${x.id}" value="${x.hours}" aria-label="Hours"><input type="text" ${at} data-lf="note" data-lid="${x.id}" value="${escAttr(x.note)}" placeholder="Note" aria-label="Note"><button class="icon-btn" data-qba="sl-log-del" data-lid="${x.id}" aria-label="Delete entry">${X_SVG}</button></div>`).join('');
+  return `<section class="lp-sec" id="lp-sec-plan" data-sec="plan"><h3>Plan</h3>
+      ${f('Paid or unpaid', `<select ${at} data-lf="paidMode"><option value="auto"${s.paidMode === 'auto' ? ' selected' : ''}>Automatic (${slType(s) ? 'matches “' + escHtml(slType(s).name) + '”: ' + (slType(s).paid ? 'Paid' : 'Unpaid') : 'Paid'})</option><option value="paid"${s.paidMode === 'paid' ? ' selected' : ''}>Paid</option><option value="unpaid"${s.paidMode === 'unpaid' ? ' selected' : ''}>Unpaid</option></select>`, 'Automatic uses the stage line types in Settings &gt; Quotes &amp; pricing &gt; Labour and margin.')}
+      ${f('Planned time', `<div class="q-inline"><input type="number" step="any" min="0" ${at} data-lf="plannedValue" value="${s.plannedValue === '' ? '' : s.plannedValue}" placeholder="Blank = none" aria-label="Planned time"><select ${at} data-lf="plannedUnit"><option value="days"${s.plannedUnit === 'days' ? ' selected' : ''}>days</option><option value="hours"${s.plannedUnit === 'hours' ? ' selected' : ''}>hours</option></select></div>`, `Hours convert at ${hpd()} per day (Settings).`)}
+      <div class="q-help" id="slPlanOut">${slPlannedHours(s) ? `Planned: ${hrs(slPlannedHours(s))} = ${dys(slPlannedHours(s) / hpd())}` : 'No planned time.'}</div>
+      ${slQuoteNoteHtml(root)}
+    </section>
+    <section class="lp-sec" id="lp-sec-log" data-sec="log"><h3>Time logged</h3>
+      <div class="q-help" id="slLogOut" style="margin:0 0 8px;"><b>${hrs(slLogged(s))}</b> = ${dys(slLogged(s) / hpd())}</div>
+      <div class="sl-log sl-add"><input type="date" id="slLogDate" value="${fmt(new Date())}" aria-label="Date"><input type="number" step="any" min="0" id="slLogHours" placeholder="Hours" aria-label="Hours"><input type="text" id="slLogNote" placeholder="Note" aria-label="Note"><button class="btn" data-qba="sl-log-add">Add</button></div>
+      <div id="slLogList">${log || '<div class="lp-empty">No time logged yet.</div>'}</div>
+    </section>`;
+}
+function openStageLinePanel(pl, rid, sid){
+  const { rec, s } = slFind(pl, rid, sid); if(!s) return; slEnsure(s);
+  lpOpen({ kind: 'stline', id: sid, pl, rid }, { cls: 'lc-sup', label: 'Edit stage line time', code: recordCode(rid, pl), chips: [['plan', 'Plan'], ['log', 'Time logged']], head: slHeadHtml(s, rec, pl), body: slBodyHtml(s, rec, pl), sec: '', refresh: () => {} });
+}
+function slSync(){
+  const { rec, s } = lp ? slFind(lp.pl, lp.rid, lp.id) : {}; if(!s){ closeLeadPanel(); return; }
+  lpEl('lpHeadInfo').innerHTML = slHeadHtml(s, rec);
+  const po = lpEl('slPlanOut'); if(po) po.textContent = slPlannedHours(s) ? `Planned: ${hrs(slPlannedHours(s))} = ${dys(slPlannedHours(s) / hpd())}` : 'No planned time.';
+  const lo = lpEl('slLogOut'); if(lo) lo.innerHTML = `<b>${hrs(slLogged(s))}</b> = ${dys(slLogged(s) / hpd())}`;
+}
+function slAfter(){ saveState(); render(); }
+function slChange(el){
+  const { s } = slFind(el.dataset.pl, Number(el.dataset.rid), el.dataset.sid); if(!s) return; slEnsure(s);
+  const f = el.dataset.lf, v = el.value;
+  if(el.dataset.lid){
+    const x = s.log.find(l => l.id === el.dataset.lid); if(!x) return;
+    if(f === 'date') x.date = isoOk(v) || x.date; else if(f === 'hours') x.hours = qNumOr(v, 0); else if(f === 'note') x.note = v.trim();
+  } else if(f === 'paidMode') s.paidMode = ['paid', 'unpaid'].includes(v) ? v : 'auto';
+  else if(f === 'plannedValue') s.plannedValue = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
+  else if(f === 'plannedUnit') s.plannedUnit = v === 'hours' ? 'hours' : 'days';
+  slAfter();
+  if(f === 'paidMode' || f === 'plannedUnit') { const { rec } = slFind(el.dataset.pl, Number(el.dataset.rid), el.dataset.sid); lpEl('lpBody').innerHTML = slBodyHtml(s, rec); }
+}
+function slLogAdd(){
+  const { rec, s } = lp ? slFind(lp.pl, lp.rid, lp.id) : {}; if(!s) return; slEnsure(s);
+  const h = Number(lpEl('slLogHours').value); if(!(h > 0)){ lpEl('slLogHours').focus(); return; }
+  s.log.push({ id: qRand('lg_'), date: isoOk(lpEl('slLogDate').value) || fmt(new Date()), hours: h, note: lpEl('slLogNote').value.trim() });
+  slAfter(); lpEl('lpBody').innerHTML = slBodyHtml(s, rec); const hh = lpEl('slLogHours'); if(hh) hh.focus();
+}
+function slLogDel(lid){
+  const { rec, s } = lp ? slFind(lp.pl, lp.rid, lp.id) : {}; if(!s) return;
+  const i = s.log.findIndex(x => x.id === lid); if(i < 0) return; const [gone] = s.log.splice(i, 1);
+  slAfter(); lpEl('lpBody').innerHTML = slBodyHtml(s, rec);
+  showToast('Time entry removed', () => { s.log.splice(Math.min(i, s.log.length), 0, gone); slAfter(); if(lp && lp.kind === 'stline') lpEl('lpBody').innerHTML = slBodyHtml(s, rec); });
+}
+document.addEventListener('change', (e) => { const el = e.target; if(el.dataset && el.dataset.sl !== undefined && state && el.isConnected) slChange(el); });
+
+/* ---- the quote on a lead / deal / project ---- */
+function quoteChipHtml(root){
+  const q = qLatestForRoot(root); if(!q) return '';
+  const c = qCalc(q), vatOn = qVatOn();
+  return `<div class="q-chip"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>version ${q.version}</span><span class="q-st q-st-${q.status}">${q.status}</span>
+    <span>${qm(c.totalEx)} ex VAT${vatOn ? ' · ' + qm(c.totalInc) + ' inc VAT' : ''}</span><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open quote</button></div>`;
+}
+
+/* ---- Gantt: delivery drops ---- */
+const DROP_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v9H2zM13 9h5l3 3v3h-8z"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>';
+const COLLECT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
+function qDropsFor(root){
+  const q = qLatestForRoot(root); if(!q || q.status === 'Declined' || q.status === 'Expired') return [];
+  return q.drops.filter(d => d.date).map(d => ({ q, d }));
+}
+function qGanttMarkers(root, o){
+  const by = {}; qDropsFor(root).forEach(x => { (by[x.d.date] = by[x.d.date] || []).push(x); });
+  return Object.keys(by).map(date => {
+    const left = dayIdx(toDate(date), o.start) * o.px;
+    return `<div class="gantt-drops" style="left:${left}px">${by[date].map(({ q, d }) => {
+      const name = d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop'), collect = d.method === 'collect';
+      return `<span class="gantt-drop ${collect ? 'collect' : 'delivered'}" data-qba="open-drop" data-qid="${q.id}" data-id="${d.id}" title="${escAttr((collect ? 'Collection' : 'Delivery') + ': ' + name + ' · ' + fmtDisplay(toDate(date)) + ' · ' + qRef(q))}">${collect ? COLLECT_SVG : DROP_SVG}<em>${escHtml(name)}</em></span>`;
+    }).join('')}</div>`;
+  }).join('');
+}
+
+/* ---- price ageing ---- */
+function qAgeRows(){
+  const rows = [], now = Date.now();
+  state.quotes.filter(q => q.status === 'Draft' || q.status === 'Sent').forEach(q => q.lines.forEach(l => l.prices.forEach(p => {
+    const sup = supFind(p.supplierId), validity = sup ? Number(sup.priceValidityDays) || 0 : 0, age = Math.max(0, Math.floor((now - new Date(p.date + 'T00:00:00').getTime()) / 86400000));
+    const status = !validity || age <= validity ? 'ok' : (age <= 2 * validity ? 'stale' : 'expired');
+    rows.push({ q, l, p, sup, validity, age, status });
+  })));
+  return rows.sort((a, b) => b.age - a.age || qRef(a.q).localeCompare(qRef(b.q)));
+}
+function renderQuoteAgeing(){
+  const box = document.getElementById('quoteAgeingView'); if(!box) return;
+  const all = qAgeRows(), sups = [...new Map(all.filter(r => r.sup).map(r => [r.sup.id, r.sup.name])).entries()];
+  const rows = all.filter(r => !qUi.ageSup || String(r.p.supplierId) === qUi.ageSup);
+  const ae = document.activeElement;
+  box.innerHTML = `<div class="crm-filters"><select id="qAgeSup" aria-label="Filter by supplier" style="width:auto;border:1px solid var(--line);background:#fff;padding:7px 8px;"><option value="">All suppliers</option>${sups.map(([id, n]) => `<option value="${id}"${qUi.ageSup === String(id) ? ' selected' : ''}>${escHtml(n)}</option>`).join('')}</select>
+      <span class="sup-count">${rows.length} priced line${rows.length !== 1 ? 's' : ''} on Draft and Sent quotes, oldest first</span></div>
+    <p class="q-help">Stale = older than the supplier's price validity. Expired = more than twice that. Suppliers with no validity set always show OK.</p>
+    <div class="qb-scroll"><table class="quotes-table"><thead><tr><th>Quote</th><th>Line</th><th>Supplier</th><th>Price</th><th>Date entered</th><th>Age (days)</th><th>Validity (days)</th><th>Status</th><th></th></tr></thead><tbody>
+    ${rows.length ? rows.map(r => `<tr><td class="code-cell">${escHtml(qRef(r.q))}</td><td title="${escAttr(r.l.description)}">${escHtml(r.l.description || '(no description)')}</td><td>${escHtml(r.sup ? r.sup.name : '(removed)')}</td>
+      <td class="q-num">${qm(r.p.price)}</td><td>${escHtml(r.p.date)}</td><td class="q-num">${r.age}</td><td class="q-num">${r.validity || '—'}</td>
+      <td><span class="q-age q-age-${r.status}">${r.status === 'ok' ? 'OK' : r.status === 'stale' ? 'Stale' : 'Expired'}</span></td>
+      <td><button class="btn secondary qb-sm" data-qba="age-check" data-qid="${r.q.id}" data-lid="${r.l.id}" data-sid="${r.p.supplierId}">Mark as checked today</button></td></tr>`).join('') : '<tr><td colspan="9"><div class="sup-empty">No priced lines on Draft or Sent quotes.</div></td></tr>'}
+    </tbody></table></div>`;
+}
+function qAgeCheck(b){
+  const q = qFind(Number(b.dataset.qid)), l = q && q.lines.find(x => x.id === b.dataset.lid), p = l && l.prices.find(x => String(x.supplierId) === b.dataset.sid); if(!p) return;
+  p.date = fmt(new Date());
+  q.timeline.push({ date: p.date, note: `Price checked: ${l.description || 'line'} from ${qbSupName(p.supplierId)} at ${qm(p.price)}`, created: Date.now(), kind: 'price' });
+  saveState(); renderQuotes();
+}
+
+function projStageTimeHtml(p){
+  const st = Array.isArray(p.stages) ? p.stages : []; if(!st.length) return '';
+  return `<div class="stage-label-row">Stage lines — time</div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Start</th><th>End</th><th>Time</th></tr></thead><tbody>
+    ${st.map(s => `<tr><td>${escHtml(s.label || 'Stage')}</td><td>${escHtml(s.start || '—')}</td><td>${escHtml(s.end || '—')}</td><td><button type="button" class="btn secondary qb-sm sl-btn" data-qba="stage-open" data-pl="project" data-rid="${p.id}" data-sid="${slEnsure(s).id}">${slSummaryHtml(s)}</button></td></tr>`).join('')}</tbody></table></div>${slQuoteNoteHtml(p.id)}`;
+}
+function renderCashflowQuotes(){
+  const box = document.getElementById('cashflowQuoteBox'); if(!box) return;
+  const items = qAllCashItems(); if(!items.length){ box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="card" style="margin-top:14px;"><div class="qb-sec-h"><h3>Quote cash movements</h3></div>
+    <p class="q-help" style="margin:0 0 8px;">Solid rows are Accepted quotes and are in the totals above. Dashed rows are Sent quotes, shown “if won”, and are not in the closing balance. A deal with a Sent or Accepted quote is counted from the quote, not from its stage costs.</p>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Quote</th><th>What</th><th>In / out</th><th>Amount</th><th></th></tr></thead><tbody>
+    ${items.map(i => `<tr class="${i.status === 'Accepted' ? '' : 'cf-ifwon'}"><td>${escHtml(i.date)}${i.estimated ? ' <span class="qb-dim">(est.)</span>' : ''}</td><td><button class="sp-link" data-qba="open-quote" data-id="${i.qid}">${escHtml(i.ref)}</button></td>
+      <td>${i.supplierId ? `<i class="q-dot" style="background:${supColour(i.supplierId)}"></i>` : ''}${escHtml(i.label)}</td><td>${i.kind === 'in' ? 'In' : 'Out'}</td><td class="qb-calc">${qm(i.amount)}</td><td>${i.status === 'Accepted' ? '' : 'if won'}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+}
+document.addEventListener('change', (e) => { if(e.target.id === 'qAgeSup'){ qUi.ageSup = e.target.value; renderQuoteAgeing(); } });
 
 function renderTransactions(){
   const txns = state.transactions;
@@ -5383,7 +5866,8 @@ function renderRevenueBreakdown(){
 /* ---------- cash flow ---------- */
 function computeCashFlow(months){
   const fixedMonthly = totalOverhead()/12;
-  let closing = (state.settings && Number(state.settings.startingCash)) || Number(state.startingCash) || 0;
+  let closing = (state.settings && Number(state.settings.startingCash)) || Number(state.startingCash) || 0, closingIf = closing;
+  const qItems = qAllCashItems(), liveRoots = new Set(qLive().flatMap(q => (q.linkedIds || []).map(linkedRoot)));   // a deal with a live quote is counted from the quote, not from its stage costs
   const tradeDays = (state.settings && state.settings.tradeAccountDays) || 30;
   return months.map(m => {
     const key = monthKey(m); let committedIn=0, weightedIn=0, materialsOut=0;
@@ -5395,12 +5879,15 @@ function computeCashFlow(months){
       });
     });
     state.pipeline.forEach(r => {
+      if(liveRoots.has(r.id)) return;
       const d = derivePipelineRow(r);
       if(d.paymentDue && monthKey(d.paymentDue)===key) weightedIn += (Number(r.quoteValue)||0)*effectiveProb(r);
       if(d.materialsPaymentDue && monthKey(d.materialsPaymentDue)===key) materialsOut += (Number(d.materialsCost)||0)*effectiveProb(r);
     });
-    const net = committedIn + weightedIn - materialsOut - fixedMonthly; closing += net;
-    return { label: monthLabel(m), committedIn, weightedIn, materialsOut, fixedMonthly, net, closing };
+    let qIn = 0, qOut = 0, qInIf = 0, qOutIf = 0;
+    qItems.forEach(i => { if(i.date.slice(0, 7) !== key) return; const acc = i.status === 'Accepted'; if(i.kind === 'in'){ if(acc) qIn += i.amount; else qInIf += i.amount; } else { if(acc) qOut += i.amount; else qOutIf += i.amount; } });
+    const net = committedIn + weightedIn + qIn - materialsOut - qOut - fixedMonthly; closing += net; closingIf += net + qInIf - qOutIf;
+    return { label: monthLabel(m), committedIn, weightedIn, materialsOut, fixedMonthly, qIn, qOut, qInIf, qOutIf, net, closing, closingIf };
   });
 }
 function renderCashflow(){
@@ -5413,11 +5900,17 @@ function renderCashflow(){
     <tr><td>Cash in — committed (projects)</td>${cf.map(c=>`<td>${money(c.committedIn)}</td>`).join('')}</tr>
     <tr><td>Cash in — weighted pipeline</td>${cf.map(c=>`<td>${money(c.weightedIn)}</td>`).join('')}</tr>
     <tr><td>Cash out — materials</td>${cf.map(c=>`<td>-${money(c.materialsOut)}</td>`).join('')}</tr>
+    <tr><td>Quotes — cash in (accepted)</td>${cf.map(c=>`<td>${money(c.qIn)}</td>`).join('')}</tr>
+    <tr><td>Quotes — cash out (accepted)</td>${cf.map(c=>`<td>-${money(c.qOut)}</td>`).join('')}</tr>
+    <tr class="cf-ifwon"><td>Quotes — cash in <em>(if won, sent)</em></td>${cf.map(c=>`<td>${money(c.qInIf)}</td>`).join('')}</tr>
+    <tr class="cf-ifwon"><td>Quotes — cash out <em>(if won, sent)</em></td>${cf.map(c=>`<td>-${money(c.qOutIf)}</td>`).join('')}</tr>
     <tr><td>Cash out — fixed overhead</td>${cf.map(c=>`<td>-${money(c.fixedMonthly)}</td>`).join('')}</tr>
     <tr><td><strong>Net cash flow</strong></td>${cf.map(c=>`<td><strong>${c.net<0?'-':''}${money(Math.abs(c.net))}</strong></td>`).join('')}</tr>
     <tr><td>Closing balance</td>${cf.map(c=>`<td${c.closing<0?' style="color:#b3453f;font-weight:700;"':''}>${money(c.closing)}</td>`).join('')}</tr>
+    <tr class="cf-ifwon"><td>Closing balance <em>(if sent quotes are won)</em></td>${cf.map(c=>`<td${c.closingIf<0?' style="color:#b3453f;font-weight:700;"':''}>${money(c.closingIf)}</td>`).join('')}</tr>
     </tbody></table>`;
   document.getElementById('cashflowTableWrap').innerHTML = html;
+  renderCashflowQuotes();
 }
 
 /* ---------- generic simple tables ---------- */
