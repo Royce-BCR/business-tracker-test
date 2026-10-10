@@ -952,6 +952,11 @@
   .gantt-drops { position: absolute; top: -1px; display: flex; gap: 3px; z-index: 3; }
   .gantt-drop { display: inline-flex; align-items: center; gap: 3px; height: 14px; padding: 0 4px; border-radius: 4px; background: #fff; border: 1px solid #a8763e; color: #7a5128; cursor: pointer; font-size: 9px; white-space: nowrap; }
   .gantt-drop.collect { border-style: dashed; border-color: #4f7cac; color: #2f4f78; } .gantt-drop svg { width: 10px; height: 10px; } .gantt-drop em { font-style: normal; max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+  .qcd-grid { display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; } .qcd-tabs { display: none; gap: 6px; margin-bottom: 10px; }
+  .qcd-opts select { border: 1px solid var(--line); background: #fff; padding: 7px 8px; } .qcd-btns { display: grid; gap: 8px; margin: 12px 0; }
+  .qcd-prev { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 18px 20px; max-height: 900px; overflow: auto; }
+  .qcd-msg { font-size: 12.5px; min-height: 0; } .qcd-msg.ok { color: #1e5c2e; } .qcd-msg.bad { color: #b3453f; font-weight: 600; }
+  @media (max-width: 1000px) { .qcd-grid { grid-template-columns: 1fr; } .qcd-tabs { display: flex; } .qcd-grid[data-cv="opts"] .qcd-prev { display: none; } .qcd-grid[data-cv="prev"] .qcd-opts { display: none; } }
   .q-help { font-size: 12px; color: var(--muted); margin: 4px 0 0; line-height: 1.45; }
   .q-err { font-size: 12px; color: #b3453f; margin: 4px 0 0; }
   .q-err:empty { display: none; }
@@ -1770,6 +1775,15 @@ create policy "app update" on tracker_data for update using (true) with check (t
   </div>
 </div>
 
+<div class="modal-overlay" id="xlsxOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="xlsxTitle">
+    <div class="modal-title" id="xlsxTitle">Download Excel</div>
+    <div class="modal-msg">Sheet 1 is the quote as the customer sees it. The internal costing sheet shows your costs and margins: only include it for your own use.</div>
+    <label class="q-check" style="margin-bottom:18px;"><input type="checkbox" id="xlsxInternal"> Include internal costing sheet</label>
+    <div class="modal-actions"><button class="btn secondary" data-xl="cancel">Cancel</button><button class="btn" id="xlsxGo" data-xl="go">Download</button></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalOverlay" hidden>
   <div class="modal">
     <div class="modal-title" id="modalTitle"></div>
@@ -1980,6 +1994,8 @@ function ensureQuoteModel(o, seedAction){
   st.insuranceCover = str(st.insuranceCover).trim();
   st.complaintDays = intOr(st.complaintDays, 3, 1);
   st.hoursPerDay = intOr(st.hoursPerDay, 8, 1);
+  st.quoteViewMode = ['A', 'B', 'C', 'D'].includes(st.quoteViewMode) ? st.quoteViewMode : 'D';
+  st.showGroupPricesC = st.showGroupPricesC === true;
   st.complaintDayType = st.complaintDayType === 'calendar' ? 'calendar' : 'working';
   st.vatNumber = str(st.vatNumber).trim();
   st.vatRegistered = st.vatRegistered === true && !!st.vatNumber;   // ON only ever with a VAT number
@@ -2190,6 +2206,7 @@ function mergeDefaults(loaded){
   if(!Array.isArray(loaded.quotes)){ out.quotes = []; out.nextQuoteId = 1; out.nextJobNumber = 1; }   // old backups: no quotes yet (not the sample ones from the defaults)
   out.settings.quoteSampleSeeded = !!(loaded.settings && loaded.settings.quoteSampleSeeded);
   out.settings.quoteLinkSeeded = !!(loaded.settings && loaded.settings.quoteLinkSeeded);
+  out.settings.quoteDocSeeded = !!(loaded.settings && loaded.settings.quoteDocSeeded);
   ensureQuoteModel(out, true);   // old backups: quote settings, units and line categories get defaults; the insurance Action is added once
   ensureQuoteDocModel(out, true);   // quotes: normalise, and load the sample quote once
   out.branding = normaliseBranding(loaded.branding);   // old backups: default name and font, no logos
@@ -4516,7 +4533,7 @@ const QS_FIELD = {   // key -> kind. 'int' needs a whole number >= min (blank / 
   insuranceCover: { k: 'free' }, complaintDays: { k: 'int', min: 1 }, complaintDayType: { k: 'sel' }, vatNumber: { k: 'vatno' }, vatRate: { k: 'num', min: 0, max: 100 },
   tradeAccountDays: { k: 'int', min: 0 }, labourRateHour: { k: 'opt' }, labourRateHalfDay: { k: 'opt' }, labourRateDay: { k: 'opt' },
   labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' },
-  hoursPerDay: { k: 'int', min: 1 }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
+  hoursPerDay: { k: 'int', min: 1 }, quoteViewMode: { k: 'view' }, showGroupPricesC: { k: 'bool' }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
 };
 function qtF(label, field, o){
   o = o || {}; const v = state.settings[field];
@@ -4545,6 +4562,9 @@ function renderQuoteSettings(){
     <div class="lp-f" style="max-width:560px;margin-top:6px;"><label>Insurance cover</label>
       <input type="text" autocomplete="off" data-q="insuranceCover" value="${escAttr(s.insuranceCover)}">
       <p class="q-help">Terms only show an insurance clause when this is filled in.</p></div>
+    <div class="q-sub">Customer view</div>
+    <div class="assumptions-grid"><div class="lp-f"><label>Default customer view</label><select data-q="quoteViewMode" aria-label="Default customer view">${VIEW_MODES.map(m => `<option value="${m[0]}"${s.quoteViewMode === m[0] ? ' selected' : ''}>Mode ${m[0]} — ${escHtml(m[1])}</option>`).join('')}</select><p class="q-help">Each quote can use its own view; this is the starting point.</p></div>
+      <div class="lp-f"><label>Mode C</label><label class="q-check"><input type="checkbox" data-q="showGroupPricesC"${s.showGroupPricesC ? ' checked' : ''}> Show group prices in mode C</label><p class="q-help">Off: only the grand total is priced.</p></div></div>
     <div class="q-sub">VAT</div>
     <label class="q-check"><input type="checkbox" data-q="vatRegistered"${vatOn ? ' checked' : ''}> Business is VAT registered</label>
     ${vatOn ? `<div class="assumptions-grid" style="margin-top:10px;">
@@ -4643,6 +4663,8 @@ function qtApplyField(el){
   if(spec.k === 'text'){ if(v) st[f] = v; else el.value = st[f]; }
   else if(spec.k === 'free') st[f] = v;
   else if(spec.k === 'sel') st[f] = v === 'calendar' ? 'calendar' : 'working';
+  else if(spec.k === 'view') st[f] = ['A', 'B', 'C', 'D'].includes(v) ? v : st[f];
+  else if(spec.k === 'bool') st[f] = !!el.checked;
   else if(spec.k === 'int'){ const n = Math.round(Number(v)); if(v !== '' && !isNaN(n) && n >= spec.min) st[f] = n; else el.value = st[f]; }
   else if(spec.k === 'num'){ const n = qNum(v, spec.min, spec.max); if(n !== '') st[f] = n; else el.value = st[f]; }
   else if(spec.k === 'opt'){ st[f] = qNum(v, 0); el.value = st[f]; }
@@ -4757,6 +4779,8 @@ function ensureQuoteDocModel(o, seed){
       q.timeline = (Array.isArray(q.timeline) ? q.timeline : []).filter(t => t && typeof t === 'object').map(t => ({ date: iso(t.date) || fmt(new Date()), note: str(t.note), created: Number(t.created) || 0, kind: str(t.kind) }));
       q.recoverUnpaid = !!q.recoverUnpaid;
       q.unpaidOverride = (q.unpaidOverride === '' || q.unpaidOverride == null || isNaN(Number(q.unpaidOverride)) || Number(q.unpaidOverride) < 0) ? '' : Number(q.unpaidOverride);
+      q.viewMode = ['A', 'B', 'C', 'D'].includes(q.viewMode) ? q.viewMode : '';
+      q.sentSnapshot = (q.sentSnapshot && typeof q.sentSnapshot === 'object' && q.sentSnapshot.docs && q.sentSnapshot.terms) ? q.sentSnapshot : null;
       q.acceptedDate = iso(q.acceptedDate); q.asSold = (q.asSold && typeof q.asSold === 'object') ? q.asSold : null;
       q.payments = Array.isArray(q.payments) ? q.payments.filter(r => r && typeof r === 'object').map(r => ({ id: str(r.id) || qRand('pm_'), label: str(r.label), mode: r.mode === 'amount' ? 'amount' : 'percent', value: qNumOr(r.value, 0),
         dueMode: ['afterEnd', 'completion', 'acceptance', 'date'].includes(r.dueMode) ? r.dueMode : 'afterEnd', date: iso(r.date), days: (r.days === '' || r.days == null || isNaN(Number(r.days)) || Number(r.days) < 0) ? '' : Math.round(Number(r.days)) })) : [qNewPayment()];
@@ -4779,7 +4803,8 @@ function ensureQuoteDocModel(o, seed){
     if(!(Number(o.nextJobNumber) > maxJob)) o.nextJobNumber = maxJob + 1;
     (o.pipeline || []).concat(o.projects || []).forEach(r => { if(r && Array.isArray(r.stages)) r.stages.forEach(slEnsure); });   // stage lines: ids, paid tag, planned time, time log
     if(seed && !o.settings.quoteLinkSeeded) qSeedLink(o);
-    if(seed){ o.settings.quoteSampleSeeded = true; o.settings.quoteLinkSeeded = true; }
+    if(seed && !o.settings.quoteDocSeeded) qSeedGroups(o);
+    if(seed){ o.settings.quoteSampleSeeded = true; o.settings.quoteLinkSeeded = true; o.settings.quoteDocSeeded = true; }
   } finally { state = prev; }
   return o;
 }
@@ -4953,7 +4978,7 @@ function qbHeaderHtml(q){
       ${f('Customer', qbIn('hdr', '', 'customer', q.customer))}
       ${f('Project', qbIn('hdr', '', 'project', q.project))}
       <div class="lp-f qb-wide"><label>Customer address</label><textarea rows="2" data-qb="hdr" data-f="address">${escHtml(q.address)}</textarea></div>
-      <div class="lp-f qb-wide"><label>Notes</label><textarea rows="2" data-qb="hdr" data-f="notes">${escHtml(q.notes)}</textarea></div>
+      <div class="lp-f qb-wide"><label>Notes (printed on the customer document as the project description)</label><textarea rows="2" data-qb="hdr" data-f="notes">${escHtml(q.notes)}</textarea></div>
     </div>${qbDealHtml(q)}</div>`;
 }
 function qbTilesHtml(){
@@ -4989,7 +5014,7 @@ function qbMaterialsHtml(q){
   return `<div class="card"><div class="qb-sec-h"><h3>Materials</h3><div class="qb-sec-tools">
       ${avail.length ? `<select id="qbAddSup" aria-label="Add a supplier column"><option value="">+ Add supplier column…</option>${avail.map(([v, n]) => `<option value="${v}">${escHtml(n)}</option>`).join('')}</select>` : ''}
       <button class="btn" data-qba="add-line">+ Add line</button></div></div>
-    <p class="q-help" style="margin:0 0 8px;">${tpl ? 'Template rules: quantity to order is rounded up for every line (packs and bags too) and the cheapest supplier price is used.' : 'Quantity to order is rounded up to a whole unit after wastage, except units named pack, bag or box: wastage is not applied to those and they are not rounded up.'} Type a price per supplier; prices older than a supplier's price validity show a stale tag.</p>
+    <p class="q-help" style="margin:0 0 8px;">${tpl ? 'Template rules: quantity to order is rounded up for every line (packs and bags too) and the cheapest supplier price is used.' : 'Quantity to order is rounded up to a whole unit after wastage, except units named pack, bag or box: wastage is not applied to those and they are not rounded up.'} Type a price per supplier; prices older than a supplier's price validity show a stale tag. Hidden lines (Show unticked) are still included in the group price.</p>
     <div class="qb-scroll"><table class="qb-table"><thead>${h}</thead><tbody>${body}</tbody></table></div></div>`;
 }
 function qbDeliveryHtml(q){
@@ -5023,14 +5048,15 @@ function qbRender(){
   const ae = document.activeElement; if(ae && box.contains(ae) && ae.blur) ae.blur();   // commit a half-finished edit before the page is rebuilt
   const sc = box.querySelector('.qb-scroll'), sl = sc ? sc.scrollLeft : 0, sy = window.scrollY;
   qAutoDrops(q);
-  box.innerHTML = qbBannerHtml(q) + qbHeaderHtml(q) + qbTilesHtml() + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qAsSoldHtml(q) + '<div id="qbActual"></div><div id="qbCash"></div>' + qbTimelineHtml(q);
+  box.innerHTML = qbBannerHtml(q) + qbHeaderHtml(q) + qbTilesHtml() + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + qAsSoldHtml(q) + '<datalist id="qbGroupsList"></datalist><div id="qbActual"></div><div id="qbCash"></div>' + qbTimelineHtml(q);
   const ns = box.querySelector('.qb-scroll'); if(ns) ns.scrollLeft = sl;
+  box.querySelectorAll('[data-f="customerGroup"]').forEach(i => i.setAttribute('list', 'qbGroupsList'));
   qbRefresh(); window.scrollTo(0, sy);
   document.getElementById('quoteListView').hidden = true; box.hidden = false;
 }
 function qbGet(q, el){
   const k = el.dataset.qb, f = el.dataset.f, id = el.dataset.id;
-  if(k === 'hdr'){ if(f === 'link') return (q.linkedIds || [])[0] || ''; return q[f]; }
+  if(k === 'hdr'){ if(f === 'link') return (q.linkedIds || [])[0] || ''; if(f === 'viewMode') return qViewMode(q); return q[f]; }
   if(k === 'line'){ const l = q.lines.find(x => x.id === id); return l ? l[f] : undefined; }
   if(k === 'price'){ const l = q.lines.find(x => x.id === id), p = l && l.prices.find(x => String(x.supplierId) === el.dataset.sid); return p ? p[f] : ''; }
   if(k === 'lab'){ const r = q.labour.find(x => x.id === id); return r ? r[f] : undefined; }
@@ -5080,6 +5106,8 @@ function qbTouch(q, rebuild){
 function qbUndoable(msg, restore){ showToast(msg, () => { restore(); qAutoDrops(qFind(qUi.openId) || { drops: [], lines: [], labour: [] }); saveState(); qbRender(); }); }
 function qApplyStatus(q, to){
   const from = q.status, today = fmt(new Date()); qSetStatus(q, to);
+  if((to === 'Sent' || to === 'Accepted') && !q.sentSnapshot){ q.sentSnapshot = qTakeSnapshot(q); q.timeline.push({ date: today, note: `Sent snapshot taken (customer view Mode ${q.sentSnapshot.mode}, terms as they were)`, created: Date.now() + 2, kind: 'snapshot' }); }
+  else if(to === 'Draft' && q.sentSnapshot){ q.sentSnapshot = null; q.timeline.push({ date: today, note: 'Sent snapshot removed (back to Draft)', created: Date.now() + 2, kind: 'snapshot' }); }
   if(to === 'Accepted'){ q.acceptedDate = today; q.asSold = qSnapshot(q); q.timeline.push({ date: today, note: 'As-sold snapshot taken (locked)', created: Date.now() + 1, kind: 'asSold' }); }
   else if(from === 'Accepted'){ q.asSold = null; q.acceptedDate = ''; q.timeline.push({ date: today, note: 'As-sold snapshot removed', created: Date.now() + 1, kind: 'asSold' }); }
 }
@@ -5095,7 +5123,7 @@ function qCreate(){
 }
 function qNewVersion(q){
   const c = JSON.parse(JSON.stringify(q)), map = {}, today = fmt(new Date());
-  c.id = state.nextQuoteId++; c.version = q.version + 1; c.status = 'Draft'; c.refOverride = ''; c.date = today; c.asSold = null; c.acceptedDate = '';   // a new version is not sold yet
+  c.id = state.nextQuoteId++; c.version = q.version + 1; c.status = 'Draft'; c.refOverride = ''; c.date = today; c.asSold = null; c.acceptedDate = ''; c.sentSnapshot = null;   // a new version is not sold yet
   c.drops.forEach(d => { const n = qRand('dr_'); map[d.id] = n; d.id = n; });
   c.lines.forEach(l => { l.id = qRand('ln_'); if(l.deliveryDropId) l.deliveryDropId = map[l.deliveryDropId] || ''; });
   c.labour.forEach(r => { r.id = qRand('lb_'); });
@@ -5131,6 +5159,7 @@ function qbChange(el){
       rebuild = true;
     }
     else if(f === 'recoverUnpaid'){ q.recoverUnpaid = !!v; rebuild = true; }
+    else if(f === 'viewMode'){ q.viewMode = ['A', 'B', 'C', 'D'].includes(v) ? v : q.viewMode; const h = document.getElementById('qcdModeHelp'); if(h) h.textContent = VIEW_MODES.find(m => m[0] === qViewMode(q))[2]; }
     else if(f === 'unpaidOverride') q.unpaidOverride = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
     else if(f === 'date'){ if(/^\d{4}-\d{2}-\d{2}$/.test(v)) q.date = v; }
     else if(['customer', 'address', 'project', 'notes', 'refOverride'].includes(f)) q[f] = String(v).trim();
@@ -5206,6 +5235,9 @@ function qbAction(a, b){
   }
   const q = qFind(qUi.openId); if(!q) return; const id = b.dataset.id;
   if(a === 'open-pipeline'){ qGoDeal(q); return; }
+  if(a === 'doc-pdf'){ qDocPdf(q); return; }
+  if(a === 'doc-word'){ qDocWord(q); return; }
+  if(a === 'doc-xlsx'){ qXlsxDialog(q); return; }
   if(a === 'unlock'){ qUi.unlock.add(q.id); qbRender(); return; }
   if(a === 'relock'){ qUi.unlock.delete(q.id); qbRender(); return; }
   if(a === 'unpaid-reset'){ q.unpaidOverride = ''; qbTouch(q, true); return; }
@@ -5374,6 +5406,7 @@ function qPayDate(q, r){
 function qPayAlloc(q, c){
   const payable = qPayable(q, c);
   const rows = q.payments.map(r => ({ row: r, amount: r.mode === 'percent' ? r2(payable * (Number(r.value) || 0) / 100) : r2(Number(r.value) || 0), date: qPayDate(q, r) }));
+  if(rows.length > 1 && rows.every(x => x.row.mode === 'percent') && Math.abs(q.payments.reduce((a, r) => a + (Number(r.value) || 0), 0) - 100) < 1e-9){ const last = rows[rows.length - 1]; last.amount = r2(payable - rows.slice(0, -1).reduce((a, x) => a + x.amount, 0)); }   // percentages that make 100 always add up to the penny: the last row takes the remainder
   const allocated = r2(rows.reduce((a, x) => a + x.amount, 0));
   return { payable, rows, allocated, unallocated: r2(payable - allocated) };
 }
@@ -5541,13 +5574,14 @@ function qbLiveParts(q, c){
   pa.rows.forEach(x => { const a = document.querySelector(`[data-qc="${x.row.id}|payAmt"]`), d = document.querySelector(`[data-qc="${x.row.id}|payDate"]`); if(a) a.textContent = qm(x.amount); if(d) d.textContent = x.date || 'set the stage dates'; });
   const ua = document.getElementById('qbUnalloc');
   if(ua){ const z = Math.abs(pa.unallocated) < 0.005; ua.className = 'qb-unalloc ' + (z ? 'ok' : 'bad'); ua.textContent = z ? `Fully allocated: ${qm(pa.payable)}` : `Unallocated: ${pa.unallocated < 0 ? '−' : ''}${qm(Math.abs(pa.unallocated))} of ${qm(pa.payable)}`; }
+  qcdRefresh(q, c);
   const un = c.unpaid, ov = document.querySelector('[data-qc="unpaid|ov"]'); if(ov) ov.hidden = !un.overridden;
   const inf = document.getElementById('qbUnpaidInfo');
   if(inf) inf.innerHTML = un.hours > 0 ? `<b>Unpaid time (not charged):</b> ${hrs(un.hours)}${un.rateMissing ? ', set the hourly labour rate in Settings to see its cost' : `, ${qm(r2(un.hours * un.rate))} at the labour rate of ${qm(un.rate)} an hour`}.` : 'No unpaid stage-line time on the linked deal yet.';
 }
 function qbLock(q){
   const box = document.getElementById('quoteBuilderView'), lock = qLocked(q);
-  box.querySelectorAll('[data-qb]').forEach(el => { if(el.dataset.f === 'status' || el.closest('#lpBody')) return; el.disabled = lock; });
+  box.querySelectorAll('[data-qb]').forEach(el => { if(el.dataset.f === 'status' || el.dataset.f === 'viewMode' || el.closest('#lpBody')) return; el.disabled = lock; });
   box.querySelectorAll('[data-qba]').forEach(b => { if(['add-line', 'line-up', 'line-down', 'line-dup', 'line-del', 'del-supcol', 'add-lab', 'add-allowance', 'lab-del', 'add-drop', 'drop-del', 'add-pay', 'pay-del', 'use-new', 'unpaid-reset'].includes(b.dataset.qba)) b.disabled = lock; });
   const sp = document.getElementById('qbAddSup'); if(sp) sp.disabled = lock;
   box.classList.toggle('qb-locked', lock);
@@ -5691,6 +5725,373 @@ function renderCashflowQuotes(){
     </tbody></table></div></div>`;
 }
 document.addEventListener('change', (e) => { if(e.target.id === 'qAgeSup'){ qUi.ageSup = e.target.value; renderQuoteAgeing(); } });
+
+
+/* ---------- Quote Centre step 4: customer views, the customer document, PDF / Word / Excel ----------
+   qCustomerDoc() is the ONE function that turns a quote into structured content (header, meta, body for the chosen view mode, summary, payments, acceptance, footer, terms).
+   The preview, the print page (PDF), the Word file and the Excel sheet all read that structure. A quote that has been Sent keeps a snapshot of it (all four modes + the terms). */
+const VIEW_MODES = [
+  ['A', 'Total only', 'One total, with the project description.'],
+  ['B', 'Groups with prices', 'Each customer group with its price, and a total.'],
+  ['C', 'Groups listing items, no prices', 'Each group heading with its items (description and quantity). Only the grand total is priced unless group prices are switched on in Settings.'],
+  ['D', 'Fully itemised', 'Every line with quantity, price each and line price, under group headings.']
+];
+const QLIBS = {
+  docx:    { name: 'Word export', url: 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js', ready: () => window.docx },
+  exceljs: { name: 'Excel export', url: 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js', ready: () => window.ExcelJS }
+};
+const QLIB_LOADING = {};
+function qLoadLib(key){   // only ever called from a Word / Excel button; never at page start
+  const lib = QLIBS[key]; if(lib.ready()) return Promise.resolve();
+  if(QLIB_LOADING[key]) return QLIB_LOADING[key];
+  QLIB_LOADING[key] = new Promise((resolve, reject) => {
+    const s = document.createElement('script'); s.src = lib.url; s.async = true;
+    s.onload = () => { QLIB_LOADING[key] = null; lib.ready() ? resolve() : (s.remove(), reject(new Error('missing'))); };
+    s.onerror = () => { QLIB_LOADING[key] = null; s.remove(); reject(new Error('offline')); };
+    document.head.appendChild(s);
+  });
+  return QLIB_LOADING[key];
+}
+function qViewMode(q){ const m = q.viewMode || state.settings.quoteViewMode; return (m && 'ABCD'.includes(m)) ? m : 'D'; }
+function qDocDate(iso){ const d = toDate(iso); return d && !isNaN(d) ? d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
+function qFmtDays(n){ n = Math.round(n * 100) / 100; return n === 1 ? '1 day' : n + ' days'; }
+function qDocDays(q){
+  let d = q.labour.reduce((a, r) => a + qLabourDays(r), 0);
+  if(!(d > 0)) d = qStageLines(q).filter(s => s.kind === 'onsite' || /install/i.test(s.label || '')).reduce((a, s) => a + slPlannedHours(s) / hpd(), 0);
+  return d > 0 ? d : 0;
+}
+function qHex(h, fb){ const m = /^#?([0-9a-f]{6})$/i.exec(String(h || '')); return m ? m[1].toUpperCase() : fb; }
+function qLum(hex){ const n = parseInt(hex, 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255; return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; }
+function qBrand(){
+  const b = state.branding || defaultBranding(), f = brandFont(b.font), st = state.settings, lg = b.logos || {};
+  const logoUrl = lg.fullStd || lg.badgeStd || '', showLogo = !!logoUrl && (b.mode === 'logo' || b.mode === 'both');
+  let heading = qHex(b.colours && b.colours.primary, '1C1F22'); if(qLum(heading) > 0.62) heading = qHex(b.colours && b.colours.secondary, '1C1F22'); if(qLum(heading) > 0.62) heading = '1C1F22';
+  return { name: String(b.name || '').trim(), tagline: String(st.bizTagline || '').trim(), logo: showLogo ? logoUrl : '', showName: !showLogo || b.mode === 'both',
+    heading, rule: qHex(b.colours && b.colours.secondary, 'A8763E'), fontName: f.name, fontStack: f.stack, weight: f.weight };
+}
+/* customer groups: every line counts, hidden or not; groups add up to the grand total to the penny (any rounding difference lands on the largest group) */
+function qGroups(q, c){
+  const st = state.settings, tpl = q.mode === 'template', defRate = (Number(st.vatRate) || 0) / 100, map = {}, order = [];
+  const get = n => map[n] || (order.push(map[n] = { name: n, exRaw: 0, incRaw: 0, items: [], ex: 0, inc: 0 }), map[n]);
+  q.lines.forEach(l => {
+    const x = c.lines[l.id], g = get(l.customerGroup.trim() || 'Materials'); g.exRaw += x.priceEx; g.incRaw += x.priceInc;
+    if(l.showOnQuote) g.items.push({ kind: 'line', desc: l.description, qty: x.qtyOrder, each: x.priceEach, ex: r2(x.priceEx), inc: r2(x.priceInc) });
+  });
+  q.labour.forEach(r => {
+    const a = c.labour[r.id].amount, v = tpl ? a * defRate : r2(a * defRate), g = get(r.customerGroup.trim() || 'Installation labour'); g.exRaw += a; g.incRaw += a + v;
+    if(r.showOnQuote){ const n = Number(r.qty) || 0, unit = r.basis === 'day' ? (n === 1 ? 'day' : 'days') : r.basis === 'halfday' ? (n === 1 ? 'half-day' : 'half-days') : r.basis === 'hour' ? (n === 1 ? 'hour' : 'hours') : '';
+      g.items.push({ kind: 'labour', desc: r.description || 'Labour', qtyText: r.basis === 'fixed' ? '' : (Math.round(n * 100) / 100) + ' ' + unit, ex: r2(a), inc: r2(a + v) }); }
+  });
+  if(q.recoverUnpaid && c.unpaid.amount){ const a = c.unpaid.amount, v = tpl ? a * defRate : r2(a * defRate), g = get('Installation labour'); g.exRaw += a; g.incRaw += a + v; }   // recovered time is priced in, never listed
+  if(c.deliveryEx){ const v = tpl ? c.deliveryEx * defRate : q.drops.reduce((s, d) => s + r2((Number(d.charge) || 0) * defRate), 0), g = get('Delivery'); g.exRaw += c.deliveryEx; g.incRaw += c.deliveryEx + v; g.items.push({ kind: 'delivery', desc: 'Delivery', ex: r2(c.deliveryEx), inc: r2(c.deliveryEx + v) }); }
+  const groups = order.filter(g => g.exRaw || g.incRaw || g.items.length);
+  groups.forEach(g => { g.ex = r2(g.exRaw); g.inc = r2(g.incRaw); });
+  const adj = {};
+  [['ex', c.totalEx], ['inc', c.totalInc]].forEach(([k, total]) => {
+    const diff = r2(total - groups.reduce((a, g) => a + g[k], 0)); if(!groups.length || Math.abs(diff) < 0.005) return;
+    const big = groups.reduce((m, g) => g[k] > m[k] ? g : m, groups[0]); big[k] = r2(big[k] + diff); adj[k] = { group: big.name, amount: diff };
+  });
+  return { groups, adj };
+}
+function qPayDueText(q, r){
+  if(r.dueMode === 'acceptance') return 'on acceptance';
+  if(r.dueMode === 'completion') return 'on completion';
+  if(r.dueMode === 'date') return r.date ? 'on ' + qDocDate(r.date) : 'on a date to be agreed';
+  const d = r.days === '' ? (Number(state.settings.paymentTermsDays) || 0) : Number(r.days); return d + ' day' + (d === 1 ? '' : 's') + ' after completion';
+}
+function qCustomerDoc(q, mode, c){
+  c = c || qCalc(q); mode = mode || qViewMode(q);
+  const st = state.settings, vatOn = qVatOn(), brand = qBrand(), terms = quoteTermsDoc(st), gr = qGroups(q, c), days = qDocDays(q);
+  const validUntil = addDaysIso(q.date, Number(st.quoteValidityDays) || 0);
+  const summary = [];
+  if(c.materialsEx) summary.push({ label: 'Materials', amount: c.materialsEx });
+  if(c.labourEx) summary.push({ label: 'Installation labour', amount: c.labourEx });
+  if(c.deliveryEx) summary.push({ label: 'Delivery', amount: c.deliveryEx });
+  if(days > 0) summary.push({ label: 'Estimated days on site', text: qFmtDays(days) });
+  if(vatOn){ summary.push({ label: 'Total excluding VAT', amount: c.totalEx, total: true }, { label: 'VAT', amount: c.vat }, { label: 'Total including VAT', amount: c.totalInc, total: true }); }
+  else summary.push({ label: 'Total', amount: c.totalEx, total: true });
+  const pa = qPayAlloc(q, c), payments = q.payments.length > 1 ? pa.rows.map(x => ({ label: x.row.label || 'Payment', pct: x.row.mode === 'percent' ? (Math.round(Number(x.row.value) * 100) / 100) + '%' : '', due: qPayDueText(q, x.row), amount: x.amount })) : [];
+  return { mode, vatOn, brand, title: 'QUOTATION', prepared: { name: q.customer, address: q.address }, project: q.project, ref: qRef(q), date: qDocDate(q.date), validUntil: qDocDate(validUntil),
+    description: String(q.notes || '').trim(),
+    body: { groups: gr.groups.map(g => ({ name: g.name, ex: g.ex, inc: g.inc, items: g.items })), showGroupPrices: !!st.showGroupPricesC, adj: gr.adj, totalEx: c.totalEx, totalInc: c.totalInc },
+    summary, payments, paymentLine: payments.length ? 'Payment: ' + payments.map(p => (p.pct || qm(p.amount)) + ' ' + p.due).join(', ') : '',
+    acceptance: terms.acceptance, terms,
+    footer: { name: brand.name, address: terms.business.address, phone: terms.business.phone, email: terms.business.email, ref: qRef(q), vatNumber: vatOn ? String(st.vatNumber || '').trim() : '' } };
+}
+function qDocFor(q, mode){
+  mode = mode || qViewMode(q); const sn = q.sentSnapshot;
+  if(sn && q.status !== 'Draft' && sn.docs && sn.docs[mode]){
+    const d = JSON.parse(JSON.stringify(sn.docs[mode])); d.terms = sn.terms; d.acceptance = sn.terms.acceptance; d.brand.logo = qBrand().logo; d.snapshot = sn.date; return d;
+  }
+  return qCustomerDoc(q, mode);
+}
+function qTakeSnapshot(q){
+  const c = qCalc(q), docs = {}; ['A', 'B', 'C', 'D'].forEach(m => { const d = qCustomerDoc(q, m, c); d.brand.logo = ''; d.terms = null; d.acceptance = null; docs[m] = d; });
+  return { date: fmt(new Date()), mode: qViewMode(q), docs, terms: quoteTermsDoc(state.settings) };
+}
+function qDocName(q, doc, ext){ return (doc.ref + ' ' + (q.customer || '') + ' ' + (q.project || '')).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim() + (ext || ''); }
+
+/* ---- HTML (preview and print page) ---- */
+function qDocCss(b){
+  return `.cd{color:#1b1b1b;background:#fff;font:13px/1.5 'Inter','Segoe UI',Arial,sans-serif}.cd *{box-sizing:border-box}
+.cd-head{display:flex;align-items:center;gap:14px;border-bottom:3px solid #${b.rule};padding-bottom:8px;margin-bottom:12px}.cd-logo{max-height:56px;max-width:240px;display:block}
+.cd-name{font-family:${b.fontStack};font-weight:${b.weight};font-size:26px;color:#${b.heading};line-height:1.15}.cd-tag{font-size:12px;color:#555;font-style:italic;margin-top:2px}
+.cd h1{font-family:${b.fontStack};font-weight:${b.weight};font-size:28px;letter-spacing:.14em;color:#${b.heading};margin:4px 0 12px}
+.cd h2{font-family:${b.fontStack};font-weight:${b.weight};font-size:20px;color:#${b.heading};margin:0 0 8px}.cd h3{font-family:${b.fontStack};font-weight:${b.weight};font-size:14px;color:#${b.heading};margin:12px 0 2px;break-after:avoid}
+.cd-meta{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px 18px;margin-bottom:12px}.cd-k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6a6a6a;font-weight:600}.cd-v{font-size:13px}
+.cd-desc{margin:0 0 12px;white-space:pre-wrap}.cd table{border-collapse:collapse;width:100%}.cd th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;text-align:left;color:#fff;background:#${b.heading};padding:6px 8px}
+.cd td{padding:5px 8px;border-bottom:1px solid #ddd;vertical-align:top}.cd .n{text-align:right;white-space:nowrap}.cd tr{break-inside:avoid;page-break-inside:avoid}
+.cd .cd-grp td{background:#f3f1ec;font-weight:600;color:#${b.heading}}.cd .cd-tot td{font-weight:700;border-top:2px solid #${b.rule}}
+.cd-sum{width:auto!important;min-width:60%;margin:14px 0 0 auto}.cd-sum td{border-bottom:1px solid #e3e3e3}.cd-sum .cd-tot td{font-size:14px}
+.cd-big{font-family:${b.fontStack};font-size:26px;color:#${b.heading};font-weight:${b.weight}}.cd-box{border:1px solid #bbb;border-radius:6px;padding:10px 14px;margin-top:14px;break-inside:avoid;page-break-inside:avoid}
+.cd-sign{display:grid;grid-template-columns:2fr 3fr 1.3fr;gap:18px;margin-top:22px}.cd-sign span{border-top:1px solid #333;padding-top:3px;font-size:11px;color:#555}
+.cd-foot{margin-top:18px;padding-top:8px;border-top:3px solid #${b.rule};font-size:11px;color:#444;break-inside:avoid}.cd p{margin:0 0 6px}
+.cd-list{margin:2px 0 6px 18px;padding:0}.cd-list li{margin:1px 0}.cd-gh{display:flex;justify-content:space-between;gap:12px;font-weight:600;color:#${b.heading};margin-top:10px;break-after:avoid}
+.cd-terms{margin-top:30px;padding-top:18px;border-top:2px dashed #ccc}.cd-terms .cd-t-sec{break-inside:avoid;page-break-inside:avoid}.cd-snap{font-size:11px;color:#777;margin-top:4px}`;
+}
+function qDocHtml(d){
+  const e = escHtml, b = d.brand, M = qm, vat = d.vatOn, br = s => e(s).replace(/\n/g, '<br>');
+  const head = `<div class="cd-head">${b.logo ? `<img class="cd-logo" src="${escAttr(b.logo)}" alt="${escAttr(b.name)}">` : ''}<div>${(b.showName || !b.logo) && b.name ? `<div class="cd-name">${e(b.name)}</div>` : ''}${b.tagline ? `<div class="cd-tag">${e(b.tagline)}</div>` : ''}</div></div>`;
+  const meta = `<div class="cd-meta"><div><div class="cd-k">Prepared for</div><div class="cd-v"><b>${e(d.prepared.name || '—')}</b>${d.prepared.address ? '<br>' + br(d.prepared.address) : ''}</div></div>
+    <div><div class="cd-k">Project</div><div class="cd-v">${e(d.project || '—')}</div></div><div><div class="cd-k">Quotation reference</div><div class="cd-v">${e(d.ref)}</div></div>
+    <div></div><div><div class="cd-k">Date</div><div class="cd-v">${e(d.date)}</div></div><div><div class="cd-k">Valid until</div><div class="cd-v">${e(d.validUntil)}</div></div></div>`;
+  let body = '';
+  const gs = d.body.groups;
+  if(d.mode === 'A'){
+    body = `<div class="cd-box"><div class="cd-k">Total price${vat ? ' including VAT' : ''}</div><div class="cd-big">${M(vat ? d.body.totalInc : d.body.totalEx)}</div></div>`;
+  } else if(d.mode === 'B'){
+    body = `<table><thead><tr><th>Item</th>${vat ? '<th class="n">Price ex VAT</th><th class="n">Price incl. VAT</th>' : '<th class="n">Price</th>'}</tr></thead><tbody>
+      ${gs.map(g => `<tr><td>${e(g.name)}</td>${vat ? `<td class="n">${M(g.ex)}</td><td class="n">${M(g.inc)}</td>` : `<td class="n">${M(g.ex)}</td>`}</tr>`).join('')}
+      <tr class="cd-tot"><td>Total</td>${vat ? `<td class="n">${M(d.body.totalEx)}</td><td class="n">${M(d.body.totalInc)}</td>` : `<td class="n">${M(d.body.totalEx)}</td>`}</tr></tbody></table>`;
+  } else if(d.mode === 'C'){
+    body = gs.map(g => `<div class="cd-gh"><span>${e(g.name)}</span>${d.body.showGroupPrices ? `<span>${vat ? M(g.ex) + ' ex VAT · ' + M(g.inc) + ' incl. VAT' : M(g.ex)}</span>` : ''}</div>
+      <ul class="cd-list">${g.items.length ? g.items.map(i => `<li>${e(i.desc)}${i.qty != null && i.qty !== '' ? ' — qty ' + e(String(i.qty)) : (i.qtyText ? ' — ' + e(i.qtyText) : '')}</li>`).join('') : '<li>Included in the price</li>'}</ul>`).join('');
+  } else {
+    const mats = gs.filter(g => g.items.some(i => i.kind === 'line'));
+    body = `<table><thead><tr><th>Material</th><th class="n">Qty</th>${vat ? '<th class="n">Price each ex VAT</th><th class="n">Price incl. VAT</th>' : '<th class="n">Price each</th><th class="n">Price</th>'}</tr></thead>
+      ${mats.map(g => `<tbody><tr class="cd-grp"><td colspan="4">${e(g.name)}</td></tr>${g.items.filter(i => i.kind === 'line').map(i => `<tr><td>${e(i.desc)}</td><td class="n">${i.qty}</td><td class="n">${M(i.each)}</td><td class="n">${M(vat ? i.inc : i.ex)}</td></tr>`).join('')}</tbody>`).join('')}</table>`;
+  }
+  const sum = `<table class="cd-sum"><tbody>${d.summary.map(r => `<tr class="${r.total ? 'cd-tot' : ''}"><td>${e(r.label)}</td><td class="n">${r.text ? e(r.text) : M(r.amount)}</td></tr>`).join('')}</tbody></table>`;
+  const pay = d.payments.length ? `<div class="cd-box"><div class="cd-k">Payment</div><p>${e(d.paymentLine)}</p><table><tbody>${d.payments.map(p => `<tr><td>${e(p.label)}</td><td>${e(p.due)}</td><td class="n">${M(p.amount)}</td></tr>`).join('')}</tbody></table></div>` : '';
+  const acc = `<div class="cd-box"><p><b>${e(d.acceptance.text)}</b></p><div class="cd-sign">${d.acceptance.fields.map(f => `<span>${e(f)}</span>`).join('')}</div></div>`;
+  const f = d.footer, foot = `<div class="cd-foot"><b>${e(f.name)}</b>${f.address ? ' · ' + e(f.address) : ''}${f.phone ? ' · ' + e(f.phone) : ''}${f.email ? ' · ' + e(f.email) : ''}<br>Quotation ${e(f.ref)}${f.vatNumber ? ' · VAT number: ' + e(f.vatNumber) : ''}</div>`;
+  const t = d.terms, tb = t.business;
+  const terms = `<section class="cd-terms">${head}
+    <h2>${e(t.heading)}</h2>${t.sections.map(s => `<div class="cd-t-sec"><h3>${s.num} ${e(s.title)}</h3>${s.paras.map(p => `<p>${e(p)}</p>`).join('')}</div>`).join('')}
+    <div class="cd-box"><h3 style="margin-top:0">${e(t.rightToCancel.title)}</h3><p>${e(t.rightToCancel.text)}</p></div></section>`;
+  return `<div class="cd"><style>${qDocCss(b)}</style>${head}<h1>${e(d.title)}</h1>${meta}${d.description ? `<p class="cd-desc">${e(d.description)}</p>` : ''}${body}${sum}${pay}${acc}${foot}${terms}${d.snapshot ? `<div class="cd-snap">Sent snapshot (${e(d.snapshot)})</div>` : ''}</div>`;
+}
+function qPrintPage(d, title){
+  const fonts = [...document.querySelectorAll('link[rel="stylesheet"]')].map(l => `<link rel="stylesheet" href="${escAttr(l.href)}">`).join('');
+  return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escHtml(title)}</title>${fonts}
+<style>@page{size:A4;margin:15mm}html,body{margin:0;background:#e9e7e2}body{padding:0 0 30px}.pp-bar{position:sticky;top:0;background:#1c1f22;color:#fff;padding:10px 16px;font:13px/1.4 Arial,sans-serif;display:flex;gap:14px;align-items:center;z-index:5}
+.pp-bar button{font:inherit;padding:6px 14px;border-radius:6px;border:0;cursor:pointer}.pp-sheet{width:210mm;max-width:100%;margin:16px auto;background:#fff;padding:15mm;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.pp-sheet .cd{font-size:12px;line-height:1.38}.pp-sheet .cd td{padding:3px 7px}.pp-sheet .cd th{padding:5px 7px}.pp-sheet .cd h1{font-size:24px;margin:2px 0 8px}.pp-sheet .cd-meta{margin-bottom:8px}.pp-sheet .cd-box{margin-top:9px;padding:7px 12px}.pp-sheet .cd-sign{margin-top:14px}.pp-sheet .cd-sum{margin-top:10px}.pp-sheet .cd-foot{margin-top:12px}.pp-sheet .cd p{margin:0 0 4px}.pp-sheet .cd h3{margin:8px 0 1px;font-size:13px}.pp-sheet .cd h2{font-size:18px;margin:0 0 4px}
+.pp-sheet .cd-terms{break-before:page;page-break-before:always;margin-top:0;padding-top:0;border-top:0}
+@media print{html,body{background:#fff}.pp-bar{display:none!important}.pp-sheet{width:auto;margin:0;padding:0;box-shadow:none}.cd-snap{display:none}}</style></head>
+<body><div class="pp-bar"><span>Choose <b>Save as PDF</b> as the destination in the print dialog.</span><button onclick="window.print()">Print / Save as PDF</button></div><div class="pp-sheet">${qDocHtml(d)}</div>
+<script>window.addEventListener('load',function(){setTimeout(function(){try{window.print()}catch(e){}},700)})<\/script></body></html>`;
+}
+
+/* ---- logo to PNG bytes (Word / Excel need a raster image) ---- */
+function qLogoPng(url, maxW){
+  return new Promise(resolve => {
+    if(!url) return resolve(null);
+    const img = new Image();
+    img.onload = () => {
+      try{
+        const nw = img.naturalWidth || 300, nh = img.naturalHeight || 100, k = Math.min(1, 640 / nw), cw = Math.max(1, Math.round(nw * k)), ch = Math.max(1, Math.round(nh * k));
+        const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch; const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cw, ch); cx.drawImage(img, 0, 0, cw, ch);
+        const dataUrl = cv.toDataURL('image/png'), bin = atob(dataUrl.split(',')[1]), data = new Uint8Array(bin.length); for(let i = 0; i < bin.length; i++) data[i] = bin.charCodeAt(i);
+        const w = Math.min(maxW || 190, cw), h = Math.round(w * ch / cw); resolve({ data, dataUrl, w, h });
+      }catch(e){ resolve(null); }
+    };
+    img.onerror = () => resolve(null); img.src = url;
+  });
+}
+function qDownload(blob, name){
+  const a = document.createElement('a'), u = URL.createObjectURL(blob); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+}
+
+/* ---- Word ---- */
+async function qBuildDocx(d){
+  const D = window.docx, { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, ImageRun, HeadingLevel, AlignmentType, ShadingType } = D;
+  const hc = d.brand.heading, rc = d.brand.rule, vat = d.vatOn, M = qm, W = 10204;
+  const para = (text, o) => { o = o || {}; return new Paragraph({ children: [new TextRun({ text: String(text), bold: !!o.bold, italics: !!o.italics, color: o.color, size: o.size })], alignment: o.align, spacing: { before: o.before || 0, after: o.after == null ? 80 : o.after }, keepNext: !!o.keepNext, pageBreakBefore: !!o.pageBreakBefore }); };
+  const heading = (text, lvl, o) => new Paragraph({ heading: lvl, children: [new TextRun({ text })], keepNext: true, pageBreakBefore: !!(o && o.pageBreakBefore) });
+  const bd = { style: BorderStyle.SINGLE, size: 4, color: 'BBBBBB' }, borders = { top: bd, bottom: bd, left: bd, right: bd };
+  const cell = (text, w, o) => { o = o || {}; return new TableCell({ children: [para(text, { bold: o.bold, align: o.right ? AlignmentType.RIGHT : undefined, after: 0, color: o.color })], borders, width: { size: w, type: WidthType.DXA }, columnSpan: o.span,
+    shading: o.fill ? { type: ShadingType.CLEAR, fill: o.fill, color: 'auto' } : undefined, margins: { top: 60, bottom: 60, left: 100, right: 100 } }); };
+  const table = (widths, rows) => new Table({ width: { size: widths.reduce((a, b) => a + b, 0), type: WidthType.DXA }, columnWidths: widths, rows: rows.map(cells => new TableRow({ children: cells, cantSplit: true })) });
+  const head = (ws, labels) => labels.map((l, i) => cell(l, ws[i], { bold: true, fill: hc, color: 'FFFFFF', right: i > 0 && /Qty|Price/.test(l) }));
+  const kids = [];
+  const logo = d.brand.logo ? await qLogoPng(d.brand.logo, 190) : null;
+  if(logo) kids.push(new Paragraph({ children: [new ImageRun({ data: logo.data, transformation: { width: logo.w, height: logo.h }, type: 'png' })], spacing: { after: 60 } }));
+  if((d.brand.showName || !logo) && d.brand.name) kids.push(new Paragraph({ children: [new TextRun({ text: d.brand.name, bold: true, size: 44, color: hc, font: d.brand.fontName })], spacing: { after: 40 } }));
+  if(d.brand.tagline) kids.push(para(d.brand.tagline, { italics: true, color: '555555', after: 120 }));
+  kids.push(new Paragraph({ children: [], border: { bottom: { style: BorderStyle.SINGLE, size: 18, color: rc, space: 1 } }, spacing: { after: 160 } }));
+  kids.push(heading(d.title, HeadingLevel.HEADING_1));
+  const mw = [2600, 7604], mrow = (k, v) => [cell(k, mw[0], { bold: true, fill: 'F3F1EC' }), cell(v, mw[1])];
+  kids.push(table(mw, [mrow('Prepared for', [d.prepared.name, d.prepared.address].filter(Boolean).join('\n').replace(/\n+/g, ', ')), mrow('Project', d.project || ''), mrow('Quotation reference', d.ref), mrow('Date', d.date), mrow('Valid until', d.validUntil)]));
+  kids.push(para('', { after: 60 }));
+  if(d.description) kids.push(para(d.description, { after: 140 }));
+  const gs = d.body.groups;
+  if(d.mode === 'A'){
+    kids.push(table([W], [[cell('Total price' + (vat ? ' including VAT' : '') + ': ' + M(vat ? d.body.totalInc : d.body.totalEx), W, { bold: true })]]));
+  } else if(d.mode === 'B'){
+    const ws = vat ? [5604, 2300, 2300] : [7604, 2600], lab = vat ? ['Item', 'Price ex VAT', 'Price incl. VAT'] : ['Item', 'Price'];
+    kids.push(table(ws, [head(ws, lab)].concat(gs.map(g => vat ? [cell(g.name, ws[0]), cell(M(g.ex), ws[1], { right: true }), cell(M(g.inc), ws[2], { right: true })] : [cell(g.name, ws[0]), cell(M(g.ex), ws[1], { right: true })]),
+      [vat ? [cell('Total', ws[0], { bold: true }), cell(M(d.body.totalEx), ws[1], { bold: true, right: true }), cell(M(d.body.totalInc), ws[2], { bold: true, right: true })] : [cell('Total', ws[0], { bold: true }), cell(M(d.body.totalEx), ws[1], { bold: true, right: true })]])));
+  } else if(d.mode === 'C'){
+    gs.forEach(g => {
+      kids.push(para(g.name + (d.body.showGroupPrices ? ' — ' + (vat ? M(g.ex) + ' ex VAT, ' + M(g.inc) + ' incl. VAT' : M(g.ex)) : ''), { bold: true, color: hc, before: 120, after: 40, keepNext: true }));
+      if(!g.items.length) kids.push(new Paragraph({ children: [new TextRun('Included in the price')], bullet: { level: 0 }, spacing: { after: 20 } }));
+      g.items.forEach(i => kids.push(new Paragraph({ children: [new TextRun(i.desc + (i.qty != null && i.qty !== '' ? ' — qty ' + i.qty : (i.qtyText ? ' — ' + i.qtyText : '')))], bullet: { level: 0 }, spacing: { after: 20 } })));
+    });
+  } else {
+    const ws = [5204, 1000, 2000, 2000], lab = vat ? ['Material', 'Qty', 'Price each ex VAT', 'Price incl. VAT'] : ['Material', 'Qty', 'Price each', 'Price'], rows = [head(ws, lab)];
+    gs.filter(g => g.items.some(i => i.kind === 'line')).forEach(g => { rows.push([cell(g.name, W, { bold: true, fill: 'F3F1EC', span: 4 })]); g.items.filter(i => i.kind === 'line').forEach(i => rows.push([cell(i.desc, ws[0]), cell(String(i.qty), ws[1], { right: true }), cell(M(i.each), ws[2], { right: true }), cell(M(vat ? i.inc : i.ex), ws[3], { right: true })])); });
+    kids.push(table(ws, rows));
+  }
+  kids.push(para('', { after: 80 }));
+  const sw = [5604, 2600]; kids.push(table(sw, d.summary.map(r => [cell(r.label, sw[0], { bold: !!r.total }), cell(r.text || M(r.amount), sw[1], { bold: !!r.total, right: true })])));
+  if(d.payments.length){ kids.push(para(d.paymentLine, { bold: true, before: 160, after: 60 })); const pw = [3600, 3600, 3004]; kids.push(table(pw, d.payments.map(p => [cell(p.label, pw[0]), cell(p.due, pw[1]), cell(M(p.amount), pw[2], { right: true })]))); }
+  kids.push(para(d.acceptance.text, { bold: true, before: 200, after: 80, keepNext: true }));
+  const aw = [3400, 4400, 2404]; kids.push(table(aw, [d.acceptance.fields.map((f, i) => cell(f + ':', aw[i], { bold: true })), d.acceptance.fields.map((f, i) => cell(' \n ', aw[i]))].map(r => r)));
+  const f = d.footer; kids.push(para([f.name, f.address, f.phone, f.email].filter(Boolean).join(' · '), { size: 18, color: '444444', before: 200, after: 20 }));
+  kids.push(para('Quotation ' + f.ref + (f.vatNumber ? ' · VAT number: ' + f.vatNumber : ''), { size: 18, color: '444444' }));
+  const t = d.terms;
+  kids.push(para(t.business.name || d.brand.name, { bold: true, size: 36, color: hc, pageBreakBefore: true, after: 20 })); if(t.business.tagline) kids.push(para(t.business.tagline, { italics: true, color: '555555' }));
+  kids.push(heading(t.heading, HeadingLevel.HEADING_2));
+  t.sections.forEach(s => { kids.push(heading(s.num + ' ' + s.title, HeadingLevel.HEADING_3)); s.paras.forEach(p => kids.push(para(p, { after: 60 }))); });
+  kids.push(table([W], [[new TableCell({ children: [para(t.rightToCancel.title, { bold: true, color: hc, after: 40 }), para(t.rightToCancel.text, { after: 0 })], borders, width: { size: W, type: WidthType.DXA }, margins: { top: 100, bottom: 100, left: 140, right: 140 } })]]));
+  const font = d.brand.fontName;
+  const doc = new Document({ creator: d.brand.name || 'Quote', title: d.ref + ' ' + d.prepared.name,
+    styles: { default: { document: { run: { font: 'Calibri', size: 21, color: '1B1B1B' } } }, paragraphStyles: [
+      { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font, size: 52, bold: true, color: hc }, paragraph: { spacing: { before: 120, after: 160 } } },
+      { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font, size: 34, bold: true, color: hc }, paragraph: { spacing: { before: 200, after: 120 } } },
+      { id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font, size: 24, bold: true, color: hc }, paragraph: { spacing: { before: 160, after: 40 } } } ] },
+    sections: [{ properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 851, right: 851, bottom: 851, left: 851 } } }, children: kids }] });
+  return Packer.toBlob(doc);
+}
+
+/* ---- Excel ---- */
+async function qBuildXlsx(q, d, internal){
+  const wb = new window.ExcelJS.Workbook(), vat = d.vatOn, GBP = '£#,##0.00', H = 'FF' + d.brand.heading, R = 'FF' + d.brand.rule;
+  wb.creator = d.brand.name || 'Quote'; wb.created = new Date();
+  const ws = wb.addWorksheet('Customer quote', { pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0 } });
+  ws.columns = [{ width: 62 }, { width: 10 }, { width: 20 }, { width: 20 }];
+  const thin = { style: 'thin', color: { argb: 'FFBBBBBB' } }, box = { top: thin, left: thin, bottom: thin, right: thin };
+  const row = (vals, o) => { o = o || {}; const r = ws.addRow(vals); r.eachCell({ includeEmpty: false }, (c, n) => { c.font = { name: 'Calibri', size: o.size || 11, bold: !!o.bold, color: { argb: o.color || 'FF1B1B1B' } }; c.alignment = { vertical: 'top', wrapText: true, horizontal: (typeof c.value === 'number') ? 'right' : (o.right && n > 1 ? 'right' : 'left') }; if(typeof c.value === 'number') c.numFmt = GBP; if(o.fill) c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: o.fill } }; if(o.box) c.border = box; }); return r; };
+  const logo = d.brand.logo ? await qLogoPng(d.brand.logo, 190) : null;
+  if(logo){ const id = wb.addImage({ base64: logo.dataUrl, extension: 'png' }); const r = ws.addRow([]); r.height = logo.h * 0.78 + 6; ws.addImage(id, { tl: { col: 0.05, row: 0.05 }, ext: { width: logo.w, height: logo.h } }); }
+  if((d.brand.showName || !logo) && d.brand.name) row([d.brand.name], { bold: true, size: 20, color: H });
+  if(d.brand.tagline) row([d.brand.tagline], { color: 'FF555555' });
+  ws.addRow([]); row([d.title], { bold: true, size: 18, color: H });
+  [['Prepared for', [d.prepared.name, d.prepared.address].filter(Boolean).join('\n')], ['Project', d.project], ['Quotation reference', d.ref], ['Date', d.date], ['Valid until', d.validUntil]].forEach(([k, v]) => { const r = row([k, v]); ws.mergeCells(r.number, 2, r.number, 4); r.getCell(1).font = { name: 'Calibri', bold: true, color: { argb: 'FF555555' } }; if(String(v).includes('\n')) r.height = 15 * (String(v).split('\n').length + 0.5); });
+  ws.addRow([]); if(d.description){ const r = row([d.description]); ws.mergeCells(r.number, 1, r.number, 4); r.height = Math.max(15, 15 * Math.ceil(d.description.length / 95)); ws.addRow([]); }
+  const hdr = (labels) => row(labels, { bold: true, color: 'FFFFFFFF', fill: H, right: true });
+  const gs = d.body.groups;
+  if(d.mode === 'A'){ row(['Total price' + (vat ? ' including VAT' : ''), null, null, vat ? d.body.totalInc : d.body.totalEx], { bold: true, size: 13, box: true }); }
+  else if(d.mode === 'B'){
+    hdr(vat ? ['Item', null, 'Price ex VAT', 'Price incl. VAT'] : ['Item', null, null, 'Price']);
+    gs.forEach(g => row(vat ? [g.name, null, g.ex, g.inc] : [g.name, null, null, g.ex], { box: true }));
+    row(vat ? ['Total', null, d.body.totalEx, d.body.totalInc] : ['Total', null, null, d.body.totalEx], { bold: true, box: true });
+  } else if(d.mode === 'C'){
+    gs.forEach(g => { const r = row(d.body.showGroupPrices ? (vat ? [g.name, null, g.ex, g.inc] : [g.name, null, null, g.ex]) : [g.name], { bold: true, color: H, fill: 'FFF3F1EC', box: true }); if(!d.body.showGroupPrices) ws.mergeCells(r.number, 1, r.number, 4);
+      (g.items.length ? g.items : [{ desc: 'Included in the price' }]).forEach(i => { const r2_ = row(['    ' + i.desc, i.qty != null && i.qty !== '' ? i.qty : (i.qtyText || '')], { box: true }); r2_.getCell(2).numFmt = '0.##'; r2_.getCell(2).alignment = { horizontal: 'right', vertical: 'top' }; ws.mergeCells(r2_.number, 3, r2_.number, 4); }); });
+    row(['Total', null, null, vat ? d.body.totalInc : d.body.totalEx], { bold: true, box: true });
+  } else {
+    hdr(vat ? ['Material', 'Qty', 'Price each ex VAT', 'Price incl. VAT'] : ['Material', 'Qty', 'Price each', 'Price']);
+    gs.filter(g => g.items.some(i => i.kind === 'line')).forEach(g => { const r = row([g.name], { bold: true, color: H, fill: 'FFF3F1EC', box: true }); ws.mergeCells(r.number, 1, r.number, 4);
+      g.items.filter(i => i.kind === 'line').forEach(i => { const rr = row([i.desc, i.qty, i.each, vat ? i.inc : i.ex], { box: true }); rr.getCell(2).numFmt = '0.##'; rr.getCell(2).alignment = { horizontal: 'right', vertical: 'top' }; }); });
+  }
+  ws.addRow([]);
+  d.summary.forEach(s => { const r = row([s.label, null, null, s.text || s.amount], { bold: !!s.total, box: true }); if(s.text) r.getCell(4).alignment = { horizontal: 'right' }; if(s.total) r.eachCell(c => { c.border = { top: { style: 'medium', color: { argb: R } }, bottom: thin, left: thin, right: thin }; }); });
+  if(d.payments.length){ ws.addRow([]); const r = row([d.paymentLine], { bold: true }); ws.mergeCells(r.number, 1, r.number, 4); d.payments.forEach(p => row([p.label, null, p.due, p.amount], { box: true })); }
+  ws.addRow([]); { const r = row([d.acceptance.text], { bold: true }); ws.mergeCells(r.number, 1, r.number, 4); r.height = 32; }
+  d.acceptance.fields.forEach(f => { const r = row([f + ':']); r.height = 24; r.getCell(1).font = { bold: true, name: 'Calibri' }; ws.mergeCells(r.number, 2, r.number, 4); r.getCell(2).border = { bottom: thin }; });
+  ws.addRow([]); { const f = d.footer, r = row([[f.name, f.address, f.phone, f.email].filter(Boolean).join(' · ')], { size: 9, color: 'FF444444' }); ws.mergeCells(r.number, 1, r.number, 4); const r2_ = row(['Quotation ' + f.ref + (f.vatNumber ? ' · VAT number: ' + f.vatNumber : '')], { size: 9, color: 'FF444444' }); ws.mergeCells(r2_.number, 1, r2_.number, 4); }
+  if(internal){
+    const c = qCalc(q), is = wb.addWorksheet('Internal costing (do not send)', { properties: { tabColor: { argb: 'FFC0392B' } } });
+    is.columns = [{ width: 46 }, { width: 16 }, { width: 9 }, { width: 8 }, { width: 10 }, { width: 11 }, { width: 22 }, { width: 13 }, { width: 10 }, { width: 13 }, { width: 14 }, { width: 11 }, { width: 14 }, { width: 22 }, { width: 8 }];
+    const ir = (vals, o) => { o = o || {}; const r = is.addRow(vals); r.eachCell({ includeEmpty: false }, cc => { cc.font = { name: 'Calibri', bold: !!o.bold, color: { argb: o.color || 'FF1B1B1B' } }; if(o.fill) cc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: o.fill } }; if(typeof cc.value === 'number' && o.money !== false) cc.numFmt = GBP; }); return r; };
+    ir(['INTERNAL - NOT FOR CUSTOMERS'], { bold: true, color: 'FFFFFFFF', fill: 'FFC0392B' }); is.mergeCells(1, 1, 1, 8); is.getCell(1, 1).font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+    is.addRow([q.refOverride && q.refOverride.trim() ? 'Quote ' + qRef(q) : 'Quote ' + qRef(q), (q.mode === 'template' ? 'Template rules' : 'New rules') + ' · live data']); is.addRow([]);
+    const h1 = ir(['Material', 'Category', 'Unit', 'Qty', 'Wastage %', 'Qty to order', 'Selected supplier', 'Selected cost each', 'Markup %', 'Cost total', 'Price ex VAT', 'VAT', 'Price inc VAT', 'Customer group', 'Shown'], { bold: true, fill: 'FFF3F1EC' }); h1.alignment = { wrapText: true };
+    q.lines.forEach(l => { const x = c.lines[l.id], cat = state.lineCategories.find(k => k.id === l.categoryId), r = ir([l.description, cat ? cat.name : '', qUnitName(l), l.qty, l.wastagePct, x.qtyOrder, x.selSupplierId ? qbSupName(x.selSupplierId) : '', x.costEach, l.markupPct, x.lineCost, x.priceEx, x.vat, x.priceInc, l.customerGroup.trim() || 'Materials', l.showOnQuote ? 'Yes' : 'No']);
+      [4, 5, 6, 9].forEach(n => { r.getCell(n).numFmt = '0.##'; }); });
+    is.addRow([]); ir(['Labour'], { bold: true, fill: 'FFF3F1EC' }); ir(['Description', 'Basis', null, 'Qty', null, null, null, 'Rate', null, null, 'Amount'], { bold: true });
+    q.labour.forEach(r => ir([r.description, r.basis, null, r.qty, null, null, null, r.rate === '' ? 0 : r.rate, null, null, c.labour[r.id].amount]).getCell(4).numFmt = '0.##');
+    if(q.recoverUnpaid) ir(['Unpaid time recovered (' + hrs(c.unpaid.hours) + ')', 'auto', null, null, null, null, null, c.unpaid.rate, null, null, c.unpaid.amount]);
+    is.addRow([]); ir(['Delivery drops'], { bold: true, fill: 'FFF3F1EC' }); ir(['Label', 'Method', null, null, null, null, 'Supplier', 'Date', null, 'Payment due', 'Charge ex VAT'], { bold: true });
+    q.drops.forEach(dr => ir([dr.label, dr.method, null, null, null, null, dr.supplierId ? qbSupName(dr.supplierId) : '', dr.date, null, dr.paymentDueDate, Number(dr.charge) || 0]));
+    is.addRow([]); ir(['Margin summary'], { bold: true, fill: 'FFF3F1EC' });
+    [['Materials cost', c.materialsCost], ['Materials price ex VAT', c.materialsEx], ['Labour (price)', c.labourEx], ['Labour cost (at profit share)', c.labourCost], ['Delivery', c.deliveryEx], ['Total ex VAT', c.totalEx], ['VAT', c.vat], ['Total inc VAT', c.totalInc]].forEach(([k, v]) => { const r = ir([k]); r.getCell(11).value = v; r.getCell(11).numFmt = GBP; });
+    [['Margin after wages', c.marginAfter, c.pctAfter], ['Margin before wages', c.marginBefore, c.pctBefore]].forEach(([k, v, p]) => { const r = ir([k], { bold: true }); r.getCell(11).value = v; r.getCell(11).numFmt = GBP; r.getCell(12).value = Math.round(p * 10) / 10 / 100; r.getCell(12).numFmt = '0.0%'; });
+  }
+  return wb.xlsx.writeBuffer();
+}
+
+/* ---- builder: the Customer view card ---- */
+function qcdMsg(text, bad){ const m = document.getElementById('qcdMsg'); if(m){ m.textContent = text || ''; m.className = 'qcd-msg' + (text ? (bad ? ' bad' : ' ok') : ''); } }
+function qcdTimeline(q, what, extra){ q.timeline.push({ date: fmt(new Date()), note: `${what} generated, Mode ${qViewMode(q)}, v${q.version}${extra || ''}`, created: Date.now(), kind: 'doc' }); saveState(); }
+function qbCustomerHtml(q){
+  const mode = qViewMode(q), sn = q.sentSnapshot && q.status !== 'Draft';
+  return `<div class="card" id="qbCustomer"><div class="qb-sec-h"><h3>Customer view</h3>${sn ? `<span class="qb-mode new" title="PDF, Word and Excel for this version are built from the snapshot, not from live prices or Settings">Sent snapshot (${escHtml(q.sentSnapshot.date)})</span>` : ''}</div>
+    <div class="qcd-tabs"><button type="button" class="active" data-qba="cv-tab" data-v="opts">Options</button><button type="button" data-qba="cv-tab" data-v="prev">Preview</button></div>
+    <div class="qcd-grid" data-cv="opts"><div class="qcd-opts">
+      <div class="lp-f"><label>Customer view</label>${qbSel('hdr', '', 'viewMode', qbOpts(VIEW_MODES.map(m => [m[0], 'Mode ' + m[0] + ' — ' + m[1]]), mode), { aria: 'Customer view' })}<p class="q-help" id="qcdModeHelp">${escHtml(VIEW_MODES.find(m => m[0] === mode)[2])}</p></div>
+      <div class="qcd-btns"><button class="btn" data-qba="doc-pdf">Download PDF</button><button class="btn secondary" data-qba="doc-word">Download Word</button><button class="btn secondary" data-qba="doc-xlsx">Download Excel</button></div>
+      <p class="q-help">PDF opens a print page: choose <b>Save as PDF</b>. Word and Excel load a small helper library only when you click them.</p>
+      <div class="qcd-msg" id="qcdMsg" role="alert"></div>
+      <p class="q-help" id="qcdAdj"></p>
+      <p class="q-help">${sn ? 'This version is built from its Sent snapshot, so later price or term changes do not alter it. A New version re-reads live data.' : 'Draft quotes always use live data. The snapshot is taken when the quote is marked Sent.'}</p>
+    </div><div class="qcd-prev" id="qcdPreview"></div></div></div>`;
+}
+function qcdRefresh(q, c){
+  const pv = document.getElementById('qcdPreview'); if(!pv) return;
+  const d = qDocFor(q, qViewMode(q)); pv.innerHTML = qDocHtml(d);
+  const gr = q.sentSnapshot && q.status !== 'Draft' ? null : qGroups(q, c), adj = gr ? gr.adj : (d.body.adj || {}), ae = document.getElementById('qcdAdj');
+  if(ae){ const bits = []; if(adj.ex) bits.push(`rounding adjusted on “${adj.ex.group}” (ex VAT ${adj.ex.amount > 0 ? '+' : '−'}${qm(Math.abs(adj.ex.amount))})`); if(adj.inc && qVatOn()) bits.push(`rounding adjusted on “${adj.inc.group}” (incl. VAT ${adj.inc.amount > 0 ? '+' : '−'}${qm(Math.abs(adj.inc.amount))})`); ae.textContent = bits.length ? 'Preview note: ' + bits.join('; ') + '. This note is not on the customer document.' : ''; }
+  const dl = document.getElementById('qbGroupsList'); if(dl){ const names = new Set(['Materials', 'Installation labour', 'Delivery']); q.lines.concat(q.labour).forEach(x => { if(x.customerGroup.trim()) names.add(x.customerGroup.trim()); }); dl.innerHTML = [...names].map(n => `<option value="${escAttr(n)}"></option>`).join(''); }
+}
+async function qDocPdf(q){
+  const d = qDocFor(q), win = window.open('', '_blank');
+  if(!win){ qcdMsg('The print page was blocked by the browser. Allow pop-ups for this site and try again.', true); return; }
+  win.document.open(); win.document.write(qPrintPage(d, qDocName(q, d))); win.document.close();
+  qcdTimeline(q, 'PDF'); qbRender(); qcdMsg('Print page opened. Choose “Save as PDF” in the print dialog.');
+}
+async function qDocWord(q){
+  qcdMsg('Preparing the Word file…');
+  try{ await qLoadLib('docx'); }catch(e){ qcdMsg('Could not load the Word export helper (it needs an internet connection). Nothing else is affected: try again when you are online.', true); return; }
+  try{ const d = qDocFor(q), blob = await qBuildDocx(d); qDownload(blob, qDocName(q, d, '.docx')); qcdTimeline(q, 'Word'); qbRender(); qcdMsg('Word file downloaded.'); }
+  catch(e){ qcdMsg('The Word file could not be built: ' + (e && e.message || e), true); }
+}
+async function qDocXlsx(q, internal){
+  qcdMsg('Preparing the Excel file…');
+  try{ await qLoadLib('exceljs'); }catch(e){ qcdMsg('Could not load the Excel export helper (it needs an internet connection). Nothing else is affected: try again when you are online.', true); return; }
+  try{ const d = qDocFor(q), buf = await qBuildXlsx(q, d, internal); qDownload(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), qDocName(q, d, '.xlsx')); qcdTimeline(q, 'Excel', internal ? ' (with internal costing)' : ''); qbRender(); qcdMsg('Excel file downloaded.'); }
+  catch(e){ qcdMsg('The Excel file could not be built: ' + (e && e.message || e), true); }
+}
+function qXlsxDialog(q){
+  const o = document.getElementById('xlsxOverlay'); document.getElementById('xlsxInternal').checked = false; o.hidden = false; o.dataset.qid = q.id; document.getElementById('xlsxGo').focus();
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-xl]'); if(!b || !state) return;
+  const o = document.getElementById('xlsxOverlay'), q = qFind(Number(o.dataset.qid)), internal = document.getElementById('xlsxInternal').checked; o.hidden = true;
+  if(b.dataset.xl === 'go' && q) qDocXlsx(q, internal);
+});
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-qba="cv-tab"]'); if(!b) return;
+  const g = document.querySelector('#qbCustomer .qcd-grid'); if(g) g.dataset.cv = b.dataset.v; document.querySelectorAll('#qbCustomer .qcd-tabs button').forEach(x => x.classList.toggle('active', x === b));
+});
+
+function qSeedGroups(o){   // the Guy Nunn sample: group its lines (only if the groups have never been touched)
+  const q = (o.quotes || []).find(x => String(x.refOverride).trim() === 'BWR001' && x.customer === 'Guy Nunn');
+  if(!q || q.lines.length !== 7 || q.lines.some(l => String(l.customerGroup || '').trim())) return;
+  q.lines.forEach((l, i) => { l.customerGroup = i < 4 ? 'Sleepers and timber' : 'Fixings and stone'; });
+}
 
 function renderTransactions(){
   const txns = state.transactions;
