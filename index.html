@@ -957,6 +957,19 @@
   .qcd-prev { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 18px 20px; max-height: 900px; overflow: auto; }
   .qcd-msg { font-size: 12.5px; min-height: 0; } .qcd-msg.ok { color: #1e5c2e; } .qcd-msg.bad { color: #b3453f; font-weight: 600; }
   @media (max-width: 1000px) { .qcd-grid { grid-template-columns: 1fr; } .qcd-tabs { display: flex; } .qcd-grid[data-cv="opts"] .qcd-prev { display: none; } .qcd-grid[data-cv="prev"] .qcd-opts { display: none; } }
+  .ap-modal input[type=text], .ap-modal textarea, #decOverlay textarea { border: 1px solid var(--line); background: #fff; padding: 7px 8px; }
+  .quotes-table td.q-acts { max-width: none; overflow: visible; white-space: normal; min-width: 300px; }
+  .who-pick { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-right: 12px; } .who-pick select { width: auto; border: 1px solid var(--line); background: #fff; padding: 3px 6px; font-size: 12px; }
+  .ap-flags:empty { display: none; } .ap-flags { margin-bottom: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ap-chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 1px 9px; border-radius: 999px; background: #eceae5; color: #5a564e; } .ap-chip.ok { background: #d5ecd9; color: #1e5c2e; } .ap-chip.warn { background: #fbf1cf; color: #8a5a1c; }
+  .ap-lane { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; background: #fff; } .ap-lane-h { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .ap-mode { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; } .ap-decs { font-size: 12.5px; margin: 6px 0; } .ap-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ap-st { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 1px 9px; border-radius: 999px; background: #fbf1cf; color: #8a5a1c; } .ap-st-approved, .ap-st-seen { background: #d5ecd9; color: #1e5c2e; } .ap-st-changes, .ap-st-concern { background: #f8e3e0; color: #8a3a34; } .ap-st-rejected { background: #b3453f; color: #fff; }
+  .ap-why { color: #8a3a34; font-size: 12.5px; margin: 8px 0 0; font-weight: 600; } .ap-modal, .send-modal { max-width: 560px; max-height: calc(100vh - 40px); overflow: auto; }
+  .ap-sub { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; } .ap-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .ap-sub-grid label { font-size: 11px; color: var(--muted); } .ap-sub-grid select { border: 1px solid var(--line); background: #fff; padding: 6px; }
+  .ap-people { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 6px; } .send-list { list-style: none; padding: 0; margin: 10px 0; font-size: 13px; } .send-list li.ok { color: #1e5c2e; } .send-list li.bad { color: #b3453f; } .send-note { font-size: 12.5px; background: #fbf1cf; padding: 8px 10px; border-radius: 8px; }
+  .send-modal input[type=email] { border: 1px solid var(--line); background: #fff; padding: 7px 8px; } #apLanesCard input:not([type=checkbox]), #apLanesCard select, #apSendCard input, #apSendCard textarea { border: 1px solid var(--line); background: #fff; padding: 7px 8px; }
+  #apLanesCard .lp-f > label, #apSendCard .lp-f > label { text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; }
   .q-help { font-size: 12px; color: var(--muted); margin: 4px 0 0; line-height: 1.45; }
   .q-err { font-size: 12px; color: #b3453f; margin: 4px 0 0; }
   .q-err:empty { display: none; }
@@ -1325,8 +1338,9 @@
   </div>
 
   <div class="nav-group g-revenue">
-    <div class="nav-label">Revenue</div>
+    <div class="nav-label">Revenue <span class="tab-count" id="revBadge" hidden></span></div>
     <div class="tab g-revenue" data-tab="quotations">Quotes</div>
+    <div class="tab g-revenue" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></div>
     <div class="tab g-revenue" data-tab="revenue">Revenue Forecast</div>
   </div>
 
@@ -1373,6 +1387,7 @@
 
   <div class="brandbar" id="brandBar">
     <div class="brandbar-in" id="brandBarIn">
+      <div class="who-pick" id="whoPick"></div>
       <div class="save-status" id="saveStatus"></div>
       <div class="brand-pill" id="brandPill"></div>
     </div>
@@ -1618,6 +1633,14 @@
     <div class="card" id="qtUnitsCard"></div>
         </section>
 
+        <section class="set-sec" data-sec="approvals">
+    <div class="section-label">Approvals</div>
+    <div class="card" id="apLanesCard"></div>
+
+    <div class="section-label">Sending and follow-up</div>
+    <div class="card" id="apSendCard"></div>
+        </section>
+
         <section class="set-sec" data-sec="dashboard">
     <div class="section-label">Needs attention thresholds</div>
     <div class="card" id="dashSettingsCard"></div>
@@ -1683,6 +1706,12 @@ create policy "app update" on tracker_data for update using (true) with check (t
         </section>
       </div>
     </div>
+  </div>
+
+  <!-- APPROVALS -->
+  <div class="panel" id="panel-approvals">
+    <div class="page-head"><h2>Approvals</h2><div class="desc">Quotes waiting for a decision. Approvals are a team process, not security: anyone with the login can choose any name. Turn lanes on in Settings &gt; Approvals.</div></div>
+    <div id="apprInbox"></div>
   </div>
 
   <!-- QUOTES -->
@@ -1781,6 +1810,37 @@ create policy "app update" on tracker_data for update using (true) with check (t
     <div class="modal-msg">Sheet 1 is the quote as the customer sees it. The internal costing sheet shows your costs and margins: only include it for your own use.</div>
     <label class="q-check" style="margin-bottom:18px;"><input type="checkbox" id="xlsxInternal"> Include internal costing sheet</label>
     <div class="modal-actions"><button class="btn secondary" data-xl="cancel">Cancel</button><button class="btn" id="xlsxGo" data-xl="go">Download</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="apprOverlay" hidden>
+  <div class="modal ap-modal" role="dialog" aria-modal="true" aria-labelledby="apprTitle">
+    <div class="modal-title" id="apprTitle">Submit for approval</div>
+    <div class="modal-msg">These lanes apply to this quote. You can change them for this quote only; the changes are recorded in the timeline.</div>
+    <div id="apprBody"></div>
+    <div class="lp-f"><label>Reason for any override (optional)</label><input type="text" id="apprReason" autocomplete="off"></div>
+    <div class="q-err" id="apprErr" role="alert"></div>
+    <div class="modal-actions"><button class="btn secondary" data-apx="appr-cancel">Cancel</button><button class="btn" data-apx="appr-go">Submit</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="decOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="decTitle">
+    <div class="modal-title" id="decTitle"></div>
+    <div class="lp-f"><label id="decLabel">Comment</label><textarea id="decComment" rows="4"></textarea></div>
+    <div class="q-err" id="decErr" role="alert"></div>
+    <div class="modal-actions"><button class="btn secondary" data-apx="dec-cancel">Cancel</button><button class="btn" data-apx="dec-go">Confirm</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="sendOverlay" hidden>
+  <div class="modal send-modal" role="dialog" aria-modal="true" aria-labelledby="sendTitle">
+    <div class="modal-title" id="sendTitle">Send quote</div>
+    <div class="lp-f"><label>Customer email (required)</label><input type="email" id="sendEmail" autocomplete="off" placeholder="name@example.com"></div>
+    <ul class="send-list" id="sendList"></ul>
+    <p class="send-note"><b>Gmail can't attach files automatically. Download the PDF and attach it before sending.</b> This app never sends anything itself: it opens a Gmail draft for you to check and send.</p>
+    <div id="sendLink"></div><div class="q-err" id="sendErr" role="alert"></div>
+    <div class="modal-actions" style="flex-wrap:wrap;"><button class="btn secondary" data-apx="send-cancel">Cancel</button><button class="btn secondary" data-apx="send-pdf">Download PDF</button><button class="btn secondary" data-apx="send-gmail">Open Gmail draft</button><button class="btn" id="sendGo" data-apx="send-done">I've sent it</button></div>
   </div>
 </div>
 
@@ -1995,6 +2055,11 @@ function ensureQuoteModel(o, seedAction){
   st.complaintDays = intOr(st.complaintDays, 3, 1);
   st.hoursPerDay = intOr(st.hoursPerDay, 8, 1);
   st.quoteViewMode = ['A', 'B', 'C', 'D'].includes(st.quoteViewMode) ? st.quoteViewMode : 'D';
+  st.approvalLanes = apNormLanes(st.approvalLanes);   // Settings > Approvals: both lanes OFF by default
+  st.followUpDays = intOr(st.followUpDays, 7, 0);
+  st.sendAccount = typeof st.sendAccount === 'string' ? st.sendAccount.trim() : 'brookwood.rural@gmail.com';
+  st.emailSubject = typeof st.emailSubject === 'string' && st.emailSubject.trim() ? st.emailSubject : AP_DEFAULT_SUBJECT;
+  st.emailBody = typeof st.emailBody === 'string' && st.emailBody.trim() ? st.emailBody : AP_DEFAULT_BODY;
   st.showGroupPricesC = st.showGroupPricesC === true;
   st.complaintDayType = st.complaintDayType === 'calendar' ? 'calendar' : 'working';
   st.vatNumber = str(st.vatNumber).trim();
@@ -2446,6 +2511,7 @@ async function startApp(){
   loadTodayScope();
   render();
   activateTab('today');   // Today is the landing page after every login
+  qHashOpen();
   const cu = document.getElementById('cloudUrl'), ck = document.getElementById('cloudKey');
   if(cu) cu.value = cloud.url || '';
   if(ck) ck.value = cloud.key || '';
@@ -4524,6 +4590,7 @@ function renderSettings(){
   renderTiers();
   renderDashSettings();
   renderQuoteSettings();
+  renderApprovalSettings();
 }
 /* ---------- Settings > Quotes & pricing ---------- */
 let qtVatPending = false;      // VAT switch flipped on before a VAT number exists: the number box shows, nothing is saved as ON yet
@@ -4779,6 +4846,11 @@ function ensureQuoteDocModel(o, seed){
       q.timeline = (Array.isArray(q.timeline) ? q.timeline : []).filter(t => t && typeof t === 'object').map(t => ({ date: iso(t.date) || fmt(new Date()), note: str(t.note), created: Number(t.created) || 0, kind: str(t.kind) }));
       q.recoverUnpaid = !!q.recoverUnpaid;
       q.unpaidOverride = (q.unpaidOverride === '' || q.unpaidOverride == null || isNaN(Number(q.unpaidOverride)) || Number(q.unpaidOverride) < 0) ? '' : Number(q.unpaidOverride);
+      q.approval = (q.approval && typeof q.approval === 'object' && Array.isArray(q.approval.lanes) && q.approval.parts) ? q.approval : null;
+      if(q.approval){ const a = q.approval; a.round = Math.max(1, Math.floor(Number(a.round)) || 1); a.status = ['pending', 'approved', 'changes', 'rejected'].includes(a.status) ? a.status : 'pending'; a.submittedBy = str(a.submittedBy); a.submittedAt = str(a.submittedAt) || new Date().toISOString(); a.reason = str(a.reason);
+        a.lanes = a.lanes.filter(l => l && typeof l === 'object').map(l => ({ id: str(l.id), name: str(l.name), mode: l.mode === 'notify' ? 'notify' : 'gateway', approvers: (Array.isArray(l.approvers) ? l.approvers : []).map(String), rule: l.rule === 'all' ? 'all' : 'any', reasons: (Array.isArray(l.reasons) ? l.reasons : []).map(String),
+          decisions: (Array.isArray(l.decisions) ? l.decisions : []).filter(d => d && typeof d === 'object').map(d => ({ by: str(d.by), decision: ['approve', 'changes', 'reject', 'seen', 'concern'].includes(d.decision) ? d.decision : 'seen', comment: str(d.comment), at: str(d.at), self: !!d.self })) })); }
+      q.sentTo = str(q.sentTo); q.sentAt = iso(q.sentAt);
       q.viewMode = ['A', 'B', 'C', 'D'].includes(q.viewMode) ? q.viewMode : '';
       q.sentSnapshot = (q.sentSnapshot && typeof q.sentSnapshot === 'object' && q.sentSnapshot.docs && q.sentSnapshot.terms) ? q.sentSnapshot : null;
       q.acceptedDate = iso(q.acceptedDate); q.asSold = (q.asSold && typeof q.asSold === 'object') ? q.asSold : null;
@@ -4941,7 +5013,7 @@ function renderQuotes(){
   list.forEach(q => {
     const c = qCalc(q);
     html += `<tr class="sup-row" data-qba="open" data-id="${q.id}" tabindex="0"><td class="code-cell">${escHtml(qRef(q))}</td><td class="q-strong">${escHtml(q.customer || '—')}</td><td>${escHtml(q.project || '—')}</td>
-      <td>${q.version}</td><td><span class="q-st q-st-${q.status}">${q.status}</span></td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
+      <td>${q.version}</td><td><span class="q-st q-st-${q.status}">${q.status}</span>${apListChips(q)}</td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
       <td>${escHtml(q.date)}</td><td>${escHtml(qLinkedText(q) || '—')}</td></tr>`;
   });
   wrap.innerHTML = html + '</tbody></table>';
@@ -5048,7 +5120,7 @@ function qbRender(){
   const ae = document.activeElement; if(ae && box.contains(ae) && ae.blur) ae.blur();   // commit a half-finished edit before the page is rebuilt
   const sc = box.querySelector('.qb-scroll'), sl = sc ? sc.scrollLeft : 0, sy = window.scrollY;
   qAutoDrops(q);
-  box.innerHTML = qbBannerHtml(q) + qbHeaderHtml(q) + qbTilesHtml() + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + qAsSoldHtml(q) + '<datalist id="qbGroupsList"></datalist><div id="qbActual"></div><div id="qbCash"></div>' + qbTimelineHtml(q);
+  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + qAsSoldHtml(q) + '<datalist id="qbGroupsList"></datalist><div id="qbActual"></div><div id="qbCash"></div>' + qbTimelineHtml(q);
   const ns = box.querySelector('.qb-scroll'); if(ns) ns.scrollLeft = sl;
   box.querySelectorAll('[data-f="customerGroup"]').forEach(i => i.setAttribute('list', 'qbGroupsList'));
   qbRefresh(); window.scrollTo(0, sy);
@@ -5066,6 +5138,7 @@ function qbGet(q, el){
 /* recompute and repaint every calculated cell, tile and total; fields follow the data (unless someone is typing in them) */
 function qbRefresh(){
   const q = qFind(qUi.openId); if(!q) return;
+  if(apCheck(q)) saveState();
   const c = qCalc(q), v = {};
   q.lines.forEach(l => { const x = c.lines[l.id]; v[l.id + '|qtyOrder'] = String(x.qtyOrder); v[l.id + '|costEach'] = qm(x.costEach); v[l.id + '|lineCost'] = qm(x.lineCost); v[l.id + '|priceEx'] = qm(x.priceEx); v[l.id + '|vat'] = qm(x.vat); v[l.id + '|priceInc'] = qm(x.priceInc); });
   q.labour.forEach(r => { v[r.id + '|amount'] = qm(c.labour[r.id].amount); });
@@ -5089,6 +5162,7 @@ function qbRefresh(){
   const ref = document.getElementById('qbRef'); if(ref) ref.textContent = qRef(q);
   qbSyncInputs(q, document);
   qbLiveParts(q, c); qbLock(q);
+  apRefresh(q);
 }
 function qbSyncInputs(q, scope){
   (scope || document).querySelectorAll('[data-qb]').forEach(el => {
@@ -5139,6 +5213,7 @@ function qbChange(el){
   if(k === 'hdr'){
     if(f === 'status'){
       const to = QUOTE_STATUSES.includes(v) ? v : q.status;
+      if(to === 'Sent' && q.status !== 'Sent'){ const sb = apSendBlock(q); if(sb.blocked){ showToast(sb.reason); qbRender(); return; } }
       if(to === 'Sent' && q.status !== 'Sent'){
         const pa = qPayAlloc(q, qCalc(q));
         if(Math.abs(pa.unallocated) >= 0.005){ showToast(`Not marked as Sent: ${qm(Math.abs(pa.unallocated))} of the payment schedule is ${pa.unallocated < 0 ? 'over-allocated' : 'unallocated'}. Fix it in Customer payment schedule first.`); qbRender(); const u = document.getElementById('qbUnalloc'); if(u) u.scrollIntoView({ block: 'center' }); return; }
@@ -5222,6 +5297,10 @@ function qbAction(a, b){
   if(a === 'new'){ qCreate(); return; }
   if(a === 'open'){ qUi.openId = Number(b.dataset.id); renderQuotes(); window.scrollTo(0, 0); return; }
   if(a === 'tab'){ qUi.tab = b.dataset.v; renderQuotes(); return; }
+  if(a === 'ap-tab'){ apUi.tab = b.dataset.v; renderApprovals(); return; }
+  if(a === 'ap-tpl-reset'){ apTplReset(); return; }
+  if(a === 'ap-decide-q'){ const q2 = qFind(Number(b.dataset.qid)); if(q2) apOpenDecide(q2, b.dataset.lane, b.dataset.d); return; }
+  if(a === 'mark-expired'){ const q2 = qFind(Number(b.dataset.id)); if(q2 && q2.status === 'Sent'){ qApplyStatus(q2, 'Expired'); q2.timeline.push({ date: fmt(new Date()), note: 'Marked expired (past valid until ' + qValidUntil(q2) + ')', created: Date.now() + 3, kind: 'status' }); saveState(); render(); } return; }
   if(a === 'age-check'){ qAgeCheck(b); return; }
   if(a === 'stage-open'){ openStageLinePanel(b.dataset.pl, Number(b.dataset.rid), b.dataset.sid); return; }
   if(a === 'sl-log-add'){ slLogAdd(); return; }
@@ -5235,6 +5314,10 @@ function qbAction(a, b){
   }
   const q = qFind(qUi.openId); if(!q) return; const id = b.dataset.id;
   if(a === 'open-pipeline'){ qGoDeal(q); return; }
+  if(a === 'ap-submit'){ apOpenSubmit(q); return; }
+  if(a === 'ap-decide'){ apOpenDecide(q, b.dataset.lane, b.dataset.d); return; }
+  if(a === 'ap-copy'){ apCopy(apRequestText(q, b.dataset.lane)); return; }
+  if(a === 'send-open'){ qOpenSend(q); return; }
   if(a === 'doc-pdf'){ qDocPdf(q); return; }
   if(a === 'doc-word'){ qDocWord(q); return; }
   if(a === 'doc-xlsx'){ qXlsxDialog(q); return; }
@@ -5827,7 +5910,7 @@ function qDocFor(q, mode){
 }
 function qTakeSnapshot(q){
   const c = qCalc(q), docs = {}; ['A', 'B', 'C', 'D'].forEach(m => { const d = qCustomerDoc(q, m, c); d.brand.logo = ''; d.terms = null; d.acceptance = null; docs[m] = d; });
-  return { date: fmt(new Date()), mode: qViewMode(q), docs, terms: quoteTermsDoc(state.settings) };
+  return { date: fmt(new Date()), mode: qViewMode(q), docs, terms: quoteTermsDoc(state.settings), validUntil: addDaysIso(q.date, Number(state.settings.quoteValidityDays) || 0) };
 }
 function qDocName(q, doc, ext){ return (doc.ref + ' ' + (q.customer || '') + ' ' + (q.project || '')).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim() + (ext || ''); }
 
@@ -6042,7 +6125,8 @@ function qbCustomerHtml(q){
     <div class="qcd-tabs"><button type="button" class="active" data-qba="cv-tab" data-v="opts">Options</button><button type="button" data-qba="cv-tab" data-v="prev">Preview</button></div>
     <div class="qcd-grid" data-cv="opts"><div class="qcd-opts">
       <div class="lp-f"><label>Customer view</label>${qbSel('hdr', '', 'viewMode', qbOpts(VIEW_MODES.map(m => [m[0], 'Mode ' + m[0] + ' — ' + m[1]]), mode), { aria: 'Customer view' })}<p class="q-help" id="qcdModeHelp">${escHtml(VIEW_MODES.find(m => m[0] === mode)[2])}</p></div>
-      <div class="qcd-btns"><button class="btn" data-qba="doc-pdf">Download PDF</button><button class="btn secondary" data-qba="doc-word">Download Word</button><button class="btn secondary" data-qba="doc-xlsx">Download Excel</button></div>
+      <div class="qcd-btns"><button class="btn" data-qba="doc-pdf">Download PDF</button><button class="btn secondary" data-qba="doc-word">Download Word</button><button class="btn secondary" data-qba="doc-xlsx">Download Excel</button>
+        <button class="btn" id="qcdSend" data-qba="send-open" style="margin-top:6px;">Send quote…</button><div class="ap-why" id="qcdSendWhy"></div></div>
       <p class="q-help">PDF opens a print page: choose <b>Save as PDF</b>. Word and Excel load a small helper library only when you click them.</p>
       <div class="qcd-msg" id="qcdMsg" role="alert"></div>
       <p class="q-help" id="qcdAdj"></p>
@@ -6060,7 +6144,7 @@ async function qDocPdf(q){
   const d = qDocFor(q), win = window.open('', '_blank');
   if(!win){ qcdMsg('The print page was blocked by the browser. Allow pop-ups for this site and try again.', true); return; }
   win.document.open(); win.document.write(qPrintPage(d, qDocName(q, d))); win.document.close();
-  qcdTimeline(q, 'PDF'); qbRender(); qcdMsg('Print page opened. Choose “Save as PDF” in the print dialog.');
+  qSetPdfDone(q); qcdTimeline(q, 'PDF'); qbRender(); qcdMsg('Print page opened. Choose “Save as PDF” in the print dialog.');
 }
 async function qDocWord(q){
   qcdMsg('Preparing the Word file…');
@@ -6092,6 +6176,439 @@ function qSeedGroups(o){   // the Guy Nunn sample: group its lines (only if the 
   if(!q || q.lines.length !== 7 || q.lines.some(l => String(l.customerGroup || '').trim())) return;
   q.lines.forEach((l, i) => { l.customerGroup = i < 4 ? 'Sleepers and timber' : 'Fixings and stone'; });
 }
+
+
+/* ---------- Quote Centre step 5: approvals and sending (phase 1: manual Gmail compose) ----------
+   Two independent approval lanes live in Settings > Approvals (state.settings.approvalLanes, all OFF by default). A quote that a lane applies to is submitted for approval
+   (q.approval = { round, status, lanes[{ id, name, mode, approvers, rule, reasons, decisions[] }], parts, submittedBy, submittedAt, reason, returned }).
+   Gateway lanes block sending until approved; Notify-only lanes never block. A material change after approval resets the decisions.
+   Identity: the login username when it matches a name in the team list (#ownersList), otherwise the "Who are you?" picker (remembered on this device).
+   Approvals are a team process, not security. */
+const AP_DEFAULT_SUBJECT = 'Quotation {ref} - {project}';
+const AP_DEFAULT_BODY = "Hi {customerName},\n\nThank you for the opportunity to quote for {project}. Please find our quotation {ref} attached. It is valid until {validUntil}.\n\nIf you have any questions, or would like to go ahead, just reply to this email or give me a call on {phone}.\n\nKind regards,\n{businessName}";
+const AP_LANE_DEFS = [
+  { id: 'l1', name: 'Pricing and margin', enabled: false, mode: 'gateway', approvers: [], rule: 'any', marginBelow: '', totalOver: '' },
+  { id: 'l2', name: 'Cash flow and timeline', enabled: false, mode: 'gateway', approvers: [], rule: 'any', negativeMonth: false, totalOver: '', deliveryBeforePayment: false }
+];
+const AP_WHO_KEY = STORAGE_PREFIX + 'business-tracker-who-are-you';
+const AP_LABELS = { pending: 'Pending', approved: 'Approved', changes: 'Changes requested', rejected: 'Rejected', seen: 'Seen', concern: 'Concern raised' };
+function apNormLanes(arr){
+  const numOrBlank = v => (v === '' || v == null || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
+  return AP_LANE_DEFS.map(d => {
+    const x = (Array.isArray(arr) ? arr : []).find(l => l && l.id === d.id) || {}, out = Object.assign({}, d);
+    out.name = String(x.name == null ? d.name : x.name).trim() || d.name; out.enabled = x.enabled === true; out.mode = x.mode === 'notify' ? 'notify' : 'gateway';
+    out.approvers = [...new Set((Array.isArray(x.approvers) ? x.approvers : []).map(String).filter(Boolean))].slice(0, 3); out.rule = x.rule === 'all' ? 'all' : 'any';
+    out.totalOver = numOrBlank(x.totalOver);
+    if(d.id === 'l1') out.marginBelow = numOrBlank(x.marginBelow);
+    else { out.negativeMonth = x.negativeMonth === true; out.deliveryBeforePayment = x.deliveryBeforePayment === true; }
+    return out;
+  });
+}
+function apTeam(){ return [...document.querySelectorAll('#ownersList option')].map(o => o.value).filter(v => v && v !== 'TBC'); }
+function whoAmI(){
+  const u = String((session && session.username) || '').toLowerCase(), team = apTeam();
+  const hit = u && team.find(n => u === n.toLowerCase() || u.startsWith(n.toLowerCase()));
+  if(hit) return { name: hit, source: 'login' };
+  let p = ''; try{ p = localStorage.getItem(AP_WHO_KEY) || ''; }catch(e){}
+  return { name: team.includes(p) ? p : '', source: 'picker' };
+}
+function renderWho(){
+  const el = document.getElementById('whoPick'); if(!el || !state) return;
+  const w = whoAmI();
+  if(w.source === 'login'){ el.innerHTML = `<span class="who-lbl" title="Taken from your login">Acting as <b>${escHtml(w.name)}</b></span>`; return; }
+  el.innerHTML = `<label class="who-lbl" for="whoSel">Who are you?</label><select id="whoSel" aria-label="Who are you?"><option value="">Choose…</option>${apTeam().map(n => `<option${n === w.name ? ' selected' : ''}>${escHtml(n)}</option>`).join('')}</select>`;
+}
+document.addEventListener('change', (e) => {
+  if(e.target.id !== 'whoSel') return;
+  try{ localStorage.setItem(AP_WHO_KEY, e.target.value); }catch(err){}
+  render();
+});
+
+/* ---- which lanes apply to a quote ---- */
+function apCashFacts(q, c){
+  const items = qCashItems(q, c), months = qMonthly(items), outs = items.filter(i => i.kind === 'out').map(i => i.date).sort(), ins = items.filter(i => i.kind === 'in').map(i => i.date).sort();
+  return { negMonth: months.find(m => m.inn - m.out < -0.005) || null, firstOut: outs[0] || '', firstIn: ins[0] || '' };
+}
+function apLaneApplies(lane, q, c){
+  if(!lane.enabled) return { applies: false, reasons: [] };
+  const why = [], set = [];
+  if(lane.id === 'l1'){
+    if(lane.marginBelow !== ''){ set.push(1); if(c.pctBefore < lane.marginBelow) why.push(`margin before wages is ${qpct(c.pctBefore)}, below ${lane.marginBelow}%`); }
+    if(lane.totalOver !== ''){ set.push(1); if(c.totalEx > lane.totalOver) why.push(`total ex VAT ${qm(c.totalEx)} is over ${qm(lane.totalOver)}`); }
+  } else {
+    const f = apCashFacts(q, c);
+    if(lane.negativeMonth){ set.push(1); if(f.negMonth) why.push(`${monthLabel(toDate(f.negMonth.key + '-01'))} is net negative in this project's cash flow`); }
+    if(lane.totalOver !== ''){ set.push(1); if(c.totalInc > lane.totalOver) why.push(`total inc VAT ${qm(c.totalInc)} is over ${qm(lane.totalOver)}`); }
+    if(lane.deliveryBeforePayment){ set.push(1); if(f.firstOut && f.firstIn && f.firstOut < f.firstIn) why.push(`the first delivery payment (${f.firstOut}) falls due before the first customer payment (${f.firstIn})`); }
+  }
+  if(!set.length) return { applies: true, reasons: ['this lane is needed for every quote'] };
+  return { applies: why.length > 0, reasons: why };
+}
+function apApplicable(q, c){ c = c || qCalc(q); return state.settings.approvalLanes.map(lane => ({ lane, res: apLaneApplies(lane, q, c) })).filter(x => x.res.applies); }
+
+/* ---- material change fingerprint ---- */
+function apHash(s){ let h = 5381; for(let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(16); }
+function apParts(q){
+  const c = qCalc(q), j = JSON.stringify;
+  return {
+    lines: apHash(j(q.lines.map(l => [l.id, l.qty, l.wastagePct, l.unitId, l.prices.map(p => [p.supplierId, p.price]), l.selectedSupplierId, l.costOverride, l.markupPct, l.vatRate]))),
+    labour: apHash(j([q.labour.map(r => [r.id, r.basis, r.qty, r.rate]), q.recoverUnpaid, c.unpaid.amount])),
+    drops: apHash(j(q.drops.map(d => [d.id, d.supplierId, d.date, d.method, d.charge, d.paymentDueDate, q.lines.filter(l => l.deliveryDropId === d.id).map(l => l.id)]))),
+    payments: apHash(j(q.payments.map(r => [r.id, r.mode, r.value, r.dueMode, r.date, r.days]))),
+    vat: apHash(j([qVatOn(), state.settings.vatRate, q.mode])),
+    totals: apHash(j([c.totalEx, c.vat, c.totalInc]))
+  };
+}
+const AP_PART_NAMES = { lines: 'Prices or quantities', labour: 'Labour', drops: 'Delivery drops', payments: 'Payment schedule', vat: 'VAT setting' };
+function apNow(){ return new Date().toISOString(); }
+function apActive(q){ return q.approval && (q.approval.status === 'pending' || q.approval.status === 'approved') ? q.approval : null; }
+function apCheck(q){   // a material change after (partial) approval puts every lane back to Pending
+  const a = apActive(q); if(!a) return false;
+  const now = apParts(q), changed = Object.keys(now).filter(k => now[k] !== a.parts[k]); if(!changed.length) return false;
+  const hasDecisions = a.lanes.some(l => l.decisions.length);
+  a.parts = now; if(!hasDecisions) return false;
+  const names = changed.filter(k => AP_PART_NAMES[k]).map(k => AP_PART_NAMES[k]);
+  a.lanes.forEach(l => { l.decisions = []; }); a.status = 'pending';
+  q.timeline.push({ date: fmt(new Date()), note: `Approvals reset to Pending: ${names.length ? names.join(', ') : 'Totals'} changed after approval`, created: Date.now(), kind: 'approval' });
+  return true;
+}
+function apEligible(a, ln){ const others = ln.approvers.filter(n => n !== a.submittedBy); return others.length ? others : ln.approvers; }
+function apLatest(ln){ const m = {}; ln.decisions.forEach(d => { m[d.by] = d; }); return Object.values(m); }
+function apLaneState(a, ln){
+  const dec = apLatest(ln), elig = apEligible(a, ln), has = (n, d) => dec.some(x => x.by === n && x.decision === d);
+  if(ln.mode === 'gateway'){
+    if(dec.some(d => d.decision === 'reject')) return 'rejected';
+    if(dec.some(d => d.decision === 'changes')) return 'changes';
+    const ok = ln.rule === 'all' ? elig.every(n => has(n, 'approve')) : elig.some(n => has(n, 'approve'));
+    return ok ? 'approved' : 'pending';
+  }
+  if(dec.some(d => d.decision === 'concern')) return 'concern';
+  const ok = ln.rule === 'all' ? elig.every(n => has(n, 'seen')) : elig.some(n => has(n, 'seen'));
+  return ok ? 'seen' : 'pending';
+}
+function apRecompute(a){
+  const gs = a.lanes.filter(l => l.mode === 'gateway').map(l => apLaneState(a, l));
+  a.status = gs.includes('rejected') ? 'rejected' : gs.includes('changes') ? 'changes' : gs.every(s => s === 'approved') ? 'approved' : 'pending';
+}
+function apConcerns(q){ const a = q.approval; if(!a) return []; const out = []; a.lanes.forEach(l => { if(l.mode === 'notify') apLatest(l).filter(d => d.decision === 'concern').forEach(d => out.push({ lane: l.name, by: d.by, comment: d.comment })); }); return out; }
+/* why a quote cannot be sent yet (gateway lanes only; notify-only lanes never block) */
+function apSendBlock(q){
+  if(q.status !== 'Draft') return { blocked: false, reason: '' };
+  const a = q.approval;
+  if(!a || (a.status !== 'pending' && a.status !== 'approved')){
+    const needG = apApplicable(q).filter(x => x.lane.mode === 'gateway');
+    if(a && (a.status === 'changes' || a.status === 'rejected')) return { blocked: true, reason: `${a.status === 'changes' ? 'Changes were requested' : 'The quote was rejected'}: edit it and submit for approval again.` };
+    return needG.length ? { blocked: true, reason: `Needs approval first: submit for approval (${needG.map(x => x.lane.name).join(', ')}).` } : { blocked: false, reason: '' };
+  }
+  const waiting = a.lanes.filter(l => l.mode === 'gateway' && apLaneState(a, l) !== 'approved');
+  if(!waiting.length) return { blocked: false, reason: '' };
+  return { blocked: true, reason: waiting.map(l => { const ap = new Set(apLatest(l).filter(d => d.decision === 'approve').map(d => d.by)), need = apEligible(a, l).filter(n => !ap.has(n)); return `Waiting for ${(l.rule === 'all' ? need : need).join(l.rule === 'all' ? ' and ' : ' or ')}'s approval on ${l.name}`; }).join('. ') };
+}
+
+/* ---- submit / decide ---- */
+function apSubmit(q, lanes, reason, overrides){
+  const who = whoAmI().name, a0 = q.approval, round = a0 ? a0.round + 1 : 1, today = fmt(new Date());
+  q.approval = { round, status: 'pending', submittedBy: who, submittedAt: apNow(), reason: reason || '', parts: apParts(q), returned: null,
+    lanes: lanes.map(l => ({ id: l.id, name: l.name, mode: l.mode, approvers: l.approvers.slice(), rule: l.rule, reasons: l.reasons || [], decisions: [] })) };
+  apRecompute(q.approval);
+  const lanesTxt = lanes.map(l => `${l.name} (${l.mode === 'gateway' ? 'Gateway' : 'Notify only'}, ${l.approvers.join(l.rule === 'all' ? ' and ' : ' or ')}${l.approvers.length > 1 ? ', ' + (l.rule === 'all' ? 'all must approve' : 'any one approves') : ''})`).join('; ');
+  q.timeline.push({ date: today, note: `Submitted for approval (round ${round}) by ${who}: ${lanesTxt}`, created: Date.now(), kind: 'approval' });
+  overrides.forEach(o => q.timeline.push({ date: today, note: `Approval override for this quote: ${o}${reason ? ' (reason: ' + reason + ')' : ''}`, created: Date.now() + 1, kind: 'approval' }));
+}
+function apDecide(q, laneId, decision, comment){
+  const a = apActive(q), who = whoAmI().name; if(!a) return { ok: false, msg: 'This quote is not waiting for approval.' };
+  if(apCheck(q)){ saveState(); return { ok: false, msg: 'The quote changed since it was submitted, so approvals were reset. Please look again.' }; }
+  const ln = a.lanes.find(l => l.id === laneId); if(!ln) return { ok: false, msg: 'Lane not found.' };
+  if(!who) return { ok: false, msg: 'Choose who you are (top of the page) first.' };
+  if(!ln.approvers.includes(who)) return { ok: false, msg: `${who} is not an approver on ${ln.name}.` };
+  const self = who === a.submittedBy;
+  if(self && apEligible(a, ln).includes(who) === false) return { ok: false, msg: 'You submitted this quote, so someone else needs to decide it.' };
+  if(['changes', 'reject', 'concern'].includes(decision) && !String(comment || '').trim()) return { ok: false, msg: 'A comment is required.' };
+  const d = decision === 'reject' ? 'reject' : decision; ln.decisions = ln.decisions.filter(x => x.by !== who || x.decision === 'x');
+  ln.decisions.push({ by: who, decision: d, comment: String(comment || '').trim(), at: apNow(), self });
+  const verbs = { approve: 'approved', changes: 'requested changes on', reject: 'rejected', seen: 'marked as seen', concern: 'raised a concern on' };
+  q.timeline.push({ date: fmt(new Date()), note: `${who} ${verbs[d]} ${ln.name} (round ${a.round})${self ? ' [self-approved]' : ''}${comment ? ': ' + String(comment).trim() : ''}`, created: Date.now(), kind: 'approval' });
+  apRecompute(a);
+  if(a.status === 'changes' || a.status === 'rejected') a.returned = { by: who, lane: ln.name, decision: d, comment: String(comment).trim(), round: a.round, at: apNow() };
+  saveState(); return { ok: true };
+}
+function apRequestText(q, laneId){
+  const a = q.approval, ln = a && a.lanes.find(l => l.id === laneId), c = qCalc(q), lane = ln ? ln.name : (state.settings.approvalLanes.find(l => l.id === laneId) || {}).name;
+  return `Quote ${qRef(q)} for ${q.customer || 'the customer'} needs your ${lane} approval. Total ${qm(c.totalEx)} ex VAT, margin ${qpct(c.pctBefore)} before wages. ${location.href.split('#')[0]}#quote=${q.id}`;
+}
+function apCopy(text){
+  const done = () => showToast('Request text copied');
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => apCopyOld(text, done)); else apCopyOld(text, done);
+}
+function apCopyOld(text, done){ const t = document.createElement('textarea'); t.value = text; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); try{ document.execCommand('copy'); done(); }catch(e){ showToast('Could not copy: ' + text); } t.remove(); }
+
+/* ---- the Approvals card on a quote ---- */
+function apTimeAgo(iso){ const ms = Date.now() - new Date(iso).getTime(), h = ms / 3600000; return h < 1 ? 'just now' : h < 24 ? Math.floor(h) + ' h ago' : Math.floor(h / 24) + ' d ago'; }
+function apCardHtml(q){
+  const lanesOn = state.settings.approvalLanes.some(l => l.enabled), a = q.approval;
+  if(!lanesOn && !a) return '';
+  const c = qCalc(q), app = apApplicable(q, c), who = whoAmI(), act = apActive(q);
+  let h = `<div class="card" id="qbApprCard"><div class="qb-sec-h"><h3>Approvals</h3>`;
+  if(q.status === 'Draft' && !act && app.length) h += `<button class="btn" data-qba="ap-submit">Submit for approval</button>`;
+  h += '</div>';
+  if(a && a.returned && (a.status === 'changes' || a.status === 'rejected')) h += `<div class="qb-banner warn" style="margin-bottom:10px;"><b>${a.status === 'changes' ? 'Changes requested' : 'Rejected'} by ${escHtml(a.returned.by)} on ${escHtml(a.returned.lane)} (round ${a.returned.round}):</b> ${escHtml(a.returned.comment)}</div>`;
+  if(!a || (!act && a.status !== 'changes' && a.status !== 'rejected')){
+    h += app.length ? `<p class="q-help" style="margin:0 0 6px;">${app.map(x => `<b>${escHtml(x.lane.name)}</b> applies: ${escHtml(x.res.reasons.join('; '))}.`).join(' ')}</p>` : '<p class="q-help" style="margin:0;"><b>No approval needed.</b> No enabled lane applies to this quote, so it can be sent.</p>';
+  }
+  if(a){
+    h += `<p class="q-help" style="margin:0 0 8px;">Round ${a.round}, submitted by ${escHtml(a.submittedBy)} ${escHtml(apTimeAgo(a.submittedAt))}${a.reason ? ' · override reason: ' + escHtml(a.reason) : ''}.</p>`;
+    h += a.lanes.map(ln => {
+      const s = apLaneState(a, ln), me = who.name, ok = act && me && ln.approvers.includes(me) && apEligible(a, ln).includes(me);
+      const btns = !ok ? '' : ln.mode === 'gateway'
+        ? `<button class="btn qb-sm" data-qba="ap-decide" data-lane="${ln.id}" data-d="approve">Approve</button><button class="btn secondary qb-sm" data-qba="ap-decide" data-lane="${ln.id}" data-d="changes">Request changes</button><button class="btn secondary qb-sm" data-qba="ap-decide" data-lane="${ln.id}" data-d="reject" style="color:#b3453f;">Reject</button>`
+        : `<button class="btn secondary qb-sm" data-qba="ap-decide" data-lane="${ln.id}" data-d="seen">Seen</button><button class="btn secondary qb-sm" data-qba="ap-decide" data-lane="${ln.id}" data-d="concern" style="color:#8a5a1c;">Raise a concern</button>`;
+      return `<div class="ap-lane ap-${s}"><div class="ap-lane-h"><b>${escHtml(ln.name)}</b><span class="ap-mode">${ln.mode === 'gateway' ? 'Gateway' : 'Notify only'}</span><span class="ap-st ap-st-${s}">${AP_LABELS[s]}</span>
+          <span class="q-help" style="margin:0;">${escHtml(ln.approvers.join(ln.rule === 'all' ? ' + ' : ' / '))}${ln.approvers.length > 1 ? ' · ' + (ln.rule === 'all' ? 'all must approve' : 'any one approves') : ''}</span></div>
+        ${ln.reasons.length ? `<div class="q-help" style="margin:2px 0;">Needed because ${escHtml(ln.reasons.join('; '))}.</div>` : ''}
+        <div class="ap-decs">${ln.decisions.length ? ln.decisions.slice().reverse().map(d => `<div><b>${escHtml(d.by)}</b> ${escHtml({ approve: 'approved', changes: 'requested changes', reject: 'rejected', seen: 'saw it', concern: 'raised a concern' }[d.decision])}${d.self ? ' <span class="qb-dim">(self-approved)</span>' : ''} · ${escHtml(apTimeAgo(d.at))}${d.comment ? ': ' + escHtml(d.comment) : ''}</div>`).join('') : '<span class="qb-dim">No decisions yet.</span>'}</div>
+        <div class="ap-acts">${btns}<button class="btn secondary qb-sm" data-qba="ap-copy" data-lane="${ln.id}">Copy request text</button></div></div>`;
+    }).join('');
+  }
+  const conc = apConcerns(q); if(conc.length) h += `<div class="qb-banner warn ap-flag" style="margin-top:10px;">⚠ <b>Concern raised</b> (does not block sending): ${conc.map(x => `${escHtml(x.by)} on ${escHtml(x.lane)}: ${escHtml(x.comment)}`).join(' · ')}</div>`;
+  const sb = apSendBlock(q); if(sb.blocked) h += `<p class="ap-why" id="apWhy">${escHtml(sb.reason)}</p>`;
+  return h + '</div>';
+}
+function apRefresh(q){
+  const box = document.getElementById('qbAppr'); if(!box) return;
+  const html = apCardHtml(q); if(box.dataset.sig !== html){ box.dataset.sig = html; box.innerHTML = html; }
+  const sb = apSendBlock(q), btn = document.getElementById('qcdSend'), why = document.getElementById('qcdSendWhy');
+  if(btn){ btn.hidden = q.status !== 'Draft'; btn.disabled = sb.blocked; }
+  if(why) why.textContent = q.status === 'Draft' ? sb.reason : '';
+  const opt = document.querySelector('[data-qb="hdr"][data-f="status"] option[value="Sent"]'); if(opt) opt.disabled = sb.blocked;
+  const fl = document.getElementById('qbFlags'); if(fl){
+    const fb = []; const conc = apConcerns(q); if(conc.length) fb.push('<span class="ap-chip warn">⚠ Concern raised</span>');
+    if(qPastValid(q)) fb.push(`<span class="ap-chip warn">Past valid until ${escHtml(qValidUntil(q))}</span> <button class="btn secondary qb-sm" data-qba="mark-expired" data-id="${q.id}">Mark expired</button>`);
+    fl.innerHTML = fb.join(' ');
+  }
+}
+function qValidUntil(q){ return q.sentSnapshot && q.sentSnapshot.validUntil ? q.sentSnapshot.validUntil : addDaysIso(q.date, Number(state.settings.quoteValidityDays) || 0); }
+function qPastValid(q){ return q.status === 'Sent' && qValidUntil(q) && fmt(new Date()) > qValidUntil(q); }
+
+/* ---- submit dialog ---- */
+function apOpenSubmit(q){
+  if(!whoAmI().name){ showToast('Choose who you are (top of the page) first.'); return; }
+  const app = apApplicable(q), team = apTeam(), o = document.getElementById('apprOverlay');
+  o.dataset.qid = q.id;
+  document.getElementById('apprBody').innerHTML = app.map(x => `<div class="ap-sub" data-lane="${x.lane.id}"><label class="q-check"><input type="checkbox" data-ap-inc checked> <b>${escHtml(x.lane.name)}</b></label>
+      <div class="q-help" style="margin:2px 0 6px;">Applies because ${escHtml(x.res.reasons.join('; '))}.</div>
+      <div class="ap-sub-grid"><label>Mode<select data-ap-mode><option value="gateway"${x.lane.mode === 'gateway' ? ' selected' : ''}>Gateway (blocks sending)</option><option value="notify"${x.lane.mode === 'notify' ? ' selected' : ''}>Notify only</option></select></label>
+        <label>Rule<select data-ap-rule><option value="any"${x.lane.rule === 'any' ? ' selected' : ''}>Any one approves</option><option value="all"${x.lane.rule === 'all' ? ' selected' : ''}>All must approve</option></select></label></div>
+      <div class="ap-people">${team.map(n => `<label class="q-check"><input type="checkbox" data-ap-person value="${escAttr(n)}"${x.lane.approvers.includes(n) ? ' checked' : ''}> ${escHtml(n)}</label>`).join('')}</div></div>`).join('');
+  document.getElementById('apprReason').value = ''; document.getElementById('apprErr').textContent = ''; o.hidden = false;
+}
+function apSubmitFromDialog(){
+  const o = document.getElementById('apprOverlay'), q = qFind(Number(o.dataset.qid)), err = document.getElementById('apprErr'); if(!q) return;
+  const app = apApplicable(q), chosen = [], overrides = [];
+  for(const el of o.querySelectorAll('.ap-sub')){
+    const x = app.find(y => y.lane.id === el.dataset.lane); if(!x) continue;
+    if(!el.querySelector('[data-ap-inc]').checked){ overrides.push(`${x.lane.name} left out`); continue; }
+    const ap = [...el.querySelectorAll('[data-ap-person]:checked')].map(i => i.value), mode = el.querySelector('[data-ap-mode]').value, rule = el.querySelector('[data-ap-rule]').value;
+    if(!ap.length || ap.length > 3){ err.textContent = `${x.lane.name}: choose 1 to 3 approvers.`; return; }
+    chosen.push({ id: x.lane.id, name: x.lane.name, mode, rule, approvers: ap, reasons: x.res.reasons });
+    const ch = []; if(mode !== x.lane.mode) ch.push(`${x.lane.name} switched to ${mode === 'gateway' ? 'Gateway' : 'Notify only'}`); if(rule !== x.lane.rule) ch.push(`${x.lane.name} rule set to ${rule === 'all' ? 'all must approve' : 'any one approves'}`);
+    if(ap.slice().sort().join() !== x.lane.approvers.slice().sort().join()) ch.push(`${x.lane.name} approvers set to ${ap.join(', ')}`); overrides.push(...ch);
+  }
+  if(!chosen.length){ err.textContent = 'Tick at least one lane, or cancel.'; return; }
+  const reason = document.getElementById('apprReason').value.trim(); o.hidden = true;
+  apSubmit(q, chosen, reason, overrides); saveState(); render(); showToast('Submitted for approval');
+}
+
+/* ---- decision dialog (comment) ---- */
+function apOpenDecide(q, laneId, d){
+  const need = d === 'changes' || d === 'reject' || d === 'concern', o = document.getElementById('decOverlay'), lane = (q.approval.lanes.find(l => l.id === laneId) || {}).name;
+  o.dataset.qid = q.id; o.dataset.lane = laneId; o.dataset.d = d;
+  document.getElementById('decTitle').textContent = { approve: 'Approve', changes: 'Request changes', reject: 'Reject', seen: 'Mark as seen', concern: 'Raise a concern' }[d] + ' — ' + lane + ' — ' + qRef(q);
+  document.getElementById('decLabel').textContent = need ? 'Comment (required)' : 'Comment (optional)'; document.getElementById('decComment').value = ''; document.getElementById('decErr').textContent = ''; o.hidden = false; document.getElementById('decComment').focus();
+}
+function apDecideFromDialog(){
+  const o = document.getElementById('decOverlay'), q = qFind(Number(o.dataset.qid)); if(!q) return;
+  const r = apDecide(q, o.dataset.lane, o.dataset.d, document.getElementById('decComment').value);
+  if(!r.ok){ document.getElementById('decErr').textContent = r.msg; return; }
+  o.hidden = true; render(); showToast('Recorded');
+}
+
+/* ---- send quote, phase 1 (manual Gmail compose; nothing is sent by the app) ---- */
+function qCustomerEmail(q){
+  const d = qDeal(q); if(!d) return '';
+  const r = d.rec; return String(r.email || '').trim() || String(((r.contacts || []).find(c => c.email) || {}).email || '').trim();
+}
+function qMerge(tpl, q){
+  const c = qCalc(q), st = state.settings, vals = { customerName: q.customer || 'there', project: q.project || '', ref: qRef(q), validUntil: qDocDate(qValidUntil(q)), total: qm(qPayable(q, c)) + (qVatOn() ? ' including VAT' : ''),
+    businessName: String((state.branding && state.branding.name) || '').trim(), phone: String(st.bizPhone || '').trim() };
+  return String(tpl).replace(/\{(\w+)\}/g, (m, k) => k in vals ? vals[k] : m);
+}
+function qGmailUrl(q, email){
+  const st = state.settings, enc = encodeURIComponent;
+  return `https://mail.google.com/mail/?authuser=${enc(st.sendAccount)}&view=cm&fs=1&to=${enc(email)}&su=${enc(qMerge(st.emailSubject, q))}&body=${enc(qMerge(st.emailBody, q))}`;
+}
+function apEmailOk(v){ return /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(String(v || '').trim()); }
+function qOpenSend(q){
+  const sb = apSendBlock(q); if(sb.blocked){ showToast(sb.reason); return; }
+  const o = document.getElementById('sendOverlay'); o.dataset.qid = q.id; qUi.pdfDone = qUi.pdfDone || new Set();
+  document.getElementById('sendEmail').value = qCustomerEmail(q); document.getElementById('sendLink').innerHTML = ''; document.getElementById('sendErr').textContent = ''; o.hidden = false; qSendRefresh(q);
+}
+function qSendRefresh(q){
+  const c = qCalc(q), pa = qPayAlloc(q, c), z = Math.abs(pa.unallocated) < 0.005, mode = qViewMode(q), pdf = qUi.pdfDone && qUi.pdfDone.has(q.id), email = document.getElementById('sendEmail').value;
+  const row = (ok, t) => `<li class="${ok ? 'ok' : 'bad'}">${ok ? '✓' : '✗'} ${t}</li>`;
+  document.getElementById('sendList').innerHTML = row(apEmailOk(email), 'Customer email ' + (apEmailOk(email) ? 'looks right' : 'is needed (a valid address)')) + row(true, `Customer view: Mode ${mode} — ${escHtml(VIEW_MODES.find(m => m[0] === mode)[1])}`)
+    + row(true, `Terms included (as of ${fmt(new Date())})`) + row(true, `Valid until ${escHtml(qDocDate(qValidUntil(q)))}`) + row(z, z ? 'Payment schedule adds up' : `Payment schedule does not add up (${qm(Math.abs(pa.unallocated))} ${pa.unallocated < 0 ? 'over' : 'unallocated'})`)
+    + row(!!pdf, pdf ? 'PDF downloaded this session' : 'PDF not downloaded yet this session');
+  document.getElementById('sendGo').disabled = !(apEmailOk(email) && z);
+}
+function qSendDone(q, email){   // "I've sent it": deliberate; sets Sent and writes the trail
+  const sb = apSendBlock(q); if(sb.blocked){ showToast(sb.reason); return false; }
+  const pa = qPayAlloc(q, qCalc(q)); if(Math.abs(pa.unallocated) >= 0.005){ showToast('The payment schedule does not add up.'); return false; }
+  const today = fmt(new Date()), ref = qRef(q), st = state.settings;
+  qApplyStatus(q, 'Sent'); q.sentTo = email; q.sentAt = today;
+  if(q.sentSnapshot && !q.sentSnapshot.validUntil) q.sentSnapshot.validUntil = addDaysIso(q.date, Number(st.quoteValidityDays) || 0);
+  q.timeline.push({ date: today, note: `Quote ${ref} sent to ${email}`, created: Date.now() + 3, kind: 'sent' });
+  const deal = qDeal(q);
+  if(deal){ deal.rec.comms = Array.isArray(deal.rec.comms) ? deal.rec.comms : []; deal.rec.comms.push({ date: today, note: `Quote ${ref} sent to ${email}`, created: Date.now(), src: 'quote', quoteId: q.id }); }   // counts as a contact: stamps Last contacted
+  const calls = typeOpt('tt_call') ? 'tt_call' : defaultTypeId();
+  const t = createTask({ title: `Follow up quote ${ref}`, dueDate: addDaysIso(today, Number(st.followUpDays) || 0), typeId: calls, owner: whoAmI().name || meName(),
+    description: `Quote ${ref} (${q.customer || ''}${q.project ? ', ' + q.project : ''}) was sent to ${email} on ${today}. Check it arrived and ask whether they have any questions.`, linkedIds: deal ? [recordCode(deal.rec.id, deal.pl)] : [] });
+  t.quoteId = q.id;
+  saveState(); return true;
+}
+function qSetPdfDone(q){ qUi.pdfDone = qUi.pdfDone || new Set(); qUi.pdfDone.add(q.id); }
+
+/* ---- Approvals inbox (Revenue > Approvals) ---- */
+const apUi = { tab: 'inbox', status: 'all' };
+function apItems(){   // one item per quote lane in an approval round
+  const out = [];
+  state.quotes.forEach(q => { const a = q.approval; if(!a) return; a.lanes.forEach(ln => out.push({ q, a, ln, s: ln.mode === 'gateway' ? apLaneState(a, ln) : apLaneState(a, ln) })); });
+  return out;
+}
+function apWaitingFor(name){
+  if(!name) return [];
+  return apItems().filter(x => apActive(x.q) && x.ln.approvers.includes(name) && apEligible(x.a, x.ln).includes(name) && !apLatest(x.ln).some(d => d.by === name)
+    && (x.ln.mode === 'notify' ? apLaneState(x.a, x.ln) !== 'seen' : apLaneState(x.a, x.ln) === 'pending'));   // gateway: still undecided; notify-only: told but not yet seen
+}
+function apBadges(){
+  const n = apWaitingFor(whoAmI().name).length;
+  ['apBadge', 'revBadge'].forEach(id => { const el = document.getElementById(id); if(el){ el.textContent = n; el.hidden = !n; } });
+}
+function apSummary(q){ const c = qCalc(q); const f = apCashFacts(q, c); return `${qm(c.totalEx)} ex VAT · margin ${qpct(c.pctBefore)} before wages · ${f.negMonth ? 'cash dips negative in ' + monthLabel(toDate(f.negMonth.key + '-01')) : 'cash stays positive'}`; }
+function renderApprovals(){
+  const box = document.getElementById('apprInbox'); if(!box) return;
+  state.quotes.forEach(q => { if(apCheck(q)) saveState(); });
+  const me = whoAmI().name, mine = apWaitingFor(me), all = apItems().sort((a, b) => b.a.submittedAt.localeCompare(a.a.submittedAt));
+  const tabs = `<div class="view-toggle" style="margin-bottom:12px;">${[['inbox', 'Waiting for me'], ['all', 'All approvals']].map(([v, n]) => `<button type="button" data-qba="ap-tab" data-v="${v}" class="${apUi.tab === v ? 'active' : ''}">${n}${v === 'inbox' && mine.length ? ` <span class="tab-count">${mine.length}</span>` : ''}</button>`).join('')}</div>`;
+  let body = '';
+  const acts = x => { const ok = apActive(x.q) && me && x.ln.approvers.includes(me) && apEligible(x.a, x.ln).includes(me); return ok ? (x.ln.mode === 'gateway'
+      ? `<button class="btn qb-sm" data-qba="ap-decide-q" data-qid="${x.q.id}" data-lane="${x.ln.id}" data-d="approve">Approve</button> <button class="btn secondary qb-sm" data-qba="ap-decide-q" data-qid="${x.q.id}" data-lane="${x.ln.id}" data-d="changes">Request changes</button> <button class="btn secondary qb-sm" data-qba="ap-decide-q" data-qid="${x.q.id}" data-lane="${x.ln.id}" data-d="reject">Reject</button>`
+      : `<button class="btn secondary qb-sm" data-qba="ap-decide-q" data-qid="${x.q.id}" data-lane="${x.ln.id}" data-d="seen">Seen</button> <button class="btn secondary qb-sm" data-qba="ap-decide-q" data-qid="${x.q.id}" data-lane="${x.ln.id}" data-d="concern">Raise a concern</button>`) : ''; };
+  if(apUi.tab === 'inbox'){
+    body = !me ? '<div class="sup-empty">Choose who you are (top of the page) to see what is waiting for you.</div>' : (mine.length ? `<table class="quotes-table"><thead><tr><th>Quote</th><th>Lane</th><th>Submitted by</th><th>Age</th><th>Summary</th><th></th></tr></thead><tbody>
+      ${mine.map(x => `<tr><td class="code-cell">${escHtml(qRef(x.q))}<div class="q-help" style="margin:0">${escHtml(x.q.customer)}${x.q.project ? ' · ' + escHtml(x.q.project) : ''}</div></td><td>${escHtml(x.ln.name)}<div class="q-help" style="margin:0">${x.ln.mode === 'gateway' ? 'Gateway' : 'Notify only'}</div></td><td>${escHtml(x.a.submittedBy)}</td><td>${escHtml(apTimeAgo(x.a.submittedAt))}</td><td style="white-space:normal">${escHtml(apSummary(x.q))}</td>
+      <td class="q-acts"><button class="btn secondary qb-sm" data-qba="open-quote" data-id="${x.q.id}">Open quote</button> ${acts(x)}</td></tr>`).join('')}</tbody></table>` : '<div class="sup-empty">Nothing is waiting for you.</div>');
+  } else {
+    const rows = all.filter(x => apUi.status === 'all' || x.s === apUi.status);
+    body = `<div class="crm-filters"><select id="apStatusSel" aria-label="Filter by status" style="width:auto;border:1px solid var(--line);background:#fff;padding:7px 8px;"><option value="all">All statuses</option>${Object.keys(AP_LABELS).map(k => `<option value="${k}"${apUi.status === k ? ' selected' : ''}>${AP_LABELS[k]}</option>`).join('')}</select></div>
+      <table class="quotes-table"><thead><tr><th>Quote</th><th>Lane</th><th>Status</th><th>Round</th><th>Submitted by</th><th>Age</th><th>Summary</th><th></th></tr></thead><tbody>
+      ${rows.length ? rows.map(x => `<tr><td class="code-cell">${escHtml(qRef(x.q))}<div class="q-help" style="margin:0">${escHtml(x.q.customer)}</div></td><td>${escHtml(x.ln.name)}</td><td><span class="ap-st ap-st-${x.s}">${AP_LABELS[x.s]}</span></td><td>${x.a.round}</td><td>${escHtml(x.a.submittedBy)}</td><td>${escHtml(apTimeAgo(x.a.submittedAt))}</td><td style="white-space:normal">${escHtml(apSummary(x.q))}</td>
+      <td><button class="btn secondary qb-sm" data-qba="open-quote" data-id="${x.q.id}">Open quote</button></td></tr>`).join('') : '<tr><td colspan="8"><div class="sup-empty">No approvals yet.</div></td></tr>'}</tbody></table>`;
+  }
+  box.innerHTML = tabs + body; apBadges();
+}
+document.addEventListener('change', (e) => { if(e.target.id === 'apStatusSel'){ apUi.status = e.target.value; renderApprovals(); } });
+
+/* ---- Settings > Approvals ---- */
+function renderApprovalSettings(){
+  const el = document.getElementById('apLanesCard'); if(!el) return;
+  const st = state.settings, team = apTeam();
+  const lane = l => `<div class="ap-set" data-lane="${l.id}"><div class="q-sub" style="margin-top:0;">${escHtml(l.name)}</div>
+    <div class="assumptions-grid">
+      <div class="lp-f"><label>Lane name</label><input type="text" data-ap="name" data-lane="${l.id}" value="${escAttr(l.name)}"></div>
+      <div class="lp-f"><label>Mode</label><select data-ap="mode" data-lane="${l.id}"><option value="gateway"${l.mode === 'gateway' ? ' selected' : ''}>Gateway: cannot be sent until approved</option><option value="notify"${l.mode === 'notify' ? ' selected' : ''}>Notify only: people are told and can raise a concern</option></select></div>
+      <div class="lp-f"><label>When more than one approver</label><select data-ap="rule" data-lane="${l.id}"><option value="any"${l.rule === 'any' ? ' selected' : ''}>Any one approves</option><option value="all"${l.rule === 'all' ? ' selected' : ''}>All must approve</option></select></div></div>
+    <label class="q-check" style="margin:6px 0;"><input type="checkbox" data-ap="enabled" data-lane="${l.id}"${l.enabled ? ' checked' : ''}> Enabled</label>
+    <div class="lp-f"><label>Approvers (1 to 3, from the team list)</label><div class="ap-people">${team.map(n => `<label class="q-check"><input type="checkbox" data-ap="person" data-lane="${l.id}" value="${escAttr(n)}"${l.approvers.includes(n) ? ' checked' : ''}> ${escHtml(n)}</label>`).join('')}</div></div>
+    <div class="q-sub">Only needed when (blank = always needed when enabled; with conditions set, the lane is needed when ANY of them is true)</div>
+    <div class="assumptions-grid">${l.id === 'l1'
+      ? `<div class="lp-f"><label>Margin before wages below (%)</label><input type="number" min="0" step="any" data-ap="marginBelow" data-lane="${l.id}" value="${l.marginBelow}" placeholder="Not set"></div>
+         <div class="lp-f"><label>Or total ex VAT over (£)</label><input type="number" min="0" step="any" data-ap="totalOver" data-lane="${l.id}" value="${l.totalOver}" placeholder="Not set"></div>`
+      : `<div class="lp-f"><label>Total inc VAT over (£)</label><input type="number" min="0" step="any" data-ap="totalOver" data-lane="${l.id}" value="${l.totalOver}" placeholder="Not set"></div>
+         <div class="lp-f"><label>Any month net negative</label><label class="q-check"><input type="checkbox" data-ap="negativeMonth" data-lane="${l.id}"${l.negativeMonth ? ' checked' : ''}> In this project's cash flow</label></div>
+         <div class="lp-f"><label>Delivery paid before customer</label><label class="q-check"><input type="checkbox" data-ap="deliveryBeforePayment" data-lane="${l.id}"${l.deliveryBeforePayment ? ' checked' : ''}> First delivery payment due before the first customer payment</label></div>`}</div>
+    <div class="q-err" id="apErr-${l.id}" role="alert"></div></div>`;
+  el.innerHTML = `<p class="q-help" style="margin:0 0 10px;"><b>Approvals are a team process, not security: anyone with the login can choose any name.</b> Everything is OFF until you enable a lane. Approvers come from the team list used for task owners.</p>${st.approvalLanes.map(lane).join('<hr style="border:0;border-top:1px solid var(--line);margin:18px 0;">')}`;
+  document.getElementById('apSendCard').innerHTML = `<div class="assumptions-grid">
+      <div class="lp-f"><label>Follow-up after sending (days)</label><input type="number" min="0" step="1" data-ap="followUpDays" value="${st.followUpDays}"></div>
+      <div class="lp-f"><label>Sending Gmail account</label><input type="text" data-ap="sendAccount" value="${escAttr(st.sendAccount)}" autocomplete="off"></div></div>
+    <div class="q-sub">Quote email template</div>
+    <p class="q-help" style="margin:0 0 8px;">Merge fields: {customerName} {project} {ref} {validUntil} {total} {businessName} {phone}. The app opens a Gmail draft for you to check, attach the PDF to and send yourself. It never sends anything.</p>
+    <div class="lp-f"><label>Subject</label><input type="text" data-ap="emailSubject" value="${escAttr(st.emailSubject)}"></div>
+    <div class="lp-f"><label>Body</label><textarea rows="9" data-ap="emailBody">${escHtml(st.emailBody)}</textarea></div>
+    <button type="button" class="btn secondary" data-qba="ap-tpl-reset">Reset template to the default</button>`;
+}
+function apSettingChange(el){
+  const st = state.settings, f = el.dataset.ap, lane = st.approvalLanes.find(l => l.id === el.dataset.lane), err = lane ? document.getElementById('apErr-' + lane.id) : null; if(err) err.textContent = '';
+  if(lane){
+    if(f === 'name') lane.name = el.value.trim() || lane.name;
+    else if(f === 'mode') lane.mode = el.value === 'notify' ? 'notify' : 'gateway';
+    else if(f === 'rule') lane.rule = el.value === 'all' ? 'all' : 'any';
+    else if(f === 'enabled'){ if(el.checked && !lane.approvers.length){ el.checked = false; if(err) err.textContent = 'Choose at least one approver before enabling this lane.'; return; } lane.enabled = el.checked; }
+    else if(f === 'person'){
+      const set = new Set(lane.approvers); if(el.checked) set.add(el.value); else set.delete(el.value);
+      if(set.size > 3){ el.checked = false; if(err) err.textContent = 'A lane can have 1 to 3 approvers.'; return; }
+      lane.approvers = [...set]; if(!lane.approvers.length && lane.enabled){ lane.enabled = false; if(err) err.textContent = 'A lane needs at least one approver, so it has been switched off.'; renderApprovalSettings(); }
+    }
+    else if(f === 'marginBelow' || f === 'totalOver') lane[f] = (el.value === '' || isNaN(Number(el.value)) || Number(el.value) < 0) ? '' : Number(el.value);
+    else if(f === 'negativeMonth' || f === 'deliveryBeforePayment') lane[f] = el.checked;
+  } else if(f === 'followUpDays'){ const n = Math.round(Number(el.value)); if(el.value !== '' && !isNaN(n) && n >= 0) st.followUpDays = n; else el.value = st.followUpDays; }
+  else if(f === 'sendAccount') st.sendAccount = el.value.trim();
+  else if(f === 'emailSubject') st.emailSubject = el.value;
+  else if(f === 'emailBody') st.emailBody = el.value;
+  saveState(); render();
+}
+document.addEventListener('change', (e) => { const el = e.target; if(el.dataset && el.dataset.ap !== undefined && state && el.isConnected) apSettingChange(el); });
+function apTplReset(){ state.settings.emailSubject = AP_DEFAULT_SUBJECT; state.settings.emailBody = AP_DEFAULT_BODY; saveState(); renderApprovalSettings(); }
+function qHashOpen(){
+  const m = /#quote=(\d+)/.exec(location.hash || ''); if(!m || !state) return;
+  const q = qFind(Number(m[1])); if(!q) return; qUi.openId = q.id; qUi.tab = 'quotes'; activateTab('quotations'); renderQuotes();
+}
+window.addEventListener('hashchange', qHashOpen);
+
+/* CASH-FLOW CONTROL AFTER SIGN-OFF is parked (not built). When it is, it should read the as-sold snapshot and the cash items above. */
+
+function apListChips(q){
+  const out = [], a = q.approval;
+  if(a && q.status === 'Draft' && (a.status === 'pending' || a.status === 'approved')) out.push(`<span class="ap-chip ${a.status === 'approved' ? 'ok' : ''}">${a.status === 'approved' ? 'Approved' : 'Awaiting approval'}</span>`);
+  if(a && q.status === 'Draft' && (a.status === 'changes' || a.status === 'rejected')) out.push(`<span class="ap-chip warn">${a.status === 'changes' ? 'Changes requested' : 'Rejected'}</span>`);
+  if(apConcerns(q).length) out.push('<span class="ap-chip warn">⚠ Concern</span>');
+  if(qPastValid(q)) out.push(`<span class="ap-chip warn" title="Valid until ${escAttr(qValidUntil(q))}">Past valid until</span> <button class="btn secondary qb-sm" data-qba="mark-expired" data-id="${q.id}">Mark expired</button>`);
+  return out.length ? '<div style="margin-top:3px">' + out.join(' ') + '</div>' : '';
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-apx]'); if(!b || !state) return;
+  const a = b.dataset.apx, sq = qFind(Number(document.getElementById('sendOverlay').dataset.qid));
+  if(a === 'appr-cancel') document.getElementById('apprOverlay').hidden = true;
+  else if(a === 'appr-go') apSubmitFromDialog();
+  else if(a === 'dec-cancel') document.getElementById('decOverlay').hidden = true;
+  else if(a === 'dec-go') apDecideFromDialog();
+  else if(a === 'send-cancel') document.getElementById('sendOverlay').hidden = true;
+  else if(a === 'send-pdf' && sq){ qDocPdf(sq).then(() => qSendRefresh(sq)); }
+  else if(a === 'send-gmail' && sq){
+    const email = document.getElementById('sendEmail').value.trim(), err = document.getElementById('sendErr');
+    if(!apEmailOk(email)){ err.textContent = 'Enter the customer\'s email address first.'; return; } err.textContent = '';
+    const url = qGmailUrl(sq, email), w = window.open(url, '_blank'); if(w){ try{ w.opener = null; }catch(x){} }
+    document.getElementById('sendLink').innerHTML = `<p class="q-help">${w ? 'A Gmail draft should have opened.' : 'The pop-up was blocked.'} <a href="${escAttr(url)}" target="_blank" rel="noopener">Open the Gmail draft</a></p>`;
+  }
+  else if(a === 'send-done' && sq){
+    const email = document.getElementById('sendEmail').value.trim(), err = document.getElementById('sendErr'), pdf = qUi.pdfDone && qUi.pdfDone.has(sq.id);
+    if(!apEmailOk(email)){ err.textContent = 'Enter the customer\'s email address first.'; return; }
+    showConfirm(`Mark ${qRef(sq)} as sent?`, `Confirm only once you have actually sent it to ${email}. This app has not sent anything.${pdf ? '' : ' You have not downloaded the PDF this session.'}`).then(ok => {
+      if(!ok) return; if(qSendDone(sq, email)){ document.getElementById('sendOverlay').hidden = true; qbRender(); render(); showToast('Marked as sent. A follow-up task has been created.'); } else err.textContent = 'Could not mark it as sent. See the message above.';
+    });
+  }
+});
+document.addEventListener('input', (e) => { if(e.target.id === 'sendEmail'){ const q = qFind(Number(document.getElementById('sendOverlay').dataset.qid)); if(q) qSendRefresh(q); } });
 
 function renderTransactions(){
   const txns = state.transactions;
@@ -6549,6 +7066,7 @@ function ensureTaskModel(o){
     notes: (Array.isArray(t.notes) ? t.notes : []).filter(n => n && typeof n === 'object').map((n, i) => { const r = {
       id: n.id || ('n' + i), text: String(n.text == null ? '' : n.text), created: Number(n.created) || 0, author: iso(n.author) };
       if(/^\d{4}-\d{2}-\d{2}$/.test(n.date || '')) r.date = n.date; return r; }),
+    quoteId: Number(t.quoteId) > 0 ? Number(t.quoteId) : 0,
     description: iso(t.description), notesMigrated: !!t.notesMigrated, descNoteIds: Array.isArray(t.descNoteIds) ? t.descNoteIds.map(String) : [],
     createdAt: iso(t.createdAt), createdBy: iso(t.createdBy)
   }));
@@ -6661,7 +7179,7 @@ function createTask(f){
     id: 'T-' + String(state.nextTaskNo++).padStart(3, '0'), title: String(f.title).trim(),
     dueDate: f.dueDate || '', priorityId: prioOpt(f.priorityId) ? f.priorityId : defaultPrioId(), typeId: typeOpt(f.typeId) ? f.typeId : defaultTypeId(),
     status: 'open', completedAt: '', completedBy: '', owner: f.owner == null ? meName() : f.owner, linkedId: '', linkedIds: [],
-    description: String(f.description || ''), notes: [], notesMigrated: true, descNoteIds: [], createdAt: new Date().toISOString(), createdBy: meName()
+    description: String(f.description || ''), quoteId: Number(f.quoteId) > 0 ? Number(f.quoteId) : 0, notes: [], notesMigrated: true, descNoteIds: [], createdAt: new Date().toISOString(), createdBy: meName()
   };
   t.linkedIds = migrateLinkedIds({ linkedIds: Array.isArray(f.linkedIds) ? f.linkedIds : (f.linkedId ? [f.linkedId] : []) });
   t.linkedId = t.linkedIds[0] || '';   // the old single field, kept in step only when the task is created (safety net)
@@ -7700,6 +8218,7 @@ const SET_SECTIONS = [
   { id: 'suppliers', label: 'Suppliers' },
   { id: 'finance',   label: 'Finance' },
   { id: 'quotes',    label: 'Quotes & pricing' },
+  { id: 'approvals', label: 'Approvals' },
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'data',      label: 'Data' },
   { id: 'admin',     label: 'Admin', admin: true }   // same admin-only gating as the cards inside it
@@ -7747,7 +8266,9 @@ function render(){
   renderBusinessPlan();
   renderLeads();
   renderSuppliers();
+  renderWho();
   renderQuotes();
+  renderApprovals();
   renderPipeline();
   renderProjects();
   renderAllPipelineViews();
