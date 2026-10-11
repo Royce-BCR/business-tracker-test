@@ -34,6 +34,7 @@
     --radius-sm: 9px;
     --shadow: 0 1px 3px rgba(28,31,34,0.06), 0 1px 2px rgba(28,31,34,0.04);
     --shadow-lift: 0 4px 14px rgba(28,31,34,0.08);
+    --env-h: 0px;   /* height of the TEST banner (set to 28px by the TEST block below); 0 on LIVE. Everything fixed or sticky at the top sits below it. */
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
@@ -42,6 +43,7 @@
     background: var(--paper);
     color: var(--ink);
     min-height: 100vh;
+    padding-top: var(--env-h);
     font-size: 13.5px;
     -webkit-font-smoothing: antialiased;
   }
@@ -49,10 +51,10 @@
   /* ---------------- Sidebar ---------------- */
   .sidebar {
     position: fixed;
-    top: 0;
+    top: var(--env-h);
     left: 0;
     width: 244px;
-    height: 100vh;
+    height: calc(100vh - var(--env-h));
     background: var(--ink);
     color: #d9d5cc;
     padding: 22px 14px 30px 14px;
@@ -150,7 +152,7 @@
 
   /* ---------------- Brand row + pill (top of every page) ---------------- */
   .brandbar {
-    position: sticky; top: 0; z-index: 12;
+    position: sticky; top: var(--env-h); z-index: 12;
     height: 44px; margin: 0 calc(-1 * var(--px)) 8px; padding: 0 var(--px);
     background: var(--paper);
     display: flex; align-items: center; justify-content: flex-end;
@@ -175,7 +177,7 @@
   .brandbar.off { height: 0; margin-bottom: 32px; padding-top: 0; padding-bottom: 0; background: none; }
   .brandbar.off .brandbar-in { transform: none !important; visibility: visible !important; }
   .brandbar.off .brand-pill { display: none; }
-  .brandbar.off .save-status { position: fixed; top: 14px; right: 18px; z-index: 30; display: block; max-width: calc(100vw - 36px); background: rgba(255,255,255,0.82); backdrop-filter: blur(4px); border: 1px solid var(--line); border-radius: 20px; padding: 4px 12px; }
+  .brandbar.off .save-status { position: fixed; top: calc(14px + var(--env-h)); right: 18px; z-index: 30; display: block; max-width: calc(100vw - 36px); background: rgba(255,255,255,0.82); backdrop-filter: blur(4px); border: 1px solid var(--line); border-radius: 20px; padding: 4px 12px; }
   .brandbar.off .save-status:empty { display: none; }
   @media (max-width: 700px) { body.bt-panel-open .brandbar-in { visibility: hidden; } }
   .panel { display: none; animation: fade 0.18s ease; }
@@ -474,8 +476,8 @@
   @media (max-width: 560px) { .lc { margin: 8px 6px 10px; } .lc-sum { gap: 8px; padding: 12px 10px 2px; } .lc-block { padding: 10px 30px 10px 10px; } .lc-cols { padding: 12px 10px; } .lc-note-add { flex-wrap: wrap; } .lc-foot .edit-btn { margin-left: 0; } }
 
   /* leads: editor panel (slides in from the right) */
-  .lp-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.11); z-index: 62; animation: lpFade 0.15s ease; }
-  .lp-panel { --lc-edge: #14805f; --lc-tint: rgba(29,158,117,0.13); --lc-line: rgba(20,128,95,0.4); position: fixed; top: 10px; right: 10px; bottom: 10px; width: min(400px, calc(100% - 20px)); background: var(--card); z-index: 63; display: flex; flex-direction: column; animation: lpIn 0.18s ease; outline: none; }
+  .lp-backdrop { position: fixed; inset: var(--env-h) 0 0 0; background: rgba(0,0,0,0.11); z-index: 62; animation: lpFade 0.15s ease; }
+  .lp-panel { --lc-edge: #14805f; --lc-tint: rgba(29,158,117,0.13); --lc-line: rgba(20,128,95,0.4); position: fixed; top: calc(10px + var(--env-h)); right: 10px; bottom: 10px; width: min(400px, calc(100% - 20px)); background: var(--card); z-index: 63; display: flex; flex-direction: column; animation: lpIn 0.18s ease; outline: none; }
   .lp-panel.lc-com { --lc-edge: #2a6fb5; --lc-tint: rgba(55,138,221,0.14); --lc-line: rgba(42,111,181,0.4); }
   .lp-backdrop[hidden], .lp-panel[hidden] { display: none; }
   @keyframes lpIn { from { transform: translateX(28px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -716,7 +718,7 @@
 
   /* auth */
   body.logged-out .sidebar, body.logged-out .main, body.logged-out .save-status, body.logged-out .mobile-bar, body.logged-out .sidebar-backdrop { display: none !important; }
-  .login-overlay { position: fixed; inset: 0; background: var(--ink); display: flex; overflow-y: auto; z-index: 200; }
+  .login-overlay { position: fixed; inset: var(--env-h) 0 0 0; background: var(--ink); display: flex; overflow-y: auto; z-index: 200; }
   .login-stack { margin: auto; padding: 24px 0; display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; }
   .login-brand { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: calc(100% - 32px); color: #f4f2ed; text-align: center; }
   .login-brand:empty { display: none; }
@@ -747,7 +749,7 @@
 
   /* ---------------- Settings: secondary menu + section content ---------------- */
   .set-wrap { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 28px; align-items: start; }
-  .set-menu { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 2px; max-height: calc(100vh - 80px); overflow-y: auto; }
+  .set-menu { position: sticky; top: calc(60px + var(--env-h)); display: flex; flex-direction: column; gap: 2px; max-height: calc(100vh - 80px - var(--env-h)); overflow-y: auto; }
   .set-menu button { border: none; background: none; font-family: inherit; font-size: 13px; color: var(--slate); text-align: left; padding: 9px 12px; border-radius: var(--radius-sm); border-left: 2.5px solid transparent; cursor: pointer; }
   .set-menu button:hover { background: #efece6; color: var(--ink); }
   .set-menu button.active { background: var(--card); color: var(--ink); font-weight: 600; border-left-color: var(--oak); box-shadow: var(--shadow); }
@@ -965,7 +967,7 @@
   .ap-lane { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; background: #fff; } .ap-lane-h { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .ap-mode { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; } .ap-decs { font-size: 12.5px; margin: 6px 0; } .ap-acts { display: flex; gap: 6px; flex-wrap: wrap; }
   .ap-st { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 1px 9px; border-radius: 999px; background: #fbf1cf; color: #8a5a1c; } .ap-st-approved, .ap-st-seen { background: #d5ecd9; color: #1e5c2e; } .ap-st-changes, .ap-st-concern { background: #f8e3e0; color: #8a3a34; } .ap-st-rejected { background: #b3453f; color: #fff; }
-  .ap-why { color: #8a3a34; font-size: 12.5px; margin: 8px 0 0; font-weight: 600; } .ap-modal, .send-modal { max-width: 560px; max-height: calc(100vh - 40px); overflow: auto; }
+  .ap-why { color: #8a3a34; font-size: 12.5px; margin: 8px 0 0; font-weight: 600; } .ap-modal, .send-modal { max-width: 560px; max-height: calc(100vh - 40px - var(--env-h)); overflow: auto; }
   .ap-sub { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; } .ap-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .ap-sub-grid label { font-size: 11px; color: var(--muted); } .ap-sub-grid select { border: 1px solid var(--line); background: #fff; padding: 6px; }
   .ap-people { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 6px; } .send-list { list-style: none; padding: 0; margin: 10px 0; font-size: 13px; } .send-list li.ok { color: #1e5c2e; } .send-list li.bad { color: #b3453f; } .send-note { font-size: 12.5px; background: #fbf1cf; padding: 8px 10px; border-radius: 8px; }
   .send-modal input[type=email] { border: 1px solid var(--line); background: #fff; padding: 7px 8px; } #apLanesCard input:not([type=checkbox]), #apLanesCard select, #apSendCard input, #apSendCard textarea { border: 1px solid var(--line); background: #fff; padding: 7px 8px; }
@@ -985,7 +987,7 @@
   .q-row input { border: 1px solid var(--line); background: #fff; padding: 6px 8px; }
   .q-row.q-head { border: 0; background: none; padding-top: 0; padding-bottom: 0; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
   .q-pct { display: flex; align-items: center; gap: 3px; font-size: 11.5px; color: var(--muted); }
-  .terms-modal { max-width: 720px; width: calc(100% - 32px); max-height: calc(100vh - 48px); overflow: auto; padding: 18px 26px 24px; }
+  .terms-modal { max-width: 720px; width: calc(100% - 32px); max-height: calc(100vh - 48px - var(--env-h)); overflow: auto; padding: 18px 26px 24px; }
   .terms-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: sticky; top: -18px; background: #fff; padding: 6px 0; }
   .terms-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
   .terms-doc h2 { font-family: var(--serif); font-size: 22px; margin: 4px 0 14px; }
@@ -996,7 +998,7 @@
   .terms-doc .t-sign span { border-bottom: 1px solid #8a8780; padding-bottom: 22px; font-size: 12px; color: var(--muted); }
   .terms-doc .t-cancel { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-top: 14px; background: #faf8f4; }
   .terms-doc .t-foot { font-size: 11px; color: var(--muted); margin-top: 14px; }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(28,31,34,0.42); display: grid; place-items: center; z-index: 100; animation: fade 0.15s ease; }
+  .modal-overlay { position: fixed; inset: var(--env-h) 0 0 0; background: rgba(28,31,34,0.42); display: grid; place-items: center; z-index: 100; animation: fade 0.15s ease; }
   .modal-overlay[hidden] { display: none; }
   .modal { background: #fff; border-radius: var(--radius); box-shadow: 0 12px 40px rgba(0,0,0,0.22); padding: 24px 26px; max-width: 380px; width: calc(100% - 40px); }
   .modal-title { font-family: var(--serif); font-weight: 600; font-size: 20px; margin-bottom: 8px; }
@@ -1037,7 +1039,7 @@
   .mobile-bar {
     display: none;
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: var(--env-h); left: 0; right: 0;
     height: 52px;
     background: var(--ink);
     color: #fff;
@@ -1054,7 +1056,7 @@
   .mobile-bar .title { font-family: var(--serif); font-weight: 600; font-size: 16.5px; }
   .sidebar-backdrop {
     display: none;
-    position: fixed; inset: 0; background: rgba(28,31,34,0.48);
+    position: fixed; inset: var(--env-h) 0 0 0; background: rgba(28,31,34,0.48);
     z-index: 19;
   }
   .sidebar-backdrop.open { display: block; }
@@ -1062,7 +1064,7 @@
   @media (max-width: 860px) {
     .mobile-bar { display: flex; }
     .sidebar {
-      top: 0;
+      top: var(--env-h);
       padding-top: 66px;
       width: 84%;
       max-width: 300px;
@@ -1073,9 +1075,9 @@
     }
     .sidebar.open { transform: translateX(0); }
     .main { --px: 16px; margin-left: 0; margin-top: 52px; padding: 0 var(--px) 100px var(--px); }
-    .brandbar { top: 52px; }
+    .brandbar { top: calc(52px + var(--env-h)); }
     .brandbar.off { margin-bottom: 20px; }
-    .brandbar.off .save-status { top: 62px; right: 12px; }
+    .brandbar.off .save-status { top: calc(62px + var(--env-h)); right: 12px; }
     .page-head h2 { font-size: 23px; }
     .kpi-row { grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; }
     .assumptions-grid, .assumptions-grid.two, .milestone-grid, .qual-grid { grid-template-columns: 1fr !important; }
@@ -1090,7 +1092,7 @@
   .panel[data-view="gantt"] > .table-tools, .panel[data-view="gantt"] > .table-scroll[id] { display: none; }
   .bd-hint { font-size: 11.5px; color: var(--muted); margin: 0 0 8px; }
   .bd-board { display: flex; gap: 12px; align-items: stretch; overflow-x: auto; padding: 2px 2px 12px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
-  .bd-col { --sc: var(--slate); flex: 1 0 240px; min-width: 220px; max-width: 340px; min-height: 260px; display: flex; flex-direction: column; max-height: max(380px, calc(100vh - 270px)); background: #efece6; border: 1px solid var(--line); border-top: 3px solid var(--sc); border-radius: var(--radius-sm); scroll-snap-align: start; transition: background 0.1s, box-shadow 0.1s; }
+  .bd-col { --sc: var(--slate); flex: 1 0 240px; min-width: 220px; max-width: 340px; min-height: 260px; display: flex; flex-direction: column; max-height: max(380px, calc(100vh - 270px - var(--env-h))); background: #efece6; border: 1px solid var(--line); border-top: 3px solid var(--sc); border-radius: var(--radius-sm); scroll-snap-align: start; transition: background 0.1s, box-shadow 0.1s; }
   .bd-col-head { position: sticky; top: 0; z-index: 2; background: #efece6; padding: 10px 11px 8px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; flex-shrink: 0; }
   .bd-col-title { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 12.5px; }
   .bd-col-title .bd-col-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1117,14 +1119,14 @@
   body.dnd-active .bd-board { scroll-snap-type: none; }
   body.dnd-active, body.dnd-active * { cursor: grabbing !important; user-select: none !important; -webkit-user-select: none !important; }
   @media (max-width: 860px) {
-    .bd-col { flex-basis: 78vw; min-width: 220px; max-width: 320px; max-height: max(360px, calc(100vh - 240px)); }
+    .bd-col { flex-basis: 78vw; min-width: 220px; max-width: 320px; max-height: max(360px, calc(100vh - 240px - var(--env-h))); }
     .gantt { --lw: 150px; }
     .gantt-scroll { max-height: 66vh; }
   }
 
   /* record detail drawer (reuses the table's expanded detail markup) */
-  .dr-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.11); z-index: 60; animation: fade 0.15s ease; }
-  .dr-panel { position: fixed; top: 10px; right: 10px; bottom: 10px; width: min(780px, calc(100% - 20px)); background: var(--paper); z-index: 61; display: flex; flex-direction: column; animation: drIn 0.18s ease; }
+  .dr-backdrop { position: fixed; inset: var(--env-h) 0 0 0; background: rgba(0,0,0,0.11); z-index: 60; animation: fade 0.15s ease; }
+  .dr-panel { position: fixed; top: calc(10px + var(--env-h)); right: 10px; bottom: 10px; width: min(780px, calc(100% - 20px)); background: var(--paper); z-index: 61; display: flex; flex-direction: column; animation: drIn 0.18s ease; }
   .dr-backdrop[hidden], .dr-panel[hidden], .toast[hidden] { display: none; }
   @keyframes drIn { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
   .dr-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 12px 20px; background: var(--card); border-bottom: 1px solid var(--line); flex-shrink: 0; }
@@ -1156,6 +1158,13 @@
   .crm-grp { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; max-width: 100%; }
   .crm-check { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--slate); cursor: pointer; }
   .crm-check input { width: auto; }
+  .owner-td { min-width: 120px; } .status-td { min-width: 104px; } .owner-cb input { min-width: 64px; }
+  .owner-cb { display: flex; align-items: stretch; gap: 2px; width: 100%; } .owner-cb input { flex: 1 1 auto; min-width: 0; }
+  .owner-cb-btn { flex: 0 0 26px; border: 1px solid var(--line); background: #fff; border-radius: 6px; font-size: 12px; line-height: 1; color: var(--muted); cursor: pointer; padding: 0; }
+  .owner-cb-btn:hover { border-color: var(--stone-deep); color: var(--ink); }
+  .owner-menu { position: fixed; z-index: 100200; background: #fff; border: 1px solid var(--stone-deep); border-radius: 9px; box-shadow: var(--shadow-lift); padding: 4px; overflow-y: auto; font-size: 13.5px; }
+  .owner-opt { padding: 8px 10px; border-radius: 6px; cursor: pointer; } .owner-opt:hover, .owner-opt.hi { background: #f1ece3; } .owner-opt.cur { font-weight: 700; } .owner-opt.clear { color: var(--muted); font-style: italic; } .owner-opt.none { color: var(--muted); cursor: default; }
+  @media (max-width: 700px) { .owner-cb-btn { flex-basis: 34px; } .owner-opt { padding: 11px 12px; } }
   .crm-colwrap { position: relative; }
   .crm-colmenu { position: absolute; top: calc(100% + 4px); left: 0; z-index: 15; background: #fff; border: 1px solid var(--stone-deep); border-radius: 9px; box-shadow: var(--shadow-lift); padding: 8px 12px; min-width: 150px; }
   .crm-colmenu label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 4px 0; cursor: pointer; }
@@ -1201,11 +1210,11 @@
   .tkr-form .tkf-actions { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; }
   .tkf-err { color: #b3453f; font-size: 12px; }
   /* task side panel */
-  .tk-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.11); z-index: 66; animation: fade 0.15s ease; }
-  .tk-panel { position: fixed; top: 10px; right: 10px; bottom: 10px; width: min(520px, calc(100% - 20px)); background: var(--card); z-index: 67; display: flex; flex-direction: column; animation: drIn 0.18s ease; }
+  .tk-backdrop { position: fixed; inset: var(--env-h) 0 0 0; background: rgba(0,0,0,0.11); z-index: 66; animation: fade 0.15s ease; }
+  .tk-panel { position: fixed; top: calc(10px + var(--env-h)); right: 10px; bottom: 10px; width: min(520px, calc(100% - 20px)); background: var(--card); z-index: 67; display: flex; flex-direction: column; animation: drIn 0.18s ease; }
   /* shared floating-card look for every right-hand panel (record drawer, lead / supplier editor, task / action) */
   .lp-panel, .dr-panel, .tk-panel { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(28,31,34,0.06), 0 6px 16px rgba(28,31,34,0.08), 0 22px 48px rgba(28,31,34,0.12); }
-  @media (max-width: 700px) { .lp-panel, .dr-panel, .tk-panel { top: 0; right: 0; bottom: 0; width: 100%; border: none; border-radius: 0; box-shadow: none; } }
+  @media (max-width: 700px) { .lp-panel, .dr-panel, .tk-panel { top: var(--env-h); right: 0; bottom: 0; width: 100%; border: none; border-radius: 0; box-shadow: none; } }
   @media (prefers-reduced-motion: reduce) { .lp-panel, .dr-panel, .tk-panel, .lp-backdrop, .dr-backdrop, .tk-backdrop { animation: none; } .brandbar-in { transition: none; } }
   .tk-backdrop[hidden], .tk-panel[hidden] { display: none; }
   .tk-head { flex: 0 0 auto; display: flex; align-items: flex-start; gap: 12px; padding: 16px 14px 14px 20px; background: #faf8f4; border-bottom: 1px solid var(--line); }
@@ -1874,7 +1883,8 @@ const STORAGE_PREFIX = 'bt-test-';                                              
 if(ENV_LABEL === 'TEST'){
   document.title = '[TEST] ' + document.title;
   const st = document.createElement('style');
-  st.textContent = '#envBanner{position:fixed;top:0;left:0;right:0;height:28px;line-height:28px;z-index:100000;background:#f5a623;color:#3a2400;text-align:center;font:700 12.5px/28px Inter,system-ui,sans-serif;letter-spacing:.06em;box-shadow:0 1px 4px rgba(0,0,0,.25)}body{padding-top:28px}.mobile-bar{top:28px !important}';
+  st.textContent = '#envBanner{position:fixed;top:0;left:0;right:0;height:28px;line-height:28px;z-index:100000;background:#f5a623;color:#3a2400;text-align:center;font:700 12.5px/28px Inter,system-ui,sans-serif;letter-spacing:.06em;box-shadow:0 1px 4px rgba(0,0,0,.25)}';
+  document.documentElement.style.setProperty('--env-h', '28px');   // the banner takes real space: the page is pushed down by this, and fixed / sticky things at the top sit below it
   document.head.appendChild(st);
   const bn = document.createElement('div'); bn.id = 'envBanner'; bn.textContent = 'TEST SITE \u2014 not real data';
   document.body.insertBefore(bn, document.body.firstChild);
@@ -6894,16 +6904,86 @@ function statusStyle(s){
   if(s==='Waiting') return 'background:#e6ecf5;color:#4a6b8a;';
   return '';
 }
+/* ---------- owner combobox (Actions) ----------
+   An input you can type any name into, plus a button that opens a menu of ALL owners whatever is already in the field (a native datalist only shows matches).
+   Choosing sets the value and fires the same 'change' event as typing, so every existing handler works. Names already used on actions and tasks join the team names, so a new name typed once is offered next time. */
+const ACT_COLS = [['owner2', '+ Owner'], ['status', 'Status'], ['notes', 'Notes'], ['linked', 'Linked record']];   // the optional Actions columns
+function ownerChoices(){
+  const out = [], seen = new Set(), add = n => { n = String(n == null ? '' : n).trim(); const k = n.toLowerCase(); if(n && !seen.has(k)){ seen.add(k); out.push(n); } };
+  [...document.querySelectorAll('#ownersList option')].forEach(o => add(o.value));   // the team list first, in its order
+  const extra = [];
+  (state.actions || []).concat(state.archivedActions || []).forEach(a => { extra.push(a.owner, a.owner2); });
+  (state.crmTasks || []).forEach(t => { extra.push(t.owner); });
+  extra.filter(Boolean).sort((a, b) => String(a).localeCompare(String(b))).forEach(add);
+  return out;
+}
+function ownerFieldHtml(attrs, value, o){
+  o = o || {};
+  return `<span class="owner-cb"><input type="text" ${attrs} value="${escAttr(value || '')}"${o.optional ? ' placeholder="optional" data-owner-opt="1"' : ''} autocomplete="off" role="combobox" aria-haspopup="listbox" aria-expanded="false">`
+    + `<button type="button" class="owner-cb-btn" data-owner-btn tabindex="-1" aria-label="Show all owners">▾</button></span>`;
+}
+const ownerMenu = { el: null, input: null, hi: -1, t: 0 };
+function ownerMenuClose(){
+  if(ownerMenu.el){ ownerMenu.el.remove(); ownerMenu.el = null; }
+  if(ownerMenu.input){ ownerMenu.input.setAttribute('aria-expanded', 'false'); ownerMenu.input = null; } ownerMenu.hi = -1;
+}
+function ownerMenuItems(input, filter){
+  const f = String(filter || '').trim().toLowerCase(), items = [];
+  if(input.dataset.ownerOpt !== undefined) items.push({ v: '', label: '— None (clear)', clear: true });
+  ownerChoices().forEach(n => { if(!f || n.toLowerCase().includes(f)) items.push({ v: n, label: n }); });
+  return items;
+}
+function ownerMenuOpen(input, filter){
+  ownerMenuClose(); const items = ownerMenuItems(input, filter);
+  const m = document.createElement('div'); m.id = 'ownerMenu'; m.className = 'owner-menu'; m.setAttribute('role', 'listbox');
+  m.innerHTML = items.length ? items.map((it, i) => `<div class="owner-opt${it.clear ? ' clear' : ''}${!it.clear && it.v.toLowerCase() === String(input.value).trim().toLowerCase() ? ' cur' : ''}" role="option" data-i="${i}" data-v="${escAttr(it.v)}">${escHtml(it.label)}</div>`).join('') : '<div class="owner-opt none">No match: keep typing to add a new name</div>';
+  document.body.appendChild(m); ownerMenu.el = m; ownerMenu.input = input; ownerMenu.items = items; ownerMenu.hi = -1; ownerMenu.t = Date.now();
+  input.setAttribute('aria-expanded', 'true');
+  const r = (input.closest('.owner-cb') || input).getBoundingClientRect(), mh = Math.min(m.scrollHeight, 260);
+  m.style.minWidth = Math.max(r.width, 150) + 'px'; m.style.left = Math.max(4, Math.min(r.left, window.innerWidth - Math.max(r.width, 150) - 4)) + 'px';
+  const below = window.innerHeight - r.bottom - 8, top = (below >= mh || below >= r.top - 8) ? r.bottom + 2 : r.top - mh - 2;
+  m.style.top = Math.max(4, top) + 'px'; m.style.maxHeight = Math.max(120, Math.min(260, (below >= mh ? below : r.top - 8))) + 'px';
+}
+function ownerMenuHi(i){
+  const rows = ownerMenu.el ? [...ownerMenu.el.querySelectorAll('.owner-opt[data-i]')] : []; if(!rows.length) return;
+  ownerMenu.hi = (i + rows.length) % rows.length; rows.forEach((r, k) => r.classList.toggle('hi', k === ownerMenu.hi)); rows[ownerMenu.hi].scrollIntoView({ block: 'nearest' });
+}
+function ownerPick(v){
+  const input = ownerMenu.input; ownerMenuClose(); if(!input) return;
+  input.value = v; input.dispatchEvent(new Event('input', { bubbles: true })); input.dispatchEvent(new Event('change', { bubbles: true }));   // the same events typing produces
+}
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest && e.target.closest('[data-owner-btn]');
+  if(btn){ const input = btn.parentNode.querySelector('input'); if(ownerMenu.input === input){ ownerMenuClose(); } else { ownerMenuOpen(input, ''); } return; }
+  const opt = e.target.closest && e.target.closest('#ownerMenu .owner-opt[data-i]'); if(opt){ ownerPick(opt.dataset.v); return; }
+  if(ownerMenu.el && !(e.target.closest && e.target.closest('#ownerMenu, .owner-cb'))) ownerMenuClose();
+});
+document.addEventListener('mousedown', (e) => { if(e.target.closest && e.target.closest('#ownerMenu')) e.preventDefault(); });   // keep focus in the field while choosing
+document.addEventListener('keydown', (e) => {
+  const input = e.target.closest && e.target.closest('.owner-cb input'); if(!input) return;
+  const open = !!ownerMenu.el && ownerMenu.input === input;
+  if(e.key === 'ArrowDown'){ e.preventDefault(); if(!open) ownerMenuOpen(input, ''); else ownerMenuHi(ownerMenu.hi + 1); }
+  else if(e.key === 'ArrowUp' && open){ e.preventDefault(); ownerMenuHi(ownerMenu.hi - 1); }
+  else if(e.key === 'Enter' && open && ownerMenu.hi >= 0){ e.preventDefault(); e.stopPropagation(); const it = ownerMenu.items[ownerMenu.hi]; if(it) ownerPick(it.v); }
+  else if(e.key === 'Escape' && open){ e.preventDefault(); e.stopPropagation(); ownerMenuClose(); }
+  else if(e.key === 'Tab' && open) ownerMenuClose();
+}, true);
+document.addEventListener('input', (e) => {   // typing narrows an open menu; with nothing typed it shows everyone
+  const input = e.target.closest && e.target.closest('.owner-cb input'); if(input && ownerMenu.el && ownerMenu.input === input && e.isTrusted !== false) ownerMenuOpen(input, input.value);
+});
+window.addEventListener('resize', () => { if(ownerMenu.el && Date.now() - ownerMenu.t > 400) ownerMenuClose(); });   // not for the first moments (a phone keyboard or scroll settling as the menu opens)
+window.addEventListener('scroll', (e) => { if(ownerMenu.el && Date.now() - ownerMenu.t > 400 && !(e.target.closest && e.target.closest('#ownerMenu'))) ownerMenuClose(); }, true);
 function renderActions(){
   const today = new Date(); today.setHours(0,0,0,0);
   const statuses = ['Not Started','In Progress','Waiting','Done'];
-  const showLinked = state.actionPrefs.shownCols.includes('linked');
+  const shownCols = state.actionPrefs.shownCols, showLinked = shownCols.includes('linked'), showOwner2 = shownCols.includes('owner2'), showStatus = shownCols.includes('status'), showNotes = shownCols.includes('notes');
   const cw = document.getElementById('actColsWrap');
-  if(cw) cw.innerHTML = `<button class="btn secondary" data-today="act-cols">Columns ▾</button>${actUi.colsOpen ? `<div class="crm-colmenu"><label><input type="checkbox" data-acol="linked"${showLinked ? ' checked' : ''}> Linked record</label></div>` : ''}`;
-  let html = `<table style="min-width:${showLinked ? 1390 : 1210}px"><thead><tr>
-    <th style="width:44px"></th><th style="width:118px">Date Raised</th><th style="min-width:260px">Action</th><th style="width:104px">Owner</th>
-    <th style="width:104px">+ Owner</th><th style="width:132px">Deadline</th><th style="width:74px">Priority</th>
-    <th style="width:128px">Status</th>${showLinked ? '<th style="width:170px">Linked record</th>' : ''}<th style="min-width:180px">Notes</th><th style="width:34px"></th></tr></thead><tbody>`;
+  if(cw) cw.innerHTML = `<button class="btn secondary" data-today="act-cols">Columns ▾</button>${actUi.colsOpen ? `<div class="crm-colmenu">${ACT_COLS.map(([k, label]) => `<label><input type="checkbox" data-acol="${k}"${shownCols.includes(k) ? ' checked' : ''}> ${label}</label>`).join('')}</div>` : ''}`;
+  const minW = 44 + 118 + 260 + 128 + 132 + 74 + 34 + (showOwner2 ? 128 : 0) + (showStatus ? 128 : 0) + (showLinked ? 170 : 0) + (showNotes ? 180 : 0) + 24;   // the table is as wide as the columns that are on
+  let html = `<table style="min-width:${minW}px"><thead><tr>
+    <th style="width:44px"></th><th style="width:118px">Date Raised</th><th style="min-width:260px">Action</th><th style="width:128px">Owner</th>
+    ${showOwner2 ? '<th style="width:128px">+ Owner</th>' : ''}<th style="width:132px">Deadline</th><th style="width:74px">Priority</th>
+    ${showStatus ? '<th style="width:128px">Status</th>' : ''}${showLinked ? '<th style="width:170px">Linked record</th>' : ''}${showNotes ? '<th style="min-width:180px">Notes</th>' : ''}<th style="width:34px"></th></tr></thead><tbody>`;
   state.actions.forEach((r,i) => {
     const done = r.status === 'Done';
     const isArchiving = archiving.has(r);
@@ -6915,16 +6995,16 @@ function renderActions(){
       <td><div class="cbx${isArchiving?' checked':''}" data-action="toggle-done" data-idx="${i}" title="Complete &amp; archive">${CHECK_SVG}</div></td>
       <td><input type="date" data-tab="actions" data-idx="${i}" data-field="dateRaised" value="${r.dateRaised||''}"></td>
       <td><input class="acc-action-text" data-tab="actions" data-idx="${i}" data-field="action" value="${escAttr(r.action)}"></td>
-      <td><input list="ownersList" data-tab="actions" data-idx="${i}" data-field="owner" value="${escAttr(r.owner||'')}"></td>
-      <td><input list="ownersList" data-tab="actions" data-idx="${i}" data-field="owner2" value="${escAttr(r.owner2||'')}" placeholder="optional"></td>
+      <td class="owner-td">${ownerFieldHtml(`data-tab="actions" data-idx="${i}" data-field="owner"`, r.owner)}</td>
+      ${showOwner2 ? `<td class="owner-td">${ownerFieldHtml(`data-tab="actions" data-idx="${i}" data-field="owner2"`, r.owner2, { optional: true })}</td>` : ''}
       <td><input type="date" data-tab="actions" data-idx="${i}" data-field="deadline" value="${r.deadline||''}"></td>
       <td><select data-tab="actions" data-idx="${i}" data-field="priority" style="background:${pBg};color:${pFg};font-weight:700;text-align:center;border-radius:6px;">
         ${[0,1,2,3].map(p=>`<option value="${p}"${Number(r.priority)===p?' selected':''}>${p}</option>`).join('')}</select></td>
-      <td><select data-tab="actions" data-idx="${i}" data-field="status" style="${statusStyle(r.status)}font-weight:600;border-radius:6px;">${statuses.map(s=>`<option${r.status===s?' selected':''}>${s}</option>`).join('')}</select></td>
+      ${showStatus ? `<td class="status-td"><select data-tab="actions" data-idx="${i}" data-field="status" style="${statusStyle(r.status)}font-weight:600;border-radius:6px;">${statuses.map(s=>`<option${r.status===s?' selected':''}>${s}</option>`).join('')}</select></td>` : ''}
       ${showLinked ? (actLinks(r).length > 1
         ? `<td>${linkSummaryHtml(r, `data-today="act-open" data-idx="${i}"`)}</td>`
         : `<td><input list="crmRecList" data-alink="${i}" value="${escAttr(actLinks(r)[0] || '')}" placeholder="optional" autocomplete="off" title="${escAttr(actLinks(r).length ? linkedText(r) : '')}"></td>`) : ''}
-      <td><input data-tab="actions" data-idx="${i}" data-field="notes" value="${escAttr(r.notes||'')}"></td>
+      ${showNotes ? `<td><input data-tab="actions" data-idx="${i}" data-field="notes" value="${escAttr(r.notes||'')}"></td>` : ''}
       <td><button class="icon-btn" data-action="archive-action" data-idx="${i}" title="Archive without completing">${TRAY_SVG}</button></td>
     </tr>`;
   });
@@ -7080,8 +7160,10 @@ function ensureTaskModel(o){
   o.nextTaskNo = Math.max(Number(o.nextTaskNo) || 0, maxNo + 1);
   const pr = (o.crmPrefs && typeof o.crmPrefs === 'object') ? o.crmPrefs : {};
   o.crmPrefs = { hiddenCols: (Array.isArray(pr.hiddenCols) ? pr.hiddenCols : []).filter(x => typeof x === 'string') };
-  const ap = (o.actionPrefs && typeof o.actionPrefs === 'object') ? o.actionPrefs : {};   // optional Actions columns that are switched on (none by default)
-  o.actionPrefs = { shownCols: (Array.isArray(ap.shownCols) ? ap.shownCols : []).filter(x => typeof x === 'string') };
+  const ap = (o.actionPrefs && typeof o.actionPrefs === 'object') ? o.actionPrefs : {};   // optional Actions columns that are switched on
+  const shown = (Array.isArray(ap.shownCols) ? ap.shownCols : []).filter(x => typeof x === 'string');
+  if(ap.colsMigrated !== true) ['owner2', 'status', 'notes'].forEach(c => { if(!shown.includes(c)) shown.push(c); });   // one-time: the three newly optional columns start ticked; a later untick is respected
+  o.actionPrefs = { shownCols: shown, colsMigrated: true };
   // Sales and Project records get the same newest-first communication timeline a Lead has
   (o.pipeline || []).concat(o.projects || []).forEach(r => { if(!Array.isArray(r.comms)) r.comms = []; });
   return o;
@@ -7514,11 +7596,11 @@ function tkPropsHtml(){
   return `<div class="tk-props">
       <div><label for="tkpStatus">Status</label><select id="tkpStatus" data-af="status">${['Not Started', 'In Progress', 'Waiting', 'Done'].map(x => `<option${o.status === x ? ' selected' : ''}>${x}</option>`).join('')}</select></div>
       <div><label for="tkpPrio">Priority</label><select id="tkpPrio" data-af="priority">${[0, 1, 2, 3].map(x => `<option value="${x}"${Number(o.priority) === x ? ' selected' : ''}>${x}</option>`).join('')}</select></div>
-      <div><label for="tkpOwner">Owner</label><input id="tkpOwner" list="ownersList" data-af="owner" value="${escAttr(o.owner || '')}"></div>
+      <div><label for="tkpOwner">Owner</label>${ownerFieldHtml('id="tkpOwner" data-af="owner"', o.owner)}</div>
       <div><label for="tkpDue">Due date</label><input id="tkpDue" type="date" data-af="deadline" value="${escAttr(o.deadline || '')}"></div>
     </div>
     <details class="tk-more"><summary>More details</summary><div class="tk-props">
-      <div><label for="tkpOwner2">+ Owner</label><input id="tkpOwner2" list="ownersList" data-af="owner2" value="${escAttr(o.owner2 || '')}" placeholder="optional"></div>
+      <div><label for="tkpOwner2">+ Owner</label>${ownerFieldHtml('id="tkpOwner2" data-af="owner2"', o.owner2, { optional: true })}</div>
       <div><label for="tkpRaised">Date raised</label><input id="tkpRaised" type="date" data-af="dateRaised" value="${escAttr(o.dateRaised || '')}"></div></div></details>`;
 }
 function tkFormHtml(){
