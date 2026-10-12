@@ -1135,6 +1135,16 @@
   .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 110; background: var(--ink); color: #fff; font-size: 12.5px; padding: 10px 12px 10px 16px; border-radius: 10px; box-shadow: var(--shadow-lift); display: flex; align-items: center; gap: 14px; max-width: calc(100% - 24px); }
   .toast-btn { background: none; border: 1px solid rgba(255,255,255,0.4); color: #fff; font-family: inherit; font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 7px; cursor: pointer; }
   .toast-btn:hover { background: rgba(255,255,255,0.12); }
+  .undo-hist-btn { background: none; border: 1px solid #3a3d41; color: #cfcabf; font-family: inherit; font-size: 11.5px; padding: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; }
+  .undo-hist-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .undo-wrap { padding: 12px 12px 0; margin-top: auto; }
+  .undo-wrap + .logout-bar { margin-top: 10px; }
+  .undo-modal { max-width: 640px; width: calc(100% - 32px); max-height: calc(100vh - 48px); overflow: auto; padding: 18px 22px 22px; }
+  .undo-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .undo-row:last-child { border-bottom: 0; }
+  .undo-row .u-main { flex: 1; min-width: 0; }
+  .undo-row .u-label { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+  .undo-row .u-meta { font-size: 11.5px; color: var(--muted); }
 
   /* ---------------- CRM tasks ---------------- */
   .crm-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -1365,6 +1375,7 @@
     <div class="tab g-organisation" data-tab="settings">Settings</div>
   </div>
 
+  <div class="undo-wrap"><button type="button" class="undo-hist-btn" data-action="undo-history" title="Restore things you deleted in the last 24 hours">↶ Undo history <span class="tab-count" id="undoBadge" hidden></span></button></div>
   <div class="logout-bar" id="logoutBar"></div>
 
 </div>
@@ -1796,6 +1807,14 @@ create policy "app update" on tracker_data for update using (true) with check (t
 </aside>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button class="toast-btn" id="toastUndo" type="button">Undo</button></div>
 <div class="gantt-tip" id="ganttTip" hidden></div>
+
+<div class="modal-overlay" id="undoOverlay" hidden>
+  <div class="modal undo-modal" role="dialog" aria-label="Undo history">
+    <div class="terms-top"><span class="terms-tag">Undo history</span><button class="btn secondary" type="button" data-action="undo-close">Close</button></div>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 6px;line-height:1.5;">The last 50 things deleted, kept for 24 hours and shared across devices. Restore puts an item back where it was.</p>
+    <div id="undoList"></div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="termsOverlay" hidden>
   <div class="modal terms-modal" role="dialog" aria-modal="true" aria-labelledby="termsHeading">
@@ -2275,6 +2294,7 @@ function mergeDefaults(loaded){
   ensureQuoteModel(out, true);   // old backups: quote settings, units and line categories get defaults; the insurance Action is added once
   ensureQuoteDocModel(out, true);   // quotes: normalise, and load the sample quote once
   out.branding = normaliseBranding(loaded.branding);   // old backups: default name and font, no logos
+  out.undoLog = Array.isArray(loaded.undoLog) ? loaded.undoLog : [];   // old backups: no undo log yet
   return out;
 }
 /* ---------- storage layer: cloud (Supabase REST) with localStorage fallback ---------- */
@@ -2507,6 +2527,7 @@ async function renderUsers(){
 async function startApp(){
   hideLoginShowApp();
   await loadState();
+  undoPrune(); undoBadge();
   ensurePipelineIds();
   loadTodayScope();
   render();
@@ -3263,10 +3284,93 @@ function showToast(msg, undo){
   toastUndo = undo || null;
   document.getElementById('toastUndo').style.display = undo ? '' : 'none';
   document.getElementById('toast').hidden = false;
-  clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, 5000);
+  clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, undo ? 9000 : 5000);
 }
 function hideToast(){ clearTimeout(toastTimer); document.getElementById('toast').hidden = true; toastUndo = null; }
 document.getElementById('toastUndo').addEventListener('click', () => { const f = toastUndo; hideToast(); if(f) f(); });
+
+
+/* ---------- Undo log ----------
+   Every delete records { id, at, by, label, path, index, item, extra } in state.undoLog (newest first, max 50, 24 hours, ~1.5 MB).
+   path is how to find the array the item came from: strings are keys, {id} steps pick a record by id (e.g. ['quotes', {id:3}, 'lines']).
+   It lives in the saved document, so it survives a refresh and shows on other devices. */
+const UNDO_MAX = 50, UNDO_TTL = 24 * 3600 * 1000, UNDO_BYTES = 1500000;
+function undoPrune(){
+  if(!state) return;
+  const now = Date.now();
+  const log = (Array.isArray(state.undoLog) ? state.undoLog : []).filter(e => e && e.id && e.path && now - Number(e.at) < UNDO_TTL).sort((a, b) => b.at - a.at).slice(0, UNDO_MAX);
+  let size = 0; const keep = [];
+  for(const e of log){ const n = JSON.stringify(e).length; if(keep.length && size + n > UNDO_BYTES) break; keep.push(e); size += n; }
+  state.undoLog = keep;
+}
+function undoBadge(){
+  const b = document.getElementById('undoBadge'); if(!b || !state) return;
+  const n = (state.undoLog || []).length; b.textContent = n; b.hidden = !n;
+}
+/* record a delete and show the toast. Call it right after the splice. */
+function undoDeleted(label, path, index, item, extra, quiet){
+  undoPrune();
+  const e = { id: 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), at: Date.now(), by: session ? session.username : '', label, path, index, item: JSON.parse(JSON.stringify(item)), extra: extra || null };
+  state.undoLog.unshift(e); undoPrune(); undoBadge(); saveState();
+  if(!quiet) showToast(label, () => undoRestore(e.id));
+  return e;
+}
+function undoArray(path){
+  let o = state;
+  for(const st of path){
+    if(o == null) return null;
+    o = typeof st === 'string' ? o[st] : (Array.isArray(o) ? o.find(x => x && x.id === st.id) : null);
+  }
+  return Array.isArray(o) ? o : null;
+}
+function undoFind(coll, id){ return (state[coll] || []).find(x => x && x.id === id) || null; }
+function undoWhere(rec){ return ['leads', 'pipeline', 'projects', 'suppliers', 'crmTasks'].find(k => state[k].includes(rec)) || ''; }
+function undoApplyExtra(e, arr){
+  const x = e.extra; if(!x) return;
+  if(x.type === 'drop'){ const q = undoArray(e.path.slice(0, -1).concat(['lines'])); (x.lineIds || []).forEach(id => { const l = q && q.find(y => y.id === id); if(l) l.deliveryDropId = e.item.id; }); }
+  else if(x.type === 'supcol'){ const lines = undoArray(e.path.slice(0, -1).concat(['lines'])) || []; (x.snap || []).forEach(sn => { const l = lines.find(y => y.id === sn.lid); if(l){ (sn.prices || []).forEach(p => { if(!l.prices.some(z => z.supplierId === p.supplierId)) l.prices.splice(sn.pi >= 0 ? Math.min(sn.pi, l.prices.length) : l.prices.length, 0, p); }); if(sn.sel) l.selectedSupplierId = sn.sel; } }); }
+  else if(x.type === 'moved'){ (x.moved || []).forEach(m => { const r = undoFind(m.coll, m.id); if(r) Object.assign(r, m.before); }); if(x.defaultTier) state.settings.defaultTierId = x.defaultTier; if(x.renumber) renumberStages(arr); if(x.tiers) reapplyAutoTiers(); }
+  else if(x.type === 'primary'){ const sup = undoFind('suppliers', e.path[1].id); if(sup && x.promotedId) (sup.contacts || []).forEach(c => { if(c.id === x.promotedId) c.primary = false; }); }
+}
+function undoRestore(id){
+  undoPrune();
+  const i = state.undoLog.findIndex(e => e.id === id);
+  if(i < 0){ showToast('That item has expired and can no longer be restored'); return false; }
+  const e = state.undoLog[i], arr = undoArray(e.path);
+  if(!arr){ showToast(`Can't restore “${e.label}” — what it belonged to has been deleted too. Restore that first.`); return false; }
+  const it = e.item;
+  if(it && typeof it === 'object' && it.id !== undefined && it.id !== '' && arr.some(x => x && x.id === it.id)){ state.undoLog.splice(i, 1); saveState(); undoBadge(); undoPanelRender(); showToast('Already restored'); return false; }
+  arr.splice(Math.min(Math.max(0, Number(e.index) || 0), arr.length), 0, (it && typeof it === 'object') ? JSON.parse(JSON.stringify(it)) : it);
+  undoApplyExtra(e, arr);
+  state.undoLog.splice(i, 1);
+  saveState(); render();
+  try{
+    if(typeof qUi !== 'undefined' && qUi.openId && qFind(qUi.openId)) qbRender();
+    if(lp){ if(lp.kind === 'lead') lpRenderBody(true); else if(lp.kind === 'supplier') supRenderBody(true); }
+  }catch(err){}
+  undoBadge(); undoPanelRender();
+  showToast('Restored: ' + e.label);
+  return true;
+}
+function undoAgo(at){ const m = Math.round((Date.now() - at) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : Math.round(m / 60) + ' h ago'; }
+function undoPanelRender(){
+  const o = document.getElementById('undoOverlay'); if(!o || o.hidden) return;
+  undoPrune();
+  const log = state.undoLog;
+  document.getElementById('undoList').innerHTML = log.length ? log.map(e => `<div class="undo-row"><div class="u-main"><div class="u-label">${escHtml(e.label)}</div><div class="u-meta">${undoAgo(e.at)}${e.by ? ' · ' + escHtml(e.by) : ''} · expires in ${Math.max(1, Math.round((e.at + UNDO_TTL - Date.now()) / 3600000))} h</div></div><button class="btn secondary" type="button" data-action="undo-restore" data-uid="${escHtml(e.id)}">Restore</button></div>`).join('')
+    : '<div class="breakdown-hint" style="padding:14px 0;">Nothing deleted in the last 24 hours.</div>';
+}
+function undoPanelOpen(){ undoPrune(); document.getElementById('undoOverlay').hidden = false; undoPanelRender(); }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-action^="undo-"]'); if(b){
+    const a = b.dataset.action;
+    if(a === 'undo-history') undoPanelOpen(); else if(a === 'undo-close') document.getElementById('undoOverlay').hidden = true; else if(a === 'undo-restore') undoRestore(b.dataset.uid);
+    return;
+  }
+  if(e.target.id === 'undoOverlay') e.target.hidden = true;
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ const o = document.getElementById('undoOverlay'); if(o && !o.hidden){ o.hidden = true; e.stopPropagation(); } } });
+setInterval(() => { if(state){ const n = (state.undoLog || []).length; undoPrune(); if(state.undoLog.length !== n){ undoBadge(); undoPanelRender(); } } }, 60000);
 
 /* a drop changes the stage id only, then goes through the normal render + save path. A sales stage's percentage follows the
    stage automatically (effectiveProb) unless the deal has its own override, which is kept. Leads are never promoted, and
@@ -3643,17 +3747,19 @@ function newTierId(){ let id; do { id = 'tier_' + Math.random().toString(36).sli
 async function deleteTier(idx){
   const t = state.tiers[idx]; if(!t) return;
   const u = tierUsage(t.id), n = u.leads.length + u.pipeline.length + u.projects.length;
-  let dest = '';
+  let dest = '', moved = [];
   if(n){
     const opts = '<option value="">No tier</option>' + state.tiers.filter(x=>x.id!==t.id).map(x=>`<option value="${escHtml(x.id)}">${escHtml(x.name)}</option>`).join('');
     const ok = await showConfirm(`Delete “${t.name}”?`, `${n} record${n!==1?'s use':' uses'} this tier. Move ${n!==1?'them':'it'} to:`, `<select id="tierMoveTo">${opts}</select>`);
     if(!ok) return;
     dest = _confirmExtraValue || '';
-    u.leads.forEach(r => { r.tierId = dest; r.tierManual = true; });
-    [...u.pipeline, ...u.projects].forEach(r => { r.tierId = dest; });
+    u.leads.forEach(r => { moved.push({ coll: 'leads', id: r.id, before: { tierId: r.tierId, tierManual: r.tierManual } }); r.tierId = dest; r.tierManual = true; });
+    [...u.pipeline, ...u.projects].forEach(r => { moved.push({ coll: undoWhere(r), id: r.id, before: { tierId: r.tierId } }); r.tierId = dest; });
   }
   state.tiers.splice(idx, 1);
-  if(state.settings.defaultTierId === t.id) state.settings.defaultTierId = '';
+  const wasDefault = state.settings.defaultTierId === t.id;
+  if(wasDefault) state.settings.defaultTierId = '';
+  undoDeleted('Tier deleted: ' + String(t.name).slice(0, 40), ['tiers'], idx, t, { type: 'moved', moved, defaultTier: wasDefault ? t.id : '', tiers: true });
   reapplyAutoTiers(); render(); saveState();
 }
 /* resize to max 64x64 on a canvas and keep as a small PNG data URL */
@@ -3990,8 +4096,8 @@ document.addEventListener('click', (e) => {
     const l = state.leads.find(x => x.id === id); if(!l || !l.contacts) return;
     const ci = l.contacts.findIndex(c => c.id === b.dataset.cid); if(ci < 0) return;
     const gone = l.contacts.splice(ci, 1)[0];
+    undoDeleted('Contact removed: ' + String(gone.name || '(no name)').slice(0, 40), ['leads', { id: l.id }, 'contacts'], ci, gone);
     render(); saveState(); lpRenderBody(true);
-    showToast('Contact removed', () => { const x = state.leads.find(y => y.id === id); if(x){ x.contacts.splice(Math.min(ci, x.contacts.length), 0, gone); render(); saveState(); lpRenderBody(true); } });
   }
   else if(a === 'note-add') addLeadNote(b.closest('.lc-note-add'));
   else if(a === 'crm'){   // every open task for this lead, in the CRM list
@@ -4353,7 +4459,7 @@ async function deleteSupplier(id){
   const ok = await showConfirm(`Delete “${label}”?`, 'This permanently removes the supplier with its contacts and notes, and cannot be undone. Making it inactive keeps everything and just hides it from the default list.');
   if(!ok) return;
   const at = state.suppliers.findIndex(x => x.id === id); if(at < 0) return;
-  state.suppliers.splice(at, 1); render(); saveState(); showToast('Supplier deleted');
+  const gone = state.suppliers.splice(at, 1)[0]; undoDeleted('Supplier deleted: ' + String(label).slice(0, 40), ['suppliers'], at, gone); render(); saveState();
 }
 function addSupplierNote(box){
   if(!box) return;
@@ -4397,15 +4503,15 @@ document.addEventListener('click', (e) => {
     const ci = s.contacts.findIndex(c => c.id === b.dataset.cid); if(ci < 0) return;
     const gone = s.contacts.splice(ci, 1)[0], promoted = (gone.primary && s.contacts.length) ? s.contacts[0] : null;
     if(promoted) promoted.primary = true;   // there is always one primary while any contact exists
+    undoDeleted('Supplier contact removed: ' + String(gone.name || '(no name)').slice(0, 40), ['suppliers', { id: s.id }, 'contacts'], ci, gone, promoted ? { type: 'primary', promotedId: promoted.id } : null);
     render(); saveState(); supRenderBody(true);
-    showToast('Contact removed', () => { const x = supFind(id); if(!x) return; if(promoted) promoted.primary = false; x.contacts.splice(Math.min(ci, x.contacts.length), 0, gone); render(); saveState(); if(supOpenId() === id) supRenderBody(true); });
   }
   else if(a === 'note-add') addSupplierNote(b.closest('.sp-note-add'));
   else if(a === 'del-note'){
     const ni = Number(b.dataset.nidx); if(!s.notes[ni]) return;
     const gone = s.notes.splice(ni, 1)[0];
+    undoDeleted('Supplier note removed: ' + String(gone.note || gone.text || '').slice(0, 40), ['suppliers', { id: s.id }, 'notes'], ni, gone);
     render(); saveState(); supRenderNotes();
-    showToast('Note removed', () => { const x = supFind(id); if(!x) return; x.notes.push(gone); render(); saveState(); if(supOpenId() === id) supRenderNotes(); });
   }
   else if(a === 'toggle-status'){ s.status = s.status === 'Active' ? 'Inactive' : 'Active'; render(); saveState(); }
   else if(a === 'delete') deleteSupplier(id);
@@ -4561,7 +4667,7 @@ async function deleteStageItem(pl, id){
   const list = listFor(pl), idx = list.findIndex(x => x.id === id); if(idx < 0) return;
   const item = list[idx], noun = pl === 'reasons' ? 'reason' : (pl === 'supplycats' ? 'category' : 'stage');
   if(list.length <= 1){ alert(`A list needs at least one ${noun} — add another before deleting “${item.name}”.`); return; }
-  const holders = stageHolders(pl, id), n = holders.length;
+  const holders = stageHolders(pl, id), n = holders.length, moved = [];
   if(n){
     const others = list.filter(x => x.id !== id);
     const holds = pl === 'reasons' ? 'lost lead' : (pl === 'supplycats' ? 'supplier' : 'record');
@@ -4570,13 +4676,18 @@ async function deleteStageItem(pl, id){
     if(!ok) return;
     const dest = others.some(x => x.id === _confirmExtraValue) ? _confirmExtraValue : others[0].id;
     holders.forEach(r => {
+      moved.push({ coll: undoWhere(r), id: r.id, before: JSON.parse(JSON.stringify({ lostReason: r.lostReason, categoryIds: r.categoryIds, stageId: r.stageId, lostStageId: r.lostStageId })) });
       if(pl === 'reasons') r.lostReason = dest;
       else if(pl === 'supplycats') r.categoryIds = [...new Set(r.categoryIds.map(c => c === id ? dest : c))];
       else { if(r.stageId === id) r.stageId = dest; if(r.lostStageId === id) r.lostStageId = dest; }
     });
   }
   const at = list.findIndex(x => x.id === id);
-  if(at >= 0) list.splice(at, 1);
+  if(at >= 0){
+    list.splice(at, 1);
+    const path = pl === 'reasons' ? ['lostReasons'] : (pl === 'supplycats' ? ['supplyCategories'] : ['pipelineStages', pl]);
+    undoDeleted((pl === 'reasons' ? 'Lost reason' : (pl === 'supplycats' ? 'Supplier category' : 'Pipeline stage')) + ' deleted: ' + String(item.name).slice(0, 40), path, at, item, { type: 'moved', moved: moved.filter(m => m.coll), renumber: true });
+  }
   renumberStages(list); render(); saveState();
 }
 function renderSettings(){
@@ -4762,7 +4873,7 @@ function qtListAction(a, id){
   } else {
     const at = list.findIndex(x => x.id === id); if(at < 0) return;
     const [gone] = list.splice(at, 1); renderQuoteSettings(); saveState(); if(kind === 'stype'){ renderPipeline(); renderQuotes(); }
-    showToast(`Removed “${gone.name}”`, () => { list.splice(Math.min(at, list.length), 0, gone); renderQuoteSettings(); saveState(); });
+    undoDeleted(`Removed ${kind === 'unit' ? 'unit' : (kind === 'stype' ? 'stage line type' : 'line category')} “${gone.name}”`, [kind === 'unit' ? 'quoteUnits' : (kind === 'stype' ? 'stageLineTypes' : 'lineCategories')], at, gone);
   }
 }
 document.addEventListener('change', (e) => {
@@ -5326,25 +5437,25 @@ function qbAction(a, b){
   if(a === 'unpaid-reset'){ q.unpaidOverride = ''; qbTouch(q, true); return; }
   if(a === 'add-allowance'){ q.labour.push({ id: qRand('lb_'), description: 'Allowance (site visit and quoting)', basis: 'fixed', qty: 1, rate: '', customerGroup: '', showOnQuote: true }); qbTouch(q, true); const el = document.querySelector(`#quoteBuilderView [data-qb="lab"][data-id="${q.labour[q.labour.length - 1].id}"][data-f="rate"]`); if(el) el.focus(); return; }
   if(a === 'add-pay'){ q.payments.push(qNewPayment({ label: 'Payment ' + (q.payments.length + 1), mode: 'amount', value: 0 })); qbTouch(q, true); return; }
-  if(a === 'pay-del'){ const i = q.payments.findIndex(r => r.id === id); if(i < 0) return; const [gone] = q.payments.splice(i, 1); qbTouch(q, true); qbUndoable('Payment row deleted', () => { q.payments.splice(Math.min(i, q.payments.length), 0, gone); }); return; }
+  if(a === 'pay-del'){ const i = q.payments.findIndex(r => r.id === id); if(i < 0) return; const [gone] = q.payments.splice(i, 1); undoDeleted('Payment row deleted: ' + String(gone.label || '').slice(0, 40), ['quotes', { id: q.id }, 'payments'], i, gone); qbTouch(q, true); return; }
   if(a === 'back'){ if(lp && lp.kind === 'qline') closeLeadPanel(); qUi.openId = 0; renderQuotes(); return; }
   if(a === 'add-line'){ const l = qNewLine(q); q.lines.push(l); qbTouch(q, true); const el = document.querySelector(`#quoteBuilderView [data-id="${l.id}"][data-f="description"]`); if(el) el.focus(); return; }
-  if(a === 'line-del'){ const i = q.lines.findIndex(l => l.id === id); if(i < 0) return; const [gone] = q.lines.splice(i, 1); qbTouch(q, true); qbUndoable('Line deleted', () => { q.lines.splice(Math.min(i, q.lines.length), 0, gone); }); return; }
+  if(a === 'line-del'){ const i = q.lines.findIndex(l => l.id === id); if(i < 0) return; const [gone] = q.lines.splice(i, 1); undoDeleted('Quote line deleted: ' + String(gone.description || '(blank)').slice(0, 40), ['quotes', { id: q.id }, 'lines'], i, gone); qbTouch(q, true); return; }
   if(a === 'line-dup'){ const i = q.lines.findIndex(l => l.id === id); if(i < 0) return; const c = JSON.parse(JSON.stringify(q.lines[i])); c.id = qRand('ln_'); q.lines.splice(i + 1, 0, c); qbTouch(q, true); return; }
   if(a === 'line-up' || a === 'line-down'){ qbMove(q, q.lines, id, a === 'line-up' ? -1 : 1); return; }
   if(a === 'line-edit'){ openQuoteLinePanel(q.id, id); return; }
   if(a === 'del-supcol'){
-    const sid = Number(b.dataset.sid), snap = q.lines.map(l => ({ l, p: l.prices.filter(p => p.supplierId === sid), sel: l.selectedSupplierId }));
+    const sid = Number(b.dataset.sid), scAt = q.supplierCols.indexOf(sid), snap = q.lines.map(l => ({ l, p: l.prices.filter(p => p.supplierId === sid), pi: l.prices.findIndex(p => p.supplierId === sid), sel: l.selectedSupplierId }));
     q.supplierCols = q.supplierCols.filter(x => x !== sid); q.lines.forEach(l => { l.prices = l.prices.filter(p => p.supplierId !== sid); if(l.selectedSupplierId === sid) l.selectedSupplierId = ''; });
-    qbTouch(q, true); qbUndoable('Supplier column removed', () => { q.supplierCols.push(sid); snap.forEach(s => { s.l.prices.push(...s.p); s.l.selectedSupplierId = s.sel; }); }); return;
+    undoDeleted('Supplier column removed: ' + qbSupName(sid), ['quotes', { id: q.id }, 'supplierCols'], Math.max(0, scAt), sid, { type: 'supcol', snap: snap.map(s => ({ lid: s.l.id, prices: s.p, pi: s.p.length ? s.pi : -1, sel: s.sel === sid ? sid : '' })) }); qbTouch(q, true); return;
   }
   if(a === 'add-lab'){ const st = state.settings; q.labour.push({ id: qRand('lb_'), description: 'Labour', basis: 'day', qty: 1, rate: st.labourRateDay === '' ? '' : st.labourRateDay, customerGroup: '', showOnQuote: true }); qbTouch(q, true); return; }
-  if(a === 'lab-del'){ const i = q.labour.findIndex(r => r.id === id); if(i < 0) return; const [gone] = q.labour.splice(i, 1); qbTouch(q, true); qbUndoable('Labour row deleted', () => { q.labour.splice(Math.min(i, q.labour.length), 0, gone); }); return; }
+  if(a === 'lab-del'){ const i = q.labour.findIndex(r => r.id === id); if(i < 0) return; const [gone] = q.labour.splice(i, 1); undoDeleted('Labour row deleted: ' + String(gone.description || '').slice(0, 40), ['quotes', { id: q.id }, 'labour'], i, gone); qbTouch(q, true); return; }
   if(a === 'add-drop'){ q.drops.push({ id: qRand('dr_'), label: 'Drop ' + (q.drops.length + 1), supplierId: '', date: '', method: 'delivered', charge: 0, chargeManual: false, paymentDueDate: '', dueManual: false }); qbTouch(q, true); return; }
   if(a === 'drop-del'){
     const i = q.drops.findIndex(d => d.id === id); if(i < 0) return; const [gone] = q.drops.splice(i, 1), tagged = q.lines.filter(l => l.deliveryDropId === id);
-    tagged.forEach(l => { l.deliveryDropId = ''; }); qbTouch(q, true);
-    qbUndoable('Delivery drop deleted', () => { q.drops.splice(Math.min(i, q.drops.length), 0, gone); tagged.forEach(l => { l.deliveryDropId = id; }); }); return;
+    tagged.forEach(l => { l.deliveryDropId = ''; });
+    undoDeleted('Delivery drop deleted: ' + String(gone.label || '').slice(0, 40), ['quotes', { id: q.id }, 'drops'], i, gone, { type: 'drop', lineIds: tagged.map(l => l.id) }); qbTouch(q, true); return;
   }
   if(a === 'tl-add'){
     const n = document.getElementById('qbTlNote'), d = document.getElementById('qbTlDate'); if(!n || !n.value.trim()){ if(n) n.focus(); return; }
@@ -5359,8 +5470,7 @@ function qbAction(a, b){
   if(a === 'del-quote'){
     showConfirm(`Delete ${qRef(q)}?`, 'This permanently removes the quote with its lines, labour and timeline.').then(ok => {
       if(!ok) return; const i = state.quotes.indexOf(q); if(i < 0) return; if(lp && lp.kind === 'qline') closeLeadPanel();
-      state.quotes.splice(i, 1); qUi.openId = 0; saveState(); renderQuotes();
-      showToast('Quote deleted', () => { state.quotes.splice(Math.min(i, state.quotes.length), 0, q); saveState(); renderQuotes(); });
+      state.quotes.splice(i, 1); qUi.openId = 0; undoDeleted('Quote deleted: ' + qRef(q), ['quotes'], i, q); saveState(); renderQuotes();
     }); return;
   }
 }
@@ -5729,8 +5839,8 @@ function slLogAdd(){
 function slLogDel(lid){
   const { rec, s } = lp ? slFind(lp.pl, lp.rid, lp.id) : {}; if(!s) return;
   const i = s.log.findIndex(x => x.id === lid); if(i < 0) return; const [gone] = s.log.splice(i, 1);
+  undoDeleted('Time entry removed: ' + hrs(Number(gone.hours) || 0) + (gone.note ? ' · ' + String(gone.note).slice(0, 30) : ''), [lp.pl === 'sales' ? 'pipeline' : 'projects', { id: rec.id }, 'stages', { id: s.id }, 'log'], i, gone);
   slAfter(); lpEl('lpBody').innerHTML = slBodyHtml(s, rec);
-  showToast('Time entry removed', () => { s.log.splice(Math.min(i, s.log.length), 0, gone); slAfter(); if(lp && lp.kind === 'stline') lpEl('lpBody').innerHTML = slBodyHtml(s, rec); });
 }
 document.addEventListener('change', (e) => { const el = e.target; if(el.dataset && el.dataset.sl !== undefined && state && el.isConnected) slChange(el); });
 
@@ -7713,7 +7823,8 @@ async function deleteTask(id){
   const t = findTask(id); if(!t) return;
   const ok = await showConfirm(`Delete ${t.id}?`, `“${t.title}” and its ${t.notes.length} note${t.notes.length !== 1 ? 's' : ''} will be permanently removed. Notes already logged on a record's timeline stay there. To keep the task, mark it done instead.`);
   if(!ok) return;
-  state.crmTasks.splice(state.crmTasks.indexOf(t), 1);
+  const at = state.crmTasks.indexOf(t); state.crmTasks.splice(at, 1);
+  undoDeleted(`Task deleted: ${t.id} ${String(t.title || '').slice(0, 40)}`, ['crmTasks'], at, t);
   if(taskPanel && taskPanel.id === id) closeTaskPanel();
   render(); saveState();
 }
@@ -7742,15 +7853,17 @@ function newOptId(kind){ const pre = kind === 'priority' ? 'tp_' : 'tt_'; let id
 async function deleteTaskOption(kind, id){
   const list = state.taskOptions[kind], o = list.find(x => x.id === id); if(!o) return;
   if(list.length <= 1){ alert(`A list needs at least one ${kind} — add another before deleting “${o.name}”.`); return; }
-  const field = kind === 'priority' ? 'priorityId' : 'typeId', used = state.crmTasks.filter(t => t[field] === id), others = list.filter(x => x.id !== id);
+  const moved = [], field = kind === 'priority' ? 'priorityId' : 'typeId', used = state.crmTasks.filter(t => t[field] === id), others = list.filter(x => x.id !== id);
   if(used.length){
     const ok = await showConfirm(`Delete “${o.name}”?`, `${used.length} task${used.length !== 1 ? 's use' : ' uses'} this ${kind}. Move ${used.length !== 1 ? 'them' : 'it'} to:`,
       `<select id="optMoveTo">${others.map(x => `<option value="${escAttr(x.id)}">${escHtml(x.name)}</option>`).join('')}</select>`);
     if(!ok) return;
     const dest = others.some(x => x.id === _confirmExtraValue) ? _confirmExtraValue : others[0].id;
-    used.forEach(t => { t[field] = dest; });
+    used.forEach(t => { moved.push({ coll: 'crmTasks', id: t.id, before: { [field]: t[field] } }); t[field] = dest; });
   }
-  list.splice(list.findIndex(x => x.id === id), 1); renumberStages(list);
+  const at = list.findIndex(x => x.id === id); list.splice(at, 1);
+  undoDeleted(`Task ${kind} deleted: ` + String(o.name).slice(0, 40), ['taskOptions', kind], at, o, { type: 'moved', moved, renumber: true });
+  renumberStages(list);
   render(); saveState();
 }
 
@@ -8262,6 +8375,7 @@ document.getElementById('setMenuSelect').addEventListener('change', (e) => setti
 
 /* ---------- master render ---------- */
 function render(){
+  undoBadge();
   renderDashboard();
   renderBusinessPlan();
   renderLeads();
@@ -8388,7 +8502,11 @@ document.addEventListener('click', (e) => {
     if(tab === 'pipeline'){ row.id = allocRecordId(); expandedProjects.add(row.id); }
     state[tab].push(row); render(); saveState();
   }
-  else if(action === 'delete-row'){ const tab = btn.dataset.tab; state[tab].splice(Number(btn.dataset.idx),1); render(); saveState(); }
+  else if(action === 'delete-row'){
+    const tab = btn.dataset.tab, at = Number(btn.dataset.idx), gone = state[tab].splice(at, 1)[0];
+    if(gone !== undefined){ const nm = gone.name || gone.label || gone.description || gone.title || gone.goal || gone.item || ''; undoDeleted(`${({ pipeline: 'Sales deal', goals: 'Goal', transactions: 'Transaction', pricingTiers: 'Pricing tier' })[tab] || 'Row'} deleted${nm ? ': ' + String(nm).slice(0, 40) : ''}`, [tab], at, gone); }
+    render(); saveState();
+  }
   else if(action === 'toggle-project'){
     const id = Number(btn.dataset.id);
     if(expandedProjects.has(id)) expandedProjects.delete(id); else expandedProjects.add(id);
@@ -8407,10 +8525,16 @@ document.addEventListener('click', (e) => {
   }
   else if(action === 'del-stage'){
     const p = Number(btn.dataset.proj), s = Number(btn.dataset.sidx);
-    state.pipeline[p].stages.splice(s,1); render(); saveState();
+    const rec = state.pipeline[p], gone = rec.stages.splice(s, 1)[0];
+    if(gone) undoDeleted('Stage line deleted: ' + String(gone.label || 'Stage').slice(0, 40), ['pipeline', { id: rec.id }, 'stages'], s, gone);
+    render(); saveState();
   }
   else if(action === 'add-lead'){ const l = newRowFor('leads'); l.id = allocRecordId(); expandedLeads.add(l.id); state.leads.push(l); render(); saveState(); }
-  else if(action === 'delete-lead'){ state.leads.splice(Number(btn.dataset.idx),1); render(); saveState(); }
+  else if(action === 'delete-lead'){
+    const at = Number(btn.dataset.idx), gone = state.leads.splice(at, 1)[0];
+    if(gone) undoDeleted('Lead deleted: ' + String(gone.projectName || gone.contact || gone.company || recordCode(gone.id, 'lead')).slice(0, 40), ['leads'], at, gone);
+    render(); saveState();
+  }
   else if(action === 'toggle-lead'){ const id = Number(btn.dataset.id); if(expandedLeads.has(id)) expandedLeads.delete(id); else expandedLeads.add(id); renderLeads(); }
   else if(action === 'add-tier'){ state.tiers.push({ id: newTierId(), name: 'Tier ' + (state.tiers.length+1), label: '', image: '', min: '', max: '', placeholder: false }); render(); saveState(); }
   else if(action === 'delete-tier'){ deleteTier(Number(btn.dataset.idx)); }
@@ -8434,13 +8558,21 @@ document.addEventListener('click', (e) => {
   }
   else if(action === 'del-comm'){
     const l = commOwner(btn.dataset.pl, Number(btn.dataset.id));
-    if(l && l.comms){ l.comms.splice(Number(btn.dataset.cidx), 1); render(); saveState(); }
+    if(l && l.comms){
+      const at = Number(btn.dataset.cidx), gone = l.comms.splice(at, 1)[0];
+      if(gone) undoDeleted('Timeline note deleted: ' + String(gone.note || '(empty)').replace(/\s+/g, ' ').slice(0, 40), [btn.dataset.pl === 'sales' ? 'pipeline' : (btn.dataset.pl === 'project' ? 'projects' : 'leads'), { id: l.id }, 'comms'], at, gone);
+      render(); saveState();
+    }
   }
   else if(action === 'promote-project'){ promoteToProject(Number(btn.dataset.id)); }
   else if(action === 'toggle-projrec'){ const id = Number(btn.dataset.id); if(expandedProjectsP.has(id)) expandedProjectsP.delete(id); else expandedProjectsP.add(id); renderProjects(); }
-  else if(action === 'delete-projrec'){ state.projects.splice(Number(btn.dataset.idx),1); render(); saveState(); }
+  else if(action === 'delete-projrec'){
+    const at = Number(btn.dataset.idx), gone = state.projects.splice(at, 1)[0];
+    if(gone) undoDeleted('Project deleted: ' + String(gone.name || recordCode(gone.id, 'project')).slice(0, 40), ['projects'], at, gone);
+    render(); saveState();
+  }
   else if(action === 'add-payline'){ const p=Number(btn.dataset.idx); state.projects[p].paymentLines = state.projects[p].paymentLines||[]; state.projects[p].paymentLines.push({ desc:'Payment', dueDate:'', amount:0, invoicedDate:'', paidDate:'' }); render(); saveState(); }
-  else if(action === 'del-payline'){ const p=Number(btn.dataset.idx), pl=Number(btn.dataset.pli); state.projects[p].paymentLines.splice(pl,1); render(); saveState(); }
+  else if(action === 'del-payline'){ const p=Number(btn.dataset.idx), pl=Number(btn.dataset.pli); const rec = state.projects[p], gone = rec.paymentLines.splice(pl, 1)[0]; if(gone) undoDeleted('Payment line deleted: ' + String(gone.desc || 'Payment').slice(0, 40), ['projects', { id: rec.id }, 'paymentLines'], pl, gone); render(); saveState(); }
   else if(action === 'toggle-done'){
     const i = Number(btn.dataset.idx); const r = state.actions[i];
     if(archiving.has(r)) return;
