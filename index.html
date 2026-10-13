@@ -1535,7 +1535,7 @@
     }
     .table-scroll > table:has(> thead > tr > th:first-child:empty) > thead > tr > :nth-child(2) { background-color: #faf8f4; z-index: 3; }
     .leads-table tr.lead-row > td:nth-child(-n+2) { background-image: linear-gradient(var(--lead-tint), var(--lead-tint)); }
-    .table-scroll.scroll-more { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); }
+    .table-scroll.scroll-more, .pw-nav.scroll-more, .lp-chips.scroll-more { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); }
   }
   /* ---------------- Q6: long page intros are shortened to two lines on phones, with an "About this page" button to read the rest ---------------- */
   .desc-more { display: none; }
@@ -11206,6 +11206,18 @@ new MutationObserver((recs) => {
 document.addEventListener('focusout', (e) => { if(e.target && e.target.tagName === 'INPUT') setTimeout(() => moneyEnhance(e.target), 0); }, true);
 moneyEnhanceAll();
 
+/* a scrolling tab strip keeps the current tab in view: when the highlighted project section changes, the strip slides to show it */
+function revealActiveTab(nav){
+  const a = nav && nav.querySelector('button.active'); if(!a || nav.scrollWidth <= nav.clientWidth + 2) return;
+  const x = a.getBoundingClientRect().left - nav.getBoundingClientRect().left + nav.scrollLeft - (nav.clientWidth - a.offsetWidth) / 2;
+  nav.scrollTo({ left: Math.max(0, x), behavior: 'smooth' });
+}
+new MutationObserver((recs) => {
+  for(const r of recs){
+    if(r.type === 'attributes'){ const t = r.target; if(t.matches && t.matches('.pw-nav button.active')) revealActiveTab(t.parentElement); }
+    else r.addedNodes.forEach(n => { if(n.nodeType === 1){ const nav = n.matches('.pw-nav') ? n : (n.querySelector && n.querySelector('.pw-nav')); if(nav) revealActiveTab(nav); } });
+  }
+}).observe(document.getElementById('projectWorkspace'), { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
 /* the sidebar label tells the truth about which copy this is (reads ENV_LABEL from the settings block at the top of this script) */
 (function(){ const el = document.getElementById('envSub'); if(el) el.textContent = ENV_LABEL === 'TEST' ? 'Test system' : 'Live system'; })();
 /* phones: shorten each long page intro to two lines (full text stays in the page for screen readers) with an "About this page" button */
@@ -11229,9 +11241,9 @@ function updateScrollCue(el){
 let scrollCueQueued = false;
 function updateScrollCues(){
   if(scrollCueQueued) return; scrollCueQueued = true;
-  requestAnimationFrame(() => { scrollCueQueued = false; document.querySelectorAll('.table-scroll, .pw-nav').forEach(updateScrollCue); });
+  requestAnimationFrame(() => { scrollCueQueued = false; document.querySelectorAll('.table-scroll, .pw-nav, .lp-chips').forEach(updateScrollCue); });
 }
-document.addEventListener('scroll', (e) => { const t = e.target; if(t && t.classList && (t.classList.contains('table-scroll') || t.classList.contains('pw-nav'))) updateScrollCue(t); }, true);
+document.addEventListener('scroll', (e) => { const t = e.target; if(t && t.classList && (t.classList.contains('table-scroll') || t.classList.contains('pw-nav') || t.classList.contains('lp-chips'))) updateScrollCue(t); }, true);
 window.addEventListener('resize', updateScrollCues);
 new MutationObserver(updateScrollCues).observe(document.querySelector('.main'), { childList: true, subtree: true });
 PHONE_MQ.addEventListener('change', () => { rtApply(); updateScrollCues(); });
