@@ -70,11 +70,12 @@
   .brand h1 {
     font-family: var(--serif);
     font-weight: 600;
-    font-size: 24px;
+    font-size: 22px;
     margin: 0;
     letter-spacing: -0.2px;
     color: #fff;
     letter-spacing: 0.2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;   /* never wraps onto two lines */
   }
   .brand .sub {
     font-size: 10px;
@@ -1558,7 +1559,7 @@
 <nav class="sidebar" id="sidebar" aria-label="Main">
   <div class="brand">
     <h1>Business Tracker</h1>
-    <div class="sub">Live System</div>
+    <div class="sub" id="envSub">Live system</div>
   </div>
 
   <div class="nav-group g-command">
@@ -11136,6 +11137,8 @@ document.getElementById('menuBtn').addEventListener('click', () => {
 });
 document.getElementById('sidebarBackdrop').addEventListener('click', closeMobileSidebar);
 
+/* the sidebar label tells the truth about which copy this is (reads ENV_LABEL from the settings block at the top of this script) */
+(function(){ const el = document.getElementById('envSub'); if(el) el.textContent = ENV_LABEL === 'TEST' ? 'Test system' : 'Live system'; })();
 /* phones: shorten each long page intro to two lines (full text stays in the page for screen readers) with an "About this page" button */
 function initDescToggles(){
   document.querySelectorAll('.page-head .desc').forEach((d, i) => {
