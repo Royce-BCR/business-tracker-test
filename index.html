@@ -1168,6 +1168,13 @@
   .qb-t2-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .qb-t2-3 small { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); } .qb-t2-3 b { font-size: 13.5px; font-variant-numeric: tabular-nums; } .qb-t2-3 em { display: block; font-size: 11px; font-style: normal; }
   .qb-t2-3 .q-over { color: #b3453f; } .qb-t2-3 .q-under { color: #2e7a45; }
   .tbl-flip { border: 1px solid var(--stone-deep); background: #fff; border-radius: 7px; padding: 2px 8px; font: inherit; font-size: 12px; cursor: pointer; color: var(--slate); margin-right: 6px; } .tbl-flip:hover { background: #efece6; }
+  .stq-list { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; max-height: 46vh; overflow: auto; }
+  .stq-row { display: grid; grid-template-columns: minmax(0,1.6fr) 70px 58px minmax(0,1.3fr); gap: 10px; align-items: center; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; font-size: 12.5px; width: 100%; }
+  .stq-row.off { opacity: .55; } .stq-row.off label { cursor: default; } .stq-row input { width: auto; margin: 0; }
+  .stq-n small { display: block; color: var(--muted); font-size: 11px; } .stq-t { font-variant-numeric: tabular-nums; text-align: right; } .stq-w { color: var(--muted); font-size: 11.5px; }
+  .stq-sum { font-size: 12.5px; margin: 6px 0 12px; font-weight: 600; } .stq-diff { margin: 0 0 10px 18px; padding: 0; font-size: 13px; } .stq-diff li { margin: 3px 0; } .stq-diff li.removed { color: #b3453f; } .stq-diff li.added { color: #2e7a45; }
+  @media (max-width: 600px) { .stq-row { grid-template-columns: 1fr auto auto; } .stq-w { grid-column: 1 / -1; } }
+  .qb-stageflag { background: #fbf1cf; border: 1px solid #e5cf86; border-radius: 10px; padding: 8px 12px; margin-top: 10px; font-size: 13px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .qb-vi { font-size: 9px; background: #fbf1cf; color: #8a5a1c; border-radius: 4px; padding: 0 4px; margin-left: 4px; text-transform: none; letter-spacing: 0; }
   .qb-star { color: #b3453f; font-weight: 700; margin-left: 2px; cursor: help; }
   .qb-foot td { background: #faf8f4 !important; border-top: 1px solid var(--line); font-size: 12px; } .qb-footl { font-weight: 600; } .qb-flags { white-space: normal; max-width: 140px; }
@@ -1847,6 +1854,13 @@ create policy "app update" on tracker_data for update using (true) with check (t
 </aside>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button class="toast-btn" id="toastUndo" type="button">Undo</button></div>
 <div class="gantt-tip" id="ganttTip" hidden></div>
+
+<div class="modal-overlay" id="stqOverlay" hidden>
+  <div class="modal undo-modal" role="dialog" aria-label="Quote from stages">
+    <div class="terms-top"><span class="terms-tag" id="stqTitle">Create quote from stages</span><button class="btn secondary" type="button" data-action="stq-close">Close</button></div>
+    <div id="stqBody"></div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="undoOverlay" hidden>
   <div class="modal undo-modal" role="dialog" aria-label="Undo history">
@@ -3133,6 +3147,7 @@ function salesDetailHtml(r, i){
         <div class="btn-row" style="margin-top:10px;">
           <button class="btn secondary" data-action="add-stage" data-proj="${i}">+ Add stage</button>
           <button class="btn secondary" data-action="add-visit" data-proj="${i}">+ Add site visit</button>
+          <button class="btn secondary" data-action="stq-open" data-pl="sales" data-id="${r.id}" title="Bring chosen stage lines into a quote">Create quote from stages</button>
         </div>
         <div class="stage-label-row" style="margin-top:8px;">Forecast weighting</div>
         <div class="qual-grid" style="grid-template-columns:1fr 1fr;max-width:520px;">
@@ -5078,7 +5093,7 @@ function qNewLine(q, o){
   const st = state.settings, units = state.quoteUnits || [];
   const u = units.find(x => x.id === 'un_each') || units[0];
   const l = Object.assign({ id: qRand('ln_'), description: '', categoryId: '', unitId: u ? u.id : '', unitName: u ? u.name : '', qty: 1, wastagePct: 0, wastageManual: false, prices: [], selectedSupplierId: '',
-    costOverride: '', markupPct: st.materialsMarkupPct === '' ? 0 : st.materialsMarkupPct, vatRate: st.vatRate, customerGroup: '', showOnQuote: true, deliveryDropId: '', optGroup: '' }, o || {});
+    costOverride: '', markupPct: st.materialsMarkupPct === '' ? 0 : st.materialsMarkupPct, vatRate: st.vatRate, customerGroup: '', showOnQuote: true, deliveryDropId: '', optGroup: '', stageId: '', deliverStageId: '', deliverDate: '' }, o || {});
   return l;
 }
 function qNormLine(l, supIds){
@@ -5092,7 +5107,8 @@ function qNormLine(l, supIds){
     selectedSupplierId: Number(l.selectedSupplierId) > 0 ? Number(l.selectedSupplierId) : '',
     costOverride: (l.costOverride === '' || l.costOverride == null || isNaN(Number(l.costOverride)) || Number(l.costOverride) < 0) ? '' : Number(l.costOverride),
     markupPct: qNumOr(l.markupPct, 0), vatRate: qNumOr(l.vatRate, state.settings.vatRate), customerGroup: str(l.customerGroup), showOnQuote: l.showOnQuote !== false,
-    deliveryDropId: str(l.deliveryDropId), optGroup: str(l.optGroup).trim()   // optional line group (e.g. Tiled roof): left out of the total until ticked
+    deliveryDropId: str(l.deliveryDropId), optGroup: str(l.optGroup).trim(),
+    stageId: str(l.stageId), deliverStageId: str(l.deliverStageId), deliverDate: /^\d{4}-\d{2}-\d{2}$/.test(l.deliverDate || '') ? l.deliverDate : ''   // the stage line it is for, and when it is delivered (stage start unless an earlier stage or a typed date)   // optional line group (e.g. Tiled roof): left out of the total until ticked
   };
   if(!out.unitId){ const u = units.find(x => x.name.toLowerCase() === out.unitName.toLowerCase()); if(u) out.unitId = u.id; }
   const u = units.find(x => x.id === out.unitId); if(u) out.unitName = u.name;
@@ -5119,6 +5135,8 @@ function ensureQuoteDocModel(o, seed){
       q.linkedIds = migrateLinkedIds(q); delete q.linkedId;
       q.timeline = (Array.isArray(q.timeline) ? q.timeline : []).filter(t => t && typeof t === 'object').map(t => ({ date: iso(t.date) || fmt(new Date()), note: str(t.note), created: Number(t.created) || 0, kind: str(t.kind) }));
       q.optIncluded = [...new Set((Array.isArray(q.optIncluded) ? q.optIncluded : []).map(v => str(v).trim()).filter(Boolean))];   // optional groups ticked into the total
+      { const sl = q.stageLink;   // set when the quote was built from the deal's stage lines: which ones, and how they looked then (to spot later changes)
+        q.stageLink = (sl && typeof sl === 'object' && Array.isArray(sl.sel) && sl.snap && typeof sl.snap === 'object') ? { sel: sl.sel.map(str), snap: sl.snap, date: iso(sl.date) } : null; }
       q.recoverUnpaid = !!q.recoverUnpaid;
       q.unpaidOverride = (q.unpaidOverride === '' || q.unpaidOverride == null || isNaN(Number(q.unpaidOverride)) || Number(q.unpaidOverride) < 0) ? '' : Number(q.unpaidOverride);
       q.approval = (q.approval && typeof q.approval === 'object' && Array.isArray(q.approval.lanes) && q.approval.parts) ? q.approval : null;
@@ -5134,13 +5152,13 @@ function ensureQuoteDocModel(o, seed){
         dueOverride: iso(r.dueOverride) })) : [qNewPayment()];   // dueOverride: a typed due date that automatic recalculation never overwrites
       q.drops = (Array.isArray(q.drops) ? q.drops : []).filter(d => d && typeof d === 'object').map(d => ({
         id: str(d.id) || qRand('dr_'), label: str(d.label), supplierId: Number(d.supplierId) > 0 ? Number(d.supplierId) : '', date: iso(d.date), method: d.method === 'collect' ? 'collect' : 'delivered',
-        charge: qNumOr(d.charge, 0), chargeManual: !!d.chargeManual, paymentDueDate: iso(d.paymentDueDate), dueManual: !!d.dueManual }));
+        charge: qNumOr(d.charge, 0), chargeManual: !!d.chargeManual, paymentDueDate: iso(d.paymentDueDate), dueManual: !!d.dueManual, stageAuto: !!d.stageAuto }));
       q.lines = (Array.isArray(q.lines) ? q.lines : []).filter(l => l && typeof l === 'object').map(l => qNormLine(l));
       q.lines.forEach(l => { if(l.deliveryDropId && !q.drops.some(d => d.id === l.deliveryDropId)) l.deliveryDropId = ''; });
       q.labour = (Array.isArray(q.labour) ? q.labour : []).filter(r => r && typeof r === 'object').map(r => ({
         id: str(r.id) || qRand('lb_'), description: str(r.description), basis: LAB_BASES.some(b => b[0] === r.basis) ? r.basis : 'day', qty: qNumOr(r.qty, 0),
         rate: (r.rate === '' || r.rate == null || isNaN(Number(r.rate)) || Number(r.rate) < 0) ? '' : Number(r.rate), customerGroup: str(r.customerGroup), showOnQuote: r.showOnQuote !== false,
-        helperQty: (r.helperQty === '' || r.helperQty == null || isNaN(Number(r.helperQty)) || Number(r.helperQty) < 0) ? '' : Number(r.helperQty), optGroup: str(r.optGroup).trim() }));
+        helperQty: (r.helperQty === '' || r.helperQty == null || isNaN(Number(r.helperQty)) || Number(r.helperQty) < 0) ? '' : Number(r.helperQty), optGroup: str(r.optGroup).trim(), stageId: str(r.stageId) }));
       const sup = new Set((o.suppliers || []).map(s => s.id));
       const cols = new Set((Array.isArray(q.supplierCols) ? q.supplierCols : []).map(Number).filter(n => sup.has(n)));
       q.lines.forEach(l => l.prices.forEach(p => { if(sup.has(p.supplierId)) cols.add(p.supplierId); }));
@@ -5386,7 +5404,7 @@ function qbFootHtml(q, c){
   const vatOn = qVatOn(), tot = qSupTotals(q, c), cols = q.supplierCols.length, live = q.lines.filter(l => !qExcluded(q, l));
   const est = live.filter(l => !l.prices.length && l.costOverride !== '').reduce((a, l) => a + c.lines[l.id].lineCost, 0), noPrice = live.filter(l => !l.prices.length && l.costOverride === '').length;
   if(!cols && !est) return '';
-  const lead = 6, tail = 10 + (vatOn ? 2 : 0), tr = (label, cells, estCell, help) => `<tr class="qb-foot"><td colspan="${lead}" class="qb-footl"${help ? ` title="${escAttr(help)}"` : ''}>${label}</td>${cells.join('')}<td class="qb-calc">${estCell || ''}</td><td colspan="${tail}"></td></tr>`;
+  const lead = 6, tail = 10 + (vatOn ? 2 : 0) + (qStageLines(q).length ? 2 : 0), tr = (label, cells, estCell, help) => `<tr class="qb-foot"><td colspan="${lead}" class="qb-footl"${help ? ` title="${escAttr(help)}"` : ''}>${label}</td>${cells.join('')}<td class="qb-calc">${estCell || ''}</td><td colspan="${tail}"></td></tr>`;
   const rows = [];
   rows.push(tr('Total if bought here <span class="qb-dim">(every line priced, ex VAT)</span>', tot.map(t => `<td class="qb-calc"><b>${qm(t.all)}</b>${t.missing ? `<div class="qb-dim" title="${t.missing} line${t.missing !== 1 ? 's have' : ' has'} no price from this supplier">${t.priced}/${t.priced + t.missing} lines</div>` : ''}</td>`), est ? `<b>${qm(est)}</b>` : '', 'What each supplier column adds up to if every line it has a price for were bought there. Prices stated inc VAT are netted to ex VAT.'));
   rows.push(tr('Selected from here <span class="qb-dim">(lines you are buying)</span>', tot.map(t => `<td class="qb-calc">${t.buy > 0 ? qm(t.buy) : '<span class="qb-dim">—</span>'}</td>`), '', 'The cost of the lines that are actually being bought from this supplier.'));
@@ -5408,9 +5426,17 @@ function qbMaterialsHtml(q){
   const cols = q.supplierCols, dropOpts = [['', '—']].concat(q.drops.map((d, i) => [d.id, d.label || ('Drop ' + (i + 1))]));
   const supOpts = () => [['', 'Cheapest']].concat(cols.map(id => [id, qbSupName(id)]));   // a supplier with no price on a line falls back to the cheapest
   const avail = state.suppliers.filter(s => s.status === 'Active' && !cols.includes(s.id)).map(s => [s.id, s.name]);
-  const totalCols = 6 + cols.length + 1 + 10 + (vatOn ? 2 : 0);
+  const stLines = qStageLines(q).map(slEnsure), stageCols = stLines.length > 0;   // stage columns only when the quote is linked to a deal with stage lines
+  const totalCols = 6 + cols.length + 1 + 10 + (vatOn ? 2 : 0) + (stageCols ? 2 : 0);
   let h = `<tr><th class="qb-sticky-l">Description</th><th>Category</th><th>Unit</th><th>Qty</th><th>Waste %</th><th>To order</th>${cols.map(id => { const sp = supFind(id); return `<th class="qb-supcol" title="${escAttr(qbSupName(id))}${sp && sp.pricesIncVat ? ' (prices entered inc VAT, netted to ex VAT)' : ''}">${escHtml(sp ? supShort(sp) : '?')}${sp && sp.pricesIncVat ? '<span class="qb-vi">inc VAT</span>' : ''}<button class="qb-x" data-qba="del-supcol" data-sid="${id}" title="Remove ${escAttr(qbSupName(id))}" aria-label="Remove supplier column">×</button></th>`; }).join('')}
-    <th title="Lines with no supplier price but a typed cost override">No price / estimate</th><th>Supplier</th><th class="qb-sticky-r">Materials cost</th><th>Cost total</th><th>Markup %</th><th>Price ex VAT</th>${vatOn ? '<th>VAT</th><th>Price inc VAT</th>' : ''}<th>Customer group</th><th>Optional group</th><th>Show</th><th>Drop</th><th></th></tr>`;
+    <th title="Lines with no supplier price but a typed cost override">No price / estimate</th><th>Supplier</th><th class="qb-sticky-r">Materials cost</th><th>Cost total</th><th>Markup %</th><th>Price ex VAT</th>${vatOn ? '<th>VAT</th><th>Price inc VAT</th>' : ''}<th>Customer group</th><th>Optional group</th><th>Show</th>${stageCols ? '<th title="The stage line these materials are for">Stage</th><th title="When the materials are delivered: the stage start, an earlier stage, or a typed date">Delivery date</th>' : ''}<th>Drop</th><th></th></tr>`;
+  const stOpts = [['', '—']].concat(stLines.map(s => [s.id, s.label || 'Stage']));
+  const delCell = l => {
+    if(!l.stageId) return '<span class="qb-dim">—</span>';
+    const st = stLines.find(x => x.id === l.stageId), eff = qLineDeliveryDate(q, l), mode = l.deliverDate ? 'manual' : (l.deliverStageId ? 'st:' + l.deliverStageId : 'stage');
+    const earlier = stLines.filter(x => x.id !== l.stageId && x.start && (!st || !st.start || x.start <= st.start));
+    return qbSel('line', l.id, 'deliverSel', `<option value="stage"${mode === 'stage' ? ' selected' : ''}>At stage start${st && st.start ? ' (' + escHtml(st.start) + ')' : ' (no date)'}</option>` + earlier.map(x => `<option value="st:${escAttr(x.id)}"${mode === 'st:' + x.id ? ' selected' : ''}>Earlier: ${escHtml(x.label || 'Stage')} (${escHtml(x.start)})</option>`).join('') + `<option value="manual"${mode === 'manual' ? ' selected' : ''}>Set a date…</option>`, { aria: 'Delivery' }) + (mode === 'manual' ? `<input type="date" data-qb="line" data-id="${l.id}" data-f="deliverDate" value="${escAttr(l.deliverDate)}" aria-label="Delivery date">` : (eff ? `<div class="qb-dim" style="font-size:11px;">${escHtml(eff)}</div>` : ''));
+  };
   const row = (l, i) => `<tr data-line="${l.id}" data-drag="qline" data-ix="${i}">
     <td class="qb-sticky-l dg">${DRAG_H}<div class="qb-desc">${qbIn('line', l.id, 'description', l.description, { ph: 'Description', aria: 'Description' })}</div></td>
     <td>${qbSel('line', l.id, 'categoryId', qbOpts(cats, l.categoryId, '—'), { aria: 'Category' })}</td>
@@ -5426,6 +5452,7 @@ function qbMaterialsHtml(q){
     <td>${qbIn('line', l.id, 'customerGroup', l.customerGroup, { aria: 'Customer group' })}</td>
     <td>${qbIn('line', l.id, 'optGroup', l.optGroup, { aria: 'Optional group', ph: 'none' }).replace('<input', '<input list="qbOptList"')}</td>
     <td class="qb-c"><input type="checkbox" data-qb="line" data-id="${l.id}" data-f="showOnQuote"${l.showOnQuote ? ' checked' : ''} aria-label="Show on quote"></td>
+    ${stageCols ? `<td>${qbSel('line', l.id, 'stageId', qbOpts(stOpts, l.stageId), { aria: 'Stage line' })}</td><td>${delCell(l)}</td>` : ''}
     <td>${qbSel('line', l.id, 'deliveryDropId', qbOpts(dropOpts, l.deliveryDropId), { aria: 'Delivery drop' })}</td>
     <td class="qb-rowacts"><div class="qb-ra"><button class="icon-btn" data-qba="line-up" data-id="${l.id}" title="Move up"${i === 0 ? ' disabled' : ''}>${UP_SVG}</button><button class="icon-btn" data-qba="line-down" data-id="${l.id}" title="Move down"${i === q.lines.length - 1 ? ' disabled' : ''}>${DOWN_SVG}</button>
       <button class="btn secondary qb-sm" data-qba="line-edit" data-id="${l.id}">Edit</button><button class="btn secondary qb-sm" data-qba="line-dup" data-id="${l.id}">Duplicate</button><button class="icon-btn" data-qba="line-del" data-id="${l.id}" title="Delete line" aria-label="Delete line">${X_SVG}</button></div></td></tr>`;
@@ -5626,13 +5653,20 @@ function qbChange(el){
     else if(f === 'showOnQuote') l.showOnQuote = !!v;
     else if(f === 'optGroup'){ l.optGroup = String(v).trim(); rebuild = true; }
     else if(f === 'deliveryDropId') l.deliveryDropId = v;
-    else if(f === 'selectedSupplierId') l.selectedSupplierId = v === '' ? '' : Number(v);
+    else if(f === 'stageId'){ l.stageId = v; if(!v){ l.deliverStageId = ''; l.deliverDate = ''; } qSyncStageDrops(q); rebuild = true; }
+    else if(f === 'deliverSel'){
+      if(v === 'stage'){ l.deliverStageId = ''; l.deliverDate = ''; } else if(v.startsWith('st:')){ l.deliverStageId = v.slice(3); l.deliverDate = ''; } else { l.deliverDate = qLineDeliveryDate(q, l) || fmt(new Date()); l.deliverStageId = ''; }
+      qSyncStageDrops(q); rebuild = true;
+    }
+    else if(f === 'deliverDate'){ l.deliverDate = isoOk(v); qSyncStageDrops(q); rebuild = true; }
+    else if(f === 'selectedSupplierId'){ l.selectedSupplierId = v === '' ? '' : Number(v); if(l.stageId){ qSyncStageDrops(q); rebuild = true; } }
   } else if(k === 'price'){
     const l = q.lines.find(x => x.id === id); if(!l) return; const sid = Number(el.dataset.sid), at = l.prices.findIndex(p => p.supplierId === sid);
     if(f === 'price'){
       if(v === '' || isNaN(Number(v)) || Number(v) < 0){ if(at >= 0) l.prices.splice(at, 1); if(l.selectedSupplierId === sid) l.selectedSupplierId = ''; }
       else if(at >= 0){ if(l.prices[at].price !== Number(v)){ l.prices[at].price = Number(v); l.prices[at].date = fmt(new Date()); } }
       else l.prices.push({ supplierId: sid, price: Number(v), date: fmt(new Date()), note: '' });
+      if(l.stageId){ qSyncStageDrops(q); rebuild = true; }
     } else if(at >= 0){ if(f === 'note') l.prices[at].note = String(v).trim(); else if(f === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(v)) l.prices[at].date = v; }
   } else if(k === 'lab'){
     const r = q.labour.find(x => x.id === id); if(!r) return;
@@ -5780,7 +5814,7 @@ function qlBodyHtml(q, l){
       ${f('VAT rate %', qbIn('line', l.id, 'vatRate', l.vatRate, { num: true }), vatOn ? '' : 'VAT is switched off in Settings, so this is not shown on the quote yet.')}
       ${f('Customer group', qbIn('line', l.id, 'customerGroup', l.customerGroup))}
       ${f('Optional group', qbIn('line', l.id, 'optGroup', l.optGroup, { ph: 'None: always in the total' }), 'Lines sharing an optional group (for example “Tiled roof”) stay out of the total until the group is ticked on the quote.')}
-      ${f('Delivery drop', qbSel('line', l.id, 'deliveryDropId', qbOpts(dropOpts, l.deliveryDropId)))}
+      ${f('Delivery drop', qbSel('line', l.id, 'deliveryDropId', qbOpts(dropOpts, l.deliveryDropId)), l.stageId ? 'This line is tied to a stage, so its drop is managed from the Stage and Delivery date columns on the quote.' : '')}
       <label class="q-check"><input type="checkbox" data-qb="line" data-id="${l.id}" data-f="showOnQuote"${l.showOnQuote ? ' checked' : ''}> Show on quote</label>
     </section>
     <section class="lp-sec" id="lp-sec-prices" data-sec="prices"><h3>Supplier prices</h3>
@@ -5856,11 +5890,156 @@ function dealHasLiveQuote(root){ return qLive().some(q => (q.linkedIds || []).so
 
 /* ---- unpaid time ---- */
 function qUnpaid(q){
-  let hours = 0; qStageLines(q).filter(s => !slPaid(s)).forEach(s => { const lg = slLogged(s); hours += lg > 0 ? lg : slPlannedHours(s); });
+  const sel = q.stageLink ? q.stageLink.sel : null;   // a quote built from stages only recovers the unpaid lines that were ticked
+  let hours = 0; qStageLines(q).filter(s => !slPaid(s) && (!sel || sel.includes(s.id))).forEach(s => { const lg = slLogged(s); hours += lg > 0 ? lg : slPlannedHours(s); });
   const rate = Number(state.settings.labourRateHour), rateMissing = !(rate > 0), auto = rateMissing ? 0 : r2(hours * rate);
   const overridden = q.unpaidOverride !== '' && q.unpaidOverride != null && !isNaN(Number(q.unpaidOverride));
   return { hours, rate: rateMissing ? 0 : rate, rateMissing, auto, overridden, amount: overridden ? Number(q.unpaidOverride) : auto };
 }
+
+/* ---------- Quote from stages (Quote Centre step 6) ----------
+   The deal's stage lines hold timing and logged hours; the quote holds the money. "Create quote from stages" turns the ticked lines into labour rows
+   (paid time, grouped under the stage name) and unpaid-time recovery (unpaid lines). q.stageLink = { sel: [stage line ids], snap: { id: { label, start, end, paid, planned } }, date }
+   remembers what the lines looked like, so a later change shows as a flag (never silently changing the quote) with a Review & refresh button. */
+function qStageHours(s){ const plan = slPlannedHours(s); return plan > 0 ? plan : slLogged(s); }
+function qStageSnapEntry(s){ return { label: String(s.label || ''), start: s.start || '', end: s.end || '', paid: slPaid(s), planned: Math.round(slPlannedHours(s) * 100) / 100 }; }
+function qStageSnapAll(lines){ const m = {}; lines.forEach(s => { m[slEnsure(s).id] = qStageSnapEntry(s); }); return m; }
+function qStageLabourRow(s, rate){
+  const plan = slPlannedHours(s), days = plan > 0 && s.plannedUnit === 'days', hours = qStageHours(s), st = state.settings;
+  const basis = days ? 'day' : 'hour', qty = days ? Number(s.plannedValue) : Math.round(hours * 100) / 100;
+  const def = basis === 'day' ? st.labourRateDay : st.labourRateHour;
+  return { description: String(s.label || 'Stage'), basis, qty, rate: (def === '' || def == null) ? '' : def, customerGroup: String(s.label || 'Stage').trim(), showOnQuote: true, stageId: s.id };
+}
+function qStageDiff(q){
+  const sl = q.stageLink; if(!sl) return []; const cur = qStageLines(q).map(slEnsure), out = [];
+  const byId = {}; cur.forEach(s => { byId[s.id] = s; });
+  Object.keys(sl.snap).forEach(id => {
+    const was = sl.snap[id], s = byId[id], name = was.label || 'Stage line';
+    if(!s){ out.push({ id, kind: 'removed', text: `“${name}” has been removed from the stage lines` }); return; }
+    const now = qStageSnapEntry(s), bits = [];
+    if(now.label !== was.label) bits.push(`renamed to “${now.label}”`);
+    if(now.start !== was.start || now.end !== was.end) bits.push(`dates ${was.start || '—'} → ${was.end || '—'} became ${now.start || '—'} → ${now.end || '—'}`);
+    if(now.planned !== was.planned) bits.push(`planned time ${hrs(was.planned)} → ${hrs(now.planned)}`);
+    if(now.paid !== was.paid) bits.push(`now ${now.paid ? 'Paid' : 'Unpaid'} (was ${was.paid ? 'Paid' : 'Unpaid'})`);
+    if(bits.length) out.push({ id, kind: 'changed', text: `“${name}”: ${bits.join('; ')}` });
+  });
+  cur.forEach(s => { if(!sl.snap[s.id]) out.push({ id: s.id, kind: 'added', text: `New stage line “${s.label || 'Stage'}” (not in this quote)` }); });
+  return out;
+}
+function qLineDeliveryDate(q, l){
+  if(l.deliverDate) return l.deliverDate;
+  const sid = l.deliverStageId || l.stageId; if(!sid) return '';
+  const s = qStageLines(q).find(x => x.id === sid); return s ? (s.start || '') : '';
+}
+/* materials tied to a stage take its delivery date; lines with the same supplier and date share one drop (created here when there is none yet) */
+function qSyncStageDrops(q){
+  q.lines.forEach(l => {
+    if(!l.stageId) return;
+    const date = qLineDeliveryDate(q, l); if(!date) return;
+    const sel = qSelected(q, l), sup = sel ? sel.supplierId : '';
+    let d = q.drops.find(x => x.date === date && String(x.supplierId) === String(sup));
+    if(!d){ d = { id: qRand('dr_'), label: (sup ? qbSupName(sup) : 'Delivery') + ' ' + date, supplierId: sup, date, method: 'delivered', charge: 0, chargeManual: false, paymentDueDate: '', dueManual: false, stageAuto: true }; q.drops.push(d); }
+    l.deliveryDropId = d.id;
+  });
+  q.drops = q.drops.filter(d => !d.stageAuto || q.lines.some(l => l.deliveryDropId === d.id));   // an automatic drop nobody uses any more goes away
+}
+function qNewBlank(){
+  return { id: state.nextQuoteId++, jobNumber: state.nextJobNumber++, version: 0, refOverride: '', customer: '', address: '', project: '', date: fmt(new Date()), status: 'Draft', vatMode: 'settings', mode: 'new', notes: '',
+    linkedIds: [], recoverUnpaid: false, unpaidOverride: '', acceptedDate: '', asSold: null, payments: [qNewPayment()], supplierCols: [], lines: [], labour: [], drops: [], optIncluded: [], stageLink: null, timeline: [{ date: fmt(new Date()), note: 'Quote created', created: Date.now(), kind: 'created' }] };
+}
+const stqUi = { pl: '', rid: 0, sel: new Set(), target: 'new', mode: 'create', qid: 0 };
+function stqRec(){ return findRec(stqUi.pl, stqUi.rid); }
+function stqOpen(pl, rid){
+  const rec = findRec(pl, rid); if(!rec) return;
+  const lines = (rec.stages || []).map(slEnsure);
+  Object.assign(stqUi, { pl, rid, mode: 'create', qid: 0, sel: new Set(lines.filter(s => qStageHours(s) > 0).map(s => s.id)) });
+  const draft = qLatestForRoot(rid); stqUi.target = draft && draft.status === 'Draft' ? String(draft.id) : 'new';
+  document.getElementById('stqOverlay').hidden = false; stqRender();
+}
+function stqOpenReview(qid){
+  const q = qFind(qid); if(!q || !q.stageLink) return; Object.assign(stqUi, { mode: 'review', qid, pl: '', rid: 0 });
+  document.getElementById('stqOverlay').hidden = false; stqRender();
+}
+function stqClose(){ document.getElementById('stqOverlay').hidden = true; }
+function stqRender(){
+  const box = document.getElementById('stqBody'), e = escHtml;
+  if(stqUi.mode === 'review'){
+    const q = qFind(stqUi.qid); if(!q){ stqClose(); return; }
+    const diff = qStageDiff(q);
+    document.getElementById('stqTitle').textContent = 'Stage lines changed since this quote';
+    box.innerHTML = `<p class="q-help" style="margin:0 0 10px;">${e(qRef(q))} was built from the stage lines of ${e(qDeal(q) ? boardTitle(qDeal(q).pl, qDeal(q).rec) : 'its deal')} on ${e(q.stageLink.date || 'an earlier date')}. The quote has not been changed.</p>
+      <ul class="stq-diff">${diff.length ? diff.map(d => `<li class="${d.kind}">${e(d.text)}</li>`).join('') : '<li>No differences any more.</li>'}</ul>
+      <p class="q-help">${qLocked(q) ? '<b>This quote is Accepted and locked.</b> Make a New version to bring it up to date.' : 'Refreshing updates the labour hours of the stage rows, the delivery dates of materials tied to a stage (and their drops) and the unpaid-time recovery. Prices and anything you typed over stay as they are. New stage lines are not added automatically: use Create quote from stages to add them.'}</p>
+      <div class="modal-actions"><button class="btn secondary" type="button" data-action="stq-close">Cancel</button><button class="btn secondary" type="button" data-action="stq-keep">Keep the quote as it is</button><button class="btn" type="button" data-action="stq-apply"${qLocked(q) ? ' disabled' : ''}>Refresh the quote from the stage lines</button></div>`;
+    return;
+  }
+  const rec = stqRec(); if(!rec){ stqClose(); return; }
+  const lines = (rec.stages || []).map(slEnsure), tgt = qLatestForRoot(rec.id), draft = tgt && tgt.status === 'Draft' ? tgt : null;
+  document.getElementById('stqTitle').textContent = 'Create quote from stages';
+  const rows = lines.map(s => {
+    const h = qStageHours(s), paid = slPaid(s), has = h > 0, on = stqUi.sel.has(s.id);
+    return `<div class="stq-row${has ? '' : ' off'}"><label class="q-check stq-n"><input type="checkbox" data-stq="${e(s.id)}"${on ? ' checked' : ''}${has ? '' : ' disabled'}><span><b>${e(s.label || 'Stage')}</b><small>${s.start || s.end ? e((s.start || '—') + ' → ' + (s.end || '—')) : 'not dated'}</small></span></label>
+      <span class="stq-t">${has ? hrs(h) : 'no time yet'}</span><span class="sl-tag ${paid ? 'paid' : 'unpaid'}">${paid ? 'Paid' : 'Unpaid'}</span>
+      <span class="stq-w">${!has ? 'nothing to add' : paid ? 'becomes a labour row' : 'feeds unpaid-time recovery'}</span></div>`;
+  }).join('');
+  const sel = lines.filter(s => stqUi.sel.has(s.id)), paidH = sel.filter(s => slPaid(s)).reduce((a, s) => a + qStageHours(s), 0), unpaidH = sel.filter(s => !slPaid(s)).reduce((a, s) => a + qStageHours(s), 0);
+  box.innerHTML = `<p class="q-help" style="margin:0 0 8px;">${e(boardTitle(stqUi.pl, rec))} (${recordCode(rec.id, stqUi.pl)}). Tick the stage lines to bring into the quote. Paid time becomes labour rows grouped under the stage name; unpaid time feeds the “recover unpaid time” sum. Planned time is used, or logged time when nothing is planned.</p>
+    ${lines.length ? `<div class="stq-list">${rows}</div>` : '<div class="sup-empty">This deal has no stage lines yet. Add some on the Sales Pipeline first.</div>'}
+    <div class="stq-sum">${hrs(paidH)} paid (labour) · ${hrs(unpaidH)} unpaid</div>
+    <div class="lp-f"><label>Where to put them</label><select data-stq-target><option value="new"${stqUi.target === 'new' ? ' selected' : ''}>A new quote</option>${draft ? `<option value="${draft.id}"${stqUi.target === String(draft.id) ? ' selected' : ''}>Add to ${e(qRef(draft))} (Draft)</option>` : ''}</select></div>
+    <div class="modal-actions"><button class="btn secondary" type="button" data-action="stq-close">Cancel</button><button class="btn" type="button" data-action="stq-create"${sel.length ? '' : ' disabled'}>${stqUi.target === 'new' ? 'Create quote' : 'Add to quote'}</button></div>`;
+}
+function stqCreate(){
+  const rec = stqRec(); if(!rec) return;
+  const lines = (rec.stages || []).map(slEnsure), picked = lines.filter(s => stqUi.sel.has(s.id) && qStageHours(s) > 0); if(!picked.length) return;
+  let q = stqUi.target !== 'new' ? qFind(Number(stqUi.target)) : null; const isNew = !q;
+  if(isNew){
+    q = qNewBlank(); state.quotes.push(q);
+    const code = recordCode(rec.id, stqUi.pl); q.linkedIds = [code];
+    q.customer = String(rec.contact || rec.company || '').trim() || String(rec.name || '').trim(); q.address = String(rec.address || '').trim(); q.project = String(rec.projectName || rec.name || '').trim();
+  }
+  if(!q.stageLink) q.stageLink = { sel: [], snap: {}, date: fmt(new Date()) };
+  const ids = new Set(picked.map(s => s.id));
+  q.labour = q.labour.filter(r => !(r.stageId && ids.has(r.stageId)));   // re-adding a stage replaces its row
+  picked.filter(s => slPaid(s)).forEach(s => q.labour.push(Object.assign({ id: qRand('lb_'), helperQty: '', optGroup: '' }, qStageLabourRow(s))));
+  const unp = picked.filter(s => !slPaid(s)); if(unp.length) q.recoverUnpaid = true;
+  q.stageLink.sel = [...new Set(q.stageLink.sel.concat(picked.map(s => s.id)))];
+  q.stageLink.snap = qStageSnapAll(lines); q.stageLink.date = fmt(new Date());
+  q.timeline.push({ date: fmt(new Date()), note: `Stage lines brought in: ${picked.map(s => s.label || 'Stage').join(', ')}`, created: Date.now(), kind: 'stages' });
+  qAutoDrops(q); saveState(); stqClose(); qUi.openId = q.id; qUi.tab = 'quotes'; activateTab('quotations'); render(); window.scrollTo(0, 0);
+  showToast(isNew ? `New quote ${qRef(q)} created from ${picked.length} stage line${picked.length !== 1 ? 's' : ''}` : `Added ${picked.length} stage line${picked.length !== 1 ? 's' : ''} to ${qRef(q)}`);
+}
+function stqApply(keepOnly){
+  const q = qFind(stqUi.qid); if(!q || !q.stageLink) return;
+  const cur = qStageLines(q).map(slEnsure), diff = qStageDiff(q), notes = [];
+  if(!keepOnly){
+    q.labour.forEach(r => {
+      if(!r.stageId) return; const s = cur.find(x => x.id === r.stageId);
+      if(!s){ notes.push(`“${r.description}” (stage line gone: row left as it is)`); return; }
+      const upd = qStageLabourRow(s); if(!slPaid(s)){ notes.push(`“${s.label}” is now unpaid: its labour row is left as it is, remove it by hand if wanted`); return; }
+      if(r.basis !== upd.basis || r.qty !== upd.qty){ notes.push(`“${s.label}” labour ${r.qty} ${r.basis} → ${upd.qty} ${upd.basis}`); r.basis = upd.basis; r.qty = upd.qty; }
+    });
+    qSyncStageDrops(q);
+  }
+  q.stageLink.snap = qStageSnapAll(cur); q.stageLink.date = fmt(new Date());
+  q.timeline.push({ date: fmt(new Date()), note: keepOnly ? `Stage line changes reviewed, quote kept as it was (${diff.length} change${diff.length !== 1 ? 's' : ''})` : `Refreshed from the stage lines (${diff.length} change${diff.length !== 1 ? 's' : ''})${notes.length ? ': ' + notes.join('; ') : ''}`, created: Date.now(), kind: 'stages' });
+  qAutoDrops(q); saveState(); stqClose(); render(); showToast(keepOnly ? 'Stage line changes dismissed. The quote is unchanged.' : 'Quote refreshed from the stage lines');
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-action^="stq-"]'); if(b){
+    const a = b.dataset.action;
+    if(a === 'stq-open') stqOpen(b.dataset.pl, Number(b.dataset.id)); else if(a === 'stq-close') stqClose(); else if(a === 'stq-create') stqCreate();
+    else if(a === 'stq-apply') stqApply(false); else if(a === 'stq-keep') stqApply(true); else if(a === 'stq-review') stqOpenReview(Number(b.dataset.id));
+    return;
+  }
+  if(e.target.id === 'stqOverlay') stqClose();
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.closest || !el.closest('#stqOverlay')) return;
+  if(el.dataset.stq !== undefined){ if(el.checked) stqUi.sel.add(el.dataset.stq); else stqUi.sel.delete(el.dataset.stq); stqRender(); }
+  else if(el.dataset.stqTarget !== undefined){ stqUi.target = el.value; stqRender(); }
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ const o = document.getElementById('stqOverlay'); if(o && !o.hidden){ stqClose(); e.stopPropagation(); } } });
 
 /* ---- payments (money in) ---- */
 function qPayable(q, c){ return qVatOn() ? c.totalInc : c.totalEx; }
@@ -5990,7 +6169,9 @@ function qbDealHtml(q){
   const d = qDeal(q); if(!d) return '';
   const label = d.pl === 'lead' ? 'lead' : d.pl === 'sales' ? 'sales deal' : 'project', stages = (d.rec.stages || []).length;
   return `<div class="qb-deal">Linked ${label}: <b>${escHtml(boardTitle(d.pl, d.rec))}</b> (${recordCode(d.rec.id, d.pl)})${stages ? ` · ${stages} stage line${stages !== 1 ? 's' : ''}` : d.pl === 'lead' ? ' · no stage lines until it is promoted to Sales' : ''}
-    <button type="button" class="btn secondary qb-sm" data-qba="open-pipeline">Open pipeline</button></div>`;
+    <button type="button" class="btn secondary qb-sm" data-qba="open-pipeline">Open pipeline</button>
+    ${stages ? `<button type="button" class="btn secondary qb-sm" data-action="stq-open" data-pl="${d.pl}" data-id="${d.rec.id}">Create quote from stages</button>` : ''}</div>
+    ${(() => { const df = qStageDiff(q); return df.length ? `<div class="qb-stageflag">⚠ <b>Stage lines changed since this quote</b> (${df.length} change${df.length !== 1 ? 's' : ''}). The quote has not been changed. <button type="button" class="btn secondary qb-sm" data-action="stq-review" data-id="${q.id}">Review and refresh</button></div>` : ''; })()}`;
 }
 function qbLabourHtml(q){
   const un = qUnpaid(q), unpaidRow = q.recoverUnpaid ? `<tr class="qb-autorow"><td><b>Unpaid time recovered</b><div class="q-help">${hrs(un.hours)} of unpaid stage-line time (logged hours, else planned) × the hourly labour rate${un.rateMissing ? '' : ' of ' + qm(un.rate)}</div></td>
