@@ -2888,7 +2888,7 @@ function importData(file){
       render();
       saveState();
       setSaveStatus('Backup imported');
-    }catch(err){ setSaveStatus('Could not read that file'); alert('That file could not be read as a valid backup.'); }
+    }catch(err){ setSaveStatus('Could not read that file'); showToast('That file could not be read as a valid backup.', null, 8000); }
   };
   reader.readAsText(file);
 }
@@ -3611,12 +3611,12 @@ function renderBoard(pl){
 
 /* ---------- moving a record between stages (board drop + undo) ---------- */
 let toastTimer = null, toastUndo = null;
-function showToast(msg, undo){
+function showToast(msg, undo, ms){
   document.getElementById('toastMsg').textContent = msg;
   toastUndo = undo || null;
   document.getElementById('toastUndo').style.display = undo ? '' : 'none';
   document.getElementById('toast').hidden = false;
-  clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, undo ? 9000 : 5000);
+  clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, ms || (undo ? 9000 : 5000));
 }
 function hideToast(){ clearTimeout(toastTimer); document.getElementById('toast').hidden = true; toastUndo = null; }
 document.getElementById('toastUndo').addEventListener('click', () => { const f = toastUndo; hideToast(); if(f) f(); });
@@ -4611,7 +4611,7 @@ function renderLostLeads(){
 }
 async function markLeadLost(id){
   const l = state.leads.find(x => x.id === id && !x.lost); if(!l) return;
-  if(!state.lostReasons.length){ alert('Add at least one lost reason in Settings first.'); return; }
+  if(!state.lostReasons.length){ showToast('Add at least one lost reason in Settings first.', null, 8000); return; }
   const extra = `<select id="lostReasonSel" required><option value="">Select a reason…</option>${state.lostReasons.map(r=>`<option value="${escHtml(r.id)}">${escHtml(r.name)}</option>`).join('')}</select>
     <textarea id="lostNoteTxt" placeholder="Optional note"></textarea><div class="modal-err" id="modalExtraErr"></div>`;
   const ok = await showConfirm('Mark this lead as lost?', `${recordCode(l.id,'lead')} · ${leadPrimaryName(l)} will leave the active Lead Pipeline view and all active counts. You can restore it from the Lost leads bar at the bottom of this tab.`, extra);
@@ -4946,7 +4946,7 @@ function supplierReferences(id){
 async function deleteSupplier(id){
   const s = supFind(id); if(!s) return;
   const label = s.name || supCode(s), refs = supplierReferences(id);
-  if(refs.length){ alert(`“${label}” can't be deleted because it is used by ${refs.join(', ')}. Make it inactive instead — it keeps its history and drops off the default list.`); return; }
+  if(refs.length){ showToast(`“${label}” can't be deleted because it is used by ${refs.join(', ')}. Make it inactive instead — it keeps its history and drops off the default list.`, null, 12000); return; }
   const ok = await showConfirm(`Delete “${label}”?`, 'This permanently removes the supplier with its contacts and notes, and cannot be undone. Making it inactive keeps everything and just hides it from the default list.');
   if(!ok) return;
   const at = state.suppliers.findIndex(x => x.id === id); if(at < 0) return;
@@ -6035,7 +6035,7 @@ function moveStageItem(pl, id, dir){
 async function deleteStageItem(pl, id){
   const list = listFor(pl), idx = list.findIndex(x => x.id === id); if(idx < 0) return;
   const item = list[idx], noun = pl === 'reasons' ? 'reason' : (pl === 'supplycats' ? 'category' : 'stage');
-  if(list.length <= 1){ alert(`A list needs at least one ${noun} — add another before deleting “${item.name}”.`); return; }
+  if(list.length <= 1){ showToast(`A list needs at least one ${noun} — add another before deleting “${item.name}”.`, null, 8000); return; }
   const holders = stageHolders(pl, id), n = holders.length, moved = [];
   if(n){
     const others = list.filter(x => x.id !== id);
@@ -9458,6 +9458,15 @@ function resolveConfirm(val){
   if(_confirmResolver){ _confirmResolver(val); _confirmResolver = null; }
 }
 
+/* asks for a new password in the app's own dialog (replaces the browser's prompt box); resolves to the typed text, or '' if cancelled */
+async function askNewPassword(u){
+  const btn = document.querySelector('#modalOverlay [data-modal="confirm"]'), old = btn.textContent; btn.textContent = 'Reset password';
+  const asked = showConfirm('Reset password', 'Enter a new password for "' + u + '":', '<div class="lp-f"><input type="text" id="newPwModal" autocomplete="off" aria-label="New password"></div>');
+  const inp = document.getElementById('newPwModal');
+  if(inp){ inp.focus(); inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); resolveConfirm(true); } }); }
+  const ok = await asked; btn.textContent = old;
+  return ok ? (_confirmExtraNote || '') : '';
+}
 function statusStyle(s){
   if(s==='Done') return 'background:#e4f0e6;color:#4f8a5b;';
   if(s==='In Progress') return 'background:#fbf1cf;color:#c9822f;';
@@ -10312,7 +10321,7 @@ function renderTaskOptions(){
 function newOptId(kind){ const pre = kind === 'priority' ? 'tp_' : 'tt_'; let id; do { id = pre + Math.random().toString(36).slice(2, 8); } while(state.taskOptions[kind].some(o => o.id === id)); return id; }
 async function deleteTaskOption(kind, id){
   const list = state.taskOptions[kind], o = list.find(x => x.id === id); if(!o) return;
-  if(list.length <= 1){ alert(`A list needs at least one ${kind} — add another before deleting “${o.name}”.`); return; }
+  if(list.length <= 1){ showToast(`A list needs at least one ${kind} — add another before deleting “${o.name}”.`, null, 8000); return; }
   const moved = [], field = kind === 'priority' ? 'priorityId' : 'typeId', used = state.crmTasks.filter(t => t[field] === id), others = list.filter(x => x.id !== id);
   if(used.length){
     const ok = await showConfirm(`Delete “${o.name}”?`, `${used.length} task${used.length !== 1 ? 's use' : ' uses'} this ${kind}. Move ${used.length !== 1 ? 'them' : 'it'} to:`,
@@ -11119,14 +11128,15 @@ document.addEventListener('click', (e) => {
   }
   else if(action === 'reset-user'){
     const u = btn.dataset.user;
-    const np = prompt('Enter a new password for "' + u + '":');
-    if(np){ (async () => { try{ await sbRpc('app_reset_password', { p_username: u, p_password: np }); alert('Password reset for ' + u + '.'); }catch(e){ alert('Reset failed: ' + (e.message||'')); } })(); }
+    askNewPassword(u).then(np => {
+      if(np){ (async () => { try{ await sbRpc('app_reset_password', { p_username: u, p_password: np }); showToast('Password reset for ' + u + '.'); }catch(e){ showToast('Reset failed: ' + (e.message||''), null, 9000); } })(); }
+    });
   }
   else if(action === 'delete-user'){
     const u = btn.dataset.user;
-    if(session && u === session.username){ alert("You can't delete the account you're logged in as."); return; }
+    if(session && u === session.username){ showToast("You can't delete the account you're logged in as.", null, 8000); return; }
     showConfirm('Remove user "' + u + '"?', 'This deletes their login. It cannot be undone.').then(async ok => {
-      if(ok){ try{ await sbRpc('app_delete_user', { p_username: u }); renderUsers(); }catch(e){ alert('Delete failed: ' + (e.message||'')); } }
+      if(ok){ try{ await sbRpc('app_delete_user', { p_username: u }); renderUsers(); }catch(e){ showToast('Delete failed: ' + (e.message||''), null, 9000); } }
     });
   }
   else if(action === 'reset-data'){
