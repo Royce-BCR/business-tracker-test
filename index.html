@@ -1543,7 +1543,12 @@
     }
     .table-scroll > table:has(> thead > tr > th:first-child:empty) > thead > tr > :nth-child(2) { background-color: #faf8f4; z-index: 3; }
     .leads-table tr.lead-row > td:nth-child(-n+2) { background-image: linear-gradient(var(--lead-tint), var(--lead-tint)); }
+    /* an opened row (lead / sales detail) is only as wide as the screen, so it can be read without scrolling sideways */
+    .table-scroll > table > tbody > tr.detail-row > td:first-child { position: static; background-color: #faf8f4; }
+    tr.detail-row > td > .lc, tr.detail-row > td > .detail-box { position: sticky; left: 0; width: calc(100vw - 2 * var(--px) - 2px); max-width: calc(100vw - 2 * var(--px) - 2px); }
+    tr.detail-row > td > .lc { margin-left: 0; margin-right: 0; }
     .table-scroll.scroll-more, .pw-nav.scroll-more, .lp-chips.scroll-more { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); }
+    .table-scroll:has(tr.detail-row) { -webkit-mask-image: none; mask-image: none; }   /* no edge fade while a row is opened */
   }
   /* ---------------- Q6: long page intros are shortened to two lines on phones, with an "About this page" button to read the rest ---------------- */
   .desc-more { display: none; }
