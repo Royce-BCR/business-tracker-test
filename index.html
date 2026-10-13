@@ -416,7 +416,7 @@
   .leads-table tr.lead-res { --lead-tint: rgba(29,158,117,0.05); --lead-tint-hover: rgba(29,158,117,0.12); --lead-edge: #14805f; }
   .leads-table tr.lead-com { --lead-tint: rgba(55,138,221,0.06); --lead-tint-hover: rgba(55,138,221,0.13); --lead-edge: #2a6fb5; }
   .leads-table td.computed { background: var(--lead-tint) !important; border-radius: 0; }   /* let the row tint show through the grey 'computed' look */
-  .leads-table input.computed { background: transparent !important; color: #a8a398; }
+  .leads-table input.computed { background: transparent !important; color: var(--text-muted); }
   .leads-table input.lead-proj::placeholder { color: #6b665c; opacity: 1; font-style: italic; }
   .leads-table input.lead-pc { text-transform: uppercase; }
   .leads-table input.lead-pc.manual { font-weight: 600; }
@@ -430,9 +430,10 @@
 
   /* leads: status cell (pill + qualification chip), active-row accent while the editor panel is open */
   .lead-status-cell { display: flex; align-items: center; gap: 6px; }
-  .qual-chip { flex: 0 0 auto; font-size: 12px; font-weight: 600; line-height: 1; padding: 4px 8px; border-radius: 999px; background: #eceae5; color: #5a564e; border: 1px solid #d3cfc6; white-space: nowrap; }
-  .qual-chip.q-some { background: #fde9bd; color: #7a4a07; border-color: #efc66b; }
-  .qual-chip.q-full { background: #d5ecd9; color: #1e5c2e; border-color: #9fcfa8; }
+  .qual-chip { flex: 0 0 auto; font-size: 12px; font-weight: 600; line-height: 1; padding: 4px 8px; border-radius: 999px; background: #ebe8e1; color: #4d4a43; border: 1px solid #d2cec4; white-space: nowrap; }
+  .qual-chip.q-some { background: #fdeccb; color: #7a4b00; border-color: #efcf91; }
+  .qual-chip.q-full { background: #e3f0e7; color: #2f6b45; border-color: #b9d9c4; }
+  .qual-chip.q-some::before { content: '▲\00a0'; } .qual-chip.q-full::before { content: '✓\00a0'; }
   .leads-table tr.lead-active td { background: var(--lead-tint-hover); box-shadow: inset 0 2px 0 var(--lead-edge), inset 0 -2px 0 var(--lead-edge); }
   .leads-table tr.lead-active td:last-child { box-shadow: inset 0 2px 0 var(--lead-edge), inset 0 -2px 0 var(--lead-edge), inset -2px 0 0 var(--lead-edge); }
 
@@ -638,8 +639,8 @@
   .breakdown-box th { background: none; border: none; color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 8px; }
   .breakdown-box td { border: none; border-top: 1px solid var(--line); padding: 6px 8px; }
   .lyr { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
-  .lyr.committed { background: #e4f0e6; color: #4f8a5b; }
-  .lyr.weighted { background: #fbf1cf; color: #c9822f; }
+  .lyr.committed { background: #e3f0e7; color: #2f6b45; } .lyr.committed::before { content: '✓\00a0'; }
+  .lyr.weighted { background: #fdeccb; color: #7a4b00; } .lyr.weighted::before { content: '▲\00a0'; }
 
   /* dashboard */
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
@@ -918,8 +919,10 @@
   .quotes-table td { padding: 9px 10px; border-bottom: 1px solid #efece6; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
   .quotes-table tr.sup-row { cursor: pointer; } .quotes-table tr.sup-row:hover { background: #faf8f4; }
   .q-strong { font-weight: 600; } .q-num { text-align: right; font-variant-numeric: tabular-nums; }
-  .q-st { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: #eceae5; color: #5a564e; }
-  .q-st-Sent { background: #e6ecf5; color: #4a6b8a; } .q-st-Accepted { background: #d5ecd9; color: #1e5c2e; } .q-st-Declined { background: #f3dedb; color: #8a3a34; } .q-st-Expired { background: #fbf1cf; color: #8a5a1c; }
+  .q-st { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: #ebe8e1; color: #4d4a43; }
+  .q-st::before { content: '○\00a0'; }
+  .q-st-Sent { background: #e2ecf8; color: #234f8a; } .q-st-Accepted { background: #e3f0e7; color: #2f6b45; } .q-st-Declined { background: #fbe3e0; color: #a4302a; } .q-st-Expired { background: #fdeccb; color: #7a4b00; }
+  .q-st-Sent::before { content: '●\00a0'; } .q-st-Accepted::before { content: '✓\00a0'; } .q-st-Declined::before { content: '!\00a0'; } .q-st-Expired::before { content: '▲\00a0'; }
   .qb-scroll { overflow-x: auto; }
   .qb-head .qb-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
   .qb-ref { font-family: var(--serif); font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -1462,7 +1465,7 @@
   .pw-var-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; } .pw-var-a { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   .pw-var-links { margin: 8px 0; font-size: 12.5px; } .pw-var-links summary { cursor: pointer; color: var(--slate); font-weight: 600; } .pw-var-links label { display: flex; gap: 8px; padding: 3px 0; }
   .pw-var-ap { margin-top: 8px; font-size: 12.5px; color: #2e7a45; }
-  .q-st-Invoiced { background: #e4f0e6; color: #2e7a45; }
+  .q-st-Invoiced { background: #e3f0e7; color: #2f6b45; } .q-st-Invoiced::before { content: '✓\00a0'; }
 
   /* ---------------- Finance: totals, cash-flow lines, invoicing, pending transactions ---------------- */
   .fin-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; } .fin-note { font-size: 12px; color: var(--text-muted); margin: -4px 0 14px; }
@@ -1470,8 +1473,9 @@
   .cf-n { border: 0; background: none; padding: 2px 6px; border-radius: 6px; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; } .cf-n:hover, .cf-n.sel { background: #efece6; } .cf-n.sel { font-weight: 700; }
   .cf-memo td { color: var(--text-muted); font-style: italic; } .cf-lines { margin-top: 14px; }
   .inv-st { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
-  .inv-st-Unconfirmed { background: #ebe9e4; color: #6b6760; } .inv-st-Pending { background: #dcebf7; color: #2a638e; } .inv-st-Sent { background: #c9def2; color: #1f4f78; } .inv-st-Due { background: #fbeccd; color: #8a5a10; }
-  .inv-st-Overdue { background: #f6d5d2; color: #a3342d; } .inv-st-Queried { background: #e6dcf2; color: #5b3d86; } .inv-st-Partpaid { background: #d3ece8; color: #1f6b63; } .inv-st-Paid { background: #d8ecdc; color: #25603a; } .inv-st-Warning { background: #7a1f1a; color: #fff; }
+  .inv-st-Unconfirmed { background: #ebe8e1; color: #4d4a43; } .inv-st-Pending { background: #e2ecf8; color: #234f8a; } .inv-st-Sent { background: #e2ecf8; color: #234f8a; } .inv-st-Due { background: #fdeccb; color: #7a4b00; }
+  .inv-st-Overdue { background: #fbe3e0; color: #a4302a; } .inv-st-Queried { background: #fdeccb; color: #7a4b00; } .inv-st-Partpaid { background: #e2ecf8; color: #234f8a; } .inv-st-Paid { background: #e3f0e7; color: #2f6b45; } .inv-st-Warning { background: #7a1f1a; color: #fff; }
+  .inv-st-Unconfirmed::before { content: '○\00a0'; } .inv-st-Pending::before, .inv-st-Sent::before, .inv-st-Partpaid::before { content: '●\00a0'; } .inv-st-Due::before, .inv-st-Queried::before { content: '▲\00a0'; } .inv-st-Overdue::before, .inv-st-Warning::before { content: '!\00a0'; } .inv-st-Paid::before { content: '✓\00a0'; }
   .inv-tools { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 12px 0; } .inv-legend { display: flex; gap: 6px; flex-wrap: wrap; } .inv-filter { font-size: 12px; color: var(--slate); display: flex; align-items: center; gap: 6px; }
   .inv-table td { vertical-align: top; } .inv-table input[type=date] { min-width: 128px; } .inv-table input.qb-n { width: 92px; } .inv-acts { white-space: nowrap; } .inv-acts .btn { margin: 0 4px 4px 0; }
   .inv-row.inv-Warning td:first-child { box-shadow: inset 4px 0 0 #7a1f1a; } .inv-row.inv-Overdue td:first-child { box-shadow: inset 4px 0 0 #c0443c; } .inv-row.inv-var td { background: #fbf9f3; }
@@ -3472,7 +3476,7 @@ function renderPipelineTable(){
         <option value="real"${r.type==='real'?' selected':''}>Real</option>
         <option value="example"${r.type==='example'?' selected':''}>Example</option></select></td>
       <td><select data-tab="pipeline" data-idx="${i}" data-field="tier">${tiers.map(t=>`<option${r.tier===t?' selected':''}>${t}</option>`).join('')}</select></td>
-      <td><select data-tab="pipeline" data-idx="${i}" data-field="stageId">${salesStages.map(s=>`<option value="${escHtml(s.id)}"${r.stageId===s.id?' selected':''}>${escHtml(s.name)}</option>`).join('')}</select></td>
+      <td><select class="lead-pill" data-tab="pipeline" data-idx="${i}" data-field="stageId" style="${chipStyle(SALES_CHIP[r.stageId] || 'neutral')}">${salesStages.map(s=>`<option value="${escHtml(s.id)}"${r.stageId===s.id?' selected':''}>${chipSym(SALES_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select></td>
       <td class="computed" title="From sales stage">${Math.round(effectiveProb(r)*100)}%${(r.probOverride!==undefined&&r.probOverride!==null&&r.probOverride!=='')?'*':''}</td>
       <td><input type="number" step="1" data-tab="pipeline" data-idx="${i}" data-field="quoteValue" value="${r.quoteValue}"></td>
       <td class="computed">${fmtDisplay(roll.start)}</td>
@@ -4257,17 +4261,23 @@ document.addEventListener('change', (e) => {
 
 /* ---------- Lead Pipeline ---------- */
 const expandedLeads = new Set();
+/* status chips: five verified text-on-fill pairs (all 5:1 or better) and a small leading symbol, so meaning never relies on colour alone */
+const CHIP = {
+  success: { bg: '#e3f0e7', fg: '#2f6b45', bd: '#b9d9c4', sym: '✓' },
+  warning: { bg: '#fdeccb', fg: '#7a4b00', bd: '#efcf91', sym: '▲' },
+  problem: { bg: '#fbe3e0', fg: '#a4302a', bd: '#ecb9b4', sym: '!' },
+  info:    { bg: '#e2ecf8', fg: '#234f8a', bd: '#b6cbe8', sym: '●' },
+  neutral: { bg: '#ebe8e1', fg: '#4d4a43', bd: '#d2cec4', sym: '○' }
+};
+function chipStyle(k){ const c = CHIP[k] || CHIP.neutral; return `background:${c.bg};color:${c.fg};border-color:${c.bd};`; }
+function chipSym(k){ return (CHIP[k] || CHIP.neutral).sym; }
+const LEAD_CHIP = { stg_lead_qualified: 'success', stg_lead_possible: 'warning', stg_lead_contacted: 'info', stg_lead_closed: 'problem' };
+const SALES_CHIP = { stg_sales_confirmed: 'success', stg_sales_quoted: 'warning', stg_sales_tabled: 'info' };
+const ACTION_STATUS_CHIP = { 'Done': 'success', 'In Progress': 'warning', 'Waiting': 'info' };
+const PRIORITY_CHIP = ['problem', 'problem', 'warning', 'success'];   // 0 and 1 urgent, 2 watch, 3 relaxed
+function priorityChipSym(i){ return i === 0 ? '!!' : chipSym(PRIORITY_CHIP[i] || 'neutral'); }
 /* pill colours follow the stage id (so renaming keeps the colour); stages you add get the neutral grey */
-function leadStatusStyle(stageId){
-  // one hue per stage, cool to warm to green; dark text for contrast, a border so pills stand out on tinted rows
-  const c = (bg,fg,bd) => `background:${bg};color:${fg};border-color:${bd};`;
-  if(stageId==='stg_lead_qualified') return c('#d5ecd9','#1e5c2e','#9fcfa8');
-  if(stageId==='stg_lead_possible') return c('#fde9bd','#7a4a07','#efc66b');
-  if(stageId==='stg_lead_contacted') return c('#d9e6f7','#1f4f82','#a9c5e8');
-  if(stageId==='stg_lead_no_opportunity') return c('#eceae5','#5a564e','#d3cfc6');
-  if(stageId==='stg_lead_closed') return c('#f3dfdc','#8a3a33','#e2b8b3');
-  return c('#e4e2dd','#4b4840','#c9c5bb');   // Not Contacted
-}
+function leadStatusStyle(stageId){ return chipStyle(LEAD_CHIP[stageId] || 'neutral'); }
 const QUAL_FIELDS = [['budget','Budget'],['decisionMaker','Decision-maker'],['timeline','Timeline'],['competition','Competition']];
 function leadQualDone(l){ return QUAL_FIELDS.filter(([k]) => l[k]).length; }
 function leadQualMissing(l){ return QUAL_FIELDS.filter(([k]) => !l[k]).map(([, n]) => n); }
@@ -4361,7 +4371,7 @@ function renderLeads(){
         : `<input class="computed" disabled value="—" title="Residential — no company">`}</td>
       <td><input class="lead-pc${l.postcodeManual?' manual':''}" data-tab="leads" data-idx="${i}" data-field="postcode" value="${escAttr(l.postcode||'')}" title="${l.postcodeManual?'Set manually — clear this cell to go back to automatic':'Filled automatically from the address — type to override'}"></td>
       <td class="computed" title="Pulled from the latest communication entry">${last?fmtDisplay(toDate(last)):'—'}</td>
-      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${escHtml(s.name)}</option>`).join('')}</select><span class="qual-chip${qd === QUAL_FIELDS.length ? ' q-full' : (qd ? ' q-some' : '')}" title="Qualification: ${qd} of ${QUAL_FIELDS.length} complete">${qd}/${QUAL_FIELDS.length}</span></div></td>
+      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select><span class="qual-chip${qd === QUAL_FIELDS.length ? ' q-full' : (qd ? ' q-some' : '')}" title="Qualification: ${qd} of ${QUAL_FIELDS.length} complete">${qd}/${QUAL_FIELDS.length}</span></div></td>
       <td><button class="icon-btn" data-action="delete-lead" data-idx="${i}" title="Delete lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
     </tr>`;
     if(isOpen){ html += `<tr class="detail-row${active}"><td colspan="10">${leadDetailHtml(l, i)}</td></tr>`; }
@@ -4648,7 +4658,7 @@ function restoreLead(id){
    default equals its minimum (chevron / delete) has no drag handle. */
 const RT_SPECS = {
   leadsTableWrap:    { cols: [[34,34],[66,56],[64,44],[200,90],[170,90],[170,90],[110,76],[126,84],[236,130],[34,34]] },
-  pipelineTableWrap: { cols: [[34,34],[92,80],[208,120],[96,84],[172,120],[130,104],[64,52],[100,72],[116,100],[116,100],[100,72],[34,34]], nested: ['pipelineStages'] },
+  pipelineTableWrap: { cols: [[34,34],[92,80],[190,120],[96,84],[172,120],[148,116],[64,52],[100,72],[116,100],[116,100],[100,72],[34,34]], nested: ['pipelineStages'] },
   pipelineStages:    { cols: [[200,100],[140,90],[128,104],[128,104],[64,48],[100,70],[210,150],[34,34]], parent: 'pipelineTableWrap' },
   projectsTableWrap: { cols: [[34,34],[100,80],[240,120],[120,90],[200,120],[150,100],[34,34]], nested: ['projectPayments'] },
   projectPayments:   { cols: [[90,72],[220,100],[128,104],[100,72],[128,104],[128,104],[34,34]], parent: 'projectsTableWrap' },
@@ -9480,28 +9490,22 @@ async function askNewPassword(u){
   const ok = await asked; btn.textContent = old;
   return ok ? (_confirmExtraNote || '') : '';
 }
-function statusStyle(s){
-  if(s==='Done') return 'background:#e4f0e6;color:#4f8a5b;';
-  if(s==='In Progress') return 'background:#fbf1cf;color:#c9822f;';
-  if(s==='Waiting') return 'background:#e6ecf5;color:#4a6b8a;';
-  return '';
-}
+function statusStyle(s){ return chipStyle(ACTION_STATUS_CHIP[s] || 'neutral'); }
 function renderActions(){
   const today = new Date(); today.setHours(0,0,0,0);
   const statuses = ['Not Started','In Progress','Waiting','Done'];
   const showLinked = state.actionPrefs.shownCols.includes('linked');
   const cw = document.getElementById('actColsWrap');
   if(cw) cw.innerHTML = `<button class="btn secondary" data-today="act-cols">Columns ▾</button>${actUi.colsOpen ? `<div class="crm-colmenu"><label><input type="checkbox" data-acol="linked"${showLinked ? ' checked' : ''}> Linked record</label></div>` : ''}`;
-  let html = `<table style="min-width:${showLinked ? 1438 : 1258}px"><thead><tr>
-    <th style="width:44px"></th><th style="width:118px">Date Raised</th><th style="min-width:170px">Action</th><th style="width:130px;min-width:122px">Owner</th>
-    <th style="width:96px">+ Owner</th><th style="width:132px">Deadline</th><th style="width:74px">Priority</th>
+  let html = `<table style="min-width:${showLinked ? 1454 : 1274}px"><thead><tr>
+    <th style="width:44px"></th><th style="width:118px">Date Raised</th><th style="min-width:160px">Action</th><th style="width:130px;min-width:122px">Owner</th>
+    <th style="width:96px">+ Owner</th><th style="width:132px">Deadline</th><th style="width:90px;min-width:84px">Priority</th>
     <th style="width:152px;min-width:140px">Status</th>${showLinked ? '<th style="width:170px">Linked record</th>' : ''}<th style="min-width:130px">Notes</th><th style="width:34px"></th></tr></thead><tbody>`;
   state.actions.forEach((r,i) => {
     const done = r.status === 'Done';
     const isArchiving = archiving.has(r);
     const overdue = r.deadline && !done && toDate(r.deadline) < today;
-    const pBg = Number(r.priority)<=1 ? (Number(r.priority)===0?'#b3453f':'#c9822f') : (Number(r.priority)===2 ? '#fbf1cf' : '#e4f0e6');
-    const pFg = Number(r.priority)<=1 ? '#fff' : (Number(r.priority)===2 ? '#c9a227' : '#4f8a5b');
+    const pKind = PRIORITY_CHIP[Number(r.priority)] || 'neutral';
     const rowClass = [overdue?'flag-row':'', isArchiving?'archiving':''].filter(Boolean).join(' ');
     html += `<tr${rowClass?` class="${rowClass}"`:''}>
       <td><div class="cbx${isArchiving?' checked':''}" data-action="toggle-done" data-idx="${i}" title="Complete &amp; archive">${CHECK_SVG}</div></td>
@@ -9510,9 +9514,9 @@ function renderActions(){
       <td><input list="ownersList" data-tab="actions" data-idx="${i}" data-field="owner" value="${escAttr(r.owner||'')}"></td>
       <td><input list="ownersList" data-tab="actions" data-idx="${i}" data-field="owner2" value="${escAttr(r.owner2||'')}" placeholder="optional"></td>
       <td><input type="date" data-tab="actions" data-idx="${i}" data-field="deadline" value="${r.deadline||''}"></td>
-      <td><select data-tab="actions" data-idx="${i}" data-field="priority" style="background:${pBg};color:${pFg};font-weight:700;text-align:center;border-radius:6px;">
-        ${[0,1,2,3].map(p=>`<option value="${p}"${Number(r.priority)===p?' selected':''}>${p}</option>`).join('')}</select></td>
-      <td><select data-tab="actions" data-idx="${i}" data-field="status" style="${statusStyle(r.status)}font-weight:600;border-radius:6px;">${statuses.map(s=>`<option${r.status===s?' selected':''}>${s}</option>`).join('')}</select></td>
+      <td><select data-tab="actions" data-idx="${i}" data-field="priority" style="${chipStyle(pKind)}font-weight:700;text-align:center;border-radius:6px;">
+        ${[0,1,2,3].map(p=>`<option value="${p}"${Number(r.priority)===p?' selected':''}>${priorityChipSym(p)} ${p}</option>`).join('')}</select></td>
+      <td><select data-tab="actions" data-idx="${i}" data-field="status" style="${statusStyle(r.status)}font-weight:600;border-radius:6px;">${statuses.map(s=>`<option value="${s}"${r.status===s?' selected':''}>${chipSym(ACTION_STATUS_CHIP[s] || 'neutral')} ${s}</option>`).join('')}</select></td>
       ${showLinked ? (actLinks(r).length > 1
         ? `<td>${linkSummaryHtml(r, `data-today="act-open" data-idx="${i}"`)}</td>`
         : `<td><input list="crmRecList" data-alink="${i}" value="${escAttr(actLinks(r)[0] || '')}" placeholder="optional" autocomplete="off" title="${escAttr(actLinks(r).length ? linkedText(r) : '')}"></td>`) : ''}
@@ -9579,7 +9583,7 @@ function applyResizable(){
 const CRM_TABLE_ID = 'crmTableWrap';
 const SEED_TASK_PRIORITIES = [ ['tp_p0','P0'], ['tp_p1','P1'], ['tp_p2','P2'], ['tp_p3','P3'] ];
 const SEED_TASK_TYPES = [ ['tt_todo','To Do',false], ['tt_call','Call',true], ['tt_email','Email',true] ];   // 3rd = counts as a contact
-const PRIO_PALETTE = [ ['#b3453f','#fff'], ['#c9822f','#fff'], ['#fbf1cf','#a8851a'], ['#e4f0e6','#4f8a5b'] ];
+const PRIO_PALETTE = PRIORITY_CHIP.map(k => [CHIP[k].bg, CHIP[k].fg]);   // same five verified pairs as everywhere else
 const TYPE_ICONS = {
   tt_todo:  '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>',
   tt_call:  '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
@@ -9695,7 +9699,7 @@ function taskNum(t){ return Number(String(t.id).replace(/\D/g, '')) || 0; }
 function prioPill(id){
   const i = prioIdx(id), p = prioList()[i]; if(!p) return '<span class="tier-none">—</span>';
   const c = i < PRIO_PALETTE.length ? PRIO_PALETTE[i] : ['#efece6', '#6c675e'];
-  return `<span class="tk-pill" style="background:${c[0]};color:${c[1]}">${escHtml(p.name)}</span>`;
+  return `<span class="tk-pill" style="background:${c[0]};color:${c[1]}">${i < PRIORITY_CHIP.length ? priorityChipSym(i) + ' ' : ''}${escHtml(p.name)}</span>`;
 }
 function typeIcon(id){ const t = typeOpt(id); return `<span class="tk-ico" title="${escAttr(t ? t.name : '')}">${TYPE_ICONS[id] || TYPE_ICON_DEFAULT}</span>`; }
 function optionsHtml(list, sel){ return list.map(o => `<option value="${escHtml(o.id)}"${o.id === sel ? ' selected' : ''}>${escHtml(o.name)}</option>`).join(''); }
