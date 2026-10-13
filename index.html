@@ -116,12 +116,22 @@
     margin: 1px 0;
     border-radius: var(--radius-sm);
     cursor: pointer;
+    font-family: inherit;
     font-size: 13px;
+    text-align: left;
+    width: 100%;
+    background: none;
+    border: 0;
     color: #cfcabf;
     border-left: 2.5px solid transparent;
     transition: background 0.12s ease, color 0.12s ease;
     user-select: none;
   }
+  main { display: block; }
+  main:focus { outline: none; }
+  .skip-link { position: absolute; left: 8px; top: -60px; z-index: 100001; background: #fff; color: var(--ink); padding: 10px 16px; border-radius: 8px; font-weight: 600; text-decoration: none; box-shadow: var(--shadow-lift); }
+  .skip-link:focus { top: 8px; }
+  body.logged-out .skip-link { display: none; }
   .tab:hover { background: rgba(255,255,255,0.05); color: #fff; }
   .tab.active {
     background: color-mix(in srgb, var(--accent) 22%, transparent);
@@ -1489,6 +1499,7 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <div class="mobile-bar" id="mobileBar">
   <button class="menu-btn" id="menuBtn" aria-label="Open menu">
@@ -1498,7 +1509,7 @@
 </div>
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-<div class="sidebar" id="sidebar">
+<nav class="sidebar" id="sidebar" aria-label="Main">
   <div class="brand">
     <h1>Business Tracker</h1>
     <div class="sub">Live System</div>
@@ -1506,52 +1517,52 @@
 
   <div class="nav-group g-command">
     <div class="nav-label">Command</div>
-    <div class="tab g-command active" data-tab="today">Today <span class="tab-count" id="todayBadge" hidden></span></div>
-    <div class="tab g-command" data-tab="dashboard">Dashboard</div>
+    <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
+    <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
   </div>
 
   <div class="nav-group g-growth">
     <div class="nav-label">Growth</div>
-    <div class="tab g-growth" data-tab="leads">Lead Pipeline</div>
-    <div class="tab g-growth" data-tab="salespipeline">Sales Pipeline</div>
-    <div class="tab g-growth" data-tab="crm">CRM</div>
+    <button type="button" class="tab g-growth" data-tab="leads">Lead Pipeline</button>
+    <button type="button" class="tab g-growth" data-tab="salespipeline">Sales Pipeline</button>
+    <button type="button" class="tab g-growth" data-tab="crm">CRM</button>
   </div>
 
   <div class="nav-group g-revenue">
     <div class="nav-label">Revenue <span class="tab-count" id="revBadge" hidden></span></div>
-    <div class="tab g-revenue" data-tab="quotations">Quotes</div>
-    <div class="tab g-revenue" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></div>
-    <div class="tab g-revenue" data-tab="revenue">Revenue Forecast</div>
+    <button type="button" class="tab g-revenue" data-tab="quotations">Quotes</button>
+    <button type="button" class="tab g-revenue" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></button>
+    <button type="button" class="tab g-revenue" data-tab="revenue">Revenue Forecast</button>
   </div>
 
   <div class="nav-group g-finance">
     <div class="nav-label">Finance</div>
-    <div class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</div>
-    <div class="tab g-finance" data-tab="invoicing">Invoicing</div>
-    <div class="tab g-finance" data-tab="transactions">Transactions</div>
-    <div class="tab g-finance" data-tab="pricing">Pricing Model</div>
+    <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
+    <button type="button" class="tab g-finance" data-tab="invoicing">Invoicing</button>
+    <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
+    <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
   </div>
 
   <div class="nav-group g-operations">
     <div class="nav-label">Operations</div>
-    <div class="tab g-operations" data-tab="projectpipeline">Project Pipeline</div>
-    <div class="tab g-operations" data-tab="suppliers">Suppliers</div>
-    <div class="tab g-operations" data-tab="purchaseorders">Purchase Orders</div>
+    <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
+    <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
+    <button type="button" class="tab g-operations" data-tab="purchaseorders">Purchase Orders</button>
   </div>
 
   <div class="nav-group g-organisation">
     <div class="nav-label">Organisation</div>
-    <div class="tab g-organisation" data-tab="admin">Setup &amp; Admin</div>
-    <div class="tab g-organisation" data-tab="businessplan">Business Plan</div>
-    <div class="tab g-organisation" data-tab="actions">Actions</div>
-    <div class="tab g-organisation" data-tab="assets">Assets</div>
-    <div class="tab g-organisation" data-tab="settings">Settings</div>
+    <button type="button" class="tab g-organisation" data-tab="admin">Setup &amp; Admin</button>
+    <button type="button" class="tab g-organisation" data-tab="businessplan">Business Plan</button>
+    <button type="button" class="tab g-organisation" data-tab="actions">Actions</button>
+    <button type="button" class="tab g-organisation" data-tab="assets">Assets</button>
+    <button type="button" class="tab g-organisation" data-tab="settings">Settings</button>
   </div>
 
   <div class="undo-wrap"><button type="button" class="undo-hist-btn" data-action="undo-history" title="Restore things you deleted in the last 24 hours">↶ Undo history <span class="tab-count" id="undoBadge" hidden></span></button></div>
   <div class="logout-bar" id="logoutBar"></div>
 
-</div>
+</nav>
 
 <div class="login-overlay hidden" id="loginOverlay">
   <div class="login-stack">
@@ -1578,6 +1589,8 @@
   </div>
 
   <div class="navbar" id="navBar" hidden></div>
+
+  <main id="main" tabindex="-1">
 
   <!-- TODAY -->
   <div class="panel active" id="panel-today">
@@ -1994,6 +2007,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
     <div id="archivedWrap"></div>
   </div>
 
+  </main>
 </div>
 
 <div class="dr-backdrop" id="drBackdrop" data-action="close-detail" hidden></div>
@@ -11077,12 +11091,17 @@ document.getElementById('sidebarBackdrop').addEventListener('click', closeMobile
 function activateTab(name){
   const tab = document.querySelector('.tab[data-tab="' + name + '"]'), panel = document.getElementById('panel-' + name);
   if(!tab || !panel) return;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.removeAttribute('aria-current'); });
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   tab.classList.add('active');
+  tab.setAttribute('aria-current', 'page');
   panel.classList.add('active');
   if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
 }
+document.querySelector('.skip-link').addEventListener('click', (e) => {
+  e.preventDefault();
+  const m = document.getElementById('main'); if(m){ m.focus({ preventScroll: true }); m.scrollIntoView(); }
+});
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     navClear();   // the main menu starts a fresh trail
