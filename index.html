@@ -1536,6 +1536,12 @@
     .leads-table tr.lead-row > td:nth-child(-n+2) { background-image: linear-gradient(var(--lead-tint), var(--lead-tint)); }
     .table-scroll.scroll-more { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); }
   }
+  /* ---------------- Q6: long page intros are shortened to two lines on phones, with an "About this page" button to read the rest ---------------- */
+  .desc-more { display: none; }
+  @media (max-width: 700px) {
+    .page-head .desc.has-more:not(.open) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .desc-more { display: inline-flex; margin: 2px 0 6px; font-size: 12.5px; }
+  }
 </style>
 </head>
 <body>
@@ -11130,6 +11136,20 @@ document.getElementById('menuBtn').addEventListener('click', () => {
 });
 document.getElementById('sidebarBackdrop').addEventListener('click', closeMobileSidebar);
 
+/* phones: shorten each long page intro to two lines (full text stays in the page for screen readers) with an "About this page" button */
+function initDescToggles(){
+  document.querySelectorAll('.page-head .desc').forEach((d, i) => {
+    if(d.id === 'todaySummary' || d.textContent.trim().length < 110 || d.classList.contains('has-more')) return;
+    d.classList.add('has-more');
+    if(!d.id) d.id = 'pageDesc' + i;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'link-btn desc-more'; b.textContent = 'About this page';
+    b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', d.id);
+    b.addEventListener('click', () => { const open = d.classList.toggle('open'); b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'Show less' : 'About this page'; });
+    d.insertAdjacentElement('afterend', b);
+  });
+}
+initDescToggles();
 /* scroll cues: a soft fade on the right edge of any strip that still has more to scroll to (the fade itself is phone-only CSS) */
 function updateScrollCue(el){
   el.classList.toggle('scroll-more', el.scrollWidth - el.clientWidth - el.scrollLeft > 2);
