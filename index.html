@@ -1523,8 +1523,8 @@
   /* ---------------- Q5: tables on phones scroll sideways at readable widths, first column stays put, edge fade shows there is more ---------------- */
   @media (max-width: 700px) {
     .table-tools .width-toggle { display: none; }   /* Fit to screen is not used on phones (the saved choice is kept for larger screens) */
-    .table-scroll > table:not([data-rt]) td:has(> input:not([type=checkbox]):not([type=radio]), > select) { min-width: 96px; }
-    .table-scroll > table:not([data-rt]) td:has(> input[type=text], > textarea) { min-width: 140px; }
+    .table-scroll > table:not([data-rt]) td:has(input:not([type=checkbox]):not([type=radio]), select) { min-width: 96px; }
+    .table-scroll > table:not([data-rt]) td:has(input[type=text], textarea) { min-width: 140px; }
     .rt-table td:has(> .icon-btn:only-child) { padding-left: 6px; padding-right: 6px; }
     .table-scroll > table > thead > tr > :first-child, .table-scroll > table > tbody > tr > :first-child {
       position: sticky; left: 0; z-index: 2; background-color: var(--card);
@@ -1543,6 +1543,16 @@
     .page-head .desc.has-more:not(.open) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .desc-more { display: inline-flex; margin: 2px 0 6px; font-size: 12.5px; }
   }
+  /* ---------------- Q8: money inputs show a £ sign and thousands separators when not being edited (the stored value is untouched) ---------------- */
+  .money-wrap { display: grid; max-width: 100%; position: relative; }
+  .money-wrap.inl { display: inline-grid; vertical-align: middle; }
+  .money-wrap > * { grid-area: 1 / 1; min-width: 0; }
+  .money-wrap > input { padding-left: 17px !important; }
+  .money-wrap > .money-cur, .money-wrap > .money-fmt { pointer-events: none; align-self: center; line-height: 1.2; white-space: nowrap; overflow: hidden; box-sizing: border-box; }
+  .money-wrap > .money-cur { color: var(--text-muted); justify-self: start; }
+  .money-wrap > .money-fmt { width: 100%; }
+  .money-wrap.has-fmt:not(:focus-within) > input { color: transparent; }
+  .money-wrap:focus-within > .money-fmt { visibility: hidden; }
 </style>
 </head>
 <body>
@@ -2204,6 +2214,7 @@ if(ENV_LABEL === 'TEST'){
 /* ---------- date helpers ---------- */
 function toDate(s){ return s ? new Date(s+'T00:00:00') : null; }
 function fmt(d){ if(!d) return ''; const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return y+'-'+m+'-'+day; }
+function dShow(s){ const m = /^\d{4}-\d{2}-\d{2}/.exec(String(s || '')); const d = m ? toDate(m[0]) : null; return d && !isNaN(d) ? fmtDisplay(d) : String(s || ''); }   // an ISO date string as 9 Oct 2026 (the stored value is not changed)
 function fmtDisplay(d){ if(!d) return '—'; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
 function addCalendarDays(d, n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
 function completionDate(start, buildDays){
@@ -2218,7 +2229,7 @@ function completionDate(start, buildDays){
 }
 function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 function monthLabel(d){ return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'}); }
-function money(n){ if(n===null||n===undefined||isNaN(n)) return '£0'; return '£'+Math.round(n).toLocaleString('en-GB'); }
+function money(n){ if(n===null||n===undefined||isNaN(n)) return '£0'; const r = Math.round(n); return (r < 0 ? '-£' : '£') + Math.abs(r).toLocaleString('en-GB'); }   // whole pounds with thousands separators; zero is always £0, never -£0
 function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
 
 /* ---------- pipeline stages: configurable lists, referenced by permanent id ---------- */
@@ -2985,7 +2996,7 @@ const dashDays = (a, b) => Math.round((toDate(b) - toDate(a)) / 86400000);
 const dashPlural = (n, one, many) => n + ' ' + (n === 1 ? one : (many || one + 's'));
 function moneySigned(n){ n = Math.round(Number(n) || 0); return n < 0 ? '−' + money(-n) : money(n); }
 function moneyShort(n){
-  n = Number(n) || 0; const a = Math.abs(n), sg = n < 0 ? '−' : '';
+  n = Number(n) || 0; const a = Math.abs(n), sg = (n < 0 && Math.round(a) > 0) ? '−' : '';
   if(a >= 1e6) return sg + '£' + (a / 1e6).toFixed(1).replace(/\.0$/, '') + 'm';
   if(a >= 1e3) return sg + '£' + (a / 1e3).toFixed(1).replace(/\.0$/, '') + 'k';
   return sg + '£' + Math.round(a);
@@ -6289,7 +6300,7 @@ const LAB_BASES = [['hour', 'Hour'], ['halfday', 'Half-day'], ['day', 'Day'], ['
 const QUOTE_SAMPLE_SUPPLIERS = ['Decking Delivery', 'Kellaway Building Supplies', 'Travis Perkins', 'Selco', 'Screwfix'];
 function qRand(p){ return p + Math.random().toString(36).slice(2, 9); }
 function r2(n){ n = Number(n) || 0; return Math.round(Number((n * 100).toPrecision(12))) / 100; }
-function qm(n){ return '£' + Number(n || 0).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function qm(n){ const r = Math.round((Number(n) || 0) * 100) / 100; return (r < 0 ? '-£' : '£') + Math.abs(r).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }   // pounds and pence; zero is always £0.00, never -£0.00
 function qpct(n){ return (Math.round((Number(n) || 0) * 10) / 10) + '%'; }
 function addDaysIso(iso, n){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if(!m) return ''; return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + n)).toISOString().slice(0, 10); }
 function qNumOr(v, d){ const n = parseFloat(v); return (isNaN(n) || n < 0) ? d : n; }
@@ -6538,7 +6549,7 @@ function renderQuotes(){
     const c = qCalc(q);
     html += `<tr class="sup-row" data-qba="open" data-id="${q.id}" tabindex="0"><td class="code-cell">${escHtml(qRef(q))}</td><td class="q-strong">${escHtml(q.customer || '—')}</td><td>${escHtml(q.project || '—')}</td>
       <td>${q.version}</td><td><span class="q-st q-st-${q.status}">${q.status}</span>${apListChips(q)}</td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
-      <td>${escHtml(q.date)}</td><td>${escHtml(qLinkedText(q) || '—')}</td></tr>`;
+      <td>${escHtml(dShow(q.date))}</td><td>${escHtml(qLinkedText(q) || '—')}</td></tr>`;
   });
   wrap.innerHTML = html + '</tbody></table>';
   const cnt = document.getElementById('quoteCount'); if(cnt) cnt.textContent = state.quotes.length ? `${list.length} of ${state.quotes.length} quote${state.quotes.length !== 1 ? 's' : ''}` : '';
@@ -6707,7 +6718,7 @@ function qbTimelineHtml(q){
   const items = sortedComms(q, 'timeline');
   return `<div class="card"><div class="qb-sec-h"><h3>Timeline</h3></div>
     <div class="lc-note-add" style="margin-bottom:10px;"><input type="date" id="qbTlDate" value="${fmt(new Date())}" aria-label="Date"><input type="text" id="qbTlNote" placeholder="Add a note…" maxlength="300" aria-label="Note"><button class="btn" data-qba="tl-add">Add</button></div>
-    <div class="comms-scroll">${items.length ? items.map(({ c }) => `<div class="comm-entry"><span class="comm-date q-tl-d">${escHtml(c.date)}</span><span class="q-tl-n">${escHtml(c.note)}</span></div>`).join('') : '<div class="lp-empty">Nothing yet.</div>'}</div></div>`;
+    <div class="comms-scroll">${items.length ? items.map(({ c }) => `<div class="comm-entry"><span class="comm-date q-tl-d">${escHtml(dShow(c.date))}</span><span class="q-tl-n">${escHtml(c.note)}</span></div>`).join('') : '<div class="lp-empty">Nothing yet.</div>'}</div></div>`;
 }
 function qbRender(){
   const q = qFind(qUi.openId), box = document.getElementById('quoteBuilderView'); if(!q || !box) return;
@@ -7315,7 +7326,7 @@ function qActualHtml(q){
   const t = (title, sold, act, vr, cls, w) => `<div class="qb-t2"><h4>${title}</h4>
     <div class="qb-t2-3"><div><small>Sold</small><b>${sold || '—'}</b></div><div><small>Actual</small><b>${act || '—'}</b></div><div class="${cls || ''}"><small>Variance</small><b>${vr || '—'}</b>${w ? `<em>${w}</em>` : ''}</div></div></div>`;
   return `<div class="card qb-avs"><div class="qb-sec-h"><h3>Actual vs sold</h3></div>
-    <p class="q-help" style="margin:0 0 8px;">As sold on ${escHtml(s.date)} (frozen). Logged days come from the Paid stage lines on the linked deal, at ${hpd()} hours per day.</p>
+    <p class="q-help" style="margin:0 0 8px;">As sold on ${escHtml(dShow(s.date))} (frozen). Logged days come from the Paid stage lines on the linked deal, at ${hpd()} hours per day.</p>
     <div class="qb-tilegrid">
       ${t('Labour days', dys(s.labourDays), dys(a.paidDays), sg(vd, dys), col(vd), word(vd))}
       ${t('Labour £' + (s.dayRate > 0 ? ' (variance × ' + qm(s.dayRate) + ' day rate)' : ' (no day rate set)'), qm(s.labourEx), '', vm === null ? '' : sg(vm, qm), vm === null ? '' : col(vm), vm === null ? '' : word(vm))}
@@ -7328,7 +7339,7 @@ function qAsSoldHtml(q){
   const s = q.asSold; if(!s) return '';
   const t = (title, rows, cls) => `<div class="qb-t2${cls ? ' ' + cls : ''}"><h4>${title}</h4>${rows.map(([k, v, c]) => `<div class="qb-t2-r${c ? ' ' + c : ''}"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;
   const labRows = s.labourRows.map(r => [escHtml(r.description || 'Labour') + ': ' + (r.basis === 'fixed' ? 'fixed' : (Math.round(r.qty * 100) / 100) + ' × ' + escHtml(r.basis)), qm(r.amount), 'dim']);
-  return `<div class="card qb-as"><div class="qb-sec-h"><h3>As sold</h3><span class="qb-mode">Locked ${escHtml(s.date)}</span></div>
+  return `<div class="card qb-as"><div class="qb-sec-h"><h3>As sold</h3><span class="qb-mode">Locked ${escHtml(dShow(s.date))}</span></div>
     <div class="qb-tilegrid">
       ${t('Labour', [[`Total (${dys(s.labourDays)} · ${hrs(s.labourHours)})`, qm(s.labourEx), 'strong']].concat(labRows))}
       ${t('Materials and delivery', [['Materials cost', qm(s.materialsCost)], ['Materials price ex VAT', qm(s.materialsEx)], ['Delivery ex VAT', qm(s.deliveryEx)]])}
@@ -7431,7 +7442,7 @@ function qbCashHtml(q, c){
     ${months.map(m => { const net = m.inn - m.out; cum += net; return `<tr><td>${monthLabel(toDate(m.key + '-01'))}</td><td class="qb-calc">${qm(m.inn)}</td><td class="qb-calc">${qm(m.out)}</td><td class="qb-calc${net < 0 ? ' q-over' : ''}"><b>${net < 0 ? '−' : ''}${qm(Math.abs(net))}</b></td><td class="qb-calc">${cum < 0 ? '−' : ''}${qm(Math.abs(cum))}</td></tr>`; }).join('')}
     </tbody></table></div>
     <div class="qb-scroll" style="margin-top:10px;"><table class="qb-table qb-narrow" data-flip="qcash-d"><thead><tr><th>Date</th><th>What</th><th>In / out</th><th>Amount</th></tr></thead><tbody>
-    ${items.sort((a, b) => a.date.localeCompare(b.date)).map(i => `<tr><td>${escHtml(i.date)}${i.estimated ? ' <span class="qb-dim">(est.)</span>' : ''}</td><td>${i.supplierId ? `<i class="q-dot" style="background:${supColour(i.supplierId)}"></i>` : ''}${escHtml(i.label)}</td><td>${i.kind === 'in' ? 'In' : 'Out'}</td><td class="qb-calc">${qm(i.amount)}</td></tr>`).join('')}
+    ${items.sort((a, b) => a.date.localeCompare(b.date)).map(i => `<tr><td>${escHtml(dShow(i.date))}${i.estimated ? ' <span class="qb-dim">(est.)</span>' : ''}</td><td>${i.supplierId ? `<i class="q-dot" style="background:${supColour(i.supplierId)}"></i>` : ''}${escHtml(i.label)}</td><td>${i.kind === 'in' ? 'In' : 'Out'}</td><td class="qb-calc">${qm(i.amount)}</td></tr>`).join('')}
     </tbody></table></div></div>`;
 }
 /* the parts of the builder that are recalculated live (no inputs inside, so they are simply rewritten) */
@@ -7439,7 +7450,7 @@ function qbLiveParts(q, c){
   const el = document.getElementById('qbActual'); if(el) el.innerHTML = qActualHtml(q);
   const ce = document.getElementById('qbCash'); if(ce){ ce.innerHTML = qbCashHtml(q, c); cfFlipAll(ce); }
   const pa = qPayAlloc(q, c);
-  pa.rows.forEach(x => { const a = document.querySelector(`[data-qc="${x.row.id}|payAmt"]`), d = document.querySelector(`[data-qc="${x.row.id}|payDate"]`); if(a) a.textContent = qm(x.amount); if(d) d.innerHTML = x.date ? escHtml(x.date) + (x.row.dueOverride ? ' <span class="qb-flag manual" title="A manual date: it is kept when the quote recalculates">manual</span>' : '') : 'set the stage dates'; });
+  pa.rows.forEach(x => { const a = document.querySelector(`[data-qc="${x.row.id}|payAmt"]`), d = document.querySelector(`[data-qc="${x.row.id}|payDate"]`); if(a) a.textContent = qm(x.amount); if(d) d.innerHTML = x.date ? escHtml(dShow(x.date)) + (x.row.dueOverride ? ' <span class="qb-flag manual" title="A manual date: it is kept when the quote recalculates">manual</span>' : '') : 'set the stage dates'; });
   const ua = document.getElementById('qbUnalloc');
   if(ua){ const z = Math.abs(pa.unallocated) < 0.005; ua.className = 'qb-unalloc ' + (z ? 'ok' : 'bad'); ua.textContent = z ? `Fully allocated: ${qm(pa.payable)}` : `Unallocated: ${pa.unallocated < 0 ? '−' : ''}${qm(Math.abs(pa.unallocated))} of ${qm(pa.payable)}`; }
   qcdRefresh(q, c);
@@ -7589,7 +7600,7 @@ function renderQuoteAgeing(){
     <p class="q-help">Stale = older than the supplier's price validity. Expired = more than twice that. Suppliers with no validity set always show OK.</p>
     <div class="qb-scroll"><table class="quotes-table"><thead><tr><th>Quote</th><th>Line</th><th>Supplier</th><th>Price</th><th>Date entered</th><th>Age (days)</th><th>Validity (days)</th><th>Status</th><th></th></tr></thead><tbody>
     ${rows.length ? rows.map(r => `<tr><td class="code-cell">${escHtml(qRef(r.q))}</td><td title="${escAttr(r.l.description)}">${escHtml(r.l.description || '(no description)')}</td><td>${escHtml(r.sup ? r.sup.name : '(removed)')}</td>
-      <td class="q-num">${qm(r.p.price)}</td><td>${escHtml(r.p.date)}</td><td class="q-num">${r.age}</td><td class="q-num">${r.validity || '—'}</td>
+      <td class="q-num">${qm(r.p.price)}</td><td>${escHtml(dShow(r.p.date))}</td><td class="q-num">${r.age}</td><td class="q-num">${r.validity || '—'}</td>
       <td><span class="q-age q-age-${r.status}">${r.status === 'ok' ? 'OK' : r.status === 'stale' ? 'Stale' : 'Expired'}</span></td>
       <td><button class="btn secondary qb-sm" data-qba="age-check" data-qid="${r.q.id}" data-lid="${r.l.id}" data-sid="${r.p.supplierId}">Mark as checked today</button></td></tr>`).join('') : '<tr><td colspan="9"><div class="sup-empty">No priced lines on Draft or Sent quotes.</div></td></tr>'}
     </tbody></table></div>`;
@@ -7612,7 +7623,7 @@ function renderCashflowQuotes(){
   box.innerHTML = `<div class="card" style="margin-top:14px;"><div class="qb-sec-h"><h3>Quote cash movements</h3></div>
     <p class="q-help" style="margin:0 0 8px;">Solid rows are Accepted quotes and are in the totals above. Dashed rows are Sent quotes, shown “if won”, and are not in the closing balance. A deal with a Sent or Accepted quote is counted from the quote, not from its stage costs.</p>
     <div class="qb-scroll"><table class="qb-table qb-narrow" data-flip="cfquotes"><thead><tr><th>Date</th><th>Quote</th><th>What</th><th>In / out</th><th>Amount</th><th></th></tr></thead><tbody>
-    ${items.map(i => `<tr class="${i.status === 'Accepted' ? '' : 'cf-ifwon'}"><td>${escHtml(i.date)}${i.estimated ? ' <span class="qb-dim">(est.)</span>' : ''}</td><td><button class="sp-link" data-qba="open-quote" data-id="${i.qid}">${escHtml(i.ref)}</button></td>
+    ${items.map(i => `<tr class="${i.status === 'Accepted' ? '' : 'cf-ifwon'}"><td>${escHtml(dShow(i.date))}${i.estimated ? ' <span class="qb-dim">(est.)</span>' : ''}</td><td><button class="sp-link" data-qba="open-quote" data-id="${i.qid}">${escHtml(i.ref)}</button></td>
       <td>${i.supplierId ? `<i class="q-dot" style="background:${supColour(i.supplierId)}"></i>` : ''}${escHtml(i.label)}</td><td>${i.kind === 'in' ? 'In' : 'Out'}</td><td class="qb-calc">${qm(i.amount)}</td><td>${i.status === 'Accepted' ? '' : 'if won'}</td></tr>`).join('')}
     </tbody></table></div></div>`;
   cfFlipAll(box);
@@ -8524,7 +8535,7 @@ function computeCashFlow(months){
   });
 }
 function cfCell(c, row, v, neg, extraCls){
-  const n = c.lines[row] || [], txt = (neg ? '-' : '') + money(v), sel = cfUi.sel && cfUi.sel.row === row && cfUi.sel.key === c.key;
+  const n = c.lines[row] || [], txt = (neg && Math.round(Number(v) || 0) !== 0 ? '-' : '') + money(v), sel = cfUi.sel && cfUi.sel.row === row && cfUi.sel.key === c.key;
   return `<td class="${extraCls || ''}">${n.length ? `<button type="button" class="cf-n${sel ? ' sel' : ''}" data-cf="sel" data-row="${row}" data-key="${c.key}" title="Show the ${n.length} line${n.length > 1 ? 's' : ''} behind this number">${txt}</button>` : txt}</td>`;
 }
 function cfLinesHtml(cf){
@@ -11136,6 +11147,54 @@ document.getElementById('menuBtn').addEventListener('click', () => {
   document.getElementById('sidebarBackdrop').classList.add('open');
 });
 document.getElementById('sidebarBackdrop').addEventListener('click', closeMobileSidebar);
+
+/* money inputs (number boxes labelled with a £): add a visible £ sign and, when the box is not being edited, show the value with thousands
+   separators (1234 -> 1,234). The input itself is left as a plain number box, so what is stored and saved never changes. */
+function moneyText(v){
+  if(v === '' || v == null) return '';
+  const n = Number(v); if(!isFinite(n)) return '';
+  const frac = String(v).indexOf('.') >= 0 && Math.abs(n % 1) > 0;
+  return n.toLocaleString('en-GB', { minimumFractionDigits: frac ? 2 : 0, maximumFractionDigits: 2 });
+}
+const moneyValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+function moneyRefresh(inp){
+  const f = inp._mfFmt; if(!f) return;
+  const t = moneyText(moneyValueDesc.get.call(inp));
+  f.textContent = t; inp.parentNode.classList.toggle('has-fmt', t !== '');
+}
+const MONEY_FIELDS = new Set(['agreedValue', 'quoteValue', 'startingCash', 'estValue', 'budgetedCost', 'actualCost', 'moneyIn', 'moneyOut', 'materialsCost']);
+function isMoneyInput(inp){
+  if(inp.type !== 'number' || inp._mfDone) return false;
+  if(MONEY_FIELDS.has(inp.dataset.field)) return true;
+  if((inp.getAttribute('aria-label') || '').indexOf('£') >= 0) return true;
+  const td = inp.closest('td');
+  if(td){ const t = td.closest('table'), th = t && t.tHead && t.tHead.rows[0] && t.tHead.rows[0].cells[td.cellIndex]; return !!(th && th.textContent.indexOf('£') >= 0); }
+  const p = inp.parentElement, lab = p && p.querySelector(':scope > label');
+  return !!(lab && lab.textContent.indexOf('£') >= 0);
+}
+function moneyEnhance(inp){
+  if(!isMoneyInput(inp) || document.activeElement === inp || !inp.parentNode) return;
+  inp._mfDone = true;
+  const cs = getComputedStyle(inp);
+  const wrap = document.createElement('span'); wrap.className = 'money-wrap' + (inp.style.width && !/%$/.test(inp.style.width) ? ' inl' : '');
+  const cur = document.createElement('span'); cur.className = 'money-cur'; cur.textContent = '£';
+  const fmtEl = document.createElement('span'); fmtEl.className = 'money-fmt'; fmtEl.setAttribute('aria-hidden', 'true');
+  [cur, fmtEl].forEach(e => { e.style.fontFamily = cs.fontFamily; e.style.fontSize = cs.fontSize; e.style.fontWeight = cs.fontWeight; });
+  fmtEl.style.color = cs.color; fmtEl.style.textAlign = cs.textAlign === 'right' ? 'right' : 'left';
+  fmtEl.style.paddingLeft = (parseFloat(cs.borderLeftWidth) + 17) + 'px'; fmtEl.style.paddingRight = cs.paddingRight;
+  cur.style.paddingLeft = (parseFloat(cs.borderLeftWidth) + 4) + 'px';
+  inp.parentNode.insertBefore(wrap, inp); wrap.appendChild(inp); wrap.appendChild(cur); wrap.appendChild(fmtEl);
+  inp._mfFmt = fmtEl;
+  Object.defineProperty(inp, 'value', { configurable: true, get(){ return moneyValueDesc.get.call(this); }, set(v){ moneyValueDesc.set.call(this, v); moneyRefresh(this); } });
+  inp.addEventListener('input', () => moneyRefresh(inp)); inp.addEventListener('change', () => moneyRefresh(inp));
+  moneyRefresh(inp);
+}
+function moneyEnhanceAll(root){ (root || document).querySelectorAll('input[type=number]').forEach(moneyEnhance); }
+new MutationObserver((recs) => {
+  for(const r of recs) r.addedNodes.forEach(n => { if(n.nodeType === 1){ if(n.tagName === 'INPUT') moneyEnhance(n); else moneyEnhanceAll(n); } });
+}).observe(document.body, { childList: true, subtree: true });
+document.addEventListener('focusout', (e) => { if(e.target && e.target.tagName === 'INPUT') setTimeout(() => moneyEnhance(e.target), 0); }, true);
+moneyEnhanceAll();
 
 /* the sidebar label tells the truth about which copy this is (reads ENV_LABEL from the settings block at the top of this script) */
 (function(){ const el = document.getElementById('envSub'); if(el) el.textContent = ENV_LABEL === 'TEST' ? 'Test system' : 'Live system'; })();
