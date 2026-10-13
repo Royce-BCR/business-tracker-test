@@ -127,6 +127,9 @@
     transition: background 0.12s ease, color 0.12s ease;
     user-select: none;
   }
+  /* keyboard focus: one visible ring for everything that can take focus */
+  :where(a, button, input, select, textarea, summary, [role=button], [tabindex]):focus-visible { outline: 2px solid #7e5120; outline-offset: 2px; }
+  .sidebar :focus-visible { outline-color: #fff; }
   main { display: block; }
   main:focus { outline: none; }
   .skip-link { position: absolute; left: 8px; top: -60px; z-index: 100001; background: #fff; color: var(--ink); padding: 10px 16px; border-radius: 8px; font-weight: 600; text-decoration: none; box-shadow: var(--shadow-lift); }
@@ -300,7 +303,7 @@
   }
   input:hover, select:hover, textarea:hover { border-color: var(--stone-deep); background: #fff; }
   input:focus, select:focus, textarea:focus {
-    outline: none; border-color: var(--oak); background: #fffdf9;
+    border-color: var(--oak); background: #fffdf9;
     box-shadow: 0 0 0 3px rgba(168,118,62,0.1);
   }
   input[type="date"] { min-width: 118px; }
@@ -400,7 +403,7 @@
   .comm-entry .comm-date { width: 120px; flex-shrink: 0; border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 5px 6px; font-size: 11.5px; }
   .comm-entry .comm-note { flex: 1; border: 1px solid transparent; background: transparent; padding: 5px 6px; font-size: 12.5px; border-radius: 6px; }
   .comm-entry .comm-note:hover { border-color: var(--stone-deep); background: #fff; }
-  .comm-entry .comm-note:focus { border-color: var(--oak); background: #fffdf9; outline: none; }
+  .comm-entry .comm-note:focus { border-color: var(--oak); background: #fffdf9; }
   /* leads: collapsed-row colour coding, status pill, resizable fixed-layout table */
   .leads-table { table-layout: fixed; }
   .leads-table th { overflow: hidden; text-overflow: ellipsis; }
@@ -445,7 +448,7 @@
   .lc-head .lc-pill, .lp-pill { margin-left: auto; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; }
   .lc-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 16px 16px 4px; }
   .lc-block { position: relative; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; width: 100%; text-align: left; font-family: inherit; color: var(--ink); background: #faf8f4; border: 1px solid var(--line); border-radius: 10px; padding: 12px 36px 12px 14px; cursor: pointer; min-width: 0; line-height: 1.5; transition: border-color 0.12s, background 0.12s; }
-  .lc-block:hover, .lc-block:focus-visible { border-color: var(--lc-edge); background: #fff; outline: none; }
+  .lc-block:hover, .lc-block:focus-visible { border-color: var(--lc-edge); background: #fff; }
   .lc-block .pen { position: absolute; top: 11px; right: 11px; width: 15px; height: 15px; color: var(--text-muted); }
   .lc-block:hover .pen { color: var(--lc-edge); }
   .lc-block h4 { margin: 0 0 6px; font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.02em; }
@@ -748,7 +751,7 @@
   .login-field { margin-bottom: 14px; }
   .login-field label { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; }
   .login-field input { width: 100%; border: 1px solid var(--stone-deep); border-radius: 8px; padding: 9px 11px; font-size: 13.5px; font-family: inherit; }
-  .login-field input:focus { outline: none; border-color: var(--oak); box-shadow: 0 0 0 3px rgba(168,118,62,0.12); }
+  .login-field input:focus { border-color: var(--oak); box-shadow: 0 0 0 3px rgba(168,118,62,0.12); }
   .login-btn { width: 100%; background: var(--ink); color: #fff; border: none; border-radius: 9px; padding: 11px; font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 6px; }
   .login-btn:hover { background: #33383d; }
   .login-err { color: #b3453f; font-size: 12px; min-height: 16px; margin-top: 10px; text-align: center; }
@@ -1322,7 +1325,7 @@
   .tk-head .cbx svg { width: 14px; height: 14px; }
   .tk-titlein { flex: 1; min-width: 0; min-height: 0; resize: none; overflow: hidden; border: 1px solid transparent; background: transparent; border-radius: 8px; padding: 4px 8px; margin: 0 0 0 -8px; font-family: var(--serif); font-size: 20px; font-weight: 600; line-height: 1.3; color: var(--ink); }
   .tk-titlein:hover { border-color: var(--line); background: #fff; }
-  .tk-titlein:focus { border-color: var(--oak); background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(168,133,26,0.12); }
+  .tk-titlein:focus { border-color: var(--oak); background: #fff; box-shadow: 0 0 0 3px rgba(168,133,26,0.12); }
   .tk-head.done .tk-titlein { color: var(--text-muted); text-decoration: line-through; }
   .tk-head .icon-btn { flex-shrink: 0; margin-top: 1px; }
   .tk-form { display: flex; flex-direction: column; gap: 18px; }
@@ -1358,7 +1361,7 @@
   .tk-saved { font-size: 12px; color: var(--green); min-height: 16px; }
   .tk-desc { width: 100%; min-height: 140px; resize: none; overflow: hidden; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 11px 12px; font-family: inherit; font-size: 14px; line-height: 1.55; color: var(--ink); }
   .tk-desc:hover { border-color: var(--stone-deep); }
-  .tk-desc:focus { border-color: var(--oak); outline: none; box-shadow: 0 0 0 3px rgba(168,133,26,0.12); }
+  .tk-desc:focus { border-color: var(--oak); box-shadow: 0 0 0 3px rgba(168,133,26,0.12); }
   .tk-addnote-link { background: none; border: none; padding: 2px 0; font-family: inherit; font-size: 13px; font-weight: 600; color: #2a6fb5; cursor: pointer; }
   .tk-addnote-link:hover { text-decoration: underline; }
   .tk-noteform { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: #faf8f4; }
