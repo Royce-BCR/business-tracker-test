@@ -1477,6 +1477,11 @@
   .asset-table input:not([type=checkbox]) { min-width: 110px; } .asset-table input.qb-n { min-width: 84px; width: 90px; } .asset-table td { vertical-align: top; } .asset-table .over input { color: #b3453f; }
   .fin-help { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin: -4px 0 6px; }
   .asset-table { min-width: 1280px; } .asset-table select { min-width: 100px; }
+
+  /* ---------------- Purchase orders ---------------- */
+  .po-st { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; } .po-st-Draft { background: #ebe9e4; color: #6b6760; } .po-st-Approved { background: #dcebf7; color: #2a638e; } .po-st-Sent { background: #c9def2; color: #1f4f78; } .po-st-Delivered { background: #fbeccd; color: #8a5a10; } .po-st-Matched { background: #d8ecdc; color: #2e7a45; }
+  .po-needs td { background: #fdf0ee; } .po-needs td:first-child { box-shadow: inset 4px 0 0 #c0443c; } .po-flag { display: inline-block; background: #b3453f; color: #fff; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .po-note { font-size: 12.5px; color: var(--slate); margin-bottom: 12px; } .po-steps { display: flex; gap: 8px; align-items: center; margin: 4px 0 12px; font-size: 12.5px; color: var(--muted); } .po-steps span.done { color: #2e7a45; font-weight: 600; } .po-steps span.cur { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--ink); } .po-steps i { font-style: normal; }
 </style>
 </head>
 <body>
@@ -1527,6 +1532,7 @@
     <div class="nav-label">Operations</div>
     <div class="tab g-operations" data-tab="projectpipeline">Project Pipeline</div>
     <div class="tab g-operations" data-tab="suppliers">Suppliers</div>
+    <div class="tab g-operations" data-tab="purchaseorders">Purchase Orders</div>
   </div>
 
   <div class="nav-group g-organisation">
@@ -1741,6 +1747,15 @@
     <div class="table-scroll" id="cashflowTableWrap"></div>
     <div id="cashflowLines"></div>
     <div id="cashflowQuoteBox"></div>
+  </div>
+
+  <!-- PURCHASE ORDERS -->
+  <div class="panel" id="panel-purchaseorders">
+    <div class="page-head">
+      <h2>Purchase Orders</h2>
+      <div class="desc">Optional orders raised from a project's delivery drops: supplier, items, agreed prices, delivery date and address. Draft, Approved, Sent, Delivered, Matched (to the supplier's invoice in Transactions).</div>
+    </div>
+    <div id="poBody"></div>
   </div>
 
   <!-- ASSETS -->
@@ -2311,6 +2326,7 @@ function ensureQuoteModel(o, seedAction){
   { const r = qNum(st.vatRate, 0, 100); st.vatRate = r === '' ? 20 : r; }
   ['labourRateHour','labourRateHalfDay','labourRateDay'].forEach(k => { st[k] = qNum(st[k], 0); });
   { const r = qNum(st.labourProfitPct, 0); st.labourProfitPct = r === '' ? 0 : r; }
+  if(!String(st.poPrefix || '').trim()) st.poPrefix = 'PO-BWR-'; if(st.poApprovalThreshold === undefined || st.poApprovalThreshold === '') st.poApprovalThreshold = 1000; st.poApprovalOn = st.poApprovalOn === true; st.poInApprovals = st.poInApprovals === true;   // purchase orders: prefix, optional approval above a value
   { const r = qNum(st.variationThresholdPct, 0); st.variationThresholdPct = (r === '' || st.variationThresholdPct === undefined) ? 10 : r; }   // % of contract value approved in variations before a new quote version is suggested
   st.materialsMarkupPct = qNum(st.materialsMarkupPct, 0);
   // units: stable ids, names kept as typed
@@ -2475,7 +2491,7 @@ function defaultState(){
     suppliers: [], nextSupplierId: 1,
     branding: defaultBranding(),
     quotes: [], nextQuoteId: 1, nextJobNumber: 1,
-    assets: [], assetPlan: []
+    assets: [], assetPlan: [], purchaseOrders: [], poNextNo: 1
   }))), true), true);
 }
 
@@ -2506,7 +2522,7 @@ function mergeDefaults(loaded){
   out.colWidths = Object.assign({}, loaded.colWidths || {});
   out.settings = Object.assign({}, d.settings, loaded.settings || {});
   { const n = Math.floor(Number(out.settings.leadStaleDays)); out.settings.leadStaleDays = n >= 1 ? n : 14; }   // Dashboard: days without contact before a lead is flagged
-  ['goals','pricingTiers','pipeline','capability','network','milestones','admin','actions','archivedActions','leads','projects','transactions','tiers','crmTasks','suppliers','assets','assetPlan'].forEach(k => {
+  ['goals','pricingTiers','pipeline','capability','network','milestones','admin','actions','archivedActions','leads','projects','transactions','tiers','crmTasks','suppliers','assets','assetPlan','purchaseOrders'].forEach(k => {
     if(!Array.isArray(out[k])) out[k] = d[k];
   });
   // stages: seed/normalise the configurable lists and convert any old stage NAMES on records to stage IDs
@@ -5268,6 +5284,11 @@ function pwTimelineHtml(p, i){
       <p class="q-help">Milestone dates stay as you type them (and still drive the project stage). The diamond colour shows done, due soon (within a week), overdue or future; the right-hand columns show what the stages, deliveries and payments say; “use” copies that date across.</p></div></section>`;
 }
 function pwLineDropName(wq, id){ const d = wq.drops.find(x => x.id === id); return d ? (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop')) : 'No drop'; }
+function pwPoCell(p, x, plan){
+  const po = poForDrop(p.id, x.d.id);
+  if(po) return `<button type="button" class="sp-link" data-po="open" data-id="${po.id}">${escHtml(po.ref)}</button> ${poPill(po)}${poNeedsApproval(po) && !poApproved(po) ? ' <span class="po-flag">Requires approval</span>' : ''}`;
+  return plan && x.out > 0 ? `<button type="button" class="btn secondary qb-sm" data-po="create" data-pid="${p.id}" data-did="${escAttr(x.d.id)}">Create PO</button>` : '<span class="qb-dim">—</span>';
+}
 function pwMaterialsHtml(p, i){
   const ed = pwEditOn(p, 'delivery') ? pwUi.edit : null, aq = projAcceptedQuote(p), wq = ed ? planAsQuote(aq, ed.draft.plan) : projWorkQuote(p), dl = projDeliveries(p, wq), order = projOrderDate(p), inst = projInstallStart(p), m = p.milestones, plan = !!(aq && p.plan);
   let table;
@@ -5287,8 +5308,8 @@ function pwMaterialsHtml(p, i){
   } else {
     const rows = dl.drops.map(x => `<tr class="${x.flags.length ? 'qb-warnrow' : ''}"><td>${x.date ? pwD(x.date) : '<span class="qb-dim">no date</span>'}</td><td>${escHtml(x.supplier)}<div class="qb-dim" style="font-size:11px;">${x.method === 'collect' ? 'Collect' : 'Delivered'}</div></td><td>${escHtml(x.items.join(', ') || '—')}</td>
       <td>${x.flags.map(f => `<div class="qb-warn">⚠ ${escHtml(f)}</div>`).join('') || '<span class="pw-ok">✓</span>'}</td><td class="qb-calc">${qm(x.out)}</td>
-      <td>${x.delivered ? `${pwD(x.delivered)} <button type="button" class="sp-link" data-pw="del-undo" data-did="${escAttr(x.d.id)}">clear</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="del-done" data-did="${escAttr(x.d.id)}">Delivered today</button>`}</td></tr>`).join('');
-    table = `<div class="qb-scroll" style="margin-top:8px;"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Supplier</th><th>Items</th><th>Checks</th><th>Owed</th><th>Delivered</th></tr></thead><tbody>${rows || '<tr><td colspan="6"><div class="sup-empty">No deliveries: they come from the delivery drops on the linked quote.</div></td></tr>'}</tbody></table></div>`;
+      <td>${x.delivered ? `${pwD(x.delivered)} <button type="button" class="sp-link" data-pw="del-undo" data-did="${escAttr(x.d.id)}">clear</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="del-done" data-did="${escAttr(x.d.id)}">Delivered today</button>`}</td><td>${pwPoCell(p, x, plan)}</td></tr>`).join('');
+    table = `<div class="qb-scroll" style="margin-top:8px;"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Supplier</th><th>Items</th><th>Checks</th><th>Owed</th><th>Delivered</th><th>PO</th></tr></thead><tbody>${rows || '<tr><td colspan="7"><div class="sup-empty">No deliveries: they come from the delivery drops on the linked quote.</div></td></tr>'}</tbody></table></div>`;
   }
   const src = dl.q ? (plan ? `<div class="pw-qbar" style="margin-top:8px;">Deliveries are edited here, on the <b>Working plan</b> (copied from <b>${escHtml(qRef(dl.q))}</b> when the project was won). The quote keeps its as-sold copy untouched.${pwEditBtn(p, 'delivery', 'Edit deliveries')}<button type="button" class="btn secondary qb-sm" data-qba="open-drop" data-qid="${dl.q.id}" data-id="${dl.drops[0] ? escAttr(dl.drops[0].d.id) : ''}"${dl.drops.length ? '' : ' disabled'}>View as sold on the quote</button></div>`
     : `<div class="pw-qbar" style="margin-top:8px;">From <b>${escHtml(qRef(dl.q))}</b> (${dl.q.status}). Once the quote is accepted and the project is live, deliveries are edited here. A drop dated before the order date or after install starts is flagged.<button type="button" class="btn secondary qb-sm" data-qba="open-drop" data-qid="${dl.q.id}" data-id="${dl.drops[0] ? escAttr(dl.drops[0].d.id) : ''}"${dl.drops.length ? '' : ' disabled'}>Edit drops on the quote</button></div>`) : '';
@@ -6004,7 +6025,7 @@ const QS_FIELD = {   // key -> kind. 'int' needs a whole number >= min (blank / 
   insuranceCover: { k: 'free' }, complaintDays: { k: 'int', min: 1 }, complaintDayType: { k: 'sel' }, vatNumber: { k: 'vatno' }, vatRate: { k: 'num', min: 0, max: 100 },
   tradeAccountDays: { k: 'int', min: 0 }, labourRateHour: { k: 'opt' }, labourRateHalfDay: { k: 'opt' }, labourRateDay: { k: 'opt' },
   labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' }, helperRateDay: { k: 'opt' }, showRightToCancel: { k: 'bool' },
-  hoursPerDay: { k: 'int', min: 1 }, quoteViewMode: { k: 'view' }, variationThresholdPct: { k: 'num', min: 0, max: 1000 }, showGroupPricesC: { k: 'bool' }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
+  hoursPerDay: { k: 'int', min: 1 }, quoteViewMode: { k: 'view' }, variationThresholdPct: { k: 'num', min: 0, max: 1000 }, poPrefix: { k: 'text' }, poApprovalOn: { k: 'bool' }, poApprovalThreshold: { k: 'num', min: 0 }, poInApprovals: { k: 'bool' }, showGroupPricesC: { k: 'bool' }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
 };
 function qtF(label, field, o){
   o = o || {}; const v = state.settings[field];
@@ -6057,7 +6078,11 @@ function renderQuoteSettings(){
       <select data-ql="stype" data-id="${escAttr(x.id)}" data-lf="paid" aria-label="Paid or unpaid"><option value="paid"${x.paid ? ' selected' : ''}>Paid</option><option value="unpaid"${x.paid ? '' : ' selected'}>Unpaid</option></select>
       <button class="icon-btn" data-qa="stype-del" data-id="${escAttr(x.id)}" title="Remove" aria-label="Remove ${escAttr(x.name)}">${X_SVG}</button></div>`).join('')}</div>
     <button class="btn secondary" style="margin-top:10px;" data-qa="stype-add">+ Add type</button>
-    <div class="q-sub">Change control on a live project</div><div class="assumptions-grid">${qtF('Variation threshold for suggesting a new quote (%)', 'variationThresholdPct', { step: '0.1', help: 'When approved variations pass this share of the contract value, the project suggests a new quote version instead of more variations. Default 10.' })}</div>`;
+    <div class="q-sub">Change control on a live project</div><div class="assumptions-grid">${qtF('Variation threshold for suggesting a new quote (%)', 'variationThresholdPct', { step: '0.1', help: 'When approved variations pass this share of the contract value, the project suggests a new quote version instead of more variations. Default 10.' })}</div>
+    <div class="q-sub">Purchase orders</div><div class="assumptions-grid">${qtF('PO number prefix', 'poPrefix', { type: 'text', help: 'Numbers run PO-BWR-0001, PO-BWR-0002… Changing the prefix only affects new POs.' })}
+      <div class="lp-f"><label>Approval</label><label class="q-check"><input type="checkbox" data-q="poApprovalOn"${s.poApprovalOn ? ' checked' : ''}> Require approval for large POs</label></div>
+      ${qtF('Approval value threshold (£, inc VAT if registered)', 'poApprovalThreshold', { step: '1', help: 'With approval on, a PO at or above this value is flagged in red and cannot be sent until approved.' })}
+      <div class="lp-f"><label>Approvals process</label><label class="q-check"><input type="checkbox" data-q="poInApprovals"${s.poInApprovals ? ' checked' : ''}${poApproversList().length ? '' : ' disabled'}> Include POs in the Approvals process</label><p class="q-help">${poApproversList().length ? 'Only the approvers named in Settings &gt; Approvals can approve a PO, and flagged POs show on the Approvals page.' : 'Switch on an approval lane with approvers in Settings &gt; Approvals first.'}</p></div></div>`;
   const rows = (list, kind, w) => list.map(x => `<div class="q-row${w ? ' has-w' : ''}">
       <input type="text" data-ql="${kind}" data-id="${escAttr(x.id)}" data-lf="name" value="${escAttr(x.name)}" aria-label="Name">
       ${w ? `<div class="q-pct"><input type="number" min="0" max="100" step="0.1" data-ql="${kind}" data-id="${escAttr(x.id)}" data-lf="wastage" value="${x.wastagePct}" placeholder="0" aria-label="Default wastage %">%</div>` : ''}
@@ -8219,7 +8244,7 @@ function apWaitingFor(name){
     && (x.ln.mode === 'notify' ? apLaneState(x.a, x.ln) !== 'seen' : apLaneState(x.a, x.ln) === 'pending'));   // gateway: still undecided; notify-only: told but not yet seen
 }
 function apBadges(){
-  const n = apWaitingFor(whoAmI().name).length;
+  const n = apWaitingFor(whoAmI().name).length + (typeof poWaitingFor === 'function' ? poWaitingFor(whoAmI().name).length : 0);
   ['apBadge', 'revBadge'].forEach(id => { const el = document.getElementById(id); if(el){ el.textContent = n; el.hidden = !n; } });
 }
 function apSummary(q){ const c = qCalc(q); const f = apCashFacts(q, c); return `${qm(c.totalEx)} ex VAT · margin ${qpct(c.pctBefore)} before wages · ${f.negMonth ? 'cash dips negative in ' + monthLabel(toDate(f.negMonth.key + '-01')) : 'cash stays positive'}`; }
@@ -8243,7 +8268,7 @@ function renderApprovals(){
       ${rows.length ? rows.map(x => `<tr><td class="code-cell">${escHtml(qRef(x.q))}<div class="q-help" style="margin:0">${escHtml(x.q.customer)}</div></td><td>${escHtml(x.ln.name)}</td><td><span class="ap-st ap-st-${x.s}">${AP_LABELS[x.s]}</span></td><td>${x.a.round}</td><td>${escHtml(x.a.submittedBy)}</td><td>${escHtml(apTimeAgo(x.a.submittedAt))}</td><td style="white-space:normal">${escHtml(apSummary(x.q))}</td>
       <td><button class="btn secondary qb-sm" data-qba="open-quote" data-id="${x.q.id}">Open quote</button></td></tr>`).join('') : '<tr><td colspan="8"><div class="sup-empty">No approvals yet.</div></td></tr>'}</tbody></table>`;
   }
-  box.innerHTML = tabs + body; apBadges();
+  box.innerHTML = tabs + body + (apUi.tab === 'inbox' ? poApprovalsHtml() : ''); apBadges();
 }
 document.addEventListener('change', (e) => { if(e.target.id === 'apStatusSel'){ apUi.status = e.target.value; renderApprovals(); } });
 
@@ -8682,7 +8707,7 @@ function finVarRefresh(){
 document.addEventListener('input', (e) => { if(e.target.id === 'finAmt') finVarRefresh(); });
 function txnCompleteSave(){
   const t = finUi.pend, er = document.getElementById('finErr'); if(!t) return;
-  const a = Number(document.getElementById('finAmt').value) || 0, date = isoOk(document.getElementById('finDate').value) || fmt(new Date()), d = r2(a - t.amount), diff = Math.abs(d) >= 0.005, reason = document.getElementById('finReason').value.trim();
+  const a = Number(document.getElementById('finAmt').value) || 0, date = isoOk(document.getElementById('finDate').value) || fmt(new Date()), d = r2(a - t.amount), diff = Math.abs(d) >= 0.005, reason = document.getElementById('finReason').value.trim() || ((document.getElementById('finPoReason') || {}).value || '').trim();   // one reason covers both the plan variance and the PO difference
   if(!finUi.file){ er.textContent = 'Upload the invoice (or take a photo of it) first.'; return; }
   if(!(a > 0)){ er.textContent = 'Enter the value ' + (t.dir === 'out' ? 'paid' : 'received') + '.'; return; }
   if(diff && reason.length < 3){ er.textContent = 'The value differs from the plan: give a reason.'; return; }
@@ -8900,6 +8925,131 @@ document.addEventListener('change', (e) => {
   if(reg && f === 'status' && el.value === 'Retired' && !reg.retiredDate) reg.retiredDate = fmt(new Date());
   if(pl && f === 'status' && el.value === 'Bought' && !pl.assetId){ o.status = 'Approved'; saveState(); assetOpenBuy(pl.id); return; }
   saveState(); clearTimeout(window._assetLazy); window._assetLazy = setTimeout(render, 350);
+});
+
+/* ---------- Purchase orders ----------
+   An optional PO is made from a delivery drop on a project's Working plan: it copies the supplier, the items with quantities to order and the agreed (cost) prices, the delivery
+   date and address and the project reference, and gets the next number (prefix in Settings). It is a snapshot, editable while Draft. Stored: state.purchaseOrders[], state.poNextNo.
+   po { id, no, ref, pid, did, supplierId, items[{ lineId, desc, qty, unit, price, vatRate }], deliveryDate, method, address, notes, status, createdBy, createdAt, approval{ by, at }, sentAt, deliveredAt, match{ txnUid, invoice, diff, reason, at } } */
+const PO_STATUS = ['Draft', 'Approved', 'Sent', 'Delivered', 'Matched'];
+const poUi = { open: 0 };
+navExtra('po', () => poUi.open, v => { poUi.open = v || 0; });
+function poPrefixText(){ const v = String(state.settings.poPrefix == null ? '' : state.settings.poPrefix).trim(); return v || 'PO-BWR-'; }
+function poFind(id){ return (state.purchaseOrders || []).find(x => x.id === id) || null; }
+function poTotals(po){
+  const defRate = (Number(state.settings.vatRate) || 0) / 100; let ex = 0, vat = 0;
+  po.items.forEach(i => { const a = (Number(i.qty) || 0) * (Number(i.price) || 0); ex += a; vat += a * (i.lineId === '' ? defRate : (Number(i.vatRate) || 0) / 100); });
+  ex = r2(ex); vat = qVatOn() ? r2(vat) : 0; return { ex, vat, inc: r2(ex + vat), payable: r2(ex + vat) };
+}
+function poNeedsApproval(po){ const s = state.settings; return !!s.poApprovalOn && Number(s.poApprovalThreshold) > 0 && poTotals(po).payable >= Number(s.poApprovalThreshold); }
+function poApproved(po){ return !!(po.approval && po.approval.by); }
+function poForDrop(pid, did){ return (state.purchaseOrders || []).find(x => x.pid === pid && x.did === did) || null; }
+function poApproversList(){ return [...new Set((state.settings.approvalLanes || []).filter(l => l.enabled).flatMap(l => l.approvers || []))]; }
+function poViaApprovals(){ return !!state.settings.poInApprovals && poApproversList().length > 0; }
+function poCanApprove(po){ const me = whoAmI().name; if(!poViaApprovals()) return { ok: true }; const ok = poApproversList().filter(n => n !== po.createdBy).length ? poApproversList().filter(n => n !== po.createdBy) : poApproversList(); return me && ok.includes(me) ? { ok: true } : { ok: false, why: 'Approvals are on: only ' + ok.join(' or ') + ' can approve a PO' + (me ? '' : ' (choose who you are at the top of the page)') }; }
+function poDelivered(po){ const p = state.projects.find(x => x.id === po.pid); return !!(p && p.dropState && p.dropState[po.did] && p.dropState[po.did].delivered); }
+function poSnapshot(p, did){
+  const wq = projWorkQuote(p), d = wq.drops.find(x => x.id === did); if(!d) return null; const c = qCalc(wq), cu = projCustomer(p);
+  const items = wq.lines.filter(l => l.deliveryDropId === did && c.lines[l.id] && !c.lines[l.id].excluded).map(l => ({ lineId: l.id, desc: l.description || 'Item', qty: c.lines[l.id].qtyOrder, unit: qUnitName(l), price: r2(c.lines[l.id].costEach), vatRate: Number(l.vatRate) || 0 }));
+  if(d.method !== 'collect' && Number(d.charge) > 0) items.push({ lineId: '', desc: 'Delivery charge', qty: 1, unit: '', price: r2(d.charge), vatRate: Number(state.settings.vatRate) || 0 });
+  return { supplierId: d.supplierId || '', supplierName: d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Supplier'), items, deliveryDate: d.date || '', method: d.method,
+    address: d.method === 'collect' ? '' : [cu.address, cu.postcode && !String(cu.address).includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ') };
+}
+function poCreate(pid, did){
+  const p = state.projects.find(x => x.id === pid); if(!p) return; const ex = poForDrop(pid, did); if(ex){ navGo(() => poOpen(ex.id)); return; }
+  const snap = poSnapshot(p, did); if(!snap) return;
+  const no = Math.max(Number(state.poNextNo) || 1, (state.purchaseOrders || []).reduce((m, x) => Math.max(m, x.no), 0) + 1); state.poNextNo = no + 1;
+  const po = Object.assign({ id: no, no, ref: poPrefixText() + String(no).padStart(4, '0'), pid, did, notes: '', status: 'Draft', createdBy: whoName(), createdAt: fmt(new Date()), approval: null, sentAt: '', deliveredAt: '', match: null }, snap);
+  state.purchaseOrders = state.purchaseOrders || []; state.purchaseOrders.push(po); saveState(); render(); navGo(() => poOpen(po.id)); showToast(po.ref + ' created as a Draft');
+}
+function poOpen(id){ poUi.open = id; activateTab('purchaseorders'); renderPOs(); window.scrollTo(0, 0); }
+function poPill(po){ const s = po.status; return `<span class="po-st po-st-${s}">${s}</span>`; }
+function renderPOs(){
+  const el = document.getElementById('poBody'); if(!el) return;
+  (state.purchaseOrders || []).forEach(po => { if(po.status === 'Sent' && poDelivered(po)){ po.status = 'Delivered'; po.deliveredAt = po.deliveredAt || fmt(new Date()); } });
+  const po = poUi.open ? poFind(poUi.open) : null; if(poUi.open && !po) poUi.open = 0;
+  if(po) { el.innerHTML = poDetailHtml(po); return; }
+  const list = (state.purchaseOrders || []).slice().sort((a, b) => b.no - a.no), me = whoAmI().name;
+  el.innerHTML = `<div class="po-note">${state.settings.poApprovalOn ? `Approval is <b>on</b>: POs of <b>${qm(state.settings.poApprovalThreshold)}</b> or more are flagged and cannot be sent until approved${poViaApprovals() ? ' (through the Approvals process)' : ''}.` : 'PO approval is off (Settings &gt; Quotes &gt; Purchase orders).'} Create a PO from a delivery drop in a project's Materials and deliveries section.</div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>PO</th><th>Project</th><th>Supplier</th><th>Delivery</th><th>Value</th><th>Status</th><th>Approval</th><th></th></tr></thead><tbody>${list.map(x => { const need = poNeedsApproval(x);
+      return `<tr class="${need && !poApproved(x) ? 'po-needs' : ''}"><td><b>${escHtml(x.ref)}</b></td><td>${finSrcLink({ t: 'project', id: x.pid, sec: 'materials' }, recordCode(x.pid, 'project'))}</td><td>${escHtml(x.supplierName)}</td><td>${x.deliveryDate ? pwD(x.deliveryDate) : '—'}</td><td class="qb-calc">${qm(poTotals(x).payable)}</td><td>${poPill(x)}</td>
+      <td>${need ? (poApproved(x) ? `<span class="pw-ok">✓ ${escHtml(x.approval.by)}</span>` : '<span class="po-flag">Requires approval</span>') : '<span class="qb-dim">not needed</span>'}</td><td><button type="button" class="btn secondary qb-sm" data-po="open" data-id="${x.id}">Open</button></td></tr>`; }).join('') || '<tr><td colspan="8"><div class="sup-empty">No purchase orders yet.</div></td></tr>'}</tbody></table></div></div>`;
+}
+function poDetailHtml(po){
+  const t = poTotals(po), need = poNeedsApproval(po), appr = poApproved(po), draft = po.status === 'Draft', p = state.projects.find(x => x.id === po.pid), sup = po.supplierId ? supFind(po.supplierId) : null;
+  const can = poCanApprove(po), blockSend = need && !appr, step = PO_STATUS.indexOf(po.status);
+  const items = po.items.map((i, ix) => `<tr><td>${draft ? `<input data-po-i="${ix}" data-f="desc" value="${escAttr(i.desc)}">` : escHtml(i.desc)}</td><td>${draft ? `<input type="number" step="any" min="0" class="qb-n" data-po-i="${ix}" data-f="qty" value="${i.qty}">` : i.qty} ${escHtml(i.unit)}</td><td class="qb-calc">${draft ? `<input type="number" step="any" min="0" class="qb-n" data-po-i="${ix}" data-f="price" value="${i.price}">` : qm(i.price)}</td><td class="qb-calc">${qm((Number(i.qty) || 0) * (Number(i.price) || 0))}</td>${draft ? `<td><button type="button" class="icon-btn" data-po="item-del" data-i="${ix}" aria-label="Remove item">${X_SVG}</button></td>` : ''}</tr>`).join('');
+  const acts = [];
+  if(draft && !appr){ acts.push(`<button type="button" class="btn qb-sm" data-po="approve" data-id="${po.id}"${can.ok ? '' : ' disabled'} title="${escAttr(can.ok ? '' : can.why)}">Approve</button>`); }
+  if(po.status === 'Draft' || po.status === 'Approved') acts.push(`<button type="button" class="btn qb-sm" data-po="sent" data-id="${po.id}"${blockSend ? ' disabled' : ''} title="${blockSend ? 'Requires approval before it can be sent' : ''}">Mark sent</button>`);
+  if(po.status === 'Sent') acts.push(`<button type="button" class="btn qb-sm" data-po="delivered" data-id="${po.id}">Mark delivered</button>`);
+  if(draft) acts.push(`<button type="button" class="btn secondary qb-sm" data-po="refresh" data-id="${po.id}" title="Re-copy items, prices and dates from the Working plan">Refresh from plan</button><button type="button" class="btn secondary qb-sm" data-po="del" data-id="${po.id}">Delete</button>`);
+  acts.push(`<button type="button" class="btn secondary qb-sm" data-po="print" data-id="${po.id}">Print / save as PDF</button><button type="button" class="btn secondary qb-sm" data-po="email" data-id="${po.id}">Email to supplier</button>`);
+  return `<div class="card"><div class="qb-sec-h"><h4><button type="button" class="btn secondary qb-sm" data-po="list">← All POs</button> &nbsp;${escHtml(po.ref)} ${poPill(po)}</h4><div class="qb-sec-tools">${finSrcLink({ t: 'project', id: po.pid, sec: 'materials' }, 'Project ' + recordCode(po.pid, 'project') + ' →')}</div></div>
+    <div class="po-steps">${PO_STATUS.map((s, i) => `<span class="${i < step ? 'done' : i === step ? 'cur' : ''}">${s}</span>`).join('<i>›</i>')}</div>
+    ${need ? `<div class="pw-qbar pw-alert-bar po-flagbar">${appr ? `✓ Approved by <b>${escHtml(po.approval.by)}</b> on ${pwD(po.approval.at)}.` : `⚠ <b>Requires approval</b>: ${qm(t.payable)} is at or above the ${qm(state.settings.poApprovalThreshold)} threshold, so it cannot be sent until approved.${poViaApprovals() ? ' It is also waiting in the Approvals page.' : ''}${can.ok ? '' : ' ' + escHtml(can.why) + '.'}`}</div>` : ''}
+    <div class="qual-grid"><div class="qual-field"><label>Supplier</label><input value="${escAttr(po.supplierName)}" disabled>${sup ? `<div class="q-help">${escHtml([sup.address, sup.postcode].filter(Boolean).join(', '))}${supEmail(sup) ? ' · ' + escHtml(supEmail(sup)) : ''}</div>` : ''}</div>
+      <div class="qual-field"><label>Project reference</label><input value="${escAttr(recordCode(po.pid, 'project') + (p ? ' · ' + p.name : ''))}" disabled></div>
+      <div class="qual-field"><label>Delivery date</label><input type="date" data-po-f="deliveryDate" value="${escAttr(po.deliveryDate)}"${draft ? '' : ' disabled'}></div>
+      <div class="qual-field" style="grid-column:span 2;"><label>${po.method === 'collect' ? 'Collection' : 'Delivery address'}</label><input data-po-f="address" value="${escAttr(po.method === 'collect' ? (po.address || 'Collection from the supplier') : po.address)}"${draft ? '' : ' disabled'}></div></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Item</th><th>Quantity</th><th>Agreed price ex VAT</th><th>Amount</th>${draft ? '<th></th>' : ''}</tr></thead><tbody>${items}</tbody><tfoot><tr class="qb-foot"><td colspan="3" style="text-align:right;">Total ex VAT</td><td class="qb-calc"><b>${qm(t.ex)}</b></td>${draft ? '<td></td>' : ''}</tr>${qVatOn() ? `<tr class="qb-foot"><td colspan="3" style="text-align:right;">VAT</td><td class="qb-calc">${qm(t.vat)}</td>${draft ? '<td></td>' : ''}</tr><tr class="qb-foot"><td colspan="3" style="text-align:right;">Total inc VAT</td><td class="qb-calc"><b>${qm(t.inc)}</b></td>${draft ? '<td></td>' : ''}</tr>` : ''}</tfoot></table></div>
+    ${po.match ? `<div class="pw-qbar" style="display:block;margin-top:10px;">✓ Matched to an invoice of <b>${qm(po.match.invoice)}</b> on ${pwD(po.match.at)}: difference ${Math.abs(po.match.diff) < 0.005 ? 'none' : (po.match.diff > 0 ? '+' : '−') + qm(Math.abs(po.match.diff))}${po.match.reason ? ' (' + escHtml(po.match.reason) + ')' : ''} ${po.match.txnUid ? finSrcLink({ t: 'txn', id: po.match.txnUid }, 'transaction →') : ''}</div>` : ''}
+    <div class="lp-f" style="margin-top:10px;"><label>Notes for the supplier</label><textarea rows="2" data-po-f="notes"${po.status === 'Matched' ? ' disabled' : ''}>${escHtml(po.notes)}</textarea></div>
+    <div class="pw-var-a">${acts.join('')}</div></div>`;
+}
+function poPrintHtml(po){
+  const t = poTotals(po), b = qBrand(), st = state.settings, sup = po.supplierId ? supFind(po.supplierId) : null, p = state.projects.find(x => x.id === po.pid), e = escHtml;
+  return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(po.ref)}</title><style>@page{size:A4;margin:15mm}body{font:13px/1.45 Arial,sans-serif;color:#1c1f22;margin:0;padding:16px;background:#e9e7e2}.bar{background:#1c1f22;color:#fff;padding:10px 16px;display:flex;gap:14px;align-items:center;margin:-16px -16px 16px}.bar button{padding:6px 14px;border:0;border-radius:6px;cursor:pointer}.sheet{background:#fff;max-width:210mm;margin:0 auto;padding:15mm}h1{font-size:26px;margin:0 0 2px;color:#${b.heading}}table{width:100%;border-collapse:collapse;margin:14px 0}th{background:#f2f0ea;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em}td,th{padding:6px 8px;border-bottom:1px solid #e3dfd5}td.n,th.n{text-align:right}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.small{font-size:12px;color:#555}.tot td{border:0;padding:3px 8px}.big{font-size:15px;font-weight:700}@media print{body{background:#fff;padding:0}.bar{display:none}.sheet{padding:0;max-width:none}}</style></head><body><div class="bar"><span>Choose <b>Save as PDF</b> as the destination in the print dialog.</span><button onclick="window.print()">Print / Save as PDF</button></div><div class="sheet">
+    <div class="grid"><div><h1>Purchase order</h1><div><b style="font-size:18px">${e(po.ref)}</b></div><div class="small">Date: ${pwD(po.createdAt)}${po.status === 'Draft' ? ' · DRAFT' : ''}</div></div><div style="text-align:right"><b>${e(b.name)}</b><div class="small">${e(st.bizTagline || '')}</div><div class="small">${e(st.bizAddress || '').replace(/\n/g, '<br>')}</div><div class="small">${e(st.bizPhone || '')} · ${e(st.bizEmail || '')}</div></div></div>
+    <div class="grid" style="margin-top:14px"><div><b>Supplier</b><br>${e(po.supplierName)}${sup ? `<div class="small">${e([sup.address, sup.postcode].filter(Boolean).join(', '))}<br>${e(supEmail(sup) || '')} ${e(supPhone(sup) || '')}</div>` : ''}${sup && sup.accountNo ? `<div class="small">Our account: ${e(sup.accountNo)}</div>` : ''}</div>
+    <div><b>${po.method === 'collect' ? 'Collection' : 'Deliver to'}</b><br>${e(po.method === 'collect' ? (po.address || 'Collection from your premises') : po.address).replace(/\n/g, '<br>')}<div class="small">Required: ${po.deliveryDate ? pwD(po.deliveryDate) : 'to be agreed'}</div><div class="small">Project reference: ${e(recordCode(po.pid, 'project'))}${p ? ' · ' + e(p.name) : ''}</div></div></div>
+    <table><thead><tr><th>Item</th><th class="n">Qty</th><th class="n">Agreed price</th><th class="n">Amount</th></tr></thead><tbody>${po.items.map(i => `<tr><td>${e(i.desc)}</td><td class="n">${i.qty} ${e(i.unit)}</td><td class="n">${qm(i.price)}</td><td class="n">${qm((Number(i.qty) || 0) * (Number(i.price) || 0))}</td></tr>`).join('')}</tbody></table>
+    <table class="tot" style="width:50%;margin-left:auto"><tr><td>Total ex VAT</td><td class="n">${qm(t.ex)}</td></tr>${qVatOn() ? `<tr><td>VAT</td><td class="n">${qm(t.vat)}</td></tr><tr class="big"><td>Total inc VAT</td><td class="n">${qm(t.inc)}</td></tr>` : ''}</table>
+    ${po.notes ? `<p><b>Notes:</b> ${e(po.notes)}</p>` : ''}<p class="small">Please quote ${e(po.ref)} on your delivery note and invoice. ${st.vatRegistered && st.vatNumber ? 'Our VAT number: ' + e(st.vatNumber) + '.' : ''}</p></div>
+    <script>window.addEventListener('load',function(){setTimeout(function(){try{window.print()}catch(e){}},500)})<\/script></body></html>`;
+}
+/* invoice match: when an invoice is uploaded against a supplier payment, it is compared with the PO value */
+function poMatchFor(t){ if(!t || !t.key || !t.key.startsWith('sp:')) return null; const [, pid, did] = t.key.split(':'); const po = poForDrop(Number(pid), did); return po && po.status !== 'Draft' ? po : null; }
+function poMatchDialogHtml(t, amount){
+  const po = poMatchFor(t); if(!po) return ''; const pv = poTotals(po).payable, d = r2(amount - pv), diff = Math.abs(d) >= 0.005;
+  const keep = (document.getElementById('finPoReason') || {}).value || '';
+  return `<div class="fin-var"><b>${escHtml(po.ref)}</b> value ${qm(pv)} vs invoice ${qm(amount)}: ${diff ? `difference <b class="over">${d > 0 ? '+' : '−'}${qm(Math.abs(d))}</b>` : '<b class="under">matches</b>'}</div>${diff ? '<div class="lp-f"><label>Reason the invoice differs from the PO (required)</label><textarea id="finPoReason" rows="2" maxlength="250">' + escHtml(keep) + '</textarea></div>' : ''}`;
+}
+function poMatchSave(t, amount){
+  const po = poMatchFor(t); if(!po) return null; const pv = poTotals(po).payable, d = r2(amount - pv), diff = Math.abs(d) >= 0.005, r = (document.getElementById('finPoReason') || {}).value;
+  if(diff && !(r && r.trim().length >= 3)) return { err: 'The invoice differs from the PO: give a reason.' };
+  return { note: po.ref + (diff ? ' differs by ' + (d > 0 ? '+' : '−') + qm(Math.abs(d)) + ': ' + r.trim() : ' matched'), po, d, reason: diff ? r.trim() : '' };
+}
+function poMarkFromTxn(p, did, tx){
+  const po = poForDrop(p.id, did); if(!po || po.status === 'Draft') return; const pv = poTotals(po).payable, a = Number(tx.moneyOut) || 0, d = r2(a - pv), r = (document.getElementById('finPoReason') || {}).value;
+  po.match = { txnUid: tx.uid, invoice: a, diff: d, reason: Math.abs(d) >= 0.005 && r ? r.trim() : '', at: tx.date }; po.status = 'Matched'; tx.poId = po.id;
+}
+function poMatchHtml(t){ if(!t.poId) return ''; const po = poFind(t.poId); return po ? `<div class="qb-dim" style="font-size:11px;">${finSrcLink({ t: 'po', id: po.id }, po.ref)} ${po.match && Math.abs(po.match.diff) >= 0.005 ? '· differs ' + (po.match.diff > 0 ? '+' : '−') + qm(Math.abs(po.match.diff)) + (po.match.reason ? ': ' + escHtml(po.match.reason) : '') : '· matched'}</div>` : ''; }
+function poApprovalsHtml(){
+  if(!poViaApprovals()) return ''; const me = whoAmI().name, waiting = (state.purchaseOrders || []).filter(po => po.status === 'Draft' && poNeedsApproval(po) && !poApproved(po));
+  return `<div class="card" style="margin-top:14px;"><div class="qb-sec-h"><h4>Purchase orders waiting for approval <span class="db-count">${waiting.length}</span></h4></div>${waiting.length ? `<table class="quotes-table"><thead><tr><th>PO</th><th>Supplier</th><th>Value</th><th>Raised by</th><th></th></tr></thead><tbody>${waiting.map(po => { const c = poCanApprove(po); return `<tr class="po-needs"><td><b>${escHtml(po.ref)}</b></td><td>${escHtml(po.supplierName)}</td><td class="q-num">${qm(poTotals(po).payable)}</td><td>${escHtml(po.createdBy)}</td><td><button type="button" class="btn secondary qb-sm" data-po="open" data-id="${po.id}">Open PO</button> <button type="button" class="btn qb-sm" data-po="approve" data-id="${po.id}"${c.ok ? '' : ' disabled'} title="${escAttr(c.ok ? '' : c.why)}">Approve</button></td></tr>`; }).join('')}</tbody></table>` : '<div class="sup-empty">No POs are waiting for approval.</div>'}</div>`;
+}
+function poWaitingFor(name){ if(!poViaApprovals() || !name) return []; return (state.purchaseOrders || []).filter(po => po.status === 'Draft' && poNeedsApproval(po) && !poApproved(po) && poCanApprove(po).ok); }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-po]'); if(!b) return; const a = b.dataset.po, po = poFind(Number(b.dataset.id || poUi.open));
+  if(a === 'open'){ navGo(() => poOpen(Number(b.dataset.id))); return; } if(a === 'list'){ poUi.open = 0; renderPOs(); return; } if(a === 'create'){ poCreate(Number(b.dataset.pid), b.dataset.did); return; }
+  if(!po) return;
+  if(a === 'approve'){ const c = poCanApprove(po); if(!c.ok){ showToast(c.why); return; } po.approval = { by: whoName(), at: fmt(new Date()) }; po.status = 'Approved'; }
+  else if(a === 'sent'){ if(poNeedsApproval(po) && !poApproved(po)){ showToast('This PO requires approval before it can be sent'); return; } po.status = 'Sent'; po.sentAt = fmt(new Date()); }
+  else if(a === 'delivered'){ po.status = 'Delivered'; po.deliveredAt = fmt(new Date()); const p = state.projects.find(x => x.id === po.pid); if(p){ p.dropState[po.did] = p.dropState[po.did] || {}; if(!p.dropState[po.did].delivered) p.dropState[po.did].delivered = fmt(new Date()); } }
+  else if(a === 'del'){ const ix = state.purchaseOrders.indexOf(po); state.purchaseOrders.splice(ix, 1); undoDeleted('Purchase order deleted: ' + po.ref, ['purchaseOrders'], ix, po); poUi.open = 0; }
+  else if(a === 'refresh'){ const p = state.projects.find(x => x.id === po.pid), snap = p && poSnapshot(p, po.did); if(snap) Object.assign(po, snap); }
+  else if(a === 'item-del'){ po.items.splice(Number(b.dataset.i), 1); }
+  else if(a === 'print'){ const w = window.open('', '_blank'); if(!w){ showToast('Allow pop-ups to print the PO'); return; } w.document.open(); w.document.write(poPrintHtml(po)); w.document.close(); return; }
+  else if(a === 'email'){ const sup = po.supplierId ? supFind(po.supplierId) : null, em = sup ? supEmail(sup) : '', t = poTotals(po); window.location.href = `mailto:${encodeURIComponent(em || '')}?subject=${encodeURIComponent('Purchase order ' + po.ref + ' - ' + recordCode(po.pid, 'project'))}&body=${encodeURIComponent('Hello,\n\nPlease find purchase order ' + po.ref + ' (' + qm(t.ex) + ' ex VAT) for delivery on ' + (po.deliveryDate ? pwD(po.deliveryDate) : 'a date to be agreed') + '. Please quote the PO number on your delivery note and invoice.\n\n(Attach the PDF saved from "Print / save as PDF".)\n\nKind regards,\n' + (qBrand().name || ''))}`; return; }
+  saveState(); render();
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.dataset) return; const po = poFind(poUi.open); if(!po) return;
+  if(el.dataset.poI !== undefined){ const i = po.items[Number(el.dataset.poI)]; if(!i) return; const f = el.dataset.f; i[f] = f === 'desc' ? el.value.trim() : Math.max(0, Number(el.value) || 0); }
+  else if(el.dataset.poF){ po[el.dataset.poF] = el.dataset.poF === 'deliveryDate' ? isoOk(el.value) : el.value.trim(); }
+  else return;
+  saveState(); clearTimeout(window._poLazy); window._poLazy = setTimeout(render, 350);
 });
 
 /* ---------- moving a record between the three pipelines ----------
@@ -10647,6 +10797,7 @@ function render(){
   renderTransactions();
   renderInvoicing();
   renderAssets();
+  renderPOs();
   renderSettings();
   renderBranding();
   settingsMenuSync();
