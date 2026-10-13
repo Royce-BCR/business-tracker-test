@@ -1100,10 +1100,10 @@
       max-width: 300px;
       transform: translateX(-100%);
       transition: transform 0.22s ease;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.28);
+      box-shadow: none;   /* no shadow strip down the screen edge while the menu is closed */
       z-index: 21;
     }
-    .sidebar.open { transform: translateX(0); }
+    .sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.28); }
     .main { --px: 16px; margin-left: 0; margin-top: 52px; padding: 0 var(--px) 100px var(--px); }
     .brandbar { top: 52px; }
     .brandbar.off { margin-bottom: 20px; }
@@ -1553,6 +1553,19 @@
   .money-wrap > .money-fmt { width: 100%; }
   .money-wrap.has-fmt:not(:focus-within) > input { color: transparent; }
   .money-wrap:focus-within > .money-fmt { visibility: hidden; }
+  /* ---------------- Q11: tidier top strip on phones: who-am-I and save status share one line, a short brand pill ---------------- */
+  .brand-pill .bp-short { display: none; font-size: 15px; line-height: 1; font-weight: 600; letter-spacing: 0.03em; }
+  @media (max-width: 700px) {
+    .brandbar-in { width: 100%; flex-wrap: nowrap; gap: 8px; }
+    .who-pick { flex: 0 1 auto; margin-right: 0; min-width: 0; white-space: nowrap; }
+    .who-pick .who-lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .who-pick select { max-width: 110px; }
+    .save-status { flex: 1 1 0; white-space: nowrap; text-overflow: ellipsis; -webkit-line-clamp: 1; line-clamp: 1; }
+    .brand-pill { flex: 0 0 auto; }
+    .brand-pill .bp-name { display: none; }
+    .brand-pill .bp-short { display: inline; }
+    .brand-pill.no-mark { padding: 0 12px; }
+  }
 </style>
 </head>
 <body>
@@ -10613,6 +10626,7 @@ function brandShow(b, logo){
   return { logo: (m === 'logo' || m === 'both') ? logo : '', name: name && (m === 'name' || m === 'both' || (m === 'logo' && !logo)) ? name : '' };
 }
 /* the pill (light background): Standard logos only — Badge, else Full. null = nothing to show, so the row collapses */
+function brandInitials(n){ const w = String(n || '').trim().split(/\s+/).filter(Boolean); return (w.length > 1 ? w[0][0] + w[1][0] : (w[0] || '').slice(0, 2)).toUpperCase(); }
 function brandPillParts(b){
   if(b.mode === 'hidden') return null;
   const lg = b.logos || {}, isBadge = !!lg.badgeStd, sh = brandShow(b, lg.badgeStd || lg.fullStd);
@@ -10620,7 +10634,8 @@ function brandPillParts(b){
   const img = sh.logo ? `<img src="${escHtml(sh.logo)}" alt="${sh.name ? '' : escHtml(brandName(b))}">` : '';
   const nm = sh.name ? `<span class="bp-name" style="${brandNameStyle(b)}">${escHtml(sh.name)}</span>` : '';
   const cls = !sh.logo ? 'brand-pill no-mark' : (isBadge && sh.name) ? 'brand-pill' : 'brand-pill full-only';
-  return { cls, html: img + nm };
+  const short = (sh.name && !sh.logo) ? `<span class="bp-short" aria-hidden="true" style="${brandNameStyle(b)}">${escHtml(brandInitials(sh.name))}</span>` : '';   // phones show this instead of the full name
+  return { cls, html: img + nm + short };
 }
 /* the login screen (dark background): Reversed logos only — Full, else Badge. '' = nothing, as before branding existed. b needs mode, name, tagline, font, logos.fullRev / badgeRev */
 function brandLoginHtml(b){
