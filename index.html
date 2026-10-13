@@ -1435,6 +1435,15 @@
   .pw-ms-chip { display: inline-flex; align-items: center; gap: 6px; margin: 2px 4px 2px 0; font-size: 11.5px; font-weight: 600; background: #f6f4ef; border-radius: 999px; padding: 1px 8px 1px 7px; }
   .pw-chg { border-bottom: 1px solid #f0ece4; padding: 8px 0; } .pw-chg:last-child { border-bottom: 0; } .pw-chg summary { cursor: pointer; font-size: 12.5px; } .pw-chg ul { margin: 6px 0 2px 18px; padding: 0; font-size: 12.5px; color: var(--slate); } .pw-chg-when { color: var(--muted); } .pw-chg-r { color: var(--ink); }
   .chg-list { margin: 0 0 10px 18px; padding: 0; font-size: 12.5px; max-height: 190px; overflow: auto; } .chg-err { color: #b3453f; font-size: 12px; min-height: 16px; }
+
+  /* ---------------- Working plan and variations ---------------- */
+  .pw-removed td { opacity: .55; text-decoration: line-through; } .pw-removed td:last-child { text-decoration: none; }
+  .pw-alert-bar { background: #fdf0ee; color: #8a2f2a; border: 1px solid #e3c4c1; }
+  .pw-var { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; background: #fff; } .pw-var.Approved, .pw-var.Invoiced { background: #f7fbf8; border-color: #cfe3d4; }
+  .pw-var-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; } .pw-var-a { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .pw-var-links { margin: 8px 0; font-size: 12.5px; } .pw-var-links summary { cursor: pointer; color: var(--slate); font-weight: 600; } .pw-var-links label { display: flex; gap: 8px; padding: 3px 0; }
+  .pw-var-ap { margin-top: 8px; font-size: 12.5px; color: #2e7a45; }
+  .q-st-Invoiced { background: #e4f0e6; color: #2e7a45; }
 </style>
 </head>
 <body>
@@ -2237,6 +2246,7 @@ function ensureQuoteModel(o, seedAction){
   { const r = qNum(st.vatRate, 0, 100); st.vatRate = r === '' ? 20 : r; }
   ['labourRateHour','labourRateHalfDay','labourRateDay'].forEach(k => { st[k] = qNum(st[k], 0); });
   { const r = qNum(st.labourProfitPct, 0); st.labourProfitPct = r === '' ? 0 : r; }
+  { const r = qNum(st.variationThresholdPct, 0); st.variationThresholdPct = (r === '' || st.variationThresholdPct === undefined) ? 10 : r; }   // % of contract value approved in variations before a new quote version is suggested
   st.materialsMarkupPct = qNum(st.materialsMarkupPct, 0);
   // units: stable ids, names kept as typed
   let units = Array.isArray(o.quoteUnits) ? o.quoteUnits.filter(u => u && typeof u === 'object' && u.id) : [];
@@ -5062,7 +5072,7 @@ function projOnQuoteAccepted(q){   // a quote linked to a project has just been 
 
 /* ---------- Project workspace (the open project) ---------- */
 const pwUi = { id: 0, sec: 'overview', quick: null, edit: null, lock: 0 };
-const PW_SECS = [['overview', 'Overview'], ['timeline', 'Timeline'], ['money', 'Money'], ['materials', 'Materials & deliveries'], ['changes', 'Change log'], ['notes', 'Notes & files'], ['history', 'Lead & sales history']];
+const PW_SECS = [['overview', 'Overview'], ['timeline', 'Timeline'], ['money', 'Money'], ['materials', 'Materials & deliveries'], ['plan', 'Working plan'], ['variations', 'Variations'], ['changes', 'Change log'], ['notes', 'Notes & files'], ['history', 'Lead & sales history']];
 function openProjectWorkspace(id){ if(pwUi.edit && pwUi.edit.pid !== id) pwUi.edit = null; pwUi.id = id; pwUi.sec = 'overview'; activateTab('projectpipeline'); closeDetail(); renderProjects(); window.scrollTo(0, 0); }
 function closeProjectWorkspace(){ pwUi.id = 0; renderProjects(); }
 function pwRel(d){
@@ -5081,12 +5091,12 @@ function pwEventActions(e){
   return '';
 }
 function pwEditOn(p, kind){ const e = pwUi.edit; return !!(e && e.pid === p.id && (!kind || e.kind === kind)); }
-const PW_EDIT_NAME = { timeline: 'timeline', delivery: 'deliveries', materials: 'materials', labour: 'labour' };
+const PW_EDIT_NAME = { timeline: 'timeline', delivery: 'deliveries', materials: 'materials', labour: 'labour', variation: 'variation' };
 function pwHeaderHtml(p, i){
   const nm = projNextMs(p), pg = projProgress(p), mg = projMargin(p), ct = projContract(p), cu = projCustomer(p), opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${p.stageId === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
   const custName = [cu.company, cu.name].filter(Boolean).join(' — '), bits = [cu.phone ? `<a href="tel:${escAttr(cu.phone.replace(/\s+/g, ''))}">${escHtml(cu.phone)}</a>` : '', cu.email ? `<a href="mailto:${escAttr(cu.email)}">${escHtml(cu.email)}</a>` : '', cu.address ? escHtml([cu.address, cu.postcode && !cu.address.includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ')) : ''].filter(Boolean);
   const value = ct.live
-    ? `<b>${qm(ct.value)}</b><em>ex VAT · live from <button type="button" class="sp-link" data-qba="open-quote" data-id="${ct.q.id}">${escHtml(qRef(ct.q))}</button>${qVatOn() ? ' · ' + qm(ct.inc) + ' inc VAT' : ''}</em>`
+    ? `<b>${qm(ct.value)}</b><em>${projVariationsValue(p) ? '+ ' + qm(projVariationsValue(p)) + ' variations · ' : ''}ex VAT · live from <button type="button" class="sp-link" data-qba="open-quote" data-id="${ct.q.id}">${escHtml(qRef(ct.q))}</button>${qVatOn() ? ' · ' + qm(ct.inc) + ' inc VAT' : ''}</em>`
     : `<input class="pw-val" type="number" step="1" data-tab="projects" data-idx="${i}" data-field="agreedValue" value="${p.agreedValue || 0}" aria-label="Agreed value ex VAT"><em>typed (no accepted quote yet)</em>`;
   return `<div class="pw-sticky"><div class="pw-top">
       <div class="pw-title"><button type="button" class="btn secondary qb-sm" data-pw="back">← All projects</button><span class="detail-code" style="background:var(--green);">${recordCode(p.id, 'project')}</span>
@@ -5301,7 +5311,8 @@ function planDiff(a, b){
   Object.keys(B).forEach(id => {
     const n = B[id], o = A[id];
     if(!o){ out.push(`Added material: ${n.description || 'Item'} (${n.qty} ${qUnitName(n)})`); return; }
-    const ch = []; [['description', 'name'], ['qty', 'qty'], ['wastagePct', 'wastage %'], ['markupPct', 'markup %'], ['costOverride', 'cost override']].forEach(([f, lab]) => { if(String(o[f]) !== String(n[f])) ch.push(`${lab} ${num(o[f])} → ${num(n[f])}`); });
+    const ch = []; [['description', 'name'], ['qty', 'qty'], ['wastagePct', 'wastage %'], ['markupPct', 'markup %']].forEach(([f, lab]) => { if(String(o[f]) !== String(n[f])) ch.push(`${lab} ${num(o[f])} → ${num(n[f])}`); });
+    if(String(o.costOverride) !== String(n.costOverride)) ch.push(`cost each ${o.costOverride === '' ? 'supplier price' : qm(o.costOverride)} → ${n.costOverride === '' ? 'supplier price' : qm(n.costOverride)}`);
     if(String(o.selectedSupplierId) !== String(n.selectedSupplierId)) ch.push(`supplier ${o.selectedSupplierId ? qbSupName(o.selectedSupplierId) : 'cheapest'} → ${n.selectedSupplierId ? qbSupName(n.selectedSupplierId) : 'cheapest'}`);
     if(JSON.stringify(o.prices) !== JSON.stringify(n.prices)) ch.push('prices changed');
     if(o.deliveryDropId !== n.deliveryDropId) ch.push(`drop ${drop(a, o.deliveryDropId)} → ${drop(b, n.deliveryDropId)}`);
@@ -5328,7 +5339,7 @@ function planDiff(a, b){
 function renderProjectWorkspace(p){
   const el = document.getElementById('projectWorkspace'), i = state.projects.indexOf(p); projEnsure(p);
   const top = window.scrollY;
-  el.innerHTML = pwHeaderHtml(p, i) + pwOverviewHtml(p, i) + pwTimelineHtml(p, i) + pwMoneyHtml(p, i) + pwMaterialsHtml(p, i) + pwChangeLogHtml(p) + pwNotesHtml(p, i) + pwHistoryHtml(p, i);
+  el.innerHTML = pwHeaderHtml(p, i) + pwOverviewHtml(p, i) + pwTimelineHtml(p, i) + pwMoneyHtml(p, i) + pwMaterialsHtml(p, i) + pwPlanHtml(p, i) + pwVariationsHtml(p, i) + pwChangeLogHtml(p) + pwNotesHtml(p, i) + pwHistoryHtml(p, i);
   window.scrollTo(0, top);
   pwStick(); pwSpy();
 }
@@ -5417,6 +5428,8 @@ function pwClick(b){
   if(a === 'edit-discard'){ pwEditDiscard(); return; }
   if(a === 'edit-reset'){ pwEditReset(); return; }
   if(a === 'edit-baseline'){ pwEditBaseline(); return; }
+  if(pwPlanClick(a, b, p) || pwVarClick(a, b, p)) return;
+  if(a === 'new-version'){ const aq = projAcceptedQuote(p); if(aq) navGo(() => { qNewVersion(aq); activateTab('quotations'); window.scrollTo(0, 0); }); return; }
   if(a === 'drop-add' && pwUi.edit){ pwUi.edit.draft.plan.drops.push({ id: qRand('dr_'), label: 'New drop', supplierId: '', date: '', method: 'delivered', charge: 0, chargeManual: false, paymentDueDate: '', dueManual: false }); qAutoDrops(pwDraftQuote()); renderProjects(); return; }
   if(a === 'drop-del' && pwUi.edit){ const pl = pwUi.edit.draft.plan; pl.drops = pl.drops.filter(d => d.id !== b.dataset.id); pl.lines.forEach(l => { if(l.deliveryDropId === b.dataset.id) l.deliveryDropId = ''; }); renderProjects(); return; }
   if(a === 'ms-done' || a === 'ms-use'){
@@ -5433,6 +5446,178 @@ function pwClick(b){
   if(a === 'add-link'){ p.links.push({ name: '', url: '' }); render(); saveState(); return; }
   if(a === 'del-link'){ const li = Number(b.dataset.li), gone = p.links.splice(li, 1)[0]; if(gone) undoDeleted('Link removed: ' + String(gone.name || gone.url || '').slice(0, 40), ['projects', { id: p.id }, 'links'], li, gone); render(); saveState(); return; }
   if(a === 'quick'){ pwQuickOpen(b.dataset.q, b.dataset.sid || ''); return; }
+}
+
+/* ---------- Working plan: Sold vs Working plan vs Actual, creep, variations ----------
+   Sold = the accepted quote (frozen). Working plan = p.plan (editable lines, labour and drops that carry the expected cost). Actual = hours logged and real transactions.
+   Creep = a working-plan cost line costing more than it was sold for. If a variation is linked to the line it is "recovered creep"; if not it is "absorbed creep" (it comes out of margin). */
+function projPlanItems(p, plan){
+  const aq = projAcceptedQuote(p); plan = plan || p.plan; if(!aq || !plan) return null;
+  const sc = qCalc(aq), pq = planAsQuote(aq, plan), pc = qCalc(pq), prof = 1 + (Number(state.settings.labourProfitPct) || 0) / 100;
+  const vars = p.variations || [], vOf = key => vars.find(v => (v.lineKeys || []).includes(key)) || null, out = { mat: [], lab: [], del: [], pc, sc, pq };
+  const merge = (qa, pa) => [...new Set(qa.map(x => x.id).concat(pa.map(x => x.id)))];
+  merge(aq.lines, plan.lines).forEach(id => {
+    const ql = aq.lines.find(l => l.id === id), pl = plan.lines.find(l => l.id === id), sold = ql && sc.lines[id] && !sc.lines[id].excluded ? sc.lines[id].lineCost : 0, cur = pl && pc.lines[id] && !pc.lines[id].excluded ? pc.lines[id].lineCost : 0;
+    out.mat.push({ key: 'm:' + id, id, desc: (pl || ql).description || 'Item', sold: r2(sold), plan: r2(cur), delta: r2(cur - sold), st: !ql ? 'added' : !pl ? 'removed' : '', pl, ql, v: vOf('m:' + id) });
+  });
+  merge(aq.labour, plan.labour).forEach(id => {
+    const ql = aq.labour.find(r => r.id === id), pl = plan.labour.find(r => r.id === id), sold = ql && sc.labour[id] && !sc.labour[id].excluded ? sc.labour[id].amount / prof : 0, cur = pl && pc.labour[id] && !pc.labour[id].excluded ? pc.labour[id].amount / prof : 0;
+    out.lab.push({ key: 'l:' + id, id, desc: (pl || ql).description || 'Labour', sold: r2(sold), plan: r2(cur), delta: r2(cur - sold), st: !ql ? 'added' : !pl ? 'removed' : '', pl, ql, v: vOf('l:' + id) });
+  });
+  merge(aq.drops, plan.drops).forEach(id => {
+    const ql = aq.drops.find(d => d.id === id), pl = plan.drops.find(d => d.id === id), nm = d => d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop');
+    out.del.push({ key: 'd:' + id, id, desc: 'Delivery: ' + nm(pl || ql), sold: r2(ql ? Number(ql.charge) || 0 : 0), plan: r2(pl ? Number(pl.charge) || 0 : 0), delta: r2((pl ? Number(pl.charge) || 0 : 0) - (ql ? Number(ql.charge) || 0 : 0)), st: !ql ? 'added' : !pl ? 'removed' : '', pl, ql, v: vOf('d:' + id) });
+  });
+  const all = out.mat.concat(out.lab, out.del), sum = (a, f) => r2(a.reduce((s, x) => s + f(x), 0));
+  out.tot = { matSold: sum(out.mat, x => x.sold), matPlan: sum(out.mat, x => x.plan), labSold: sum(out.lab, x => x.sold), labPlan: sum(out.lab, x => x.plan), delSold: sum(out.del, x => x.sold), delPlan: sum(out.del, x => x.plan) };
+  out.tot.sold = r2(out.tot.matSold + out.tot.labSold + out.tot.delSold); out.tot.plan = r2(out.tot.matPlan + out.tot.labPlan + out.tot.delPlan);
+  out.absorbed = sum(all.filter(x => !x.v), x => Math.max(0, x.delta)); out.recovered = sum(all.filter(x => x.v), x => Math.max(0, x.delta)); out.savings = sum(all, x => Math.max(0, -x.delta));
+  return out;
+}
+/* what has actually happened: labour from the hours logged on Paid stage lines, the rest from transactions attributed to this project */
+function projActualCost(p){
+  const aq = projAcceptedQuote(p), tx = (state.transactions || []).filter(t => t.projectId === p.id && Number(t.moneyOut) > 0), cat = c => tx.filter(t => (t.projCat || t.category) === c).reduce((a, t) => a + Number(t.moneyOut), 0);
+  const prof = 1 + (Number(state.settings.labourProfitPct) || 0) / 100, sold = aq && aq.asSold, dayRate = sold && sold.dayRate > 0 ? sold.dayRate : (Number(state.settings.labourRateDay) || 0), a = aq ? qActual(aq) : { paidDays: 0 };
+  const materials = r2(cat('Materials')), delivery = r2(cat('Delivery')), labour = r2(a.paidDays > 0 && dayRate > 0 ? a.paidDays * dayRate / prof : 0), other = r2(tx.reduce((s, t) => s + Number(t.moneyOut), 0) - materials - delivery);
+  return { materials, delivery, labour, other, total: r2(materials + delivery + labour + other), hasTx: tx.length > 0 };
+}
+function projVariationsValue(p, statuses){ return r2((p.variations || []).filter(v => (statuses || ['Approved', 'Invoiced']).includes(v.status)).reduce((a, v) => a + (Number(v.price) || 0), 0)); }
+function projVarPct(p){ const ct = projContract(p); return ct.value > 0 ? projVariationsValue(p) / ct.value * 100 : 0; }
+function projMarginCC(p, plan){
+  const it = projPlanItems(p, plan); if(!it) return null; const aq = projAcceptedQuote(p), sold = aq.asSold, soldM = sold ? sold.marginAfter : it.sc.marginAfter, contract = sold ? sold.totalEx : it.sc.totalEx, vars = projVariationsValue(p);
+  const cost = it.pc.materialsCost + it.pc.deliveryEx + it.pc.labourCost, now = r2(contract + vars - cost);
+  return { soldM: r2(soldM), soldPct: contract ? soldM / contract * 100 : 0, now, nowPct: contract + vars ? now / (contract + vars) * 100 : 0, absorbed: it.absorbed, absorbedPct: contract ? it.absorbed / contract * 100 : 0, recovered: it.recovered, vars, contract, it };
+}
+const VAR_STATUSES = ['Draft', 'Proposed', 'Approved', 'Invoiced'], VAR_HOW = [['verbal', 'Verbal'], ['email', 'Email'], ['signed', 'Signed']];
+function varNew(p, desc){ p.variations = p.variations || []; const n = p.variations.reduce((m, v) => Math.max(m, Number(String(v.ref).replace(/\D/g, '')) || 0), 0) + 1; const v = { id: qRand('va_'), ref: 'V' + n, desc: desc || '', price: 0, lineKeys: [], status: 'Draft', created: fmt(new Date()), approval: null, invoicedDate: '', dueDate: '', paidDate: '', queried: false }; p.variations.push(v); return v; }
+function varVat(v){ return qVatOn() ? r2((Number(v.price) || 0) * (Number(state.settings.vatRate) || 0) / 100) : 0; }
+function varCanInvoice(v){ return v.status === 'Approved' && !!(v.approval && v.approval.ticked && v.approval.by); }
+function pwPlanItemRow(x, ed, kind){
+  const dv = x.delta, cls = Math.abs(dv) < 0.005 ? '' : (dv > 0 ? 'q-over' : 'q-under');
+  return `<td class="qb-calc">${qm(x.sold)}</td><td class="qb-calc">${qm(x.plan)}</td><td class="qb-calc ${cls}">${Math.abs(dv) < 0.005 ? '—' : (dv > 0 ? '+' : '−') + qm(Math.abs(dv))}</td><td>${x.v ? `<span class="qb-flag ok" title="${escAttr(x.v.desc)}">${escHtml(x.v.ref)}</span>` : (dv > 0.005 ? '<span class="qb-flag bad">absorbed</span>' : '')}</td>`;
+}
+function pwPlanHtml(p, i){
+  const aq = projAcceptedQuote(p), ed = pwEditOn(p, 'materials') || pwEditOn(p, 'labour') ? pwUi.edit : null;
+  if(!aq) return `<section class="pw-sec" id="pw-plan" data-sec="plan"><h3>Working plan</h3><div class="pw-card pw-wide"><div class="pw-empty">The Working plan starts when a quote is accepted: it copies the quote's materials, labour and deliveries so you can record what the job is really going to cost. Until then there is nothing to compare.</div></div></section>`;
+  const plan = ed ? ed.draft.plan : projPlanEnsure(p), it = projPlanItems(p, plan), mg = projMarginCC(p, plan), act = projActualCost(p), t = it.tot, ep = ed && ed.kind;
+  const sg = v => Math.abs(v) < 0.005 ? '—' : (v > 0 ? '+' : '−') + qm(Math.abs(v)), vc = v => Math.abs(v) < 0.005 ? '' : (v > 0 ? 'q-over' : 'q-under');
+  const totRow = (label, sold, pl, a) => `<tr><td><b>${label}</b></td><td class="qb-calc">${qm(sold)}</td><td class="qb-calc">${qm(pl)}</td><td class="qb-calc">${a === null ? '<span class="qb-dim">—</span>' : qm(a)}</td><td class="qb-calc ${vc(pl - sold)}">${sg(pl - sold)}</td><td class="qb-calc ${a === null ? '' : vc(a - pl)}">${a === null ? '—' : sg(a - pl)}</td></tr>`;
+  const matRows = it.mat.map(x => {
+    const l = x.pl, c = it.pc.lines[x.id];
+    if(ep === 'materials' && l) return `<tr><td><input data-pwd="mat" data-id="${escAttr(x.id)}" data-f="description" value="${escAttr(l.description || '')}" aria-label="Description">${x.st === 'added' ? ' <span class="qb-flag">new</span>' : ''}</td><td><div class="q-inline"><input type="number" step="any" min="0" class="qb-n" data-pwd="mat" data-id="${escAttr(x.id)}" data-f="qty" value="${l.qty}" aria-label="Quantity"><span class="qb-dim">${escHtml(qUnitName(l))}</span></div></td><td><input type="number" step="any" min="0" class="qb-n" data-pwd="mat" data-id="${escAttr(x.id)}" data-f="wastagePct" value="${l.wastagePct}" aria-label="Wastage %"></td><td><input type="number" step="any" min="0" class="qb-n" data-pwd="mat" data-id="${escAttr(x.id)}" data-f="cost" value="${c ? r2(c.costEach) : 0}" aria-label="Cost each ex VAT">${l.costOverride !== '' ? ' <span class="qb-flag manual">typed</span>' : ''}</td>${pwPlanItemRow(x)}<td><button type="button" class="icon-btn" data-pw="mat-del" data-id="${escAttr(x.id)}" aria-label="Remove line">${X_SVG}</button></td></tr>`;
+    return `<tr class="${x.st === 'removed' ? 'pw-removed' : ''}"><td>${escHtml(x.desc)}${x.st === 'added' ? ' <span class="qb-flag">added</span>' : x.st === 'removed' ? ' <span class="qb-flag bad">removed</span>' : ''}</td><td class="qb-calc">${l ? l.qty + ' ' + escHtml(qUnitName(l)) : '—'}</td><td class="qb-calc">${l ? l.wastagePct + '%' : '—'}</td><td class="qb-calc">${c ? qm(c.costEach) : '—'}</td>${pwPlanItemRow(x)}${ep === 'materials' ? '<td></td>' : ''}</tr>`;
+  }).join('');
+  const labRows = it.lab.map(x => {
+    const r = x.pl;
+    if(ep === 'labour' && r) return `<tr><td><input data-pwd="lab" data-id="${escAttr(x.id)}" data-f="description" value="${escAttr(r.description || '')}" aria-label="Description">${x.st === 'added' ? ' <span class="qb-flag">new</span>' : ''}</td><td><select data-pwd="lab" data-id="${escAttr(x.id)}" data-f="basis" aria-label="Basis">${LAB_BASES.map(b => `<option value="${b[0]}"${r.basis === b[0] ? ' selected' : ''}>${b[1]}</option>`).join('')}</select></td><td><input type="number" step="any" min="0" class="qb-n" data-pwd="lab" data-id="${escAttr(x.id)}" data-f="qty" value="${r.qty}" aria-label="Quantity"></td><td><input type="number" step="any" min="0" class="qb-n" data-pwd="lab" data-id="${escAttr(x.id)}" data-f="rate" value="${r.rate}" aria-label="Rate"></td>${pwPlanItemRow(x)}<td><button type="button" class="icon-btn" data-pw="lab-del" data-id="${escAttr(x.id)}" aria-label="Remove labour">${X_SVG}</button></td></tr>`;
+    return `<tr class="${x.st === 'removed' ? 'pw-removed' : ''}"><td>${escHtml(x.desc)}${x.st === 'added' ? ' <span class="qb-flag">added</span>' : x.st === 'removed' ? ' <span class="qb-flag bad">removed</span>' : ''}</td><td class="qb-calc">${r ? escHtml((LAB_BASES.find(b => b[0] === r.basis) || [0, r.basis])[1]) : '—'}</td><td class="qb-calc">${r ? r.qty : '—'}</td><td class="qb-calc">${r && r.rate !== '' ? qm(r.rate) : '—'}</td>${pwPlanItemRow(x)}${ep === 'labour' ? '<td></td>' : ''}</tr>`;
+  }).join('');
+  const delRows = it.del.map(x => `<tr class="${x.st === 'removed' ? 'pw-removed' : ''}"><td>${escHtml(x.desc)}${x.st === 'added' ? ' <span class="qb-flag">added</span>' : x.st === 'removed' ? ' <span class="qb-flag bad">removed</span>' : ''}</td>${pwPlanItemRow(x)}</tr>`).join('');
+  const pct = projVarPct(p), thr = Number(state.settings.variationThresholdPct), over = thr > 0 && pct > thr;
+  const barMat = ep === 'materials' ? pwEditBar(p, 'materials', '<button type="button" class="btn secondary qb-sm" data-pw="mat-add">+ Add material</button>') : '', barLab = ep === 'labour' ? pwEditBar(p, 'labour', '<button type="button" class="btn secondary qb-sm" data-pw="lab-add">+ Add labour</button>') : '';
+  const matHead = ep === 'materials' ? '<th>Line</th><th>Qty</th><th>Wastage</th><th>Cost each ex VAT</th>' : '<th>Line</th><th>Qty</th><th>Wastage</th><th>Cost each</th>';
+  return `<section class="pw-sec" id="pw-plan" data-sec="plan"><h3>Working plan</h3>
+    <div class="pw-card pw-wide"><p class="q-help" style="margin:0 0 10px;"><b>Sold</b> is the accepted quote (${escHtml(qRef(aq))}), frozen. The <b>Working plan</b> is the editable list carrying the true expected cost. <b>Actual</b> is hours logged and real transactions. This is not a requote: a big change means a new quote version. Costs are ex VAT.</p>
+      ${over ? `<div class="pw-qbar pw-alert-bar">⚠ Approved variations are <b>${qpct(pct)}</b> of the contract, over your ${thr}% threshold. Consider a new quote version instead of more variations.<button type="button" class="btn secondary qb-sm" data-pw="new-version">Create a new quote version</button></div>` : ''}
+      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th></th><th>Sold</th><th>Working plan</th><th>Actual</th><th>Plan vs sold</th><th>Actual vs plan</th></tr></thead><tbody>
+        ${totRow('Materials cost', t.matSold, t.matPlan, act.hasTx ? act.materials : null)}${totRow('Labour cost', t.labSold, t.labPlan, act.labour > 0 ? act.labour : null)}${totRow('Delivery', t.delSold, t.delPlan, act.hasTx ? act.delivery : null)}${act.other > 0 ? `<tr><td><b>Other attributed costs</b></td><td class="qb-calc">—</td><td class="qb-calc">—</td><td class="qb-calc">${qm(act.other)}</td><td></td><td></td></tr>` : ''}
+        <tr class="qb-foot">${`<td><b>Total cost</b></td><td class="qb-calc"><b>${qm(t.sold)}</b></td><td class="qb-calc"><b>${qm(t.plan)}</b></td><td class="qb-calc"><b>${act.total > 0 ? qm(act.total) : '—'}</b></td><td class="qb-calc ${vc(t.plan - t.sold)}"><b>${sg(t.plan - t.sold)}</b></td><td class="qb-calc ${act.total > 0 ? vc(act.total - t.plan) : ''}"><b>${act.total > 0 ? sg(act.total - t.plan) : '—'}</b></td>`}</tr></tbody></table></div>
+      <div class="pw-money" style="margin-top:12px;"><div><small>Margin as sold</small><b>${qm(mg.soldM)}</b><em>${qpct(mg.soldPct)}</em></div><div><small>Margin now (plan + approved variations)</small><b class="${mg.now < mg.soldM - 0.005 ? 'over' : ''}">${qm(mg.now)}</b><em>${qpct(mg.nowPct)}</em></div>
+        <div><small>Margin lost to absorbed creep</small><b class="${mg.absorbed > 0.005 ? 'over' : ''}">${qm(mg.absorbed)}</b><em>${qpct(mg.absorbedPct)} of contract · cost increases with no variation</em></div><div><small>Recovered creep</small><b class="ok">${qm(mg.recovered)}</b><em>covered by a variation</em></div>${it.savings > 0.005 ? `<div><small>Savings</small><b class="ok">${qm(it.savings)}</b><em>lines costing less than sold</em></div>` : ''}</div></div>
+    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Materials <span class="qb-dim">(cost ex VAT: sold vs working plan)</span></h4><div class="qb-sec-tools">${pwEditBtn(p, 'materials', 'Edit materials')}</div></div>${barMat}
+      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr>${matHead}<th>Sold</th><th>Plan</th><th>Variance</th><th>Creep</th>${ep === 'materials' ? '<th></th>' : ''}</tr></thead><tbody>${matRows || '<tr><td colspan="9"><div class="sup-empty">No material lines.</div></td></tr>'}</tbody></table></div></div>
+    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Labour <span class="qb-dim">(cost: sold vs working plan)</span></h4><div class="qb-sec-tools">${pwEditBtn(p, 'labour', 'Edit labour')}</div></div>${barLab}
+      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Line</th><th>Basis</th><th>Qty</th><th>Rate</th><th>Sold</th><th>Plan</th><th>Variance</th><th>Creep</th>${ep === 'labour' ? '<th></th>' : ''}</tr></thead><tbody>${labRows || '<tr><td colspan="9"><div class="sup-empty">No labour lines.</div></td></tr>'}</tbody></table></div></div>
+    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Delivery <span class="qb-dim">(charges ex VAT; edited under Materials and deliveries)</span></h4></div>
+      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Drop</th><th>Sold</th><th>Plan</th><th>Variance</th><th>Creep</th></tr></thead><tbody>${delRows || '<tr><td colspan="5"><div class="sup-empty">No deliveries.</div></td></tr>'}</tbody></table></div></div></section>`;
+}
+function pwVariationsHtml(p, i){
+  const aq = projAcceptedQuote(p), vars = p.variations || [], it = aq && p.plan ? projPlanItems(p) : null, pct = projVarPct(p), thr = Number(state.settings.variationThresholdPct), over = thr > 0 && pct > thr;
+  if(!aq) return `<section class="pw-sec" id="pw-variations" data-sec="variations"><h3>Variations</h3><div class="pw-card pw-wide"><div class="pw-empty">Variations (scope additions) are agreed against an accepted quote. There is none on this project yet.</div></div></section>`;
+  const keyList = it ? it.mat.concat(it.lab, it.del) : [];
+  const card = v => {
+    const locked = v.status === 'Approved' || v.status === 'Invoiced', ap = v.approval, linked = keyList.filter(x => (v.lineKeys || []).includes(x.key)), linkCost = r2(linked.reduce((a, x) => a + x.plan, 0));
+    const linkBox = keyList.length ? `<details class="pw-var-links"${pwUi.openVar === v.id ? ' open' : ''}><summary>${linked.length ? linked.length + ' cost line' + (linked.length > 1 ? 's' : '') + ' linked · plan cost ' + qm(linkCost) : 'Link cost lines from the Working plan'}</summary>${keyList.map(x => `<label class="q-check"><input type="checkbox" data-pwv="link" data-vid="${v.id}" data-key="${escAttr(x.key)}"${(v.lineKeys || []).includes(x.key) ? ' checked' : ''}${locked ? ' disabled' : ''}> ${escHtml(x.desc)} <span class="qb-dim">${qm(x.plan)}${x.delta > 0.005 ? ' · +' + qm(x.delta) + ' over sold' : ''}</span></label>`).join('')}</details>` : '<div class="qb-dim">Cost lines appear once the Working plan exists.</div>';
+    const acts = v.status === 'Draft' ? `<button type="button" class="btn secondary qb-sm" data-pw="var-propose" data-vid="${v.id}">Mark proposed</button><button type="button" class="btn qb-sm" data-pw="var-approve" data-vid="${v.id}">Approve…</button><button type="button" class="btn secondary qb-sm" data-pw="var-del" data-vid="${v.id}">Delete</button>`
+      : v.status === 'Proposed' ? `<button type="button" class="btn qb-sm" data-pw="var-approve" data-vid="${v.id}">Approve…</button><button type="button" class="btn secondary qb-sm" data-pw="var-draft" data-vid="${v.id}">Back to draft</button>`
+      : v.status === 'Approved' ? `<button type="button" class="btn qb-sm" data-pw="var-invoice" data-vid="${v.id}">Mark invoiced</button>` : `<span class="pw-ok">✓ invoiced ${pwD(v.invoicedDate)}</span>`;
+    return `<div class="pw-var ${v.status}"><div class="pw-var-h"><b>${escHtml(v.ref)}</b><span class="q-st q-st-${v.status === 'Approved' ? 'Accepted' : v.status === 'Invoiced' ? 'Accepted' : v.status === 'Proposed' ? 'Sent' : 'Draft'}">${v.status}</span><span class="qb-dim">raised ${pwD(v.created)}</span></div>
+      <div class="qual-grid"><div class="qual-field" style="grid-column:span 2;"><label>Description</label><input data-pwv="desc" data-vid="${v.id}" value="${escAttr(v.desc)}"${locked ? ' disabled' : ''} placeholder="What the customer has asked for"></div>
+        <div class="qual-field"><label>Customer price ex VAT (£)</label><input type="number" step="any" min="0" data-pwv="price" data-vid="${v.id}" value="${v.price}"${locked ? ' disabled' : ''}>${qVatOn() ? `<div class="q-help">+ VAT ${qm(varVat(v))} = ${qm((Number(v.price) || 0) + varVat(v))}</div>` : ''}</div></div>
+      ${linkBox}${ap ? `<div class="pw-var-ap">✓ Approved by <b>${escHtml(ap.by)}</b> on ${pwD(ap.at)} (${escHtml((VAR_HOW.find(h => h[0] === ap.how) || [0, ap.how])[1])})${ap.file ? ` · <a href="${escAttr(ap.file.data)}" download="${escAttr(ap.file.name)}">${escHtml(ap.file.name)}</a>` : ''}</div>` : ''}
+      ${v.status === 'Approved' || v.status === 'Invoiced' ? '' : '<div class="q-help">Cannot be invoiced until it is Approved.</div>'}<div class="pw-var-a">${acts}</div></div>`;
+  };
+  return `<section class="pw-sec" id="pw-variations" data-sec="variations"><h3>Variations</h3><div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Scope additions <span class="qb-dim">(extra work the customer pays for; the original contract is never changed)</span></h4><div class="qb-sec-tools"><button type="button" class="btn secondary" data-pw="var-add">+ New variation</button></div></div>
+    <div class="pw-money" style="margin-bottom:10px;"><div><small>Approved variations</small><b>${qm(projVariationsValue(p))}</b><em>${qpct(pct)} of the contract · threshold ${thr}%</em></div><div><small>Contract ex VAT</small><b>${qm(projContract(p).value)}</b></div></div>
+    ${over ? `<div class="pw-qbar pw-alert-bar">⚠ Approved variations have passed ${thr}% of the contract value. Suggest creating a new quote version instead.<button type="button" class="btn secondary qb-sm" data-pw="new-version">Create a new quote version</button></div>` : ''}
+    ${vars.length ? vars.map(card).join('') : '<div class="pw-empty">No variations yet. Add one when the customer asks for extra work, link the cost lines behind it, and get it approved before invoicing.</div>'}</div></section>`;
+}
+function pwInvoicesHtml(p){
+  const lines = p.paymentLines, vars = (p.variations || []).filter(v => v.status === 'Approved' || v.status === 'Invoiced'), contract = lines.reduce((a, l) => a + (Number(l.amount) || 0), 0), addl = vars.reduce((a, v) => a + (Number(v.price) || 0), 0);
+  const stat = l => l.paidDate ? 'Paid' : l.invoicedDate ? 'Invoiced' : 'Not yet invoiced';
+  return `<div class="pw-card pw-wide"><h4>Invoice view <span class="qb-dim">(ex VAT${qVatOn() ? '; VAT added per Settings' : ''})</span></h4>
+    <div class="q-sub" style="margin-top:0;">Original contract: agreed payment plan</div>
+    <table class="qb-table qb-narrow"><thead><tr><th>Payment</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${lines.map(l => `<tr><td>${escHtml(l.desc || 'Payment')}</td><td>${pwD(l.dueDate)}</td><td class="qb-calc">${qm(l.amount)}</td><td>${stat(l)}</td></tr>`).join('') || '<tr><td colspan="4"><div class="sup-empty">No payment lines.</div></td></tr>'}</tbody><tfoot><tr class="qb-foot"><td><b>Contract total</b></td><td></td><td class="qb-calc"><b>${qm(contract)}</b></td><td></td></tr></tfoot></table>
+    ${vars.length ? `<div class="q-sub">Scope additions</div><table class="qb-table qb-narrow"><thead><tr><th>Variation</th><th>Approved</th><th>Amount</th><th>Status</th></tr></thead><tbody>${vars.map(v => `<tr><td>${escHtml(v.ref + ' · ' + v.desc)}</td><td>${v.approval ? pwD(v.approval.at) : '—'}</td><td class="qb-calc">${qm(v.price)}</td><td>${v.status === 'Invoiced' ? 'Invoiced ' + pwD(v.invoicedDate) : 'Approved, not yet invoiced'}</td></tr>`).join('')}</tbody><tfoot><tr class="qb-foot"><td><b>Scope additions total</b></td><td></td><td class="qb-calc"><b>${qm(addl)}</b></td><td></td></tr><tr class="qb-foot"><td><b>Contract plus scope additions</b></td><td></td><td class="qb-calc"><b>${qm(contract + addl)}</b></td><td></td></tr></tfoot></table>` : ''}</div>`;
+}
+
+/* ---- Working plan drafts: materials and labour lines; variation records ---- */
+function pwPlanDraft(){ return pwUi.edit.draft.plan; }
+function pwBlankLabour(){ return { id: qRand('lb_'), description: 'New labour', basis: 'day', qty: 1, rate: Number(state.settings.labourRateDay) > 0 ? Number(state.settings.labourRateDay) : '', customerGroup: '', showOnQuote: true, helperQty: '', optGroup: '', stageId: '', added: true }; }
+document.addEventListener('change', (ev) => {
+  const el = ev.target; if(!el.dataset || !pwUi.edit || (el.dataset.pwd !== 'mat' && el.dataset.pwd !== 'lab')) return;
+  const plan = pwPlanDraft(), f = el.dataset.f, n = Math.max(0, Number(el.value) || 0);
+  if(el.dataset.pwd === 'mat'){
+    const l = plan.lines.find(x => x.id === el.dataset.id); if(!l) return;
+    if(f === 'description') l.description = el.value.trim(); else if(f === 'qty') l.qty = n; else if(f === 'wastagePct'){ l.wastagePct = n; l.wastageManual = true; }
+    else if(f === 'cost') l.costOverride = el.value === '' ? '' : n;
+  } else {
+    const r = plan.labour.find(x => x.id === el.dataset.id); if(!r) return;
+    if(f === 'description') r.description = el.value.trim(); else if(f === 'basis') r.basis = LAB_BASES.some(b => b[0] === el.value) ? el.value : 'day'; else if(f === 'qty') r.qty = n; else if(f === 'rate') r.rate = el.value === '' ? '' : n;
+  }
+  pwRedraw(el);
+});
+document.addEventListener('change', (ev) => {
+  const el = ev.target; if(!el.dataset || !el.dataset.pwv) return;
+  const p = state.projects.find(x => x.id === pwUi.id), v = p && (p.variations || []).find(x => x.id === el.dataset.vid); if(!v) return;
+  const f = el.dataset.pwv;
+  if(f === 'desc') v.desc = el.value.trim(); else if(f === 'price') v.price = Math.max(0, Number(el.value) || 0);
+  else if(f === 'link'){ const k = el.dataset.key, s = new Set(v.lineKeys || []); if(el.checked) s.add(k); else s.delete(k); v.lineKeys = [...s]; pwUi.openVar = v.id; }
+  saveState(); clearTimeout(pwLazyT); pwLazyT = setTimeout(renderProjects, 350);
+});
+function varLog(p, v, text){ chgLog(p, 'variation', { cause: 'customer', reason: `Variation ${v.ref}${v.desc ? ' (' + v.desc + ')' : ''}` }, [text]); }
+function pwVarClick(a, b, p){
+  if(a === 'var-add'){ const v = varNew(p); pwUi.openVar = v.id; saveState(); render(); return true; }
+  const v = (p.variations || []).find(x => x.id === b.dataset.vid);
+  if(a === 'var-del' && v){ const ix = p.variations.indexOf(v); p.variations.splice(ix, 1); undoDeleted('Variation deleted: ' + (v.ref + ' ' + v.desc).slice(0, 40), ['projects', { id: p.id }, 'variations'], ix, v); saveState(); render(); return true; }
+  if(a === 'var-propose' && v){ v.status = 'Proposed'; varLog(p, v, `${v.ref} marked Proposed at ${qm(v.price)} ex VAT`); saveState(); render(); return true; }
+  if(a === 'var-draft' && v){ v.status = 'Draft'; saveState(); render(); return true; }
+  if(a === 'var-approve' && v){ pwQuickOpen('varapprove', v.id); return true; }
+  if(a === 'var-invoice' && v){
+    if(!varCanInvoice(v)){ showToast('A variation cannot be invoiced until it is Approved (tick, who, when and how)'); return true; }
+    const today = fmt(new Date()); v.status = 'Invoiced'; v.invoicedDate = today; v.dueDate = addDaysIso(today, Number(state.settings.paymentTermsDays) || 0);
+    varLog(p, v, `${v.ref} invoiced at ${qm(v.price)} ex VAT`); saveState(); render(); showToast(v.ref + ' marked invoiced'); return true;
+  }
+  return false;
+}
+async function pwVarApproveSave(p, qk){
+  const v = (p.variations || []).find(x => x.id === qk.sid), g = id => document.getElementById(id), err = g('pwqErr');
+  if(!v) return pwQuickClose();
+  if(!g('pwqTick').checked){ err.textContent = 'Tick to confirm the customer has approved this.'; return; }
+  const by = g('pwqWho').value.trim(); if(!by){ err.textContent = 'Say who approved it.'; return; }
+  let file = null; const f = g('pwqFile').files && g('pwqFile').files[0];
+  if(f){ if(f.size > 1200000){ err.textContent = 'The attachment is over 1.2 MB. Use a smaller file or leave it off and keep it elsewhere.'; return; } file = { name: f.name, type: f.type, data: await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); }) }; }
+  v.approval = { ticked: true, by, at: isoOk(g('pwqDate').value) || fmt(new Date()), how: g('pwqHow').value, file }; v.status = 'Approved';
+  varLog(p, v, `${v.ref} approved by ${by} (${g('pwqHow').value}) at ${qm(v.price)} ex VAT`);
+  pwQuickClose(); saveState(); render(); showToast(v.ref + ' approved');
+}
+function pwPlanClick(a, b, p){
+  if(!pwUi.edit) return false; const plan = pwPlanDraft();
+  if(a === 'mat-add'){ plan.lines.push(qNewLine(planAsQuote(projAcceptedQuote(p), plan), { description: 'New item', qty: 1, markupPct: 0, added: true })); renderProjects(); return true; }
+  if(a === 'mat-del'){ plan.lines = plan.lines.filter(l => l.id !== b.dataset.id); renderProjects(); return true; }
+  if(a === 'lab-add'){ plan.labour.push(pwBlankLabour()); renderProjects(); return true; }
+  if(a === 'lab-del'){ plan.labour = plan.labour.filter(r => r.id !== b.dataset.id); renderProjects(); return true; }
+  return false;
 }
 
 function pwOverviewHtml(p, i){
@@ -5471,6 +5656,7 @@ function pwMoneyHtml(p, i){
     <div class="pw-card pw-wide">${quoteBar}<div class="qb-sec-h"><h4>Money in <span class="qb-dim">(payment lines: sold, invoiced, paid)</span></h4><div class="qb-sec-tools"><button class="btn secondary" data-action="add-payline" data-idx="${i}">+ Add payment line</button></div></div>
       <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Description</th><th>Due</th><th>Sold</th><th>Amount</th><th>Invoiced</th><th>Paid</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="7"><div class="sup-empty">No payment lines yet.</div></td></tr>'}</tbody>
       ${lines.length ? `<tfoot><tr class="qb-foot"><td><b>Totals</b></td><td></td><td class="qb-calc"><b>${tot.sold ? qm(tot.sold) : '—'}</b></td><td class="qb-calc"><b>${qm(tot.amt)}</b></td><td class="qb-calc">${qm(tot.inv)} invoiced</td><td class="qb-calc">${qm(tot.paid)} paid</td><td></td></tr></tfoot>` : ''}</table></div></div>
+    ${pwInvoicesHtml(p)}
     <div class="pw-grid">
       <div class="pw-card"><h4>Money out <span class="qb-dim">(supplier drops and their due dates)</span></h4>${outRows ? `<table class="qb-table qb-narrow"><thead><tr><th>Supplier</th><th>Due</th><th>Amount</th><th>Paid</th></tr></thead><tbody>${outRows}</tbody></table>` : '<div class="pw-empty">No supplier payments: they come from the delivery drops on the linked quote.</div>'}</div>
       <div class="pw-card"><h4>Sold vs actual</h4>${mg ? `<div class="pw-money"><div><small>Margin as sold</small><b>${mg.hasSold ? qm(mg.soldAfter) : '—'}</b><em>${mg.hasSold ? qpct(mg.soldPct) : 'no snapshot'}</em></div><div><small>Margin now</small><b class="${mg.now < mg.soldAfter - 0.005 && mg.hasSold ? 'over' : ''}">${qm(mg.now)}</b><em>${qpct(mg.nowPct)}</em></div></div><p class="q-help">Margin now uses ${escHtml(mg.basis)}. Per stage (hours sold, planned, logged) is in Timeline; per payment line (sold, invoiced, paid) is above.</p>` : '<div class="pw-empty">Needs an accepted quote to compare against.</div>'}
@@ -5511,12 +5697,13 @@ function pwQuickOpen(kind, sid){
   if(kind === 'time'){ title = 'Log time'; body = `<div class="lp-f"><label>Stage</label><select id="pwqStage">${o((p.stages || []).map(s => [slEnsure(s).id, s.label || 'Stage']), sid)}</select></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>Hours</label><input type="number" step="any" min="0" id="pwqHours" placeholder="e.g. 4"></div></div><div class="lp-f"><label>Note (optional)</label><input id="pwqNote"></div>`; }
   else if(kind === 'milestone'){ const open = state.pipelineStages.project.filter(s => s.key && !(p.milestones[s.key] && p.milestones[s.key] <= today)); title = 'Mark milestone done'; body = `<div class="lp-f"><label>Milestone</label><select id="pwqMs">${o(open.map(s => [s.key, s.name]), open[0] && open[0].key)}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>`; }
   else if(kind === 'invoice' || kind === 'paid'){ const f = kind === 'invoice' ? 'invoicedDate' : 'paidDate', open = p.paymentLines.map((l, ix) => [String(ix), `${l.desc || 'Payment'} · ${qm(l.amount)}${l.dueDate ? ' · due ' + l.dueDate : ''}`, l]).filter(x => !x[2][f]); title = kind === 'invoice' ? 'Mark invoice sent' : 'Mark paid'; body = open.length ? `<div class="lp-f"><label>Payment line</label><select id="pwqPay">${o(open.map(x => [x[0], x[1]]), open[0][0])}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>` : '<div class="pw-empty">Every payment line already has this date.</div>'; }
+  else if(kind === 'varapprove'){ const v = (p.variations || []).find(x => x.id === sid); title = 'Approve ' + (v ? v.ref : 'variation'); body = `<p class="q-help" style="margin:0 0 8px;">${v ? escHtml(v.desc) + ' · ' + qm(v.price) + ' ex VAT' : ''}</p><label class="q-check"><input type="checkbox" id="pwqTick"> The customer has approved this variation</label><div class="lp-f"><label>Who approved it</label><input id="pwqWho" value="${escAttr(projCustomer(p).name)}"></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>When</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>How</label><select id="pwqHow">${VAR_HOW.map(h => `<option value="${h[0]}">${h[1]}</option>`).join('')}</select></div></div><div class="lp-f"><label>Attachment (optional, up to 1.2 MB)</label><input type="file" id="pwqFile" accept="image/*,application/pdf,.eml,.msg"></div><div class="chg-err" id="pwqErr"></div>`; }
   else if(kind === 'note'){ title = 'Add note'; body = `<div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>Note</label><textarea id="pwqNote" rows="3" maxlength="300"></textarea></div>`; }
   document.getElementById('pwqTitle').textContent = title; document.getElementById('pwqBody').innerHTML = body + '<div class="modal-actions"><button class="btn secondary" type="button" data-pwq="cancel">Cancel</button><button class="btn" type="button" data-pwq="save">Save</button></div>';
   document.getElementById('pwqOverlay').hidden = false; const f = document.querySelector('#pwqBody input:not([type=date]), #pwqBody textarea, #pwqBody select'); if(f) f.focus();
 }
 function pwQuickSave(){
-  const p = state.projects.find(x => x.id === pwUi.id), qk = pwUi.quick; if(!p || !qk) return; const v = id => { const e = document.getElementById(id); return e ? e.value : ''; }, date = isoOk(v('pwqDate')) || fmt(new Date());
+  const p = state.projects.find(x => x.id === pwUi.id), qk = pwUi.quick; if(!p || !qk) return; if(qk.kind === 'varapprove'){ pwVarApproveSave(p, qk); return; } const v = id => { const e = document.getElementById(id); return e ? e.value : ''; }, date = isoOk(v('pwqDate')) || fmt(new Date());
   if(qk.kind === 'time'){
     const s = (p.stages || []).find(x => x.id === v('pwqStage')), h = Number(v('pwqHours')); if(!s || !(h > 0)){ showToast('Choose a stage and enter the hours'); return; }
     slEnsure(s); s.log.push({ id: qRand('lg_'), date, hours: h, note: v('pwqNote').trim() }); showToast(`Logged ${hrs(h)} on ${s.label || 'the stage'}`);
@@ -5733,7 +5920,7 @@ const QS_FIELD = {   // key -> kind. 'int' needs a whole number >= min (blank / 
   insuranceCover: { k: 'free' }, complaintDays: { k: 'int', min: 1 }, complaintDayType: { k: 'sel' }, vatNumber: { k: 'vatno' }, vatRate: { k: 'num', min: 0, max: 100 },
   tradeAccountDays: { k: 'int', min: 0 }, labourRateHour: { k: 'opt' }, labourRateHalfDay: { k: 'opt' }, labourRateDay: { k: 'opt' },
   labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' }, helperRateDay: { k: 'opt' }, showRightToCancel: { k: 'bool' },
-  hoursPerDay: { k: 'int', min: 1 }, quoteViewMode: { k: 'view' }, showGroupPricesC: { k: 'bool' }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
+  hoursPerDay: { k: 'int', min: 1 }, quoteViewMode: { k: 'view' }, variationThresholdPct: { k: 'num', min: 0, max: 1000 }, showGroupPricesC: { k: 'bool' }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
 };
 function qtF(label, field, o){
   o = o || {}; const v = state.settings[field];
@@ -5785,7 +5972,8 @@ function renderQuoteSettings(){
       <input type="text" data-ql="stype" data-id="${escAttr(x.id)}" data-lf="name" value="${escAttr(x.name)}" aria-label="Name">
       <select data-ql="stype" data-id="${escAttr(x.id)}" data-lf="paid" aria-label="Paid or unpaid"><option value="paid"${x.paid ? ' selected' : ''}>Paid</option><option value="unpaid"${x.paid ? '' : ' selected'}>Unpaid</option></select>
       <button class="icon-btn" data-qa="stype-del" data-id="${escAttr(x.id)}" title="Remove" aria-label="Remove ${escAttr(x.name)}">${X_SVG}</button></div>`).join('')}</div>
-    <button class="btn secondary" style="margin-top:10px;" data-qa="stype-add">+ Add type</button>`;
+    <button class="btn secondary" style="margin-top:10px;" data-qa="stype-add">+ Add type</button>
+    <div class="q-sub">Change control on a live project</div><div class="assumptions-grid">${qtF('Variation threshold for suggesting a new quote (%)', 'variationThresholdPct', { step: '0.1', help: 'When approved variations pass this share of the contract value, the project suggests a new quote version instead of more variations. Default 10.' })}</div>`;
   const rows = (list, kind, w) => list.map(x => `<div class="q-row${w ? ' has-w' : ''}">
       <input type="text" data-ql="${kind}" data-id="${escAttr(x.id)}" data-lf="name" value="${escAttr(x.name)}" aria-label="Name">
       ${w ? `<div class="q-pct"><input type="number" min="0" max="100" step="0.1" data-ql="${kind}" data-id="${escAttr(x.id)}" data-lf="wastage" value="${x.wastagePct}" placeholder="0" aria-label="Default wastage %">%</div>` : ''}
