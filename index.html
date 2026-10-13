@@ -1465,6 +1465,18 @@
   .txn-pend-date { width: 90px; color: var(--muted); font-size: 12px; } .txn-pend-desc { flex: 1; min-width: 180px; } .txn-pend-d { padding: 6px 0 4px 102px; font-size: 12.5px; color: var(--slate); } .txn-pend-d .over { color: #b3453f; }
   .fin-file { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .fin-var { background: #f6f4ef; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; margin: 6px 0; } .fin-var .over { color: #b3453f; } .fin-var .under { color: #2e7a45; }
   @media (max-width: 700px) { .txn-pend-d { padding-left: 0; } .inv-table { min-width: 860px; } }
+
+  /* ---------------- Retained profit pot, assets ---------------- */
+  #dbPot { padding: 0; } .pot { display: grid; grid-template-columns: minmax(0, 3fr) minmax(220px, 1fr); gap: 0; } .pot-main { padding: 16px 20px; } .pot-cash { padding: 16px 20px; border-left: 1px solid var(--line); background: #faf8f3; border-radius: 0 var(--radius) var(--radius) 0; }
+  .pot h3 { margin: 0; font-family: var(--serif); font-size: 17px; } .pot-sub { font-size: 11.5px; color: var(--muted); } .pot small, .pot-b small { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+  .pot-fig { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 12px 0; } .pot-fig b { font-family: var(--serif); font-size: 26px; font-variant-numeric: tabular-nums; } .pot b.over { color: #b3453f; }
+  .pot-buckets { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; } .pot-b { background: #f6f4ef; border-radius: 10px; padding: 8px 12px; } .pot-b b { font-size: 15px; font-variant-numeric: tabular-nums; } .pot-b em { display: block; font-style: normal; font-size: 11px; color: var(--muted); }
+  .pot-links { margin-top: 10px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; } .pot-cash b { display: block; font-family: var(--serif); font-size: 26px; margin: 6px 0; font-variant-numeric: tabular-nums; } .pot-cash em { font-style: normal; font-size: 11.5px; color: var(--muted); }
+  .db-card-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  @media (max-width: 800px) { .pot { grid-template-columns: 1fr; } .pot-cash { border-left: 0; border-top: 1px solid var(--line); border-radius: 0 0 var(--radius) var(--radius); } }
+  .asset-table input:not([type=checkbox]) { min-width: 110px; } .asset-table input.qb-n { min-width: 84px; width: 90px; } .asset-table td { vertical-align: top; } .asset-table .over input { color: #b3453f; }
+  .fin-help { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin: -4px 0 6px; }
+  .asset-table { min-width: 1280px; } .asset-table select { min-width: 100px; }
 </style>
 </head>
 <body>
@@ -1522,6 +1534,7 @@
     <div class="tab g-organisation" data-tab="admin">Setup &amp; Admin</div>
     <div class="tab g-organisation" data-tab="businessplan">Business Plan</div>
     <div class="tab g-organisation" data-tab="actions">Actions</div>
+    <div class="tab g-organisation" data-tab="assets">Assets</div>
     <div class="tab g-organisation" data-tab="settings">Settings</div>
   </div>
 
@@ -1582,6 +1595,7 @@
       <div class="view-toggle" id="dbPeriod" role="group" aria-label="Period for the period-based widgets"></div>
     </div>
     <div class="db-kpis" id="dbKpis"></div>
+    <section class="db-card" id="dbPot" aria-label="Retained profit"></section>
     <section class="db-card" id="dbAttention" aria-label="Needs attention"></section>
     <div class="db-grid">
       <section class="db-card" id="dbCash" aria-label="Cash flow"></section>
@@ -1727,6 +1741,15 @@
     <div class="table-scroll" id="cashflowTableWrap"></div>
     <div id="cashflowLines"></div>
     <div id="cashflowQuoteBox"></div>
+  </div>
+
+  <!-- ASSETS -->
+  <div class="panel" id="panel-assets">
+    <div class="page-head">
+      <h2>Assets</h2>
+      <div class="desc">The kit the business owns (register) and the kit it plans to buy (plan). Approved plan items go into the Cash Flow Forecast; buying one turns it into a register entry and a transaction. Retained profit funds the plan.</div>
+    </div>
+    <div id="assetsBody"></div>
   </div>
 
   <!-- INVOICING -->
@@ -2451,7 +2474,8 @@ function defaultState(){
     crmTasks: [], nextTaskNo: 1, crmPrefs: { hiddenCols: [] },
     suppliers: [], nextSupplierId: 1,
     branding: defaultBranding(),
-    quotes: [], nextQuoteId: 1, nextJobNumber: 1
+    quotes: [], nextQuoteId: 1, nextJobNumber: 1,
+    assets: [], assetPlan: []
   }))), true), true);
 }
 
@@ -2482,7 +2506,7 @@ function mergeDefaults(loaded){
   out.colWidths = Object.assign({}, loaded.colWidths || {});
   out.settings = Object.assign({}, d.settings, loaded.settings || {});
   { const n = Math.floor(Number(out.settings.leadStaleDays)); out.settings.leadStaleDays = n >= 1 ? n : 14; }   // Dashboard: days without contact before a lead is flagged
-  ['goals','pricingTiers','pipeline','capability','network','milestones','admin','actions','archivedActions','leads','projects','transactions','tiers','crmTasks','suppliers'].forEach(k => {
+  ['goals','pricingTiers','pipeline','capability','network','milestones','admin','actions','archivedActions','leads','projects','transactions','tiers','crmTasks','suppliers','assets','assetPlan'].forEach(k => {
     if(!Array.isArray(out[k])) out[k] = d[k];
   });
   // stages: seed/normalise the configurable lists and convert any old stage NAMES on records to stage IDs
@@ -3164,6 +3188,7 @@ function renderDashboard(){
   document.getElementById('dbKpis').innerHTML = dashKpis({ weighted, total, projCount: state.projects.length, projValue, bank: startCash + totIn - totOut,
     leadN: leads.length, leadSub, taskN: dueToday + over, dueToday, over, won, range });
 
+  document.getElementById('dbPot').innerHTML = dbPotHtml();
   document.getElementById('dbAttention').innerHTML = dashAttentionHtml(today, T);
   const months = getMonthRange();
   document.getElementById('dbCash').innerHTML = dashCashHtml();
@@ -5569,12 +5594,21 @@ function pwPlanHtml(p, i){
         <tr class="qb-foot">${`<td><b>Total cost</b></td><td class="qb-calc"><b>${qm(t.sold)}</b></td><td class="qb-calc"><b>${qm(t.plan)}</b></td><td class="qb-calc"><b>${act.total > 0 ? qm(act.total) : '—'}</b></td><td class="qb-calc ${vc(t.plan - t.sold)}"><b>${sg(t.plan - t.sold)}</b></td><td class="qb-calc ${act.total > 0 ? vc(act.total - t.plan) : ''}"><b>${act.total > 0 ? sg(act.total - t.plan) : '—'}</b></td>`}</tr></tbody></table></div>
       <div class="pw-money" style="margin-top:12px;"><div><small>Margin as sold</small><b>${qm(mg.soldM)}</b><em>${qpct(mg.soldPct)}</em></div><div><small>Margin now (plan + approved variations)</small><b class="${mg.now < mg.soldM - 0.005 ? 'over' : ''}">${qm(mg.now)}</b><em>${qpct(mg.nowPct)}</em></div>
         <div><small>Margin lost to absorbed creep</small><b class="${mg.absorbed > 0.005 ? 'over' : ''}">${qm(mg.absorbed)}</b><em>${qpct(mg.absorbedPct)} of contract · cost increases with no variation</em></div><div><small>Recovered creep</small><b class="ok">${qm(mg.recovered)}</b><em>covered by a variation</em></div>${act.unplanned > 0.005 ? `<div><small>Unplanned costs</small><b class="over">${qm(act.unplanned)}</b><em>bought, not in the Working plan · profit after: ${qm(mg.now - act.unplanned)}</em></div>` : ''}${it.savings > 0.005 ? `<div><small>Savings</small><b class="ok">${qm(it.savings)}</b><em>lines costing less than sold</em></div>` : ''}</div></div>
+    ${pwRetainedHtml(p)}
     <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Materials <span class="qb-dim">(cost ex VAT: sold vs working plan)</span></h4><div class="qb-sec-tools">${pwEditBtn(p, 'materials', 'Edit materials')}</div></div>${barMat}
       <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr>${matHead}<th>Sold</th><th>Plan</th><th>Variance</th><th>Creep</th>${ep === 'materials' ? '<th></th>' : ''}</tr></thead><tbody>${matRows || '<tr><td colspan="9"><div class="sup-empty">No material lines.</div></td></tr>'}</tbody></table></div></div>
     <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Labour <span class="qb-dim">(cost: sold vs working plan)</span></h4><div class="qb-sec-tools">${pwEditBtn(p, 'labour', 'Edit labour')}</div></div>${barLab}
       <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Line</th><th>Basis</th><th>Qty</th><th>Rate</th><th>Sold</th><th>Plan</th><th>Variance</th><th>Creep</th>${ep === 'labour' ? '<th></th>' : ''}</tr></thead><tbody>${labRows || '<tr><td colspan="9"><div class="sup-empty">No labour lines.</div></td></tr>'}</tbody></table></div></div>
     <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Delivery <span class="qb-dim">(charges ex VAT; edited under Materials and deliveries)</span></h4></div>
       <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Drop</th><th>Sold</th><th>Plan</th><th>Variance</th><th>Creep</th></tr></thead><tbody>${delRows || '<tr><td colspan="5"><div class="sup-empty">No deliveries.</div></td></tr>'}</tbody></table></div></div></section>`;
+}
+function pwRetainedHtml(p){
+  const r = projRetained(p), rate = profitShare(), row = (l, a, b) => `<tr><td>${l}</td><td class="qb-calc">${a}</td><td class="qb-calc">${b}</td></tr>`;
+  return `<div class="pw-card pw-wide"><h4>Retained profit <span class="qb-dim">(project profit minus profit share at ${rate ? qm(rate) + ' per labour hour' : 'no hourly share set (Settings > Finance)'})</span></h4>
+    <table class="qb-table qb-narrow"><thead><tr><th></th><th>${r.hasQuote ? 'As sold' : 'Typed budget'}</th><th>${r.hasQuote ? 'Working plan' : 'Current'}</th></tr></thead><tbody>
+      ${row('Project profit', qm(r.sold.profit), qm(r.plan.profit))}${row('Labour hours', r.sold.hours.toFixed(1) + ' h', r.plan.hours.toFixed(1) + ' h')}${row('Profit share', '−' + qm(r.sold.share), '−' + qm(r.plan.share))}
+      <tr class="qb-foot"><td><b>Retained profit</b></td><td class="qb-calc"><b>${qm(r.sold.retained)}</b></td><td class="qb-calc"><b>${qm(r.plan.retained)}</b></td></tr></tbody></table>
+    <p class="q-help">${r.loggedHours.toFixed(1)} h logged so far = ${qm(r.loggedShare)} of profit share. Recognised so far (${Math.round(r.frac * 100)}% of the job invoiced): <b>${qm(r.toDate)}</b>.</p></div>`;
 }
 function pwVariationsHtml(p, i){
   const aq = projAcceptedQuote(p), vars = p.variations || [], it = aq && p.plan ? projPlanItems(p) : null, pct = projVarPct(p), thr = Number(state.settings.variationThresholdPct), over = thr > 0 && pct > thr;
@@ -5933,6 +5967,10 @@ function renderSettings(){
     `<div><label>Starting cash balance (£)</label><input type="number" step="1" data-tab="settings" data-field="startingCash" value="${s.startingCash}"></div>
      <div><label>Trade account terms (days)</label><input type="number" step="1" data-tab="settings" data-field="tradeAccountDays" value="${s.tradeAccountDays}"></div>
      <div><label>Client payment terms (days)</label><input type="number" step="1" data-tab="settings" data-field="paymentTermsDays" value="${s.paymentTermsDays}"></div>
+     <div><label>Profit share per hour (£)</label><input type="number" step="0.01" min="0" data-tab="settings" data-field="profitSharePerHour" value="${s.profitSharePerHour === undefined ? 0 : s.profitSharePerHour}"></div>
+     <div class="fin-help">Taken off project profit for every labour hour (sold, planned and logged) to give <b>retained profit</b>. This is separate from “Labour profit share (%)” in Quote settings: that percentage is the profit built into the labour <em>price</em> (labour cost = price ÷ (1 + %)) and is already inside project profit; the hourly figure is then deducted from it. Set one or the other to what you intend, so the same share is not taken twice.</div>
+     ${POT_BUCKETS.map(b => `<div><label>Retained pot: ${b[1]} (%)</label><input type="number" step="1" min="0" data-tab="settings" data-field="${b[0]}" value="${potPct(b[0])}"></div>`).join('')}
+     <div class="fin-help">The four buckets share the retained profit pot${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) === 100 ? '.' : ` (they add up to ${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0)}%, so they are scaled to 100% on the Dashboard).`}</div>
      <div><label>Invoice warning after (days overdue)</label><input type="number" step="1" min="0" data-tab="settings" data-field="invoiceWarnDays" value="${s.invoiceWarnDays === undefined || s.invoiceWarnDays === '' ? 14 : s.invoiceWarnDays}"></div>
      <div><label>Forecast horizon (months, if no dated work)</label><input type="number" step="1" data-tab="settings" data-field="forecastMonths" value="${s.forecastMonths}"></div>`;
   renderTiers();
@@ -8350,10 +8388,10 @@ function finSrcLink(src, text){
 }
 function finNavOpen(kind, id, extra){
   if(kind === 'invoicing'){ invUi.view = 'all'; invUi.flash = id + ':' + extra; activateTab('invoicing'); renderInvoicing(); window.scrollTo(0, 0); setTimeout(() => { const el = document.querySelector('#invoicingBody tr.inv-flash'); if(el) el.scrollIntoView({ block: 'center' }); }, 30); }
-  else if(kind === 'txn'){ txnUi.flash = Number(id); activateTab('transactions'); renderTransactions(); window.scrollTo(0, 0); setTimeout(() => { const el = document.querySelector('#transactionsTableWrap tr.inv-flash'); if(el) el.scrollIntoView({ block: 'center' }); }, 30); }
+  else if(kind === 'txn'){ const ix = state.transactions.findIndex(t => t.uid === id); txnUi.flash = ix >= 0 ? ix : Number(id); activateTab('transactions'); renderTransactions(); window.scrollTo(0, 0); setTimeout(() => { const el = document.querySelector('#transactionsTableWrap tr.inv-flash'); if(el) el.scrollIntoView({ block: 'center' }); }, 30); }
   else if(kind === 'deal'){ openDetail('sales', Number(id)); }
   else if(kind === 'po' && typeof poOpen === 'function') poOpen(Number(id));
-  else if(kind === 'asset' && typeof assetNavOpen === 'function') assetNavOpen(Number(id));
+  else if(kind === 'asset') assetNavOpen(id);
 }
 /* ---------- cash flow: every number can be opened to the lines behind it ---------- */
 const cfUi = { sel: null };
@@ -8593,7 +8631,7 @@ function renderTransactions(){
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyIn" value="${t.moneyIn||0}"></td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyOut" value="${t.moneyOut||0}"></td>
       <td><input data-tab="transactions" data-idx="${i}" data-field="linkedCode" value="${escAttr(t.linkedCode||'')}" placeholder="e.g. P-201-INV1"></td>
-      <td>${t.file ? `<a href="${escAttr(t.file.data)}" download="${escAttr(t.file.name)}" title="${escAttr(t.file.name)}">📎 invoice</a>` : '<span class="qb-dim">—</span>'}${t.plannedAmount !== undefined && t.plannedAmount !== '' ? `<div class="qb-dim" style="font-size:11px;">planned ${qm(t.plannedAmount)} · ${Math.abs(t.variance) < 0.005 ? 'on plan' : (t.variance > 0 ? '+' : '−') + qm(Math.abs(t.variance))}${t.varianceReason ? '<br>' + escHtml(t.varianceReason) : ''}</div>` : ''}${typeof poMatchHtml === 'function' ? poMatchHtml(t) : ''}</td>
+      <td>${t.file ? `<a href="${escAttr(t.file.data)}" download="${escAttr(t.file.name)}" title="${escAttr(t.file.name)}">📎 invoice</a>` : '<span class="qb-dim">—</span>'}${t.plannedAmount !== undefined && t.plannedAmount !== '' ? `<div class="qb-dim" style="font-size:11px;">planned ${qm(t.plannedAmount)} · ${Math.abs(t.variance) < 0.005 ? 'on plan' : (t.variance > 0 ? '+' : '−') + qm(Math.abs(t.variance))}${t.varianceReason ? '<br>' + escHtml(t.varianceReason) : ''}</div>` : ''}${typeof poMatchHtml === 'function' ? poMatchHtml(t) : ''}${t.category === 'Equipment' && !t.assetId && Number(t.moneyOut) > 0 ? `<div><button type="button" class="sp-link" data-fin="to-asset" data-idx="${i}">Convert to asset…</button></div>` : ''}</td>
       <td><button class="icon-btn" data-action="delete-row" data-tab="transactions" data-idx="${i}" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
     </tr>`;
   });
@@ -8651,7 +8689,7 @@ function txnCompleteSave(){
   let poNote = ''; if(typeof poMatchSave === 'function'){ const m = poMatchSave(t, a); if(m && m.err){ er.textContent = m.err; return; } poNote = m ? m.note : ''; }
   const [kind, pid, ref] = t.key.split(':'), p = state.projects.find(x => x.id === Number(pid)); if(!p) return finClose();
   const part = !!(document.getElementById('finPart') && document.getElementById('finPart').checked && diff && d < 0);
-  const tx = { date, description: (t.dir === 'out' ? 'Payment: ' : 'Receipt: ') + t.label, category: t.dir === 'out' ? 'Materials' : 'Income', moneyIn: t.dir === 'in' ? a : 0, moneyOut: t.dir === 'out' ? a : 0, linkedCode: '', projectId: p.id, projCat: t.dir === 'out' ? 'Materials' : '', planned: true, srcKey: t.key, plannedAmount: t.amount, variance: d, varianceReason: reason, file: finUi.file };
+  const tx = { uid: qRand('tx_'), date, description: (t.dir === 'out' ? 'Payment: ' : 'Receipt: ') + t.label, category: t.dir === 'out' ? 'Materials' : 'Income', moneyIn: t.dir === 'in' ? a : 0, moneyOut: t.dir === 'out' ? a : 0, linkedCode: '', projectId: p.id, projCat: t.dir === 'out' ? 'Materials' : '', planned: true, srcKey: t.key, plannedAmount: t.amount, variance: d, varianceReason: reason, file: finUi.file };
   if(kind === 'sp'){ p.dropState[ref] = p.dropState[ref] || {}; p.dropState[ref].paid = date; if(poNote) tx.poNote = poNote; if(typeof poMarkFromTxn === 'function') poMarkFromTxn(p, ref, tx); }
   else { const tgt = kind === 'vp' ? (p.variations || []).find(x => x.id === ref) : p.paymentLines[Number(ref)]; if(!tgt) return finClose(); tx.linkedCode = kind === 'cp' ? recordCode(p.id, 'project') + '-INV' + (Number(ref) + 1) : recordCode(p.id, 'project') + '-' + (tgt.ref || 'VAR');
     tgt.paidAmount = (Number(tgt.paidAmount) || 0) + a; if(!tgt.invoicedDate) tgt.invoicedDate = date; if(part) tgt.paidDate = ''; else { tgt.paidDate = date; } }
@@ -8684,13 +8722,22 @@ function txnAddSave(){
   const g = id => document.getElementById(id), er = g('finErr'), a = Number(g('finAmt').value) || 0, desc = g('finDesc').value.trim(), dir = g('finDir').value;
   if(!(a > 0)){ er.textContent = 'Enter an amount.'; return; } if(!desc){ er.textContent = 'Say what it was for.'; return; }
   const direct = dir === 'out' && (document.querySelector('input[name="finDirect"]:checked') || {}).value === 'yes';
-  const tx = { date: isoOk(g('finDate').value) || fmt(new Date()), description: desc, category: g('finCat').value, moneyIn: dir === 'in' ? a : 0, moneyOut: dir === 'out' ? a : 0, linkedCode: '' };
+  const tx = { uid: qRand('tx_'), date: isoOk(g('finDate').value) || fmt(new Date()), description: desc, category: g('finCat').value, moneyIn: dir === 'in' ? a : 0, moneyOut: dir === 'out' ? a : 0, linkedCode: '' };
   if(direct){ const pid = Number(g('finProj').value); if(!pid){ er.textContent = 'Choose the project.'; return; } tx.projectId = pid; tx.projCat = g('finPcat').value; tx.planKey = g('finPlan').value; tx.planned = !!tx.planKey; }
   if(finUi.file) tx.file = finUi.file;
   if(typeof assetOfferSave === 'function'){ const r = assetOfferSave(tx); if(r && r.err){ er.textContent = r.err; return; } }
   state.transactions.push(tx); finClose(); saveState(); render(); showToast(direct && !tx.planned ? 'Added: counted as an unplanned cost on the project' : 'Transaction added');
 }
 document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ const o = document.getElementById('finOverlay'); if(o && !o.hidden){ finClose(); e.stopPropagation(); } } });
+function txnOpenToAsset(i){
+  const t = state.transactions[i]; if(!t) return; finUi.mode = 'toasset'; finUi.key = i;
+  finOpen('Convert to an asset', `<p class="q-help" style="margin:0 0 8px;">${escHtml(t.description)} · ${qm(t.moneyOut)}. An item used across jobs that lasts over a year is an asset, not a project cost.</p><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Expected life (years)</label><input type="number" step="any" min="0.5" id="finLife" value="5"></div><div class="lp-f"><label>Residual value (£)</label><input type="number" step="any" min="0" id="finRes" value="0"></div></div><div class="chg-err" id="finErr"></div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn" type="button" data-fin="save">Add to register</button></div>`);
+}
+function txnToAssetSave(){
+  const t = state.transactions[finUi.key], life = Number(document.getElementById('finLife').value) || 0; if(!t) return finClose(); if(!(life > 0)){ document.getElementById('finErr').textContent = 'Enter the expected life in years.'; return; }
+  t.uid = t.uid || qRand('tx_'); const as = assetNew(); Object.assign(as, { name: t.description, category: 'Equipment', purchased: t.date, cost: Number(t.moneyOut) || 0, life, residual: Number(document.getElementById('finRes').value) || 0, txnUid: t.uid });
+  t.assetId = as.id; delete t.projectId; delete t.projCat; delete t.planned; finClose(); saveState(); render(); showToast('Added to the Asset register');
+}
 function txnPendAll(){
   const pend = txnPending(); finUi.mode = 'pend';
   finOpen('All pending transactions (' + pend.length + ')', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Due</th><th>Item</th><th>Project</th><th>Planned</th><th></th></tr></thead><tbody>${pend.map(t => `<tr><td>${t.date ? pwD(t.date) : '—'}</td><td>${t.dir === 'out' ? 'Pay' : 'Receive'}: ${escHtml(t.label)}</td><td>${escHtml(t.code)}</td><td class="qb-calc">${t.dir === 'out' ? '−' : ''}${qm(t.amount)}</td><td><button type="button" class="btn qb-sm" data-fin="complete" data-key="${escAttr(t.key)}">Complete…</button> ${finSrcLink(t.src, 'source →')}</td></tr>`).join('')}</tbody></table></div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Close</button></div>`, true);
@@ -8698,8 +8745,161 @@ function txnPendAll(){
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-fin]'); if(!b) return; const a = b.dataset.fin;
   if(a === 'cancel') finClose(); else if(a === 'complete'){ finClose(); txnOpenComplete(b.dataset.key); }
-  else if(a === 'save'){ if(finUi.mode === 'complete') txnCompleteSave(); else if(finUi.mode === 'add') txnAddSave(); }
+  else if(a === 'save'){ if(finUi.mode === 'complete') txnCompleteSave(); else if(finUi.mode === 'add') txnAddSave(); else if(finUi.mode === 'assetbuy') assetBuySave(); else if(finUi.mode === 'toasset') txnToAssetSave(); }
+  else if(a === 'to-asset') txnOpenToAsset(Number(b.dataset.idx));
   else if(a === 'txn-add') txnOpenAdd(); else if(a === 'pend-all') txnPendAll();
+});
+
+/* ---------- Retained profit and the pot ----------
+   Profit share per hour (Settings) is a flat £ per labour hour that goes to the people doing the work. It is separate from "Labour profit share (%)" in Quote settings,
+   which is the share of the labour PRICE that is profit on top of wages (it is what makes labour cost = labour price ÷ (1 + %)). The percentage lives inside the project profit
+   already; the hourly figure is then taken off that profit, so retained profit = project profit − (labour hours × £ per hour). Hours: sold (as-sold snapshot), planned (Working plan) and logged (stage line time). */
+function profitShare(){ const v = Number(state.settings.profitSharePerHour); return v > 0 ? v : 0; }
+function projHours(p){
+  const aq = projAcceptedQuote(p), logged = (p.stages || []).reduce((a, s) => a + slLogged(s), 0);
+  if(!aq) return { sold: 0, plan: 0, logged };
+  const sold = aq.asSold ? aq.asSold.labourHours : aq.labour.filter(r => !qExcluded(aq, r)).reduce((a, r) => a + qLabourDays(r) * hpd(), 0);
+  const pq = projWorkQuote(p), plan = pq.labour.filter(r => !qExcluded(pq, r)).reduce((a, r) => a + qLabourDays(r) * hpd(), 0);
+  return { sold, plan, logged };
+}
+function projInvoicedShare(p){
+  const rows = invRows().filter(r => r.pid === p.id), tot = rows.reduce((a, r) => a + r.amount, 0), inv = rows.filter(r => r.invoicedDate).reduce((a, r) => a + r.amount, 0);
+  return tot > 0 ? inv / tot : 0;
+}
+function projRetained(p){
+  const rate = profitShare(), h = projHours(p), aq = projAcceptedQuote(p), act = projActualCost(p); let sold, plan;
+  if(aq && p.plan){ const mg = projMarginCC(p); sold = { profit: mg.soldM, hours: h.sold }; plan = { profit: r2(mg.now - act.unplanned), hours: h.plan }; }
+  else { const prof = r2((Number(p.agreedValue) || 0) - (Number(p.actualCost) > 0 ? Number(p.actualCost) : Number(p.budgetedCost) || 0)); sold = { profit: prof, hours: h.logged }; plan = { profit: prof, hours: h.logged }; }
+  sold.share = r2(sold.hours * rate); sold.retained = r2(sold.profit - sold.share); plan.share = r2(plan.hours * rate); plan.retained = r2(plan.profit - plan.share);
+  const frac = projInvoicedShare(p);
+  return { sold, plan, loggedHours: h.logged, loggedShare: r2(h.logged * rate), frac, toDate: r2(plan.retained * frac), hasQuote: !!aq };
+}
+function retainedTotals(){
+  const rows = state.projects.map(p => ({ p, r: projRetained(p) })), sum = f => r2(rows.reduce((a, x) => a + f(x.r), 0));
+  return { rows, toDate: sum(r => r.toDate), plan: sum(r => r.plan.retained), sold: sum(r => r.sold.retained), profit: sum(r => r.plan.profit), share: sum(r => r.plan.share) };
+}
+/* retained profit expected to have come in by a date: each project's retained profit, in proportion to the invoices dated on or before it */
+function retainedBy(date){
+  let t = 0; const rows = invRows();
+  state.projects.forEach(p => {
+    const r = projRetained(p), mine = rows.filter(x => x.pid === p.id), tot = mine.reduce((a, x) => a + x.amount, 0); if(!(tot > 0)) return;
+    const upto = mine.filter(x => { const d = x.paidDate || x.invoicedDate || x.dueDate; return d && d <= date; }).reduce((a, x) => a + x.amount, 0); t += r.plan.retained * upto / tot;
+  });
+  return r2(t);
+}
+const POT_BUCKETS = [['potAssetsPct', 'Assets', 30], ['potTaxPct', 'Tax', 25], ['potBufferPct', 'Buffer', 20], ['potGrowthPct', 'Growth', 25]];
+function potPct(f){ const d = POT_BUCKETS.find(b => b[0] === f)[2], v = state.settings[f]; const n = Number(v); return (v === undefined || v === '' || isNaN(n) || n < 0) ? d : n; }
+function cashPosition(){ const s = (state.settings && Number(state.settings.startingCash)) || 0; return s + state.transactions.reduce((a, t) => a + (Number(t.moneyIn) || 0) - (Number(t.moneyOut) || 0), 0); }
+function assetCommitted(){ return r2((state.assetPlan || []).filter(a => a.funding === 'retained' && ['Approved', 'Ordered', 'Bought'].includes(a.status)).reduce((s, a) => s + (Number(a.cost) || 0), 0)); }
+function dbPotHtml(){
+  const rt = retainedTotals(), committed = assetCommitted(), un = r2(rt.toDate - committed), cash = cashPosition(), sum = POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) || 1;
+  const bucket = b => { const pct = potPct(b[0]), amt = r2(rt.toDate * pct / sum); return `<div class="pot-b"><small>${b[1]} · ${Math.round(pct / sum * 100)}%</small><b>${money(amt)}</b>${b[0] === 'potAssetsPct' ? `<em>${money(committed)} committed</em>` : ''}</div>`; };
+  return `<div class="pot"><div class="pot-main"><div class="db-card-h"><h3>Retained profit</h3><span class="pot-sub">project profit minus profit share${profitShare() ? ' (£' + profitShare() + '/h)' : ' (no hourly share set)'}, recognised as invoices are raised</span></div>
+      <div class="pot-fig"><div><small>Retained profit to date</small><b>${money(rt.toDate)}</b></div><div><small>Committed to the asset plan</small><b>${money(committed)}</b></div><div><small>Unallocated</small><b class="${un < 0 ? 'over' : ''}">${money(un)}</b></div></div>
+      <div class="pot-buckets">${POT_BUCKETS.map(bucket).join('')}</div>
+      <div class="pot-links"><button type="button" class="sp-link" data-dash="go" data-tab="assets">Asset plan &amp; register →</button> <span class="pot-sub">Whole-job retained profit forecast: ${money(rt.plan)}</span></div></div>
+    <div class="pot-cash"><small>Cash position</small><b class="${cash < 0 ? 'over' : ''}">${money(cash)}</b><em>starting cash plus actual transactions. Profit is not cash: retained profit is earned on the jobs, cash is what is in the bank.</em></div></div>`;
+}
+/* ---------- Assets (Organisation > Assets) ---------- */
+const ASSET_STATUS = ['Owned', 'Retired'], PLAN_PRIORITY = ['Essential', 'Job-driven', 'Nice to have'], PLAN_STATUS = ['Wishlist', 'Approved', 'Ordered', 'Bought'], FUNDING = [['retained', 'Retained profit'], ['cash', 'Cash in the bank'], ['finance', 'Finance / lease'], ['customer', 'Customer-funded (job)']];
+const assetUi = { tab: 'register', flash: '' };
+navExtra('assets', () => ({ t: assetUi.tab, f: assetUi.flash }), o => { if(o){ assetUi.tab = o.t; assetUi.flash = o.f; } });
+function assetDep(a){
+  const cost = Number(a.cost) || 0, res = Math.min(cost, Math.max(0, Number(a.residual) || 0)), life = Math.max(0.01, Number(a.life) || 1), yr = (cost - res) / life;
+  const end = a.status === 'Retired' && a.retiredDate ? a.retiredDate : fmt(new Date()), age = a.purchased ? Math.max(0, (toDate(end) - toDate(a.purchased)) / 86400000 / 365.25) : 0, acc = Math.min(yr * age, cost - res);
+  return { yearly: r2(yr), accumulated: r2(acc), book: r2(cost - acc) };
+}
+function assetNew(){ const a = { id: qRand('as_'), name: 'New asset', category: '', supplier: '', purchased: fmt(new Date()), cost: 0, life: 5, residual: 0, status: 'Owned', serial: '', serviceDue: '', insuranceDue: '', retiredDate: '', txnUid: '', planId: '' }; state.assets.push(a); return a; }
+function planNew(){ const a = { id: qRand('ap_'), item: 'New item', reason: '', neededBy: '', cost: 0, priority: 'Nice to have', status: 'Wishlist', projectId: '', funding: 'retained', assetId: '', txnUid: '' }; state.assetPlan.push(a); return a; }
+function assetNavOpen(id){
+  const inReg = state.assets.some(a => a.id === id); assetUi.tab = inReg ? 'register' : 'plan'; assetUi.flash = id; activateTab('assets'); renderAssets(); window.scrollTo(0, 0);
+  setTimeout(() => { const el = document.querySelector('#assetsBody tr.inv-flash'); if(el) el.scrollIntoView({ block: 'center' }); }, 30);
+}
+function cfAssetLines(key){
+  return (state.assetPlan || []).filter(a => (a.status === 'Approved' || a.status === 'Ordered') && a.neededBy && a.neededBy.slice(0, 7) === key && (Number(a.cost) || 0) > 0)
+    .map(a => ({ label: 'Asset: ' + a.item + ' (' + a.status + ')', amount: Number(a.cost) || 0, date: a.neededBy, src: { t: 'asset', id: a.id }, pname: (state.projects.find(p => p.id === Number(a.projectId)) || {}).name || '' }));
+}
+function assetRegisterHtml(){
+  const rows = state.assets.map(a => {
+    const d = assetDep(a), at = `data-asset="${a.id}"`, f = (k, type, extra) => `<input ${type === 'number' ? 'type="number" step="any" min="0" class="qb-n"' : (type === 'date' ? 'type="date"' : '')} ${at} data-f="${k}" value="${escAttr(a[k] === undefined ? '' : a[k])}" ${extra || ''}>`;
+    const tx = a.txnUid ? state.transactions.findIndex(t => t.uid === a.txnUid) : -1, today = fmt(new Date());
+    const due = k => a[k] && a[k] < today ? ' class="over"' : '';
+    return `<tr class="${assetUi.flash === a.id ? 'inv-flash' : ''}${a.status === 'Retired' ? ' pw-removed' : ''}"><td>${f('name')}</td><td>${f('category')}</td><td>${f('supplier')}</td><td>${f('purchased', 'date')}</td><td>${f('cost', 'number')}</td><td>${f('life', 'number', 'style="width:64px"')}</td><td>${f('residual', 'number')}</td>
+      <td><select ${at} data-f="status">${ASSET_STATUS.map(s => `<option${a.status === s ? ' selected' : ''}>${s}</option>`).join('')}</select></td><td>${f('serial')}</td><td><span${due('serviceDue')}>${f('serviceDue', 'date')}</span></td><td><span${due('insuranceDue')}>${f('insuranceDue', 'date')}</span></td>
+      <td class="qb-calc">${qm(d.book)}</td><td class="qb-calc">${qm(d.yearly)}</td><td>${tx >= 0 ? finSrcLink({ t: 'txn', id: a.txnUid }, 'transaction →') : ''}${a.planId ? '<div class="qb-dim">from plan</div>' : ''}</td><td><button type="button" class="icon-btn" data-asset-a="del" ${at} aria-label="Delete asset">${X_SVG}</button></td></tr>`;
+  }).join('');
+  const t = state.assets.filter(a => a.status === 'Owned').reduce((s, a) => { const d = assetDep(a); s.cost += Number(a.cost) || 0; s.book += d.book; s.yr += d.yearly; return s; }, { cost: 0, book: 0, yr: 0 });
+  return `<div class="kpi-row"><div class="kpi" style="--accent:var(--oak)"><div class="label">Cost of owned assets</div><div class="value">${qm(t.cost)}</div><div class="fin-sub">ex VAT</div></div><div class="kpi" style="--accent:var(--green)"><div class="label">Book value</div><div class="value">${qm(t.book)}</div><div class="fin-sub">after straight-line depreciation</div></div><div class="kpi" style="--accent:var(--slate)"><div class="label">Replacement set-aside per year</div><div class="value">${qm(t.yr)}</div><div class="fin-sub">(cost − residual) ÷ expected life, owned assets</div></div></div>
+    <div class="btn-row"><button type="button" class="btn" data-asset-a="add">+ Add asset</button></div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Name</th><th>Category</th><th>Supplier</th><th>Purchased</th><th>Cost ex VAT</th><th>Life (yrs)</th><th>Residual</th><th>Status</th><th>Serial</th><th>Service due</th><th>Insurance due</th><th>Book value</th><th>Replacement / yr</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="15"><div class="sup-empty">No assets yet. Add one, or buy an item from the Asset plan.</div></td></tr>'}</tbody>
+      ${state.assets.length ? `<tfoot><tr class="qb-foot"><td><b>Totals (owned)</b></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.cost)}</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.book)}</b></td><td class="qb-calc"><b>${qm(t.yr)}</b></td><td></td><td></td></tr></tfoot>` : ''}</table></div></div>`;
+}
+function assetPlanHtml(){
+  const rt = retainedTotals(), items = state.assetPlan.slice().sort((a, b) => String(a.neededBy || '9999').localeCompare(String(b.neededBy || '9999'))), aPct = potPct('potAssetsPct') / (POT_BUCKETS.reduce((s, b) => s + potPct(b[0]), 0) || 1);
+  let cum = 0; const aff = {};
+  items.forEach(a => { if(a.funding === 'retained'){ cum += Number(a.cost) || 0; const avail = a.neededBy ? retainedBy(a.neededBy) : rt.plan; aff[a.id] = { cum: r2(cum), avail, head: r2(avail - cum), bucket: r2(avail * aPct - cum) }; } });
+  const rows = state.assetPlan.map(a => {
+    const at = `data-asset-plan="${a.id}"`, f = (k, type) => `<input ${type === 'number' ? 'type="number" step="any" min="0" class="qb-n"' : (type === 'date' ? 'type="date"' : '')} ${at} data-f="${k}" value="${escAttr(a[k] === undefined ? '' : a[k])}">`, sel = (k, opts) => `<select ${at} data-f="${k}">${opts.map(o => { const [v, n] = Array.isArray(o) ? o : [o, o]; return `<option value="${escAttr(v)}"${String(a[k]) === String(v) ? ' selected' : ''}>${escHtml(n)}</option>`; }).join('')}</select>`;
+    const af = aff[a.id], bought = a.status === 'Bought', ev = af ? (af.head >= 0 ? `<span class="qb-flag ok">affordable</span> <span class="qb-dim">headroom ${qm(af.head)}</span>` : `<span class="qb-flag bad">short ${qm(-af.head)}</span>`) + `<div class="qb-dim" style="font-size:11px;">cumulative ${qm(af.cum)} vs retained ${qm(af.avail)} by then · assets bucket ${af.bucket >= 0 ? 'ok' : 'short ' + qm(-af.bucket)}</div>` : '<span class="qb-dim">not funded from retained profit</span>';
+    return `<tr class="${assetUi.flash === a.id ? 'inv-flash' : ''}"><td>${f('item')}</td><td>${f('reason')}</td><td>${f('neededBy', 'date')}</td><td>${f('cost', 'number')}</td><td>${sel('priority', PLAN_PRIORITY)}</td><td>${sel('status', PLAN_STATUS)}</td>
+      <td>${sel('projectId', [['', '— none —']].concat(state.projects.map(p => [String(p.id), recordCode(p.id, 'project') + ' ' + p.name])))}</td><td>${sel('funding', FUNDING)}</td><td>${ev}</td>
+      <td>${bought ? (a.assetId ? finSrcLink({ t: 'asset', id: a.assetId }, 'in register →') : '') + (a.txnUid ? ' ' + finSrcLink({ t: 'txn', id: a.txnUid }, 'transaction →') : '') : `<button type="button" class="btn qb-sm" data-asset-a="buy" ${at.replace('data-asset-plan', 'data-pid')}>Mark bought…</button>`}</td><td><button type="button" class="icon-btn" data-asset-a="plan-del" ${at.replace('data-asset-plan', 'data-pid')} aria-label="Delete plan item">${X_SVG}</button></td></tr>`;
+  }).join('');
+  const committed = assetCommitted();
+  const byProj = rt.rows.map(({ p, r }) => `<tr><td>${finSrcLink({ t: 'project', id: p.id, sec: 'plan' }, recordCode(p.id, 'project') + ' ' + p.name)}</td><td class="qb-calc">${qm(r.plan.profit)}</td><td class="qb-calc">${r.plan.hours ? r.plan.hours.toFixed(1) + ' h' : '—'}</td><td class="qb-calc">−${qm(r.plan.share)}</td><td class="qb-calc"><b>${qm(r.plan.retained)}</b></td><td class="qb-calc">${Math.round(r.frac * 100)}%</td><td class="qb-calc">${qm(r.toDate)}</td></tr>`).join('');
+  return `<div class="kpi-row"><div class="kpi" style="--accent:var(--green)"><div class="label">Retained profit to date</div><div class="value">${qm(rt.toDate)}</div><div class="fin-sub">forecast over the jobs ${qm(rt.plan)}</div></div><div class="kpi" style="--accent:var(--oak)"><div class="label">Committed to the plan</div><div class="value">${qm(committed)}</div><div class="fin-sub">approved, ordered or bought, funded from retained profit</div></div><div class="kpi" style="--accent:var(--slate)"><div class="label">Unallocated</div><div class="value ${rt.toDate - committed < 0 ? 'flag' : ''}">${qm(rt.toDate - committed)}</div><div class="fin-sub">retained to date − committed</div></div></div>
+    <div class="btn-row"><button type="button" class="btn" data-asset-a="plan-add">+ Add plan item</button></div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Item</th><th>Reason</th><th>Needed by</th><th>Est. cost ex VAT</th><th>Priority</th><th>Status</th><th>Project</th><th>Funding</th><th>Affordability against retained profit</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="11"><div class="sup-empty">Nothing planned. Add the kit you will need; approved items go into the cash flow forecast on their needed-by date.</div></td></tr>'}</tbody></table></div>
+      <p class="q-help">Affordability adds up every item funded from retained profit in needed-by order and compares it with the retained profit expected by that date (each job's retained profit, in proportion to its invoices dated by then). Approved and ordered items appear in the Cash Flow Forecast as money out on the needed-by date.</p></div>
+    <details class="card" style="margin-top:14px;"><summary><b>Retained profit by project</b> <span class="qb-dim">(project profit minus profit share)</span></summary><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Project</th><th>Profit (plan)</th><th>Hours</th><th>Profit share</th><th>Retained</th><th>Invoiced</th><th>To date</th></tr></thead><tbody>${byProj || '<tr><td colspan="7"><div class="sup-empty">No projects.</div></td></tr>'}</tbody><tfoot><tr class="qb-foot"><td><b>Total</b></td><td class="qb-calc"><b>${qm(rt.profit)}</b></td><td></td><td class="qb-calc"><b>−${qm(rt.share)}</b></td><td class="qb-calc"><b>${qm(rt.plan)}</b></td><td></td><td class="qb-calc"><b>${qm(rt.toDate)}</b></td></tr></tfoot></table></div></details>`;
+}
+function renderAssets(){
+  const el = document.getElementById('assetsBody'); if(!el) return;
+  el.innerHTML = `<div class="view-toggle" role="group" aria-label="Assets" style="margin-bottom:12px;">${[['register', 'Asset register'], ['plan', 'Asset plan']].map(([v, n]) => `<button type="button" data-asset-tab="${v}" class="${assetUi.tab === v ? 'active' : ''}">${n}</button>`).join('')}</div>${assetUi.tab === 'plan' ? assetPlanHtml() : assetRegisterHtml()}`;
+}
+/* buying an item from the plan turns it into a register entry and a transaction, linked both ways */
+function assetOpenBuy(id){
+  const a = state.assetPlan.find(x => x.id === id); if(!a) return; finUi.mode = 'assetbuy'; finUi.key = id; finUi.file = null;
+  finOpen('Mark bought: ' + a.item, `<p class="q-help" style="margin:0 0 8px;">This adds the item to the Asset register and records the purchase as a transaction.</p><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Date bought</label><input type="date" id="finDate" value="${fmt(new Date())}"></div><div class="lp-f"><label>Cost paid ex VAT (£)</label><input type="number" step="any" min="0" id="finAmt" value="${a.cost}"></div></div>
+    <div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Supplier</label><input id="finSup"></div><div class="lp-f"><label>Expected life (years)</label><input type="number" step="any" min="0.5" id="finLife" value="5"></div><div class="lp-f"><label>Residual value (£)</label><input type="number" step="any" min="0" id="finRes" value="0"></div></div>${finFileHtml(false)}<div class="chg-err" id="finErr"></div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn" type="button" data-fin="save">Mark bought</button></div>`);
+}
+function assetBuySave(){
+  const a = state.assetPlan.find(x => x.id === finUi.key), g = id => document.getElementById(id), er = g('finErr'); if(!a) return finClose();
+  const cost = Number(g('finAmt').value) || 0, life = Number(g('finLife').value) || 0; if(!(cost > 0)){ er.textContent = 'Enter what it cost.'; return; } if(!(life > 0)){ er.textContent = 'Enter the expected life in years.'; return; }
+  const uid = qRand('tx_'), date = isoOk(g('finDate').value) || fmt(new Date()), as = assetNew(); Object.assign(as, { name: a.item, category: 'Equipment', supplier: g('finSup').value.trim(), purchased: date, cost, life, residual: Number(g('finRes').value) || 0, txnUid: uid, planId: a.id });
+  const tx = { uid, date, description: 'Asset purchase: ' + a.item, category: 'Equipment', moneyIn: 0, moneyOut: cost, linkedCode: '', assetId: as.id, planned: true }; if(finUi.file) tx.file = finUi.file;
+  state.transactions.push(tx); Object.assign(a, { status: 'Bought', assetId: as.id, txnUid: uid, cost }); finClose(); saveState(); render(); showToast('Bought: added to the Asset register');
+}
+/* a one-off or hire item for a single job is a direct project cost; something used across jobs that lasts over a year is an asset */
+function assetOfferHtml(prev){
+  const cat = (document.getElementById('finCat') || {}).value, direct = (document.querySelector('input[name="finDirect"]:checked') || {}).value === 'yes', dir = (document.getElementById('finDir') || {}).value;
+  if(dir === 'in' || cat !== 'Equipment') return direct && cat === 'Hire' ? '<p class="q-help">Hired for one job: that is a direct project cost, so it stays on the project.</p>' : '';
+  const was = document.getElementById('finAsset'), checked = was ? was.checked : !direct;
+  return `<div class="pw-qbar" style="display:block;"><label class="q-check"><input type="checkbox" id="finAsset"${checked ? ' checked' : ''}> ${direct ? 'This will be used across jobs and last over a year: add it to the Asset register instead of charging it to one project' : 'Used across jobs and lasts over a year: add it to the Asset register'}</label>
+    <div class="q-inline" style="gap:10px;margin-top:6px;"><div class="lp-f"><label>Expected life (years)</label><input type="number" step="any" min="0.5" id="finLife2" value="${was ? (document.getElementById('finLife2') || {}).value : 5}"></div><div class="lp-f"><label>Residual value (£)</label><input type="number" step="any" min="0" id="finRes2" value="${was ? (document.getElementById('finRes2') || {}).value : 0}"></div></div></div>`;
+}
+function assetOfferSave(tx){
+  const c = document.getElementById('finAsset'); if(!c || !c.checked) return null;
+  const life = Number(document.getElementById('finLife2').value) || 0; if(!(life > 0)) return { err: 'Enter the expected life in years.' };
+  tx.uid = tx.uid || qRand('tx_'); const as = assetNew(); Object.assign(as, { name: tx.description, category: 'Equipment', purchased: tx.date, cost: tx.moneyOut, life, residual: Number(document.getElementById('finRes2').value) || 0, txnUid: tx.uid });
+  tx.assetId = as.id; delete tx.projectId; delete tx.projCat; delete tx.planKey; delete tx.planned; return null;
+}
+document.addEventListener('click', (e) => {
+  const t = e.target.closest && e.target.closest('[data-asset-tab]'); if(t){ assetUi.tab = t.dataset.assetTab; assetUi.flash = ''; renderAssets(); return; }
+  const b = e.target.closest && e.target.closest('[data-asset-a]'); if(!b) return; const a = b.dataset.assetA;
+  if(a === 'add'){ assetNew(); saveState(); renderAssets(); }
+  else if(a === 'plan-add'){ planNew(); saveState(); renderAssets(); }
+  else if(a === 'del'){ const i = state.assets.findIndex(x => x.id === b.dataset.asset); if(i >= 0){ const gone = state.assets.splice(i, 1)[0]; undoDeleted('Asset deleted: ' + gone.name.slice(0, 40), ['assets'], i, gone); saveState(); render(); } }
+  else if(a === 'plan-del'){ const i = state.assetPlan.findIndex(x => x.id === b.dataset.pid); if(i >= 0){ const gone = state.assetPlan.splice(i, 1)[0]; undoDeleted('Plan item deleted: ' + gone.item.slice(0, 40), ['assetPlan'], i, gone); saveState(); render(); } }
+  else if(a === 'buy') assetOpenBuy(b.dataset.pid);
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.dataset || !el.dataset.f) return;
+  const reg = el.dataset.asset ? state.assets.find(x => x.id === el.dataset.asset) : null, pl = el.dataset.assetPlan ? state.assetPlan.find(x => x.id === el.dataset.assetPlan) : null, o = reg || pl; if(!o) return;
+  const f = el.dataset.f, numeric = ['cost', 'life', 'residual'].includes(f); o[f] = numeric ? Math.max(0, Number(el.value) || 0) : (el.type === 'date' ? isoOk(el.value) : el.value);
+  if(reg && f === 'status' && el.value === 'Retired' && !reg.retiredDate) reg.retiredDate = fmt(new Date());
+  if(pl && f === 'status' && el.value === 'Bought' && !pl.assetId){ o.status = 'Approved'; saveState(); assetOpenBuy(pl.id); return; }
+  saveState(); clearTimeout(window._assetLazy); window._assetLazy = setTimeout(render, 350);
 });
 
 /* ---------- moving a record between the three pipelines ----------
@@ -10446,6 +10646,7 @@ function render(){
   renderCashflow();
   renderTransactions();
   renderInvoicing();
+  renderAssets();
   renderSettings();
   renderBranding();
   settingsMenuSync();
