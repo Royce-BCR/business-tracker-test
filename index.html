@@ -145,7 +145,6 @@
     --px: 44px;
     margin-left: 244px;
     padding: 0 var(--px) 120px var(--px);
-    max-width: 1520px;
   }
 
   /* ---------------- Brand row + pill (top of every page) ---------------- */
@@ -528,7 +527,9 @@
   .lp-panel.lc-sup { --lc-edge: #8a7048; --lc-tint: rgba(198,184,157,0.3); --lc-line: rgba(138,112,72,0.4); }
   .lp-panel input[type="checkbox"] { width: auto; padding: 0; }
   .sup-pills { display: flex; flex-wrap: wrap; gap: 4px; }
-  .sup-pill { display: inline-block; font-size: 12px; font-weight: 500; line-height: 1.3; padding: 2px 9px; border-radius: 999px; background: #efece6; color: var(--slate); border: 1px solid var(--line); white-space: nowrap; }
+  .sup-pill { display: inline-block; font-size: 12px; font-weight: 500; line-height: 1.3; padding: 2px 9px; border-radius: 999px; background: #efece6; color: var(--slate); border: 1px solid var(--line); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .sup-pills.fit { max-height: 52px; overflow: hidden; }
+  .sup-pill.sup-more { background: #fff; border-style: dashed; color: var(--oak); font-weight: 600; }
   .sup-st { display: inline-block; font-size: 12px; font-weight: 600; line-height: 1.3; padding: 2px 10px; border-radius: 999px; border: 1px solid #9fcfa8; background: #d5ecd9; color: #1e5c2e; white-space: nowrap; }
   .sup-st.off { border-color: #d3cfc6; background: #eceae5; color: #5a564e; }
   .sup-count { font-size: 12px; color: var(--muted); margin-left: auto; }
@@ -553,7 +554,7 @@
   .sp-link:hover { color: var(--ink); }
   .sp-link.danger { color: #b3453f; }
   .lp-contact-top .sp-ctl { display: flex; align-items: center; gap: 8px; }
-  .sp-check { display: flex; align-items: center; gap: 9px; font-size: 13px; padding: 5px 0; cursor: pointer; }
+  .sp-check { display: flex; align-items: center; gap: 9px; font-size: 13px; padding: 5px 8px 5px 0; cursor: pointer; width: fit-content; max-width: 100%; }
   .sp-q-empty { font-size: 13px; color: var(--muted); line-height: 1.55; background: #faf8f4; border: 1px dashed var(--stone-deep); border-radius: 10px; padding: 14px 16px; }
   .sp-q-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--line); }
   .sp-q-row .k { color: var(--muted); font-size: 12px; }
@@ -977,7 +978,7 @@
   .q-sub:first-child { margin-top: 0; }
   .q-inline { display: flex; gap: 8px; align-items: center; }
   .q-inline input { max-width: 110px; }
-  .q-check { display: flex; align-items: center; gap: 8px; font-size: 13.5px; cursor: pointer; }
+  .q-check { display: flex; align-items: center; gap: 8px; font-size: 13.5px; cursor: pointer; width: fit-content; max-width: 100%; padding: 2px 8px 2px 0; }
   .q-check input { width: auto; }
   .q-list { max-width: 560px; display: grid; gap: 6px; margin-top: 10px; }
   .q-row { display: grid; grid-template-columns: minmax(0,1fr) 34px; gap: 8px; align-items: center; padding: 5px 8px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
@@ -1135,6 +1136,22 @@
   .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 110; background: var(--ink); color: #fff; font-size: 12.5px; padding: 10px 12px 10px 16px; border-radius: 10px; box-shadow: var(--shadow-lift); display: flex; align-items: center; gap: 14px; max-width: calc(100% - 24px); }
   .toast-btn { background: none; border: 1px solid rgba(255,255,255,0.4); color: #fff; font-family: inherit; font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 7px; cursor: pointer; }
   .toast-btn:hover { background: rgba(255,255,255,0.12); }
+  .move-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 12px; margin: 0 0 12px; background: #faf8f4; border: 1px solid var(--line); border-radius: 10px; }
+  .move-strip label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); font-weight: 600; margin: 0; }
+  .move-strip select { width: auto; min-width: 150px; }
+  .move-strip .btn.secondary { margin-left: auto; }
+  .dr-views { display: inline-flex; gap: 2px; background: #efece6; padding: 3px; border-radius: 10px; margin: 0 0 12px; }
+  .dr-views button { border: 0; background: none; padding: 6px 14px; border-radius: 8px; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--slate); cursor: pointer; }
+  .dr-views button.active { background: #fff; color: var(--ink); box-shadow: var(--shadow); }
+  .ro-grid { display: grid; grid-template-columns: minmax(110px, 160px) 1fr; gap: 6px 14px; font-size: 13px; margin: 6px 0 14px; }
+  .ro-grid dt { color: var(--muted); } .ro-grid dd { margin: 0; overflow-wrap: anywhere; } .ro-grid .dim { color: var(--muted); }
+  .comm-entry.ro { display: flex; gap: 10px; font-size: 12.5px; padding: 4px 0; } .comm-entry.ro .comm-date { color: var(--muted); flex-shrink: 0; }
+  .lp-statusrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .lp-statusrow select { flex: 1; min-width: 160px; }
+  td.dg { padding-left: 20px; } td.dg:not(.qb-sticky-l) { position: relative; }
+  .drag-h { position: absolute; left: 3px; top: 50%; transform: translateY(-50%); cursor: grab; color: var(--muted); opacity: 0; font-size: 13px; line-height: 1; letter-spacing: -2px; user-select: none; touch-action: none; padding: 6px 3px; border-radius: 4px; z-index: 3; }
+  tr:hover .drag-h, .drag-h:focus-visible, tr.dragging .drag-h { opacity: .8; } .drag-h:hover { background: #efece6; color: var(--ink); }
+  @media (hover: none) { .drag-h { opacity: .45; } }
+  tr.dragging { opacity: .55; background: #f7f2e8; } tr.drop-before > td { box-shadow: inset 0 2px 0 var(--oak); } tr.drop-after > td { box-shadow: inset 0 -2px 0 var(--oak); } body.dragging-rows, body.dragging-rows * { cursor: grabbing !important; user-select: none; }
   .undo-hist-btn { background: none; border: 1px solid #3a3d41; color: #cfcabf; font-family: inherit; font-size: 11.5px; padding: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; }
   .undo-hist-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
   .undo-wrap { padding: 12px 12px 0; margin-top: auto; }
@@ -1164,11 +1181,11 @@
   .crm-filters .view-toggle button { padding: 5px 11px; font-size: 12px; }
   .crm-filters .crm-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
   .crm-grp { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; max-width: 100%; }
-  .crm-check { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--slate); cursor: pointer; }
+  .crm-check { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--slate); cursor: pointer; padding-right: 6px; }
   .crm-check input { width: auto; }
   .crm-colwrap { position: relative; }
   .crm-colmenu { position: absolute; top: calc(100% + 4px); left: 0; z-index: 15; background: #fff; border: 1px solid var(--stone-deep); border-radius: 9px; box-shadow: var(--shadow-lift); padding: 8px 12px; min-width: 150px; }
-  .crm-colmenu label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 4px 0; cursor: pointer; }
+  .crm-colmenu label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 4px 8px 4px 0; cursor: pointer; width: fit-content; max-width: 100%; }
   .crm-colmenu input { width: auto; }
   .crm-row { cursor: pointer; }
   .crm-row.done-row td { color: var(--muted); }
@@ -1342,7 +1359,7 @@
 
   <div class="nav-group g-growth">
     <div class="nav-label">Growth</div>
-    <div class="tab g-growth" data-tab="leads">Leads</div>
+    <div class="tab g-growth" data-tab="leads">Lead Pipeline</div>
     <div class="tab g-growth" data-tab="salespipeline">Sales Pipeline</div>
     <div class="tab g-growth" data-tab="crm">CRM</div>
   </div>
@@ -1363,8 +1380,8 @@
 
   <div class="nav-group g-operations">
     <div class="nav-label">Operations</div>
-    <div class="tab g-operations" data-tab="suppliers">Suppliers</div>
     <div class="tab g-operations" data-tab="projectpipeline">Project Pipeline</div>
+    <div class="tab g-operations" data-tab="suppliers">Suppliers</div>
   </div>
 
   <div class="nav-group g-organisation">
@@ -1489,7 +1506,7 @@
   <!-- LEADS -->
   <div class="panel" id="panel-leads">
     <div class="page-head">
-      <h2>Leads</h2>
+      <h2>Lead Pipeline</h2>
       <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once budget, decision-maker, timeline and competition are all filled — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
     </div>
     <div class="view-toggle" id="viewToggle-lead"></div>
@@ -2884,7 +2901,7 @@ function dashFunnelHtml(range, won, lostN){
   const head = dashCardHead('Lead funnel', 'Active leads in each stage right now. Lost leads are not counted.');
   const decided = won.count + lostN, rate = decided ? Math.round(won.count / decided * 100) : null;
   let body;
-  if(!leads.length) body = dashEmpty('No active leads yet — add one to start the funnel.', ['leads', 'Open Leads']);
+  if(!leads.length) body = dashEmpty('No active leads yet — add one to start the funnel.', ['leads', 'Open Lead Pipeline']);
   else {
     const stages = state.pipelineStages.lead, rows = stages.map(s => { const c = leads.filter(l => l.stageId === s.id).length; return { label: s.name, value: c, valueText: String(c), tip: `${s.name}: ${dashPlural(c, 'lead')}` }; });
     const desc = rows.map(r => `${r.label}: ${r.valueText}`).join('; ') + '.';
@@ -3063,6 +3080,7 @@ function salesDetailHtml(r, i){
           <span>${escAttr(r.name)}</span>
           <span class="detail-meta">${roll.start?fmtDisplay(roll.start):'—'} → ${roll.end?fmtDisplay(roll.end):'—'} · ${roll.durationDays||0} days span · total cost ${money(roll.totalCost)}</span>
         </div>
+        ${moveStripHtml('sales', r, i)}
         ${recTasksHtml('sales', r)}
         ${quoteChipHtml(r.id)}
         <div class="detail-notes"><label>Notes</label><input data-tab="pipeline" data-idx="${i}" data-field="notes" value="${escAttr(r.notes||'')}"></div>
@@ -3071,8 +3089,8 @@ function salesDetailHtml(r, i){
         ${rtTable('pipelineStages', ['Stage','Kind','Start','End','Days','Cost (£)','Time',''])}`;
       (r.stages||[]).forEach((s, si) => {
         const sDays = (s.start && (s.end||s.start)) ? Math.round((toDate(s.end||s.start)-toDate(s.start))/86400000)+1 : 0;
-        html += `<tr>
-          <td><input data-tab="stages" data-proj="${i}" data-sidx="${si}" data-field="label" value="${escAttr(s.label||'')}"></td>
+        html += `<tr data-drag="sstage" data-rid="${r.id}" data-ix="${si}">
+          <td class="dg">${DRAG_H}<input data-tab="stages" data-proj="${i}" data-sidx="${si}" data-field="label" value="${escAttr(s.label||'')}"></td>
           <td><select data-tab="stages" data-proj="${i}" data-sidx="${si}" data-field="kind" style="border-left:3px solid ${STAGE_KINDS[s.kind]?STAGE_KINDS[s.kind].color:'#8b867c'};">
             ${kinds.map(k=>`<option value="${k}"${s.kind===k?' selected':''}>${STAGE_KINDS[k].label}</option>`).join('')}</select></td>
           <td><input type="date" data-tab="stages" data-proj="${i}" data-sidx="${si}" data-field="start" value="${s.start||''}"></td>
@@ -3290,6 +3308,58 @@ function hideToast(){ clearTimeout(toastTimer); document.getElementById('toast')
 document.getElementById('toastUndo').addEventListener('click', () => { const f = toastUndo; hideToast(); if(f) f(); });
 
 
+/* ---------- drag to reorder rows ----------
+   Rows in the line tables carry data-drag="<kind>" and data-ix (position); the handle sits in the first cell and shows on hover.
+   Kinds: qline / qlab / qpay (the open quote's materials, labour, payment schedule), sstage (a deal's stage lines), ppay (a project's payment lines). */
+const DRAG_H = '<span class="drag-h" role="button" tabindex="0" title="Drag to reorder" aria-label="Drag to reorder">⋮⋮</span>';
+function dragTarget(tr){
+  const k = tr.dataset.drag;
+  if(k === 'qline' || k === 'qlab' || k === 'qpay'){ const q = qFind(qUi.openId); return q ? { q, arr: k === 'qline' ? q.lines : (k === 'qlab' ? q.labour : q.payments) } : null; }
+  if(k === 'sstage'){ const r = state.pipeline.find(x => x.id === Number(tr.dataset.rid)); return r && Array.isArray(r.stages) ? { arr: r.stages } : null; }
+  if(k === 'ppay'){ const p = state.projects.find(x => x.id === Number(tr.dataset.rid)); return p && Array.isArray(p.paymentLines) ? { arr: p.paymentLines } : null; }
+  return null;
+}
+function dragMove(tr, from, to){
+  const t = dragTarget(tr); if(!t || from === to || !t.arr[from]) return;
+  if(t.q && qLocked(t.q)){ showToast('This quote is locked. Click “Edit anyway” to change it.'); return; }
+  t.arr.splice(to, 0, t.arr.splice(from, 1)[0]);
+  if(t.q) qbTouch(t.q, true); else { render(); saveState(); }
+}
+(function(){
+  let d = null;
+  const rowsOf = () => [...d.body.children].filter(r => r.dataset && r.dataset.drag === d.kind);
+  const clear = () => rowsOf().forEach(r => r.classList.remove('drop-before', 'drop-after'));
+  document.addEventListener('pointerdown', (e) => {
+    const h = e.target.closest && e.target.closest('.drag-h'); if(!h || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const tr = h.closest('tr[data-drag]'); if(!tr) return;
+    e.preventDefault();
+    d = { tr, body: tr.parentNode, kind: tr.dataset.drag, from: Number(tr.dataset.ix), ins: null, id: e.pointerId };
+    tr.classList.add('dragging'); document.body.classList.add('dragging-rows');
+    try{ h.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  document.addEventListener('pointermove', (e) => {
+    if(!d || e.pointerId !== d.id) return;
+    const rows = rowsOf(); if(!rows.length) return;
+    clear(); let ins = rows.length;
+    for(let i = 0; i < rows.length; i++){ const r = rows[i].getBoundingClientRect(); if(e.clientY < r.top + r.height / 2){ ins = i; break; } }
+    d.ins = ins;
+    if(ins < rows.length) rows[ins].classList.add('drop-before'); else rows[rows.length - 1].classList.add('drop-after');
+  });
+  const end = (e, cancel) => {
+    if(!d || (e && e.pointerId !== d.id)) return;
+    const { tr, from, ins } = d; clear(); tr.classList.remove('dragging'); document.body.classList.remove('dragging-rows'); d = null;
+    if(cancel || ins === null) return;
+    dragMove(tr, from, ins > from ? ins - 1 : ins);
+  };
+  document.addEventListener('pointerup', (e) => end(e, false));
+  document.addEventListener('pointercancel', (e) => end(e, true));
+  document.addEventListener('keydown', (e) => {   // keyboard: focus the handle, Alt+↑ / Alt+↓ moves the row
+    const h = e.target.closest && e.target.closest('.drag-h'); if(!h || !e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+    const tr = h.closest('tr[data-drag]'); if(!tr) return; e.preventDefault();
+    const from = Number(tr.dataset.ix); dragMove(tr, from, from + (e.key === 'ArrowUp' ? -1 : 1));
+  });
+})();
+
 /* ---------- Undo log ----------
    Every delete records { id, at, by, label, path, index, item, extra } in state.undoLog (newest first, max 50, 24 hours, ~1.5 MB).
    path is how to find the array the item came from: strings are keys, {id} steps pick a record by id (e.g. ['quotes', {id:3}, 'lines']).
@@ -3479,7 +3549,7 @@ let detailRef = null;   // { pl, id }
 function openDetail(pl, id){
   if(!findRec(pl, id)) return;
   if(pl === 'lead'){ closeDetail(); openLeadPanel(id, '', true); return; }   // leads have one editing surface: the Leads editor panel
-  detailRef = { pl, id };
+  detailRef = { pl, id, view: 'current' };
   document.getElementById('drBody').scrollTop = 0;
   renderDetail();
 }
@@ -3491,9 +3561,13 @@ function closeDetail(){
 function renderDetail(){
   if(!detailRef) return;
   const { pl, id } = detailRef; let html = '', title = '';
-  if(pl === 'sales'){ const i = state.pipeline.findIndex(r => r.id === id); if(i >= 0){ html = salesDetailHtml(state.pipeline[i], i); title = 'Sales deal'; } }
-  else { const i = state.projects.findIndex(p => p.id === id); if(i >= 0){ html = projectDetailHtml(state.projects[i], i); title = 'Project'; } }
+  let rec = null;
+  if(pl === 'sales'){ const i = state.pipeline.findIndex(r => r.id === id); if(i >= 0){ rec = state.pipeline[i]; html = salesDetailHtml(rec, i); title = 'Sales deal'; } }
+  else { const i = state.projects.findIndex(p => p.id === id); if(i >= 0){ rec = state.projects[i]; html = projectDetailHtml(rec, i); title = 'Project'; } }
   if(!html){ closeDetail(); return; }   // moved on (promoted, lost, deleted) — nothing left to show here
+  const view = detailRef.view === 'lead' ? 'lead' : 'current';
+  if(view === 'lead') html = leadInfoHtml(rec);
+  html = `<div class="dr-views" role="tablist"><button type="button" data-action="dr-view" data-v="current" class="${view === 'current' ? 'active' : ''}">${title}</button><button type="button" data-action="dr-view" data-v="lead" class="${view === 'lead' ? 'active' : ''}">Original lead info</button></div>` + html;
   const body = document.getElementById('drBody'), keep = body.scrollTop;
   document.getElementById('drTitle').textContent = title;
   body.innerHTML = html; rtApply(body); body.scrollTop = keep;
@@ -3792,7 +3866,7 @@ document.addEventListener('change', (e) => {
   if(el.dataset && el.dataset.tierimg !== undefined){ handleTierImage(Number(el.dataset.tierimg), el.files && el.files[0]); el.value = ''; }
 });
 
-/* ---------- Leads ---------- */
+/* ---------- Lead Pipeline ---------- */
 const expandedLeads = new Set();
 /* pill colours follow the stage id (so renaming keeps the colour); stages you add get the neutral grey */
 function leadStatusStyle(stageId){
@@ -3965,7 +4039,7 @@ function lpBodyHtml(l, i){
       ${lpFieldHtml('Source', lpInput(i, 'source', l.source, { ph: 'e.g. Referral, Facebook group' }))}
       ${lpFieldHtml('Estimated value (£)', `<input type="number" step="1" min="0" data-tab="leads" data-idx="${i}" data-field="estValue" value="${l.estValue === '' || l.estValue == null ? '' : l.estValue}" placeholder="Sets the tier automatically">`)}
       ${lpFieldHtml('Tier', `<select data-tab="leads" data-idx="${i}" data-field="tierSel" id="lpTier">${lpTierOptions(l)}</select>`)}
-      ${lpFieldHtml('Lead status', `<select data-tab="leads" data-idx="${i}" data-field="stageId">${stageOpts}</select>`)}
+      ${lpFieldHtml('Lead status', `<div class="lp-statusrow"><select data-tab="leads" data-idx="${i}" data-field="stageId">${stageOpts}</select>${leadQualified(l) ? `<button type="button" class="promote-btn" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button>` : ''}</div>`)}
     </section>
     <section class="lp-sec" id="lp-sec-location" data-sec="location"><h3>Location</h3>
       ${lpFieldHtml('Address', `<textarea rows="3" data-tab="leads" data-idx="${i}" data-field="address" placeholder="Site address">${escAttr(l.address || '')}</textarea>`)}
@@ -4061,6 +4135,10 @@ function lpSync(){
   const q = lpQualNoteHtml(l);
   lpEl('lpQualCount').textContent = q.count; lpEl('lpQualNote').textContent = q.note;
   document.querySelectorAll('#lpBody [data-qf]').forEach(w => w.classList.toggle('missing', !l[w.dataset.qf]));
+  const srow = document.querySelector('#lpBody .lp-statusrow');   // “Promote to Sales” appears the moment the lead is fully qualified
+  if(srow){ const b = srow.querySelector('[data-action="promote-lead"]'), q = leadQualified(l);
+    if(q && !b) srow.insertAdjacentHTML('beforeend', `<button type="button" class="promote-btn" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button>`);
+    else if(!q && b) b.remove(); }
   const tl = lpEl('lpTimeline');
   if(tl && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#lpTimeline .comm-entry'))){
     const ae = document.activeElement, noteFocus = ae && ae.dataset && ae.dataset.lc === 'note' && tl.contains(ae), keep = noteFocus ? ae.value : '', top = tl.querySelector('.comms-scroll');
@@ -4160,7 +4238,7 @@ async function markLeadLost(id){
   if(!state.lostReasons.length){ alert('Add at least one lost reason in Settings first.'); return; }
   const extra = `<select id="lostReasonSel" required><option value="">Select a reason…</option>${state.lostReasons.map(r=>`<option value="${escHtml(r.id)}">${escHtml(r.name)}</option>`).join('')}</select>
     <textarea id="lostNoteTxt" placeholder="Optional note"></textarea><div class="modal-err" id="modalExtraErr"></div>`;
-  const ok = await showConfirm('Mark this lead as lost?', `${recordCode(l.id,'lead')} · ${leadPrimaryName(l)} will leave the active Leads view and all active counts. You can restore it from the Lost leads bar at the bottom of this tab.`, extra);
+  const ok = await showConfirm('Mark this lead as lost?', `${recordCode(l.id,'lead')} · ${leadPrimaryName(l)} will leave the active Lead Pipeline view and all active counts. You can restore it from the Lost leads bar at the bottom of this tab.`, extra);
   if(!ok || !_confirmExtraValue) return;
   l.lostStageId = l.stageId;
   l.lostReason = _confirmExtraValue; l.lostNote = (_confirmExtraNote || '').trim(); l.lostDate = fmt(new Date());
@@ -4257,6 +4335,30 @@ function supMainContact(s){ return s.contacts.find(c => c.primary) || s.contacts
 function supPhone(s){ const c = supMainContact(s); return (c && c.phone) || s.phone || ''; }
 function supEmail(s){ const c = supMainContact(s); return (c && c.email) || s.email || ''; }
 function supPillsHtml(s){ const cs = supCatsOf(s); return cs.length ? `<div class="sup-pills">${cs.map(c => `<span class="sup-pill">${escHtml(c.name)}</span>`).join('')}</div>` : ''; }
+/* categories are limited to two lines per row: whatever does not fit collapses into a “+N more” pill (clicking the row opens the profile) */
+function supFitPills(){
+  document.querySelectorAll('#suppliersTableWrap .sup-pills').forEach(box => {
+    box.classList.remove('fit'); box.querySelectorAll('.sup-more').forEach(x => x.remove());
+    const pills = [...box.querySelectorAll('.sup-pill')]; pills.forEach(x => { x.hidden = false; });
+    if(!pills.length) return;
+    const rowTop = () => [...new Set(pills.filter(x => !x.hidden).map(x => x.offsetTop))].sort((a, b) => a - b);
+    if(rowTop().length <= 2) return;
+    box.classList.add('fit');
+    const more = document.createElement('span'); more.className = 'sup-pill sup-more'; box.appendChild(more);
+    let hidden = 0;
+    const apply = () => { more.textContent = '+' + hidden + ' more'; more.title = pills.filter(x => x.hidden).map(x => x.textContent).join(', '); };
+    const lastVisible = () => { for(let i = pills.length - 1; i >= 0; i--) if(!pills[i].hidden) return pills[i]; return null; };
+    // hide from the end until at most two rows remain and the “+N more” pill sits on the second row
+    for(let guard = 0; guard < pills.length; guard++){
+      hidden = pills.filter(x => x.hidden).length; apply();
+      const tops = [...new Set([...pills.filter(x => !x.hidden), more].map(x => x.offsetTop))];
+      if(tops.length <= 2) break;
+      const lv = lastVisible(); if(!lv) break; lv.hidden = true;
+    }
+    hidden = pills.filter(x => x.hidden).length; apply();
+  });
+}
+let _supFitT = null; window.addEventListener('resize', () => { clearTimeout(_supFitT); _supFitT = setTimeout(() => { try{ supFitPills(); }catch(e){} }, 150); });
 function supStatusHtml(s){ return `<span class="sup-st${s.status === 'Inactive' ? ' off' : ''}">${s.status}</span>`; }
 function supTermsText(s){ return s.paymentTerms === '' ? '' : s.paymentTerms + (s.paymentTerms === 1 ? ' day' : ' days'); }
 function supDeliveryText(s){ return s.deliveryCharge === '' ? '' : (s.deliveryCharge === 0 ? 'Free' : '£' + s.deliveryCharge.toFixed(2).replace(/\.00$/, '') + ' / drop'); }
@@ -4304,7 +4406,7 @@ function renderSuppliers(){
       <td>${supStatusHtml(s)}</td></tr>`;
   });
   wrap.innerHTML = html + '</tbody></table>';
-  rtApply(wrap);
+  rtApply(wrap); supFitPills();
   const cnt = document.getElementById('supCount');
   if(cnt) cnt.textContent = state.suppliers.length ? `${list.length} of ${state.suppliers.length} supplier${state.suppliers.length !== 1 ? 's' : ''}` : '';
 }
@@ -4537,6 +4639,7 @@ function projectDetailHtml(p, i){
   const m = p.milestones || {}, projStages = state.pipelineStages.project;
       let html = `<div class="detail-box">
         <div class="detail-head"><span class="detail-code" style="background:var(--green);">${recordCode(p.id,'project')}</span><span>${escAttr(p.name)}</span><span class="detail-meta">Stage: ${escHtml(stageName('project', p.stageId))}</span></div>
+        ${moveStripHtml('project', p, i)}
         ${recTasksHtml('project', p)}
         ${quoteChipHtml(p.id)}${projStageTimeHtml(p)}
         <div class="stage-label-row">Delivery milestones</div>
@@ -4551,8 +4654,8 @@ function projectDetailHtml(p, i){
         <div class="table-scroll" style="box-shadow:none;border-radius:9px;">
         ${rtTable('projectPayments', ['Code','Description','Due date','Amount (£)','Invoiced','Paid',''])}`;
       (p.paymentLines||[]).forEach((pl, pli) => {
-        html += `<tr>
-          <td class="code-cell">${recordCode(p.id,'project')}-INV${pli+1}</td>
+        html += `<tr data-drag="ppay" data-rid="${p.id}" data-ix="${pli}">
+          <td class="code-cell dg">${DRAG_H}${recordCode(p.id,'project')}-INV${pli+1}</td>
           <td><input data-tab="payline" data-idx="${i}" data-pli="${pli}" data-field="desc" value="${escAttr(pl.desc||'')}"></td>
           <td><input type="date" data-tab="payline" data-idx="${i}" data-pli="${pli}" data-field="dueDate" value="${pl.dueDate||''}"></td>
           <td><input type="number" step="1" data-tab="payline" data-idx="${i}" data-pli="${pli}" data-field="amount" value="${pl.amount||0}"></td>
@@ -5177,8 +5280,8 @@ function qbMaterialsHtml(q){
   const avail = state.suppliers.filter(s => s.status === 'Active' && !cols.includes(s.id)).map(s => [s.id, s.name]);
   let h = `<tr><th class="qb-sticky-l">Description</th><th>Category</th><th>Unit</th><th>Qty</th><th>Waste %</th><th>To order</th>${cols.map(id => `<th class="qb-supcol">${escHtml(qbSupName(id))}<button class="qb-x" data-qba="del-supcol" data-sid="${id}" title="Remove this supplier column" aria-label="Remove supplier column">×</button></th>`).join('')}
     <th>Supplier</th><th class="qb-sticky-r">Cost each</th><th>Cost total</th><th>Markup %</th><th>Price ex VAT</th>${vatOn ? '<th>VAT</th><th>Price inc VAT</th>' : ''}<th>Customer group</th><th>Show</th><th>Drop</th><th></th></tr>`;
-  let body = q.lines.map((l, i) => `<tr data-line="${l.id}">
-    <td class="qb-sticky-l"><div class="qb-desc">${qbIn('line', l.id, 'description', l.description, { ph: 'Description', aria: 'Description' })}</div></td>
+  let body = q.lines.map((l, i) => `<tr data-line="${l.id}" data-drag="qline" data-ix="${i}">
+    <td class="qb-sticky-l dg">${DRAG_H}<div class="qb-desc">${qbIn('line', l.id, 'description', l.description, { ph: 'Description', aria: 'Description' })}</div></td>
     <td>${qbSel('line', l.id, 'categoryId', qbOpts(cats, l.categoryId, '—'), { aria: 'Category' })}</td>
     <td>${qbSel('line', l.id, 'unitId', qbOpts(units, l.unitId, l.unitName || '—'), { aria: 'Unit' })}</td>
     <td>${qbIn('line', l.id, 'qty', l.qty, { num: true, cls: 'qb-n', aria: 'Qty' })}</td><td>${qbIn('line', l.id, 'wastagePct', l.wastagePct, { num: true, cls: 'qb-n', aria: 'Wastage %' })}</td>
@@ -5719,7 +5822,7 @@ function qbLabourHtml(q){
       <td>Auto</td><td class="qb-calc" data-qc="unpaid|hours">${hrs(un.hours)}</td><td class="qb-calc">${un.rateMissing ? '—' : qm(un.rate)}</td>
       <td class="qb-calc"><input type="number" step="any" min="0" class="qb-n" data-qb="hdr" data-f="unpaidOverride" value="${q.unpaidOverride === '' ? '' : escAttr(q.unpaidOverride)}" placeholder="${un.amount ? un.amount.toFixed(2) : '0.00'}" aria-label="Unpaid time recovered amount">
         <span class="qb-ov" data-qc="unpaid|ov"${un.overridden ? '' : ' hidden'}>overridden <button type="button" class="sp-link" data-qba="unpaid-reset">reset</button></span></td><td></td><td></td><td></td></tr>` : '';
-  const rows = q.labour.map((r, i) => `<tr><td>${qbIn('lab', r.id, 'description', r.description, { aria: 'Labour description' })}</td>
+  const rows = q.labour.map((r, i) => `<tr data-drag="qlab" data-ix="${i}"><td class="dg">${DRAG_H}${qbIn('lab', r.id, 'description', r.description, { aria: 'Labour description' })}</td>
     <td>${qbSel('lab', r.id, 'basis', qbOpts(LAB_BASES, r.basis), { aria: 'Basis' })}</td><td>${qbIn('lab', r.id, 'qty', r.qty, { num: true, cls: 'qb-n', aria: 'Qty' })}</td>
     <td>${qbIn('lab', r.id, 'rate', r.rate, { num: true, cls: 'qb-n', aria: 'Rate £', ph: 'Rate' })}</td><td class="qb-calc" data-qc="${r.id}|amount">—</td>
     <td>${qbIn('lab', r.id, 'customerGroup', r.customerGroup, { aria: 'Customer group' })}</td>
@@ -5735,7 +5838,7 @@ function qbLabourHtml(q){
     <p class="q-help">Labour rates default from Settings &gt; Quotes &amp; pricing. With the switch on, an automatic row adds the unpaid time from the linked deal's stage lines; type an amount to override it.</p></div>`;
 }
 function qbPaymentsHtml(q){
-  const rows = q.payments.map(r => `<tr><td>${qbIn('pay', r.id, 'label', r.label, { aria: 'Payment label' })}</td>
+  const rows = q.payments.map((r, i) => `<tr data-drag="qpay" data-ix="${i}"><td class="dg">${DRAG_H}${qbIn('pay', r.id, 'label', r.label, { aria: 'Payment label' })}</td>
     <td>${qbSel('pay', r.id, 'mode', qbOpts([['percent', '%'], ['amount', '£']], r.mode), { aria: '% or £' })}</td><td>${qbIn('pay', r.id, 'value', r.value, { num: true, cls: 'qb-n', aria: 'Amount' })}</td>
     <td>${qbSel('pay', r.id, 'dueMode', qbOpts([['afterEnd', 'Days after the last stage ends'], ['completion', 'On completion (last stage end)'], ['acceptance', 'On acceptance'], ['date', 'A set date']], r.dueMode), { aria: 'Due' })}</td>
     <td>${r.dueMode === 'date' ? `<input type="date" data-qb="pay" data-id="${r.id}" data-f="date" value="${escAttr(r.date)}" aria-label="Due date">` : (r.dueMode === 'afterEnd' ? qbIn('pay', r.id, 'days', r.days, { num: true, cls: 'qb-n', ph: String(Number(state.settings.paymentTermsDays) || 0), aria: 'Days' }) : '')}</td>
@@ -5791,11 +5894,23 @@ function slQuoteNoteHtml(root){
 }
 function slFind(pl, rid, sid){ const rec = findRec(pl, rid); return { rec, s: rec ? (rec.stages || []).find(x => x.id === sid) || null : null }; }
 function slHeadHtml(s, rec, pl){ return `<div class="lp-title">${escHtml(s.label || 'Stage line')}</div><div class="lp-sub"><span>${escHtml(boardTitle(pl || (lp && lp.pl) || 'sales', rec))}</span><span class="sl-tag ${slPaid(s) ? 'paid' : 'unpaid'}">${slPaid(s) ? 'Paid' : 'Unpaid'}</span></div>`; }
+/* key details of the stage line, shown at the top of its pane */
+function slSumHtml(s, rec, pl){
+  pl = pl || lp.pl; const e = escHtml, k = STAGE_KINDS[s.kind], plan = slPlannedHours(s), lg = slLogged(s);
+  const days = (s.start && (s.end || s.start)) ? Math.round((toDate(s.end || s.start) - toDate(s.start)) / 86400000) + 1 : 0;
+  const row = (a, b) => `<dt>${a}</dt><dd>${b}</dd>`;
+  return `<dl class="ro-grid">${row(pl === 'sales' ? 'Deal' : 'Project', e(boardTitle(pl, rec)))}${row('Stage line', e(s.label || 'Stage'))}${k ? row('Kind', e(k.label)) : ''}
+    ${row('Dates', (s.start || s.end) ? `${e(fmtDisplay(toDate(s.start || s.end)))} → ${e(fmtDisplay(toDate(s.end || s.start)))}${days ? ` (${days} day${days !== 1 ? 's' : ''})` : ''}` : '<span class="dim">not dated yet</span>')}
+    ${row('Status', `<span class="sl-tag ${slPaid(s) ? 'paid' : 'unpaid'}">${slPaid(s) ? 'Paid' : 'Unpaid'}</span>`)}${row('Planned', plan ? `${hrs(plan)} (${dys(plan / hpd())})` : '<span class="dim">none</span>')}${row('Logged', lg ? `${hrs(lg)} (${dys(lg / hpd())})` : '<span class="dim">none</span>')}${Number(s.cost) ? row('Cost (£)', money(s.cost)) : ''}</dl>`;
+}
 function slBodyHtml(s, rec, pl){
   pl = pl || lp.pl; const root = rec.id, t = slType(s), f = (label, inner, help) => `<div class="lp-f"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
   const at = `data-sl data-pl="${pl}" data-rid="${rec.id}" data-sid="${s.id}"`;
   const log = (s.log || []).slice().sort((a, b) => b.date.localeCompare(a.date)).map(x => `<div class="sl-log"><input type="date" ${at} data-lf="date" data-lid="${x.id}" value="${escAttr(x.date)}" aria-label="Date"><input type="number" step="any" min="0" ${at} data-lf="hours" data-lid="${x.id}" value="${x.hours}" aria-label="Hours"><input type="text" ${at} data-lf="note" data-lid="${x.id}" value="${escAttr(x.note)}" placeholder="Note" aria-label="Note"><button class="icon-btn" data-qba="sl-log-del" data-lid="${x.id}" aria-label="Delete entry">${X_SVG}</button></div>`).join('');
-  return `<section class="lp-sec" id="lp-sec-plan" data-sec="plan"><h3>Plan</h3>
+  return `<section class="lp-sec" id="lp-sec-sum" data-sec="sum"><h3>This stage line</h3><div id="slSum">${slSumHtml(s, rec, pl)}</div>
+      <div class="q-inline" style="gap:12px;">${f('Start date', `<input type="date" ${at} data-lf="start" value="${escAttr(isoOk(s.start))}" aria-label="Start date">`)}${f('End date', `<input type="date" ${at} data-lf="end" value="${escAttr(isoOk(s.end))}" aria-label="End date">`)}</div>
+    </section>
+    <section class="lp-sec" id="lp-sec-plan" data-sec="plan"><h3>Plan</h3>
       ${f('Paid or unpaid', `<select ${at} data-lf="paidMode"><option value="auto"${s.paidMode === 'auto' ? ' selected' : ''}>Automatic (${slType(s) ? 'matches “' + escHtml(slType(s).name) + '”: ' + (slType(s).paid ? 'Paid' : 'Unpaid') : 'Paid'})</option><option value="paid"${s.paidMode === 'paid' ? ' selected' : ''}>Paid</option><option value="unpaid"${s.paidMode === 'unpaid' ? ' selected' : ''}>Unpaid</option></select>`, 'Automatic uses the stage line types in Settings &gt; Quotes &amp; pricing &gt; Labour and margin.')}
       ${f('Planned time', `<div class="q-inline"><input type="number" step="any" min="0" ${at} data-lf="plannedValue" value="${s.plannedValue === '' ? '' : s.plannedValue}" placeholder="Blank = none" aria-label="Planned time"><select ${at} data-lf="plannedUnit"><option value="days"${s.plannedUnit === 'days' ? ' selected' : ''}>days</option><option value="hours"${s.plannedUnit === 'hours' ? ' selected' : ''}>hours</option></select></div>`, `Hours convert at ${hpd()} per day (Settings).`)}
       <div class="q-help" id="slPlanOut">${slPlannedHours(s) ? `Planned: ${hrs(slPlannedHours(s))} = ${dys(slPlannedHours(s) / hpd())}` : 'No planned time.'}</div>
@@ -5809,11 +5924,12 @@ function slBodyHtml(s, rec, pl){
 }
 function openStageLinePanel(pl, rid, sid){
   const { rec, s } = slFind(pl, rid, sid); if(!s) return; slEnsure(s);
-  lpOpen({ kind: 'stline', id: sid, pl, rid }, { cls: 'lc-sup', label: 'Edit stage line time', code: recordCode(rid, pl), chips: [['plan', 'Plan'], ['log', 'Time logged']], head: slHeadHtml(s, rec, pl), body: slBodyHtml(s, rec, pl), sec: '', refresh: () => {} });
+  lpOpen({ kind: 'stline', id: sid, pl, rid }, { cls: 'lc-sup', label: 'Edit stage line time', code: recordCode(rid, pl), chips: [['sum', 'Details'], ['plan', 'Plan'], ['log', 'Time logged']], head: slHeadHtml(s, rec, pl), body: slBodyHtml(s, rec, pl), sec: '', refresh: () => {} });
 }
 function slSync(){
   const { rec, s } = lp ? slFind(lp.pl, lp.rid, lp.id) : {}; if(!s){ closeLeadPanel(); return; }
   lpEl('lpHeadInfo').innerHTML = slHeadHtml(s, rec);
+  const sm = lpEl('slSum'); if(sm) sm.innerHTML = slSumHtml(s, rec);
   const po = lpEl('slPlanOut'); if(po) po.textContent = slPlannedHours(s) ? `Planned: ${hrs(slPlannedHours(s))} = ${dys(slPlannedHours(s) / hpd())}` : 'No planned time.';
   const lo = lpEl('slLogOut'); if(lo) lo.innerHTML = `<b>${hrs(slLogged(s))}</b> = ${dys(slLogged(s) / hpd())}`;
 }
@@ -5824,7 +5940,8 @@ function slChange(el){
   if(el.dataset.lid){
     const x = s.log.find(l => l.id === el.dataset.lid); if(!x) return;
     if(f === 'date') x.date = isoOk(v) || x.date; else if(f === 'hours') x.hours = qNumOr(v, 0); else if(f === 'note') x.note = v.trim();
-  } else if(f === 'paidMode') s.paidMode = ['paid', 'unpaid'].includes(v) ? v : 'auto';
+  } else if(f === 'start' || f === 'end') s[f] = isoOk(v);
+  else if(f === 'paidMode') s.paidMode = ['paid', 'unpaid'].includes(v) ? v : 'auto';
   else if(f === 'plannedValue') s.plannedValue = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
   else if(f === 'plannedUnit') s.plannedUnit = v === 'hours' ? 'hours' : 'days';
   slAfter();
@@ -6750,50 +6867,175 @@ function renderTransactions(){
   document.getElementById('transactionsTableWrap').innerHTML = html;
 }
 
+/* ---------- moving a record between the three pipelines ----------
+   Promotion and return keep everything. The record keeps its id (so its code, quotes and tasks stay linked) and carries:
+     leadSnapshot  the lead as it was when promoted (the read-only "Original lead info" view)
+     salesSnapshot the deal's own fields when it was promoted to a project (project only)
+     salesHold / projectHold  what the record held in the stage it was returned from, so promoting again puts it all back. */
+const CARRY_FIELDS = ['contact','company','leadType','phone','email','contacts','source','projectName','address','postcode','postcodeManual','estValue','tierId','tierManual','budget','decisionMaker','timeline','competition'];
+const jclone = o => JSON.parse(JSON.stringify(o));
+function moveLog(rec, note){ rec.comms = rec.comms || []; rec.comms.push({ date: fmt(new Date()), note, created: Date.now(), src: 'move' }); }
 function promoteLead(id){
   const idx = state.leads.findIndex(l => l.id === id);
   if(idx < 0) return;
   const l = state.leads[idx];
   if(l.lost || !leadQualified(l)) return;   // the qualification gate holds whatever the lead stages are called
-  const primary = l.contact || l.company || 'New opportunity';
-  const name = (l.leadType === 'Commercial' && l.company)
-    ? l.company + (l.contact ? ' — ' + l.contact : '')
-    : primary;
-  const rec = {
-    id: l.id, name, type: 'real',
-    tier: 'Needs re-scoping', stageId: firstStageId('sales'), probability: 0.3, quoteValue: 0,
-    notes: (l.notes||'') + `  [From lead: budget ${l.budget||'?'}; decision-maker ${l.decisionMaker||'?'}; timeline ${l.timeline||'?'}; competition ${l.competition||'?'}]`,
-    contact: l.contact||'', company: l.company||'', leadType: l.leadType||'Residential', phone: l.phone||'', email: l.email||'', contacts: l.contacts||[], source: l.source||'',
-    projectName: l.projectName||'', address: l.address||'', postcode: l.postcode||'', postcodeManual: !!l.postcodeManual,
-    estValue: l.estValue===undefined?'':l.estValue, tierId: l.tierId||'', tierManual: !!l.tierManual,
-    budget: l.budget||'', decisionMaker: l.decisionMaker||'', timeline: l.timeline||'', competition: l.competition||'',
-    comms: l.comms||[], contractSigned: '',
-    stages: [ { label: 'Scope & cost', kind: 'scope', start: '', end: '', cost: 0 } ]
-  };
+  const snap = jclone(l); delete snap.salesHold;
+  let rec;
+  if(l.salesHold){   // it has been here before: bring back the deal exactly as it was, with the lead's latest details
+    rec = jclone(l.salesHold);
+    CARRY_FIELDS.forEach(f => { if(l[f] !== undefined) rec[f] = jclone(l[f]); });
+    rec.comms = l.comms || [];
+  } else {
+    const primary = l.contact || l.company || 'New opportunity';
+    const name = (l.leadType === 'Commercial' && l.company) ? l.company + (l.contact ? ' — ' + l.contact : '') : primary;
+    rec = {
+      id: l.id, name, type: 'real',
+      tier: 'Needs re-scoping', stageId: firstStageId('sales'), probability: 0.3, quoteValue: 0,
+      notes: (l.notes||'') + `  [From lead: budget ${l.budget||'?'}; decision-maker ${l.decisionMaker||'?'}; timeline ${l.timeline||'?'}; competition ${l.competition||'?'}]`,
+      contact: l.contact||'', company: l.company||'', leadType: l.leadType||'Residential', phone: l.phone||'', email: l.email||'', contacts: l.contacts||[], source: l.source||'',
+      projectName: l.projectName||'', address: l.address||'', postcode: l.postcode||'', postcodeManual: !!l.postcodeManual,
+      estValue: l.estValue===undefined?'':l.estValue, tierId: l.tierId||'', tierManual: !!l.tierManual,
+      budget: l.budget||'', decisionMaker: l.decisionMaker||'', timeline: l.timeline||'', competition: l.competition||'',
+      comms: l.comms||[], contractSigned: '',
+      stages: [ { label: 'Scope & cost', kind: 'scope', start: '', end: '', cost: 0 } ]
+    };
+  }
+  rec.leadSnapshot = snap;
+  moveLog(rec, l.salesHold ? 'Promoted again: Lead Pipeline → Sales Pipeline (earlier deal details restored)' : 'Promoted: Lead Pipeline → Sales Pipeline');
   state.leads.splice(idx, 1);
   state.pipeline.push(rec);
   expandedProjects.add(rec.id);
   render(); saveState();
+  closeLeadPanel(); openDetail('sales', rec.id);
 }
 function promoteToProject(id){
   const idx = state.pipeline.findIndex(p => p.id === id);
   if(idx < 0) return;
   const s = state.pipeline[idx];
-  const proj = {
-    id: s.id, name: s.name, type: s.type, agreedValue: Number(s.quoteValue)||0,
-    budgetedCost: projectRollup(s).totalCost, actualCost: 0, notes: s.notes||'',
-    milestones: { contractSigned: s.contractSigned||'', designSigned:'', materialsOrdered:'', materialsDelivered:'', onSiteStart:'', buildComplete:'', invoiced:'', paid:'', signOff:'' },
-    tierId: s.tierId||'',
-    stageId: '',
-    comms: s.comms || [],
-    testimonial: '', stages: s.stages || [],
-    paymentLines: [ { desc: 'On completion', dueDate: projectRollup(s).end ? fmt(projectRollup(s).end) : '', amount: Number(s.quoteValue)||0, invoicedDate: '', paidDate: '' } ]
-  };
-  proj.stageId = autoProjectStageId(proj) || firstStageId('project');
+  const salesSnap = jclone(s); ['comms','stages','leadSnapshot','projectHold'].forEach(k => delete salesSnap[k]);
+  let proj;
+  if(s.projectHold){   // it has been a project before: its milestones, payment lines and actuals come back
+    proj = jclone(s.projectHold);
+    proj.name = s.name; proj.type = s.type; proj.notes = s.notes || '';
+    if(Number(s.quoteValue) > 0) proj.agreedValue = Number(s.quoteValue);
+    proj.milestones = Object.assign({ contractSigned:'', designSigned:'', materialsOrdered:'', materialsDelivered:'', onSiteStart:'', buildComplete:'', invoiced:'', paid:'', signOff:'' }, proj.milestones || {});
+    if(s.contractSigned) proj.milestones.contractSigned = s.contractSigned;
+    if(s.tierId) proj.tierId = s.tierId;
+    proj.budgetedCost = projectRollup(s).totalCost || proj.budgetedCost || 0;
+  } else {
+    proj = {
+      id: s.id, name: s.name, type: s.type, agreedValue: Number(s.quoteValue)||0,
+      budgetedCost: projectRollup(s).totalCost, actualCost: 0, notes: s.notes||'',
+      milestones: { contractSigned: s.contractSigned||'', designSigned:'', materialsOrdered:'', materialsDelivered:'', onSiteStart:'', buildComplete:'', invoiced:'', paid:'', signOff:'' },
+      tierId: s.tierId||'',
+      stageId: '',
+      testimonial: '',
+      paymentLines: [ { desc: 'On completion', dueDate: projectRollup(s).end ? fmt(projectRollup(s).end) : '', amount: Number(s.quoteValue)||0, invoicedDate: '', paidDate: '' } ]
+    };
+  }
+  proj.id = s.id; proj.comms = s.comms || []; proj.stages = s.stages || [];
+  CARRY_FIELDS.forEach(f => { if(s[f] !== undefined) proj[f] = s[f]; });   // contact, address, qualification… stay with the record so it can go back
+  if(s.leadSnapshot) proj.leadSnapshot = s.leadSnapshot;
+  proj.salesSnapshot = salesSnap;
+  if(!stageById('project', proj.stageId)) proj.stageId = autoProjectStageId(proj) || firstStageId('project');
+  moveLog(proj, s.projectHold ? 'Promoted again: Sales Pipeline → Project Pipeline (earlier project details restored)' : 'Promoted: Sales Pipeline → Project Pipeline');
   state.pipeline.splice(idx, 1);
   state.projects.push(proj);
   expandedProjectsP.add(proj.id);
   render(); saveState();
+  openDetail('project', proj.id);
+}
+function returnToLead(id){
+  const idx = state.pipeline.findIndex(p => p.id === id); if(idx < 0) return;
+  const s = state.pipeline[idx];
+  const l = Object.assign(newRowFor('leads'), s.leadSnapshot ? jclone(s.leadSnapshot) : {});
+  l.id = s.id; delete l.salesHold; l.lost = false;
+  CARRY_FIELDS.forEach(f => { if(s[f] !== undefined) l[f] = s[f]; });
+  l.comms = s.comms || [];
+  if(!s.leadSnapshot){ const q = stageById('lead', 'stg_lead_qualified'); l.stageId = q ? q.id : firstStageId('lead'); }
+  if(!stageById('lead', l.stageId)) l.stageId = firstStageId('lead');
+  const hold = jclone(s); ['leadSnapshot','comms'].forEach(k => delete hold[k]);
+  l.salesHold = hold;
+  moveLog(l, 'Returned: Sales Pipeline → Lead Pipeline (deal details kept)');
+  state.pipeline.splice(idx, 1);
+  state.leads.push(l);
+  expandedLeads.add(l.id);
+  closeDetail(); render(); saveState();
+  showToast(`${recordCode(l.id, 'lead')} is back in the Lead Pipeline. Its deal details are kept for if you promote it again.`);
+}
+function returnToSales(id){
+  const idx = state.projects.findIndex(p => p.id === id); if(idx < 0) return;
+  const p = state.projects[idx];
+  const conf = stageByName(state.pipelineStages.sales, 'Confirmed');
+  const base = p.salesSnapshot ? jclone(p.salesSnapshot) : { type: p.type || 'real', tier: 'Needs re-scoping', stageId: conf ? conf.id : firstStageId('sales'), probability: 1, quoteValue: 0 };
+  const rec = Object.assign(base, { id: p.id, name: p.name, type: p.type || base.type, quoteValue: Number(p.agreedValue) || base.quoteValue || 0, notes: p.notes || '', tierId: p.tierId || base.tierId || '',
+    stages: p.stages || [], comms: p.comms || [], contractSigned: (p.milestones || {}).contractSigned || base.contractSigned || '' });
+  CARRY_FIELDS.forEach(f => { if(p[f] !== undefined) rec[f] = p[f]; });
+  if(p.leadSnapshot) rec.leadSnapshot = p.leadSnapshot;
+  if(!stageById('sales', rec.stageId)) rec.stageId = conf ? conf.id : firstStageId('sales');
+  const hold = jclone(p); ['leadSnapshot','salesSnapshot','comms','stages'].forEach(k => delete hold[k]);
+  rec.projectHold = hold;
+  moveLog(rec, 'Returned: Project Pipeline → Sales Pipeline (project details kept)');
+  state.projects.splice(idx, 1);
+  state.pipeline.push(rec);
+  expandedProjects.add(rec.id);
+  closeDetail(); render(); saveState();
+  showToast(`${projectCode(rec)} is back in the Sales Pipeline. Its project details are kept for if you promote it again.`);
+}
+/* a confirm dialog whose Confirm button stays off until a box is ticked */
+function showGateConfirm(title, msg, label){
+  const pr = showConfirm(title, msg, `<label class="q-check" style="margin-top:12px;"><input type="checkbox" id="gateChk"> ${escHtml(label)}</label>`);
+  const ok = document.querySelector('#modalOverlay [data-modal="confirm"]'), chk = document.getElementById('gateChk');
+  ok.disabled = true; chk.addEventListener('change', () => { ok.disabled = !chk.checked; });
+  return pr.then(v => { ok.disabled = false; return v; });
+}
+async function returnRecord(pl, id){
+  if(pl === 'sales'){
+    const s = state.pipeline.find(x => x.id === id); if(!s) return;
+    if(await showGateConfirm('Return to Lead Pipeline?', `${projectCode(s)} · ${s.name} goes back to the Lead Pipeline. Nothing is deleted: stages, notes, quotes and the timeline stay, and promoting it again brings the deal back.`, 'Yes, return this deal to the Lead Pipeline')) returnToLead(id);
+  } else {
+    const p = state.projects.find(x => x.id === id); if(!p) return;
+    if(await showGateConfirm('Return to Sales Pipeline?', `${recordCode(p.id, 'project')} · ${p.name} goes back to the Sales Pipeline. Nothing is deleted: milestones, payment lines, actuals and the timeline stay, and promoting it again brings the project back.`, 'Yes, return this project to the Sales Pipeline')) returnToSales(id);
+  }
+}
+/* the strip at the top of a deal / project: stage, promote and return in one place */
+function moveStripHtml(pl, r, i){
+  if(pl === 'sales'){
+    const opts = state.pipelineStages.sales.map(st => `<option value="${escHtml(st.id)}"${r.stageId === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
+    return `<div class="move-strip"><label>Sales stage <select data-tab="pipeline" data-idx="${i}" data-field="stageId">${opts}</select></label>
+      ${r.contractSigned ? `<button class="promote-btn" data-action="promote-project" data-id="${r.id}">Promote to Project Pipeline →</button>` : `<span class="gate-msg">Set the contract signed date to promote.</span>`}
+      <button class="btn secondary" data-action="return-record" data-pl="sales" data-id="${r.id}">← Return to Lead Pipeline</button></div>`;
+  }
+  const opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${r.stageId === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
+  return `<div class="move-strip"><label>Project stage <select data-tab="projects" data-idx="${i}" data-field="stageId">${opts}</select></label>
+    <button class="btn secondary" data-action="return-record" data-pl="project" data-id="${r.id}">← Return to Sales Pipeline</button></div>`;
+}
+/* "Original lead info": the lead as it was when promoted (read-only). Older records carry only the copied fields, and say so. */
+function leadInfoHtml(r){
+  const snap = r.leadSnapshot, l = snap || r, e = escHtml;
+  const row = (k, v) => `<dt>${k}</dt><dd>${v ? e(v).replace(/\n/g, '<br>') : '<span class="dim">—</span>'}</dd>`;
+  const extra = (l.contacts || []).map(c => [c.name, c.role, c.phone, c.email].filter(Boolean).join(' · ')).filter(Boolean).join('\n');
+  const tier = tierById(l.tierId), st = snap && stageById('lead', snap.stageId);
+  const comms = sortedComms(l).map(({ c }) => `<div class="comm-entry ro"><span class="comm-date">${e(c.date || '')}</span><span class="comm-note">${e(commShownText(c))}</span></div>`).join('');
+  return `<div class="detail-box lead-info">
+    <div class="gate-msg ok" style="margin-bottom:10px;">${snap ? 'The lead exactly as it was when it was promoted. Read-only.' : 'This record was promoted before original lead details were kept, so this shows the lead details carried across. Read-only.'}</div>
+    <div class="stage-label-row">Contact</div><dl class="ro-grid">${row('Contact name', l.contact)}${row('Company', l.company)}${row('Phone', l.phone)}${row('Email', l.email)}${row('Additional contacts', extra)}</dl>
+    <div class="stage-label-row">Project</div><dl class="ro-grid">${row('Project name', l.projectName)}${row('Lead type', l.leadType)}${row('Source', l.source)}${row('Estimated value', Number(l.estValue) > 0 ? money(l.estValue) : '')}${row('Tier', tier ? tier.name : '')}${snap ? row('Lead status', st ? st.name : '') : ''}</dl>
+    <div class="stage-label-row">Location</div><dl class="ro-grid">${row('Address', l.address)}${row('Postcode', l.postcode)}</dl>
+    <div class="stage-label-row">Qualification</div><dl class="ro-grid">${row('Budget', l.budget)}${row('Decision-maker', l.decisionMaker)}${row('Desired timeline', l.timeline)}${row('Competition', l.competition)}</dl>
+    <div class="stage-label-row">Lead timeline${snap ? ' (as promoted)' : ''}</div><div class="comms-scroll">${comms || '<div class="breakdown-hint">No timeline entries.</div>'}</div>
+  </div>`;
+}
+/* setting the contract signed date moves the deal to Confirmed at 100% (only when the date is first set; later manual changes are left alone) */
+function applyContractSigned(r){
+  const sales = state.pipelineStages.sales, conf = stageByName(sales, 'Confirmed') || sales.filter(x => clampPct(x.pct) >= 100).pop();
+  if(!conf) return;
+  const moved = r.stageId !== conf.id;
+  r.stageId = conf.id;
+  if(effectiveProb(r) < 1) r.probOverride = 1;
+  if(moved || r.probOverride === 1) moveLog(r, 'Contract signed date set: stage moved to ' + conf.name + ' at 100% weighted probability');
+  showToast(`Contract signed: moved to ${conf.name} at 100%`);
 }
 
 /* ---------- pricing ---------- */
@@ -8446,6 +8688,11 @@ function applyFieldChange(el){
   }
   else if(tab==='payline'){ const p=Number(el.dataset.idx), pl=Number(el.dataset.pli); if(state.projects[p] && state.projects[p].paymentLines[pl]) state.projects[p].paymentLines[pl][field] = value; }
   else if(COMMS_TABS[tab]){ const r = state[COMMS_TABS[tab]][Number(el.dataset.idx)], ci = Number(el.dataset.cidx); if(r && r.comms && r.comms[ci]) r.comms[ci][field] = value; }
+  else if(tab==='pipeline' && field==='contractSigned' && state.pipeline[Number(el.dataset.idx)]){
+    const r = state.pipeline[Number(el.dataset.idx)], had = !!r.contractSigned;
+    r.contractSigned = value;
+    if(value && !had) applyContractSigned(r);
+  }
   else if(tab==='root') state[field] = value;
   else if(tab==='stages'){ const p=Number(el.dataset.proj), s=Number(el.dataset.sidx); if(state.pipeline[p] && state.pipeline[p].stages[s]) state.pipeline[p].stages[s][field] = value; }
   else if(tab==='tiers' && state.tiers[Number(el.dataset.idx)]){
@@ -8565,6 +8812,8 @@ document.addEventListener('click', (e) => {
     }
   }
   else if(action === 'promote-project'){ promoteToProject(Number(btn.dataset.id)); }
+  else if(action === 'return-record'){ returnRecord(btn.dataset.pl, Number(btn.dataset.id)); }
+  else if(action === 'dr-view'){ if(detailRef){ detailRef.view = btn.dataset.v; renderDetail(); } }
   else if(action === 'toggle-projrec'){ const id = Number(btn.dataset.id); if(expandedProjectsP.has(id)) expandedProjectsP.delete(id); else expandedProjectsP.add(id); renderProjects(); }
   else if(action === 'delete-projrec'){
     const at = Number(btn.dataset.idx), gone = state.projects.splice(at, 1)[0];
@@ -8664,6 +8913,7 @@ function activateTab(name){
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   tab.classList.add('active');
   panel.classList.add('active');
+  if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
 }
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
