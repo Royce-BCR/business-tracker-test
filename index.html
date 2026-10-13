@@ -385,7 +385,7 @@
     display: inline-flex; align-items: center; gap: 6px;
   }
   .promote-btn:hover { background: #345a41; }
-  .promote-btn:disabled { background: #dcd7cd; color: #9a958b; cursor: not-allowed; }
+  .promote-btn:disabled { background: #dcd7cd; color: #5f5a50; cursor: not-allowed; }
   .promote-btn svg { width: 14px; height: 14px; }
   .qual-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 640px; margin-bottom: 14px; }
   .qual-field label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
@@ -1184,7 +1184,7 @@
   td.dg { padding-left: 20px; } td.dg:not(.qb-sticky-l) { position: relative; }
   .drag-h { position: absolute; left: 3px; top: 50%; transform: translateY(-50%); cursor: grab; color: var(--text-muted); opacity: 0; font-size: 13px; line-height: 1; letter-spacing: -2px; user-select: none; touch-action: none; padding: 6px 3px; border-radius: 4px; z-index: 3; }
   tr:hover .drag-h, .drag-h:focus-visible, tr.dragging .drag-h { opacity: .8; } .drag-h:hover { background: #efece6; color: var(--ink); }
-  @media (hover: none) { .drag-h { opacity: .45; } }
+  @media (hover: none) { .drag-h { opacity: .9; } }
   tr.dragging { opacity: .55; background: #f7f2e8; } tr.drop-before > td { box-shadow: inset 0 2px 0 var(--oak); } tr.drop-after > td { box-shadow: inset 0 -2px 0 var(--oak); } body.dragging-rows, body.dragging-rows * { cursor: grabbing !important; user-select: none; }
   .qb-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 14px; align-items: start; } .qb-pair > .card, .qb-pair > div:empty { margin: 0; } .qb-pair > div:empty { display: none; }
   .qb-pair:not(:has(#qbActual:not(:empty))) { grid-template-columns: 1fr; }
@@ -1523,6 +1523,10 @@
     .q-check, .sp-check, .crm-check { min-height: 44px; display: flex; align-items: center; gap: 8px; }
     tr.sup-row > td { height: 44px; }
     .skip-link { padding: 0 16px; }
+    .qb-x, .qcd-tabs button, .pw-nav button, .promote-btn { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    td.dg { padding-left: 50px !important; }   /* room for a full-size drag grip beside the first box in the row */
+    .drag-h { width: 44px; height: 44px; left: 2px; display: inline-flex; align-items: center; justify-content: center; }
+    td.qb-c { min-width: 44px; height: 44px; text-align: center; }
   }
   /* ---------------- Q5: tables on phones scroll sideways at readable widths, first column stays put, edge fade shows there is more ---------------- */
   @media (max-width: 700px) {
@@ -11225,6 +11229,12 @@ new MutationObserver((recs) => {
 document.addEventListener('focusout', (e) => { if(e.target && e.target.tagName === 'INPUT') setTimeout(() => moneyEnhance(e.target), 0); }, true);
 moneyEnhanceAll();
 
+/* phones: tapping anywhere in a table cell that only holds a tick box ticks it (the box itself is small) */
+document.addEventListener('click', (e) => {
+  const td = e.target && e.target.closest ? e.target.closest('td.qb-c') : null;
+  if(!td || e.target !== td) return;
+  const cb = td.querySelector('input[type=checkbox]'); if(cb && !cb.disabled) cb.click();
+});
 /* a scrolling tab strip keeps the current tab in view: when the highlighted project section changes, the strip slides to show it */
 function revealActiveTab(nav){
   const a = nav && nav.querySelector('button.active'); if(!a || nav.scrollWidth <= nav.clientWidth + 2) return;
