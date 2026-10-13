@@ -374,7 +374,7 @@
   .width-toggle { display: inline-flex; background: #efece6; border-radius: 8px; padding: 2px; gap: 2px; }
   .width-toggle button { border: none; background: none; font-family: inherit; font-size: 11px; font-weight: 500; padding: 4px 11px; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
   .width-toggle button.active { background: #fff; color: var(--ink); box-shadow: var(--shadow); }
-  .table-scroll.fitmode > table { min-width: 0 !important; width: 100% !important; }
+  @media (min-width: 701px) { .table-scroll.fitmode > table { min-width: 0 !important; width: 100% !important; } }   /* phones always scroll sideways instead (see rtFit) */
 
   /* status/lead pills */
   .lead-status-Not.Contacted {}
@@ -948,6 +948,7 @@
   .qb-table td { padding: 4px 5px; border-bottom: 1px solid #efece6; background: #fff; vertical-align: middle; }
   .qb-table input, .qb-table select { border: 1px solid var(--line); background: #fff; padding: 6px 6px; min-width: 70px; } .qb-table input.qb-n { min-width: 62px; width: 72px; text-align: right; }
   .qb-table input[type=checkbox] { width: auto; min-width: 0; }
+  .qb-table select[aria-label="Category"] { min-width: 124px; }
   .qb-sticky-l { position: sticky; left: 0; z-index: 2; min-width: 240px; box-shadow: 1px 0 0 var(--line); } .qb-sticky-r { position: sticky; right: 0; z-index: 2; box-shadow: -1px 0 0 var(--line); }
   .qb-table th.qb-sticky-l, .qb-table th.qb-sticky-r { z-index: 3; }
   .qb-desc input { min-width: 230px; } .qb-calc { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; padding-right: 8px !important; } .qb-cost { font-weight: 700; } .qb-c { text-align: center; } .qb-dim { color: var(--text-muted); }
@@ -1517,6 +1518,23 @@
     .q-check, .sp-check, .crm-check { min-height: 44px; display: flex; align-items: center; gap: 8px; }
     tr.sup-row > td { height: 44px; }
     .skip-link { padding: 0 16px; }
+  }
+  /* ---------------- Q5: tables on phones scroll sideways at readable widths, first column stays put, edge fade shows there is more ---------------- */
+  @media (max-width: 700px) {
+    .table-tools .width-toggle { display: none; }   /* Fit to screen is not used on phones (the saved choice is kept for larger screens) */
+    .table-scroll > table:not([data-rt]) td:has(> input:not([type=checkbox]):not([type=radio]), > select) { min-width: 96px; }
+    .table-scroll > table:not([data-rt]) td:has(> input[type=text], > textarea) { min-width: 140px; }
+    .rt-table td:has(> .icon-btn:only-child) { padding-left: 6px; padding-right: 6px; }
+    .table-scroll > table > thead > tr > :first-child, .table-scroll > table > tbody > tr > :first-child {
+      position: sticky; left: 0; z-index: 2; background-color: var(--card);
+    }
+    .table-scroll > table > thead > tr > :first-child { background-color: #faf8f4; z-index: 3; }
+    .table-scroll > table:has(> thead > tr > th:first-child:empty) > thead > tr > :nth-child(2), .table-scroll > table:has(> thead > tr > th:first-child:empty) > tbody > tr > :nth-child(2) {
+      position: sticky; left: 64px; z-index: 2; background-color: var(--card);   /* tables that start with an open/close chevron keep the code beside it in view too */
+    }
+    .table-scroll > table:has(> thead > tr > th:first-child:empty) > thead > tr > :nth-child(2) { background-color: #faf8f4; z-index: 3; }
+    .leads-table tr.lead-row > td:nth-child(-n+2) { background-image: linear-gradient(var(--lead-tint), var(--lead-tint)); }
+    .table-scroll.scroll-more { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); }
   }
 </style>
 </head>
@@ -4599,7 +4617,7 @@ function restoreLead(id){
    default equals its minimum (chevron / delete) has no drag handle. */
 const RT_SPECS = {
   leadsTableWrap:    { cols: [[34,34],[66,56],[64,44],[200,90],[170,90],[170,90],[110,76],[126,84],[236,130],[34,34]] },
-  pipelineTableWrap: { cols: [[34,34],[104,80],[220,120],[104,84],[140,110],[130,104],[64,52],[100,72],[116,100],[116,100],[100,72],[34,34]], nested: ['pipelineStages'] },
+  pipelineTableWrap: { cols: [[34,34],[92,80],[208,120],[96,84],[172,120],[130,104],[64,52],[100,72],[116,100],[116,100],[100,72],[34,34]], nested: ['pipelineStages'] },
   pipelineStages:    { cols: [[200,100],[140,90],[128,104],[128,104],[64,48],[100,70],[210,150],[34,34]], parent: 'pipelineTableWrap' },
   projectsTableWrap: { cols: [[34,34],[100,80],[240,120],[120,90],[200,120],[150,100],[34,34]], nested: ['projectPayments'] },
   projectPayments:   { cols: [[90,72],[220,100],[128,104],[100,72],[128,104],[128,104],[34,34]], parent: 'projectsTableWrap' },
@@ -4623,8 +4641,10 @@ function rtWidths(key){
   else if(saved.length !== cols.length) saved = [];
   return cols.map((c,i) => Math.max(c[1], Number(saved[i]) || c[0]));
 }
-function rtFit(table){ const sc = table.closest('.table-scroll[id]'); return !!(sc && sc.classList.contains('fitmode')); }   // detail tables follow their page table's Fit / Expand mode
+const PHONE_MQ = window.matchMedia('(max-width: 700px)');   // on phones tables scroll sideways at readable widths; the saved Fit / Expand choice is kept, just not applied
+function rtFit(table){ if(PHONE_MQ.matches) return false; const sc = table.closest('.table-scroll[id]'); return !!(sc && sc.classList.contains('fitmode')); }   // detail tables follow their page table's Fit / Expand mode
 function rtApplyTable(table, widths, fit){
+  if(!fit && PHONE_MQ.matches) widths = widths.map(w => w <= 40 ? 64 : w);   // chevron / delete columns grow to hold a 44px touch target
   const sum = widths.reduce((a,b) => a+b, 0);
   [...table.querySelector(':scope > colgroup').children].forEach((col,i) => { col.style.width = fit ? (widths[i]/sum*100).toFixed(3)+'%' : widths[i]+'px'; });
   table.style.minWidth = fit ? '0' : sum+'px';
@@ -9432,10 +9452,10 @@ function renderActions(){
   const showLinked = state.actionPrefs.shownCols.includes('linked');
   const cw = document.getElementById('actColsWrap');
   if(cw) cw.innerHTML = `<button class="btn secondary" data-today="act-cols">Columns ▾</button>${actUi.colsOpen ? `<div class="crm-colmenu"><label><input type="checkbox" data-acol="linked"${showLinked ? ' checked' : ''}> Linked record</label></div>` : ''}`;
-  let html = `<table style="min-width:${showLinked ? 1390 : 1210}px"><thead><tr>
-    <th style="width:44px"></th><th style="width:118px">Date Raised</th><th style="min-width:260px">Action</th><th style="width:104px">Owner</th>
-    <th style="width:104px">+ Owner</th><th style="width:132px">Deadline</th><th style="width:74px">Priority</th>
-    <th style="width:128px">Status</th>${showLinked ? '<th style="width:170px">Linked record</th>' : ''}<th style="min-width:180px">Notes</th><th style="width:34px"></th></tr></thead><tbody>`;
+  let html = `<table style="min-width:${showLinked ? 1438 : 1258}px"><thead><tr>
+    <th style="width:44px"></th><th style="width:118px">Date Raised</th><th style="min-width:170px">Action</th><th style="width:130px;min-width:122px">Owner</th>
+    <th style="width:96px">+ Owner</th><th style="width:132px">Deadline</th><th style="width:74px">Priority</th>
+    <th style="width:152px;min-width:140px">Status</th>${showLinked ? '<th style="width:170px">Linked record</th>' : ''}<th style="min-width:130px">Notes</th><th style="width:34px"></th></tr></thead><tbody>`;
   state.actions.forEach((r,i) => {
     const done = r.status === 'Done';
     const isArchiving = archiving.has(r);
@@ -11110,6 +11130,21 @@ document.getElementById('menuBtn').addEventListener('click', () => {
 });
 document.getElementById('sidebarBackdrop').addEventListener('click', closeMobileSidebar);
 
+/* scroll cues: a soft fade on the right edge of any strip that still has more to scroll to (the fade itself is phone-only CSS) */
+function updateScrollCue(el){
+  el.classList.toggle('scroll-more', el.scrollWidth - el.clientWidth - el.scrollLeft > 2);
+}
+let scrollCueQueued = false;
+function updateScrollCues(){
+  if(scrollCueQueued) return; scrollCueQueued = true;
+  requestAnimationFrame(() => { scrollCueQueued = false; document.querySelectorAll('.table-scroll, .pw-nav').forEach(updateScrollCue); });
+}
+document.addEventListener('scroll', (e) => { const t = e.target; if(t && t.classList && (t.classList.contains('table-scroll') || t.classList.contains('pw-nav'))) updateScrollCue(t); }, true);
+window.addEventListener('resize', updateScrollCues);
+new MutationObserver(updateScrollCues).observe(document.querySelector('.main'), { childList: true, subtree: true });
+PHONE_MQ.addEventListener('change', () => { rtApply(); updateScrollCues(); });
+updateScrollCues();
+
 function activateTab(name){
   const tab = document.querySelector('.tab[data-tab="' + name + '"]'), panel = document.getElementById('panel-' + name);
   if(!tab || !panel) return;
@@ -11119,6 +11154,7 @@ function activateTab(name){
   tab.setAttribute('aria-current', 'page');
   panel.classList.add('active');
   if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
+  updateScrollCues();
 }
 document.querySelector('.skip-link').addEventListener('click', (e) => {
   e.preventDefault();
