@@ -910,6 +910,14 @@
   .qb-acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
   .qb-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0 18px; }
   .qb-grid .qb-wide { grid-column: span 3; }
+  .qb-grid.qb-compact { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0 14px; } .qb-grid.qb-compact .qb-wide { grid-column: span 4; } .qb-grid.qb-compact .qb-addr { grid-column: span 2; }
+  .qb-grid.qb-compact .lp-f { margin-bottom: 10px; } .qb-grid.qb-compact .q-fixed { padding: 8px 10px; background: #f6f4ef; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+  .qb-same { background: #f6f4ef; border-radius: 8px; padding: 8px 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  @media (max-width: 1100px) { .qb-grid.qb-compact { grid-template-columns: repeat(2, minmax(0,1fr)); } .qb-grid.qb-compact .qb-wide { grid-column: span 2; } }
+  .qb-pill { position: relative; display: inline-flex; align-items: center; gap: 6px; background: #efece6; border: 1px solid var(--line); border-radius: 999px; padding: 3px 14px; font-family: var(--serif); font-size: 21px; font-weight: 600; }
+  .qb-pill.multi { cursor: pointer; background: #fff; border-color: var(--stone-deep); } .qb-pill.multi:hover { background: #faf8f4; } .qb-chev { font-size: 13px; color: var(--muted); }
+  .qb-pill select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 14px; border: 0; }
+  .qb-flag { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: #efece6; color: var(--slate); white-space: nowrap; } .qb-flag.ok { background: #d5ecd9; color: #1e5c2e; } .qb-flag.bad { background: #f6dad7; color: #8d2f28; } .qb-flag.manual { background: #fbf1cf; color: #8a5a1c; }
   .qb-head input, .qb-head select, .qb-head textarea { border: 1px solid var(--line); background: #fff; padding: 7px 8px; }
   .qb-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
   .qb-tile { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
@@ -934,7 +942,7 @@
   .qb-sum { width: 100%; max-width: 420px; border-collapse: collapse; } .qb-sum td { padding: 6px 4px; border-bottom: 1px solid #efece6; } .qb-sum-strong td { font-weight: 700; }
   .q-tl-d { display: inline-block; width: 100px; color: var(--muted); } .q-tl-n { font-size: 13px; }
   .ql-price { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; } .ql-pr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 0; }
-  @media (max-width: 700px) { .qb-grid { grid-template-columns: 1fr; } .qb-grid .qb-wide { grid-column: span 1; } }
+  @media (max-width: 700px) { .qb-grid, .qb-grid.qb-compact { grid-template-columns: 1fr; } .qb-grid .qb-wide, .qb-grid.qb-compact .qb-wide, .qb-grid.qb-compact .qb-addr { grid-column: span 1; } }
   .qb-banner { background: #eaf1e8; border: 1px solid #b9d3b4; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .qb-banner.warn { background: #fbf1cf; border-color: #e5cf86; } .qb-banner-btns { margin-left: auto; display: flex; gap: 8px; }
   .qb-locked .qb-table input:disabled, .qb-locked .qb-table select:disabled { background: #f6f4ef; color: var(--ink); opacity: 0.85; }
@@ -1152,6 +1160,21 @@
   tr:hover .drag-h, .drag-h:focus-visible, tr.dragging .drag-h { opacity: .8; } .drag-h:hover { background: #efece6; color: var(--ink); }
   @media (hover: none) { .drag-h { opacity: .45; } }
   tr.dragging { opacity: .55; background: #f7f2e8; } tr.drop-before > td { box-shadow: inset 0 2px 0 var(--oak); } tr.drop-after > td { box-shadow: inset 0 -2px 0 var(--oak); } body.dragging-rows, body.dragging-rows * { cursor: grabbing !important; user-select: none; }
+  .qb-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 14px; align-items: start; } .qb-pair > .card, .qb-pair > div:empty { margin: 0; } .qb-pair > div:empty { display: none; }
+  .qb-pair:not(:has(#qbActual:not(:empty))) { grid-template-columns: 1fr; }
+  .qb-tilegrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+  .qb-t2 { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fcfbf8; } .qb-t2 h4 { margin: 0 0 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+  .qb-t2-r { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; font-size: 12.5px; border-bottom: 1px dashed #ece8df; } .qb-t2-r:last-child { border-bottom: 0; } .qb-t2-r.strong { font-weight: 700; } .qb-t2-r.dim { color: var(--muted); } .qb-t2-r b { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; } .qb-t2-r small { color: var(--muted); font-weight: 500; }
+  .qb-t2-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .qb-t2-3 small { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); } .qb-t2-3 b { font-size: 13.5px; font-variant-numeric: tabular-nums; } .qb-t2-3 em { display: block; font-size: 11px; font-style: normal; }
+  .qb-t2-3 .q-over { color: #b3453f; } .qb-t2-3 .q-under { color: #2e7a45; }
+  .tbl-flip { border: 1px solid var(--stone-deep); background: #fff; border-radius: 7px; padding: 2px 8px; font: inherit; font-size: 12px; cursor: pointer; color: var(--slate); margin-right: 6px; } .tbl-flip:hover { background: #efece6; }
+  .qb-vi { font-size: 9px; background: #fbf1cf; color: #8a5a1c; border-radius: 4px; padding: 0 4px; margin-left: 4px; text-transform: none; letter-spacing: 0; }
+  .qb-star { color: #b3453f; font-weight: 700; margin-left: 2px; cursor: help; }
+  .qb-foot td { background: #faf8f4 !important; border-top: 1px solid var(--line); font-size: 12px; } .qb-footl { font-weight: 600; } .qb-flags { white-space: normal; max-width: 140px; }
+  .qb-pc.low input { border-color: #cfe3d2; } .qb-cost.qb-ovr, .qb-ovr.qb-calc { color: #7a3fb0; font-weight: 700; }
+  .qb-excl td { opacity: .55; } .qb-optbody.qb-off td { background: #faf8f4; } .qb-opthead td { background: #f3efe5 !important; font-size: 12px; }
+  .qb-opts { display: flex; flex-wrap: wrap; gap: 6px 22px; } .qb-optchk b { font-weight: 600; }
+  .qb-ovr-cell { white-space: nowrap; } .qb-ovr-cell input.qb-manual { border-color: #e5cf86; background: #fffaf0; }
   .undo-hist-btn { background: none; border: 1px solid #3a3d41; color: #cfcabf; font-family: inherit; font-size: 11.5px; padding: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; }
   .undo-hist-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
   .undo-wrap { padding: 12px 12px 0; margin-top: auto; }
@@ -2058,6 +2081,8 @@ function ensureSupplierModel(o){
     SUP_NUM_FIELDS.forEach(([k]) => { s[k] = supNum(s[k], k === 'deliveryCharge' || k === 'freeDeliveryOver' || k === 'minOrder' ? 2 : 0); });
     { const pv = supNum(s.priceValidityDays, 0); s.priceValidityDays = (s.priceValidityDays === undefined || s.priceValidityDays === null || s.priceValidityDays === '') ? 30 : pv; }   // old suppliers: 30 days
     s.callOff = s.callOff === true || s.callOff === 'yes';
+    s.pricesIncVat = s.pricesIncVat === true;   // prices, delivery charge and thresholds are entered as the supplier states them
+    s.shortCode = str(s.shortCode).trim().slice(0, 8);   // blank = worked out from the name
     s.categoryIds = [...new Set((Array.isArray(s.categoryIds) ? s.categoryIds : []).map(String).filter(id => known.has(id)))];
     s.contacts = (Array.isArray(s.contacts) ? s.contacts : []).filter(c => c && typeof c === 'object').map((c, i) => ({
       id: (typeof c.id === 'string' && c.id) ? c.id : newContactId() + i, name: str(c.name), role: str(c.role), phone: str(c.phone), email: str(c.email), primary: !!c.primary }));
@@ -2096,7 +2121,9 @@ function ensureQuoteModel(o, seedAction){
   st.sendAccount = typeof st.sendAccount === 'string' ? st.sendAccount.trim() : 'brookwood.rural@gmail.com';
   st.emailSubject = typeof st.emailSubject === 'string' && st.emailSubject.trim() ? st.emailSubject : AP_DEFAULT_SUBJECT;
   st.emailBody = typeof st.emailBody === 'string' && st.emailBody.trim() ? st.emailBody : AP_DEFAULT_BODY;
-  st.showGroupPricesC = st.showGroupPricesC === true;
+  st.showGroupPricesC = st.showGroupPricesC === true;   // no longer used: Mode C always shows group prices
+  st.showRightToCancel = st.showRightToCancel !== false;   // Right to cancel terms: ON unless switched off
+  st.helperRateDay = qNum(st.helperRateDay, 0);   // helper (second pair of hands) day rate, blank = not set
   st.complaintDayType = st.complaintDayType === 'calendar' ? 'calendar' : 'working';
   st.vatNumber = str(st.vatNumber).trim();
   st.vatRegistered = st.vatRegistered === true && !!st.vatNumber;   // ON only ever with a VAT number
@@ -3342,14 +3369,14 @@ function dragMove(tr, from, to){
     const rows = rowsOf(); if(!rows.length) return;
     clear(); let ins = rows.length;
     for(let i = 0; i < rows.length; i++){ const r = rows[i].getBoundingClientRect(); if(e.clientY < r.top + r.height / 2){ ins = i; break; } }
-    d.ins = ins;
+    d.ins = ins; d.tix = ins < rows.length ? Number(rows[ins].dataset.ix) : Number(rows[rows.length - 1].dataset.ix) + 1;   // the array position the row will land before
     if(ins < rows.length) rows[ins].classList.add('drop-before'); else rows[rows.length - 1].classList.add('drop-after');
   });
   const end = (e, cancel) => {
     if(!d || (e && e.pointerId !== d.id)) return;
-    const { tr, from, ins } = d; clear(); tr.classList.remove('dragging'); document.body.classList.remove('dragging-rows'); d = null;
+    const { tr, from, ins, tix } = d; clear(); tr.classList.remove('dragging'); document.body.classList.remove('dragging-rows'); d = null;
     if(cancel || ins === null) return;
-    dragMove(tr, from, ins > from ? ins - 1 : ins);
+    dragMove(tr, from, tix > from ? tix - 1 : tix);
   };
   document.addEventListener('pointerup', (e) => end(e, false));
   document.addEventListener('pointercancel', (e) => end(e, true));
@@ -3360,6 +3387,27 @@ function dragMove(tr, from, to){
   });
 })();
 
+/* ---------- switch rows and columns (cash forecast tables) ----------
+   A table tagged data-flip="<key>" gets a ⇄ button in its top-left cell; the choice is remembered per table in state.tableModes. */
+function cfFlipOn(key){ return !!(state.tableModes && state.tableModes['flip_' + key]); }
+function cfFlipAll(root){
+  (root || document).querySelectorAll('table[data-flip]').forEach(t => {
+    if(t.dataset.flipped) return; t.dataset.flipped = '1';
+    const key = t.dataset.flip, on = cfFlipOn(key), grid = [...t.rows].map(r => ({ cls: r.className, cells: [...r.cells] }));
+    if(!grid.length || grid.some(r => r.cells.some(c => c.colSpan > 1))){ return; }
+    const btn = `<button type="button" class="tbl-flip" data-flip-btn="${escAttr(key)}" title="Switch rows and columns" aria-label="Switch rows and columns" aria-pressed="${on}">⇄</button>`;
+    const corner = grid[0].cells[0];
+    if(!on){ corner.innerHTML = btn + corner.innerHTML; return; }
+    const n = grid[0].cells.length, mk = (tag, c, extra) => `<${tag}${c && c.className ? ` class="${c.className}"` : ''}${c && c.getAttribute('style') ? ` style="${c.getAttribute('style')}"` : ''}${extra || ''}>`;
+    let html = '<thead><tr>' + grid.map((r, ri) => ri === 0 ? `<th>${btn}${r.cells[0].innerHTML}</th>` : `<th${r.cls ? ` class="${r.cls}"` : ''}>${r.cells[0].innerHTML}</th>`).join('') + '</tr></thead><tbody>';
+    for(let j = 1; j < n; j++) html += '<tr>' + `<td class="flip-h">${grid[0].cells[j].innerHTML}</td>` + grid.slice(1).map(r => { const c = r.cells[j]; return c ? mk('td', c) + c.innerHTML + '</td>' : '<td></td>'; }).join('') + '</tr>';
+    t.innerHTML = html + '</tbody>'; t.style.minWidth = '';
+  });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-flip-btn]'); if(!b) return;
+  state.tableModes = state.tableModes || {}; const k = 'flip_' + b.dataset.flipBtn; state.tableModes[k] = !state.tableModes[k]; saveState(); render();
+});
 /* ---------- Undo log ----------
    Every delete records { id, at, by, label, path, index, item, extra } in state.undoLog (newest first, max 50, 24 hours, ~1.5 MB).
    path is how to find the array the item came from: strings are keys, {id} steps pick a record by id (e.g. ['quotes', {id:3}, 'lines']).
@@ -4327,6 +4375,13 @@ document.addEventListener('pointerdown', (e) => {
    Fields carry data-tab="supplier" / "suppliercontact" / "suppliernote" so they save through applyFieldChange() → render() → saveState(). */
 const SUP_SECTIONS = [['details','Details'],['ordering','Delivery'],['contacts','Contacts'],['categories','Categories'],['quotes','Quotes & orders'],['notes','Notes']];
 const supUi = { q: '', status: 'active', cats: new Set(), catOpen: false };   // session-only view state
+/* short supplier code for quote column headings: the saved one, else initials of the name (Travis Perkins → TP) or its first four letters (Selco → SELC) */
+function supShort(s){
+  const v = String(s.shortCode || '').trim(); if(v) return v.toUpperCase();
+  const w = String(s.name || '').split(/[^A-Za-z0-9]+/).filter(Boolean);
+  if(w.length >= 2) return w.map(x => x[0]).join('').slice(0, 4).toUpperCase();
+  return w.length ? w[0].slice(0, 4).toUpperCase() : supCode(s);
+}
 function supCode(s){ return 'SUP-' + String(s.id || 0).padStart(3, '0'); }
 function supFind(id){ return state.suppliers.find(s => s.id === id) || null; }
 function supOpenId(){ return lp && lp.kind === 'supplier' ? lp.id : 0; }
@@ -4463,6 +4518,8 @@ function supBodyHtml(s, i){
       ${supFieldHtml('VAT number', i, 'vatNo', s.vatNo, { ph: 'GB…' })}
     </section>
     <section class="lp-sec" id="lp-sec-ordering" data-sec="ordering"><h3>Delivery &amp; ordering</h3>
+      ${lpFieldHtml('Short code', `<input type="text" maxlength="8" autocomplete="off" data-tab="supplier" data-idx="${i}" data-field="shortCode" value="${escAttr(s.shortCode)}" placeholder="${escAttr(supShort(Object.assign({}, s, { shortCode: '' })))}">`) .replace('</div>', '<p class="q-help">Used in the quote column headings (the full name shows on hover). Blank = worked out from the name.</p></div>')}
+      <div class="lp-f"><label class="q-check"><input type="checkbox" data-tab="supplier" data-idx="${i}" data-field="pricesIncVat"${s.pricesIncVat ? ' checked' : ''}> Prices include VAT</label><p class="q-help">Prices, delivery charge, free-delivery threshold and minimum order are entered exactly as this supplier states them. Quotes net them down to ex VAT using the VAT rate in Settings.</p></div>
       ${lpFieldHtml('Delivery charge (£ per drop)', `<input type="number" min="0" step="0.01" inputmode="decimal" data-tab="supplier" data-idx="${i}" data-field="deliveryCharge" value="${s.deliveryCharge}" placeholder="e.g. 25">`)}
       ${lpFieldHtml('Free-delivery threshold (£)', `<input type="number" min="0" step="0.01" inputmode="decimal" data-tab="supplier" data-idx="${i}" data-field="freeDeliveryOver" value="${s.freeDeliveryOver}" placeholder="Order value above which delivery is free">`)}
       ${lpFieldHtml('Minimum order (£)', `<input type="number" min="0" step="0.01" inputmode="decimal" data-tab="supplier" data-idx="${i}" data-field="minOrder" value="${s.minOrder}">`)}
@@ -4526,7 +4583,7 @@ function supOnClose(id){
   renderSuppliers();
 }
 function newSupplier(){
-  const s = { id: state.nextSupplierId++, status: 'Active', name: '', categoryIds: [], address: '', postcode: '', website: '', phone: '', email: '', accountNo: '', paymentTerms: '', vatNo: '', deliveryCharge: '', freeDeliveryOver: '', minOrder: '', leadTimeDays: '', priceValidityDays: 30, callOff: false, contacts: [], notes: [] };
+  const s = { id: state.nextSupplierId++, status: 'Active', name: '', categoryIds: [], address: '', postcode: '', website: '', phone: '', email: '', accountNo: '', paymentTerms: '', vatNo: '', deliveryCharge: '', freeDeliveryOver: '', minOrder: '', leadTimeDays: '', priceValidityDays: 30, callOff: false, pricesIncVat: false, shortCode: '', contacts: [], notes: [] };
   state.suppliers.push(s); render(); saveState();
   openSupplierPanel(s.id, 'details');
   const n = lpEl('lpBody').querySelector('input[data-field="name"]'); if(n) n.focus();
@@ -4542,6 +4599,8 @@ function applySupplierField(el){
     else if(SUP_NUM_FIELDS.some(([k]) => k === f)) s[f] = supNum(v, f === 'leadTimeDays' ? 0 : 2);
     else if(f === 'priceValidityDays') s.priceValidityDays = supNum(v, 0);
     else if(f === 'callOff') s.callOff = v === 'yes';
+    else if(f === 'pricesIncVat') s.pricesIncVat = !!el.checked;
+    else if(f === 'shortCode') s.shortCode = v.trim().toUpperCase().slice(0, 8);
     else if(['address', 'website', 'phone', 'email', 'accountNo', 'vatNo'].includes(f)) s[f] = v;
   } else if(tab === 'suppliercontact'){
     const c = s.contacts[Number(el.dataset.cidx)]; if(c && ['name', 'role', 'phone', 'email'].includes(f)) c[f] = v;
@@ -4813,7 +4872,7 @@ const QS_FIELD = {   // key -> kind. 'int' needs a whole number >= min (blank / 
   quotePrefix: { k: 'text' }, quoteValidityDays: { k: 'int', min: 1 }, paymentTermsDays: { k: 'int', min: 0 }, guaranteeMonths: { k: 'int', min: 1 },
   insuranceCover: { k: 'free' }, complaintDays: { k: 'int', min: 1 }, complaintDayType: { k: 'sel' }, vatNumber: { k: 'vatno' }, vatRate: { k: 'num', min: 0, max: 100 },
   tradeAccountDays: { k: 'int', min: 0 }, labourRateHour: { k: 'opt' }, labourRateHalfDay: { k: 'opt' }, labourRateDay: { k: 'opt' },
-  labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' },
+  labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' }, helperRateDay: { k: 'opt' }, showRightToCancel: { k: 'bool' },
   hoursPerDay: { k: 'int', min: 1 }, quoteViewMode: { k: 'view' }, showGroupPricesC: { k: 'bool' }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
 };
 function qtF(label, field, o){
@@ -4845,7 +4904,7 @@ function renderQuoteSettings(){
       <p class="q-help">Terms only show an insurance clause when this is filled in.</p></div>
     <div class="q-sub">Customer view</div>
     <div class="assumptions-grid"><div class="lp-f"><label>Default customer view</label><select data-q="quoteViewMode" aria-label="Default customer view">${VIEW_MODES.map(m => `<option value="${m[0]}"${s.quoteViewMode === m[0] ? ' selected' : ''}>Mode ${m[0]} — ${escHtml(m[1])}</option>`).join('')}</select><p class="q-help">Each quote can use its own view; this is the starting point.</p></div>
-      <div class="lp-f"><label>Mode C</label><label class="q-check"><input type="checkbox" data-q="showGroupPricesC"${s.showGroupPricesC ? ' checked' : ''}> Show group prices in mode C</label><p class="q-help">Off: only the grand total is priced.</p></div></div>
+      <div class="lp-f"><label>Terms</label><label class="q-check"><input type="checkbox" data-q="showRightToCancel"${s.showRightToCancel !== false ? ' checked' : ''}> Include the “Right to cancel” notice (private customers)</label><p class="q-help">Shown on the terms page of the customer document, Word file and PDF. Quotes already sent keep the terms they were sent with.</p></div></div>
     <div class="q-sub">VAT</div>
     <label class="q-check"><input type="checkbox" data-q="vatRegistered"${vatOn ? ' checked' : ''}> Business is VAT registered</label>
     ${vatOn ? `<div class="assumptions-grid" style="margin-top:10px;">
@@ -4858,7 +4917,8 @@ function renderQuoteSettings(){
     <div class="assumptions-grid" style="margin-top:14px;">
       ${qtF('Labour profit share (%)', 'labourProfitPct', { step: '0.1', help: 'Share of labour charged as profit, on top of wages. 0 means labour is priced at cost.' })}
       ${qtF('Default markup on materials cost (%)', 'materialsMarkupPct', { step: '0.1', ph: 'Not set', help: 'price = cost × (1 + markup%)' })}
-      ${qtF('Hours per day', 'hoursPerDay', { help: 'Converts planned and logged hours to days on pipeline stage lines.' })}</div>
+      ${qtF('Hours per day', 'hoursPerDay', { help: 'Converts planned and logged hours to days on pipeline stage lines.' })}
+      ${qtF('Helper day rate (£)', 'helperRateDay', { step: '0.01', ph: 'Not set', help: 'A second pair of hands. Enter helper time on a labour line; a half-day is half this rate and an hour is this rate ÷ hours per day.' })}</div>
     <div class="q-sub">Stage line types (paid / unpaid)</div>
     <p class="q-help" style="margin:0;">${SLT_NOTE}</p>
     <div class="q-list"><div class="q-row has-w q-head"><span>Name contains</span><span>Tag</span><span></span></div>${(state.stageLineTypes || []).map(x => `<div class="q-row has-w">
@@ -4896,7 +4956,7 @@ function quoteTermsDoc(st){
     ['Changes', ['Extra work or changes are agreed in writing (text or email is fine) with the cost before we do them. If we find something unexpected, such as rot, hidden services or poor ground, we will stop and talk to you first.']],
     ['Payment', pay],
     ['Access and timing', ['You give us safe access and a clear working area, and tell us about underground services, boundaries or permissions. Planning and building regulations approval are your responsibility unless the quotation says otherwise. Dates are estimates; weather and supplier delays can affect outdoor work and we will keep you updated.']],
-    ['Cancelling', ['If you cancel (after any cancellation period below), you pay for work done, materials already ordered or delivered that cannot be returned, and any other reasonable costs we have committed.']],
+    ['Cancelling', ['If you cancel (after any cancellation period' + (st.showRightToCancel === false ? '' : ' below') + '), you pay for work done, materials already ordered or delivered that cannot be returned, and any other reasonable costs we have committed.']],
     ['Timber and materials', ['Timber is natural. Movement, small splits, knots, colour variation and weathering are normal and not defects. If a material becomes unavailable, we will agree an equivalent with you first. We remove leftover materials from site unless agreed otherwise.']],
     ['Guarantee', guar],
     ['If something goes wrong', [`Tell us first. We will reply within ${cd} ${dayWord}${cd === 1 ? '' : 's'} and aim to put things right quickly and fairly.`]],
@@ -4910,7 +4970,7 @@ function quoteTermsDoc(st){
     heading: 'Terms of Business',
     sections: secs.map(([title, paras], i) => ({ num: i + 1, title, paras })),
     acceptance: { text: "Accepting: sign below, or reply 'accepted' by email quoting the quotation reference. By accepting, you agree to these terms.", fields: ['Name', 'Signature', 'Date'] },
-    rightToCancel: { title: 'Right to cancel (private customers)', text: rtc },
+    rightToCancel: st.showRightToCancel === false ? null : { title: 'Right to cancel (private customers)', text: rtc },   // Settings can switch the notice off
     footer: 'Draft. Figures come from Settings.'
   };
 }
@@ -4920,7 +4980,7 @@ function quoteTermsHtml(d){
     ${d.sections.map(x => `<h4>${x.num} ${escHtml(x.title)}</h4>${x.paras.map(p => `<p>${escHtml(p)}</p>`).join('')}`).join('')}
     <p class="t-accept"><strong>${escHtml(d.acceptance.text)}</strong></p>
     <div class="t-sign">${d.acceptance.fields.map(f => `<span>${escHtml(f)}</span>`).join('')}</div>
-    <div class="t-cancel"><h4 style="margin-top:0;">${escHtml(d.rightToCancel.title)}</h4><p>${escHtml(d.rightToCancel.text)}</p></div>
+    ${d.rightToCancel ? `<div class="t-cancel"><h4 style="margin-top:0;">${escHtml(d.rightToCancel.title)}</h4><p>${escHtml(d.rightToCancel.text)}</p></div>` : ''}
     <div class="t-foot">${escHtml(d.footer)}</div>`;
 }
 function termsRefresh(){ const o = document.getElementById('termsOverlay'); if(o && !o.hidden) document.getElementById('termsDoc').innerHTML = quoteTermsHtml(quoteTermsDoc()); }
@@ -5018,7 +5078,7 @@ function qNewLine(q, o){
   const st = state.settings, units = state.quoteUnits || [];
   const u = units.find(x => x.id === 'un_each') || units[0];
   const l = Object.assign({ id: qRand('ln_'), description: '', categoryId: '', unitId: u ? u.id : '', unitName: u ? u.name : '', qty: 1, wastagePct: 0, wastageManual: false, prices: [], selectedSupplierId: '',
-    costOverride: '', markupPct: st.materialsMarkupPct === '' ? 0 : st.materialsMarkupPct, vatRate: st.vatRate, customerGroup: '', showOnQuote: true, deliveryDropId: '' }, o || {});
+    costOverride: '', markupPct: st.materialsMarkupPct === '' ? 0 : st.materialsMarkupPct, vatRate: st.vatRate, customerGroup: '', showOnQuote: true, deliveryDropId: '', optGroup: '' }, o || {});
   return l;
 }
 function qNormLine(l, supIds){
@@ -5032,7 +5092,7 @@ function qNormLine(l, supIds){
     selectedSupplierId: Number(l.selectedSupplierId) > 0 ? Number(l.selectedSupplierId) : '',
     costOverride: (l.costOverride === '' || l.costOverride == null || isNaN(Number(l.costOverride)) || Number(l.costOverride) < 0) ? '' : Number(l.costOverride),
     markupPct: qNumOr(l.markupPct, 0), vatRate: qNumOr(l.vatRate, state.settings.vatRate), customerGroup: str(l.customerGroup), showOnQuote: l.showOnQuote !== false,
-    deliveryDropId: str(l.deliveryDropId)
+    deliveryDropId: str(l.deliveryDropId), optGroup: str(l.optGroup).trim()   // optional line group (e.g. Tiled roof): left out of the total until ticked
   };
   if(!out.unitId){ const u = units.find(x => x.name.toLowerCase() === out.unitName.toLowerCase()); if(u) out.unitId = u.id; }
   const u = units.find(x => x.id === out.unitId); if(u) out.unitName = u.name;
@@ -5058,6 +5118,7 @@ function ensureQuoteDocModel(o, seed){
       q.vatMode = 'settings'; q.mode = q.mode === 'template' ? 'template' : 'new'; q.notes = str(q.notes);
       q.linkedIds = migrateLinkedIds(q); delete q.linkedId;
       q.timeline = (Array.isArray(q.timeline) ? q.timeline : []).filter(t => t && typeof t === 'object').map(t => ({ date: iso(t.date) || fmt(new Date()), note: str(t.note), created: Number(t.created) || 0, kind: str(t.kind) }));
+      q.optIncluded = [...new Set((Array.isArray(q.optIncluded) ? q.optIncluded : []).map(v => str(v).trim()).filter(Boolean))];   // optional groups ticked into the total
       q.recoverUnpaid = !!q.recoverUnpaid;
       q.unpaidOverride = (q.unpaidOverride === '' || q.unpaidOverride == null || isNaN(Number(q.unpaidOverride)) || Number(q.unpaidOverride) < 0) ? '' : Number(q.unpaidOverride);
       q.approval = (q.approval && typeof q.approval === 'object' && Array.isArray(q.approval.lanes) && q.approval.parts) ? q.approval : null;
@@ -5069,7 +5130,8 @@ function ensureQuoteDocModel(o, seed){
       q.sentSnapshot = (q.sentSnapshot && typeof q.sentSnapshot === 'object' && q.sentSnapshot.docs && q.sentSnapshot.terms) ? q.sentSnapshot : null;
       q.acceptedDate = iso(q.acceptedDate); q.asSold = (q.asSold && typeof q.asSold === 'object') ? q.asSold : null;
       q.payments = Array.isArray(q.payments) ? q.payments.filter(r => r && typeof r === 'object').map(r => ({ id: str(r.id) || qRand('pm_'), label: str(r.label), mode: r.mode === 'amount' ? 'amount' : 'percent', value: qNumOr(r.value, 0),
-        dueMode: ['afterEnd', 'completion', 'acceptance', 'date'].includes(r.dueMode) ? r.dueMode : 'afterEnd', date: iso(r.date), days: (r.days === '' || r.days == null || isNaN(Number(r.days)) || Number(r.days) < 0) ? '' : Math.round(Number(r.days)) })) : [qNewPayment()];
+        dueMode: ['afterEnd', 'completion', 'acceptance', 'date'].includes(r.dueMode) ? r.dueMode : 'afterEnd', date: iso(r.date), days: (r.days === '' || r.days == null || isNaN(Number(r.days)) || Number(r.days) < 0) ? '' : Math.round(Number(r.days)),
+        dueOverride: iso(r.dueOverride) })) : [qNewPayment()];   // dueOverride: a typed due date that automatic recalculation never overwrites
       q.drops = (Array.isArray(q.drops) ? q.drops : []).filter(d => d && typeof d === 'object').map(d => ({
         id: str(d.id) || qRand('dr_'), label: str(d.label), supplierId: Number(d.supplierId) > 0 ? Number(d.supplierId) : '', date: iso(d.date), method: d.method === 'collect' ? 'collect' : 'delivered',
         charge: qNumOr(d.charge, 0), chargeManual: !!d.chargeManual, paymentDueDate: iso(d.paymentDueDate), dueManual: !!d.dueManual }));
@@ -5077,7 +5139,8 @@ function ensureQuoteDocModel(o, seed){
       q.lines.forEach(l => { if(l.deliveryDropId && !q.drops.some(d => d.id === l.deliveryDropId)) l.deliveryDropId = ''; });
       q.labour = (Array.isArray(q.labour) ? q.labour : []).filter(r => r && typeof r === 'object').map(r => ({
         id: str(r.id) || qRand('lb_'), description: str(r.description), basis: LAB_BASES.some(b => b[0] === r.basis) ? r.basis : 'day', qty: qNumOr(r.qty, 0),
-        rate: (r.rate === '' || r.rate == null || isNaN(Number(r.rate)) || Number(r.rate) < 0) ? '' : Number(r.rate), customerGroup: str(r.customerGroup), showOnQuote: r.showOnQuote !== false }));
+        rate: (r.rate === '' || r.rate == null || isNaN(Number(r.rate)) || Number(r.rate) < 0) ? '' : Number(r.rate), customerGroup: str(r.customerGroup), showOnQuote: r.showOnQuote !== false,
+        helperQty: (r.helperQty === '' || r.helperQty == null || isNaN(Number(r.helperQty)) || Number(r.helperQty) < 0) ? '' : Number(r.helperQty), optGroup: str(r.optGroup).trim() }));
       const sup = new Set((o.suppliers || []).map(s => s.id));
       const cols = new Set((Array.isArray(q.supplierCols) ? q.supplierCols : []).map(Number).filter(n => sup.has(n)));
       q.lines.forEach(l => l.prices.forEach(p => { if(sup.has(p.supplierId)) cols.add(p.supplierId); }));
@@ -5135,7 +5198,18 @@ function qQtyOrder(q, l){
   if(q.mode !== 'template' && qIsPack(l)) return qty;   // packs, bags and boxes are bought whole: no wastage, no rounding up
   return Math.ceil(Number((qty * (1 + w)).toFixed(6)));
 }
-function qCheapest(l){ let best = null; l.prices.forEach(p => { if(Number(p.price) > 0 && (!best || p.price < best.price)) best = p; }); return best; }
+/* a supplier that states prices inc VAT is netted down to ex VAT with the VAT rate in Settings; what is typed in stays as stated */
+function qVatDiv(){ return 1 + (Number(state.settings.vatRate) || 0) / 100; }
+function qNetPrice(p){ const s = supFind(p.supplierId); return s && s.pricesIncVat ? Number(p.price) / qVatDiv() : Number(p.price); }
+function qNetAmt(sup, v){ return sup && sup.pricesIncVat && v !== '' && v != null ? r2(Number(v) / qVatDiv()) : v; }   // delivery charge, free-delivery threshold, minimum order
+function qCheapest(l){ let best = null; l.prices.forEach(p => { if(Number(p.price) > 0 && (!best || qNetPrice(p) < qNetPrice(best))) best = p; }); return best; }
+function qExcluded(q, r){ return !!(r.optGroup && !(q.optIncluded || []).includes(r.optGroup)); }   // an optional group that has not been ticked
+function qHelperRate(basis){ const d = Number(state.settings.helperRateDay) || 0; return basis === 'hour' ? d / hpd() : basis === 'halfday' ? d / 2 : d; }
+function qLabourAmt(q, r){
+  const rate = r.rate === '' ? 0 : Number(r.rate), tpl = q.mode === 'template', base = r.basis === 'fixed' ? rate : (Number(r.qty) || 0) * rate;
+  const helper = (Number(r.helperQty) || 0) * qHelperRate(r.basis);
+  const t = base + helper; return tpl ? t : r2(t);
+}
 function qSelected(q, l){
   const ch = qCheapest(l); if(q.mode === 'template') return ch;
   const s = l.selectedSupplierId ? l.prices.find(p => p.supplierId === l.selectedSupplierId && Number(p.price) > 0) : null; return s || ch;
@@ -5143,25 +5217,30 @@ function qSelected(q, l){
 function qCalc(q){
   const st = state.settings, tpl = q.mode === 'template', defRate = Number(st.vatRate) || 0, lines = {}, labour = {}, drops = {};
   let matCost = 0, matRaw = 0, matRounded = 0, vatRaw = 0, vatRoundedSum = 0;
+  const optional = {};   // optional groups that are not in the total: name → { ex, inc }
   q.lines.forEach(l => {
     const qo = qQtyOrder(q, l), sel = qSelected(q, l), ov = l.costOverride !== '' ? Number(l.costOverride) : null;
-    const costEach = ov !== null ? ov : (sel ? sel.price : 0), lineCost = qo * costEach, rate = (Number(l.vatRate) || 0) / 100;
+    const costEach = ov !== null ? ov : (sel ? qNetPrice(sel) : 0), lineCost = qo * costEach, rate = (Number(l.vatRate) || 0) / 100, excl = qExcluded(q, l);
     const raw = lineCost * (1 + (Number(l.markupPct) || 0) / 100), priceEx = tpl ? raw : r2(raw);
     const vat = tpl ? raw * rate : r2(priceEx * rate), inc = tpl ? raw * (1 + rate) : r2(priceEx + vat);
-    lines[l.id] = { qtyOrder: qo, costEach, lineCost, priceEx, vat, priceInc: inc, priceEach: qo > 0 ? r2(priceEx / qo) : 0, selSupplierId: sel ? sel.supplierId : '', cheapestId: (qCheapest(l) || {}).supplierId || '' };
-    matCost += lineCost; matRaw += priceEx; matRounded += priceEx; vatRaw += vat; vatRoundedSum += vat;
+    lines[l.id] = { qtyOrder: qo, costEach, lineCost, priceEx, vat, priceInc: inc, priceEach: qo > 0 ? r2(priceEx / qo) : 0, selSupplierId: sel ? sel.supplierId : '', cheapestId: (qCheapest(l) || {}).supplierId || '', excluded: excl,
+      source: ov !== null ? 'override' : (sel ? (l.prices.length === 1 ? 'single' : (l.selectedSupplierId && l.selectedSupplierId === sel.supplierId && q.mode !== 'template' ? 'selected' : 'cheapest')) : 'none') };
+    if(!excl){ matCost += lineCost; matRaw += priceEx; matRounded += priceEx; vatRaw += vat; vatRoundedSum += vat; }
+    else if(l.optGroup){ const o = optional[l.optGroup] || (optional[l.optGroup] = { name: l.optGroup, ex: 0, inc: 0, included: false }); o.ex += priceEx; o.inc += inc; }
   });
   let labourEx = 0, labourVat = 0;
   q.labour.forEach(r => {
-    const rate = r.rate === '' ? 0 : Number(r.rate), amt = tpl ? (r.basis === 'fixed' ? rate : (Number(r.qty) || 0) * rate) : r2(r.basis === 'fixed' ? rate : (Number(r.qty) || 0) * rate);
-    labour[r.id] = { amount: amt }; labourEx += amt; labourVat += tpl ? 0 : r2(amt * defRate / 100);
+    const amt = qLabourAmt(q, r), excl = qExcluded(q, r);
+    labour[r.id] = { amount: amt, excluded: excl };
+    if(!excl){ labourEx += amt; labourVat += tpl ? 0 : r2(amt * defRate / 100); }
+    else { const o = optional[r.optGroup] || (optional[r.optGroup] = { name: r.optGroup, ex: 0, inc: 0, included: false }); o.ex += amt; o.inc += amt + (tpl ? amt * defRate / 100 : r2(amt * defRate / 100)); }
   });
   const un = qUnpaid(q);
   if(q.recoverUnpaid){ labourEx += un.amount; labourVat += tpl ? 0 : r2(un.amount * defRate / 100); }   // the automatic "Unpaid time recovered" row
   let delEx = 0, delVat = 0;
   q.drops.forEach(d => {
     const ch = Number(d.charge) || 0; delEx += ch; delVat += tpl ? 0 : r2(ch * defRate / 100);
-    let ot = 0; q.lines.forEach(l => { if(l.deliveryDropId === d.id) ot += lines[l.id].lineCost; });
+    let ot = 0; q.lines.forEach(l => { if(l.deliveryDropId === d.id && !lines[l.id].excluded) ot += lines[l.id].lineCost; });
     drops[d.id] = { orderTotal: ot };
   });
   const materialsEx = r2(matRaw), labourR = r2(labourEx), delR = r2(delEx);
@@ -5169,7 +5248,8 @@ function qCalc(q){
   const vat = tpl ? r2(vatRaw + (labourR + delR) * defRate / 100) : r2(vatRoundedSum + labourVat + delVat);
   const totalInc = r2(totalEx + vat);
   const labourCost = labourR / (1 + (Number(st.labourProfitPct) || 0) / 100), marginBefore = totalEx - matCost - delR, marginAfter = marginBefore - labourCost;
-  return { lines, labour, drops, unpaid: un, materialsCost: matCost, materialsEx, labourEx: labourR, deliveryEx: delR, totalEx, vat, totalInc, labourCost,
+  Object.values(optional).forEach(o => { o.ex = r2(o.ex); o.inc = r2(o.inc); });
+  return { lines, labour, drops, optional, unpaid: un, materialsCost: matCost, materialsEx, labourEx: labourR, deliveryEx: delR, totalEx, vat, totalInc, labourCost,
     marginBefore, marginAfter, pctBefore: totalEx ? marginBefore / totalEx * 100 : 0, pctAfter: totalEx ? marginAfter / totalEx * 100 : 0 };
 }
 /* delivery drops: charge and payment due date follow the supplier unless typed over */
@@ -5179,8 +5259,10 @@ function qAutoDrops(q){
     const sup = d.supplierId ? supFind(d.supplierId) : null, ot = c.drops[d.id].orderTotal;
     if(d.method === 'collect'){ d.charge = 0; d.chargeManual = false; }
     else if(!d.chargeManual){
-      let ch = (sup && sup.deliveryCharge !== '') ? sup.deliveryCharge : 0;
-      if(sup && sup.freeDeliveryOver !== '' && sup.freeDeliveryOver > 0 && ot >= sup.freeDeliveryOver) ch = 0;
+      let ch = (sup && sup.deliveryCharge !== '') ? qNetAmt(sup, sup.deliveryCharge) : 0;
+      const free = sup ? qNetAmt(sup, sup.freeDeliveryOver) : '';
+      if(sup && free !== '' && free > 0 && ot >= free) ch = 0;
+      if(d.method !== 'collect' && q.lines.some(l => l.deliveryDropId === d.id) && !q.lines.some(l => l.deliveryDropId === d.id && !qExcluded(q, l))) ch = 0;   // every line on this drop is an optional extra that is not in the total
       d.charge = ch;
     }
     if(!d.dueManual){
@@ -5195,13 +5277,14 @@ function qPriceStale(p){
 }
 function qDropWarning(q, d, c){
   const sup = d.supplierId ? supFind(d.supplierId) : null, ot = c.drops[d.id] ? c.drops[d.id].orderTotal : 0, w = [];
-  if(sup && sup.minOrder !== '' && sup.minOrder > 0 && ot > 0 && ot < sup.minOrder) w.push(`${sup.name} has a minimum order of ${qm(sup.minOrder)}; this drop is ${qm(ot)}.`);
+  const minO = sup ? qNetAmt(sup, sup.minOrder) : '';
+  if(sup && minO !== '' && minO > 0 && ot > 0 && ot < minO) w.push(`${sup.name} has a minimum order of ${qm(minO)}${sup.pricesIncVat ? ' ex VAT' : ''}; this drop is ${qm(ot)}.`);
   const inst = qInstallStart(q); if(d.date && inst && d.date > inst) w.push(`This drop (${d.date}) is after the first install stage starts (${inst}).`);
   return w.join(' ');
 }
 
 /* ---- list page ---- */
-const qUi = { q: '', status: 'all', openId: 0, tab: 'quotes', ageSup: '', unlock: new Set() };
+const qUi = { q: '', status: 'all', openId: 0, tab: 'quotes', ageSup: '', unlock: new Set(), moreHdr: new Set() };
 function qLinkedText(q){
   const code = (q.linkedIds || [])[0]; if(!code) return '';
   const hit = activeRecordCodes().find(r => r.code === code); return hit ? `${code} · ${hit.name}` : code;
@@ -5244,26 +5327,36 @@ function qbIn(kind, id, f, v, o){
 }
 function qbSel(kind, id, f, html, o){ o = o || {}; return `<select data-qb="${kind}" ${id ? `data-id="${escAttr(id)}" ` : ''}data-f="${f}"${o.cls ? ` class="${o.cls}"` : ''}${o.aria ? ` aria-label="${escAttr(o.aria)}"` : ''}>${html}</select>`; }
 function qbSupName(id){ const s = supFind(id); return s ? s.name : '(removed supplier)'; }
+function qVersions(q){ return state.quotes.filter(x => x.jobNumber === q.jobNumber).sort((a, b) => a.version - b.version || a.id - b.id); }
+/* the first block of a quote, kept compact. Project and address only get their own boxes when they add something: not linked to a lead / deal,
+   blank, or different from what the linked record already says. When they simply repeat the link they collapse to one line (with an Edit button). */
 function qbHeaderHtml(q){
   const leadOpts = [['', 'Not linked']].concat(activeRecordCodes().map(r => [r.code, r.code + ' · ' + r.name]));
   (q.linkedIds || []).forEach(c => { if(!leadOpts.some(o => o[0] === c)) leadOpts.push([c, c]); });
   const clash = state.quotes.some(x => x.id !== q.id && x.jobNumber === q.jobNumber && x.version === q.version && !String(x.refOverride || '').trim());
-  const f = (label, inner, help) => `<div class="lp-f"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
+  const f = (label, inner, help, cls) => `<div class="lp-f${cls ? ' ' + cls : ''}"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
+  const vers = qVersions(q), hit = (q.linkedIds || [])[0] ? dealRecord(linkedRoot(q.linkedIds[0])) : null, lead = hit ? hit.rec : null;
+  const lp0 = lead ? String(lead.projectName || '').trim() : '', la0 = lead ? String(lead.address || '').trim() : '', more = qUi.moreHdr.has(q.id);
+  const projSame = !!lead && !!lp0 && q.project.trim() === lp0, addrSame = !!lead && !!la0 && q.address.trim() === la0;
+  const hideProj = projSame && !more, hideAddr = addrSame && !more;
+  const pill = `<span class="qb-pill${vers.length > 1 ? ' multi' : ''}" title="${vers.length > 1 ? 'All versions of this job. Pick one to open it.' : 'Reference: prefix + job number + version digit'}"><span id="qbRef">${escHtml(qRef(q))}</span>${vers.length > 1 ? `<span class="qb-chev">▾</span><select data-qb="hdr" data-f="openVersion" aria-label="Versions of this job">${vers.map(x => `<option value="${x.id}"${x.id === q.id ? ' selected' : ''}>${escHtml(qRef(x))} · version ${x.version} · ${x.status} · ${qm(qCalc(x).totalEx)}</option>`).join('')}</select>` : ''}</span>`;
+  const sums = []; if(hideProj) sums.push(`project “${escHtml(q.project)}”`); if(hideAddr) sums.push('address');
   return `<div class="card qb-head"><div class="qb-top">
       <button type="button" class="btn secondary" data-qba="back">← All quotes</button>
-      <div class="qb-ref"><span id="qbRef">${escHtml(qRef(q))}</span><span class="qb-mode ${q.mode}" title="${q.mode === 'template' ? 'Reproduces the Excel exactly' : 'The new, tidier rules'}">${q.mode === 'template' ? 'Template rules (matches the Excel)' : 'New rules'}</span></div>
+      <div class="qb-ref">${pill}<span class="qb-mode ${q.mode}" title="${q.mode === 'template' ? 'Reproduces the Excel exactly' : 'The new, tidier rules'}">${q.mode === 'template' ? 'Template rules (matches the Excel)' : 'New rules'}</span></div>
       <div class="qb-acts">${q.mode === 'template' ? '<button type="button" class="btn secondary" data-qba="use-new">Use new rules</button>' : ''}
-        ${q.status !== 'Draft' ? '<button type="button" class="btn secondary" data-qba="new-version">New version</button>' : ''}
+        <button type="button" class="btn secondary" data-qba="new-version" title="Copy this quote as the next version (a Draft)">New version</button>
         <button type="button" class="btn secondary" data-qba="del-quote" style="color:#b3453f;border-color:#e3c4c1;">Delete quote</button></div></div>
-    <div class="qb-grid">
+    <div class="qb-grid qb-compact">
       ${f('Status', qbSel('hdr', '', 'status', qbOpts(QUOTE_STATUSES.map(s => [s, s]), q.status)))}
       ${f('Quote date', `<input type="date" data-qb="hdr" data-f="date" value="${escAttr(q.date)}">`)}
-      ${f('Job number', qbIn('hdr', '', 'jobNumber', q.jobNumber, { num: true }), `Version ${q.version}. A new version is only made from a quote that has been sent; Draft edits keep the same version. From version 10 onwards the reference (job + version digit) becomes ambiguous.${clash ? ' <b style="color:#b3453f">Another quote has the same job number and version.</b>' : ''}`)}
+      ${f('Job', `<div class="q-fixed" title="Job numbers are handed out automatically and cannot be edited">${escHtml(state.settings.quotePrefix + String(q.jobNumber).padStart(3, '0'))} · version ${q.version}</div>${clash ? '<p class="q-help"><b style="color:#b3453f">Another quote has the same job number and version.</b></p>' : ''}`)}
       ${f('Reference override (optional)', qbIn('hdr', '', 'refOverride', q.refOverride, { ph: 'Shown instead of ' + state.settings.quotePrefix + String(q.jobNumber).padStart(3, '0') + q.version }))}
-      ${f('Linked lead / project', qbSel('hdr', '', 'link', qbOpts(leadOpts, (q.linkedIds || [])[0] || '')), 'Choosing one fills any blank customer, address and project.')}
+      ${f('Linked lead / project', qbSel('hdr', '', 'link', qbOpts(leadOpts, (q.linkedIds || [])[0] || '')))}
       ${f('Customer', qbIn('hdr', '', 'customer', q.customer))}
-      ${f('Project', qbIn('hdr', '', 'project', q.project))}
-      <div class="lp-f qb-wide"><label>Customer address</label><textarea rows="2" data-qb="hdr" data-f="address">${escHtml(q.address)}</textarea></div>
+      ${hideProj ? '' : f('Project', qbIn('hdr', '', 'project', q.project))}
+      ${hideAddr ? '' : `<div class="lp-f qb-addr"><label>Customer address</label><textarea rows="2" data-qb="hdr" data-f="address">${escHtml(q.address)}</textarea></div>`}
+      ${sums.length ? `<div class="lp-f qb-wide qb-same"><span class="q-help" style="margin:0;">The ${sums.join(' and ')} match${sums.length === 1 ? 'es' : ''} the linked ${hit && hit.pl === 'lead' ? 'lead' : 'deal'}, so ${sums.length === 1 ? 'it is' : 'they are'} not repeated here.</span> <button type="button" class="sp-link" data-qba="edit-hdr">Edit</button></div>` : ''}
       <div class="lp-f qb-wide"><label>Notes (printed on the customer document as the project description)</label><textarea rows="2" data-qb="hdr" data-f="notes">${escHtml(q.notes)}</textarea></div>
     </div>${qbDealHtml(q)}</div>`;
 }
@@ -5273,35 +5366,86 @@ function qbTilesHtml(){
     ${t('marginAfter', 'Margin after wages')}${t('marginBefore', 'Margin before wages')}</div>
     <p class="q-help" style="margin:-4px 0 14px;">Margin after wages = total ex VAT − materials cost − delivery − labour cost (labour price ÷ (1 + labour profit share %)). Margin before wages leaves the labour cost in. Margins are shown on price.</p>`;
 }
+function qOptNames(q){ return [...new Set(q.lines.map(l => l.optGroup).concat(q.labour.map(r => r.optGroup)).filter(Boolean))]; }
+/* the per-supplier footer: what each column adds up to, what is actually being bought there, and its delivery / minimum-order / free-delivery flags */
+function qSupTotals(q, c){
+  const live = q.lines.filter(l => !qExcluded(q, l));
+  return q.supplierCols.map(sid => {
+    const sup = supFind(sid); let all = 0, priced = 0, buy = 0;
+    live.forEach(l => {
+      const x = c.lines[l.id], pr = l.prices.find(z => z.supplierId === sid && Number(z.price) > 0);
+      if(pr){ all += x.qtyOrder * qNetPrice(pr); priced++; }
+      if(x.selSupplierId === sid && x.source !== 'override') buy += x.lineCost;
+    });
+    const base = buy > 0 ? buy : all, charge = sup && sup.deliveryCharge !== '' ? qNetAmt(sup, sup.deliveryCharge) : null, free = sup ? qNetAmt(sup, sup.freeDeliveryOver) : '', minO = sup ? qNetAmt(sup, sup.minOrder) : '';
+    const hasFree = free !== '' && free > 0, isFree = charge !== null && (charge === 0 || (hasFree && base >= free));
+    return { sid, sup, all: r2(all), priced, missing: live.length - priced, buy: r2(buy), base, charge, free: hasFree ? free : '', minO: minO !== '' && minO > 0 ? minO : '', isFree, short: hasFree && !isFree ? r2(free - base) : 0 };
+  });
+}
+function qbFootHtml(q, c){
+  const vatOn = qVatOn(), tot = qSupTotals(q, c), cols = q.supplierCols.length, live = q.lines.filter(l => !qExcluded(q, l));
+  const est = live.filter(l => !l.prices.length && l.costOverride !== '').reduce((a, l) => a + c.lines[l.id].lineCost, 0), noPrice = live.filter(l => !l.prices.length && l.costOverride === '').length;
+  if(!cols && !est) return '';
+  const lead = 6, tail = 10 + (vatOn ? 2 : 0), tr = (label, cells, estCell, help) => `<tr class="qb-foot"><td colspan="${lead}" class="qb-footl"${help ? ` title="${escAttr(help)}"` : ''}>${label}</td>${cells.join('')}<td class="qb-calc">${estCell || ''}</td><td colspan="${tail}"></td></tr>`;
+  const rows = [];
+  rows.push(tr('Total if bought here <span class="qb-dim">(every line priced, ex VAT)</span>', tot.map(t => `<td class="qb-calc"><b>${qm(t.all)}</b>${t.missing ? `<div class="qb-dim" title="${t.missing} line${t.missing !== 1 ? 's have' : ' has'} no price from this supplier">${t.priced}/${t.priced + t.missing} lines</div>` : ''}</td>`), est ? `<b>${qm(est)}</b>` : '', 'What each supplier column adds up to if every line it has a price for were bought there. Prices stated inc VAT are netted to ex VAT.'));
+  rows.push(tr('Selected from here <span class="qb-dim">(lines you are buying)</span>', tot.map(t => `<td class="qb-calc">${t.buy > 0 ? qm(t.buy) : '<span class="qb-dim">—</span>'}</td>`), '', 'The cost of the lines that are actually being bought from this supplier.'));
+  rows.push(tr('Delivery <span class="qb-dim">(ex VAT)</span>', tot.map(t => {
+    if(t.charge === null) return '<td class="qb-calc"><span class="qb-dim">—</span></td>';
+    if(t.isFree) return '<td class="qb-calc"><span class="qb-flag ok">Free</span></td>';
+    return `<td class="qb-calc">${qm(t.charge)}${t.free !== '' ? `<span class="qb-star" title="Spend ${qm(t.short)} more (ex VAT) with ${escAttr(t.sup ? t.sup.name : 'this supplier')} to clear the charge: delivery is free over ${qm(t.free)}.">*</span>` : ''}</td>`;
+  }), '', 'Based on the lines selected from the supplier, or on every line it has priced when none are selected.'));
+  rows.push(tr('Flags', tot.map(t => {
+    const f = [];
+    if(t.minO !== '' && t.base > 0) f.push(t.base < t.minO ? `<span class="qb-flag bad" title="Minimum order ${qm(t.minO)}; this basket is ${qm(t.base)}">${qm(t.minO - t.base)} under min order</span>` : '<span class="qb-flag ok">min order met</span>');
+    if(t.free !== '') f.push(t.isFree ? '<span class="qb-flag ok">free delivery</span>' : `<span class="qb-flag" title="Free delivery over ${qm(t.free)}">free over ${qm(t.free)}</span>`);
+    return `<td class="qb-calc qb-flags">${f.join(' ') || '<span class="qb-dim">—</span>'}</td>`;
+  }), noPrice ? `<span class="qb-flag bad">${noPrice} line${noPrice !== 1 ? 's' : ''} unpriced</span>` : ''));
+  return rows.join('');
+}
 function qbMaterialsHtml(q){
   const vatOn = qVatOn(), tpl = q.mode === 'template', cats = state.lineCategories.map(c => [c.id, c.name]), units = state.quoteUnits.map(u => [u.id, u.name]);
   const cols = q.supplierCols, dropOpts = [['', '—']].concat(q.drops.map((d, i) => [d.id, d.label || ('Drop ' + (i + 1))]));
   const supOpts = () => [['', 'Cheapest']].concat(cols.map(id => [id, qbSupName(id)]));   // a supplier with no price on a line falls back to the cheapest
   const avail = state.suppliers.filter(s => s.status === 'Active' && !cols.includes(s.id)).map(s => [s.id, s.name]);
-  let h = `<tr><th class="qb-sticky-l">Description</th><th>Category</th><th>Unit</th><th>Qty</th><th>Waste %</th><th>To order</th>${cols.map(id => `<th class="qb-supcol">${escHtml(qbSupName(id))}<button class="qb-x" data-qba="del-supcol" data-sid="${id}" title="Remove this supplier column" aria-label="Remove supplier column">×</button></th>`).join('')}
-    <th>Supplier</th><th class="qb-sticky-r">Cost each</th><th>Cost total</th><th>Markup %</th><th>Price ex VAT</th>${vatOn ? '<th>VAT</th><th>Price inc VAT</th>' : ''}<th>Customer group</th><th>Show</th><th>Drop</th><th></th></tr>`;
-  let body = q.lines.map((l, i) => `<tr data-line="${l.id}" data-drag="qline" data-ix="${i}">
+  const totalCols = 6 + cols.length + 1 + 10 + (vatOn ? 2 : 0);
+  let h = `<tr><th class="qb-sticky-l">Description</th><th>Category</th><th>Unit</th><th>Qty</th><th>Waste %</th><th>To order</th>${cols.map(id => { const sp = supFind(id); return `<th class="qb-supcol" title="${escAttr(qbSupName(id))}${sp && sp.pricesIncVat ? ' (prices entered inc VAT, netted to ex VAT)' : ''}">${escHtml(sp ? supShort(sp) : '?')}${sp && sp.pricesIncVat ? '<span class="qb-vi">inc VAT</span>' : ''}<button class="qb-x" data-qba="del-supcol" data-sid="${id}" title="Remove ${escAttr(qbSupName(id))}" aria-label="Remove supplier column">×</button></th>`; }).join('')}
+    <th title="Lines with no supplier price but a typed cost override">No price / estimate</th><th>Supplier</th><th class="qb-sticky-r">Materials cost</th><th>Cost total</th><th>Markup %</th><th>Price ex VAT</th>${vatOn ? '<th>VAT</th><th>Price inc VAT</th>' : ''}<th>Customer group</th><th>Optional group</th><th>Show</th><th>Drop</th><th></th></tr>`;
+  const row = (l, i) => `<tr data-line="${l.id}" data-drag="qline" data-ix="${i}">
     <td class="qb-sticky-l dg">${DRAG_H}<div class="qb-desc">${qbIn('line', l.id, 'description', l.description, { ph: 'Description', aria: 'Description' })}</div></td>
     <td>${qbSel('line', l.id, 'categoryId', qbOpts(cats, l.categoryId, '—'), { aria: 'Category' })}</td>
     <td>${qbSel('line', l.id, 'unitId', qbOpts(units, l.unitId, l.unitName || '—'), { aria: 'Unit' })}</td>
     <td>${qbIn('line', l.id, 'qty', l.qty, { num: true, cls: 'qb-n', aria: 'Qty' })}</td><td>${qbIn('line', l.id, 'wastagePct', l.wastagePct, { num: true, cls: 'qb-n', aria: 'Wastage %' })}</td>
     <td class="qb-calc" data-qc="${l.id}|qtyOrder">—</td>
     ${cols.map(sid => `<td class="qb-pc" data-qpc data-lid="${l.id}" data-sid="${sid}">${qbIn('price', l.id, 'price', '', { num: true, sid, cls: 'qb-n', aria: 'Price from ' + qbSupName(sid) })}<span class="qb-stale" hidden title="Older than this supplier's price validity">stale</span></td>`).join('')}
+    <td class="qb-calc qb-est" data-qc="${l.id}|est"></td>
     <td>${tpl ? '<span class="qb-dim" title="Template rules always use the cheapest price">Cheapest</span>' : qbSel('line', l.id, 'selectedSupplierId', qbOpts(supOpts(l), l.selectedSupplierId), { aria: 'Selected supplier' })}</td>
     <td class="qb-sticky-r qb-calc qb-cost" data-qc="${l.id}|costEach">—</td><td class="qb-calc" data-qc="${l.id}|lineCost">—</td>
     <td>${qbIn('line', l.id, 'markupPct', l.markupPct, { num: true, cls: 'qb-n', aria: 'Markup %' })}</td><td class="qb-calc" data-qc="${l.id}|priceEx">—</td>
     ${vatOn ? `<td class="qb-calc" data-qc="${l.id}|vat">—</td><td class="qb-calc" data-qc="${l.id}|priceInc">—</td>` : ''}
     <td>${qbIn('line', l.id, 'customerGroup', l.customerGroup, { aria: 'Customer group' })}</td>
+    <td>${qbIn('line', l.id, 'optGroup', l.optGroup, { aria: 'Optional group', ph: 'none' }).replace('<input', '<input list="qbOptList"')}</td>
     <td class="qb-c"><input type="checkbox" data-qb="line" data-id="${l.id}" data-f="showOnQuote"${l.showOnQuote ? ' checked' : ''} aria-label="Show on quote"></td>
     <td>${qbSel('line', l.id, 'deliveryDropId', qbOpts(dropOpts, l.deliveryDropId), { aria: 'Delivery drop' })}</td>
     <td class="qb-rowacts"><div class="qb-ra"><button class="icon-btn" data-qba="line-up" data-id="${l.id}" title="Move up"${i === 0 ? ' disabled' : ''}>${UP_SVG}</button><button class="icon-btn" data-qba="line-down" data-id="${l.id}" title="Move down"${i === q.lines.length - 1 ? ' disabled' : ''}>${DOWN_SVG}</button>
-      <button class="btn secondary qb-sm" data-qba="line-edit" data-id="${l.id}">Edit</button><button class="btn secondary qb-sm" data-qba="line-dup" data-id="${l.id}">Duplicate</button><button class="icon-btn" data-qba="line-del" data-id="${l.id}" title="Delete line" aria-label="Delete line">${X_SVG}</button></div></td></tr>`).join('');
+      <button class="btn secondary qb-sm" data-qba="line-edit" data-id="${l.id}">Edit</button><button class="btn secondary qb-sm" data-qba="line-dup" data-id="${l.id}">Duplicate</button><button class="icon-btn" data-qba="line-del" data-id="${l.id}" title="Delete line" aria-label="Delete line">${X_SVG}</button></div></td></tr>`;
+  let body = q.lines.map((l, i) => l.optGroup ? '' : row(l, i)).join('');
   if(!q.lines.length) body = `<tr><td colspan="30"><div class="sup-empty">No lines yet — add the first with “+ Add line”.</div></td></tr>`;
+  const optBodies = qOptNames(q).map(name => {
+    const inc = q.optIncluded.includes(name);
+    return `<tbody class="qb-optbody${inc ? '' : ' qb-off'}"><tr class="qb-opthead"><td colspan="${totalCols}"><b>Optional: ${escHtml(name)}</b> <span class="qb-flag ${inc ? 'ok' : ''}">${inc ? 'in the total' : 'not in the total'}</span> <span class="qb-dim">tick it under “Optional groups” above</span></td></tr>${q.lines.map((l, i) => l.optGroup === name ? row(l, i) : '').join('')}</tbody>`;
+  }).join('');
   return `<div class="card"><div class="qb-sec-h"><h3>Materials</h3><div class="qb-sec-tools">
       ${avail.length ? `<select id="qbAddSup" aria-label="Add a supplier column"><option value="">+ Add supplier column…</option>${avail.map(([v, n]) => `<option value="${v}">${escHtml(n)}</option>`).join('')}</select>` : ''}
       <button class="btn" data-qba="add-line">+ Add line</button></div></div>
-    <p class="q-help" style="margin:0 0 8px;">${tpl ? 'Template rules: quantity to order is rounded up for every line (packs and bags too) and the cheapest supplier price is used.' : 'Quantity to order is rounded up to a whole unit after wastage, except units named pack, bag or box: wastage is not applied to those and they are not rounded up.'} Type a price per supplier; prices older than a supplier's price validity show a stale tag. Hidden lines (Show unticked) are still included in the group price.</p>
-    <div class="qb-scroll"><table class="qb-table"><thead>${h}</thead><tbody>${body}</tbody></table></div></div>`;
+    <p class="q-help" style="margin:0 0 8px;">${tpl ? 'Template rules: quantity to order is rounded up for every line (packs and bags too) and the cheapest supplier price is used.' : 'Quantity to order is rounded up to a whole unit after wastage, except units named pack, bag or box: wastage is not applied to those and they are not rounded up.'} Type a price per supplier; prices older than a supplier's price validity show a stale tag. Hidden lines (Show unticked) are still included in the group price. Give lines an <b>Optional group</b> (for example “Tiled roof”) to keep them out of the total until you tick the group.</p>
+    <div class="qb-scroll"><table class="qb-table"><thead>${h}</thead><tbody>${body}</tbody>${optBodies}<tbody id="qbFoot"></tbody></table><datalist id="qbOptList">${qOptNames(q).map(n => `<option value="${escAttr(n)}">`).join('')}</datalist></div></div>`;
+}
+function qbOptionalHtml(q){
+  const names = qOptNames(q); if(!names.length) return '';
+  return `<div class="card"><div class="qb-sec-h"><h3>Optional groups</h3></div>
+    <p class="q-help" style="margin:0 0 8px;">Optional groups stay out of the total (and the supplier delivery sums) until ticked. On the customer document, ticked groups price in like any other group and unticked ones are listed as optional extras with their price.</p>
+    <div class="qb-opts">${names.map(n => `<label class="q-check qb-optchk"><input type="checkbox" data-qb="opt" data-id="${escAttr(n)}" data-f="include"${q.optIncluded.includes(n) ? ' checked' : ''}> <b>${escHtml(n)}</b> <span class="qb-dim" data-qc="opt|${escAttr(n)}"></span></label>`).join('')}</div></div>`;
 }
 function qbDeliveryHtml(q){
   const sups = state.suppliers.filter(s => s.status === 'Active' || q.drops.some(d => d.supplierId === s.id)).map(s => [s.id, s.name]);
@@ -5334,7 +5478,7 @@ function qbRender(){
   const ae = document.activeElement; if(ae && box.contains(ae) && ae.blur) ae.blur();   // commit a half-finished edit before the page is rebuilt
   const sc = box.querySelector('.qb-scroll'), sl = sc ? sc.scrollLeft : 0, sy = window.scrollY;
   qAutoDrops(q);
-  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + qAsSoldHtml(q) + '<datalist id="qbGroupsList"></datalist><div id="qbActual"></div><div id="qbCash"></div>' + qbTimelineHtml(q);
+  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbOptionalHtml(q) + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + '<div class="qb-pair">' + qAsSoldHtml(q) + '<div id="qbActual"></div></div><datalist id="qbGroupsList"></datalist><div id="qbCash"></div>' + qbTimelineHtml(q);
   const ns = box.querySelector('.qb-scroll'); if(ns) ns.scrollLeft = sl;
   box.querySelectorAll('[data-f="customerGroup"]').forEach(i => i.setAttribute('list', 'qbGroupsList'));
   qbRefresh(); window.scrollTo(0, sy);
@@ -5350,12 +5494,21 @@ function qbGet(q, el){
   if(k === 'pay'){ const r = q.payments.find(x => x.id === id); return r ? r[f] : undefined; }
 }
 /* recompute and repaint every calculated cell, tile and total; fields follow the data (unless someone is typing in them) */
+function qSourceText(q, l, x){
+  if(x.source === 'override') return `Typed override of ${qm(l.costOverride)} (set in this line's Edit panel). Supplier prices are ignored for this line.`;
+  const sel = qSelected(q, l), sp = sel ? supFind(sel.supplierId) : null, name = sel ? qbSupName(sel.supplierId) : '', inc = sp && sp.pricesIncVat ? ` (stated ${qm(sel.price)} inc VAT, netted to ex VAT)` : '';
+  if(x.source === 'selected') return `Selected supplier: ${name}${inc}`;
+  if(x.source === 'single') return `Only price entered: ${name}${inc}`;
+  if(x.source === 'cheapest') return `Cheapest of ${l.prices.length} prices: ${name}${inc}${q.mode === 'template' ? ' (template rules always use the cheapest)' : ''}`;
+  return 'No price entered yet.';
+}
 function qbRefresh(){
   const q = qFind(qUi.openId); if(!q) return;
   if(apCheck(q)) saveState();
   const c = qCalc(q), v = {};
-  q.lines.forEach(l => { const x = c.lines[l.id]; v[l.id + '|qtyOrder'] = String(x.qtyOrder); v[l.id + '|costEach'] = qm(x.costEach); v[l.id + '|lineCost'] = qm(x.lineCost); v[l.id + '|priceEx'] = qm(x.priceEx); v[l.id + '|vat'] = qm(x.vat); v[l.id + '|priceInc'] = qm(x.priceInc); });
+  q.lines.forEach(l => { const x = c.lines[l.id]; v[l.id + '|est'] = !l.prices.length ? (l.costOverride !== '' ? qm(x.lineCost) : '⚠ no price') : ''; v[l.id + '|qtyOrder'] = String(x.qtyOrder); v[l.id + '|costEach'] = qm(x.costEach); v[l.id + '|lineCost'] = qm(x.lineCost); v[l.id + '|priceEx'] = qm(x.priceEx); v[l.id + '|vat'] = qm(x.vat); v[l.id + '|priceInc'] = qm(x.priceInc); });
   q.labour.forEach(r => { v[r.id + '|amount'] = qm(c.labour[r.id].amount); });
+  qOptNames(q).forEach(n => { const ex = q.lines.filter(l => l.optGroup === n).reduce((a, l) => a + c.lines[l.id].priceEx, 0) + q.labour.filter(r => r.optGroup === n).reduce((a, r) => a + c.labour[r.id].amount, 0); v['opt|' + n] = qm(r2(ex)) + ' ex VAT'; });
   q.drops.forEach(d => { v[d.id + '|orderTotal'] = qm(c.drops[d.id].orderTotal); });
   Object.assign(v, { 'tile|totalEx': qm(c.totalEx), 'tile|vat': qm(c.vat), 'tile|totalInc': qm(c.totalInc), 'tile|materialsCost': qm(c.materialsCost), 'tile|labour': qm(c.labourEx), 'tile|delivery': qm(c.deliveryEx),
     'tile|marginAfter': qm(c.marginAfter), 'tile|marginAfterPct': qpct(c.pctAfter) + ' of price', 'tile|marginBefore': qm(c.marginBefore), 'tile|marginBeforePct': qpct(c.pctBefore) + ' of price',
@@ -5364,11 +5517,18 @@ function qbRefresh(){
   root.querySelectorAll('[data-qc]').forEach(el => { const t = v[el.dataset.qc]; if(t !== undefined && el.textContent !== t) el.textContent = t; });
   root.querySelectorAll('[data-qpc]').forEach(td => {
     const l = q.lines.find(x => x.id === td.dataset.lid); if(!l) return;
-    const sid = Number(td.dataset.sid), p = l.prices.find(x => x.supplierId === sid), x = c.lines[l.id];
-    td.classList.toggle('best', !!p && x.cheapestId === sid); td.classList.toggle('sel', !!p && x.selSupplierId === sid);
+    const sid = Number(td.dataset.sid), p = l.prices.find(x => x.supplierId === sid), x = c.lines[l.id], used = !!p && x.selSupplierId === sid && x.source !== 'override';
+    td.classList.toggle('best', used); td.classList.toggle('sel', used); td.classList.toggle('low', !!p && x.cheapestId === sid && !used);   // green = the price being used; a pale tint marks the lowest when it is not the one chosen
     const stale = td.querySelector('.qb-stale'); if(stale) stale.hidden = !(p && qPriceStale(p));
-    td.title = p ? ('Entered ' + p.date + (p.note ? ' — ' + p.note : '')) : '';
+    td.title = p ? ('Entered ' + p.date + (p.note ? ' — ' + p.note : '') + (x.cheapestId === sid ? ' · lowest price' : '') + (used ? ' · in use' : '') + (supFind(sid) && supFind(sid).pricesIncVat ? ' · stated inc VAT, netted to ' + qm(qNetPrice(p)) + ' ex VAT' : '')) : '';
   });
+  q.lines.forEach(l => {
+    const x = c.lines[l.id], tdc = root.querySelector(`[data-qc="${l.id}|costEach"]`), tre = root.querySelector(`[data-qc="${l.id}|est"]`), tr = root.querySelector(`tr[data-line="${l.id}"]`);
+    if(tdc){ tdc.classList.toggle('qb-ovr', x.source === 'override'); tdc.title = qSourceText(q, l, x); }
+    if(tre) tre.classList.toggle('qb-warn', !l.prices.length && l.costOverride === '');
+    if(tr) tr.classList.toggle('qb-excl', !!x.excluded);
+  });
+  const ft = document.getElementById('qbFoot'); if(ft) ft.innerHTML = qbFootHtml(q, c);
   root.querySelectorAll('[data-qwarn]').forEach(tr => {
     const d = q.drops.find(x => x.id === tr.dataset.qwarn), w = d ? qDropWarning(q, d, c) : '';
     tr.hidden = !w; tr.firstElementChild.innerHTML = w ? `<span class="qb-warn">⚠ ${escHtml(w)}</span>` : '';
@@ -5425,6 +5585,7 @@ function qbChange(el){
   const k = el.dataset.qb, f = el.dataset.f, id = el.dataset.id, v = el.type === 'checkbox' ? el.checked : el.value;
   let rebuild = false;
   if(k === 'hdr'){
+    if(f === 'openVersion'){ const t = qFind(Number(v)); if(t){ qUi.openId = t.id; renderQuotes(); window.scrollTo(0, 0); } return; }
     if(f === 'status'){
       const to = QUOTE_STATUSES.includes(v) ? v : q.status;
       if(to === 'Sent' && q.status !== 'Sent'){ const sb = apSendBlock(q); if(sb.blocked){ showToast(sb.reason); qbRender(); return; } }
@@ -5463,6 +5624,7 @@ function qbChange(el){
     else if(f === 'markupPct' || f === 'vatRate') l[f] = qNumOr(v, 0);
     else if(f === 'costOverride') l.costOverride = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
     else if(f === 'showOnQuote') l.showOnQuote = !!v;
+    else if(f === 'optGroup'){ l.optGroup = String(v).trim(); rebuild = true; }
     else if(f === 'deliveryDropId') l.deliveryDropId = v;
     else if(f === 'selectedSupplierId') l.selectedSupplierId = v === '' ? '' : Number(v);
   } else if(k === 'price'){
@@ -5479,6 +5641,12 @@ function qbChange(el){
     else if(f === 'qty') r.qty = qNumOr(v, 0);
     else if(f === 'rate') r.rate = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
     else if(f === 'showOnQuote') r.showOnQuote = !!v;
+    else if(f === 'helperQty') r.helperQty = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
+    else if(f === 'optGroup'){ r.optGroup = String(v).trim(); rebuild = true; }
+  } else if(k === 'opt'){
+    const n = el.dataset.id, at = q.optIncluded.indexOf(n);
+    if(v && at < 0) q.optIncluded.push(n); else if(!v && at >= 0) q.optIncluded.splice(at, 1);
+    q.timeline.push({ date: fmt(new Date()), note: `Optional group “${n}” ${v ? 'ticked into' : 'taken out of'} the total`, created: Date.now(), kind: 'optional' }); rebuild = true;
   } else if(k === 'pay'){
     const r = q.payments.find(x => x.id === id); if(!r) return;
     if(f === 'label') r.label = String(v).trim();
@@ -5486,6 +5654,7 @@ function qbChange(el){
     else if(f === 'value') r.value = qNumOr(v, 0);
     else if(f === 'dueMode'){ r.dueMode = ['afterEnd', 'completion', 'acceptance', 'date'].includes(v) ? v : 'afterEnd'; rebuild = true; }
     else if(f === 'date') r.date = isoOk(v);
+    else if(f === 'dueOverride'){ r.dueOverride = isoOk(v); rebuild = true; }
     else if(f === 'days') r.days = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Math.round(Number(v));
   } else if(k === 'drop'){
     const d = q.drops.find(x => x.id === id); if(!d) return;
@@ -5565,6 +5734,8 @@ function qbAction(a, b){
     q.timeline.push({ date: d.value || fmt(new Date()), note: n.value.trim(), created: Date.now(), kind: 'note' }); saveState(); qbRender(); return;
   }
   if(a === 'new-version'){ qNewVersion(q); return; }
+  if(a === 'edit-hdr'){ qUi.moreHdr.add(q.id); qbRender(); return; }
+  if(a === 'pay-ov-reset'){ const r = q.payments.find(x => x.id === id); if(r){ r.dueOverride = ''; qbTouch(q, true); } return; }
   if(a === 'use-new'){
     showConfirm('Switch this quote to the new rules?', 'Template rules match your Excel exactly. The new rules round every line to pence, leave packs and bags unrounded and let you pick the supplier per line. Totals can change by a few pence or more. This cannot be switched back.').then(ok => {
       if(!ok) return; q.mode = 'new'; q.timeline.push({ date: fmt(new Date()), note: 'Switched from template rules to the new rules', created: Date.now(), kind: 'mode' }); qbTouch(q, true);
@@ -5608,6 +5779,7 @@ function qlBodyHtml(q, l){
       ${f('Markup %', qbIn('line', l.id, 'markupPct', l.markupPct, { num: true }), 'Price = cost × (1 + markup%).')}
       ${f('VAT rate %', qbIn('line', l.id, 'vatRate', l.vatRate, { num: true }), vatOn ? '' : 'VAT is switched off in Settings, so this is not shown on the quote yet.')}
       ${f('Customer group', qbIn('line', l.id, 'customerGroup', l.customerGroup))}
+      ${f('Optional group', qbIn('line', l.id, 'optGroup', l.optGroup, { ph: 'None: always in the total' }), 'Lines sharing an optional group (for example “Tiled roof”) stay out of the total until the group is ticked on the quote.')}
       ${f('Delivery drop', qbSel('line', l.id, 'deliveryDropId', qbOpts(dropOpts, l.deliveryDropId)))}
       <label class="q-check"><input type="checkbox" data-qb="line" data-id="${l.id}" data-f="showOnQuote"${l.showOnQuote ? ' checked' : ''}> Show on quote</label>
     </section>
@@ -5694,6 +5866,7 @@ function qUnpaid(q){
 function qPayable(q, c){ return qVatOn() ? c.totalInc : c.totalEx; }
 function qAcceptedDate(q){ return q.acceptedDate || q.date; }
 function qPayDate(q, r){
+  if(r.dueOverride) return r.dueOverride;   // a manual date wins over every automatic rule
   if(r.dueMode === 'date') return r.date || '';
   if(r.dueMode === 'acceptance') return qAcceptedDate(q);
   const end = qLastEnd(q); if(r.dueMode === 'completion') return end;
@@ -5706,14 +5879,14 @@ function qPayAlloc(q, c){
   const allocated = r2(rows.reduce((a, x) => a + x.amount, 0));
   return { payable, rows, allocated, unallocated: r2(payable - allocated) };
 }
-function qNewPayment(o){ return Object.assign({ id: qRand('pm_'), label: 'Final payment', mode: 'percent', value: 100, dueMode: 'afterEnd', date: '', days: '' }, o || {}); }
+function qNewPayment(o){ return Object.assign({ id: qRand('pm_'), label: 'Final payment', mode: 'percent', value: 100, dueMode: 'afterEnd', date: '', days: '', dueOverride: '' }, o || {}); }
 
 /* ---- cash movements (outflows to suppliers, inflows from the customer) ---- */
 function supColour(id){ const P = ['#4f7cac', '#a8763e', '#7a6fa8', '#4f8a5b', '#8a5a7a', '#2f7f86', '#c9822f', '#9a5a4a']; const i = state.suppliers.findIndex(s => s.id === id); return i < 0 ? '#8b867c' : P[i % P.length]; }
 function qCashItems(q, c){
   c = c || qCalc(q);
   const out = [], vatOn = qVatOn(), defRate = (Number(state.settings.vatRate) || 0) / 100, trade = Number(state.settings.tradeAccountDays) || 0, anchor = addDaysIso(qAcceptedDate(q), trade);
-  const gross = l => c.lines[l.id].lineCost * (vatOn ? 1 + (Number(l.vatRate) || 0) / 100 : 1);
+  const gross = l => c.lines[l.id].excluded ? 0 : c.lines[l.id].lineCost * (vatOn ? 1 + (Number(l.vatRate) || 0) / 100 : 1);
   q.drops.forEach((d, i) => {
     const tagged = q.lines.filter(l => l.deliveryDropId === d.id), mat = tagged.reduce((a, l) => a + gross(l), 0), del = (Number(d.charge) || 0) * (vatOn ? 1 + defRate : 1), amt = r2(mat + del);
     if(amt > 0) out.push({ kind: 'out', date: d.paymentDueDate || anchor, estimated: !d.paymentDueDate, amount: amt, label: (d.method === 'collect' ? 'Collection: ' : 'Delivery: ') + (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop ' + (i + 1))), supplierId: d.supplierId || '', qid: q.id, ref: qRef(q), status: q.status });
@@ -5730,7 +5903,7 @@ function qMonthly(items){
 }
 
 /* ---- as sold ---- */
-function qLabourDays(r){ const q = Number(r.qty) || 0; return r.basis === 'day' ? q : r.basis === 'halfday' ? q * 0.5 : r.basis === 'hour' ? q / hpd() : 0; }
+function qLabourDays(r){ const f = n => r.basis === 'day' ? n : r.basis === 'halfday' ? n * 0.5 : r.basis === 'hour' ? n / hpd() : (r.basis === 'fixed' ? n : 0); return f(Number(r.qty) || 0) * (r.basis === 'fixed' ? 0 : 1) + f(Number(r.helperQty) || 0); }   // helper time counts as person-days too
 function qSnapshot(q){
   const c = qCalc(q), rows = q.labour.map(r => ({ description: r.description, basis: r.basis, qty: r.qty, rate: r.rate, amount: c.labour[r.id].amount, days: qLabourDays(r), hours: qLabourDays(r) * hpd() }));
   const un = c.unpaid; if(q.recoverUnpaid && (un.hours > 0 || un.amount)) rows.push({ description: 'Unpaid time recovered', basis: 'hour', qty: un.hours, rate: un.rate, amount: un.amount, days: 0, hours: 0 });
@@ -5747,30 +5920,32 @@ function qActual(q){
 function qActualHtml(q){
   const s = q.asSold; if(!s) return '';
   const a = qActual(q), vd = a.paidDays - s.labourDays, vm = s.dayRate > 0 ? vd * s.dayRate : null, dd = a.drops - s.deliveryEx;
-  const col = v => Math.abs(v) < 0.005 ? '' : (v > 0 ? ' q-over' : ' q-under'), word = v => Math.abs(v) < 0.005 ? 'on plan' : (v > 0 ? 'over' : 'under');
-  const row = (l, sold, act, vr, cls, w) => `<tr><td>${l}</td><td class="q-num">${sold}</td><td class="q-num">${act}</td><td class="q-num${cls}">${vr}</td><td class="${cls.trim()}">${w}</td></tr>`;
-  return `<div class="card"><div class="qb-sec-h"><h3>Actual vs sold</h3></div>
+  const col = v => Math.abs(v) < 0.005 ? '' : (v > 0 ? 'q-over' : 'q-under'), word = v => Math.abs(v) < 0.005 ? 'on plan' : (v > 0 ? 'over' : 'under');
+  const sg = (v, f) => (v > 0 ? '+' : v < 0 ? '−' : '') + f(Math.abs(v));
+  const t = (title, sold, act, vr, cls, w) => `<div class="qb-t2"><h4>${title}</h4>
+    <div class="qb-t2-3"><div><small>Sold</small><b>${sold || '—'}</b></div><div><small>Actual</small><b>${act || '—'}</b></div><div class="${cls || ''}"><small>Variance</small><b>${vr || '—'}</b>${w ? `<em>${w}</em>` : ''}</div></div></div>`;
+  return `<div class="card qb-avs"><div class="qb-sec-h"><h3>Actual vs sold</h3></div>
     <p class="q-help" style="margin:0 0 8px;">As sold on ${escHtml(s.date)} (frozen). Logged days come from the Paid stage lines on the linked deal, at ${hpd()} hours per day.</p>
-    <table class="qb-sum qb-avs"><thead><tr><th></th><th>Sold</th><th>Actual</th><th>Variance</th><th></th></tr></thead><tbody>
-      ${row('Labour days', dys(s.labourDays), dys(a.paidDays), (vd > 0 ? '+' : '') + dys(vd), col(vd), word(vd))}
-      ${row('Labour £ (variance × day rate' + (s.dayRate > 0 ? ' ' + qm(s.dayRate) : ', no day rate set') + ')', qm(s.labourEx), '', vm === null ? '—' : (vm > 0 ? '+' : vm < 0 ? '−' : '') + qm(Math.abs(vm)), vm === null ? '' : col(vm), vm === null ? '' : word(vm))}
-      ${row('Unpaid hours logged', '', hrs(a.unpaidH) + (a.unpaidPlan ? ' of ' + hrs(a.unpaidPlan) + ' planned' : ''), '', '', '')}
-      ${row('Delivery (ex VAT) vs drops entered', qm(s.deliveryEx), qm(a.drops), (dd > 0 ? '+' : dd < 0 ? '−' : '') + qm(Math.abs(dd)), col(dd), word(dd))}
-      ${row('Actual materials', qm(s.materialsCost) + ' cost', 'to come', '', '', '')}
-    </tbody></table></div>`;
+    <div class="qb-tilegrid">
+      ${t('Labour days', dys(s.labourDays), dys(a.paidDays), sg(vd, dys), col(vd), word(vd))}
+      ${t('Labour £' + (s.dayRate > 0 ? ' (variance × ' + qm(s.dayRate) + ' day rate)' : ' (no day rate set)'), qm(s.labourEx), '', vm === null ? '' : sg(vm, qm), vm === null ? '' : col(vm), vm === null ? '' : word(vm))}
+      ${t('Unpaid hours logged', '', hrs(a.unpaidH) + (a.unpaidPlan ? ' of ' + hrs(a.unpaidPlan) + ' planned' : ''), '', '', '')}
+      ${t('Delivery ex VAT vs drops entered', qm(s.deliveryEx), qm(a.drops), sg(dd, qm), col(dd), word(dd))}
+      ${t('Materials', qm(s.materialsCost) + ' cost', 'to come', '', '', '')}
+    </div></div>`;
 }
 function qAsSoldHtml(q){
   const s = q.asSold; if(!s) return '';
-  return `<div class="card"><div class="qb-sec-h"><h3>As sold</h3><span class="qb-mode">Locked ${escHtml(s.date)}</span></div>
-    <table class="qb-sum"><tbody>
-      <tr><td>Labour (${dys(s.labourDays)} · ${hrs(s.labourHours)})</td><td class="q-num">${qm(s.labourEx)}</td></tr>
-      ${s.labourRows.map(r => `<tr class="qb-dimrow"><td>&nbsp;&nbsp;${escHtml(r.description || 'Labour')}: ${r.basis === 'fixed' ? 'fixed' : (Math.round(r.qty * 100) / 100) + ' × ' + escHtml(r.basis)}</td><td class="q-num">${qm(r.amount)}</td></tr>`).join('')}
-      <tr><td>Materials cost / price ex VAT</td><td class="q-num">${qm(s.materialsCost)} / ${qm(s.materialsEx)}</td></tr><tr><td>Delivery ex VAT</td><td class="q-num">${qm(s.deliveryEx)}</td></tr>
-      <tr class="qb-sum-strong"><td>Total ex VAT</td><td class="q-num">${qm(s.totalEx)}</td></tr><tr><td>VAT</td><td class="q-num">${qm(s.vat)}</td></tr><tr class="qb-sum-strong"><td>Total inc VAT</td><td class="q-num">${qm(s.totalInc)}</td></tr>
-      <tr><td>Margin after wages</td><td class="q-num">${qm(s.marginAfter)} (${qpct(s.pctAfter)})</td></tr><tr><td>Margin before wages</td><td class="q-num">${qm(s.marginBefore)} (${qpct(s.pctBefore)})</td></tr></tbody></table></div>`;
+  const t = (title, rows, cls) => `<div class="qb-t2${cls ? ' ' + cls : ''}"><h4>${title}</h4>${rows.map(([k, v, c]) => `<div class="qb-t2-r${c ? ' ' + c : ''}"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;
+  const labRows = s.labourRows.map(r => [escHtml(r.description || 'Labour') + ': ' + (r.basis === 'fixed' ? 'fixed' : (Math.round(r.qty * 100) / 100) + ' × ' + escHtml(r.basis)), qm(r.amount), 'dim']);
+  return `<div class="card qb-as"><div class="qb-sec-h"><h3>As sold</h3><span class="qb-mode">Locked ${escHtml(s.date)}</span></div>
+    <div class="qb-tilegrid">
+      ${t('Labour', [[`Total (${dys(s.labourDays)} · ${hrs(s.labourHours)})`, qm(s.labourEx), 'strong']].concat(labRows))}
+      ${t('Materials and delivery', [['Materials cost', qm(s.materialsCost)], ['Materials price ex VAT', qm(s.materialsEx)], ['Delivery ex VAT', qm(s.deliveryEx)]])}
+      ${t('Price', [['Total ex VAT', qm(s.totalEx), 'strong'], ['VAT', qm(s.vat)], ['Total inc VAT', qm(s.totalInc), 'strong']])}
+      ${t('Margin', [['After wages', `${qm(s.marginAfter)} <small>${qpct(s.pctAfter)}</small>`, 'strong'], ['Before wages', `${qm(s.marginBefore)} <small>${qpct(s.pctBefore)}</small>`]])}
+    </div></div>`;
 }
-
-/* ---- seed: Guy Nunn's deal, stage lines, drops (once, onto the step 2 sample quote) ---- */
 function qSeedLink(o){
   const q = o.quotes.find(x => String(x.refOverride).trim() === 'BWR001' && x.customer === 'Guy Nunn'); if(!q) return;
   const NAME = 'Guy Nunn - Step Replacement', has = r => String(r.name || r.projectName || '').trim().toLowerCase() === NAME.toLowerCase();
@@ -5819,23 +5994,27 @@ function qbDealHtml(q){
 }
 function qbLabourHtml(q){
   const un = qUnpaid(q), unpaidRow = q.recoverUnpaid ? `<tr class="qb-autorow"><td><b>Unpaid time recovered</b><div class="q-help">${hrs(un.hours)} of unpaid stage-line time (logged hours, else planned) × the hourly labour rate${un.rateMissing ? '' : ' of ' + qm(un.rate)}</div></td>
-      <td>Auto</td><td class="qb-calc" data-qc="unpaid|hours">${hrs(un.hours)}</td><td class="qb-calc">${un.rateMissing ? '—' : qm(un.rate)}</td>
+      <td>Auto</td><td class="qb-calc" data-qc="unpaid|hours">${hrs(un.hours)}</td><td></td><td class="qb-calc">${un.rateMissing ? '—' : qm(un.rate)}</td>
       <td class="qb-calc"><input type="number" step="any" min="0" class="qb-n" data-qb="hdr" data-f="unpaidOverride" value="${q.unpaidOverride === '' ? '' : escAttr(q.unpaidOverride)}" placeholder="${un.amount ? un.amount.toFixed(2) : '0.00'}" aria-label="Unpaid time recovered amount">
-        <span class="qb-ov" data-qc="unpaid|ov"${un.overridden ? '' : ' hidden'}>overridden <button type="button" class="sp-link" data-qba="unpaid-reset">reset</button></span></td><td></td><td></td><td></td></tr>` : '';
-  const rows = q.labour.map((r, i) => `<tr data-drag="qlab" data-ix="${i}"><td class="dg">${DRAG_H}${qbIn('lab', r.id, 'description', r.description, { aria: 'Labour description' })}</td>
+        <span class="qb-ov" data-qc="unpaid|ov"${un.overridden ? '' : ' hidden'}>overridden <button type="button" class="sp-link" data-qba="unpaid-reset">reset</button></span></td><td></td><td></td><td></td><td></td></tr>` : '';
+  const hr = Number(state.settings.helperRateDay) || 0;
+  const rows = q.labour.map((r, i) => `<tr data-drag="qlab" data-ix="${i}"${qExcluded(q, r) ? ' class="qb-excl"' : ''}><td class="dg">${DRAG_H}${qbIn('lab', r.id, 'description', r.description, { aria: 'Labour description' })}</td>
     <td>${qbSel('lab', r.id, 'basis', qbOpts(LAB_BASES, r.basis), { aria: 'Basis' })}</td><td>${qbIn('lab', r.id, 'qty', r.qty, { num: true, cls: 'qb-n', aria: 'Qty' })}</td>
+    <td title="${hr ? 'Helper (second pair of hands) time in the same unit, at the helper day rate of ' + qm(hr) : 'Set the helper day rate in Settings first'}">${qbIn('lab', r.id, 'helperQty', r.helperQty, { num: true, cls: 'qb-n', aria: 'Helper time', ph: '0' })}</td>
     <td>${qbIn('lab', r.id, 'rate', r.rate, { num: true, cls: 'qb-n', aria: 'Rate £', ph: 'Rate' })}</td><td class="qb-calc" data-qc="${r.id}|amount">—</td>
     <td>${qbIn('lab', r.id, 'customerGroup', r.customerGroup, { aria: 'Customer group' })}</td>
+    <td>${qbIn('lab', r.id, 'optGroup', r.optGroup, { aria: 'Optional group', ph: 'none' }).replace('<input', '<input list="qbOptList"')}</td>
     <td class="qb-c"><input type="checkbox" data-qb="lab" data-id="${r.id}" data-f="showOnQuote"${r.showOnQuote ? ' checked' : ''} aria-label="Show on quote"></td>
     <td><button class="icon-btn" data-qba="lab-del" data-id="${r.id}" aria-label="Delete labour row">${X_SVG}</button></td></tr>`).join('');
+  const helperWarn = !hr && q.labour.some(r => Number(r.helperQty) > 0) ? `<p class="qb-warn" style="margin:8px 0 0;">⚠ Helper time is entered but the helper day rate is not set in Settings &gt; Quotes &amp; pricing &gt; Labour and margin, so it adds £0.</p>` : '';
   const unpaidNote = q.recoverUnpaid
     ? (un.rateMissing ? `<p class="qb-warn" style="margin:8px 0 0;">⚠ Set the hourly labour rate in Settings &gt; Quotes &amp; pricing &gt; Labour and margin. Until then the recovered row counts as £0.</p>` : '')
     : `<p class="q-help" id="qbUnpaidInfo" style="margin:10px 0 0;">${un.hours > 0 ? `<b>Unpaid time (not charged):</b> ${hrs(un.hours)}${un.rateMissing ? ', set the hourly labour rate in Settings to see its cost' : `, ${qm(r2(un.hours * un.rate))} at the labour rate of ${qm(un.rate)} an hour`}.` : 'No unpaid stage-line time on the linked deal yet.'}</p>`;
   return `<div class="card"><div class="qb-sec-h"><h3>Labour</h3><div class="qb-sec-tools"><button class="btn secondary" data-qba="add-allowance">Add flat allowance</button><button class="btn" data-qba="add-lab">+ Add labour</button></div></div>
-    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Description</th><th>Basis</th><th>Qty</th><th>Rate (£)</th><th>Amount</th><th>Customer group</th><th>Show</th><th></th></tr></thead>
-    <tbody>${rows}${unpaidRow}${(!rows && !unpaidRow) ? '<tr><td colspan="8"><div class="sup-empty">No labour yet.</div></td></tr>' : ''}</tbody></table></div>
-    <label class="q-check" style="margin-top:12px;"><input type="checkbox" data-qb="hdr" data-f="recoverUnpaid"${q.recoverUnpaid ? ' checked' : ''}> Recover unpaid time inside labour</label>${unpaidNote}
-    <p class="q-help">Labour rates default from Settings &gt; Quotes &amp; pricing. With the switch on, an automatic row adds the unpaid time from the linked deal's stage lines; type an amount to override it.</p></div>`;
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Description</th><th>Basis</th><th>Qty</th><th title="Second pair of hands: time in the same unit as the basis">Helper</th><th>Rate (£)</th><th>Amount</th><th>Customer group</th><th>Optional group</th><th>Show</th><th></th></tr></thead>
+    <tbody>${rows}${unpaidRow}${(!rows && !unpaidRow) ? '<tr><td colspan="10"><div class="sup-empty">No labour yet.</div></td></tr>' : ''}</tbody></table></div>
+    <label class="q-check" style="margin-top:12px;"><input type="checkbox" data-qb="hdr" data-f="recoverUnpaid"${q.recoverUnpaid ? ' checked' : ''}> Recover unpaid time inside labour</label>${unpaidNote}${helperWarn}
+    <p class="q-help">Labour rates default from Settings &gt; Quotes &amp; pricing. Helper time is charged at the helper day rate there (a half-day is half of it, an hour is a day ÷ hours per day). With the unpaid switch on, an automatic row adds the unpaid time from the linked deal's stage lines; type an amount to override it.</p></div>`;
 }
 function qbPaymentsHtml(q){
   const rows = q.payments.map((r, i) => `<tr data-drag="qpay" data-ix="${i}"><td class="dg">${DRAG_H}${qbIn('pay', r.id, 'label', r.label, { aria: 'Payment label' })}</td>
@@ -5843,31 +6022,32 @@ function qbPaymentsHtml(q){
     <td>${qbSel('pay', r.id, 'dueMode', qbOpts([['afterEnd', 'Days after the last stage ends'], ['completion', 'On completion (last stage end)'], ['acceptance', 'On acceptance'], ['date', 'A set date']], r.dueMode), { aria: 'Due' })}</td>
     <td>${r.dueMode === 'date' ? `<input type="date" data-qb="pay" data-id="${r.id}" data-f="date" value="${escAttr(r.date)}" aria-label="Due date">` : (r.dueMode === 'afterEnd' ? qbIn('pay', r.id, 'days', r.days, { num: true, cls: 'qb-n', ph: String(Number(state.settings.paymentTermsDays) || 0), aria: 'Days' }) : '')}</td>
     <td class="qb-calc" data-qc="${r.id}|payAmt">—</td><td class="qb-calc" data-qc="${r.id}|payDate">—</td>
+    <td class="qb-ovr-cell"><input type="date" data-qb="pay" data-id="${r.id}" data-f="dueOverride" value="${escAttr(r.dueOverride)}" aria-label="Manual due date (overrides the automatic date)" title="Type a date to override the automatic due date. It is kept when the quote recalculates."${r.dueOverride ? ' class="qb-manual"' : ''}>${r.dueOverride ? `<button type="button" class="sp-link" data-qba="pay-ov-reset" data-id="${r.id}" title="Go back to the automatic date">reset</button>` : ''}</td>
     <td><button class="icon-btn" data-qba="pay-del" data-id="${r.id}" aria-label="Delete payment row">${X_SVG}</button></td></tr>`).join('');
   return `<div class="card"><div class="qb-sec-h"><h3>Customer payment schedule</h3><button class="btn" data-qba="add-pay">+ Add payment</button></div>
-    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Label</th><th></th><th>Amount</th><th>Due</th><th>Days / date</th><th>£</th><th>Due date</th><th></th></tr></thead>
-    <tbody>${rows || '<tr><td colspan="8"><div class="sup-empty">No payments yet.</div></td></tr>'}</tbody></table></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Label</th><th></th><th>Amount</th><th>Due</th><th>Days / date</th><th>£</th><th>Due date</th><th title="Optional: a typed date that overrides the automatic one">Manual date</th><th></th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="9"><div class="sup-empty">No payments yet.</div></td></tr>'}</tbody></table></div>
     <div class="qb-unalloc" id="qbUnalloc" role="status">—</div>
-    <p class="q-help">Rows must add up to the total ${qVatOn() ? 'inc VAT' : '(VAT is off, so ex VAT)'}. A quote cannot be marked Sent while any of it is unallocated. The due date follows the linked deal's stage lines.</p></div>`;
+    <p class="q-help">Rows must add up to the total ${qVatOn() ? 'inc VAT' : '(VAT is off, so ex VAT)'}. A quote cannot be marked Sent while any of it is unallocated. The due date follows the linked deal's stage lines unless you type a manual date (marked “manual”), which stays put when the quote recalculates.</p></div>`;
 }
 function qbCashHtml(q, c){
   const items = qCashItems(q, c), months = qMonthly(items); if(!items.length) return '';
   let cum = 0;
   return `<div class="card"><div class="qb-sec-h"><h3>Cash by month (this project)</h3></div>
     <p class="q-help" style="margin:0 0 8px;">${q.status === 'Accepted' ? 'This quote is Accepted, so these movements are in the Cash Flow Forecast.' : q.status === 'Sent' ? 'This quote is Sent, so these movements show in the Cash Flow Forecast as “if won”.' : 'Preview only: ' + q.status + ' quotes do not appear in the Cash Flow Forecast.'} Outflows are paid on each drop's payment due date${qVatOn() ? ', with VAT' : ''}.</p>
-    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Month</th><th>In</th><th>Out</th><th>Net</th><th>Running net</th></tr></thead><tbody>
+    <div class="qb-scroll"><table class="qb-table qb-narrow" data-flip="qcash-m"><thead><tr><th>Month</th><th>In</th><th>Out</th><th>Net</th><th>Running net</th></tr></thead><tbody>
     ${months.map(m => { const net = m.inn - m.out; cum += net; return `<tr><td>${monthLabel(toDate(m.key + '-01'))}</td><td class="qb-calc">${qm(m.inn)}</td><td class="qb-calc">${qm(m.out)}</td><td class="qb-calc${net < 0 ? ' q-over' : ''}"><b>${net < 0 ? '−' : ''}${qm(Math.abs(net))}</b></td><td class="qb-calc">${cum < 0 ? '−' : ''}${qm(Math.abs(cum))}</td></tr>`; }).join('')}
     </tbody></table></div>
-    <div class="qb-scroll" style="margin-top:10px;"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>What</th><th>In / out</th><th>Amount</th></tr></thead><tbody>
+    <div class="qb-scroll" style="margin-top:10px;"><table class="qb-table qb-narrow" data-flip="qcash-d"><thead><tr><th>Date</th><th>What</th><th>In / out</th><th>Amount</th></tr></thead><tbody>
     ${items.sort((a, b) => a.date.localeCompare(b.date)).map(i => `<tr><td>${escHtml(i.date)}${i.estimated ? ' <span class="qb-dim">(est.)</span>' : ''}</td><td>${i.supplierId ? `<i class="q-dot" style="background:${supColour(i.supplierId)}"></i>` : ''}${escHtml(i.label)}</td><td>${i.kind === 'in' ? 'In' : 'Out'}</td><td class="qb-calc">${qm(i.amount)}</td></tr>`).join('')}
     </tbody></table></div></div>`;
 }
 /* the parts of the builder that are recalculated live (no inputs inside, so they are simply rewritten) */
 function qbLiveParts(q, c){
   const el = document.getElementById('qbActual'); if(el) el.innerHTML = qActualHtml(q);
-  const ce = document.getElementById('qbCash'); if(ce) ce.innerHTML = qbCashHtml(q, c);
+  const ce = document.getElementById('qbCash'); if(ce){ ce.innerHTML = qbCashHtml(q, c); cfFlipAll(ce); }
   const pa = qPayAlloc(q, c);
-  pa.rows.forEach(x => { const a = document.querySelector(`[data-qc="${x.row.id}|payAmt"]`), d = document.querySelector(`[data-qc="${x.row.id}|payDate"]`); if(a) a.textContent = qm(x.amount); if(d) d.textContent = x.date || 'set the stage dates'; });
+  pa.rows.forEach(x => { const a = document.querySelector(`[data-qc="${x.row.id}|payAmt"]`), d = document.querySelector(`[data-qc="${x.row.id}|payDate"]`); if(a) a.textContent = qm(x.amount); if(d) d.innerHTML = x.date ? escHtml(x.date) + (x.row.dueOverride ? ' <span class="qb-flag manual" title="A manual date: it is kept when the quote recalculates">manual</span>' : '') : 'set the stage dates'; });
   const ua = document.getElementById('qbUnalloc');
   if(ua){ const z = Math.abs(pa.unallocated) < 0.005; ua.className = 'qb-unalloc ' + (z ? 'ok' : 'bad'); ua.textContent = z ? `Fully allocated: ${qm(pa.payable)}` : `Unallocated: ${pa.unallocated < 0 ? '−' : ''}${qm(Math.abs(pa.unallocated))} of ${qm(pa.payable)}`; }
   qcdRefresh(q, c);
@@ -5877,8 +6057,8 @@ function qbLiveParts(q, c){
 }
 function qbLock(q){
   const box = document.getElementById('quoteBuilderView'), lock = qLocked(q);
-  box.querySelectorAll('[data-qb]').forEach(el => { if(el.dataset.f === 'status' || el.dataset.f === 'viewMode' || el.closest('#lpBody')) return; el.disabled = lock; });
-  box.querySelectorAll('[data-qba]').forEach(b => { if(['add-line', 'line-up', 'line-down', 'line-dup', 'line-del', 'del-supcol', 'add-lab', 'add-allowance', 'lab-del', 'add-drop', 'drop-del', 'add-pay', 'pay-del', 'use-new', 'unpaid-reset'].includes(b.dataset.qba)) b.disabled = lock; });
+  box.querySelectorAll('[data-qb]').forEach(el => { if(el.dataset.f === 'status' || el.dataset.f === 'viewMode' || el.dataset.f === 'openVersion' || el.closest('#lpBody')) return; el.disabled = lock; });
+  box.querySelectorAll('[data-qba]').forEach(b => { if(['add-line', 'line-up', 'line-down', 'line-dup', 'line-del', 'del-supcol', 'add-lab', 'add-allowance', 'lab-del', 'add-drop', 'drop-del', 'add-pay', 'pay-del', 'use-new', 'unpaid-reset', 'pay-ov-reset'].includes(b.dataset.qba)) b.disabled = lock; });
   const sp = document.getElementById('qbAddSup'); if(sp) sp.disabled = lock;
   box.classList.toggle('qb-locked', lock);
 }
@@ -6029,10 +6209,11 @@ function renderCashflowQuotes(){
   const items = qAllCashItems(); if(!items.length){ box.innerHTML = ''; return; }
   box.innerHTML = `<div class="card" style="margin-top:14px;"><div class="qb-sec-h"><h3>Quote cash movements</h3></div>
     <p class="q-help" style="margin:0 0 8px;">Solid rows are Accepted quotes and are in the totals above. Dashed rows are Sent quotes, shown “if won”, and are not in the closing balance. A deal with a Sent or Accepted quote is counted from the quote, not from its stage costs.</p>
-    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Quote</th><th>What</th><th>In / out</th><th>Amount</th><th></th></tr></thead><tbody>
+    <div class="qb-scroll"><table class="qb-table qb-narrow" data-flip="cfquotes"><thead><tr><th>Date</th><th>Quote</th><th>What</th><th>In / out</th><th>Amount</th><th></th></tr></thead><tbody>
     ${items.map(i => `<tr class="${i.status === 'Accepted' ? '' : 'cf-ifwon'}"><td>${escHtml(i.date)}${i.estimated ? ' <span class="qb-dim">(est.)</span>' : ''}</td><td><button class="sp-link" data-qba="open-quote" data-id="${i.qid}">${escHtml(i.ref)}</button></td>
       <td>${i.supplierId ? `<i class="q-dot" style="background:${supColour(i.supplierId)}"></i>` : ''}${escHtml(i.label)}</td><td>${i.kind === 'in' ? 'In' : 'Out'}</td><td class="qb-calc">${qm(i.amount)}</td><td>${i.status === 'Accepted' ? '' : 'if won'}</td></tr>`).join('')}
     </tbody></table></div></div>`;
+  cfFlipAll(box);
 }
 document.addEventListener('change', (e) => { if(e.target.id === 'qAgeSup'){ qUi.ageSup = e.target.value; renderQuoteAgeing(); } });
 
@@ -6043,7 +6224,7 @@ document.addEventListener('change', (e) => { if(e.target.id === 'qAgeSup'){ qUi.
 const VIEW_MODES = [
   ['A', 'Total only', 'One total, with the project description.'],
   ['B', 'Groups with prices', 'Each customer group with its price, and a total.'],
-  ['C', 'Groups listing items, no prices', 'Each group heading with its items (description and quantity). Only the grand total is priced unless group prices are switched on in Settings.'],
+  ['C', 'Groups with prices and item lists', 'Each group as a sub-header with its price (as mode B), and under it the items it covers (description and quantity, no prices).'],
   ['D', 'Fully itemised', 'Every line with quantity, price each and line price, under group headings.']
 ];
 const QLIBS = {
@@ -6083,12 +6264,14 @@ function qBrand(){
 function qGroups(q, c){
   const st = state.settings, tpl = q.mode === 'template', defRate = (Number(st.vatRate) || 0) / 100, map = {}, order = [];
   const get = n => map[n] || (order.push(map[n] = { name: n, exRaw: 0, incRaw: 0, items: [], ex: 0, inc: 0 }), map[n]);
+  const optMap = {};   // optional groups that are not ticked: listed as extras, never in the total
+  const getOpt = n => optMap[n] || (optMap[n] = { name: n, exRaw: 0, incRaw: 0, items: [], ex: 0, inc: 0 });
   q.lines.forEach(l => {
-    const x = c.lines[l.id], g = get(l.customerGroup.trim() || 'Materials'); g.exRaw += x.priceEx; g.incRaw += x.priceInc;
+    const x = c.lines[l.id], g = x.excluded ? getOpt(l.optGroup) : get(l.optGroup || l.customerGroup.trim() || 'Materials'); g.exRaw += x.priceEx; g.incRaw += x.priceInc;
     if(l.showOnQuote) g.items.push({ kind: 'line', desc: l.description, qty: x.qtyOrder, each: x.priceEach, ex: r2(x.priceEx), inc: r2(x.priceInc) });
   });
   q.labour.forEach(r => {
-    const a = c.labour[r.id].amount, v = tpl ? a * defRate : r2(a * defRate), g = get(r.customerGroup.trim() || 'Installation labour'); g.exRaw += a; g.incRaw += a + v;
+    const a = c.labour[r.id].amount, v = tpl ? a * defRate : r2(a * defRate), g = c.labour[r.id].excluded ? getOpt(r.optGroup) : get(r.optGroup || r.customerGroup.trim() || 'Installation labour'); g.exRaw += a; g.incRaw += a + v;
     if(r.showOnQuote){ const n = Number(r.qty) || 0, unit = r.basis === 'day' ? (n === 1 ? 'day' : 'days') : r.basis === 'halfday' ? (n === 1 ? 'half-day' : 'half-days') : r.basis === 'hour' ? (n === 1 ? 'hour' : 'hours') : '';
       g.items.push({ kind: 'labour', desc: r.description || 'Labour', qtyText: r.basis === 'fixed' ? '' : (Math.round(n * 100) / 100) + ' ' + unit, ex: r2(a), inc: r2(a + v) }); }
   });
@@ -6096,12 +6279,13 @@ function qGroups(q, c){
   if(c.deliveryEx){ const v = tpl ? c.deliveryEx * defRate : q.drops.reduce((s, d) => s + r2((Number(d.charge) || 0) * defRate), 0), g = get('Delivery'); g.exRaw += c.deliveryEx; g.incRaw += c.deliveryEx + v; g.items.push({ kind: 'delivery', desc: 'Delivery', ex: r2(c.deliveryEx), inc: r2(c.deliveryEx + v) }); }
   const groups = order.filter(g => g.exRaw || g.incRaw || g.items.length);
   groups.forEach(g => { g.ex = r2(g.exRaw); g.inc = r2(g.incRaw); });
+  const optional = Object.values(optMap).map(g => ({ name: g.name, ex: r2(g.exRaw), inc: r2(g.incRaw), items: g.items }));
   const adj = {};
   [['ex', c.totalEx], ['inc', c.totalInc]].forEach(([k, total]) => {
     const diff = r2(total - groups.reduce((a, g) => a + g[k], 0)); if(!groups.length || Math.abs(diff) < 0.005) return;
     const big = groups.reduce((m, g) => g[k] > m[k] ? g : m, groups[0]); big[k] = r2(big[k] + diff); adj[k] = { group: big.name, amount: diff };
   });
-  return { groups, adj };
+  return { groups, adj, optional };
 }
 function qPayDueText(q, r){
   if(r.dueMode === 'acceptance') return 'on acceptance';
@@ -6123,7 +6307,7 @@ function qCustomerDoc(q, mode, c){
   const pa = qPayAlloc(q, c), payments = q.payments.length > 1 ? pa.rows.map(x => ({ label: x.row.label || 'Payment', pct: x.row.mode === 'percent' ? (Math.round(Number(x.row.value) * 100) / 100) + '%' : '', due: qPayDueText(q, x.row), amount: x.amount })) : [];
   return { mode, vatOn, brand, title: 'QUOTATION', prepared: { name: q.customer, address: q.address }, project: q.project, ref: qRef(q), date: qDocDate(q.date), validUntil: qDocDate(validUntil),
     description: String(q.notes || '').trim(),
-    body: { groups: gr.groups.map(g => ({ name: g.name, ex: g.ex, inc: g.inc, items: g.items })), showGroupPrices: !!st.showGroupPricesC, adj: gr.adj, totalEx: c.totalEx, totalInc: c.totalInc },
+    body: { groups: gr.groups.map(g => ({ name: g.name, ex: g.ex, inc: g.inc, items: g.items })), showGroupPrices: true, adj: gr.adj, totalEx: c.totalEx, totalInc: c.totalInc, optional: gr.optional },
     summary, payments, paymentLine: payments.length ? 'Payment: ' + payments.map(p => (p.pct || qm(p.amount)) + ' ' + p.due).join(', ') : '',
     acceptance: terms.acceptance, terms,
     footer: { name: brand.name, address: terms.business.address, phone: terms.business.phone, email: terms.business.email, ref: qRef(q), vatNumber: vatOn ? String(st.vatNumber || '').trim() : '' } };
@@ -6174,13 +6358,16 @@ function qDocHtml(d){
       ${gs.map(g => `<tr><td>${e(g.name)}</td>${vat ? `<td class="n">${M(g.ex)}</td><td class="n">${M(g.inc)}</td>` : `<td class="n">${M(g.ex)}</td>`}</tr>`).join('')}
       <tr class="cd-tot"><td>Total</td>${vat ? `<td class="n">${M(d.body.totalEx)}</td><td class="n">${M(d.body.totalInc)}</td>` : `<td class="n">${M(d.body.totalEx)}</td>`}</tr></tbody></table>`;
   } else if(d.mode === 'C'){
-    body = gs.map(g => `<div class="cd-gh"><span>${e(g.name)}</span>${d.body.showGroupPrices ? `<span>${vat ? M(g.ex) + ' ex VAT · ' + M(g.inc) + ' incl. VAT' : M(g.ex)}</span>` : ''}</div>
-      <ul class="cd-list">${g.items.length ? g.items.map(i => `<li>${e(i.desc)}${i.qty != null && i.qty !== '' ? ' — qty ' + e(String(i.qty)) : (i.qtyText ? ' — ' + e(i.qtyText) : '')}</li>`).join('') : '<li>Included in the price</li>'}</ul>`).join('');
+    body = `<table><thead><tr><th>Item</th>${d.body.showGroupPrices ? (vat ? '<th class="n">Price ex VAT</th><th class="n">Price incl. VAT</th>' : '<th class="n">Price</th>') : ''}</tr></thead>
+      ${gs.map(g => `<tbody><tr class="cd-grp"><td>${e(g.name)}</td>${d.body.showGroupPrices ? (vat ? `<td class="n">${M(g.ex)}</td><td class="n">${M(g.inc)}</td>` : `<td class="n">${M(g.ex)}</td>`) : ''}</tr>
+      <tr><td colspan="${d.body.showGroupPrices ? (vat ? 3 : 2) : 1}"><ul class="cd-list">${g.items.length ? g.items.map(i => `<li>${e(i.desc)}${i.qty != null && i.qty !== '' ? ' — qty ' + e(String(i.qty)) : (i.qtyText ? ' — ' + e(i.qtyText) : '')}</li>`).join('') : '<li>Included in the price</li>'}</ul></td></tr></tbody>`).join('')}
+      <tbody><tr class="cd-tot"><td>Total</td>${d.body.showGroupPrices ? (vat ? `<td class="n">${M(d.body.totalEx)}</td><td class="n">${M(d.body.totalInc)}</td>` : `<td class="n">${M(d.body.totalEx)}</td>`) : ''}</tr></tbody></table>`;
   } else {
     const mats = gs.filter(g => g.items.some(i => i.kind === 'line'));
     body = `<table><thead><tr><th>Material</th><th class="n">Qty</th>${vat ? '<th class="n">Price each ex VAT</th><th class="n">Price incl. VAT</th>' : '<th class="n">Price each</th><th class="n">Price</th>'}</tr></thead>
       ${mats.map(g => `<tbody><tr class="cd-grp"><td colspan="4">${e(g.name)}</td></tr>${g.items.filter(i => i.kind === 'line').map(i => `<tr><td>${e(i.desc)}</td><td class="n">${i.qty}</td><td class="n">${M(i.each)}</td><td class="n">${M(vat ? i.inc : i.ex)}</td></tr>`).join('')}</tbody>`).join('')}</table>`;
   }
+  const opts = (d.body.optional || []).length ? `<div class="cd-box"><div class="cd-k">Optional extras (not included in the total above)</div><table><tbody>${d.body.optional.map(g => `<tr><td><b>${e(g.name)}</b>${g.items.length ? `<ul class="cd-list">${g.items.map(i => `<li>${e(i.desc)}${i.qty != null && i.qty !== '' ? ' — qty ' + e(String(i.qty)) : (i.qtyText ? ' — ' + e(i.qtyText) : '')}</li>`).join('')}</ul>` : ''}</td><td class="n">${vat ? M(g.ex) + ' ex VAT<br>' + M(g.inc) + ' incl. VAT' : M(g.ex)}</td></tr>`).join('')}</tbody></table></div>` : '';
   const sum = `<table class="cd-sum"><tbody>${d.summary.map(r => `<tr class="${r.total ? 'cd-tot' : ''}"><td>${e(r.label)}</td><td class="n">${r.text ? e(r.text) : M(r.amount)}</td></tr>`).join('')}</tbody></table>`;
   const pay = d.payments.length ? `<div class="cd-box"><div class="cd-k">Payment</div><p>${e(d.paymentLine)}</p><table><tbody>${d.payments.map(p => `<tr><td>${e(p.label)}</td><td>${e(p.due)}</td><td class="n">${M(p.amount)}</td></tr>`).join('')}</tbody></table></div>` : '';
   const acc = `<div class="cd-box"><p><b>${e(d.acceptance.text)}</b></p><div class="cd-sign">${d.acceptance.fields.map(f => `<span>${e(f)}</span>`).join('')}</div></div>`;
@@ -6188,8 +6375,8 @@ function qDocHtml(d){
   const t = d.terms, tb = t.business;
   const terms = `<section class="cd-terms">${head}
     <h2>${e(t.heading)}</h2>${t.sections.map(s => `<div class="cd-t-sec"><h3>${s.num} ${e(s.title)}</h3>${s.paras.map(p => `<p>${e(p)}</p>`).join('')}</div>`).join('')}
-    <div class="cd-box"><h3 style="margin-top:0">${e(t.rightToCancel.title)}</h3><p>${e(t.rightToCancel.text)}</p></div></section>`;
-  return `<div class="cd"><style>${qDocCss(b)}</style>${head}<h1>${e(d.title)}</h1>${meta}${d.description ? `<p class="cd-desc">${e(d.description)}</p>` : ''}${body}${sum}${pay}${acc}${foot}${terms}${d.snapshot ? `<div class="cd-snap">Sent snapshot (${e(d.snapshot)})</div>` : ''}</div>`;
+    ${t.rightToCancel ? `<div class="cd-box"><h3 style="margin-top:0">${e(t.rightToCancel.title)}</h3><p>${e(t.rightToCancel.text)}</p></div>` : ''}</section>`;
+  return `<div class="cd"><style>${qDocCss(b)}</style>${head}<h1>${e(d.title)}</h1>${meta}${d.description ? `<p class="cd-desc">${e(d.description)}</p>` : ''}${body}${opts}${sum}${pay}${acc}${foot}${terms}${d.snapshot ? `<div class="cd-snap">Sent snapshot (${e(d.snapshot)})</div>` : ''}</div>`;
 }
 function qPrintPage(d, title){
   const fonts = [...document.querySelectorAll('link[rel="stylesheet"]')].map(l => `<link rel="stylesheet" href="${escAttr(l.href)}">`).join('');
@@ -6263,6 +6450,10 @@ async function qBuildDocx(d){
     gs.filter(g => g.items.some(i => i.kind === 'line')).forEach(g => { rows.push([cell(g.name, W, { bold: true, fill: 'F3F1EC', span: 4 })]); g.items.filter(i => i.kind === 'line').forEach(i => rows.push([cell(i.desc, ws[0]), cell(String(i.qty), ws[1], { right: true }), cell(M(i.each), ws[2], { right: true }), cell(M(vat ? i.inc : i.ex), ws[3], { right: true })])); });
     kids.push(table(ws, rows));
   }
+  if((d.body.optional || []).length){
+    kids.push(para('Optional extras (not included in the total above)', { bold: true, color: hc, before: 160, after: 40, keepNext: true }));
+    const ow = [7004, 3200]; kids.push(table(ow, d.body.optional.map(g => [cell(g.name + (g.items.length ? ': ' + g.items.map(i => i.desc).join('; ') : ''), ow[0]), cell(vat ? M(g.ex) + ' ex VAT, ' + M(g.inc) + ' incl. VAT' : M(g.ex), ow[1], { right: true })])));
+  }
   kids.push(para('', { after: 80 }));
   const sw = [5604, 2600]; kids.push(table(sw, d.summary.map(r => [cell(r.label, sw[0], { bold: !!r.total }), cell(r.text || M(r.amount), sw[1], { bold: !!r.total, right: true })])));
   if(d.payments.length){ kids.push(para(d.paymentLine, { bold: true, before: 160, after: 60 })); const pw = [3600, 3600, 3004]; kids.push(table(pw, d.payments.map(p => [cell(p.label, pw[0]), cell(p.due, pw[1]), cell(M(p.amount), pw[2], { right: true })]))); }
@@ -6274,7 +6465,7 @@ async function qBuildDocx(d){
   kids.push(para(t.business.name || d.brand.name, { bold: true, size: 36, color: hc, pageBreakBefore: true, after: 20 })); if(t.business.tagline) kids.push(para(t.business.tagline, { italics: true, color: '555555' }));
   kids.push(heading(t.heading, HeadingLevel.HEADING_2));
   t.sections.forEach(s => { kids.push(heading(s.num + ' ' + s.title, HeadingLevel.HEADING_3)); s.paras.forEach(p => kids.push(para(p, { after: 60 }))); });
-  kids.push(table([W], [[new TableCell({ children: [para(t.rightToCancel.title, { bold: true, color: hc, after: 40 }), para(t.rightToCancel.text, { after: 0 })], borders, width: { size: W, type: WidthType.DXA }, margins: { top: 100, bottom: 100, left: 140, right: 140 } })]]));
+  if(t.rightToCancel) kids.push(table([W], [[new TableCell({ children: [para(t.rightToCancel.title, { bold: true, color: hc, after: 40 }), para(t.rightToCancel.text, { after: 0 })], borders, width: { size: W, type: WidthType.DXA }, margins: { top: 100, bottom: 100, left: 140, right: 140 } })]]));
   const font = d.brand.fontName;
   const doc = new Document({ creator: d.brand.name || 'Quote', title: d.ref + ' ' + d.prepared.name,
     styles: { default: { document: { run: { font: 'Calibri', size: 21, color: '1B1B1B' } } }, paragraphStyles: [
@@ -6316,6 +6507,7 @@ async function qBuildXlsx(q, d, internal){
     gs.filter(g => g.items.some(i => i.kind === 'line')).forEach(g => { const r = row([g.name], { bold: true, color: H, fill: 'FFF3F1EC', box: true }); ws.mergeCells(r.number, 1, r.number, 4);
       g.items.filter(i => i.kind === 'line').forEach(i => { const rr = row([i.desc, i.qty, i.each, vat ? i.inc : i.ex], { box: true }); rr.getCell(2).numFmt = '0.##'; rr.getCell(2).alignment = { horizontal: 'right', vertical: 'top' }; }); });
   }
+  if((d.body.optional || []).length){ ws.addRow([]); row(['Optional extras (not included in the total)'], { bold: true, color: H }); d.body.optional.forEach(g => row(vat ? [g.name, null, g.ex, g.inc] : [g.name, null, null, g.ex], { box: true })); }
   ws.addRow([]);
   d.summary.forEach(s => { const r = row([s.label, null, null, s.text || s.amount], { bold: !!s.total, box: true }); if(s.text) r.getCell(4).alignment = { horizontal: 'right' }; if(s.total) r.eachCell(c => { c.border = { top: { style: 'medium', color: { argb: R } }, bottom: thin, left: thin, right: thin }; }); });
   if(d.payments.length){ ws.addRow([]); const r = row([d.paymentLine], { bold: true }); ws.mergeCells(r.number, 1, r.number, 4); d.payments.forEach(p => row([p.label, null, p.due, p.amount], { box: true })); }
@@ -6478,10 +6670,10 @@ function apHash(s){ let h = 5381; for(let i = 0; i < s.length; i++) h = ((h << 5
 function apParts(q){
   const c = qCalc(q), j = JSON.stringify;
   return {
-    lines: apHash(j(q.lines.map(l => [l.id, l.qty, l.wastagePct, l.unitId, l.prices.map(p => [p.supplierId, p.price]), l.selectedSupplierId, l.costOverride, l.markupPct, l.vatRate]))),
-    labour: apHash(j([q.labour.map(r => [r.id, r.basis, r.qty, r.rate]), q.recoverUnpaid, c.unpaid.amount])),
+    lines: apHash(j(q.lines.map(l => [l.id, l.qty, l.wastagePct, l.unitId, l.prices.map(p => [p.supplierId, p.price]), l.selectedSupplierId, l.costOverride, l.markupPct, l.vatRate].concat(l.optGroup ? [l.optGroup] : [])))),
+    labour: apHash(j([q.labour.map(r => r.helperQty || r.optGroup ? [r.id, r.basis, r.qty, r.rate, r.helperQty, r.optGroup] : [r.id, r.basis, r.qty, r.rate]), q.recoverUnpaid, c.unpaid.amount].concat((q.optIncluded || []).length ? [q.optIncluded] : []))),
     drops: apHash(j(q.drops.map(d => [d.id, d.supplierId, d.date, d.method, d.charge, d.paymentDueDate, q.lines.filter(l => l.deliveryDropId === d.id).map(l => l.id)]))),
-    payments: apHash(j(q.payments.map(r => [r.id, r.mode, r.value, r.dueMode, r.date, r.days]))),
+    payments: apHash(j(q.payments.map(r => r.dueOverride ? [r.id, r.mode, r.value, r.dueMode, r.date, r.days, r.dueOverride] : [r.id, r.mode, r.value, r.dueMode, r.date, r.days]))),
     vat: apHash(j([qVatOn(), state.settings.vatRate, q.mode])),
     totals: apHash(j([c.totalEx, c.vat, c.totalInc]))
   };
@@ -7166,7 +7358,7 @@ function renderCashflow(){
     `<div><label>Starting cash balance (£)</label><input type="number" step="1" data-tab="settings" data-field="startingCash" value="${start}"></div>
      <div><label>Fixed monthly overhead (£)</label><input class="computed" disabled value="${money(totalOverhead()/12)}"></div>`;
   const months = getMonthRange(); const cf = computeCashFlow(months);
-  let html = `<table style="min-width:${200+cf.length*96}px"><thead><tr><th>Month</th>${cf.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>
+  let html = `<table data-flip="cashflow" style="min-width:${200+cf.length*96}px"><thead><tr><th>Month</th>${cf.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>
     <tr><td>Cash in — committed (projects)</td>${cf.map(c=>`<td>${money(c.committedIn)}</td>`).join('')}</tr>
     <tr><td>Cash in — weighted pipeline</td>${cf.map(c=>`<td>${money(c.weightedIn)}</td>`).join('')}</tr>
     <tr><td>Cash out — materials</td>${cf.map(c=>`<td>-${money(c.materialsOut)}</td>`).join('')}</tr>
@@ -7179,7 +7371,7 @@ function renderCashflow(){
     <tr><td>Closing balance</td>${cf.map(c=>`<td${c.closing<0?' style="color:#b3453f;font-weight:700;"':''}>${money(c.closing)}</td>`).join('')}</tr>
     <tr class="cf-ifwon"><td>Closing balance <em>(if sent quotes are won)</em></td>${cf.map(c=>`<td${c.closingIf<0?' style="color:#b3453f;font-weight:700;"':''}>${money(c.closingIf)}</td>`).join('')}</tr>
     </tbody></table>`;
-  document.getElementById('cashflowTableWrap').innerHTML = html;
+  document.getElementById('cashflowTableWrap').innerHTML = html; cfFlipAll(document.getElementById('cashflowTableWrap'));
   renderCashflowQuotes();
 }
 
