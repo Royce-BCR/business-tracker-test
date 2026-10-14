@@ -1365,6 +1365,12 @@
   .pj-tl { display: grid; grid-template-columns: 92px 1fr auto; gap: var(--bt-s2); padding: 4px 0; font-size: var(--bt-fs-sm); border-bottom: 1px solid var(--line); } .pj-tl:last-child { border-bottom: none; }
   .pj-tl-d { color: var(--text-muted); font-size: var(--bt-fs-xs); } .pj-tl-t { overflow-wrap: anywhere; } .pj-tl-g { font-size: var(--bt-fs-2xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
   .pj-gone { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-radius: var(--bt-r-btn); padding: var(--bt-s3) var(--bt-s4); margin-bottom: var(--bt-s3); font-size: var(--bt-fs-sm); }
+
+  /* quiet live refresh: a small banner, never a pop-up */
+  .lr-banner { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 60; display: flex; flex-wrap: wrap; align-items: center; gap: var(--bt-s2) var(--bt-s3); max-width: min(560px, calc(100% - 24px)); background: var(--bt-card); color: var(--ink); border: 1px solid var(--bt-warn-bd); border-left: 4px solid var(--bt-warn-fg); border-radius: var(--bt-r-btn); padding: var(--bt-s2) var(--bt-s3); font-size: var(--bt-fs-sm); box-shadow: var(--bt-shadow-2); }
+  .lr-banner[hidden] { display: none; }
+  .lr-banner .btn, .lr-banner .icon-btn { min-height: var(--bt-control); }
+  body.menu-phone.pm-bottom:not(.kb-open) .lr-banner { bottom: calc(var(--bt-bar-h) + env(safe-area-inset-bottom, 0px) + 12px); }
   .crm-filters { display: flex; gap: var(--bt-s2) 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
   .crm-filters-dyn { display: contents; }
   .crm-filters select, .crm-filters input[type=search] { width: auto; border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); font-size: var(--bt-fs-xs); max-width: 190px; }
@@ -2638,6 +2644,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
 <aside class="pj-panel" id="pjPanel" role="dialog" aria-modal="true" aria-labelledby="pjPanelTitle" hidden></aside>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button class="toast-btn" id="toastUndo" type="button">Undo</button></div>
 <div class="gantt-tip" id="ganttTip" hidden></div>
+<div class="lr-banner" id="lrBanner" role="status" aria-live="polite" hidden><span id="lrBannerText"></span><button type="button" class="btn secondary" id="lrApplyBtn">Apply now</button><button type="button" class="btn secondary" id="lrGoBtn" hidden></button><button type="button" class="icon-btn" id="lrDismiss" aria-label="Dismiss this message">×</button></div>
 
 <div class="modal-overlay" id="pwqOverlay" hidden>
   <div class="modal undo-modal" style="max-width:440px;" role="dialog" aria-label="Quick action">
@@ -14732,6 +14739,170 @@ function ivDocsHtml(){
   return `<div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>Number</th><th>Customer</th><th>Project</th><th>Issued</th><th>Due</th><th>Total</th><th>Status</th></tr></thead><tbody>${docs.map(i => `<tr><td><button type="button" class="sp-link" data-iv="open" data-id="${escAttr(i.id)}">${escHtml(i.number)}</button></td><td>${escHtml(i.customer.name || '')}</td><td>${escHtml(i.projectRef || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(i.total)}</td><td>${invPill(ivDisplayStatus(i))}</td></tr>`).join('') || '<tr><td colspan="7"><div class="sup-empty">No invoices made in the tracker yet. Use “Create invoice” on a pending line.</div></td></tr>'}</tbody></table></div></div>`;
 }
 /* BT:js-invoice end */
+/* BT:js-liverefresh begin */
+/* ---------- Quiet live refresh ----------
+   Every 30 seconds (and the moment the tab becomes visible again) ask Supabase for ONLY the row's updated_at. Same as cloudLoadedAt = do nothing.
+   Newer = fetch the document with the existing sbGetRow, and apply it only when that is safe (see lrBusy). Applying uses the same path as loadState
+   (mergeDefaults, replace state, set cloudLoadedAt, refresh the local backup) and then re-renders in place: same page, scroll, filters, open panel, focus.
+   This block READS and APPLIES only. It never calls saveState and does not touch how saves or the conflict guard work: it watches the save-status text
+   ("Saving…" is written by every saveState call) to know when a save is pending or running. Nothing here is stored in the saved document. */
+const LR_BASE_MS = 30000, LR_MAX_MS = 300000, LR_RETRY_MS = 1500, LR_TYPING_MS = 4000, LR_BANNER_AFTER = 3;
+const lr = { timer: null, running: false, applying: false, fails: 0, deferred: 0, remoteAt: '', badAt: '', dismissedFor: '', saving: false, lastSaveCall: 0, lastTyping: 0, dirty: new Set(), mine: '', obs: null };
+const lrHHMM = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+const lrIsField = el => !!el && el.nodeType === 1 && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable);
+const lrIgnore = el => !el || !el.closest || !!el.closest('#loginOverlay,[data-lr-ignore],.pj-controls,.crm-filters,.cx-filters') || el.type === 'search' || el.id === 'cloudUrl' || el.id === 'cloudKey';
+/* the save-status text is how we know a save is pending or running: every saveState call writes "Saving…" first, every finished save writes something else */
+(function lrWatchStatus(){
+  const el = document.getElementById('saveStatus'); if(!el || !window.MutationObserver) return;
+  lr.obs = new MutationObserver(() => {
+    const t = el.textContent;
+    if(t === 'Saving…'){ lr.saving = true; lr.lastSaveCall = Date.now(); }
+    else{
+      // a save that ended less than half a second after the latest "Saving…" belongs to an EARLIER call: the latest call's own timer is still waiting
+      const was = lr.saving; lr.saving = Date.now() - lr.lastSaveCall < 500;
+      if(was && !lr.saving){ lr.dirty.clear(); if(lr.deferred || lr.remoteAt) lrSchedule(LR_RETRY_MS); }   // the person's own save just finished: try again straight after
+      if(cloudConflict && /^⚠ Changed on another device/.test(t)) lrShowBanner('Newer changes from someone else are available. Your last edit was not saved, and Apply now will replace it.');   // the existing conflict handling is untouched; this only adds a one-click way to take their version
+    }
+  });
+  lr.obs.observe(el, { childList: true, characterData: true, subtree: true });
+})();
+document.addEventListener('input', (e) => { const el = e.target; if(!lrIsField(el) || lrIgnore(el)) return; lr.dirty.add(el); lr.lastTyping = Date.now(); }, true);
+document.addEventListener('change', (e) => { const el = e.target; if(!lr.dirty.has(el)) return; setTimeout(() => { if(!lr.saving && Date.now() - lr.lastSaveCall > 1500) lr.dirty.delete(el); }, 60); }, true);   // a change that started no save was screen-only
+/* why NOT to apply right now ('' = safe). Hard reasons also stop the "Apply now" button, because they would lose something the person has not saved. */
+function lrBusy(manual){
+  if(!state) return 'not loaded';
+  if(cloudConflict && !manual) return 'conflict';
+  if(lr.saving) return 'a save is running';
+  lr.dirty.forEach(el => { if(!el.isConnected) lr.dirty.delete(el); });
+  if(lr.dirty.size) return 'you are in the middle of typing';
+  const a = document.activeElement; if(lrIsField(a) && !lrIgnore(a) && Date.now() - lr.lastTyping < LR_TYPING_MS) return 'you are in the middle of typing';
+  if(document.querySelector('.modal-overlay:not([hidden])')) return 'a window is open';
+  if(pwUi.edit || pwUi.moneyEdit) return 'an edit is open';
+  if(manual) return '';
+  if(lp || taskPanel || actionPanel || detailRef || qUi.openId) return 'a record or quote is open for editing';
+  return '';
+}
+function lrCanPoll(){
+  return !!(session && state && usingCloud && cloud.enabled && cloud.key && cloudBase() && document.visibilityState === 'visible' && navigator.onLine !== false && !cloudConflict && !lr.applying);
+}
+function lrSchedule(ms){ clearTimeout(lr.timer); lr.timer = setTimeout(lrTick, ms); }
+function lrNextDelay(){ return lr.fails ? Math.min(LR_MAX_MS, LR_BASE_MS * Math.pow(2, lr.fails - 1)) : LR_BASE_MS; }   // 30s, then after failures 30s, 60s, 120s, 240s, 5 min
+async function lrTick(){
+  clearTimeout(lr.timer); lr.timer = null;
+  if(lr.running) return;   // never two at once
+  if(!lrCanPoll()){ lrSchedule(LR_BASE_MS); return; }
+  lr.running = true;
+  try{ await lrCheck(); lr.fails = 0; }
+  catch(e){ lr.fails++; lrOffline(); }
+  finally{ lr.running = false; lrSchedule(lrNextDelay()); }
+}
+async function lrCheck(){
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000); let row = null;
+  try{
+    const r = await fetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=updated_at`, { headers: sbHeaders(), signal: ctl.signal });   // the cheap check: one small column
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    row = (await r.json())[0] || null;
+  } finally { clearTimeout(to); }
+  if(!row || !row.updated_at || !lrNewer(row.updated_at)){ lr.deferred = 0; lr.remoteAt = ''; lrHideBanner(); lrLive(); return; }
+  if(row.updated_at === lr.badAt) return;   // that version could not be loaded once already: wait for a newer one
+  lr.remoteAt = row.updated_at;
+  if(lrBusy(false)){ lrDeferred(); return; }
+  const full = await sbGetRow();   // the existing helper, unchanged
+  if(!full) return;
+  if(lrBusy(false)){ lrDeferred(); return; }   // something may have started while we waited for the answer
+  lrApply(full, false);
+}
+const lrNewer = u => !cloudLoadedAt || (u !== cloudLoadedAt && new Date(u) > new Date(cloudLoadedAt));
+function lrDeferred(){ lr.deferred++; if(lr.deferred >= LR_BANNER_AFTER && lr.remoteAt !== lr.dismissedFor) lrShowBanner('Newer changes from someone else are available'); }
+/* ---------- status text ---------- */
+function lrSay(text){ setSaveStatus(text); if(lr.obs) lr.obs.takeRecords(); lr.mine = text; }   // our own words are never mistaken for a save
+function lrStatusFree(){ const t = (document.getElementById('saveStatus') || {}).textContent || ''; return !lr.saving && !cloudConflict && (t === lr.mine || /^(Saved to cloud|Loaded from cloud|Reloaded from cloud|All changes saved|Loaded your saved data|Starting from sample|Live ·|Updated by someone else|Offline)/.test(t)); }
+function lrLive(){ if(lrStatusFree()) lrSay('Live · updated ' + lrHHMM()); }
+function lrOffline(){ if(lrStatusFree()) lrSay('Offline – will keep trying'); }
+/* ---------- the small banner (never a pop-up or alert) ---------- */
+function lrShowBanner(msg, action){
+  const b = document.getElementById('lrBanner'); if(!b) return;
+  document.getElementById('lrBannerText').textContent = msg;
+  const ap = document.getElementById('lrApplyBtn'), go = document.getElementById('lrGoBtn');
+  ap.hidden = !!action; go.hidden = !action; if(action){ go.textContent = action.label; go.dataset.tab = action.tab; }
+  b.hidden = false;
+}
+function lrHideBanner(){ const b = document.getElementById('lrBanner'); if(b) b.hidden = true; }
+document.getElementById('lrApplyBtn').addEventListener('click', () => {
+  const why = lrBusy(true);
+  if(why){ lrShowBanner('Newer changes are waiting, but ' + why + '. Finish that, then press Apply now.'); lrSchedule(LR_RETRY_MS); return; }
+  lrCheckNowAndApply();
+});
+document.getElementById('lrDismiss').addEventListener('click', () => { lr.dismissedFor = lr.remoteAt; lrHideBanner(); });
+document.getElementById('lrGoBtn').addEventListener('click', (e) => { const t = e.currentTarget.dataset.tab; lrHideBanner(); if(t) activateTab(t); });
+async function lrCheckNowAndApply(){
+  if(lr.running || lr.applying) return;
+  lr.running = true;
+  try{
+    const full = await sbGetRow(); if(!full){ return; }
+    const why = lrBusy(true); if(why){ lrShowBanner('Newer changes are waiting, but ' + why + '. Finish that, then press Apply now.'); return; }
+    lrApply(full, true);
+  }catch(e){ lr.fails++; lrOffline(); lrShowBanner('Could not reach the server just now. Newer changes are still waiting.'); }
+  finally{ lr.running = false; }
+}
+/* ---------- apply ---------- */
+function lrScrollKey(el, i){ return (el.id ? '#' + el.id : '.' + String(el.className).split(/\s+/)[0] + ':' + i); }
+const LR_SCROLLERS = '.main,.table-scroll,.qb-scroll,.lp-body,.dr-body,.pj-body,.pw-nav,.lp-chips,.comms-scroll,.tk-body';
+function lrFocusSel(a){
+  if(!a || a === document.body) return null;
+  if(a.id) return '#' + CSS.escape(a.id);
+  const parts = [a.tagName.toLowerCase()];
+  Object.keys(a.dataset || {}).forEach(k => { parts.push('[data-' + k.replace(/[A-Z]/g, m => '-' + m.toLowerCase()) + '="' + CSS.escape(a.dataset[k]) + '"]'); });
+  if(a.getAttribute('aria-label')) parts.push('[aria-label="' + CSS.escape(a.getAttribute('aria-label')) + '"]');
+  return parts.join('');
+}
+function lrOpenThings(){   // what the person has open, with a way to tell after the refresh whether it is still there
+  const o = [];
+  if(pwUi.id){ const id = pwUi.id, p = state.projects.find(x => x.id === id); o.push({ what: 'project ' + (p ? recordCode(p.id, 'project') + ' ' + p.name : ''), tab: 'projectpipeline', test: s => s.projects.some(x => x.id === id), clear: () => { pwUi.id = 0; } }); }
+  if(qUi.openId){ const q = qFind(qUi.openId); const id = qUi.openId; o.push({ what: 'quote ' + (q ? qRef(q) : ''), tab: 'quotations', test: s => (s.quotes || []).some(x => x.id === id), clear: () => { qUi.openId = 0; } }); }
+  if(detailRef){ const d = detailRef; const r = findRec(d.pl, d.id); o.push({ what: 'record ' + (r ? boardTitle(d.pl, r) : ''), tab: d.pl === 'sales' ? 'salespipeline' : d.pl === 'project' ? 'projectpipeline' : 'leads', test: s => !!(d.pl === 'lead' ? s.leads : d.pl === 'sales' ? s.pipeline : s.projects).find(x => x.id === d.id), clear: () => { try{ closeDetail(); }catch(e){} } }); }
+  if(cxUi.cid){ const id = cxUi.cid, c = ctFind(id); o.push({ what: 'contact ' + (c ? ctName(c) : ''), tab: 'contacts', test: s => (s.contacts || []).some(x => x.id === id), clear: () => { cxUi.cid = ''; } }); }
+  if(cxUi.coid){ const id = cxUi.coid, c = coFind(id); o.push({ what: 'company ' + (c ? c.name : ''), tab: 'companies', test: s => (s.companies || []).some(x => x.id === id), clear: () => { cxUi.coid = ''; } }); }
+  if(poUi.open){ const id = poUi.open, po = poFind(id); o.push({ what: 'purchase order ' + (po ? po.ref : ''), tab: 'purchaseorders', test: s => (s.purchaseOrders || []).some(x => x.id === id), clear: () => { poUi.open = 0; } }); }
+  return o;
+}
+function lrApply(row, manual){
+  if(lr.applying) return false;
+  if(!row || !row.doc || !Object.keys(row.doc).length){ lr.badAt = row ? row.updated_at : ''; return false; }   // an empty document would wipe the screen: never applied
+  lr.applying = true;
+  const sx = window.scrollX, sy = window.scrollY, foc = document.activeElement, fSel = lrFocusSel(foc), fSel0 = foc && foc.selectionStart !== undefined ? [foc.selectionStart, foc.selectionEnd] : null;
+  const scr = []; document.querySelectorAll(LR_SCROLLERS).forEach((el, i) => { if(el.scrollTop || el.scrollLeft) scr.push([lrScrollKey(el, i), el.scrollTop, el.scrollLeft]); });
+  const open = lrOpenThings();
+  try{
+    if(manual){ try{ if(taskPanel || actionPanel) closeTaskPanel(); }catch(e){} try{ if(lp) closeLeadPanel(); }catch(e){} try{ if(detailRef) closeDetail(); }catch(e){} }   // the person pressed Apply now: panels holding old copies are closed first
+    const next = mergeDefaults(row.doc);   // the same path as loadState (a bad document throws here, before anything is replaced)
+    const gone = open.filter(t => !t.test(next));
+    gone.forEach(t => t.clear());           // what was open no longer exists: step out of it before drawing, instead of drawing a missing record
+    state = next; cloudLoadedAt = row.updated_at; cloudConflict = false;   // (reloadFromCloud does the same)
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}   // the local backup, exactly as loadState does
+    ensurePipelineIds();
+    render(); renderCloudStatus();
+    // put the screen back the way it was
+    window.scrollTo(sx, sy);
+    document.querySelectorAll(LR_SCROLLERS).forEach((el, i) => { const k = lrScrollKey(el, i), s = scr.find(x => x[0] === k); if(s){ el.scrollTop = s[1]; el.scrollLeft = s[2]; } });
+    if(fSel && document.activeElement !== foc){ try{ const n = document.querySelector(fSel); if(n){ n.focus({ preventScroll: true }); if(fSel0 && n.setSelectionRange) try{ n.setSelectionRange(fSel0[0], fSel0[1]); }catch(e){} } }catch(e){} }
+    requestAnimationFrame(() => { window.scrollTo(sx, sy); });
+    lr.deferred = 0; lr.remoteAt = ''; lr.dismissedFor = ''; lrHideBanner();
+    lrSay('Updated by someone else ' + lrHHMM());
+    if(gone.length){ const g = gone[0]; lrShowBanner('The ' + g.what.trim() + ' you had open was deleted by someone else, so it has been closed.', { label: 'Go to the list', tab: g.tab }); }
+    return true;
+  }catch(e){
+    lr.badAt = row.updated_at; lrShowBanner('Newer changes could not be loaded. Nothing on your screen was changed.');
+    return false;
+  }finally{ lr.applying = false; }
+}
+/* ---------- start / pause ---------- */
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') lrSchedule(0); else clearTimeout(lr.timer); });   // back in view = check straight away; hidden = no polling
+window.addEventListener('online', () => lrSchedule(0));
+window.addEventListener('offline', () => { clearTimeout(lr.timer); lrOffline(); lrSchedule(LR_BASE_MS); });
+lrSchedule(LR_BASE_MS);
+/* BT:js-liverefresh end */
+
 /* ---------- init ---------- */
 (async () => {
   loadCloudConfig();
