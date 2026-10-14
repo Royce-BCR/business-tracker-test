@@ -1503,6 +1503,14 @@
   .pw-fold-t h4 { margin: 0; } .pw-fold-sub { display: block; font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 2px; font-weight: 400; }
   .pw-fold-b { padding: 0 var(--bt-s4) 14px; } .pw-fold > .pw-fold-b[hidden] { display: none; }
   .pw-info > .pw-card, .pw-sec-b > .pw-fold { margin-bottom: 10px; }
+  /* ---- timeline grid ---- */
+  .pw-we { position: absolute; top: 0; bottom: 0; background: rgba(120, 108, 90, .075); }
+  .pw-dl { position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(60, 50, 35, .05) 1px, transparent 1px); background-repeat: repeat-x; }
+  .pw-wl { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(60, 50, 35, .08); } .pw-ml { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(60, 50, 35, .15); }
+  .pw-g-hl { position: absolute; top: 0; bottom: 0; background: rgba(168, 118, 62, .13); display: none; }
+  .pw-g-tip { position: fixed; z-index: 90; pointer-events: none; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 7px; box-shadow: var(--shadow-lift); white-space: nowrap; }
+  .pw-foot { margin-top: 2px; }
+
   /* ---- overview: one screen on a laptop ---- */
   .pw-ov { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; } .pw-ov > .pw-card { margin-bottom: 0; }
   .pw-span2 { grid-column: span 2; } .pw-span3 { grid-column: 1 / -1; }
@@ -5423,8 +5431,16 @@ function pwMiniGantt(p){
     if(e.kind === 'milestone'){ if(e.msSid) return false; if(['materialsDelivered', 'invoiced', 'paid'].includes(e.mkey) && ev.some(o => o !== e && o.kind !== 'milestone' && o.kind !== 'stage' && o.date === e.date)) return false; }
     return true;
   });
+  /* faint calendar grid behind the bars: a line per day on short spans, per Monday and per month always, weekends shaded */
+  const dow0 = toDate(lo).getDay(); let we = '', run = -1, wl = '';
+  for(let k = 0; k <= span; k++){
+    const wk = k < span && ((dow0 + k) % 7 === 0 || (dow0 + k) % 7 === 6);
+    if(wk && run < 0) run = k; else if(!wk && run >= 0){ we += `<i class="pw-we" style="left:${run / span * 100}%;width:${(k - run) / span * 100}%"></i>`; run = -1; }
+    if(k < span && (dow0 + k) % 7 === 1) wl += `<i class="pw-wl" style="left:${k / span * 100}%"></i>`;
+  }
+  const ml = months.map(m => pc(fmt(m))).filter(x => x > 0.2 && x < 99.8).map(x => `<i class="pw-ml" style="left:${x}%"></i>`).join(''), dl = span <= 130 ? `<i class="pw-dl" style="background-size:${100 / span}% 100%"></i>` : '';
   return `<div class="pw-gantt${ed ? ' editing' : ''}"><div class="pw-g-head">${months.map(m => `<span style="left:${Math.max(0, pc(fmt(m)))}%">${m.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}</span>`).join('')}</div>
-    <div class="pw-g-body"><div class="pw-g-over">${bo}<i class="pw-today" style="left:${pc(today)}%" title="Today"></i></div>${rows}
+    <div class="pw-g-body"><div class="pw-g-over" data-lo="${lo}" data-span="${span}">${dl}${we}${wl}${ml}${bo}<i class="pw-g-hl"></i><i class="pw-today" style="left:${pc(today)}%" title="Today"></i></div>${rows}
       <div class="pw-g-row"><span class="pw-g-l">Deliveries, payments, other milestones</span><div class="pw-g-t">${shared.map(e => e.kind === 'milestone' ? msm(e) : mk(e)).join('')}</div></div></div>
     <div class="pw-g-legend"><span><i class="pw-mk delivery"></i>Delivery</span><span><i class="pw-mk in"></i>Money in</span><span><i class="pw-mk out"></i>Money out</span>${['done', 'soon', 'overdue', 'future'].map(k => `<span><i class="pw-mk milestone ms-${k}"></i>Milestone ${PW_MS_LABEL[k].toLowerCase()}</span>`).join('')}<span><i class="pw-g-ghost-k"></i>Original dates</span><span><i class="pw-bo-k"></i>Blackout</span><span><i class="pw-today-k"></i>Today</span></div></div>`;
 }
@@ -5453,14 +5469,13 @@ function pwTimelineHtml(p, i){
   const sw = (state.blackouts || []).length;
   const bar = ed ? pwEditBar(p, 'timeline', `<button type="button" class="btn secondary qb-sm" data-pw="edit-baseline" title="Put every stage back to its original (baseline) dates in the draft">Reset to original dates</button>`) : '';
   return `<section class="pw-sec" id="pw-timeline" data-sec="timeline"><h3>Timeline</h3>
-    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan <span class="qb-dim">(the faint bar behind each stage is its original date)</span></h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div></div>
-    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Stages <span class="qb-dim">(stage lines: dates, planned and logged hours)</span></h4><div class="qb-sec-tools"><button class="btn secondary" data-pw="add-stage">+ Add stage</button></div></div>
-      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Start</th><th>End</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
+    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan</h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div>
+      <div class="pw-note pw-foot">The faint bar behind each stage is its original date. Weekends are shaded; rest the cursor on the chart for a moment to see the date.</div></div>
+    ${pwFold('t-stages', 'Stages', 'Stage lines: dates, planned and logged hours', '<button class="btn secondary" data-pw="add-stage">+ Add stage</button>', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Start</th><th>End</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
       <tbody>${stageRows || '<tr><td colspan="10"><div class="sup-empty">No stage lines on this project yet. Add one, or promote a deal that has stage lines.</div></td></tr>'}</tbody></table></div>
-      ${q ? '' : '<p class="q-help">Sold hours appear once an accepted quote is linked to this project.</p>'}${ed ? '' : '<p class="q-help">Dates change through Edit timeline (with Save, Discard and a reason), so slippage is always recorded.</p>'}</div>
-    <div class="pw-card pw-wide"><h4>The nine milestones <span class="qb-dim">and the stage or event each one lines up with</span></h4>
-      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Date</th><th></th><th>Lines up with</th><th>Date from there</th></tr></thead><tbody>${msRows}</tbody></table></div>
-      <p class="q-help">Milestone dates stay as you type them (and still drive the project stage). The diamond colour shows done, due soon (within a week), overdue or future; the right-hand columns show what the stages, deliveries and payments say; “use” copies that date across.</p></div></section>`;
+      ${q ? '' : '<p class="q-help">Sold hours appear once an accepted quote is linked to this project.</p>'}${ed ? '' : '<p class="q-help">Dates change through Edit timeline (with Save, Discard and a reason), so slippage is always recorded.</p>'}`, true)}
+    ${pwFold('t-ms', 'Milestones', 'The nine milestones and the stage or event each one lines up with', '', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Date</th><th></th><th>Lines up with</th><th>Date from there</th></tr></thead><tbody>${msRows}</tbody></table></div>
+      <p class="q-help">Milestone dates stay as you type them (and still drive the project stage). The diamond colour shows done, due soon (within a week), overdue or future; the right-hand columns show what the stages, deliveries and payments say; “use” copies that date across.</p>`, true)}</section>`;
 }
 function pwLineDropName(wq, id){ const d = wq.drops.find(x => x.id === id); return d ? (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop')) : 'No drop'; }
 function pwPoCell(p, x, plan){
@@ -5657,6 +5672,29 @@ function pwSpy(){
   if(cur !== pwUi.sec){ pwUi.sec = cur; el.querySelectorAll('.pw-nav button').forEach(b => b.classList.toggle('active', b.dataset.sec === cur)); }
 }
 window.addEventListener('scroll', () => { if(pwUi.id) pwSpy(); }, { passive: true });
+/* timeline chart: a faint column follows the cursor; resting on it for a moment names the date (bars and markers keep their own tooltips) */
+let pwTipT = 0, pwTipEl = null;
+function pwTipHide(){ clearTimeout(pwTipT); if(pwTipEl) pwTipEl.hidden = true; }
+document.addEventListener('mousemove', (e) => {
+  const g = e.target.closest && e.target.closest('.pw-gantt');
+  const off = () => { pwTipHide(); document.querySelectorAll('.pw-g-hl').forEach(h => { h.style.display = 'none'; }); };
+  if(!g || g.querySelector('.dragging')) return off();
+  const ov = g.querySelector('.pw-g-over'), r = ov.getBoundingClientRect();
+  if(e.clientX < r.left || e.clientX > r.right) return off();
+  const span = Number(ov.dataset.span), idx = Math.min(span - 1, Math.max(0, Math.floor((e.clientX - r.left) / r.width * span))), h = ov.querySelector('.pw-g-hl');
+  h.style.display = 'block'; h.style.left = (idx / span * 100) + '%'; h.style.width = (100 / span) + '%';
+  pwTipHide(); if(e.target.closest('.pw-g-bar, .pw-mk, .pw-g-ghost')) return;
+  const x = e.clientX, y = e.clientY;
+  pwTipT = setTimeout(() => {
+    const d = addDaysIso(ov.dataset.lo, idx), wd = toDate(d).getDay();
+    if(!pwTipEl){ pwTipEl = document.createElement('div'); pwTipEl.className = 'pw-g-tip'; pwTipEl.hidden = true; document.body.appendChild(pwTipEl); }
+    pwTipEl.textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][wd] + ' ' + pwD(d) + (wd === 0 || wd === 6 ? ' · weekend' : '');
+    pwTipEl.style.left = Math.min(window.innerWidth - 190, x + 12) + 'px'; pwTipEl.style.top = (y + 18) + 'px'; pwTipEl.hidden = false;
+  }, 1300);
+});
+document.addEventListener('mouseout', (e) => { if(!e.relatedTarget){ pwTipHide(); document.querySelectorAll('.pw-g-hl').forEach(h => { h.style.display = 'none'; }); } });
+window.addEventListener('scroll', pwTipHide, { passive: true });
+
 /* ---- draft edits: stage dates (table and dragging) and delivery drops ---- */
 function pwDraftStage(sid){ const e = pwUi.edit, p = state.projects.find(x => x.id === e.pid), s = (p.stages || []).find(x => x.id === sid); return e.draft.stages[sid] || (e.draft.stages[sid] = { start: s ? s.start || '' : '', end: s ? s.end || '' : '' }); }
 function pwDraftQuote(){ const e = pwUi.edit, p = state.projects.find(x => x.id === e.pid); return planAsQuote(projAcceptedQuote(p), e.draft.plan); }
