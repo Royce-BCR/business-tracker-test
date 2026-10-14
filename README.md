@@ -30,3 +30,16 @@ The amber banner code stays in the file when promoted. It does nothing unless `E
 ## Refreshing test data
 
 Row 2 is a copy of live data taken when this site was set up. To refresh it, copy row 1's `doc` into row 2 in Supabase.
+
+## Customers, supplier quote requests and invoices
+
+Added on the test site (all stored in the same document, all optional and defaulting empty so existing data loads unchanged):
+
+- **Contacts and Companies** (CRM menu): contacts, companies, links between them, and links to deals, quotes, invoices and payments. "Build contacts now" on the Contacts page creates contacts from existing records without merging anything; "Review duplicates" is where merges are confirmed (and undone from Undo history).
+- **Request supplier quotes** (quote > Materials): one request-for-quote document and ready-written email per supplier, with status on each supplier column and a reminder on Today when a reply is overdue.
+- **Invoices** (Invoicing > Create invoice): locked invoice documents made from the payment schedule and approved variations, with void / replacement, credit notes and payment reminders.
+- **Settings > Documents & email**: business and bank details, numbering, and the editable email templates.
+
+### Adding direct email sending later
+
+Today the app only *prepares* emails (it opens your mail app; you attach the PDF and press send). `sendEmailDirect()` in `index.html` is the empty hook, and "Direct sending: coming soon" is a disabled setting. To build it you need: an email provider (or Microsoft 365 sending), a Supabase edge function (for example `send-email`) that the page calls with the signed-in session, a verified sender domain (SPF / DKIM), the provider key stored as an edge-function secret (never in the page), and a way to attach the generated PDF (render it server-side or upload it to storage and pass a reference).
