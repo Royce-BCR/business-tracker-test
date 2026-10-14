@@ -1681,6 +1681,12 @@
 @media (max-width: 760px){ .cx-hide-m { display: none; } .cx-quick .cx-qa, .cx-qa { grid-template-columns: 1fr 1fr; } .cx-dup-cols { grid-template-columns: 1fr; } .cx-tl-row { grid-template-columns: 78px 1fr 28px; } .cx-tl-row .cx-tl-tag { display: none; } }
 @media (max-width: 560px){ .cx-hide-s { display: none; } .cx-listrow .cx-lab { width: 40%; flex-basis: 40%; } .cx-qa { grid-template-columns: 1fr; } .mail-sent { flex-wrap: wrap; } }
 .cx-skipped { margin: var(--bt-s2) 0; font-size: var(--bt-fs-sm); } .cx-skipped summary { cursor: pointer; color: var(--bt-warn-fg); font-weight: 600; } .cx-skipped div { padding: 2px 0; }
+.bt-modal, .mail-modal { margin-top: 40px; max-height: calc(100vh - 80px); }
+.rf-supgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px var(--bt-s4); }
+.rf-badge-wrap { margin-top: 3px; }
+.rf-banner { border-left: 4px solid var(--bt-oak-500); margin-bottom: var(--bt-s4); }
+.rf-hist summary { cursor: pointer; font-size: 13px; color: var(--text-muted); }
+@media (max-width: 700px){ .qb-sec-h { flex-wrap: wrap; gap: var(--bt-s2); } .qb-sec-tools { flex-wrap: wrap; } .qb-sec-tools select { max-width: 100%; } }
 /* BT:css end */
 </style>
 </head>
@@ -1797,6 +1803,7 @@
       <section class="td-card" id="todayCrm"></section>
       <section class="td-card" id="todayActions"></section>
       <section class="td-card" id="todayProjects" style="grid-column:1 / -1;"></section>
+      <section class="td-card" id="todayRfq" style="grid-column:1 / -1;" hidden></section>
     </div>
   </div>
 
@@ -2265,6 +2272,20 @@ create policy "app update" on tracker_data for update using (true) with check (t
 </div>
 
 <!-- BT:overlays begin -->
+<div class="modal-overlay" id="btOverlay" hidden>
+  <div class="modal undo-modal bt-modal" id="btModal" role="dialog" aria-modal="true" aria-labelledby="btTitle">
+    <div class="terms-top"><span class="terms-tag" id="btTitle"></span><button type="button" class="btn secondary" data-bt="close">Close</button></div>
+    <div id="btBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="btOverlay2" hidden>
+  <div class="modal undo-modal bt-modal" id="btModal2" role="dialog" aria-modal="true" aria-labelledby="btTitle2">
+    <div class="terms-top"><span class="terms-tag" id="btTitle2"></span><button type="button" class="btn secondary" data-bt="close2">Close</button></div>
+    <div id="btBody2"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="mailOverlay" hidden>
   <div class="modal undo-modal mail-modal" role="dialog" aria-modal="true" aria-labelledby="mailTitle">
     <div class="terms-top"><span class="terms-tag" id="mailTitle">Email ready to send</span><button type="button" class="btn secondary" data-mail="close">Close</button></div>
@@ -2281,20 +2302,6 @@ create policy "app update" on tracker_data for update using (true) with check (t
     <div class="mail-sent"><div class="lp-f" style="margin:0"><label for="mailDate">Date sent</label><input type="date" id="mailDate"></div><button type="button" class="btn secondary" data-mail="sent">Mark as sent</button></div>
     <p class="q-help" style="margin:8px 0 0;">This page does not send anything itself. Press <b>Mark as sent</b> only after you have sent the email from your mail app; it is then recorded on the timeline.</p>
     <div class="q-err" id="mailErr" role="alert"></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="btOverlay" hidden>
-  <div class="modal undo-modal bt-modal" id="btModal" role="dialog" aria-modal="true" aria-labelledby="btTitle">
-    <div class="terms-top"><span class="terms-tag" id="btTitle"></span><button type="button" class="btn secondary" data-bt="close">Close</button></div>
-    <div id="btBody"></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="btOverlay2" hidden>
-  <div class="modal undo-modal bt-modal" id="btModal2" role="dialog" aria-modal="true" aria-labelledby="btTitle2">
-    <div class="terms-top"><span class="terms-tag" id="btTitle2"></span><button type="button" class="btn secondary" data-bt="close2">Close</button></div>
-    <div id="btBody2"></div>
   </div>
 </div>
 <!-- BT:overlays end -->
@@ -12329,7 +12336,7 @@ function cxTimeline(owner, sc, isCompany){
   const out = [];
   (owner.timeline || []).forEach(t => out.push({ date: t.date, created: t.created, text: t.note, by: t.by, mine: true, id: t.id, auto: t.kind === 'auto' }));
   sc.deals.forEach(d => {
-    (d.rec.comms || []).forEach(c => out.push({ date: c.date, created: c.created || 0, text: commShownText(c), tag: d.code, nav: 'deal2:' + d.root }));
+    (d.rec.comms || []).filter(c => c.src !== 'rfq').forEach(c => out.push({ date: c.date, created: c.created || 0, text: commShownText(c), tag: d.code, nav: 'deal2:' + d.root }));
     if(d.rec.createdAt) out.push({ date: d.rec.createdAt, created: 0, text: `${d.pl === 'lead' ? 'Lead' : d.pl === 'sales' ? 'Deal' : 'Project'} ${d.code} created (${d.name})`, tag: d.code, nav: 'deal2:' + d.root, auto: true });
   });
   sc.quotes.forEach(q => (q.timeline || []).forEach(t => { if(t.kind === 'rfq') return; out.push({ date: t.date, created: t.created || 0, text: t.note, tag: qRef(q), nav: 'quote:' + q.id }); }));
@@ -12662,7 +12669,287 @@ document.addEventListener('change', (e) => {
 });
 /* BT:js-crm3 end */
 /* BT:js-rfq begin */
-function rfqEnsureModel(o){ return o; }
+/* =====================================================================
+   PHASE 2: MATERIALS LIST TO SUPPLIER QUOTE REQUEST (RFQ)
+   q.rfqs[] = { id, number, seq, supplierId, status 'Draft'|'Sent'|'Received'|'Declined', createdAt, createdBy, replyBy, requiredDate, ref, address, postcode, accessNotes, altOk, message,
+                includeCustomer, snapshot[{ lid, desc, spec, qty, unit, note }], sentAt, sentTo, receivedAt, declinedAt, history[{ at, date, by, what }] }
+   The snapshot uses qQtyOrder(), so the quantities asked for are exactly what the quote would order (wastage, round-up and pack sizes included).
+   ===================================================================== */
+const RF_STATUS = ['Draft', 'Sent', 'Received', 'Declined'];
+const RF_LABEL = { Draft: 'Draft', Sent: 'Sent', Received: 'Quote received', Declined: 'Declined' };
+function rfqEnsureModel(o){
+  const str = v => v == null ? '' : String(v), iso = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : '';
+  (o.quotes || []).forEach(q => {
+    q.rfqs = (Array.isArray(q.rfqs) ? q.rfqs : []).filter(r => r && typeof r === 'object' && r.id).map(r => ({
+      id: str(r.id), number: str(r.number), seq: Math.max(0, Math.floor(Number(r.seq)) || 0), supplierId: Number(r.supplierId) > 0 ? Number(r.supplierId) : 0, status: RF_STATUS.includes(r.status) ? r.status : 'Draft',
+      createdAt: iso(r.createdAt), createdBy: str(r.createdBy), replyBy: iso(r.replyBy), requiredDate: iso(r.requiredDate), ref: str(r.ref), address: str(r.address), postcode: str(r.postcode), accessNotes: str(r.accessNotes), altOk: !!r.altOk, message: str(r.message),
+      includeCustomer: !!r.includeCustomer, snapshot: (Array.isArray(r.snapshot) ? r.snapshot : []).filter(x => x && typeof x === 'object').map(x => ({ lid: str(x.lid), desc: str(x.desc), spec: str(x.spec), qty: Number(x.qty) || 0, unit: str(x.unit), note: str(x.note) })),
+      sentAt: iso(r.sentAt), sentTo: str(r.sentTo), receivedAt: iso(r.receivedAt), declinedAt: iso(r.declinedAt),
+      history: (Array.isArray(r.history) ? r.history : []).filter(h => h && typeof h === 'object').map(h => ({ at: Number(h.at) || 0, date: iso(h.date), by: str(h.by), what: str(h.what) })) }));
+    const mx = q.rfqs.reduce((a, r) => Math.max(a, r.seq), 0); if(o.settings && o.settings.rfqNext <= mx) o.settings.rfqNext = mx + 1;
+  });
+  return o;
+}
+function rfqNumber(seq){ return state.settings.rfqPrefix + String(seq).padStart(4, '0'); }
+function rfqOf(q, id){ return (q.rfqs || []).find(r => r.id === id) || null; }
+function rfqLatest(q, sid){ return (q.rfqs || []).filter(r => r.supplierId === sid).sort((a, b) => b.seq - a.seq)[0] || null; }
+function rfqStatusText(r){
+  if(!r) return 'Not requested';
+  if(r.status === 'Sent') return 'Sent ' + dShow(r.sentAt);
+  if(r.status === 'Received') return 'Quote received ' + dShow(r.receivedAt);
+  if(r.status === 'Declined') return 'Declined' + (r.declinedAt ? ' ' + dShow(r.declinedAt) : '');
+  return 'Draft';
+}
+function rfqBadgeHtml(q, sid){
+  const r = rfqLatest(q, sid), cls = r ? r.status.toLowerCase() : '';
+  const over = r && r.status === 'Sent' && r.replyBy && r.replyBy < fmt(new Date());
+  return `<span class="rf-sup-st ${cls}" title="${escAttr(r ? r.number + ': ' + rfqStatusText(r) + (r.replyBy ? ', reply by ' + dShow(r.replyBy) : '') : 'No supplier quote requested yet')}">${escHtml(rfqStatusText(r))}${over ? ' ⚠' : ''}</span>`;
+}
+function rfqSupplierName(id){ const s = supFind(id); return s ? s.name : '(removed supplier)'; }
+function rfqLog(q, r, text){
+  const who = whoName(); tlHist(r, text); tlQuote(q, `${r.number} · ${text}`, 'rfq');
+  (q.linkedIds || []).map(linkedRoot).filter((v, i, a) => v && a.indexOf(v) === i).forEach(root => tlDeal(root, `Supplier quote request ${r.number} · ${text}`, { src: 'rfq' }));
+}
+function rfqCatName(l){ const c = (state.lineCategories || []).find(x => x.id === l.categoryId); return c ? c.name : ''; }
+function rfqDefaultRequired(q, lineIds){
+  const drops = lineIds.map(id => q.lines.find(l => l.id === id)).filter(Boolean).map(l => (q.drops.find(d => d.id === l.deliveryDropId) || {}).date).filter(Boolean).sort();
+  if(drops.length) return drops[0];
+  const ld = lineIds.map(id => q.lines.find(l => l.id === id)).filter(Boolean).map(l => qLineDeliveryDate(q, l)).filter(Boolean).sort(); if(ld.length) return ld[0];
+  return qInstallStart(q) || (qStageLines(q).map(s => s.start).filter(Boolean).sort()[0]) || '';
+}
+function rfqSitePostcode(q){ const d = qDeal(q); if(!d) return ''; return String(d.rec.postcode || extractPostcode(d.rec.address) || '').trim(); }
+function rfqSnapshot(q, lineIds, notes){
+  return lineIds.map(id => q.lines.find(l => l.id === id)).filter(Boolean).map(l => ({ lid: l.id, desc: l.description, spec: rfqCatName(l), qty: qQtyOrder(q, l), unit: qUnitName(l), note: (notes && notes[l.id]) || '' }));
+}
+/* the printable request for one supplier */
+function rfqSpec(q, r){
+  const s = supFind(r.supplierId), mc = s ? supMainContact(s) : null, B = docBusiness();
+  const ask = ['Price per unit, ex VAT', 'Do your prices include VAT? (yes / no)', 'Delivery charge, and the order value above which delivery is free', 'Minimum order value', 'Lead time (days from order to delivery)', 'How long these prices are valid for', 'Your payment terms'];
+  const delivery = [r.postcode ? 'Delivery postcode: ' + r.postcode : '', r.address, r.accessNotes ? 'Site access: ' + r.accessNotes : '', 'Required on site by: ' + (r.requiredDate ? docDateLong(r.requiredDate) : 'to be agreed'), 'Alternatives: ' + (r.altOk ? 'acceptable (please say what you are offering)' : 'please quote exactly what is listed')].filter(Boolean);
+  const cust = r.includeCustomer && q.customer ? [['Customer', q.customer]] : [];
+  return { docType: 'Request for quotation', number: r.number, fileName: r.number + ' ' + rfqSupplierName(r.supplierId), draft: false,
+    meta: [['Date', docDateLong(r.createdAt)], ['Reply by', r.replyBy ? docDateLong(r.replyBy) : ''], ['Project reference', r.ref]].concat(cust),
+    to: { title: 'To', lines: [rfqSupplierName(r.supplierId), mc && mc.name ? 'FAO ' + mc.name : '', s && s.address, s && s.postcode, s && s.accountNo ? 'Our account: ' + s.accountNo : ''].filter(Boolean) },
+    aside: [{ title: 'Delivery details', lines: delivery }],
+    intro: r.message || '',
+    tables: [{ head: [{ t: 'Item' }, { t: 'Specification' }, { t: 'Quantity', n: 1 }, { t: 'Unit' }, { t: 'Notes' }], rows: r.snapshot.map(x => [x.desc, x.spec, String(x.qty), x.unit, x.note]) }],
+    blocks: [{ title: 'Please state in your reply', html: `<table class="dask">${ask.map((a, i) => `<tr><td class="l">${i + 1}. ${escHtml(a)}</td><td>&nbsp;</td></tr>`).join('')}</table>` }],
+    notes: [`Please quote ${r.number} in your reply. Send your quotation to ${B.email || 'the address above'}${r.replyBy ? ' by ' + docDateLong(r.replyBy) : ''}. This is a request for a price, not an order.`], footer: [B.name + (B.address ? ' · ' + B.address.replace(/\n/g, ', ') : ''), [B.phone, B.email].filter(Boolean).join(' · ')] };
+}
+function rfqEmailVals(q, r){
+  const s = supFind(r.supplierId), mc = s ? supMainContact(s) : null, first = mc && mc.name ? String(mc.name).trim().split(/\s+/)[0] : '';
+  return { supplier_contact_name: first || (s ? s.name : 'there'), supplier_name: s ? s.name : '', rfq_number: r.number, project: r.ref, delivery_postcode: r.postcode, reply_by_date: r.replyBy ? docDateLong(r.replyBy) : '', required_date: r.requiredDate ? docDateLong(r.requiredDate) : 'to be agreed', business_name: docBusiness().name, sender_name: whoName(), customer_first_name: '' };
+}
+function rfqEmail(q, r){
+  const t = docTpl('rfq'), v = rfqEmailVals(q, r), s = supFind(r.supplierId);
+  sendEmail({ kind: 'rfq', to: s ? supEmail(s) : '', subject: docMerge(t.subject, v), body: docMerge(t.body, v), attach: { spec: rfqSpec(q, r) }, title: `Email ${r.number} to ${rfqSupplierName(r.supplierId)}`,
+    onPrepared: () => { tlHist(r, 'Email prepared in the mail app'); saveState(); }, onSent: info => { rfqMarkSent(q, r, info); } });
+}
+function rfqMarkSent(q, r, info){
+  info = info || {}; const s = supFind(r.supplierId), to = info.to || (s ? supEmail(s) : '');
+  r.status = 'Sent'; r.sentAt = info.date || fmt(new Date()); r.sentTo = to; rfqLog(q, r, `marked as sent to ${rfqSupplierName(r.supplierId)}${to ? ' (' + to + ')' : ''} on ${dShow(r.sentAt)} by ${whoName()}`);
+  saveState(); rfUi.dirty = true; render(); rfRefreshOpen(); showToast(`${r.number} marked as sent`);
+}
+function rfqSetStatus(q, r, st, text){ r.status = st; if(st === 'Received') r.receivedAt = fmt(new Date()); if(st === 'Declined') r.declinedAt = fmt(new Date()); rfqLog(q, r, text); saveState(); rfUi.dirty = true; render(); rfRefreshOpen(); }
+
+/* ---------- the wizard ---------- */
+const rfUi = { w: null, focus: null, dirty: false };
+function rfDefaults(q){
+  const st = state.settings, lineIds = q.lines.filter(l => !qExcluded(q, l)).map(l => l.id), pc = rfqSitePostcode(q);
+  return { qid: q.id, step: 1, lineOn: new Set(lineIds), sup: [], cell: {}, fCat: '', fDrop: '', err: '', created: [], touched: {},
+    d: { replyBy: addDaysIso(fmt(new Date()), st.rfqReplyDays), requiredDate: rfqDefaultRequired(q, lineIds), address: '', postcode: pc, accessNotes: '', altOk: false, message: '', ref: q.project ? `${q.project} (${qRef(q)})` : qRef(q), includeCustomer: !!st.rfqIncludeCustomer } };
+}
+function rfOpen(q){
+  if(!q.lines.length){ showToast('Add some materials lines first'); return; }
+  const sups = state.suppliers.filter(s => s.status === 'Active');
+  if(!sups.length){ showToast('Add a supplier first (Operations > Suppliers)'); return; }
+  rfUi.w = rfDefaults(q);
+  const pre = q.supplierCols.filter(id => supFind(id)); pre.forEach(id => rfAddSupplier(id));   // suppliers already on the quote start ticked
+  rfRender(true);
+}
+function rfAddSupplier(id){ const w = rfUi.w; if(w.sup.includes(id)) return; w.sup.push(id); w.cell[id] = new Set(w.lineOn); }
+function rfRemoveSupplier(id){ const w = rfUi.w; w.sup = w.sup.filter(x => x !== id); delete w.cell[id]; }
+function rfShownLines(q){
+  const w = rfUi.w; return q.lines.filter(l => !qExcluded(q, l) && (!w.fCat || l.categoryId === w.fCat) && (!w.fDrop || (w.fDrop === '-' ? !l.deliveryDropId : l.deliveryDropId === w.fDrop)));
+}
+function rfStepsHtml(n){ return `<div class="rf-steps">${['1 Lines and suppliers', '2 Details', '3 Requests'].map((t, i) => `<span class="${i + 1 === n ? 'cur' : ''}">${t}</span>`).join('')}</div>`; }
+function rfRender(first){
+  const w = rfUi.w; if(!w) return; const q = qFind(w.qid); if(!q) return;
+  const body = document.getElementById('btBody'), top = body ? body.parentElement.scrollTop : 0; let h = '';
+  if(w.step === 1){
+    const shown = rfShownLines(q), sups = state.suppliers.filter(s => s.status === 'Active'), cats = state.lineCategories;
+    const dropOpts = '<option value="">All deliveries</option><option value="-"' + (w.fDrop === '-' ? ' selected' : '') + '>No delivery drop</option>' + q.drops.map((d, i) => `<option value="${escAttr(d.id)}"${w.fDrop === d.id ? ' selected' : ''}>${escHtml(d.label || 'Drop ' + (i + 1))}${d.date ? ' · ' + escHtml(dShow(d.date)) : ''}</option>`).join('');
+    h = `${rfStepsHtml(1)}<p class="q-help" style="margin-top:0">Choose the materials to ask about and the suppliers to ask. Quantities are exactly what this quote would order (wastage and pack sizes included). Each supplier can be sent a different set of lines.</p>
+      <div class="lp-f"><label>Suppliers <button type="button" class="link-btn" data-rf="sup-all">Select all</button> · <button type="button" class="link-btn" data-rf="sup-none">None</button></label><div class="rf-supgrid">${sups.map(s => `<label class="q-check"><input type="checkbox" data-rf="sup" data-sid="${s.id}"${w.sup.includes(s.id) ? ' checked' : ''}> ${escHtml(s.name)}${supEmail(s) ? '' : ' <span class="qb-dim">(no email)</span>'}${q.supplierCols.includes(s.id) ? ' <span class="qb-dim">on quote</span>' : ''}</label>`).join('')}</div></div>
+      <div class="cx-filters"><select data-rf="fcat" aria-label="Category"><option value="">All categories</option>${cats.map(c => `<option value="${escAttr(c.id)}"${w.fCat === c.id ? ' selected' : ''}>${escHtml(c.name)}</option>`).join('')}</select><select data-rf="fdrop" aria-label="Delivery drop">${dropOpts}</select>
+        <button type="button" class="btn secondary qb-sm" data-rf="lines-all">Tick shown</button><button type="button" class="btn secondary qb-sm" data-rf="lines-none">Untick shown</button></div>
+      <div class="rf-lines"><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Ask</th><th>Item</th><th>To order</th>${w.sup.map(id => `<th title="${escAttr(rfqSupplierName(id))}">${escHtml(supShort(supFind(id)))}<div><button type="button" class="link-btn" data-rf="col-all" data-sid="${id}">all</button> <button type="button" class="link-btn" data-rf="col-none" data-sid="${id}">none</button></div></th>`).join('')}</tr></thead><tbody>
+        ${shown.map(l => `<tr class="${w.lineOn.has(l.id) ? '' : 'rf-dim'}"><td><input type="checkbox" data-rf="line" data-id="${escAttr(l.id)}"${w.lineOn.has(l.id) ? ' checked' : ''} aria-label="Ask about ${escAttr(l.description)}"></td><td>${escHtml(l.description || '(no description)')}<div class="qb-dim">${escHtml(rfqCatName(l))}</div></td><td class="qb-calc">${qQtyOrder(q, l)} ${escHtml(qUnitName(l))}</td>${w.sup.map(id => `<td class="qb-c"><input type="checkbox" data-rf="cell" data-id="${escAttr(l.id)}" data-sid="${id}"${w.cell[id].has(l.id) ? ' checked' : ''}${w.lineOn.has(l.id) ? '' : ' disabled'} aria-label="${escAttr(rfqSupplierName(id))}"></td>`).join('')}</tr>`).join('') || `<tr><td colspan="${3 + w.sup.length}"><div class="sup-empty">No lines match these filters.</div></td></tr>`}</tbody></table></div></div>
+      <div class="q-err" role="alert">${escHtml(w.err)}</div><div class="modal-actions"><button type="button" class="btn secondary" data-bt="close">Cancel</button><button type="button" class="btn" data-rf="next">Next: details</button></div>`;
+  } else if(w.step === 2){
+    const d = w.d;
+    h = `${rfStepsHtml(2)}<div class="assumptions-grid">
+      <div class="lp-f"><label>Reply by</label><input type="date" data-rfd="replyBy" value="${escAttr(d.replyBy)}"></div>
+      <div class="lp-f"><label>Required delivery date</label><input type="date" data-rfd="requiredDate" value="${escAttr(d.requiredDate)}"><p class="q-help">${rfqDefaultRequired(q, [...w.lineOn]) ? 'From the delivery drop, or the stage start.' : 'No drop or stage date found: add one if you can.'}</p></div>
+      <div class="lp-f"><label>Delivery postcode</label><input data-rfd="postcode" value="${escAttr(d.postcode)}" autocomplete="off"></div>
+      <div class="lp-f"><label>Project reference shown to suppliers</label><input data-rfd="ref" value="${escAttr(d.ref)}" autocomplete="off"></div>
+      <div class="lp-f" style="grid-column:1/-1"><label>Delivery address (optional)</label><textarea rows="2" data-rfd="address" placeholder="Leave blank to give the postcode only">${escHtml(d.address)}</textarea></div>
+      <div class="lp-f" style="grid-column:1/-1"><label>Site access notes</label><textarea rows="2" data-rfd="accessNotes" placeholder="For example: narrow lane, maximum vehicle width, call before arriving">${escHtml(d.accessNotes)}</textarea></div>
+      <div class="lp-f" style="grid-column:1/-1"><label>Message to the supplier (optional)</label><textarea rows="3" data-rfd="message">${escHtml(d.message)}</textarea></div></div>
+      <label class="q-check"><input type="checkbox" data-rfd="altOk"${d.altOk ? ' checked' : ''}> Alternatives are acceptable (the supplier can offer an equivalent)</label><br>
+      <label class="q-check"><input type="checkbox" data-rfd="includeCustomer"${d.includeCustomer ? ' checked' : ''}> Include the customer's name on the request</label>
+      <p class="q-help">By default suppliers see only the project reference and the delivery postcode. This default is set in Settings &gt; Documents &amp; email.</p><div id="rfLeak" class="pw-qbar pw-alert-bar" ${rfLeak(q) ? '' : 'hidden'}>${rfLeak(q)}</div>
+      <div class="q-err" role="alert">${escHtml(w.err)}</div><div class="modal-actions"><button type="button" class="btn secondary" data-rf="back">Back</button><button type="button" class="btn" data-rf="create">Create requests</button></div>`;
+  } else {
+    h = `${rfStepsHtml(3)}<p class="q-help" style="margin-top:0">One request per supplier is ready. Open the document to download the PDF or print it, then send it with the ready-written email (attach the PDF yourself) and mark it as sent.</p>${w.created.map(id => rfqRowHtml(q, rfqOf(q, id), true)).join('')}<div class="modal-actions"><button type="button" class="btn" data-bt="close">Done</button></div>`;
+  }
+  btModal('Request supplier quotes · ' + qRef(q), h, { wide: true });
+  if(!first){ const m = document.getElementById('btModal'); if(m) m.scrollTop = top; }
+}
+function rfLeak(q){
+  const w = rfUi.w; if(!w || w.d.includeCustomer || !q.customer) return '';
+  const toks = String(q.customer).toLowerCase().split(/[^a-z]+/).filter(t => t.length >= 3), text = [w.d.ref, w.d.message, w.d.address, w.d.accessNotes].join(' ').toLowerCase();
+  const hit = toks.find(t => text.includes(t)); return hit ? `⚠ The text you have typed contains “${escHtml(hit)}”, which looks like part of the customer's name. Suppliers will see it.` : '';
+}
+function rfRefreshOpen(){ if(rfUi.w && btOpen(1) && rfUi.w.step === 3) rfRender(); const rc = document.getElementById('rfqCard'); if(rc) delete rc.dataset.sig; try{ rfqPost(); }catch(e){} }
+function rfqRowHtml(q, r, inModal){
+  if(!r) return '';
+  const at = `data-qid="${q.id}" data-rid="${escAttr(r.id)}"`, changed = r.snapshot.some(x => { const l = q.lines.find(y => y.id === x.lid); return !l || qQtyOrder(q, l) !== x.qty; });
+  const over = r.status === 'Sent' && r.replyBy && r.replyBy < fmt(new Date());
+  return `<div class="rf-out"><div class="qb-sec-h"><h4>${escHtml(r.number)} · ${escHtml(rfqSupplierName(r.supplierId))} <span class="rf-sup-st ${r.status.toLowerCase()}">${escHtml(rfqStatusText(r))}</span>${over ? ' <span class="qb-flag bad">reply overdue</span>' : ''}</h4><span class="qb-dim">${r.snapshot.length} line${r.snapshot.length === 1 ? '' : 's'}${r.replyBy ? ' · reply by ' + escHtml(dShow(r.replyBy)) : ''}</span></div>
+    ${changed ? '<div class="q-help"><b style="color:var(--bt-warn-fg)">The quote has changed since this was created</b> (a line or quantity is different). Create a new request if the supplier needs the update.</div>' : ''}
+    <div class="iv-acts"><button type="button" class="btn secondary qb-sm" data-rf="doc" ${at}>View / Download PDF</button><button type="button" class="btn secondary qb-sm" data-rf="print" ${at}>Print</button><button type="button" class="btn secondary qb-sm" data-rf="html" ${at}>HTML version</button>
+      <button type="button" class="btn qb-sm" data-rf="email" ${at}>Email supplier…</button>
+      ${r.status === 'Draft' ? `<button type="button" class="btn secondary qb-sm" data-rf="sent" ${at}>Mark as sent</button>` : ''}
+      ${r.status === 'Sent' || r.status === 'Received' ? `<button type="button" class="btn qb-sm" data-rf="prices" ${at}>Enter prices</button>` : ''}
+      ${r.status === 'Sent' ? `<button type="button" class="btn secondary qb-sm" data-rf="received" ${at}>Quote received</button>` : ''}
+      ${r.status === 'Draft' || r.status === 'Sent' ? `<button type="button" class="btn secondary qb-sm" data-rf="declined" ${at}>Declined</button>` : ''}
+      ${r.status === 'Draft' ? `<button type="button" class="btn secondary qb-sm" data-rf="delete" ${at}>Delete draft</button>` : ''}</div>
+    ${inModal ? '' : `<details class="rf-hist"><summary>History (${r.history.length})</summary><div class="iv-hist">${r.history.slice().reverse().map(h => `<div>${escHtml(dShow(h.date))} · ${escHtml(h.what)}</div>`).join('')}</div></details>`}</div>`;
+}
+function rfqCardHtml(q){
+  const list = (q.rfqs || []).slice().sort((a, b) => b.seq - a.seq);
+  return `<div class="card"><div class="qb-sec-h"><h3>Supplier quote requests</h3><button type="button" class="btn secondary" data-rf="open">Request supplier quotes</button></div>
+    ${list.length ? list.map(r => rfqRowHtml(q, r, false)).join('') : '<p class="q-help" style="margin:0">None yet. Use “Request supplier quotes” on the Materials list to ask suppliers for prices. Each supplier’s status shows on its column header in the Materials table.</p>'}</div>`;
+}
+function rfqSig(q){ return JSON.stringify([(q.rfqs || []).map(r => [r.id, r.status, r.sentAt, r.receivedAt, r.replyBy, r.history.length]), q.lines.map(l => qQtyOrder(q, l) + l.id), fmt(new Date())]); }
+/* post-pass on the quote builder: the Materials button, the status badge on each supplier column, the RFQ card, and the "entering prices" highlight */
+function rfqPost(){
+  const q = qFind(qUi.openId), root = document.getElementById('quoteBuilderView'); if(!q || !root || !root.firstElementChild) return;
+  const mh = [...root.querySelectorAll('.card > .qb-sec-h')].find(x => { const h = x.querySelector('h3'); return h && h.textContent.trim() === 'Materials'; });
+  if(mh){
+    const tools = mh.querySelector('.qb-sec-tools'); if(tools && !tools.querySelector('[data-rf="open"]')) tools.insertAdjacentHTML('afterbegin', '<button type="button" class="btn secondary" data-rf="open">Request supplier quotes</button>');
+    const card = mh.parentElement; let rc = document.getElementById('rfqCard');
+    const fo = rfUi.focus && rfUi.focus.qid === q.id ? rfUi.focus : null, sig = rfqSig(q) + (fo ? fo.rid : '');
+    if(!rc || rc.previousElementSibling !== card){ if(rc) rc.remove(); rc = document.createElement('div'); rc.id = 'rfqCard'; card.after(rc); }
+    if(rc.dataset.sig !== sig){ rc.innerHTML = (fo ? rfBannerHtml(q, fo) : '') + rfqCardHtml(q); rc.dataset.sig = sig; }
+  }
+  root.querySelectorAll('th.qb-supcol').forEach(th => {
+    const x = th.querySelector('.qb-x'); if(!x) return; const html = rfqBadgeHtml(q, Number(x.dataset.sid)); let b = th.querySelector('.rf-sup-st');
+    if(!b){ x.insertAdjacentHTML('beforebegin', '<div class="rf-badge-wrap">' + html + '</div>'); } else if(b.outerHTML !== html){ b.outerHTML = html; }
+  });
+  root.querySelectorAll('.rf-hl').forEach(e => e.classList.remove('rf-hl')); root.querySelectorAll('tr.rf-dim').forEach(e => e.classList.remove('rf-dim'));
+  const fo = rfUi.focus && rfUi.focus.qid === q.id ? rfUi.focus : null;
+  if(fo){ const r = rfqOf(q, fo.rid); if(r){ const ids = new Set(r.snapshot.map(x => x.lid));
+    root.querySelectorAll(`td[data-qpc][data-sid="${r.supplierId}"]`).forEach(td => { if(ids.has(td.dataset.lid)) td.classList.add('rf-hl'); });
+    root.querySelectorAll('tr[data-line]').forEach(tr => { if(!ids.has(tr.dataset.line)) tr.classList.add('rf-dim'); }); } }
+}
+(function(){ const o = qbRefresh; qbRefresh = function(){ const r = o.apply(this, arguments); try{ rfqPost(); }catch(e){} return r; }; })();
+function rfBannerHtml(q, fo){
+  const r = rfqOf(q, fo.rid); if(!r) return ''; const s = supFind(r.supplierId);
+  return `<div class="card rf-banner"><div class="qb-sec-h"><h4>Entering prices from ${escHtml(rfqSupplierName(r.supplierId))} <span class="qb-dim">for ${escHtml(r.number)}</span></h4><div class="qb-sec-tools"><button type="button" class="btn qb-sm" data-rf="prices-done" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Finished: mark quote received</button><button type="button" class="btn secondary qb-sm" data-rf="prices-close">Close</button></div></div>
+    <p class="q-help" style="margin:0 0 8px;">The ${r.snapshot.length} requested line${r.snapshot.length === 1 ? '' : 's'} are highlighted in the Materials table (other lines are faded). Type each price per unit into this supplier's column; use <b>Edit</b> on a line to add a note or change the price date. Prices flow into the supplier totals footer and the quote as usual.</p>
+    ${s ? `<div class="q-inline" style="gap:14px;flex-wrap:wrap;"><label class="q-check"><input type="checkbox" data-rf="inc-vat"${s.pricesIncVat ? ' checked' : ''}> This supplier's prices include VAT</label><label class="q-inline" style="gap:6px;">Prices valid for <input type="number" min="0" step="1" data-rf="validity" value="${escAttr(s.priceValidityDays === '' ? '' : s.priceValidityDays)}" style="width:80px" aria-label="Validity days"> days</label></div>` : ''}</div>`;
+}
+function rfqEnterPrices(q, r){
+  if(!q.supplierCols.includes(r.supplierId)) q.supplierCols.push(r.supplierId);
+  rfUi.focus = { qid: q.id, rid: r.id }; if(btOpen(1)) btClose(1); saveState();
+  activateTab('quotations'); qUi.openId = q.id; qbRender();
+  setTimeout(() => { const t = document.querySelector(`td.rf-hl input`); const tbl = document.querySelector('#quoteBuilderView .qb-table'); if(t){ t.scrollIntoView({ block: 'center', behavior: 'smooth' }); t.focus({ preventScroll: true }); } else if(tbl) tbl.scrollIntoView({ block: 'center' }); }, 60);
+}
+async function rfqCreate(){
+  const w = rfUi.w, q = qFind(w.qid); if(!q) return; const d = w.d;
+  if(!d.postcode.trim() && !d.address.trim()){ w.err = 'Give a delivery postcode or address.'; rfRender(); return; }
+  if(rfLeak(q) && !(await showConfirm('Customer name in the text?', 'The reference or message seems to contain the customer\'s name, and “include the customer\'s name” is off. Create the requests anyway?'))) return;
+  const today = fmt(new Date()), ids = [];
+  w.sup.forEach(sid => {
+    const lineIds = q.lines.filter(l => w.lineOn.has(l.id) && w.cell[sid].has(l.id)).map(l => l.id); if(!lineIds.length) return;
+    const seq = state.settings.rfqNext++, r = { id: qRand('rfq_'), number: rfqNumber(seq), seq, supplierId: sid, status: 'Draft', createdAt: today, createdBy: whoName(), replyBy: d.replyBy, requiredDate: d.requiredDate, ref: d.ref.trim(), address: d.address.trim(), postcode: d.postcode.trim(), accessNotes: d.accessNotes.trim(), altOk: !!d.altOk, message: d.message.trim(), includeCustomer: !!d.includeCustomer, snapshot: rfqSnapshot(q, lineIds), sentAt: '', sentTo: '', receivedAt: '', declinedAt: '', history: [] };
+    q.rfqs.push(r); if(!q.supplierCols.includes(sid)) q.supplierCols.push(sid); rfqLog(q, r, `created for ${rfqSupplierName(sid)} (${r.snapshot.length} line${r.snapshot.length === 1 ? '' : 's'}, reply by ${dShow(r.replyBy)})`); ids.push(r.id);
+  });
+  w.created = ids; w.step = 3; saveState(); render(); rfRender(true);
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-rf]'); if(!b || !state) return; const a = b.dataset.rf;
+  if(b.tagName === 'INPUT' || b.tagName === 'SELECT') return;
+  const w = rfUi.w, q = b.dataset.qid ? qFind(Number(b.dataset.qid)) : (w ? qFind(w.qid) : qFind(qUi.openId)), r = q && b.dataset.rid ? rfqOf(q, b.dataset.rid) : null;
+  if(a === 'open'){ const qq = qFind(qUi.openId); if(qq) rfOpen(qq); return; }
+  if(a === 'sup-all'){ state.suppliers.filter(s => s.status === 'Active').forEach(s => rfAddSupplier(s.id)); rfRender(); return; }
+  if(a === 'sup-none'){ w.sup.slice().forEach(rfRemoveSupplier); rfRender(); return; }
+  if(a === 'lines-all' || a === 'lines-none'){ const qq = qFind(w.qid); rfShownLines(qq).forEach(l => { if(a === 'lines-all'){ w.lineOn.add(l.id); w.sup.forEach(id => w.cell[id].add(l.id)); } else w.lineOn.delete(l.id); }); rfRender(); return; }
+  if(a === 'col-all' || a === 'col-none'){ const sid = Number(b.dataset.sid), qq = qFind(w.qid); rfShownLines(qq).forEach(l => { if(!w.lineOn.has(l.id)) return; if(a === 'col-all') w.cell[sid].add(l.id); else w.cell[sid].delete(l.id); }); rfRender(); return; }
+  if(a === 'back'){ w.step = 1; w.err = ''; rfRender(); return; }
+  if(a === 'next'){
+    if(!w.sup.length){ w.err = 'Choose at least one supplier.'; rfRender(); return; } const qq = qFind(w.qid);
+    const empty = w.sup.filter(id => !qq.lines.some(l => w.lineOn.has(l.id) && w.cell[id].has(l.id))); if(empty.length){ w.err = 'No lines are ticked for ' + empty.map(rfqSupplierName).join(', ') + '. Tick some lines or remove the supplier.'; rfRender(); return; }
+    if(!w.touched.requiredDate) w.d.requiredDate = rfqDefaultRequired(qq, [...w.lineOn]); w.err = ''; w.step = 2; rfRender(); return;
+  }
+  if(a === 'create'){ rfqCreate(); return; }
+  if(a === 'prices-close'){ rfUi.focus = null; const rc = document.getElementById('rfqCard'); if(rc) delete rc.dataset.sig; qbRender(); return; }
+  if(!q) return;
+  if(a === 'prices-done' && r){ rfUi.focus = null; rfqSetStatus(q, r, 'Received', `prices entered and quote marked as received from ${rfqSupplierName(r.supplierId)}`); qbRender(); return; }
+  if(!r) return;
+  if(a === 'doc') docOpen(rfqSpec(q, r), false);
+  else if(a === 'print') docOpen(rfqSpec(q, r), true);
+  else if(a === 'html'){ docDownloadHtml(rfqSpec(q, r)); tlHist(r, 'HTML version downloaded'); saveState(); }
+  else if(a === 'email') rfqEmail(q, r);
+  else if(a === 'sent'){
+    const s = supFind(r.supplierId), ok = await showConfirm(`Mark ${r.number} as sent?`, `Confirm only once you have actually sent it to ${rfqSupplierName(r.supplierId)}. This app has not sent anything. Date sent:`, `<div class="lp-f"><input type="date" id="rfSentDate" value="${fmt(new Date())}" aria-label="Date sent"></div>`);
+    if(!ok) return; rfqMarkSent(q, r, { to: s ? supEmail(s) : '', date: isoOk(_confirmExtraNote) || fmt(new Date()) });
+  }
+  else if(a === 'prices') rfqEnterPrices(q, r);
+  else if(a === 'received') rfqSetStatus(q, r, 'Received', `quote received from ${rfqSupplierName(r.supplierId)}`);
+  else if(a === 'declined') rfqSetStatus(q, r, 'Declined', `${rfqSupplierName(r.supplierId)} declined to quote`);
+  else if(a === 'delete'){
+    const i = q.rfqs.indexOf(r); q.rfqs.splice(i, 1); tlQuote(q, `${r.number} draft deleted by ${whoName()} (the number is not reused)`, 'rfq'); undoDeleted('Supplier request deleted: ' + r.number, ['quotes', { id: q.id }, 'rfqs'], i, r); rfUi.dirty = true; render(); rfRefreshOpen();
+  }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!state || !d) return;
+  if(d.rfd !== undefined && rfUi.w){ const k = d.rfd; rfUi.w.d[k] = el.type === 'checkbox' ? el.checked : el.value; if(k === 'requiredDate') rfUi.w.touched.requiredDate = true; const q = qFind(rfUi.w.qid), lk = document.getElementById('rfLeak'); if(lk && q){ const t = rfLeak(q); lk.innerHTML = t; lk.hidden = !t; } return; }
+  if(!d.rf) return; const w = rfUi.w;
+  if(d.rf === 'sup'){ const id = Number(d.sid); if(el.checked) rfAddSupplier(id); else rfRemoveSupplier(id); rfRender(); }
+  else if(d.rf === 'fcat'){ w.fCat = el.value; rfRender(); } else if(d.rf === 'fdrop'){ w.fDrop = el.value; rfRender(); }
+  else if(d.rf === 'line'){ if(el.checked){ w.lineOn.add(d.id); w.sup.forEach(id => w.cell[id].add(d.id)); } else w.lineOn.delete(d.id); rfRender(); }
+  else if(d.rf === 'cell'){ const sid = Number(d.sid); if(el.checked) w.cell[sid].add(d.id); else w.cell[sid].delete(d.id); }
+  else if(d.rf === 'inc-vat'){ const q = qFind(qUi.openId), fo = rfUi.focus, r = q && fo && rfqOf(q, fo.rid), s = r && supFind(r.supplierId); if(s){ s.pricesIncVat = el.checked; saveState(); qbRender(); } }
+  else if(d.rf === 'validity'){ const q = qFind(qUi.openId), fo = rfUi.focus, r = q && fo && rfqOf(q, fo.rid), s = r && supFind(r.supplierId); if(s){ const n = Math.floor(Number(el.value)); s.priceValidityDays = el.value === '' || isNaN(n) || n < 0 ? 30 : n; saveState(); } }
+});
+document.addEventListener('input', (e) => { const d = e.target.dataset; if(d && d.rfd !== undefined && rfUi.w && e.target.type !== 'checkbox' && e.target.type !== 'date'){ rfUi.w.d[d.rfd] = e.target.value; const q = qFind(rfUi.w.qid), lk = document.getElementById('rfLeak'); if(lk && q){ const t = rfLeak(q); lk.innerHTML = t; lk.hidden = !t; } } });
+
+/* ---------- reminders on the Today view: a supplier has not replied by the reply-by date ---------- */
+function rfqDue(today){
+  const me = meName(), mine = todayUi.scope === 'mine' && !!me, out = [];
+  state.quotes.forEach(q => (q.rfqs || []).forEach(r => { if(r.status === 'Sent' && r.replyBy && r.replyBy <= today && (!mine || sameUser(r.createdBy, me) || sameUser(r.createdBy, whoName()))) out.push({ q, r }); }));
+  return out.sort((a, b) => a.r.replyBy.localeCompare(b.r.replyBy));
+}
+function rfqRenderToday(){
+  const el = document.getElementById('todayRfq'); if(!el || !state) return; const today = fmt(new Date()), list = rfqDue(today);
+  const over = list.filter(x => x.r.replyBy < today).length;
+  const badge = document.getElementById('todayBadge'); if(badge && list.length){ const cur = Number(badge.textContent) || 0; badge.textContent = cur + list.length; badge.hidden = false; if(over) badge.classList.add('over'); }
+  const sum = document.getElementById('todaySummary'); if(sum && list.length) sum.textContent += ', ' + list.length + ' supplier ' + (list.length === 1 ? 'quote' : 'quotes') + ' chased';
+  el.innerHTML = list.length ? `<div class="td-head"><h3>Supplier quotes awaiting a reply</h3><span class="n">${list.length}</span></div>${list.map(({ q, r }) => `<div class="td-row"><span class="td-title">${escHtml(r.number)} · ${escHtml(rfqSupplierName(r.supplierId))} <span class="qb-dim">for ${escHtml(r.ref)}</span></span><span class="td-meta"><span class="${r.replyBy < today ? 'td-due' : ''}">${r.replyBy < today ? 'Reply was due ' : 'Reply due '}${escHtml(fmtDisplay(toDate(r.replyBy)))}</span><button type="button" class="link-btn" data-nav="quote:${q.id}">Open quote ${escHtml(qRef(q))}</button><button type="button" class="link-btn" data-rf="today-received" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Mark received</button><button type="button" class="link-btn" data-rf="today-email" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Chase by email</button></span></div>`).join('')}` : '';
+  el.hidden = !list.length;
+}
+(function(){ const o = renderToday; renderToday = function(){ const r = o.apply(this, arguments); try{ rfqRenderToday(); }catch(e){} return r; }; })();
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-rf^="today-"]'); if(!b || !state) return; const q = qFind(Number(b.dataset.qid)), r = q && rfqOf(q, b.dataset.rid); if(!r) return;
+  if(b.dataset.rf === 'today-received') rfqSetStatus(q, r, 'Received', `quote received from ${rfqSupplierName(r.supplierId)}`);
+  else if(b.dataset.rf === 'today-email'){
+    const s = supFind(r.supplierId), v = rfqEmailVals(q, r);
+    sendEmail({ kind: 'rfq', to: s ? supEmail(s) : '', subject: 'Chasing: ' + docMerge(docTpl('rfq').subject, v), body: `Hello ${v.supplier_contact_name},\n\nJust checking whether you have been able to price request ${r.number} for ${r.ref}. We asked for a reply by ${v.reply_by_date}.\n\nThank you,\n${v.sender_name}\n${v.business_name}`, title: `Chase ${r.number}`, onPrepared: () => { tlHist(r, 'Chase email prepared'); saveState(); }, onSent: info => { rfqLog(q, r, `chased ${rfqSupplierName(r.supplierId)} by email${info.to ? ' (' + info.to + ')' : ''}`); saveState(); render(); } });
+  }
+}, true);
 /* BT:js-rfq end */
 /* BT:js-invoice begin */
 function invEnsureModel(o){ o.invoices = Array.isArray(o.invoices) ? o.invoices : []; return o; }
