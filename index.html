@@ -1491,6 +1491,74 @@
   .pw-var-h { display: flex; align-items: center; gap: 10px; margin-bottom: var(--bt-s2); flex-wrap: wrap; } .pw-var-a { display: flex; gap: var(--bt-s2); flex-wrap: wrap; margin-top: 10px; }
   .pw-var-links { margin: var(--bt-s2) 0; font-size: 12.5px; } .pw-var-links summary { cursor: pointer; color: var(--slate); font-weight: 600; } .pw-var-links label { display: flex; gap: var(--bt-s2); padding: 3px 0; }
   .pw-var-ap { margin-top: var(--bt-s2); font-size: 12.5px; color: var(--bt-ok-fg); }
+  /* ---- collapsible sections and tiles ---- */
+  .pw-sec > h3 { margin: 0 0 var(--bt-s3); }
+  .pw-sec-t { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; border-radius: 8px; }
+  .pw-sec:not(.open) { margin-top: 8px; } .pw-sec:not(.open) > h3 { margin: 0; border-bottom: 1px solid var(--line); } .pw-sec:not(.open) .pw-sec-t { padding: 10px 0; }
+  .pw-sec-t:hover { color: var(--oak-text); }
+  .pw-nav button { flex: 0 0 auto; }   /* tabs keep their size and the strip scrolls sideways, so labels never overlap on a phone */
+  .pw-chev { flex: none; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .15s; margin: 0 4px 0 2px; opacity: .7; }
+  .pw-sec.open > h3 .pw-chev, .pw-fold.open > .pw-fold-h .pw-chev { transform: rotate(45deg); }
+  .pw-fold { padding: 0; } .pw-fold-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px var(--bt-s4); }
+  .pw-fold-t { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; border: 0; background: none; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  .pw-fold-t h4 { margin: 0; } .pw-fold-sub { display: block; font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 2px; font-weight: 400; }
+  .pw-fold-b { padding: 0 var(--bt-s4) 14px; } .pw-fold > .pw-fold-b[hidden] { display: none; }
+  .pw-info > .pw-card, .pw-sec-b > .pw-fold { margin-bottom: 10px; }
+  @media (min-width: 900px) { .pw-fold-b .lead-info { columns: 2; column-gap: 48px; } .pw-fold-b .lead-info .gate-msg { column-span: all; } .pw-fold-b .lead-info .stage-label-row { break-after: avoid; } .pw-fold-b .lead-info .ro-grid { break-inside: avoid; } }
+  .pw-sub-h { font-family: var(--serif); font-size: 15px; font-weight: 600; margin: 14px 0 6px; } .pw-fold-b > .pw-sub-h:first-child { margin-top: 2px; }
+  /* ---- timeline grid ---- */
+  .pw-we { position: absolute; top: 0; bottom: 0; background: rgba(120, 108, 90, .075); }
+  .pw-dl { position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(60, 50, 35, .05) 1px, transparent 1px); background-repeat: repeat-x; }
+  .pw-wl { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(60, 50, 35, .08); } .pw-ml { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(60, 50, 35, .15); }
+  .pw-g-hl { position: absolute; top: 0; bottom: 0; background: rgba(168, 118, 62, .13); display: none; }
+  .pw-g-tip { position: fixed; z-index: 90; pointer-events: none; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 7px; box-shadow: var(--shadow-lift); white-space: nowrap; }
+  .pw-foot { margin-top: 2px; }
+  /* ---- money in grid: fixed columns so nothing stretches or overlaps ---- */
+  .pw-mtab { table-layout: fixed; width: 100%; min-width: 640px; } .pw-mtab th.r, .pw-itab th.r { text-align: right; }
+  .pw-mtab .c-date, .pw-mtab .c-date2 { width: 132px; } .pw-mtab .c-sold { width: 92px; } .pw-mtab .c-amt { width: 100px; } .pw-mtab .c-x { width: 44px; }
+  .pw-mtab.editing .c-date, .pw-mtab.editing .c-date2 { width: 148px; } .pw-mtab.editing .c-sold { width: 84px; } .pw-mtab.editing .c-amt { width: 104px; }
+  .pw-mtab td { overflow: hidden; text-overflow: ellipsis; } .pw-mtab input { min-width: 0; width: 100%; } .pw-mtab input.qb-n { width: 100%; text-align: right; padding-right: 8px; -moz-appearance: textfield; }
+  .pw-mtab input.qb-n::-webkit-outer-spin-button, .pw-mtab input.qb-n::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .pw-mtab tfoot td { white-space: nowrap; }
+  .pw-itab td, .pw-itab th { padding-left: 6px; padding-right: 8px; } .pw-inv .q-sub { margin: 0 0 6px; }
+  /* ---- money in and out chart ---- */
+  .pw-cash-box { min-height: 120px; } .pw-cash { display: block; max-width: 100%; font-size: 10.5px; fill: var(--text-muted); }
+  .pw-cash .c-grid { stroke: rgba(60, 50, 35, .08); } .pw-cash .c-zero { stroke: rgba(60, 50, 35, .35); } .pw-cash .c-axis { stroke: rgba(60, 50, 35, .3); }
+  .pw-cash .c-line { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; } .pw-cash .c-line.exp { stroke-dasharray: 5 4; opacity: .55; }
+  .pw-cash .c-fill { stroke: none; } .pw-cash .c-fill.up { fill: rgba(63, 107, 79, .13); } .pw-cash .c-fill.dn { fill: rgba(164, 48, 42, .12); }
+  .pw-cash .c-pt { stroke-width: 2; fill: var(--bt-card); } .pw-cash .c-pt.in { stroke: var(--bt-ok-fg); } .pw-cash .c-pt.out { stroke: #8a5a7a; } .pw-cash .c-pt.in.done { fill: var(--bt-ok-fg); } .pw-cash .c-pt.out.done { fill: #8a5a7a; } .pw-cash .c-pt.late { stroke: var(--bt-bad-fg); stroke-dasharray: 2 2; }
+  .pw-cash .c-lab { font-weight: 700; font-size: 10.5px; } .pw-cash .c-lab.in { fill: var(--bt-ok-fg); } .pw-cash .c-lab.out { fill: #7a4a6a; }
+  .pw-cash .c-today { stroke: var(--bt-bad-fg); stroke-width: 1.5; opacity: .6; } .pw-cash .c-todaytx { fill: var(--bt-bad-fg); font-weight: 600; font-size: 10px; }
+  .pw-cash .c-order { stroke: #8a5a7a; stroke-dasharray: 3 3; opacity: .7; } .pw-cash .c-chip { fill: #f1e6ee; stroke: #cfb3c6; } .pw-cash .c-chiptx { fill: #6a3a5a; font-weight: 600; font-size: 10px; }
+  .pw-cash .c-stage { fill: var(--green); opacity: .45; }
+  .pw-pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 10px; }
+  .pw-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--bt-card); color: var(--text-muted); border-radius: 99px; padding: 3px 11px 3px 9px; font: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25); }
+  .pw-pill b { font-weight: 600; font-variant-numeric: tabular-nums; } .pw-pill .pdot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid currentColor; box-sizing: border-box; }
+  .pw-pill.on { text-decoration: none; color: var(--ink); border-color: #cfc9bb; background: #faf8f4; } .pw-pill.on.in .pdot { background: var(--bt-ok-fg); border-color: var(--bt-ok-fg); } .pw-pill.on.out .pdot { background: #8a5a7a; border-color: #8a5a7a; }
+  .pw-pill:hover { border-color: var(--oak); }
+  .pw-cash-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; font-size: var(--bt-fs-xs); color: var(--text-muted); } .pw-cash-key span { display: inline-flex; align-items: center; gap: 5px; }
+  .pw-cash-key .k { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--slate); display: inline-block; box-sizing: border-box; } .pw-cash-key .k.in { border-color: var(--bt-ok-fg); } .pw-cash-key .k.out { border-color: #8a5a7a; } .pw-cash-key .k.done { background: var(--slate); }
+
+
+  /* ---- overview: one screen on a laptop ---- */
+  .pw-ov { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; } .pw-ov > .pw-card { margin-bottom: 0; }
+  .pw-span2 { grid-column: span 2; } .pw-span3 { grid-column: 1 / -1; }
+  .pw-stack { display: grid; gap: 14px; align-content: start; } .pw-stack > .pw-card { margin-bottom: 0; }
+
+  .pw-cgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 10px; } .pw-cgrid .qual-field label { margin-bottom: 2px; }
+  .pw-notes2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .pw-custtile { display: block; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; margin-bottom: 0; } .pw-custtile:hover { border-color: var(--oak); }
+  .pw-ct-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; } .pw-ct-h b { font-size: 13px; } .pw-ct-edit { font-size: var(--bt-fs-xs); font-weight: 600; color: var(--oak-text); }
+  .pw-ct-name { display: block; font-weight: 600; font-size: 13px; overflow-wrap: anywhere; } .pw-ct-line { display: block; font-size: 12.5px; color: var(--ink); margin-top: 2px; overflow-wrap: anywhere; } .pw-ct-dim { color: var(--text-muted); }
+  .pw-cform { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; } @media (max-width: 520px) { .pw-cform { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 1199px) { .pw-ov { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pw-span3 { grid-column: 1 / -1; } .pw-stack { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 760px) { .pw-ov { grid-template-columns: minmax(0, 1fr); } .pw-span2, .pw-span3, .pw-stack { grid-column: auto; } .pw-stack { grid-template-columns: minmax(0, 1fr); } .pw-cgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pw-notes2 { grid-template-columns: minmax(0, 1fr); } }
+  @media (min-width: 701px) and (pointer: fine) {
+    .pw-compact { padding: 10px var(--bt-s3); } .pw-compact h4 { margin-bottom: 6px; }
+    .pw-compact .qual-field input { padding: 3px 8px; font-size: 12.5px; border-radius: 6px; } .pw-compact .qual-field label { font-size: 9.5px; }
+    .pw-evlist .pw-ev { padding: 5px 0; } .pw-evlist .pw-ev .btn { min-height: 30px; padding: 4px 10px; font-size: 11.5px; }
+    .pw-compact .pw-quick { gap: 6px; } .pw-compact .btn { padding: 5px 10px; font-size: 11.5px; } .pw-compact .qual-field input, .pw-compact .btn { min-height: 0 !important; }
+  }
   .q-st-Invoiced { background: #e3f0e7; color: #2f6b45; } .q-st-Invoiced::before { content: '✓\00a0'; }
 
   /* ---------------- Finance: totals, cash-flow lines, invoicing, pending transactions ---------------- */
@@ -5453,9 +5521,12 @@ function projOnQuoteAccepted(q){   // a quote linked to a project has just been 
 }
 
 /* ---------- Project workspace (the open project) ---------- */
-const pwUi = { id: 0, sec: 'overview', quick: null, edit: null, lock: 0 };
-const PW_SECS = [['overview', 'Overview'], ['timeline', 'Timeline'], ['money', 'Money'], ['materials', 'Materials & deliveries'], ['plan', 'Working plan'], ['variations', 'Variations'], ['changes', 'Change log'], ['notes', 'Notes & files'], ['history', 'Lead & sales history']];
-function openProjectWorkspace(id){ if(pwUi.edit && pwUi.edit.pid !== id) pwUi.edit = null; pwUi.id = id; pwUi.sec = 'overview'; activateTab('projectpipeline'); closeDetail(); renderProjects(); window.scrollTo(0, 0); }
+const pwUi = { id: 0, sec: 'overview', quick: null, edit: null, lock: 0, open: new Set(['overview', 'timeline']), folds: {}, moneyEdit: false, cashOff: new Set() };
+const PW_SECS = [['overview', 'Overview'], ['timeline', 'Timeline'], ['money', 'Money'], ['materials', 'Materials & deliveries'], ['plan', 'Working plan'], ['variations', 'Variations'], ['info', 'Information']];
+const PW_SEC_ALIAS = { notes: 'overview', history: 'info', changes: 'info' };   // older section names (saved views, links) land on the section that now holds them
+const pwSecKey = k => PW_SEC_ALIAS[k] || k;
+function pwOpenReset(sec, all){ pwUi.open = new Set(['overview', 'timeline']); pwUi.folds = {}; pwUi.moneyEdit = false; pwUi.cashOff = new Set(); if(all) PW_SECS.forEach(([k]) => { if(k !== 'info') pwUi.open.add(k); }); if(sec) pwUi.open.add(pwSecKey(sec)); }   // all: a project just promoted from Sales opens every section (bar the information one) so it is clear what needs working through
+function openProjectWorkspace(id, fresh){ if(pwUi.edit && pwUi.edit.pid !== id) pwUi.edit = null; pwUi.id = id; pwUi.sec = 'overview'; pwOpenReset('', !!fresh); activateTab('projectpipeline'); closeDetail(); renderProjects(); window.scrollTo(0, 0); }
 function closeProjectWorkspace(){ pwUi.id = 0; renderProjects(); }
 function pwRel(d){
   if(!d) return ''; const n = Math.round((toDate(d) - toDate(fmt(new Date()))) / 86400000);
@@ -5493,9 +5564,12 @@ function pwHeaderHtml(p, i){
     <nav class="pw-nav" aria-label="Project sections">${PW_SECS.map(([k, n]) => `<button type="button" data-pw="sec" data-sec="${k}" class="${pwUi.sec === k ? 'active' : ''}">${n}</button>`).join('')}</nav></div>`;
 }
 function pwCustomerCardHtml(p, i){
-  const cu = projCustomer(p), f = (label, field, val, ph) => `<div class="qual-field"><label>${label}</label><input data-tab="projects" data-idx="${i}" data-field="${field}" value="${escAttr(val || '')}" placeholder="${escAttr(ph || '')}"></div>`;
-  return `<div class="pw-card pw-wide"><h4>Customer and site <span class="qb-dim">(carried from the lead and the deal; shown even when the record was created without them)</span></h4>${cxCustomerHtml('project', p)}<div class="qual-grid">
-    ${f('Contact', 'contact', p.contact, cu.name)}${f('Company', 'company', p.company, '')}${f('Phone', 'phone', p.phone, cu.phone)}${f('Email', 'email', p.email, cu.email)}${f('Address', 'address', p.address, cu.address)}${f('Postcode', 'postcode', p.postcode, cu.postcode)}${f('Source', 'source', p.source, '')}${f('Project name', 'projectName', p.projectName, cu.projectName)}</div></div>`;
+  const cu = projCustomer(p), name = [cu.company, cu.name].filter(Boolean).join(' — '), site = [cu.address, cu.postcode && !String(cu.address || '').includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ');
+  const contact = [cu.phone, cu.email].filter(Boolean).join(' · '), src = [p.projectName || cu.projectName, p.source ? 'Source: ' + p.source : ''].filter(Boolean).join(' · ');
+  return `<button type="button" class="pw-card pw-compact pw-custtile" data-pw="quick" data-q="customer" title="Open to edit the customer and site details (they are first recorded in the Lead Pipeline)">
+    <span class="pw-ct-h"><b>Customer and site</b><span class="pw-ct-edit">✎ Edit</span></span>
+    <span class="pw-ct-name">${name ? escHtml(name) : '<i>Not recorded</i>'}</span>
+    ${contact ? `<span class="pw-ct-line">${escHtml(contact)}</span>` : ''}${site ? `<span class="pw-ct-line">${escHtml(site)}</span>` : ''}${src ? `<span class="pw-ct-line pw-ct-dim">${escHtml(src)}</span>` : ''}</button>`;
 }
 function pwEventRow(e){
   const flags = (e.flags || []).map(f => `<span class="qb-flag bad">⚠ ${escHtml(f)}</span>`).join(' '), amt = e.amount !== undefined ? `<b class="pw-amt ${e.kind}">${e.kind === 'out' ? '−' : ''}${qm(e.amount)}</b>` : '';
@@ -5540,8 +5614,16 @@ function pwMiniGantt(p){
     if(e.kind === 'milestone'){ if(e.msSid) return false; if(['materialsDelivered', 'invoiced', 'paid'].includes(e.mkey) && ev.some(o => o !== e && o.kind !== 'milestone' && o.kind !== 'stage' && o.date === e.date)) return false; }
     return true;
   });
+  /* faint calendar grid behind the bars: a line per day on short spans, per Monday and per month always, weekends shaded */
+  const dow0 = toDate(lo).getDay(); let we = '', run = -1, wl = '';
+  for(let k = 0; k <= span; k++){
+    const wk = k < span && ((dow0 + k) % 7 === 0 || (dow0 + k) % 7 === 6);
+    if(wk && run < 0) run = k; else if(!wk && run >= 0){ we += `<i class="pw-we" style="left:${run / span * 100}%;width:${(k - run) / span * 100}%"></i>`; run = -1; }
+    if(k < span && (dow0 + k) % 7 === 1) wl += `<i class="pw-wl" style="left:${k / span * 100}%"></i>`;
+  }
+  const ml = months.map(m => pc(fmt(m))).filter(x => x > 0.2 && x < 99.8).map(x => `<i class="pw-ml" style="left:${x}%"></i>`).join(''), dl = span <= 130 ? `<i class="pw-dl" style="background-size:${100 / span}% 100%"></i>` : '';
   return `<div class="pw-gantt${ed ? ' editing' : ''}"><div class="pw-g-head">${months.map(m => `<span style="left:${Math.max(0, pc(fmt(m)))}%">${m.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}</span>`).join('')}</div>
-    <div class="pw-g-body"><div class="pw-g-over">${bo}<i class="pw-today" style="left:${pc(today)}%" title="Today"></i></div>${rows}
+    <div class="pw-g-body"><div class="pw-g-over" data-lo="${lo}" data-span="${span}">${dl}${we}${wl}${ml}${bo}<i class="pw-g-hl"></i><i class="pw-today" style="left:${pc(today)}%" title="Today"></i></div>${rows}
       <div class="pw-g-row"><span class="pw-g-l">Deliveries, payments, other milestones</span><div class="pw-g-t">${shared.map(e => e.kind === 'milestone' ? msm(e) : mk(e)).join('')}</div></div></div>
     <div class="pw-g-legend"><span><i class="pw-mk delivery"></i>Delivery</span><span><i class="pw-mk in"></i>Money in</span><span><i class="pw-mk out"></i>Money out</span>${['done', 'soon', 'overdue', 'future'].map(k => `<span><i class="pw-mk milestone ms-${k}"></i>Milestone ${PW_MS_LABEL[k].toLowerCase()}</span>`).join('')}<span><i class="pw-g-ghost-k"></i>Original dates</span><span><i class="pw-bo-k"></i>Blackout</span><span><i class="pw-today-k"></i>Today</span></div></div>`;
 }
@@ -5570,14 +5652,14 @@ function pwTimelineHtml(p, i){
   const sw = (state.blackouts || []).length;
   const bar = ed ? pwEditBar(p, 'timeline', `<button type="button" class="btn secondary qb-sm" data-pw="edit-baseline" title="Put every stage back to its original (baseline) dates in the draft">Reset to original dates</button>`) : '';
   return `<section class="pw-sec" id="pw-timeline" data-sec="timeline"><h3>Timeline</h3>
-    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan <span class="qb-dim">(the faint bar behind each stage is its original date)</span></h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div></div>
-    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Stages <span class="qb-dim">(stage lines: dates, planned and logged hours)</span></h4><div class="qb-sec-tools"><button class="btn secondary" data-pw="add-stage">+ Add stage</button></div></div>
-      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Start</th><th>End</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
+    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan</h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div>
+      <div class="pw-note pw-foot">The faint bar behind each stage is its original date. Weekends are shaded; rest the cursor on the chart for a moment to see the date.</div></div>
+    ${pwFold('t-stages', 'Stages', 'Stage lines: dates, planned and logged hours', '<button class="btn secondary" data-pw="add-stage">+ Add stage</button>', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Start</th><th>End</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
       <tbody>${stageRows || '<tr><td colspan="10"><div class="sup-empty">No stage lines on this project yet. Add one, or promote a deal that has stage lines.</div></td></tr>'}</tbody></table></div>
-      ${q ? '' : '<p class="q-help">Sold hours appear once an accepted quote is linked to this project.</p>'}${ed ? '' : '<p class="q-help">Dates change through Edit timeline (with Save, Discard and a reason), so slippage is always recorded.</p>'}</div>
-    <div class="pw-card pw-wide"><h4>The nine milestones <span class="qb-dim">and the stage or event each one lines up with</span></h4>
-      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Date</th><th></th><th>Lines up with</th><th>Date from there</th></tr></thead><tbody>${msRows}</tbody></table></div>
-      <p class="q-help">Milestone dates stay as you type them (and still drive the project stage). The diamond colour shows done, due soon (within a week), overdue or future; the right-hand columns show what the stages, deliveries and payments say; “use” copies that date across.</p></div></section>`;
+      ${q ? '' : '<p class="q-help">Sold hours appear once an accepted quote is linked to this project.</p>'}${ed ? '' : '<p class="q-help">Dates change through Edit timeline (with Save, Discard and a reason), so slippage is always recorded.</p>'}`, true)}
+    ${pwFold('t-lab', 'Labour check', 'Planned labour cost against time logged, stage by stage', '<button type="button" class="btn secondary" data-pw="quick" data-q="time">Log time</button>', pwLabourCheckBody(p), true)}
+    ${pwFold('t-ms', 'Milestones', 'The nine milestones and the stage or event each one lines up with', '', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Date</th><th></th><th>Lines up with</th><th>Date from there</th></tr></thead><tbody>${msRows}</tbody></table></div>
+      <p class="q-help">Milestone dates stay as you type them (and still drive the project stage). The diamond colour shows done, due soon (within a week), overdue or future; the right-hand columns show what the stages, deliveries and payments say; “use” copies that date across.</p>`, true)}</section>`;
 }
 function pwLineDropName(wq, id){ const d = wq.drops.find(x => x.id === id); return d ? (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop')) : 'No drop'; }
 function pwPoCell(p, x, plan){
@@ -5616,11 +5698,6 @@ function pwMaterialsHtml(p, i){
 /* ---------- change log ---------- */
 const CHANGE_CAUSES = [['price', 'Price rise'], ['qty', 'Quantity or waste'], ['customer', 'Customer-driven'], ['unforeseen', 'Unforeseen'], ['ours', 'Our error']];
 const causeName = k => (CHANGE_CAUSES.find(c => c[0] === k) || [k, k])[1];
-function pwChangeLogHtml(p){
-  const log = (p.changeLog || []).slice().reverse();
-  return `<section class="pw-sec" id="pw-changes" data-sec="changes"><h3>Change log</h3><div class="pw-card pw-wide">${log.length ? log.map(c => `<details class="pw-chg"><summary><span class="pw-chg-when">${escHtml(new Date(c.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }))}</span> · <b>${escHtml(c.by || 'someone')}</b> · ${escHtml(PW_EDIT_NAME[c.kind] || c.kind)} <span class="qb-flag">${escHtml(causeName(c.cause))}</span> <span class="pw-chg-r">${escHtml(c.reason)}</span></summary>
-      <ul>${(c.changes || []).map(x => `<li>${escHtml(x)}</li>`).join('')}</ul></details>`).join('') : '<div class="pw-empty">No changes logged yet. Saving an edit to the timeline, deliveries or the Working plan records who, when, what and why here.</div>'}</div></section>`;
-}
 let chgResolver = null;
 function chgAsk(title, lines){
   return new Promise(resolve => {
@@ -5723,12 +5800,36 @@ function planDiff(a, b){
   return out;
 }
 
+/* every section is a collapsible block: Overview opens with the project, the others open when picked on the section bar (or by their own heading) */
+const PW_CHEV = '<span class="pw-chev" aria-hidden="true"></span>';
+function pwSecWrap(html){
+  const m = html.match(/^<section class="pw-sec" id="pw-(\w+)" data-sec="(\w+)"><h3>([\s\S]*?)<\/h3>([\s\S]*)<\/section>\s*$/); if(!m) return html;
+  const k = m[2], open = pwUi.open.has(k);
+  return `<section class="pw-sec${open ? ' open' : ''}" id="pw-${k}" data-sec="${k}"><h3><button type="button" class="pw-sec-t" data-pw="sec-toggle" data-sec="${k}" aria-expanded="${open}" aria-controls="pw-${k}-b">${PW_CHEV}${m[3]}</button></h3><div class="pw-sec-b" id="pw-${k}-b"${open ? '' : ' hidden'}>${m[4]}</div></section>`;
+}
+/* a collapsible tile inside a section: title, an optional subtitle under it, tools on the right (they never toggle it) */
+function pwFold(id, title, sub, tools, body, defOpen){
+  const open = pwUi.folds[id] === undefined ? !!defOpen : !!pwUi.folds[id];
+  return `<div class="pw-card pw-wide pw-fold${open ? ' open' : ''}" data-fold="${id}"><div class="pw-fold-h"><button type="button" class="pw-fold-t" data-pw="fold" data-fold="${id}" aria-expanded="${open}">${PW_CHEV}<span><h4>${title}</h4>${sub ? `<span class="pw-fold-sub">${sub}</span>` : ''}</span></button>${tools ? `<div class="qb-sec-tools">${tools}</div>` : ''}</div><div class="pw-fold-b"${open ? '' : ' hidden'}>${body}</div></div>`;
+}
+function pwSetSecOpen(key, open){
+  if(open) pwUi.open.add(key); else pwUi.open.delete(key);
+  const sec = document.getElementById('pw-' + key); if(!sec) return;
+  sec.classList.toggle('open', open); const b = sec.querySelector(':scope > h3 > .pw-sec-t'), body = sec.querySelector(':scope > .pw-sec-b');
+  if(b) b.setAttribute('aria-expanded', open); if(body) body.hidden = !open;
+  if(open && typeof pwCashMount === 'function') pwCashMount();
+}
+function pwToggleFold(id){
+  const el = document.querySelector('#projectWorkspace [data-fold="' + id + '"]'); if(!el) return;
+  const open = !el.classList.contains('open'); pwUi.folds[id] = open; el.classList.toggle('open', open);
+  const b = el.querySelector('.pw-fold-t'), body = el.querySelector('.pw-fold-b'); if(b) b.setAttribute('aria-expanded', open); if(body) body.hidden = !open;
+}
 function renderProjectWorkspace(p){
   const el = document.getElementById('projectWorkspace'), i = state.projects.indexOf(p); projEnsure(p);
   const top = window.scrollY;
-  el.innerHTML = pwHeaderHtml(p, i) + pwOverviewHtml(p, i) + pwTimelineHtml(p, i) + pwMoneyHtml(p, i) + pwMaterialsHtml(p, i) + pwPlanHtml(p, i) + pwVariationsHtml(p, i) + pwChangeLogHtml(p) + pwNotesHtml(p, i) + pwHistoryHtml(p, i);
+  el.innerHTML = pwHeaderHtml(p, i) + [pwOverviewHtml(p, i), pwTimelineHtml(p, i), pwMoneyHtml(p, i), pwMaterialsHtml(p, i), pwPlanHtml(p, i), pwVariationsHtml(p, i), pwInfoHtml(p, i)].map(pwSecWrap).join('');
   window.scrollTo(0, top);
-  pwStick(); pwSpy();
+  pwStick(); pwSpy(); pwCashMount();
 }
 /* where the sticky header ends, so a section heading is never hidden under it */
 function pwStickBottom(){
@@ -5739,7 +5840,8 @@ function pwStickBottom(){
 function pwStick(){ const b = pwStickBottom(); if(b) document.documentElement.style.setProperty('--pw-stick', b + 'px'); }
 window.addEventListener('resize', () => { if(pwUi.id) pwStick(); });
 function pwGoSection(key){
-  const t = document.getElementById('pw-' + key); if(!t) return; pwStick();
+  key = pwSecKey(key); const t = document.getElementById('pw-' + key); if(!t) return;
+  if(!pwUi.open.has(key)) pwSetSecOpen(key, true); pwStick();
   const y = window.scrollY + t.getBoundingClientRect().top - pwStickBottom() - 10;
   window.scrollTo({ top: Math.max(0, Math.round(y)), behavior: 'smooth' });
   pwUi.sec = key; document.querySelectorAll('#projectWorkspace .pw-nav button').forEach(b => b.classList.toggle('active', b.dataset.sec === key));
@@ -5754,6 +5856,29 @@ function pwSpy(){
   if(cur !== pwUi.sec){ pwUi.sec = cur; el.querySelectorAll('.pw-nav button').forEach(b => b.classList.toggle('active', b.dataset.sec === cur)); }
 }
 window.addEventListener('scroll', () => { if(pwUi.id) pwSpy(); }, { passive: true });
+/* timeline chart: a faint column follows the cursor; resting on it for a moment names the date (bars and markers keep their own tooltips) */
+let pwTipT = 0, pwTipEl = null;
+function pwTipHide(){ clearTimeout(pwTipT); if(pwTipEl) pwTipEl.hidden = true; }
+document.addEventListener('mousemove', (e) => {
+  const g = e.target.closest && e.target.closest('.pw-gantt');
+  const off = () => { pwTipHide(); document.querySelectorAll('.pw-g-hl').forEach(h => { h.style.display = 'none'; }); };
+  if(!g || g.querySelector('.dragging')) return off();
+  const ov = g.querySelector('.pw-g-over'), r = ov.getBoundingClientRect();
+  if(e.clientX < r.left || e.clientX > r.right) return off();
+  const span = Number(ov.dataset.span), idx = Math.min(span - 1, Math.max(0, Math.floor((e.clientX - r.left) / r.width * span))), h = ov.querySelector('.pw-g-hl');
+  h.style.display = 'block'; h.style.left = (idx / span * 100) + '%'; h.style.width = (100 / span) + '%';
+  pwTipHide(); if(e.target.closest('.pw-g-bar, .pw-mk, .pw-g-ghost')) return;
+  const x = e.clientX, y = e.clientY;
+  pwTipT = setTimeout(() => {
+    const d = addDaysIso(ov.dataset.lo, idx), wd = toDate(d).getDay();
+    if(!pwTipEl){ pwTipEl = document.createElement('div'); pwTipEl.className = 'pw-g-tip'; pwTipEl.hidden = true; document.body.appendChild(pwTipEl); }
+    pwTipEl.textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][wd] + ' ' + pwD(d) + (wd === 0 || wd === 6 ? ' · weekend' : '');
+    pwTipEl.style.left = Math.min(window.innerWidth - 190, x + 12) + 'px'; pwTipEl.style.top = (y + 18) + 'px'; pwTipEl.hidden = false;
+  }, 1300);
+});
+document.addEventListener('mouseout', (e) => { if(!e.relatedTarget){ pwTipHide(); document.querySelectorAll('.pw-g-hl').forEach(h => { h.style.display = 'none'; }); } });
+window.addEventListener('scroll', pwTipHide, { passive: true });
+
 /* ---- draft edits: stage dates (table and dragging) and delivery drops ---- */
 function pwDraftStage(sid){ const e = pwUi.edit, p = state.projects.find(x => x.id === e.pid), s = (p.stages || []).find(x => x.id === sid); return e.draft.stages[sid] || (e.draft.stages[sid] = { start: s ? s.start || '' : '', end: s ? s.end || '' : '' }); }
 function pwDraftQuote(){ const e = pwUi.edit, p = state.projects.find(x => x.id === e.pid); return planAsQuote(projAcceptedQuote(p), e.draft.plan); }
@@ -5810,6 +5935,10 @@ function pwClick(b){
     closeProjectWorkspace(); return;
   }
   if(a === 'sec'){ pwGoSection(b.dataset.sec); return; }
+  if(a === 'sec-toggle'){ pwSetSecOpen(b.dataset.sec, !pwUi.open.has(b.dataset.sec)); return; }
+  if(a === 'fold'){ pwToggleFold(b.dataset.fold); return; }
+  if(a === 'money-edit'){ pwUi.moneyEdit = !pwUi.moneyEdit; renderProjects(); return; }
+  if(a === 'cash-tog'){ const k = b.dataset.k, off = !pwUi.cashOff.has(k); if(off) pwUi.cashOff.add(k); else pwUi.cashOff.delete(k); b.classList.toggle('on', !off); b.setAttribute('aria-pressed', String(!off)); b.title = off ? 'Click to put this back in the chart' : 'Click to leave this out of the chart'; pwCashMount(); const cap = document.querySelector('#projectWorkspace .pw-cash-cap'); if(cap) cap.innerHTML = pwCashCap(p); return; }
   if(a === 'edit-begin'){ pwEditBegin(b.dataset.kind); return; }
   if(a === 'edit-save'){ pwEditSave(); return; }
   if(a === 'edit-discard'){ pwEditDiscard(); return; }
@@ -5951,9 +6080,9 @@ function pwVariationsHtml(p, i){
 function pwInvoicesHtml(p){
   const lines = p.paymentLines, vars = (p.variations || []).filter(v => v.status === 'Approved' || v.status === 'Invoiced'), contract = lines.reduce((a, l) => a + (Number(l.amount) || 0), 0), addl = vars.reduce((a, v) => a + (Number(v.price) || 0), 0);
   const stat = l => l.paidDate ? 'Paid' : l.invoicedDate ? 'Invoiced' : 'Not yet invoiced';
-  return `<div class="pw-card pw-wide"><h4>Invoice view <span class="qb-dim">(ex VAT${qVatOn() ? '; VAT added per Settings' : ''})</span></h4>
+  return `<div class="pw-card pw-inv"><h4>Invoice view <span class="qb-dim">(ex VAT${qVatOn() ? '; VAT added per Settings' : ''})</span></h4>
     <div class="q-sub" style="margin-top:0;">Original contract: agreed payment plan</div>
-    <table class="qb-table qb-narrow"><thead><tr><th>Payment</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${lines.map(l => `<tr><td>${escHtml(l.desc || 'Payment')}</td><td>${pwD(l.dueDate)}</td><td class="qb-calc">${qm(l.amount)}</td><td>${stat(l)}</td></tr>`).join('') || '<tr><td colspan="4"><div class="sup-empty">No payment lines.</div></td></tr>'}</tbody><tfoot><tr class="qb-foot"><td><b>Contract total</b></td><td></td><td class="qb-calc"><b>${qm(contract)}</b></td><td></td></tr></tfoot></table>
+    <table class="qb-table qb-narrow pw-itab"><thead><tr><th>Payment</th><th>Due</th><th class="r">Amount</th><th>Status</th></tr></thead><tbody>${lines.map(l => `<tr><td>${escHtml(l.desc || 'Payment')}</td><td>${pwD(l.dueDate)}</td><td class="qb-calc">${qm(l.amount)}</td><td>${stat(l)}</td></tr>`).join('') || '<tr><td colspan="4"><div class="sup-empty">No payment lines.</div></td></tr>'}</tbody><tfoot><tr class="qb-foot"><td><b>Contract total</b></td><td></td><td class="qb-calc"><b>${qm(contract)}</b></td><td></td></tr></tfoot></table>
     ${vars.length ? `<div class="q-sub">Scope additions</div><table class="qb-table qb-narrow"><thead><tr><th>Variation</th><th>Approved</th><th>Amount</th><th>Status</th></tr></thead><tbody>${vars.map(v => `<tr><td>${escHtml(v.ref + ' · ' + v.desc)}</td><td>${v.approval ? pwD(v.approval.at) : '—'}</td><td class="qb-calc">${qm(v.price)}</td><td>${v.status === 'Invoiced' ? 'Invoiced ' + pwD(v.invoicedDate) : 'Approved, not yet invoiced'}</td></tr>`).join('')}</tbody><tfoot><tr class="qb-foot"><td><b>Scope additions total</b></td><td></td><td class="qb-calc"><b>${qm(addl)}</b></td><td></td></tr><tr class="qb-foot"><td><b>Contract plus scope additions</b></td><td></td><td class="qb-calc"><b>${qm(contract + addl)}</b></td><td></td></tr></tfoot></table>` : ''}</div>`;
 }
 
@@ -6016,63 +6145,200 @@ function pwPlanClick(a, b, p){
   return false;
 }
 
+function pwQuotesCardHtml(p){
+  const qs = state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === p.id)).sort((a, b) => b.jobNumber - a.jobNumber || b.version - a.version);
+  return `<div class="pw-card"><h4>Quotes</h4>${qs.length ? qs.map(q => `<div class="q-chip" style="margin:0 0 6px;"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>v${q.version}</span><span class="q-st q-st-${q.status}">${q.status}</span><span>${qm(qCalc(q).totalEx)} ex VAT</span><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open</button></div>`).join('') : '<div class="pw-empty">No quotes linked.</div>'}</div>`;
+}
+function pwLinksCardHtml(p){
+  const links = p.links.map((l, li) => `<div class="pw-link"><input data-pw-link="name" data-li="${li}" value="${escAttr(l.name)}" placeholder="Name (e.g. Drawings)" aria-label="Link name"><input data-pw-link="url" data-li="${li}" value="${escAttr(l.url)}" placeholder="https://…" aria-label="Link address">${/^https?:\/\//i.test(l.url) ? `<a class="btn secondary qb-sm" href="${escAttr(l.url)}" target="_blank" rel="noopener">Open</a>` : ''}<button class="icon-btn" data-pw="del-link" data-li="${li}" aria-label="Remove link">${X_SVG}</button></div>`).join('');
+  return `<div class="pw-card"><h4>Files and links <span class="qb-dim">(drawings, photos, folders: paste the link)</span></h4>${links || '<div class="pw-empty">No links yet.</div>'}<button class="btn secondary qb-sm" data-pw="add-link" style="margin-top:8px;">+ Add link</button></div>`;
+}
+function pwNotesCardHtml(p, i){
+  return `<div class="pw-card"><h4>Notes</h4><div class="pw-notes2"><div class="detail-notes" style="margin:0;"><label>Notes</label><input data-tab="projects" data-idx="${i}" data-field="notes" value="${escAttr(p.notes || '')}"></div>
+    <div class="detail-notes" style="margin:0;"><label>Testimonial</label><input data-tab="projects" data-idx="${i}" data-field="testimonial" value="${escAttr(p.testimonial || '')}" placeholder="Capture the client's words at sign-off"></div></div></div>`;
+}
 function pwOverviewHtml(p, i){
   const today = fmt(new Date()), ev = projEventsUnique(p), upcoming = ev.filter(e => e.kind !== 'stage' ? (!e.done && e.date >= today && !e.planned) : (e.end >= today)).slice(0, 7);
   const over = ev.filter(e => e.overdue).sort((a, b) => a.date.localeCompare(b.date)), mm = projMonthMoney(p);
-  const quick = [['time', 'Log time'], ['milestone', 'Mark milestone done'], ['invoice', 'Mark invoice sent'], ['paid', 'Mark paid'], ['note', 'Add note']].map(([k, n]) => `<button type="button" class="btn secondary" data-pw="quick" data-q="${k}">${n}</button>`).join('');
+  const quick = [['time', 'Log time'], ['milestone', 'Mark milestone done'], ['invoice', 'Mark invoice sent'], ['paid', 'Mark paid'], ['note', 'Add note']].map(([k, n]) => `<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="${k}">${n}</button>`).join('');
   return `<section class="pw-sec" id="pw-overview" data-sec="overview"><h3>Overview</h3>
-    <div class="pw-grid">
-      <div class="pw-card"><h4>What happens next</h4>${upcoming.length ? upcoming.map(pwEventRow).join('') : '<div class="pw-empty">Nothing dated coming up. Add dates in Timeline.</div>'}</div>
-      <div class="pw-card${over.length ? ' pw-alert' : ''}"><h4>Overdue${over.length ? ` <span class="db-count">${over.length}</span>` : ''}</h4>${over.length ? over.map(pwEventRow).join('') : '<div class="pw-ok-big">✓ Nothing overdue</div>'}</div>
-      <div class="pw-card"><h4>Money this month</h4><div class="pw-money">
-        <div><small>In, still due</small><b>${qm(mm.inDue)}</b></div><div><small>In, received</small><b class="ok">${qm(mm.inPaid)}</b></div>
-        <div><small>Out, still due</small><b>${qm(mm.outDue)}</b></div><div><small>Out, paid</small><b>${qm(mm.outPaid)}</b></div></div>
-        <div class="pw-empty" style="padding-top:6px;">Net expected this month: <b>${qm(mm.inDue + mm.inPaid - mm.outDue - mm.outPaid)}</b></div></div>
-      <div class="pw-card"><h4>Open actions</h4>${recTasksHtml('project', p)}</div>
+    <div class="pw-ov">
+      <div class="pw-card pw-span2"><h4>What happens next</h4>${upcoming.length ? `<div class="pw-evlist">${upcoming.slice(0, 6).map(pwEventRow).join('')}</div>` : '<div class="pw-empty">Nothing dated coming up. Add dates in Timeline.</div>'}</div>
+      <div class="pw-stack">
+        <div class="pw-card${over.length ? ' pw-alert' : ''}"><h4>Overdue${over.length ? ` <span class="db-count">${over.length}</span>` : ''}</h4>${over.length ? over.map(pwEventRow).join('') : '<div class="pw-ok-big">✓ Nothing overdue</div>'}</div>
+        <div class="pw-card"><h4>Money this month</h4><div class="pw-money">
+          <div><small>In, still due</small><b>${qm(mm.inDue)}</b></div><div><small>In, received</small><b class="ok">${qm(mm.inPaid)}</b></div>
+          <div><small>Out, still due</small><b>${qm(mm.outDue)}</b></div><div><small>Out, paid</small><b>${qm(mm.outPaid)}</b></div></div>
+          <div class="pw-empty" style="padding-top:6px;">Net expected this month: <b>${qm(mm.inDue + mm.inPaid - mm.outDue - mm.outPaid)}</b></div></div>
+      </div>
       ${pwCustomerCardHtml(p, i)}
-      <div class="pw-card pw-wide"><h4>Quick actions</h4><div class="pw-quick">${quick}</div></div>
+      <div class="pw-card pw-compact"><h4>Quick actions</h4><div class="pw-quick">${quick}</div></div>
+      <div class="pw-card"><h4>Open actions</h4>${recTasksHtml('project', p)}</div>
+      ${pwQuotesCardHtml(p)}
+      ${pwLinksCardHtml(p)}
+      ${pwNotesCardHtml(p, i)}
     </div></section>`;
 }
-function pwMoneyHtml(p, i){
-  const aq = projAcceptedQuote(p), q = projQuote(p), mg = projMargin(p), lines = p.paymentLines;
-  const tot = { sold: 0, inv: 0, paid: 0, amt: 0 };
+function pwMoneyInTable(p, i){
+  const lines = p.paymentLines, ed = pwUi.moneyEdit, tot = { sold: 0, inv: 0, paid: 0, amt: 0 }, today = fmt(new Date());
   const rows = lines.map((l, pli) => {
     const amt = Number(l.amount) || 0, sold = l.soldAmount !== undefined && l.soldAmount !== '' ? Number(l.soldAmount) : null; tot.amt += amt; tot.sold += sold || 0; if(l.invoicedDate) tot.inv += amt; if(l.paidDate) tot.paid += amt;
-    const at = `data-tab="payline" data-idx="${i}" data-pli="${pli}"`, odd = l.paidDate ? 'paid' : l.invoicedDate ? 'invoiced' : (l.dueDate && l.dueDate < fmt(new Date()) ? 'over' : '');
-    return `<tr data-drag="ppay" data-rid="${p.id}" data-ix="${pli}" class="pw-pay ${odd}"><td class="dg">${DRAG_H}<input ${at} data-field="desc" value="${escAttr(l.desc || '')}" aria-label="Description">${l.quoteRowId ? '<span class="qb-flag" title="From the quote\'s payment schedule">quote</span>' : ''}</td>
+    const at = `data-tab="payline" data-idx="${i}" data-pli="${pli}"`, odd = l.paidDate ? 'paid' : l.invoicedDate ? 'invoiced' : (l.dueDate && l.dueDate < today ? 'over' : '');
+    const soldCell = `<td class="qb-calc">${sold === null ? '<span class="qb-dim">—</span>' : qm(sold)}</td>`, flags = (l.quoteRowId ? ' <span class="qb-flag" title="From the quote\'s payment schedule">quote</span>' : '');
+    if(!ed){
+      return `<tr class="pw-pay ${odd}"><td>${escHtml(l.desc || '—')}${flags}</td><td>${l.dueDate ? pwD(l.dueDate) : '<span class="qb-dim">—</span>'}${l.dueManual ? ' <span class="qb-flag manual" title="Typed here: a quote sync will not overwrite this date">manual</span>' : ''}</td>${soldCell}<td class="qb-calc"><b>${qm(amt)}</b></td>
+        <td>${l.invoicedDate ? pwD(l.invoicedDate) : `<button type="button" class="sp-link" data-pw="inv-sent" data-idx="${pli}">sent today</button>`}</td>
+        <td>${l.paidDate ? '<span class="pw-ok">✓</span> ' + pwD(l.paidDate) : `<button type="button" class="sp-link" data-pw="pay-paid" data-idx="${pli}">paid today</button>`}</td></tr>`;
+    }
+    return `<tr data-drag="ppay" data-rid="${p.id}" data-ix="${pli}" class="pw-pay ${odd}"><td class="dg">${DRAG_H}<input ${at} data-field="desc" value="${escAttr(l.desc || '')}" aria-label="Description">${flags}</td>
       <td><input type="date" ${at} data-field="dueDate" value="${escAttr(l.dueDate || '')}" aria-label="Due date">${l.dueManual ? ' <span class="qb-flag manual" title="Typed here: a quote sync will not overwrite this date">manual</span>' : ''}</td>
-      <td class="qb-calc">${sold === null ? '<span class="qb-dim">—</span>' : qm(sold)}</td><td><input type="number" step="any" ${at} data-field="amount" value="${amt}" aria-label="Amount" class="qb-n"></td>
-      <td><input type="date" ${at} data-field="invoicedDate" value="${escAttr(l.invoicedDate || '')}" aria-label="Invoiced">${l.invoicedDate ? '' : `<button type="button" class="sp-link" data-pw="inv-sent" data-idx="${pli}">sent today</button>`}</td>
-      <td><input type="date" ${at} data-field="paidDate" value="${escAttr(l.paidDate || '')}" aria-label="Paid">${l.paidDate ? '' : `<button type="button" class="sp-link" data-pw="pay-paid" data-idx="${pli}">paid today</button>`}</td>
+      ${soldCell}<td><input type="number" step="any" ${at} data-field="amount" value="${amt}" aria-label="Amount" class="qb-n"></td>
+      <td><input type="date" ${at} data-field="invoicedDate" value="${escAttr(l.invoicedDate || '')}" aria-label="Invoiced"></td>
+      <td><input type="date" ${at} data-field="paidDate" value="${escAttr(l.paidDate || '')}" aria-label="Paid"></td>
       <td><button class="icon-btn" data-action="del-payline" data-idx="${i}" data-pli="${pli}" title="Delete line" aria-label="Delete line">${X_SVG}</button></td></tr>`;
   }).join('');
+  const nc = ed ? 7 : 6;
+  return `<div class="qb-scroll"><table class="qb-table qb-narrow pw-mtab${ed ? ' editing' : ''}"><colgroup><col class="c-desc"><col class="c-date"><col class="c-sold"><col class="c-amt"><col class="c-date2"><col class="c-date2">${ed ? '<col class="c-x">' : ''}</colgroup>
+    <thead><tr><th>Description</th><th>Due</th><th class="r">Sold</th><th class="r">Amount</th><th>Invoiced</th><th>Paid</th>${ed ? '<th></th>' : ''}</tr></thead><tbody>${rows || `<tr><td colspan="${nc}"><div class="sup-empty">No payment lines yet.</div></td></tr>`}</tbody>
+    ${lines.length ? `<tfoot><tr class="qb-foot"><td><b>Totals</b></td><td></td><td class="qb-calc"><b>${tot.sold ? qm(tot.sold) : '—'}</b></td><td class="qb-calc"><b>${qm(tot.amt)}</b></td><td>${qm(tot.inv)} invoiced</td><td>${qm(tot.paid)} paid</td>${ed ? '<td></td>' : ''}</tr></tfoot>` : ''}</table></div>`;
+}
+function pwMoneyHtml(p, i){
+  const aq = projAcceptedQuote(p), q = projQuote(p), mg = projMargin(p), ed = pwUi.moneyEdit;
   const dl = projDeliveries(p), outRows = dl.drops.filter(x => x.due && x.out > 0).map(x => `<tr><td>${escHtml(x.supplier)}</td><td>${pwD(x.due)}</td><td class="qb-calc">${qm(x.out)}</td><td>${x.paid ? `${pwD(x.paid)} <button type="button" class="sp-link" data-pw="sup-unpaid" data-did="${escAttr(x.d.id)}">clear</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="sup-paid" data-did="${escAttr(x.d.id)}">Paid today</button>`}</td></tr>`).join('');
   const quoteBar = aq ? `<div class="pw-qbar"><span>Payment lines follow <b>${escHtml(qRef(aq))}</b> (Accepted)</span><button type="button" class="btn secondary qb-sm" data-pw="sync-pay">Sync from the quote</button><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${aq.id}">Open quote (As sold, Actual vs sold)</button></div>` : (q ? `<div class="pw-qbar">Linked quote ${escHtml(qRef(q))} is ${q.status}, not Accepted yet. Payment lines come from it once it is accepted.<button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open quote</button></div>` : '<div class="pw-qbar">No quote is linked to this project, so these payment lines are typed by hand.</div>');
+  const tools = ed ? `<button class="btn secondary qb-sm" data-action="add-payline" data-idx="${i}">+ Add payment line</button><button type="button" class="btn qb-sm" data-pw="money-edit">Done</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="money-edit" title="Unlock the grid to change the payment lines">✎ Edit</button>`;
   return `<section class="pw-sec" id="pw-money" data-sec="money"><h3>Money</h3>
-    <div class="pw-card pw-wide">${quoteBar}<div class="qb-sec-h"><h4>Money in <span class="qb-dim">(payment lines: sold, invoiced, paid)</span></h4><div class="qb-sec-tools"><button class="btn secondary" data-action="add-payline" data-idx="${i}">+ Add payment line</button></div></div>
-      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Description</th><th>Due</th><th>Sold</th><th>Amount</th><th>Invoiced</th><th>Paid</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="7"><div class="sup-empty">No payment lines yet.</div></td></tr>'}</tbody>
-      ${lines.length ? `<tfoot><tr class="qb-foot"><td><b>Totals</b></td><td></td><td class="qb-calc"><b>${tot.sold ? qm(tot.sold) : '—'}</b></td><td class="qb-calc"><b>${qm(tot.amt)}</b></td><td class="qb-calc">${qm(tot.inv)} invoiced</td><td class="qb-calc">${qm(tot.paid)} paid</td><td></td></tr></tfoot>` : ''}</table></div></div>
-    ${pwInvoicesHtml(p)}
+    <div class="pw-card pw-wide">${quoteBar}<div class="qb-sec-h"><h4>Money in <span class="qb-dim">(payment lines: sold, invoiced, paid${ed ? '; editing' : ''})</span></h4><div class="qb-sec-tools">${tools}</div></div>${pwMoneyInTable(p, i)}</div>
     <div class="pw-grid">
-      <div class="pw-card"><h4>Money out <span class="qb-dim">(supplier drops and their due dates)</span></h4>${outRows ? `<table class="qb-table qb-narrow"><thead><tr><th>Supplier</th><th>Due</th><th>Amount</th><th>Paid</th></tr></thead><tbody>${outRows}</tbody></table>` : '<div class="pw-empty">No supplier payments: they come from the delivery drops on the linked quote.</div>'}</div>
+      ${pwInvoicesHtml(p)}
+      ${pwCashCardHtml(p)}
+      <div class="pw-card"><h4>Money out <span class="qb-dim">(supplier drops and their due dates)</span></h4>${outRows ? `<table class="qb-table qb-narrow"><thead><tr><th>Supplier</th><th>Due</th><th class="r">Amount</th><th>Paid</th></tr></thead><tbody>${outRows}</tbody></table>` : '<div class="pw-empty">No supplier payments: they come from the delivery drops on the linked quote.</div>'}</div>
       <div class="pw-card"><h4>Sold vs actual</h4>${mg ? `<div class="pw-money"><div><small>Margin as sold</small><b>${mg.hasSold ? qm(mg.soldAfter) : '—'}</b><em>${mg.hasSold ? qpct(mg.soldPct) : 'no snapshot'}</em></div><div><small>Margin now</small><b class="${mg.now < mg.soldAfter - 0.005 && mg.hasSold ? 'over' : ''}">${qm(mg.now)}</b><em>${qpct(mg.nowPct)}</em></div></div><p class="q-help">Margin now uses ${escHtml(mg.basis)}. Per stage (hours sold, planned, logged) is in Timeline; per payment line (sold, invoiced, paid) is above.</p>` : '<div class="pw-empty">Needs an accepted quote to compare against.</div>'}
         <div class="qual-grid" style="margin-top:8px;"><div class="qual-field"><label>Budgeted cost (£)</label><input type="number" step="1" data-tab="projects" data-idx="${i}" data-field="budgetedCost" value="${p.budgetedCost || 0}"></div><div class="qual-field"><label>Actual cost (£)</label><input type="number" step="1" data-tab="projects" data-idx="${i}" data-field="actualCost" value="${p.actualCost || 0}"></div></div></div>
     </div></section>`;
 }
-function pwNotesHtml(p, i){
-  const links = p.links.map((l, li) => `<div class="pw-link"><input data-pw-link="name" data-li="${li}" value="${escAttr(l.name)}" placeholder="Name (e.g. Drawings)" aria-label="Link name"><input data-pw-link="url" data-li="${li}" value="${escAttr(l.url)}" placeholder="https://…" aria-label="Link address">${/^https?:\/\//i.test(l.url) ? `<a class="btn secondary qb-sm" href="${escAttr(l.url)}" target="_blank" rel="noopener">Open</a>` : ''}<button class="icon-btn" data-pw="del-link" data-li="${li}" aria-label="Remove link">${X_SVG}</button></div>`).join('');
-  return `<section class="pw-sec" id="pw-notes" data-sec="notes"><h3>Notes and files</h3><div class="pw-grid">
-    <div class="pw-card"><h4>Notes</h4><div class="detail-notes" style="margin:0 0 8px;"><label>Notes</label><input data-tab="projects" data-idx="${i}" data-field="notes" value="${escAttr(p.notes || '')}"></div>
-      <div class="detail-notes" style="margin:0;"><label>Testimonial</label><input data-tab="projects" data-idx="${i}" data-field="testimonial" value="${escAttr(p.testimonial || '')}" placeholder="Capture the client's words at sign-off"></div></div>
-    <div class="pw-card"><h4>Files and links <span class="qb-dim">(drawings, photos, folders: paste the link)</span></h4>${links || '<div class="pw-empty">No links yet.</div>'}<button class="btn secondary" data-pw="add-link" style="margin-top:8px;">+ Add link</button></div>
-    <div class="pw-card pw-wide"><h4>Timeline of notes</h4>${commsBlockHtml('project', p, i, 'projcomms')}</div></div></section>`;
+/* money in and out against the timeline: a step line of the running balance (in minus out), drawn from the payment lines, the supplier due dates and the order date */
+/* labour, stage by stage: planned (the Working plan's labour lines for the stage, else the stage's own planned time) against the time logged on it.
+   Logged cost = hours logged x the planned cost per hour of that stage (the settings rate when the stage has no plan). A stage counts as complete once its end date has passed. */
+function pwLabourRows(p){
+  const wq = projWorkQuote(p), today = fmt(new Date()), prof = 1 + (Number(state.settings.labourProfitPct) || 0) / 100, dayRate = Number(state.settings.labourRateDay) > 0 ? Number(state.settings.labourRateDay) : 0, defHr = dayRate ? dayRate / hpd() / prof : 0;
+  const c = wq && wq.labour && wq.labour.length ? qCalc(wq) : null, stages = p.stages || []; stages.forEach(slEnsure);
+  const rows = stages.map(st => {
+    let ph = 0, pc = 0; if(c) wq.labour.forEach(r => { const x = c.labour[r.id]; if(r.stageId !== st.id || !x || x.excluded) return; ph += qLabourDays(r) * hpd(); pc += (Number(x.amount) || 0) / prof; });
+    if(!(pc > 0) && slPlannedHours(st) > 0){ ph = slPlannedHours(st); pc = ph * defHr; }
+    const lh = slLogged(st), rate = ph > 0 && pc > 0 ? pc / ph : defHr, logs = (st.log || []).map(x => x.date).filter(Boolean).sort(), end = st.end || st.start || '';
+    return { id: st.id, label: st.label || 'Stage', ph, pc: r2(pc), lh, rate, lc: r2(lh * rate), end, last: logs.length ? logs[logs.length - 1] : '', done: !!end && end < today };
+  }).filter(g => g.ph > 0 || g.pc > 0 || g.lh > 0);
+  const unplaced = c ? wq.labour.filter(r => !stages.some(s => s.id === r.stageId) && c.labour[r.id] && !c.labour[r.id].excluded && c.labour[r.id].amount > 0).length : 0;
+  return { rows, unplaced };
 }
-function pwHistoryHtml(p, i){
-  const ss = p.salesSnapshot, qs = state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === p.id)).sort((a, b) => b.jobNumber - a.jobNumber || b.version - a.version);
-  return `<section class="pw-sec" id="pw-history" data-sec="history"><h3>Lead and sales history</h3><div class="pw-grid">
-    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Original lead info</h4><button class="btn secondary" data-action="return-record" data-pl="project" data-id="${p.id}">← Return to Sales Pipeline</button></div>${leadInfoHtml(p)}</div>
-    <div class="pw-card"><h4>As a sales deal</h4>${ss ? `<dl class="ro-grid"><dt>Sales stage</dt><dd>${escHtml(stageName('sales', ss.stageId))}</dd><dt>Quoted value</dt><dd>${ss.quoteValue ? money(ss.quoteValue) : '—'}</dd><dt>Contract signed</dt><dd>${pwD(ss.contractSigned)}</dd></dl>` : '<div class="pw-empty">This project was promoted before sales details were kept.</div>'}</div>
-    <div class="pw-card"><h4>Quotes</h4>${qs.length ? qs.map(q => `<div class="q-chip" style="margin:0 0 6px;"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>v${q.version}</span><span class="q-st q-st-${q.status}">${q.status}</span><span>${qm(qCalc(q).totalEx)} ex VAT</span><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open</button></div>`).join('') : '<div class="pw-empty">No quotes linked.</div>'}</div></div></section>`;
+function pwLabourCheckBody(p){
+  const L = pwLabourRows(p), rows = L.rows;
+  if(!rows.length) return '<div class="pw-empty">No labour planned or logged yet. Labour lines (with a stage) on the quote or Working plan set the plan; Log time adds what actually happens.</div>';
+  const t = { ph: 0, lh: 0, pc: 0, lc: 0, fc: 0 };
+  const body = rows.map(g => {
+    t.ph += g.ph; t.lh += g.lh; t.pc += g.pc; t.lc += g.lc; t.fc += g.done ? g.lc : Math.max(g.lc, g.pc);
+    const diff = g.lc - g.pc, used = g.pc > 0 ? Math.round(g.lc / g.pc * 100) : 0;
+    let pos, cls = '';
+    if(g.lh === 0 && !g.done) pos = '<span class="qb-dim">Not started</span>';
+    else if(!g.done) { pos = g.pc > 0 ? used + '% of the plan used' : 'In progress'; if(g.lc > g.pc + 0.5 && g.pc > 0){ pos = 'Over the plan already (' + used + '%)'; cls = 'q-over'; } }
+    else if(g.lc > g.pc + 0.5){ pos = 'Complete: over by ' + qm(diff); cls = 'q-over'; }
+    else if(g.lc < g.pc - 0.5){ pos = g.lh === 0 ? 'Complete: nothing logged' : 'Complete: under by ' + qm(-diff); cls = g.lh === 0 ? '' : 'q-under'; }
+    else pos = 'Complete: on plan';
+    return `<tr><td>${escHtml(g.label)}</td><td class="qb-calc">${g.ph ? hrs(g.ph) : '—'}</td><td class="qb-calc">${g.lh ? hrs(g.lh) : '—'}</td><td class="qb-calc">${g.pc ? qm(g.pc) : '—'}</td><td class="qb-calc">${g.lh ? (g.rate ? qm(g.lc) : '<span class="qb-dim" title="No planned rate or labour day rate in Settings">no rate</span>') : '—'}</td><td class="${cls}">${pos}</td></tr>`;
+  }).join('');
+  const over = t.fc > t.pc + 0.5;
+  return `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th class="r">Planned</th><th class="r">Logged</th><th class="r">Planned cost</th><th class="r">Logged cost</th><th>Where it stands</th></tr></thead><tbody>${body}</tbody>
+    <tfoot><tr class="qb-foot"><td><b>Total</b></td><td class="qb-calc"><b>${hrs(t.ph)}</b></td><td class="qb-calc"><b>${hrs(t.lh)}</b></td><td class="qb-calc"><b>${qm(t.pc)}</b></td><td class="qb-calc"><b>${qm(t.lc)}</b></td><td>Forecast at completion <b class="${over ? 'q-over' : ''}">${qm(t.fc)}</b> against ${qm(t.pc)} planned</td></tr></tfoot></table></div>
+    <p class="q-help">Planned is the forecast. As time is logged against a stage its cost is compared with the plan; a stage counts as complete once its end date has passed. Logged cost uses the stage’s planned cost per hour.${L.unplaced ? ` ${L.unplaced} labour line${L.unplaced === 1 ? ' has' : 's have'} no stage, so ${L.unplaced === 1 ? 'it is' : 'they are'} left out.` : ''}</p>`;
+}
+const PW_CASH = [['cust', 'Customer payments', true], ['var', 'Variations', true], ['sup', 'Supplier payments', false], ['direct', 'Direct costs', false], ['lab', 'Labour', false]];   // [key, label, money in?]
+function pwCashAll(p){
+  const today = fmt(new Date()), ev = [];
+  finLines().filter(x => x.pid === p.id && (x.kind === 'custPay' || x.kind === 'supPay')).forEach(x => { const d = x.paidDate || x.date; if(!(x.amount > 0) || !d) return; ev.push({ k: x.kind === 'supPay' ? 'sup' : x.variation ? 'var' : 'cust', date: d, when: d, amt: x.kind === 'supPay' ? -x.amount : x.amount, done: !!x.done, title: x.label.replace(/^Scope addition /, '') }); });
+  (state.transactions || []).filter(t => t.projectId === p.id && Number(t.moneyOut) > 0 && !t.planned && t.date).forEach(t => ev.push({ k: 'direct', date: t.date, when: t.date, amt: -Number(t.moneyOut), done: true, title: t.description || 'Direct cost' }));   // paid and not part of a plan line (planned ones already show as supplier payments)
+  const lab = pwLabourRows(p);   // labour is the forecast until time is logged: planned cost at the end of each stage, then the logged cost (plus what is still to come) as the work happens
+  lab.rows.forEach(g => {
+    if(g.lh > 0 && g.lc > 0) ev.push({ k: 'lab', date: g.last || today, when: g.last || today, amt: -g.lc, done: true, title: g.label + ': ' + hrs(g.lh) + ' logged' + (g.pc > 0 ? ' (planned ' + qm(g.pc) + ')' : '') });
+    const rem = g.pc - g.lc;
+    if(rem > 0.5 && g.end && (!g.done || g.lh === 0)) ev.push({ k: 'lab', date: g.end, when: g.end, amt: -r2(rem), done: false, noLate: true, title: g.label + ': labour ' + (g.lh > 0 ? 'still to come' : 'planned') });
+  });
+  const unplaced = lab.unplaced;
+  ev.forEach(e => { e.inn = e.amt > 0; e.late = !e.done && !e.noLate && e.date < today; if(e.late) e.date = today; });   // money still owed from the past is drawn at today, flagged
+  ev.unplaced = unplaced; return ev;
+}
+function pwCashEvents(p){ const ev = pwCashAll(p).filter(e => !pwUi.cashOff.has(e.k)); return ev.sort((a, b) => a.date.localeCompare(b.date) || b.amt - a.amt); }
+const pwK = v => { const a = Math.abs(v), t = a >= 10000 ? Math.round(a / 1000) + 'k' : a >= 1000 ? (Math.round(a / 100) / 10) + 'k' : String(Math.round(a)); return (v < 0 ? '−' : '') + '£' + t; };
+function pwNiceStep(raw){ const m = Math.pow(10, Math.floor(Math.log10(raw || 1))), r = raw / m; return (r <= 1 ? 1 : r <= 2 ? 2 : r <= 5 ? 5 : 10) * m; }
+function pwCashSvg(p, W){
+  const ev = pwCashEvents(p), today = fmt(new Date()), order = projOrderDate(p), hasDrops = ev.some(e => e.k === 'sup');
+  if(!ev.length) return '<div class="pw-empty">Nothing to draw: switch a component back on above, or add payment lines (money in) and supplier due dates (money out).</div>';
+  const st = (p.stages || []).filter(s => s.start || s.end).slice(0, 8), H = 250 + st.length * 9, ml = 50, mr = 22, mt = 20, mb = 26 + (st.length ? st.length * 9 + 8 : 0), pw = Math.max(120, W - ml - mr), ph = H - mt - mb;
+  const ds = ev.map(e => e.date).concat([today]); if(order && hasDrops) ds.push(order); st.forEach(s => ds.push(s.start || s.end, s.end || s.start)); ds.sort();
+  const lo = addDaysIso(ds[0], -2), hi = addDaysIso(ds[ds.length - 1], 6), span = Math.max(1, Math.round((toDate(hi) - toDate(lo)) / 86400000)), X = d => ml + Math.round((toDate(d) - toDate(lo)) / 86400000) / span * pw;
+  let cum = 0, vmin = 0, vmax = 0; const pts = ev.map(e => { cum += e.amt; vmin = Math.min(vmin, cum); vmax = Math.max(vmax, cum); return cum; });
+  const stp = pwNiceStep((vmax - vmin || 1) / 4), y0v = Math.floor(vmin / stp) * stp, y1v = Math.ceil(vmax / stp) * stp || stp, Y = v => mt + (1 - (v - y0v) / (y1v - y0v)) * ph, yz = Y(0);
+  let grid = '', yl = ''; for(let v = y0v; v <= y1v + 1e-6; v += stp){ grid += `<line x1="${ml}" x2="${ml + pw}" y1="${Y(v)}" y2="${Y(v)}" class="${v === 0 ? 'c-zero' : 'c-grid'}"/>`; yl += `<text x="${ml - 6}" y="${Y(v) + 3.5}" text-anchor="end">${v === 0 ? '£0' : pwK(v)}</text>`; }
+  let xt = ''; for(let d = new Date(toDate(lo).getFullYear(), toDate(lo).getMonth() + 1, 1); d <= toDate(hi); d = new Date(d.getFullYear(), d.getMonth() + 1, 1)){ const x = X(fmt(d)); if(x > ml + pw - 34) break; xt += `<line x1="${x}" x2="${x}" y1="${mt}" y2="${mt + ph}" class="c-grid"/><text x="${x + 3}" y="${mt + ph + 14}">${d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}</text>`; }
+  let path = `M${X(lo)},${yz}`, prev = 0; ev.forEach((e, k) => { path += ` L${X(e.date)},${Y(prev)} L${X(e.date)},${Y(pts[k])}`; prev = pts[k]; }); path += ` L${X(hi)},${Y(prev)}`;
+  const area = path + ` L${X(hi)},${yz} L${X(lo)},${yz} Z`, tx = X(today), id = 'pwc' + p.id;
+  const marks = ev.map((e, k) => `<circle cx="${X(e.date)}" cy="${Y(pts[k])}" r="4.5" class="c-pt ${e.inn ? 'in' : 'out'}${e.done ? ' done' : ''}${e.late ? ' late' : ''}"><title>${escHtml(e.title)}: ${e.inn ? '+' : '−'}${qm(Math.abs(e.amt))} · ${e.done ? 'paid ' : e.late ? 'was due ' : 'due '}${pwD(e.when)}${e.late ? ' (overdue, drawn at today)' : ''} · balance after ${qm(pts[k])}</title></circle>${ev.length <= 10 ? `<text x="${X(e.date)}" y="${Y(pts[k]) + (e.inn ? -9 : 17)}" text-anchor="middle" class="c-lab ${e.inn ? 'in' : 'out'}">${e.inn ? '+' : '−'}${pwK(Math.abs(e.amt)).replace('−', '')}</text>` : ''}`).join('');
+  const dues = ev.filter(e => e.k === 'sup').map(e => e.when).sort(), note = order && hasDrops ? `<line x1="${X(order)}" x2="${X(order)}" y1="${mt}" y2="${mt + ph}" class="c-order"/><g transform="translate(${Math.min(X(order), ml + pw - 66)},${mt - 17})"><rect width="66" height="15" rx="7.5" class="c-chip"/><text x="33" y="10.5" text-anchor="middle" class="c-chiptx">Ordered</text><title>Materials ordered ${pwD(order)}. A purchase is a commitment, not cash out: suppliers are paid on their due dates${dues.length ? ' (' + pwD(dues[0]) + (dues.length > 1 ? ' to ' + pwD(dues[dues.length - 1]) : '') + ')' : ''}.</title></g>` : '';
+  const strip = st.map((s, k) => { const a = s.start || s.end, b = s.end || s.start; return `<rect x="${X(a)}" y="${mt + ph + 26 + k * 9}" width="${Math.max(3, X(addDaysIso(b, 1)) - X(a))}" height="6" rx="3" class="c-stage"><title>${escHtml(s.label || 'Stage')} · ${pwD(a)} → ${pwD(b)}</title></rect>`; }).join('');
+  return `<svg class="pw-cash" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Running balance of money in minus money out across the project timeline">
+    <defs><clipPath id="${id}up"><rect x="${ml}" y="${mt}" width="${pw}" height="${Math.max(0, yz - mt)}"/></clipPath><clipPath id="${id}dn"><rect x="${ml}" y="${yz}" width="${pw}" height="${Math.max(0, mt + ph - yz)}"/></clipPath><clipPath id="${id}now"><rect x="${ml}" y="0" width="${Math.max(0, Math.min(pw, tx - ml))}" height="${H}"/></clipPath></defs>
+    ${grid}${yl}${xt}<path d="${area}" class="c-fill up" clip-path="url(#${id}up)"/><path d="${area}" class="c-fill dn" clip-path="url(#${id}dn)"/>
+    <path d="${path}" class="c-line exp"/><path d="${path}" class="c-line" clip-path="url(#${id}now)"/>
+    ${note}<line x1="${tx}" x2="${tx}" y1="${mt}" y2="${mt + ph}" class="c-today"/><text x="${tx + 3}" y="${mt + ph - 5}" class="c-todaytx">Today</text>${marks}
+    <line x1="${ml}" x2="${ml + pw}" y1="${mt + ph}" y2="${mt + ph}" class="c-axis"/>${strip}</svg>`;
+}
+function pwCashCap(p){
+  const ev = pwCashEvents(p), all = pwCashAll(p); let cum = 0, low = 0, lowAt = ''; ev.forEach(e => { cum += e.amt; if(cum < low){ low = cum; lowAt = e.when; } });
+  const parts = [!ev.length ? '' : low < -0.5 ? `Lowest point <b class="over">${qm(low)}</b> on ${pwD(lowAt)}: more has gone out than has come in by then.` : 'The balance never drops below zero: the money in lands before the money out.'];
+  if(all.unplaced && !pwUi.cashOff.has('lab')) parts.push(`${all.unplaced} labour line${all.unplaced === 1 ? ' has' : 's have'} no stage dates, so ${all.unplaced === 1 ? 'it is' : 'they are'} left off.`);
+  return parts.filter(Boolean).join(' ');
+}
+function pwCashCardHtml(p){
+  const all = pwCashAll(p), pills = PW_CASH.filter(c => all.some(e => e.k === c[0])).map(([k, n, inn]) => { const on = !pwUi.cashOff.has(k), tot = all.filter(e => e.k === k).reduce((a, e) => a + Math.abs(e.amt), 0); return `<button type="button" class="pw-pill ${inn ? 'in' : 'out'}${on ? ' on' : ''}" data-pw="cash-tog" data-k="${k}" aria-pressed="${on}" title="${on ? 'Click to leave this out of the chart' : 'Click to put this back in the chart'}"><i class="pdot"></i>${n} <b>${pwK(tot).replace('−', '')}</b></button>`; }).join('');
+  const cap = pwCashCap(p);
+  return `<div class="pw-card"><h4>Money in and out <span class="qb-dim">(running balance against the timeline)</span></h4>${pills ? `<div class="pw-pills" role="group" aria-label="What the chart includes">${pills}</div>` : ''}<div class="pw-cash-box" data-pid="${p.id}"></div>
+    <div class="pw-cash-key"><span><i class="k in"></i>Money in</span><span><i class="k out"></i>Money out</span><span><i class="k done"></i>Paid</span><span><i class="k"></i>Expected</span><span>Solid line to today, dashed after</span></div><p class="q-help pw-cash-cap">${cap}</p>
+    <p class="q-help">A purchase made before the first payment is shown as an “Ordered” note: it is a commitment, and the money only leaves on the supplier’s due date. Labour is the forecast (planned cost at the end of each stage) until time is logged, then the logged cost; the Labour check in Timeline compares the two. Stage bars sit under the dates.</p></div>`;
+}
+function pwCashMount(){
+  document.querySelectorAll('#projectWorkspace .pw-cash-box').forEach(box => {
+    const w = Math.floor(box.clientWidth), p = state.projects.find(x => x.id === Number(box.dataset.pid)); if(!p || w < 120) return;
+    const key = w + '|' + [...pwUi.cashOff].sort().join(','); if(box.dataset.w === key && box.firstChild) return; box.dataset.w = key; box.innerHTML = pwCashSvg(p, w);
+  });
+}
+let pwCashT = 0; window.addEventListener('resize', () => { clearTimeout(pwCashT); pwCashT = setTimeout(pwCashMount, 120); });
+function pwChangeLogBody(p){
+  const log = (p.changeLog || []).slice().reverse();
+  return log.length ? log.map(c => `<details class="pw-chg"><summary><span class="pw-chg-when">${escHtml(new Date(c.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }))}</span> · <b>${escHtml(c.by || 'someone')}</b> · ${escHtml(PW_EDIT_NAME[c.kind] || c.kind)} <span class="qb-flag">${escHtml(causeName(c.cause))}</span> <span class="pw-chg-r">${escHtml(c.reason)}</span></summary>
+      <ul>${(c.changes || []).map(x => `<li>${escHtml(x)}</li>`).join('')}</ul></details>`).join('') : '<div class="pw-empty">No changes logged yet. Saving an edit to the timeline, deliveries or the Working plan records who, when, what and why here.</div>';
+}
+/* Project details: everything captured in the Lead Pipeline and the Sales Pipeline, which stops being shown once the record becomes a project */
+const pwSalesKnown = () => ['id', 'name', 'comms', 'stages', 'leadSnapshot', 'projectHold', 'salesHold', 'stageId', 'quoteValue', 'contractSigned', 'probability', 'probOverride', 'tier', 'type', 'notes', 'leadNotes'].concat(CARRY_FIELDS);
+function pwSalesInfoBody(p){
+  const ss = p.salesSnapshot, st = (p.stages || []).filter(s => Number(s.cost) > 0), tot = st.reduce((a, s) => a + (Number(s.cost) || 0), 0), out = [];
+  const row = (k, v) => `<dt>${k}</dt><dd>${v ? v : '<span class="dim">—</span>'}</dd>`;
+  if(ss){
+    const prob = Math.round(effectiveProb(ss) * 100), typed = ss.probOverride !== undefined && ss.probOverride !== null && ss.probOverride !== '';
+    const extra = Object.keys(ss).filter(k => !pwSalesKnown().includes(k) && ss[k] !== '' && ss[k] !== null && ss[k] !== undefined && typeof ss[k] !== 'object').map(k => row(escHtml(k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())), escHtml(String(ss[k]))));
+    out.push(`<dl class="ro-grid">${row('Sales stage', escHtml(stageName('sales', ss.stageId)))}${row('Quoted value', ss.quoteValue ? money(ss.quoteValue) : '')}${row('Win chance', prob + '%' + (typed ? ' <span class="qb-dim">typed, not from the stage</span>' : ''))}${row('Deal tier', escHtml(ss.tier || ''))}${row('Deal type', ss.type === 'example' ? 'Worked example' : 'Real')}${row('Contract signed', ss.contractSigned ? pwD(ss.contractSigned) : '')}${ss.notes && String(ss.notes).trim() !== String(p.notes || '').trim() ? row('Sales notes when promoted', escHtml(ss.notes)) : ''}${extra.join('')}</dl>`);
+  } else out.push('<div class="pw-empty">This project was promoted before the sales deal details were kept.</div>');
+  if(st.length) out.push(`<div class="q-sub">Scoped cost of each stage <span class="qb-dim">(estimated in the Sales Pipeline)</span></div><table class="qb-table qb-narrow pw-itab"><thead><tr><th>Stage</th><th>Kind</th><th class="r">Scoped cost</th></tr></thead><tbody>${st.map(s => `<tr><td>${escHtml(s.label || 'Stage')}</td><td>${escHtml((STAGE_KINDS[s.kind] || {}).label || s.kind || '')}</td><td class="qb-calc">${qm(s.cost)}</td></tr>`).join('')}</tbody><tfoot><tr class="qb-foot"><td><b>Total</b></td><td></td><td class="qb-calc"><b>${qm(tot)}</b></td></tr></tfoot></table>`);
+  return out.join('');
+}
+function pwDetailsBody(p){
+  return `<div class="pw-sub-h">From the Lead Pipeline <span class="qb-dim">(read-only)</span></div>${leadInfoHtml(p)}<div class="pw-sub-h">From the Sales Pipeline <span class="qb-dim">(read-only)</span></div>${pwSalesInfoBody(p)}`;
+}
+function pwInfoHtml(p, i){
+  const nc = (p.comms || []).length, nl = (p.changeLog || []).length;
+  return `<section class="pw-sec" id="pw-info" data-sec="info"><h3>Information</h3>
+    ${pwFold('i-notes', 'Timeline of notes', nc ? nc + (nc === 1 ? ' entry' : ' entries') : 'No entries yet', '', commsBlockHtml('project', p, i, 'projcomms'), false)}
+    ${pwFold('i-details', 'Project details', 'Everything captured in the Lead and Sales Pipelines before this became a project', `<button class="btn secondary qb-sm" data-action="return-record" data-pl="project" data-id="${p.id}">← Return to Sales Pipeline</button>`, pwDetailsBody(p), false)}
+    ${pwFold('i-log', 'Change log', nl ? nl + (nl === 1 ? ' change' : ' changes') + ' recorded' : 'No changes recorded yet', '', pwChangeLogBody(p), false)}</section>`;
 }
 /* one-click actions: the date defaults to today; clearing offers Undo */
 function pwSetDate(label, get, set, date){
@@ -6094,6 +6360,8 @@ function pwQuickOpen(kind, sid){
   else if(kind === 'milestone'){ const open = state.pipelineStages.project.filter(s => s.key && !(p.milestones[s.key] && p.milestones[s.key] <= today)); title = 'Mark milestone done'; body = `<div class="lp-f"><label>Milestone</label><select id="pwqMs">${o(open.map(s => [s.key, s.name]), open[0] && open[0].key)}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>`; }
   else if(kind === 'invoice' || kind === 'paid'){ const f = kind === 'invoice' ? 'invoicedDate' : 'paidDate', open = p.paymentLines.map((l, ix) => [String(ix), `${l.desc || 'Payment'} · ${qm(l.amount)}${l.dueDate ? ' · due ' + l.dueDate : ''}`, l]).filter(x => !x[2][f]); title = kind === 'invoice' ? 'Mark invoice sent' : 'Mark paid'; body = open.length ? `<div class="lp-f"><label>Payment line</label><select id="pwqPay">${o(open.map(x => [x[0], x[1]]), open[0][0])}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>` : '<div class="pw-empty">Every payment line already has this date.</div>'; }
   else if(kind === 'varapprove'){ const v = (p.variations || []).find(x => x.id === sid); title = 'Approve ' + (v ? v.ref : 'variation'); body = `<p class="q-help" style="margin:0 0 8px;">${v ? escHtml(v.desc) + ' · ' + qm(v.price) + ' ex VAT' : ''}</p><label class="q-check"><input type="checkbox" id="pwqTick"> The customer has approved this variation</label><div class="lp-f"><label>Who approved it</label><input id="pwqWho" value="${escAttr(projCustomer(p).name)}"></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>When</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>How</label><select id="pwqHow">${VAR_HOW.map(h => `<option value="${h[0]}">${h[1]}</option>`).join('')}</select></div></div><div class="lp-f"><label>Attachment (optional, up to 1.2 MB)</label><input type="file" id="pwqFile" accept="image/*,application/pdf,.eml,.msg"></div><div class="chg-err" id="pwqErr"></div>`; }
+  else if(kind === 'customer'){ const cu = projCustomer(p), f = (label, field, val, ph) => `<div class="lp-f"><label>${label}</label><input id="pwqc_${field}" value="${escAttr(val || '')}" placeholder="${escAttr(ph || '')}"></div>`; title = 'Customer and site';
+    body = `<div id="pwqCx">${cxCustomerHtml('project', p)}</div><p class="q-help" style="margin:8px 0;">First recorded in the Lead Pipeline and carried across. Change it here only if it has changed since.</p><div class="pw-cform">${f('Contact', 'contact', p.contact, cu.name)}${f('Company', 'company', p.company, '')}${f('Phone', 'phone', p.phone, cu.phone)}${f('Email', 'email', p.email, cu.email)}${f('Address', 'address', p.address, cu.address)}${f('Postcode', 'postcode', p.postcode, cu.postcode)}${f('Source', 'source', p.source, '')}${f('Project name', 'projectName', p.projectName, cu.projectName)}</div>`; }
   else if(kind === 'note'){ title = 'Add note'; body = `<div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>Note</label><textarea id="pwqNote" rows="3" maxlength="300"></textarea></div>`; }
   document.getElementById('pwqTitle').textContent = title; document.getElementById('pwqBody').innerHTML = body + '<div class="modal-actions"><button class="btn secondary" type="button" data-pwq="cancel">Cancel</button><button class="btn" type="button" data-pwq="save">Save</button></div>';
   document.getElementById('pwqOverlay').hidden = false; const f = document.querySelector('#pwqBody input:not([type=date]), #pwqBody textarea, #pwqBody select'); if(f) f.focus();
@@ -6105,11 +6373,14 @@ function pwQuickSave(){
     slEnsure(s); s.log.push({ id: qRand('lg_'), date, hours: h, note: v('pwqNote').trim() }); showToast(`Logged ${hrs(h)} on ${s.label || 'the stage'}`);
   } else if(qk.kind === 'milestone'){ const key = v('pwqMs'); if(!key) return; p.milestones[key] = date; const auto = autoProjectStageId(p), list = state.pipelineStages.project; if(auto && list.findIndex(x => x.id === auto) > list.findIndex(x => x.id === p.stageId)) p.stageId = auto; showToast('Milestone marked done'); }
   else if(qk.kind === 'invoice' || qk.kind === 'paid'){ const l = p.paymentLines[Number(v('pwqPay'))]; if(!l){ pwQuickClose(); return; } if(qk.kind === 'invoice') l.invoicedDate = date; else { l.paidDate = date; if(!l.invoicedDate) l.invoicedDate = date; } showToast(qk.kind === 'invoice' ? 'Invoice marked sent' : 'Marked paid'); }
+  else if(qk.kind === 'customer'){ ['contact', 'company', 'phone', 'email', 'address', 'postcode', 'source', 'projectName'].forEach(k => { p[k] = v('pwqc_' + k).trim(); }); showToast('Customer and site details saved'); }
   else if(qk.kind === 'note'){ const n = v('pwqNote').trim(); if(!n) return; p.comms = p.comms || []; p.comms.push({ date, note: n, created: Date.now() }); showToast('Note added'); }
   pwQuickClose(); render(); saveState();
 }
+/* the customer pop-out shows the linked contacts: redraw that block when a link changes */
+function pwCxRefresh(){ const o = document.getElementById('pwqOverlay'), box = document.getElementById('pwqCx'), p = state.projects.find(x => x.id === pwUi.id); if(o && !o.hidden && box && p && pwUi.quick && pwUi.quick.kind === 'customer') box.innerHTML = cxCustomerHtml('project', p); }
 function pwQuickClose(){ document.getElementById('pwqOverlay').hidden = true; pwUi.quick = null; }
-document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-pwq]'); if(b){ if(b.dataset.pwq === 'save') pwQuickSave(); else pwQuickClose(); return; } if(e.target.id === 'pwqOverlay') pwQuickClose(); });
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-pwq]'); if(b){ if(b.dataset.pwq === 'save') pwQuickSave(); else pwQuickClose(); return; } if(e.target.id === 'pwqOverlay' || (e.target.closest && e.target.closest('#pwqOverlay [data-nav]'))) pwQuickClose(); });
 document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ const o = document.getElementById('pwqOverlay'); if(o && !o.hidden){ pwQuickClose(); e.stopPropagation(); } } });
 
 /* ---------- Project Pipeline ---------- */
@@ -9437,7 +9708,7 @@ function promoteToProject(id){
   { const aq = projAcceptedQuote(proj); if(aq && !s.projectHold && !(Number(proj.agreedValue) > 0)) proj.agreedValue = qCalc(aq).totalEx; }
   { const aq = projAcceptedQuote(proj); if(aq && !s.projectHold){ projApplyPlan(proj, aq, projPlanSync(proj, aq), false); proj.paymentLines.sort((a, b) => String(a.dueDate || '9999').localeCompare(String(b.dueDate || '9999'))); moveLog(proj, `Payment lines built from the accepted quote ${qRef(aq)}`); } }   // on win: the money events come from the quote's payment schedule
   render(); saveState();
-  openProjectWorkspace(proj.id);
+  openProjectWorkspace(proj.id, true);
 }
 function returnToLead(id){
   const idx = state.pipeline.findIndex(p => p.id === id); if(idx < 0) return;
@@ -9519,6 +9790,7 @@ function leadInfoHtml(r){
     <div class="stage-label-row">Project</div><dl class="ro-grid">${row('Project name', l.projectName)}${row('Lead type', l.leadType)}${row('Source', l.source)}${row('Estimated value', Number(l.estValue) > 0 ? money(l.estValue) : '')}${row('Tier', tier ? tier.name : '')}${snap ? row('Lead status', st ? st.name : '') : ''}</dl>
     <div class="stage-label-row">Location</div><dl class="ro-grid">${row('Address', l.address)}${row('Postcode', l.postcode)}</dl>
     <div class="stage-label-row">Qualification</div><dl class="ro-grid">${row('Budget', l.budget)}${row('Decision-maker', l.decisionMaker)}${row('Desired timeline', l.timeline)}${row('Competition', l.competition)}</dl>
+    <div class="stage-label-row">Lead record</div><dl class="ro-grid">${row('Lead came in', l.createdAt ? pwD(l.createdAt) : '')}${row('Lead notes', snap ? l.notes : (r.leadNotes || ''))}</dl>
     <div class="stage-label-row">Lead timeline${snap ? ' (as promoted)' : ''}</div><div class="comms-scroll">${comms || '<div class="breakdown-hint">No timeline entries.</div>'}</div>
   </div>`;
 }
@@ -11603,7 +11875,7 @@ function navRestore(s){
   expandedProjectsP.clear(); (s.open.proj || []).forEach(x => expandedProjectsP.add(x));
   expandedLeads.clear(); (s.open.leads || []).forEach(x => expandedLeads.add(x));
   Object.keys(s.ex || {}).forEach(k => { if(nav.extras[k]) try{ nav.extras[k].set(s.ex[k]); }catch(e){} });
-  pwUi.id = s.pw ? s.pw.id : 0; if(s.pw) pwUi.sec = s.pw.sec;
+  pwUi.id = s.pw ? s.pw.id : 0; if(s.pw){ pwUi.sec = pwSecKey(s.pw.sec); pwOpenReset(pwUi.sec); }
   qUi.openId = s.q ? s.q.id : 0; if(s.q) qUi.tab = s.q.tab;
   detailRef = s.detail && findRec(s.detail.pl, s.detail.id) && s.detail.pl !== 'lead' && s.detail.pl !== 'project' ? { pl: s.detail.pl, id: s.detail.id, view: 'current' } : null;
   if(!detailRef) closeDetail();
@@ -12188,6 +12460,7 @@ function cxAfterLinkChange(msg){
   cxDirty(); cxSyncAll(); saveState(); render();
   try{ if(lp && lp.kind === 'lead') lpRenderBody(true); }catch(e){}
   try{ if(qUi.openId && qFind(qUi.openId)) qbRender(); }catch(e){}
+  try{ pwCxRefresh(); }catch(e){}
   if(msg) showToast(msg);
 }
 function cxSetPrimary(kind, rec, cid){
