@@ -1504,6 +1504,8 @@
   .pw-fold-t h4 { margin: 0; } .pw-fold-sub { display: block; font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 2px; font-weight: 400; }
   .pw-fold-b { padding: 0 var(--bt-s4) 14px; } .pw-fold > .pw-fold-b[hidden] { display: none; }
   .pw-info > .pw-card, .pw-sec-b > .pw-fold { margin-bottom: 10px; }
+  @media (min-width: 900px) { .pw-fold-b .lead-info { columns: 2; column-gap: 48px; } .pw-fold-b .lead-info .gate-msg { column-span: all; } .pw-fold-b .lead-info .stage-label-row { break-after: avoid; } .pw-fold-b .lead-info .ro-grid { break-inside: avoid; } }
+  .pw-sub-h { font-family: var(--serif); font-size: 15px; font-weight: 600; margin: 14px 0 6px; } .pw-fold-b > .pw-sub-h:first-child { margin-top: 2px; }
   /* ---- timeline grid ---- */
   .pw-we { position: absolute; top: 0; bottom: 0; background: rgba(120, 108, 90, .075); }
   .pw-dl { position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(60, 50, 35, .05) 1px, transparent 1px); background-repeat: repeat-x; }
@@ -5509,6 +5511,7 @@ function pwTimelineHtml(p, i){
     ${pwFold('t-stages', 'Stages', 'Stage lines: dates, planned and logged hours', '<button class="btn secondary" data-pw="add-stage">+ Add stage</button>', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Start</th><th>End</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
       <tbody>${stageRows || '<tr><td colspan="10"><div class="sup-empty">No stage lines on this project yet. Add one, or promote a deal that has stage lines.</div></td></tr>'}</tbody></table></div>
       ${q ? '' : '<p class="q-help">Sold hours appear once an accepted quote is linked to this project.</p>'}${ed ? '' : '<p class="q-help">Dates change through Edit timeline (with Save, Discard and a reason), so slippage is always recorded.</p>'}`, true)}
+    ${pwFold('t-lab', 'Labour check', 'Planned labour cost against time logged, stage by stage', '<button type="button" class="btn secondary" data-pw="quick" data-q="time">Log time</button>', pwLabourCheckBody(p), true)}
     ${pwFold('t-ms', 'Milestones', 'The nine milestones and the stage or event each one lines up with', '', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Date</th><th></th><th>Lines up with</th><th>Date from there</th></tr></thead><tbody>${msRows}</tbody></table></div>
       <p class="q-help">Milestone dates stay as you type them (and still drive the project stage). The diamond colour shows done, due soon (within a week), overdue or future; the right-hand columns show what the stages, deliveries and payments say; “use” copies that date across.</p>`, true)}</section>`;
 }
@@ -6069,18 +6072,53 @@ function pwMoneyHtml(p, i){
     </div></section>`;
 }
 /* money in and out against the timeline: a step line of the running balance (in minus out), drawn from the payment lines, the supplier due dates and the order date */
+/* labour, stage by stage: planned (the Working plan's labour lines for the stage, else the stage's own planned time) against the time logged on it.
+   Logged cost = hours logged x the planned cost per hour of that stage (the settings rate when the stage has no plan). A stage counts as complete once its end date has passed. */
+function pwLabourRows(p){
+  const wq = projWorkQuote(p), today = fmt(new Date()), prof = 1 + (Number(state.settings.labourProfitPct) || 0) / 100, dayRate = Number(state.settings.labourRateDay) > 0 ? Number(state.settings.labourRateDay) : 0, defHr = dayRate ? dayRate / hpd() / prof : 0;
+  const c = wq && wq.labour && wq.labour.length ? qCalc(wq) : null, stages = p.stages || []; stages.forEach(slEnsure);
+  const rows = stages.map(st => {
+    let ph = 0, pc = 0; if(c) wq.labour.forEach(r => { const x = c.labour[r.id]; if(r.stageId !== st.id || !x || x.excluded) return; ph += qLabourDays(r) * hpd(); pc += (Number(x.amount) || 0) / prof; });
+    if(!(pc > 0) && slPlannedHours(st) > 0){ ph = slPlannedHours(st); pc = ph * defHr; }
+    const lh = slLogged(st), rate = ph > 0 && pc > 0 ? pc / ph : defHr, logs = (st.log || []).map(x => x.date).filter(Boolean).sort(), end = st.end || st.start || '';
+    return { id: st.id, label: st.label || 'Stage', ph, pc: r2(pc), lh, rate, lc: r2(lh * rate), end, last: logs.length ? logs[logs.length - 1] : '', done: !!end && end < today };
+  }).filter(g => g.ph > 0 || g.pc > 0 || g.lh > 0);
+  const unplaced = c ? wq.labour.filter(r => !stages.some(s => s.id === r.stageId) && c.labour[r.id] && !c.labour[r.id].excluded && c.labour[r.id].amount > 0).length : 0;
+  return { rows, unplaced };
+}
+function pwLabourCheckBody(p){
+  const L = pwLabourRows(p), rows = L.rows;
+  if(!rows.length) return '<div class="pw-empty">No labour planned or logged yet. Labour lines (with a stage) on the quote or Working plan set the plan; Log time adds what actually happens.</div>';
+  const t = { ph: 0, lh: 0, pc: 0, lc: 0, fc: 0 };
+  const body = rows.map(g => {
+    t.ph += g.ph; t.lh += g.lh; t.pc += g.pc; t.lc += g.lc; t.fc += g.done ? g.lc : Math.max(g.lc, g.pc);
+    const diff = g.lc - g.pc, used = g.pc > 0 ? Math.round(g.lc / g.pc * 100) : 0;
+    let pos, cls = '';
+    if(g.lh === 0 && !g.done) pos = '<span class="qb-dim">Not started</span>';
+    else if(!g.done) { pos = g.pc > 0 ? used + '% of the plan used' : 'In progress'; if(g.lc > g.pc + 0.5 && g.pc > 0){ pos = 'Over the plan already (' + used + '%)'; cls = 'q-over'; } }
+    else if(g.lc > g.pc + 0.5){ pos = 'Complete: over by ' + qm(diff); cls = 'q-over'; }
+    else if(g.lc < g.pc - 0.5){ pos = g.lh === 0 ? 'Complete: nothing logged' : 'Complete: under by ' + qm(-diff); cls = g.lh === 0 ? '' : 'q-under'; }
+    else pos = 'Complete: on plan';
+    return `<tr><td>${escHtml(g.label)}</td><td class="qb-calc">${g.ph ? hrs(g.ph) : '—'}</td><td class="qb-calc">${g.lh ? hrs(g.lh) : '—'}</td><td class="qb-calc">${g.pc ? qm(g.pc) : '—'}</td><td class="qb-calc">${g.lh ? (g.rate ? qm(g.lc) : '<span class="qb-dim" title="No planned rate or labour day rate in Settings">no rate</span>') : '—'}</td><td class="${cls}">${pos}</td></tr>`;
+  }).join('');
+  const over = t.fc > t.pc + 0.5;
+  return `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th class="r">Planned</th><th class="r">Logged</th><th class="r">Planned cost</th><th class="r">Logged cost</th><th>Where it stands</th></tr></thead><tbody>${body}</tbody>
+    <tfoot><tr class="qb-foot"><td><b>Total</b></td><td class="qb-calc"><b>${hrs(t.ph)}</b></td><td class="qb-calc"><b>${hrs(t.lh)}</b></td><td class="qb-calc"><b>${qm(t.pc)}</b></td><td class="qb-calc"><b>${qm(t.lc)}</b></td><td>Forecast at completion <b class="${over ? 'q-over' : ''}">${qm(t.fc)}</b> against ${qm(t.pc)} planned</td></tr></tfoot></table></div>
+    <p class="q-help">Planned is the forecast. As time is logged against a stage its cost is compared with the plan; a stage counts as complete once its end date has passed. Logged cost uses the stage’s planned cost per hour.${L.unplaced ? ` ${L.unplaced} labour line${L.unplaced === 1 ? ' has' : 's have'} no stage, so ${L.unplaced === 1 ? 'it is' : 'they are'} left out.` : ''}</p>`;
+}
 const PW_CASH = [['cust', 'Customer payments', true], ['var', 'Variations', true], ['sup', 'Supplier payments', false], ['direct', 'Direct costs', false], ['lab', 'Labour', false]];   // [key, label, money in?]
 function pwCashAll(p){
   const today = fmt(new Date()), ev = [];
   finLines().filter(x => x.pid === p.id && (x.kind === 'custPay' || x.kind === 'supPay')).forEach(x => { const d = x.paidDate || x.date; if(!(x.amount > 0) || !d) return; ev.push({ k: x.kind === 'supPay' ? 'sup' : x.variation ? 'var' : 'cust', date: d, when: d, amt: x.kind === 'supPay' ? -x.amount : x.amount, done: !!x.done, title: x.label.replace(/^Scope addition /, '') }); });
   (state.transactions || []).filter(t => t.projectId === p.id && Number(t.moneyOut) > 0 && !t.planned && t.date).forEach(t => ev.push({ k: 'direct', date: t.date, when: t.date, amt: -Number(t.moneyOut), done: true, title: t.description || 'Direct cost' }));   // paid and not part of a plan line (planned ones already show as supplier payments)
-  const wq = projWorkQuote(p); let unplaced = 0;
-  if(wq && wq.labour && wq.labour.length){   // planned labour cost, placed at the end of the stage it belongs to
-    const c = qCalc(wq), prof = 1 + (Number(state.settings.labourProfitPct) || 0) / 100, by = {};
-    wq.labour.forEach(r => { const x = c.labour[r.id]; if(!x || x.excluded || !(x.amount > 0)) return; const st = r.stageId && (p.stages || []).find(g => slEnsure(g).id === r.stageId), d = st && (st.end || st.start); if(!d){ unplaced++; return; } (by[st.id] = by[st.id] || { st, d, sum: 0 }).sum += x.amount / prof; });
-    Object.values(by).forEach(g => ev.push({ k: 'lab', date: g.d, when: g.d, amt: -r2(g.sum), done: g.d <= today, title: (g.st.label || 'Stage') + ' labour (planned)' }));
-  }
-  ev.forEach(e => { e.inn = e.amt > 0; e.late = !e.done && e.date < today; if(e.late) e.date = today; });   // money still owed from the past is drawn at today, flagged
+  const lab = pwLabourRows(p);   // labour is the forecast until time is logged: planned cost at the end of each stage, then the logged cost (plus what is still to come) as the work happens
+  lab.rows.forEach(g => {
+    if(g.lh > 0 && g.lc > 0) ev.push({ k: 'lab', date: g.last || today, when: g.last || today, amt: -g.lc, done: true, title: g.label + ': ' + hrs(g.lh) + ' logged' + (g.pc > 0 ? ' (planned ' + qm(g.pc) + ')' : '') });
+    const rem = g.pc - g.lc;
+    if(rem > 0.5 && g.end && (!g.done || g.lh === 0)) ev.push({ k: 'lab', date: g.end, when: g.end, amt: -r2(rem), done: false, noLate: true, title: g.label + ': labour ' + (g.lh > 0 ? 'still to come' : 'planned') });
+  });
+  const unplaced = lab.unplaced;
+  ev.forEach(e => { e.inn = e.amt > 0; e.late = !e.done && !e.noLate && e.date < today; if(e.late) e.date = today; });   // money still owed from the past is drawn at today, flagged
   ev.unplaced = unplaced; return ev;
 }
 function pwCashEvents(p){ const ev = pwCashAll(p).filter(e => !pwUi.cashOff.has(e.k)); return ev.sort((a, b) => a.date.localeCompare(b.date) || b.amt - a.amt); }
@@ -6119,7 +6157,7 @@ function pwCashCardHtml(p){
   const cap = pwCashCap(p);
   return `<div class="pw-card"><h4>Money in and out <span class="qb-dim">(running balance against the timeline)</span></h4>${pills ? `<div class="pw-pills" role="group" aria-label="What the chart includes">${pills}</div>` : ''}<div class="pw-cash-box" data-pid="${p.id}"></div>
     <div class="pw-cash-key"><span><i class="k in"></i>Money in</span><span><i class="k out"></i>Money out</span><span><i class="k done"></i>Paid</span><span><i class="k"></i>Expected</span><span>Solid line to today, dashed after</span></div><p class="q-help pw-cash-cap">${cap}</p>
-    <p class="q-help">A purchase made before the first payment is shown as an “Ordered” note: it is a commitment, and the money only leaves on the supplier’s due date. Labour is the planned cost placed at the end of each stage. Stage bars sit under the dates.</p></div>`;
+    <p class="q-help">A purchase made before the first payment is shown as an “Ordered” note: it is a commitment, and the money only leaves on the supplier’s due date. Labour is the forecast (planned cost at the end of each stage) until time is logged, then the logged cost; the Labour check in Timeline compares the two. Stage bars sit under the dates.</p></div>`;
 }
 function pwCashMount(){
   document.querySelectorAll('#projectWorkspace .pw-cash-box').forEach(box => {
@@ -6133,32 +6171,27 @@ function pwChangeLogBody(p){
   return log.length ? log.map(c => `<details class="pw-chg"><summary><span class="pw-chg-when">${escHtml(new Date(c.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }))}</span> · <b>${escHtml(c.by || 'someone')}</b> · ${escHtml(PW_EDIT_NAME[c.kind] || c.kind)} <span class="qb-flag">${escHtml(causeName(c.cause))}</span> <span class="pw-chg-r">${escHtml(c.reason)}</span></summary>
       <ul>${(c.changes || []).map(x => `<li>${escHtml(x)}</li>`).join('')}</ul></details>`).join('') : '<div class="pw-empty">No changes logged yet. Saving an edit to the timeline, deliveries or the Working plan records who, when, what and why here.</div>';
 }
-/* Sales: the deal as it stood in the Sales Pipeline when it was promoted */
-function pwSalesBody(p){
-  const ss = p.salesSnapshot; if(!ss) return '<div class="pw-empty">This project was promoted before sales details were kept.</div>';
-  const row = (k, v) => `<dt>${k}</dt><dd>${v || '—'}</dd>`, prob = Math.round(effectiveProb(ss) * 100);
-  return `<dl class="ro-grid">${row('Sales stage', escHtml(stageName('sales', ss.stageId)))}${row('Quoted value', ss.quoteValue ? money(ss.quoteValue) : '')}${row('Win chance', prob + '%' + (ss.probOverride !== undefined && ss.probOverride !== null && ss.probOverride !== '' ? ' <span class="qb-dim">typed, not from the stage</span>' : ''))}${row('Deal tier', escHtml(ss.tier || ''))}${row('Deal type', ss.type === 'example' ? 'Worked example' : 'Real')}${row('Contract signed', ss.contractSigned ? pwD(ss.contractSigned) : '')}</dl>`;
-}
-/* Project info: what was collected while this was a sales project that is not a lead detail and is not shown elsewhere in the project view (the scoped cost of each stage, any other sales field, the sales notes if they have since changed) */
+/* Project details: everything captured in the Lead Pipeline and the Sales Pipeline, which stops being shown once the record becomes a project */
 const pwSalesKnown = () => ['id', 'name', 'comms', 'stages', 'leadSnapshot', 'projectHold', 'salesHold', 'stageId', 'quoteValue', 'contractSigned', 'probability', 'probOverride', 'tier', 'type', 'notes', 'leadNotes'].concat(CARRY_FIELDS);
-function pwProjectInfoBody(p){
+function pwSalesInfoBody(p){
   const ss = p.salesSnapshot, st = (p.stages || []).filter(s => Number(s.cost) > 0), tot = st.reduce((a, s) => a + (Number(s.cost) || 0), 0), out = [];
-  if(st.length) out.push(`<div class="q-sub" style="margin-top:0;">Scoped cost of each stage <span class="qb-dim">(estimated in the Sales Pipeline)</span></div><table class="qb-table qb-narrow pw-itab"><thead><tr><th>Stage</th><th>Kind</th><th class="r">Scoped cost</th></tr></thead><tbody>${st.map(s => `<tr><td>${escHtml(s.label || 'Stage')}</td><td>${escHtml((STAGE_KINDS[s.kind] || {}).label || s.kind || '')}</td><td class="qb-calc">${qm(s.cost)}</td></tr>`).join('')}</tbody><tfoot><tr class="qb-foot"><td><b>Total</b></td><td></td><td class="qb-calc"><b>${qm(tot)}</b></td></tr></tfoot></table>`);
+  const row = (k, v) => `<dt>${k}</dt><dd>${v ? v : '<span class="dim">—</span>'}</dd>`;
   if(ss){
-    const extra = Object.keys(ss).filter(k => !pwSalesKnown().includes(k) && ss[k] !== '' && ss[k] !== null && ss[k] !== undefined && typeof ss[k] !== 'object');
-    const rows = extra.map(k => `<dt>${escHtml(k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()))}</dt><dd>${escHtml(String(ss[k]))}</dd>`);
-    if(ss.notes && String(ss.notes).trim() !== String(p.notes || '').trim()) rows.push(`<dt>Sales notes when promoted</dt><dd>${escHtml(ss.notes)}</dd>`);
-    if(rows.length) out.push(`<dl class="ro-grid"${out.length ? ' style="margin-top:10px;"' : ''}>${rows.join('')}</dl>`);
-  }
-  return out.length ? out.join('') : '<div class="pw-empty">Nothing further was collected in the Sales Pipeline: the lead details, the sales deal and the stage dates are all shown elsewhere.</div>';
+    const prob = Math.round(effectiveProb(ss) * 100), typed = ss.probOverride !== undefined && ss.probOverride !== null && ss.probOverride !== '';
+    const extra = Object.keys(ss).filter(k => !pwSalesKnown().includes(k) && ss[k] !== '' && ss[k] !== null && ss[k] !== undefined && typeof ss[k] !== 'object').map(k => row(escHtml(k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())), escHtml(String(ss[k]))));
+    out.push(`<dl class="ro-grid">${row('Sales stage', escHtml(stageName('sales', ss.stageId)))}${row('Quoted value', ss.quoteValue ? money(ss.quoteValue) : '')}${row('Win chance', prob + '%' + (typed ? ' <span class="qb-dim">typed, not from the stage</span>' : ''))}${row('Deal tier', escHtml(ss.tier || ''))}${row('Deal type', ss.type === 'example' ? 'Worked example' : 'Real')}${row('Contract signed', ss.contractSigned ? pwD(ss.contractSigned) : '')}${ss.notes && String(ss.notes).trim() !== String(p.notes || '').trim() ? row('Sales notes when promoted', escHtml(ss.notes)) : ''}${extra.join('')}</dl>`);
+  } else out.push('<div class="pw-empty">This project was promoted before the sales deal details were kept.</div>');
+  if(st.length) out.push(`<div class="q-sub">Scoped cost of each stage <span class="qb-dim">(estimated in the Sales Pipeline)</span></div><table class="qb-table qb-narrow pw-itab"><thead><tr><th>Stage</th><th>Kind</th><th class="r">Scoped cost</th></tr></thead><tbody>${st.map(s => `<tr><td>${escHtml(s.label || 'Stage')}</td><td>${escHtml((STAGE_KINDS[s.kind] || {}).label || s.kind || '')}</td><td class="qb-calc">${qm(s.cost)}</td></tr>`).join('')}</tbody><tfoot><tr class="qb-foot"><td><b>Total</b></td><td></td><td class="qb-calc"><b>${qm(tot)}</b></td></tr></tfoot></table>`);
+  return out.join('');
+}
+function pwDetailsBody(p){
+  return `<div class="pw-sub-h">From the Lead Pipeline <span class="qb-dim">(read-only)</span></div>${leadInfoHtml(p)}<div class="pw-sub-h">From the Sales Pipeline <span class="qb-dim">(read-only)</span></div>${pwSalesInfoBody(p)}`;
 }
 function pwInfoHtml(p, i){
   const nc = (p.comms || []).length, nl = (p.changeLog || []).length;
   return `<section class="pw-sec" id="pw-info" data-sec="info"><h3>Information</h3>
     ${pwFold('i-notes', 'Timeline of notes', nc ? nc + (nc === 1 ? ' entry' : ' entries') : 'No entries yet', '', commsBlockHtml('project', p, i, 'projcomms'), false)}
-    ${pwFold('i-lead', 'Lead info', 'The original lead details carried across when this was promoted', `<button class="btn secondary qb-sm" data-action="return-record" data-pl="project" data-id="${p.id}">← Return to Sales Pipeline</button>`, leadInfoHtml(p), false)}
-    ${pwFold('i-sales', 'Sales', 'The deal as it stood when it was promoted', '', pwSalesBody(p), false)}
-    ${pwFold('i-proj', 'Project info', 'Collected in the Sales Pipeline and not shown elsewhere', '', pwProjectInfoBody(p), false)}
+    ${pwFold('i-details', 'Project details', 'Everything captured in the Lead and Sales Pipelines before this became a project', `<button class="btn secondary qb-sm" data-action="return-record" data-pl="project" data-id="${p.id}">← Return to Sales Pipeline</button>`, pwDetailsBody(p), false)}
     ${pwFold('i-log', 'Change log', nl ? nl + (nl === 1 ? ' change' : ' changes') + ' recorded' : 'No changes recorded yet', '', pwChangeLogBody(p), false)}</section>`;
 }
 /* one-click actions: the date defaults to today; clearing offers Undo */
@@ -9599,6 +9632,7 @@ function leadInfoHtml(r){
     <div class="stage-label-row">Project</div><dl class="ro-grid">${row('Project name', l.projectName)}${row('Lead type', l.leadType)}${row('Source', l.source)}${row('Estimated value', Number(l.estValue) > 0 ? money(l.estValue) : '')}${row('Tier', tier ? tier.name : '')}${snap ? row('Lead status', st ? st.name : '') : ''}</dl>
     <div class="stage-label-row">Location</div><dl class="ro-grid">${row('Address', l.address)}${row('Postcode', l.postcode)}</dl>
     <div class="stage-label-row">Qualification</div><dl class="ro-grid">${row('Budget', l.budget)}${row('Decision-maker', l.decisionMaker)}${row('Desired timeline', l.timeline)}${row('Competition', l.competition)}</dl>
+    <div class="stage-label-row">Lead record</div><dl class="ro-grid">${row('Lead came in', l.createdAt ? pwD(l.createdAt) : '')}${row('Lead notes', snap ? l.notes : (r.leadNotes || ''))}</dl>
     <div class="stage-label-row">Lead timeline${snap ? ' (as promoted)' : ''}</div><div class="comms-scroll">${comms || '<div class="breakdown-hint">No timeline entries.</div>'}</div>
   </div>`;
 }
