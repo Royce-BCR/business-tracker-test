@@ -1690,6 +1690,9 @@
 .rf-hist summary { cursor: pointer; font-size: 13px; color: var(--text-muted); }
 @media (max-width: 700px){ .qb-sec-h { flex-wrap: wrap; gap: var(--bt-s2); } .qb-sec-tools { flex-wrap: wrap; } .qb-sec-tools select { max-width: 100%; } }
 .inv-tools .view-toggle { flex-wrap: wrap; max-width: 100%; }
+/* the "Back to previous view" button stays reachable above an open side panel's backdrop */
+body.lp-open .navbar, body.dr-open .navbar { z-index: 64; width: fit-content; max-width: calc(100% - 20px); margin: -4px 0 6px; padding: 6px var(--bt-s2); background: var(--bt-card); border-radius: var(--bt-r-btn); box-shadow: var(--bt-shadow-2); }
+body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none; }
 /* BT:css end */
 </style>
 </head>
