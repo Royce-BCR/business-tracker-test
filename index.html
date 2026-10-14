@@ -1899,6 +1899,46 @@ body.sheet-open { overflow: hidden; }
 .rail-btn.g-organisation, .bb-btn.g-organisation, .ms-item.g-organisation, .menu-pop.g-organisation, .ms-group.g-organisation { --accent: var(--g-organisation); }
 body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, body.logged-out .menu-pop, body.logged-out .more-sheet, body.logged-out .sheet-backdrop { display: none !important; }
 .bb-more svg circle { fill: currentColor; stroke: none; }
+
+/* ===== Batch 2b: CRM / Growth separate, several groups open, arrow button, favourites ===== */
+.brand-tools { display: flex; justify-content: flex-end; margin: -10px 0 4px; }
+.menu-mode-btn { width: 32px; height: 32px; min-height: 32px; }
+.menu-mode-btn svg { width: 18px; height: 18px; }
+.brand h1 { padding-right: 0; }
+.nav-gbtn[aria-disabled="true"] { cursor: default; }
+.nav-group.has-current .nav-gbtn .chev { opacity: 0.35; }
+.g-crm .nav-label, .g-crm { --accent: var(--g-growth); }
+.rail-btn.g-crm, .bb-btn.g-crm, .ms-item.g-crm, .menu-pop.g-crm, .ms-group.g-crm { --accent: var(--g-growth); }
+.nav-favs { margin: 2px 0 6px; padding-bottom: 8px; border-bottom: 1px solid color-mix(in srgb, var(--bt-on-dark) 12%, transparent); }
+.nav-favs[hidden] { display: none; }
+.fav-item { width: 100%; min-height: var(--bt-control); margin: 1px 0; padding: 0 11px; display: flex; align-items: center; gap: 10px; background: none; border: 0; border-left: 2.5px solid transparent; border-radius: var(--radius-sm); color: var(--bt-on-dark-muted); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.fav-item svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.fav-item .fl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fav-item:hover { background: color-mix(in srgb, var(--bt-on-dark) 6%, transparent); color: var(--bt-on-dark); }
+.fav-item[aria-current="page"] { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--bt-on-dark); border-left-color: var(--accent); }
+.fav-item.g-command, .rail-fav.g-command { --accent: var(--g-command); } .fav-item.g-growth, .rail-fav.g-growth, .fav-item.g-crm, .rail-fav.g-crm { --accent: var(--g-growth); } .fav-item.g-finance, .rail-fav.g-finance { --accent: var(--g-finance); } .fav-item.g-operations, .rail-fav.g-operations { --accent: var(--g-operations); } .fav-item.g-revenue, .rail-fav.g-revenue { --accent: var(--g-revenue); } .fav-item.g-organisation, .rail-fav.g-organisation { --accent: var(--g-organisation); }
+.rail-favs { display: flex; flex-direction: column; gap: 2px; padding-bottom: var(--bt-s2); margin-bottom: var(--bt-s1); border-bottom: 1px solid color-mix(in srgb, var(--bt-on-dark) 14%, transparent); }
+.rail-favs[hidden] { display: none; }
+.rail-fav { min-height: 48px; }
+.rail-btn { min-height: 52px; }
+.rail .rail-top { min-height: 36px; }
+.rail-fav span { max-width: 100%; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.ms-favs { margin-bottom: var(--bt-s2); }
+.ms-favs[hidden] { display: none; }
+/* the star: top right of every page, in the brand row */
+.fav-btn { flex: none; display: inline-grid; place-items: center; width: var(--bt-control); height: var(--bt-control); margin: -3px 0; padding: 0; background: none; border: 0; border-radius: var(--bt-r-pill); color: var(--bt-text-muted); cursor: pointer; }
+.fav-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.fav-btn:hover { background: var(--bt-oak-100); color: var(--bt-oak-600); }
+.fav-btn[aria-pressed="true"] { color: var(--bt-oak-600); }
+.fav-btn[aria-pressed="true"] svg { fill: currentColor; }
+.brandbar.off .fav-btn { position: fixed; top: calc(var(--bt-banner-h, 0px) + 4px); right: 10px; z-index: 30; background: color-mix(in srgb, var(--bt-on-dark) 82%, transparent); border: 1px solid var(--line); }
+.brandbar.off .save-status { right: 62px; }
+@media (max-width: 700px) {
+  .brand-tools { display: none; }
+  .brandbar.off .fav-btn { top: calc(var(--bt-banner-h, 0px) + 56px); }
+  .brandbar.off .save-status { right: 62px; top: 62px; }
+}
+body.logged-out .fav-btn { display: none; }
 </style>
 </head>
 <body>
@@ -1914,11 +1954,11 @@ body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, bod
 
 <nav class="sidebar" id="sidebar" aria-label="Main">
   <div class="brand">
-    <div class="brand-row">
-      <div class="brand-txt"><h1>Business Tracker</h1><div class="sub" id="envSub">Live system</div></div>
-      <button type="button" class="menu-mode-btn" id="menuCollapseBtn" aria-label="Collapse the menu to an icon rail" title="Collapse the menu to an icon rail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/><polyline points="15 9 12 12 15 15"/></svg></button>
-    </div>
+    <div class="brand-tools"><button type="button" class="menu-mode-btn" id="menuCollapseBtn" aria-label="Collapse the menu" title="Collapse the menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 5 8 12 15 19"/></svg></button></div>
+    <h1>Business Tracker</h1>
+    <div class="sub" id="envSub">Live system</div>
   </div>
+  <div class="nav-favs" id="navFavs" role="group" aria-label="Favourite pages" hidden></div>
 
   <div class="nav-group g-command" data-group="command" data-label="Command" data-short="Command">
     <button type="button" class="nav-label nav-gbtn" id="gh-command" aria-expanded="false" aria-controls="gp-command"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Command</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
@@ -1928,12 +1968,18 @@ body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, bod
     </div>
   </div>
 
+  <div class="nav-group g-crm" data-group="crm" data-label="CRM" data-short="CRM">
+    <button type="button" class="nav-label nav-gbtn" id="gh-crm" aria-expanded="false" aria-controls="gp-crm"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">CRM</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-crm" role="group" aria-labelledby="gh-crm">
+      <button type="button" class="tab g-growth" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
+      <button type="button" class="tab g-growth" data-tab="companies">Companies</button>
+      <button type="button" class="tab g-growth" data-tab="crm">Tasks</button>
+    </div>
+  </div>
+
   <div class="nav-group g-growth" data-group="growth" data-label="Growth" data-short="Growth">
     <button type="button" class="nav-label nav-gbtn" id="gh-growth" aria-expanded="false" aria-controls="gp-growth"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Growth</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-growth" role="group" aria-labelledby="gh-growth">
-      <button type="button" class="tab g-growth" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
-      <button type="button" class="tab g-growth" data-tab="companies">Companies</button>
-      <button type="button" class="tab g-growth" data-tab="crm">CRM tasks</button>
       <button type="button" class="tab g-growth" data-tab="leads">Lead Pipeline</button>
       <button type="button" class="tab g-growth" data-tab="salespipeline">Sales Pipeline</button>
     </div>
@@ -2012,6 +2058,7 @@ body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, bod
       <div class="who-pick" id="whoPick"></div>
       <div class="save-status" id="saveStatus"></div>
       <div class="brand-pill" id="brandPill"></div>
+      <button type="button" class="fav-btn" id="favBtn" aria-pressed="false" aria-label="Add this page to favourites" title="Add this page to favourites"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 3 14.9 8.9 21.4 9.8 16.7 14.4 17.8 20.9 12 17.8 6.2 20.9 7.3 14.4 2.6 9.8 9.1 8.9"/></svg></button>
     </div>
   </div>
 
@@ -12099,9 +12146,12 @@ const MENU_ICONS = {
   undo: '<polyline points="3 4 3 10 9 10"/><path d="M5.5 15a8 8 0 1 0 1-8.6L3 10"/>',
   logout: '<path d="M9 21H5V3h4"/><polyline points="16 7 21 12 16 17"/><line x1="21" y1="12" x2="9" y2="12"/>',
   pin: '<rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/><polyline points="13 9 16 12 13 15"/>',
+  chevR: '<polyline points="9 5 16 12 9 19"/>',
   close: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>'
 };
-const menuPrefs = { mode: '', open: '', phone: 'bottom', bottom: MENU_BOTTOM_DEFAULT.slice() };
+const MENU_FAV_MAX = 5;
+const MENU_GROUP_ICON = { crm: 'contacts' };
+const menuPrefs = { mode: '', open: [], phone: 'bottom', bottom: MENU_BOTTOM_DEFAULT.slice(), fav: [] };
 const menuMQ = window.matchMedia('(max-width: 700px)');
 const menuUi = { sig: '', pop: null, hoverT: 0, sheetFrom: null, built: false };
 const menuEl = id => document.getElementById(id);
@@ -12125,12 +12175,16 @@ function menuLoad(){
     const o = JSON.parse(localStorage.getItem(MENU_KEY) || 'null');
     if(o && typeof o === 'object'){
       if(o.mode === 'pinned' || o.mode === 'collapsed') menuPrefs.mode = o.mode;
-      if(typeof o.open === 'string') menuPrefs.open = o.open;
+      if(Array.isArray(o.open)) menuPrefs.open = o.open.map(String); else if(typeof o.open === 'string' && o.open) menuPrefs.open = [o.open];   // older saves held one group
+      if(Array.isArray(o.fav)) menuPrefs.fav = o.fav.map(String);
       if(['bottom', 'top', 'burger'].includes(o.phone)) menuPrefs.phone = o.phone;
       if(Array.isArray(o.bottom)) menuPrefs.bottom = o.bottom;
     }
   }catch(e){}
   menuPrefs.bottom = menuCleanBottom(menuPrefs.bottom);
+  const okTabs = menuValidTabs(), seen = [];
+  menuPrefs.fav.forEach(t => { if(okTabs.has(t) && !seen.includes(t) && seen.length < MENU_FAV_MAX) seen.push(t); }); menuPrefs.fav = seen;
+  const okGroups = new Set([...document.querySelectorAll('#sidebar .nav-group')].map(g => g.dataset.group)); menuPrefs.open = menuPrefs.open.filter(g => okGroups.has(g));
 }
 function menuSave(){ try{ localStorage.setItem(MENU_KEY, JSON.stringify(menuPrefs)); }catch(e){} }
 /* alert counts: read from the badges that already exist (today, approvals, duplicate contacts), rolled up per group */
@@ -12158,19 +12212,54 @@ function menuBadgesSync(){
 }
 function menuQueueBadges(){ if(menuBadgeQueued) return; menuBadgeQueued = true; requestAnimationFrame(menuBadgesSync); }
 /* ---- sidebar: folding groups ---- */
-function menuOpenGroup(id, save){
-  document.querySelectorAll('#sidebar .nav-group').forEach(g => { const on = g.dataset.group === id; g.classList.toggle('open', on); const b = g.querySelector('.nav-gbtn'); if(b) b.setAttribute('aria-expanded', String(on)); });
-  if(save){ menuPrefs.open = id; menuSave(); }
+/* several groups can be open at once; the group holding the current page is always open */
+function menuRenderOpen(){
+  const cg = menuGroupOf(menuCurrent());
+  document.querySelectorAll('#sidebar .nav-group').forEach(g => {
+    const id = g.dataset.group, forced = id === cg, on = forced || menuPrefs.open.includes(id), b = g.querySelector('.nav-gbtn');
+    g.classList.toggle('open', on);
+    if(b){ b.setAttribute('aria-expanded', String(on)); if(forced) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled'); b.title = forced ? 'Stays open while you are on a page in this group' : ''; }
+  });
+}
+function menuToggleGroup(id){
+  if(id === menuGroupOf(menuCurrent())) return;   // the current page's group stays open
+  const i = menuPrefs.open.indexOf(id); if(i >= 0) menuPrefs.open.splice(i, 1); else menuPrefs.open.push(id);
+  menuSave(); menuRenderOpen();
+}
+/* ---- favourites: up to five pages, kept per device, shown (untitled) above the groups ---- */
+function menuFavItemHtml(t, kind){
+  const g = menuGroupOf(t), icon = MENU_ICONS[t] ? t : g;
+  if(kind === 'rail') return `<button type="button" class="rail-btn rail-fav g-${g}" data-go="${t}" title="${escAttr(menuLabel(t))}">${menuSvg(icon)}<span>${escHtml(menuBarLabel(t))}</span>${menuPill('data-btab="' + t + '"', 'rb-badge')}</button>`;
+  if(kind === 'sheet') return `<button type="button" class="ms-item g-${g}" data-go="${t}"><span>${escHtml(menuLabel(t))}</span></button>`;
+  return `<button type="button" class="fav-item g-${g}" data-go="${t}">${menuSvg(icon)}<span class="fl">${escHtml(menuLabel(t))}</span>${menuPill('data-btab="' + t + '"')}</button>`;
+}
+function menuFavRender(){
+  const list = menuPrefs.fav, side = menuEl('navFavs'), rail = menuEl('railFavs');
+  if(side){ side.innerHTML = list.map(t => menuFavItemHtml(t, 'side')).join(''); side.hidden = !list.length; }
+  if(rail){ rail.innerHTML = list.map(t => menuFavItemHtml(t, 'rail')).join(''); rail.hidden = !list.length; }
+  const sh = document.getElementById('msFavs'); if(sh){ sh.innerHTML = list.map(t => menuFavItemHtml(t, 'sheet')).join(''); sh.hidden = !list.length; }
+  menuFavStar();
+}
+function menuFavStar(){
+  const b = menuEl('favBtn'); if(!b) return; const cur = menuCurrent(), on = menuPrefs.fav.includes(cur), name = cur ? menuLabel(cur) : 'this page';
+  b.setAttribute('aria-pressed', String(on));
+  const t = on ? 'Remove ' + name + ' from favourites' : 'Add ' + name + ' to favourites'; b.setAttribute('aria-label', t); b.title = t;
+}
+function menuFavToggle(){
+  const cur = menuCurrent(); if(!cur) return; const l = menuPrefs.fav, i = l.indexOf(cur);
+  if(i >= 0) l.splice(i, 1);
+  else { if(l.length >= MENU_FAV_MAX){ showToast('You can pin up to five favourites. Remove one first by tapping its star.'); return; } l.push(cur); }
+  menuSave(); menuFavRender(); menuSync();
 }
 /* ---- build the rail, top bar, bottom bar ---- */
-function menuGroupBtns(cat){ return cat.map(g => `<button type="button" class="rail-btn g-${g.id}" data-mgroup="${g.id}" aria-haspopup="menu" aria-expanded="false">${menuSvg(g.id)}<span>${g.short}</span>${menuPill('data-bgroup="' + g.id + '"', 'rb-badge')}</button>`).join(''); }
+function menuGroupBtns(cat){ return cat.map(g => `<button type="button" class="rail-btn g-${g.id}" data-mgroup="${g.id}" aria-haspopup="menu" aria-expanded="false">${menuSvg(MENU_GROUP_ICON[g.id] || g.id)}<span>${g.short}</span>${menuPill('data-bgroup="' + g.id + '"', 'rb-badge')}</button>`).join(''); }
 function menuBuild(){
   const cat = menuCatalog();
-  menuEl('rail').innerHTML = `<button type="button" class="rail-btn rail-top" id="railPin" data-mact="pin" aria-label="Pin the menu open" title="Pin the menu open">${menuSvg('pin')}</button>` + menuGroupBtns(cat) + '<div class="rail-sep"></div>'
+  menuEl('rail').innerHTML = `<button type="button" class="rail-btn rail-top" id="railPin" data-mact="pin" aria-label="Expand the menu" title="Expand the menu">${menuSvg('chevR')}</button><div class="rail-favs" id="railFavs" role="group" aria-label="Favourite pages" hidden></div>` + menuGroupBtns(cat) + '<div class="rail-sep"></div>'
     + `<button type="button" class="rail-btn" data-mact="undo" title="Undo history">${menuSvg('undo')}<span>Undo</span>${menuPill('data-bundo', 'rb-badge')}</button><button type="button" class="rail-btn" data-mact="logout" title="Log out" hidden>${menuSvg('logout')}<span>Log out</span></button>`;
   menuEl('topMenu').innerHTML = menuGroupBtns(cat);
-  document.querySelectorAll('#sidebar .nav-group').forEach(g => { const gi = g.querySelector('.gi'); if(gi) gi.innerHTML = MENU_ICONS[g.dataset.group] || ''; const c = g.querySelector('.grp-count'); if(c) c.setAttribute('data-bgroup', g.dataset.group); });
-  menuBuildBottom();
+  document.querySelectorAll('#sidebar .nav-group').forEach(g => { const gi = g.querySelector('.gi'); if(gi) gi.innerHTML = MENU_ICONS[MENU_GROUP_ICON[g.dataset.group] || g.dataset.group] || ''; const c = g.querySelector('.grp-count'); if(c) c.setAttribute('data-bgroup', g.dataset.group); });
+  menuBuildBottom(); menuFavRender();
 }
 function menuBuildBottom(){
   menuEl('bottomBar').innerHTML = menuPrefs.bottom.map(t => { const g = menuGroupOf(t); return `<button type="button" class="bb-btn g-${g}" data-go="${t}">${menuSvg(MENU_ICONS[t] ? t : g)}<span class="bb-l">${escHtml(menuBarLabel(t))}</span>${menuPill('data-btab="' + t + '"', 'rb-badge')}</button>`; }).join('')
@@ -12182,7 +12271,8 @@ function menuSync(){
   if(!menuUi.built) return;
   const cur = menuCurrent(), grp = menuGroupOf(cur), inBar = menuPrefs.bottom.includes(cur);
   document.querySelectorAll('#sidebar .nav-group').forEach(g => g.classList.toggle('has-current', g.dataset.group === grp));
-  if(grp && menuUi.synced !== cur){ menuUi.synced = cur; menuOpenGroup(grp, true); }
+  menuUi.synced = cur; menuRenderOpen(); menuFavStar();
+  document.querySelectorAll('.fav-item[data-go], .rail-fav[data-go]').forEach(b => { if(b.dataset.go === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   document.querySelectorAll('.rail-btn[data-mgroup]').forEach(b => b.classList.toggle('has-current', b.dataset.mgroup === grp));
   document.querySelectorAll('#bottomBar .bb-btn[data-go]').forEach(b => { if(b.dataset.go === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   const more = document.querySelector('#bottomBar .bb-more'); if(more) more.classList.toggle('has-current', !inBar);
@@ -12238,9 +12328,10 @@ function menuFocusMove(list, from, step){ const i = list.indexOf(from), n = list
 /* ---- the More sheet (phone bottom bar) ---- */
 function menuSheetOpen(){
   const cat = menuCatalog(), cur = menuCurrent(), u = menuEl('undoBadge'), un = u && !u.hidden ? (parseInt(u.textContent, 10) || 0) : 0;
-  menuEl('moreSheet').innerHTML = `<div class="ms-head"><h2>All pages</h2><button type="button" class="btn secondary" data-mact="sheetclose" aria-label="Close the page list">Close</button></div>`
+  menuEl('moreSheet').innerHTML = `<div class="ms-head"><h2>All pages</h2><button type="button" class="btn secondary" data-mact="sheetclose" aria-label="Close the page list">Close</button></div><div class="ms-grid ms-favs" id="msFavs" role="group" aria-label="Favourite pages" hidden></div>`
     + cat.map(g => `<div class="ms-group g-${g.id}"><h3>${escHtml(g.label)}</h3><div class="ms-grid">${g.tabs.map(t => { const c = menuBadge(t.tab); return `<button type="button" class="ms-item g-${g.id}" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('')}</div></div>`).join('')
     + `<div class="ms-foot"><button type="button" class="btn secondary" data-mact="editbar">Edit bottom bar</button><button type="button" class="btn secondary" data-mact="undo">Undo history${un ? ' (' + un + ')' : ''}</button>${document.querySelector('#logoutBar .logout-link') ? '<button type="button" class="btn secondary" data-mact="logout">Log out</button>' : ''}</div>`;
+  menuFavRender();
   menuUi.sheetFrom = document.activeElement;
   document.body.classList.add('sheet-open');
   const sh = menuEl('moreSheet'); sh.scrollTop = 0; const first = sh.querySelector('.ms-item[aria-current="page"]') || sh.querySelector('.ms-item'); if(first) first.focus({ preventScroll: true }); else sh.focus();
@@ -12276,7 +12367,8 @@ function menuAct(a){
 document.addEventListener('click', (e) => {
   const t = e.target; if(!t || !t.closest) return;
   const go = t.closest('[data-go]');
-  if(go && (go.closest('#menuPop') || go.closest('#bottomBar') || go.closest('#moreSheet'))){ menuGo(go.dataset.go, go); return; }
+  if(go && go.closest('#menuPop, #bottomBar, #moreSheet, #navFavs, #railFavs')){ menuGo(go.dataset.go, go); return; }
+  if(t.closest('#favBtn')){ menuFavToggle(); return; }
   const act = t.closest('[data-mact]');
   if(act && act.closest('#rail, #topMenu, #menuPop, #bottomBar, #moreSheet') && !act.dataset.mgroup){ menuAct(act.dataset.mact); return; }
   const gb = t.closest('[data-mgroup]');
@@ -12287,7 +12379,7 @@ document.addEventListener('click', (e) => {
     return;
   }
   const gh = t.closest('#sidebar .nav-gbtn');
-  if(gh){ const g = gh.closest('.nav-group'); menuOpenGroup(g.classList.contains('open') ? '' : g.dataset.group, true); return; }
+  if(gh){ menuToggleGroup(gh.closest('.nav-group').dataset.group); return; }
   if(t.closest('#menuCollapseBtn')){ menuAct('collapse'); return; }
   if(t.closest('#sheetBackdrop')){ menuSheetClose(true); return; }
   if(menuUi.pop && !t.closest('#menuPop')) menuPopClose(false);
@@ -12403,9 +12495,8 @@ function menuSettingsRender(){
 function menuInit(){
   const bn = menuEl('envBanner'); if(bn) document.documentElement.style.setProperty('--bt-banner-h', bn.offsetHeight + 'px');
   menuLoad(); menuBuild(); menuUi.built = true;
-  const cur = menuCurrent(), cg = menuGroupOf(cur);
-  menuOpenGroup(menuPrefs.open && document.querySelector('#sidebar .nav-group[data-group="' + menuPrefs.open + '"]') ? menuPrefs.open : cg, false);
-  menuUi.synced = cur;
+  const cur = menuCurrent();
+  menuRenderOpen(); menuUi.synced = cur;
   menuApply(true); menuSettingsRender();
   const mo = new MutationObserver(menuQueueBadges);
   ['todayBadge', 'apBadge', 'dupBadge', 'undoBadge'].forEach(id => { const el = menuEl(id); if(el) mo.observe(el, { attributes: true, childList: true, characterData: true, subtree: true }); });
