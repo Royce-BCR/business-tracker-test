@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Business Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1122,7 +1122,7 @@
   }
   .sidebar-backdrop.open { display: block; }
 
-  @media (max-width: 860px) {
+  @media (max-width: 700px) {
     .mobile-bar { display: flex; }
     .sidebar {
       top: 0;
@@ -1130,15 +1130,18 @@
       width: 84%;
       max-width: 300px;
       transform: translateX(-100%);
-      transition: transform 0.22s ease;
+      transition: transform 0.22s ease, visibility 0s linear 0.22s;
+      visibility: hidden;   /* a closed drawer takes no focus */
       box-shadow: none;   /* no shadow strip down the screen edge while the menu is closed */
       z-index: 21;
     }
-    .sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px color-mix(in srgb, var(--bt-ink) 28%, transparent); }
+    .sidebar.open { transform: translateX(0); visibility: visible; transition: transform 0.22s ease, visibility 0s; box-shadow: 4px 0 20px color-mix(in srgb, var(--bt-ink) 28%, transparent); }
     .main { --px: 16px; margin-left: 0; margin-top: 52px; padding: 0 var(--px) 100px var(--px); }
     .brandbar { top: 52px; }
     .brandbar.off { margin-bottom: var(--bt-s5); }
     .brandbar.off .save-status { top: 62px; right: 12px; }
+  }
+  @media (max-width: 860px) {
     .page-head h2 { font-size: 23px; }
     .kpi-row { grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; }
     .assumptions-grid, .assumptions-grid.two, .milestone-grid, .qual-grid { grid-template-columns: 1fr !important; }
@@ -1771,6 +1774,131 @@ body.lp-open .navbar, body.dr-open .navbar { z-index: 64; width: fit-content; ma
 body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none; }
 .cx-showrep { margin: var(--bt-s2) 0; }
 /* BT:css end */
+
+/* ===== Menu modes: folding menu, icon rail, phone top / bottom bar (preferences are per device, kept in localStorage) ===== */
+:root { --bt-rail-w: 64px; --bt-bar-h: 56px; }
+.sidebar { top: var(--bt-banner-h, 0px); height: calc(100vh - var(--bt-banner-h, 0px)); }
+.brand h1 { font-size: 19px; }
+.brand-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--bt-s2); }
+.brand-txt { min-width: 0; flex: 1; }
+.menu-mode-btn { flex: none; display: inline-grid; place-items: center; width: var(--bt-control); height: var(--bt-control); min-height: var(--bt-control); padding: 0; background: none; border: 1px solid color-mix(in srgb, var(--bt-on-dark) 22%, transparent); color: var(--bt-on-dark-muted); border-radius: var(--bt-r-btn); cursor: pointer; }
+.menu-mode-btn:hover { background: color-mix(in srgb, var(--bt-on-dark) 8%, transparent); color: var(--bt-on-dark); }
+.menu-mode-btn svg { width: 18px; height: 18px; }
+@media (max-width: 700px) { .menu-mode-btn { display: none; } }
+/* folding groups */
+.nav-group { margin-top: 4px; }
+.nav-gbtn { width: 100%; min-height: var(--bt-control); padding: 0 10px; background: none; border: 0; border-radius: var(--bt-r-btn); cursor: pointer; font-family: inherit; text-align: left; font-weight: 600; font-size: var(--bt-fs-2xs); letter-spacing: 0.15em; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+.nav-gbtn::before { display: none; }
+.nav-gbtn:hover { background: color-mix(in srgb, var(--bt-on-dark) 5%, transparent); }
+.nav-gbtn .gi { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nav-gbtn .gl { flex: 1; min-width: 0; }
+.nav-gbtn .chev { width: 14px; height: 14px; flex: none; transition: transform var(--bt-fast); }
+.nav-group.open .nav-gbtn .chev { transform: rotate(180deg); }
+.nav-gbtn #revBadge { display: none; }
+.nav-group.open .grp-count { display: none; }
+.nav-items { display: none; padding: 2px 0 6px; }
+.nav-group.open .nav-items { display: block; }
+.nav-group.has-current .nav-gbtn { color: var(--bt-on-dark); }
+/* icon rail (laptop / tablet, collapsed) */
+.rail, .topmenu, .bottombar, .sheet-backdrop, .more-sheet { display: none; }
+.rail { position: fixed; left: 0; top: var(--bt-banner-h, 0px); height: calc(100vh - var(--bt-banner-h, 0px)); width: var(--bt-rail-w); background: var(--ink); color: var(--bt-on-dark-muted); flex-direction: column; padding: var(--bt-s2) 4px var(--bt-s3); gap: 2px; overflow-y: auto; overflow-x: hidden; z-index: 20; }
+.rail-sep { flex: 1 1 0; min-height: var(--bt-s2); }
+.rail-btn { position: relative; width: 100%; min-height: 56px; padding: 6px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: none; border: 0; border-left: 2.5px solid transparent; border-radius: var(--bt-r-btn); color: var(--bt-on-dark-muted); font: inherit; font-size: var(--bt-fs-2xs); line-height: 1.1; cursor: pointer; text-align: center; }
+.rail-btn svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.rail-btn:hover, .rail-btn[aria-expanded="true"] { background: color-mix(in srgb, var(--bt-on-dark) 9%, transparent); color: var(--bt-on-dark); }
+.rail-btn.has-current { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--bt-on-dark); border-left-color: var(--accent); }
+.rail-btn .rb-badge { position: absolute; top: 3px; right: 4px; }
+.rail-btn .rb-badge[hidden] { display: none; }
+.rail .rail-top { min-height: var(--bt-control); }
+.rail :focus-visible, .topmenu :focus-visible, .bottombar :focus-visible, .menu-pop :focus-visible { outline: 2px solid var(--bt-on-dark); outline-offset: -3px; }
+@media (min-width: 701px) {
+  body.menu-rail .sidebar { display: none; }
+  body.menu-rail .rail { display: flex; }
+  body.menu-rail .main { margin-left: var(--bt-rail-w); }
+}
+/* flyout / drop-down list (shared by the rail and the phone top bar) */
+.menu-pop { position: fixed; z-index: 40; min-width: 230px; max-width: min(320px, calc(100vw - 16px)); max-height: calc(100vh - var(--bt-banner-h, 0px) - 16px); overflow-y: auto; background: var(--ink); color: var(--bt-on-dark-muted); border: 1px solid color-mix(in srgb, var(--bt-on-dark) 16%, transparent); border-radius: var(--bt-r-card); box-shadow: var(--bt-shadow-2); padding: var(--bt-s2); }
+.menu-pop[hidden] { display: none; }
+.mp-head { padding: 6px 10px; font-size: var(--bt-fs-2xs); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+.mp-item { width: 100%; min-height: var(--bt-control); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: var(--bt-s2); background: none; border: 0; border-left: 2.5px solid transparent; border-radius: var(--bt-r-btn); color: inherit; font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.mp-item:hover, .mp-item:focus-visible { background: color-mix(in srgb, var(--bt-on-dark) 9%, transparent); color: var(--bt-on-dark); }
+.mp-item[aria-current="page"] { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--bt-on-dark); border-left-color: var(--accent); }
+.mp-sep { height: 1px; margin: var(--bt-s2) 4px; background: color-mix(in srgb, var(--bt-on-dark) 14%, transparent); }
+.menu-pop.pop-top { left: 0 !important; right: 0 !important; width: 100%; max-width: none; border-radius: 0 0 var(--bt-r-card) var(--bt-r-card); border-top: 0; }
+/* phone: top bar */
+.topmenu { position: fixed; top: var(--bt-banner-h, 0px); left: 0; right: 0; height: 52px; background: var(--ink); z-index: 25; padding: 0 2px; align-items: stretch; }
+.topmenu .rail-btn { flex: 1 1 0; min-width: 0; min-height: 52px; border-left: 0; border-bottom: 2.5px solid transparent; border-radius: 0; gap: 2px; padding: 4px 1px; }
+.topmenu .rail-btn.has-current { border-left-color: transparent; border-bottom-color: var(--accent); }
+.topmenu .rail-btn svg { width: 20px; height: 20px; }
+body.menu-phone.pm-top .topmenu { display: flex; }
+body.menu-phone.pm-top .mobile-bar, body.menu-phone.pm-bottom .sidebar, body.menu-phone.pm-top .sidebar { display: none; }
+body.menu-phone.pm-top .sidebar-backdrop { display: none !important; }
+/* phone: bottom bar */
+.bottombar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 26; background: var(--ink); padding: 0 4px env(safe-area-inset-bottom, 0px); box-shadow: 0 -2px 12px color-mix(in srgb, var(--bt-ink) 22%, transparent); }
+.bb-btn { position: relative; flex: 1 1 0; min-width: 0; min-height: var(--bt-bar-h); padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: 0; border-top: 2.5px solid transparent; color: var(--bt-on-dark-muted); font: inherit; font-size: var(--bt-fs-2xs); line-height: 1.15; text-align: center; cursor: pointer; }
+.bb-btn svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bb-btn .bb-l { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; max-width: 100%; }
+.bb-btn[aria-current="page"], .bb-btn.has-current { color: var(--bt-on-dark); border-top-color: var(--accent); }
+.bb-btn .rb-badge { position: absolute; top: 3px; left: calc(50% + 6px); }
+.bb-btn .rb-badge[hidden] { display: none; }
+.bb-more { --accent: var(--bt-on-dark-dim); }
+body.menu-phone.pm-bottom .bottombar { display: flex; }
+body.menu-phone.pm-bottom.kb-open .bottombar { display: none; }   /* the on-screen keyboard would sit on top of it */
+body.menu-phone.pm-bottom .mobile-bar .menu-btn { display: none; }
+body.menu-phone.pm-bottom .mobile-bar { padding-left: var(--bt-s4); }
+@media (max-width: 700px) {
+  body.menu-phone.pm-bottom .main { padding-bottom: calc(var(--bt-bar-h) + env(safe-area-inset-bottom, 0px) + 40px); }
+  body.menu-phone.pm-bottom:not(.kb-open) .toast { bottom: calc(var(--bt-bar-h) + env(safe-area-inset-bottom, 0px) + 14px); }
+}
+/* the More sheet */
+.sheet-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--bt-ink) 48%, transparent); z-index: 70; }
+.more-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 71; max-height: min(82vh, calc(100vh - var(--bt-banner-h, 0px) - 16px)); overflow-y: auto; background: var(--bt-card); color: var(--ink); border-radius: var(--bt-r-card) var(--bt-r-card) 0 0; padding: var(--bt-s3) var(--bt-s3) calc(var(--bt-s3) + env(safe-area-inset-bottom, 0px)); box-shadow: var(--bt-shadow-2); overscroll-behavior: contain; }
+.more-sheet:focus { outline: none; }
+body.sheet-open .sheet-backdrop, body.sheet-open .more-sheet { display: block; }
+body.sheet-open { overflow: hidden; }
+.ms-head { display: flex; align-items: center; justify-content: space-between; gap: var(--bt-s2); margin-bottom: var(--bt-s2); }
+.ms-head h2 { margin: 0; font-family: var(--serif); font-size: var(--bt-fs-md); }
+.ms-group { margin-top: var(--bt-s3); }
+.ms-group h3 { margin: 0 0 var(--bt-s1); font-size: var(--bt-fs-2xs); letter-spacing: 0.15em; text-transform: uppercase; color: var(--bt-text-muted); }
+.ms-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--bt-s2); }
+.ms-item { min-height: var(--bt-control); padding: 6px var(--bt-s3); display: flex; align-items: center; justify-content: space-between; gap: var(--bt-s2); background: var(--bt-surface-2); color: var(--ink); border: 1px solid var(--bt-line); border-left: 3px solid var(--accent, var(--bt-line)); border-radius: var(--bt-r-btn); font: inherit; font-size: var(--bt-fs-sm); text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.ms-item[aria-current="page"] { background: var(--bt-oak-100); font-weight: 600; }
+.ms-foot { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--bt-s2); margin-top: var(--bt-s4); padding-top: var(--bt-s3); border-top: 1px solid var(--bt-line); }
+.ms-foot .btn { width: 100%; }
+.ms-item:focus-visible, .ms-head .btn:focus-visible, .ms-foot .btn:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+/* Settings > Phone menu */
+.pm-opts { border: 0; margin: 0 0 var(--bt-s4); padding: 0; }
+.pm-opts legend { font-weight: 600; font-size: var(--bt-fs-sm); padding: 0; margin-bottom: var(--bt-s2); }
+.pm-opt { display: flex; align-items: flex-start; gap: var(--bt-s2); min-height: var(--bt-control); padding: 4px 0; font-size: var(--bt-fs-sm); cursor: pointer; }
+.pm-opt small { display: block; color: var(--bt-text-muted); font-size: var(--bt-fs-xs); }
+.pm-note { font-size: var(--bt-fs-xs); color: var(--bt-text-muted); margin: 0 0 var(--bt-s3); max-width: 640px; line-height: 1.5; }
+.bbe-list { list-style: none; margin: 0 0 var(--bt-s3); padding: 0; max-width: 560px; }
+.bbe-list li { display: flex; align-items: center; gap: var(--bt-s2); padding: var(--bt-s1) 0; border-bottom: 1px solid var(--bt-line); }
+.bbe-n { width: 22px; flex: none; color: var(--bt-text-muted); font-size: var(--bt-fs-xs); }
+.bbe-l { flex: 1; min-width: 0; font-size: var(--bt-fs-sm); }
+.bbe-l em { display: block; font-style: normal; color: var(--bt-text-muted); font-size: var(--bt-fs-xs); margin-left: 6px; }
+.bbe-btns { display: inline-flex; gap: var(--bt-s1); }
+.bbe-btns .btn { padding: 0; min-width: var(--bt-control); }
+.bbe-add { display: flex; flex-wrap: wrap; align-items: center; gap: var(--bt-s2); margin-bottom: var(--bt-s3); }
+.bbe-add select { flex: 1 1 200px; max-width: 320px; }
+.bbe-count { font-size: var(--bt-fs-xs); color: var(--bt-text-muted); margin: 0 0 var(--bt-s2); }
+/* Today: greeting tile and the extra sections */
+.td-greet { background: var(--bt-card); border: 1px solid var(--line); border-left: 4px solid var(--bt-oak-600, var(--bt-focus)); border-radius: var(--radius); padding: var(--bt-s4) var(--bt-s5); margin-bottom: var(--bt-s4); box-shadow: var(--shadow); }
+.td-greeting { margin: 0; font-family: var(--serif); font-weight: 600; font-size: var(--bt-fs-xl); line-height: 1.2; }
+.td-greet-sum { margin-top: var(--bt-s1); font-size: var(--bt-fs-sm); color: var(--slate); }
+.td-tick { flex: none; display: inline-grid; place-items: center; min-width: var(--bt-control); min-height: var(--bt-control); margin: calc(-1 * var(--bt-s2)) -8px calc(-1 * var(--bt-s2)) calc(-1 * var(--bt-s2)); padding: 0; background: none; border: 0; cursor: pointer; border-radius: var(--bt-r-btn); }
+.td-tick .cbx { pointer-events: none; }
+.td-tick:hover .cbx { border-color: var(--green); }
+.td-sub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: var(--bt-fs-xs); color: var(--text-muted); font-weight: 400; }
+.td-note { margin: 0 0 var(--bt-s2); font-size: var(--bt-fs-xs); color: var(--text-muted); }
+.rail-btn.g-command, .bb-btn.g-command, .ms-item.g-command, .menu-pop.g-command, .ms-group.g-command { --accent: var(--g-command); }
+.rail-btn.g-growth, .bb-btn.g-growth, .ms-item.g-growth, .menu-pop.g-growth, .ms-group.g-growth { --accent: var(--g-growth); }
+.rail-btn.g-finance, .bb-btn.g-finance, .ms-item.g-finance, .menu-pop.g-finance, .ms-group.g-finance { --accent: var(--g-finance); }
+.rail-btn.g-operations, .bb-btn.g-operations, .ms-item.g-operations, .menu-pop.g-operations, .ms-group.g-operations { --accent: var(--g-operations); }
+.rail-btn.g-revenue, .bb-btn.g-revenue, .ms-item.g-revenue, .menu-pop.g-revenue, .ms-group.g-revenue { --accent: var(--g-revenue); }
+.rail-btn.g-organisation, .bb-btn.g-organisation, .ms-item.g-organisation, .menu-pop.g-organisation, .ms-group.g-organisation { --accent: var(--g-organisation); }
+body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, body.logged-out .menu-pop, body.logged-out .more-sheet, body.logged-out .sheet-backdrop { display: none !important; }
+.bb-more svg circle { fill: currentColor; stroke: none; }
 </style>
 </head>
 <body>
@@ -1786,64 +1914,82 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
 
 <nav class="sidebar" id="sidebar" aria-label="Main">
   <div class="brand">
-    <h1>Business Tracker</h1>
-    <div class="sub" id="envSub">Live system</div>
+    <div class="brand-row">
+      <div class="brand-txt"><h1>Business Tracker</h1><div class="sub" id="envSub">Live system</div></div>
+      <button type="button" class="menu-mode-btn" id="menuCollapseBtn" aria-label="Collapse the menu to an icon rail" title="Collapse the menu to an icon rail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/><polyline points="15 9 12 12 15 15"/></svg></button>
+    </div>
   </div>
 
-  <div class="nav-group g-command">
-    <div class="nav-label">Command</div>
-    <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
-    <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
+  <div class="nav-group g-command" data-group="command" data-label="Command" data-short="Command">
+    <button type="button" class="nav-label nav-gbtn" id="gh-command" aria-expanded="false" aria-controls="gp-command"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Command</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-command" role="group" aria-labelledby="gh-command">
+      <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
+      <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
+    </div>
   </div>
 
-  <div class="nav-group g-growth">
-    <div class="nav-label">CRM</div>
-    <button type="button" class="tab g-growth" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
-    <button type="button" class="tab g-growth" data-tab="companies">Companies</button>
-    <button type="button" class="tab g-growth" data-tab="crm">Tasks</button>
+  <div class="nav-group g-growth" data-group="growth" data-label="Growth" data-short="Growth">
+    <button type="button" class="nav-label nav-gbtn" id="gh-growth" aria-expanded="false" aria-controls="gp-growth"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Growth</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-growth" role="group" aria-labelledby="gh-growth">
+      <button type="button" class="tab g-growth" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
+      <button type="button" class="tab g-growth" data-tab="companies">Companies</button>
+      <button type="button" class="tab g-growth" data-tab="crm">CRM tasks</button>
+      <button type="button" class="tab g-growth" data-tab="leads">Lead Pipeline</button>
+      <button type="button" class="tab g-growth" data-tab="salespipeline">Sales Pipeline</button>
+    </div>
   </div>
 
-  <div class="nav-group g-growth">
-    <div class="nav-label">Growth</div>
-    <button type="button" class="tab g-growth" data-tab="leads">Lead Pipeline</button>
-    <button type="button" class="tab g-growth" data-tab="salespipeline">Sales Pipeline</button>
+  <div class="nav-group g-revenue" data-group="revenue" data-label="Revenue" data-short="Revenue">
+    <button type="button" class="nav-label nav-gbtn" id="gh-revenue" aria-expanded="false" aria-controls="gp-revenue"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Revenue</span><span class="tab-count" id="revBadge" hidden></span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-revenue" role="group" aria-labelledby="gh-revenue">
+      <button type="button" class="tab g-revenue" data-tab="quotations">Quotes</button>
+      <button type="button" class="tab g-revenue" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></button>
+      <button type="button" class="tab g-revenue" data-tab="revenue">Revenue Forecast</button>
+    </div>
   </div>
 
-  <div class="nav-group g-revenue">
-    <div class="nav-label">Revenue <span class="tab-count" id="revBadge" hidden></span></div>
-    <button type="button" class="tab g-revenue" data-tab="quotations">Quotes</button>
-    <button type="button" class="tab g-revenue" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></button>
-    <button type="button" class="tab g-revenue" data-tab="revenue">Revenue Forecast</button>
+  <div class="nav-group g-finance" data-group="finance" data-label="Finance" data-short="Finance">
+    <button type="button" class="nav-label nav-gbtn" id="gh-finance" aria-expanded="false" aria-controls="gp-finance"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Finance</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-finance" role="group" aria-labelledby="gh-finance">
+      <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
+      <button type="button" class="tab g-finance" data-tab="invoicing">Invoicing</button>
+      <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
+      <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
+    </div>
   </div>
 
-  <div class="nav-group g-operations">
-    <div class="nav-label">Operations</div>
-    <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
-    <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
-    <button type="button" class="tab g-operations" data-tab="purchaseorders">Purchase Orders</button>
+  <div class="nav-group g-operations" data-group="operations" data-label="Operations" data-short="Ops">
+    <button type="button" class="nav-label nav-gbtn" id="gh-operations" aria-expanded="false" aria-controls="gp-operations"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Operations</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-operations" role="group" aria-labelledby="gh-operations">
+      <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
+      <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
+      <button type="button" class="tab g-operations" data-tab="purchaseorders">Purchase Orders</button>
+    </div>
   </div>
 
-  <div class="nav-group g-finance">
-    <div class="nav-label">Finance</div>
-    <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
-    <button type="button" class="tab g-finance" data-tab="invoicing">Invoicing</button>
-    <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
-    <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
-  </div>
-
-  <div class="nav-group g-organisation">
-    <div class="nav-label">Organisation</div>
-    <button type="button" class="tab g-organisation" data-tab="admin">Setup &amp; Admin</button>
-    <button type="button" class="tab g-organisation" data-tab="businessplan">Business Plan</button>
-    <button type="button" class="tab g-organisation" data-tab="actions">Actions</button>
-    <button type="button" class="tab g-organisation" data-tab="assets">Assets</button>
-    <button type="button" class="tab g-organisation" data-tab="settings">Settings</button>
+  <div class="nav-group g-organisation" data-group="organisation" data-label="Organisation" data-short="Admin">
+    <button type="button" class="nav-label nav-gbtn" id="gh-organisation" aria-expanded="false" aria-controls="gp-organisation"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Organisation</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-organisation" role="group" aria-labelledby="gh-organisation">
+      <button type="button" class="tab g-organisation" data-tab="admin">Setup &amp; Admin</button>
+      <button type="button" class="tab g-organisation" data-tab="businessplan">Business Plan</button>
+      <button type="button" class="tab g-organisation" data-tab="actions">Actions</button>
+      <button type="button" class="tab g-organisation" data-tab="assets">Assets</button>
+      <button type="button" class="tab g-organisation" data-tab="settings">Settings</button>
+    </div>
   </div>
 
   <div class="undo-wrap"><button type="button" class="undo-hist-btn" data-action="undo-history" title="Restore things you deleted in the last 24 hours">↶ Undo history <span class="tab-count" id="undoBadge" hidden></span></button></div>
   <div class="logout-bar" id="logoutBar"></div>
 
 </nav>
+
+<!-- menu modes: icon rail (laptop/tablet), phone top bar, phone bottom bar, "More" sheet and the shared flyout. All filled in by the Menu modes script. -->
+<nav class="rail" id="rail" aria-label="Main (icon rail)"></nav>
+<nav class="topmenu" id="topMenu" aria-label="Main (top bar)"></nav>
+<div class="menu-pop" id="menuPop" role="menu" hidden></div>
+<nav class="bottombar" id="bottomBar" aria-label="Main (bottom bar)"></nav>
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="more-sheet" id="moreSheet" role="dialog" aria-modal="true" aria-label="All pages" tabindex="-1"></div>
 
 <div class="login-overlay hidden" id="loginOverlay">
   <div class="login-stack">
@@ -1875,16 +2021,23 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
 
   <!-- TODAY -->
   <div class="panel active" id="panel-today">
+    <section class="td-greet" id="todayGreet" aria-label="Greeting">
+      <h2 class="td-greeting" id="todayGreeting">Hello</h2>
+      <div class="td-greet-sum" id="todaySummary"></div>
+    </section>
     <div class="page-head crm-head">
       <div>
         <h2 id="todayDate"></h2>
-        <div class="desc" id="todaySummary"></div>
       </div>
       <div class="view-toggle" id="todayScope" title="Whose items"></div>
     </div>
     <div class="today-grid">
       <section class="td-card" id="todayCrm"></section>
       <section class="td-card" id="todayActions"></section>
+      <section class="td-card" id="todayInvoices"></section>
+      <section class="td-card" id="todayDeliveries"></section>
+      <section class="td-card" id="todayOrders"></section>
+      <section class="td-card" id="todayReady"></section>
       <section class="td-card" id="todayProjects" style="grid-column:1 / -1;"></section>
       <section class="td-card" id="todayRfq" style="grid-column:1 / -1;" hidden></section>
     </div>
@@ -2186,6 +2339,11 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
         <section class="set-sec" data-sec="dashboard">
     <div class="section-label">Needs attention thresholds</div>
     <div class="card" id="dashSettingsCard"></div>
+        </section>
+
+        <section class="set-sec" data-sec="phonemenu">
+    <div class="section-label">Menu on this device</div>
+    <div class="card" id="phoneMenuCard"></div>
         </section>
 
         <section class="set-sec" data-sec="data">
@@ -10898,7 +11056,7 @@ document.addEventListener('click', (e) => {
    Actions have no id, so the panel holds the action object itself. They also already have a free-text `notes` column, so the new
    note thread is stored in `noteLog` (same shape as a task's notes) and the links in `linkedIds`. Neither is added to existing
    actions: both are read defensively and only written when used. */
-const todayUi = { scope: 'mine', od: { crm: false, act: false, proj: false }, key: '' };
+const todayUi = { scope: 'mine', od: { crm: false, act: false, proj: false, inv: false, del: false, ord: false }, key: '' };
 const actUi = { colsOpen: false };
 function todayScopeKey(){ return STORAGE_PREFIX + 'business-tracker-today-scope:' + meName(); }
 function loadTodayScope(){ try{ todayUi.scope = localStorage.getItem(todayScopeKey()) === 'all' ? 'all' : 'mine'; }catch(e){ todayUi.scope = 'mine'; } }
@@ -10974,7 +11132,7 @@ function todaySection(key, title, addLabel, addAction, emptyLabel, main, over, r
 function todayProjectEvents(today){
   const mine = [], over = [];
   state.projects.forEach(p => projEventsUnique(p).forEach(e => {
-    if(e.planned || e.done) return; const row = { p, e };
+    if(e.planned || e.done || e.kind === 'delivery' || (e.kind === 'in' && !e.invoiced)) return; const row = { p, e };   // deliveries and invoices still to be raised have their own lists (todayDeliveryData, todayInvoiceData), so nothing shows twice
     if(e.overdue) over.push(row); else if(e.date === today) mine.push(row);
   }));
   const srt = (a, b) => a.e.date.localeCompare(b.e.date) || cmpText(a.p.name, b.p.name);
@@ -10985,13 +11143,105 @@ function todayProjectRow(x, over){
   return `<div class="td-row" data-today="proj-open" data-id="${x.p.id}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;flex-shrink:0;fill:none;stroke:var(--slate);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round">${PW_ICON[e.kind]}</svg>
     <span class="td-title">${escHtml(x.p.name)} · ${escHtml(e.title)}</span><span class="td-meta"><span>${PW_KIND[e.kind]}</span>${e.amount !== undefined ? `<span>${e.kind === 'out' ? '−' : ''}${qm(e.amount)}</span>` : ''}${over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(e.date)))}</span>` : ''}</span></div>`;
 }
+
+/* ---------- Today: invoices, deliveries, orders, and accepted quotes waiting to become a job ----------
+   No new fields: every list is read from existing data and every tick writes to an existing field.
+   Invoices    payment lines / approved variations not yet invoiced, whose raise-by date (due date less payment terms) or due date is today or earlier.   Tick = the Invoicing "Mark sent" action (invoicedDate).
+   Deliveries  project delivery drops (from the quote-line delivery dates) dated today or earlier and not delivered.   Tick = the project's "Delivered today" action (project.dropState[drop].delivered).
+   Orders      Draft / Approved purchase orders whose delivery date, or the project's materials-order date, is today or earlier.   Tick = the PO "Mark sent" action (status, sentAt).
+   Ready       accepted quotes with no linked project (same link projAcceptedQuote uses). No dates. */
+function todayInvoiceData(today){
+  const main = [], over = [];
+  invRows().forEach(r => {
+    if(r.invoicedDate || r.paidDate || r.blocked) return;
+    let d = r.raiseBy || r.dueDate;
+    if(!d && r.kind === 'variation'){ const v = invTarget(r); d = v ? String((v.approval && v.approval.at) || v.created || '').slice(0, 10) : ''; }
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d || '') || d > today) return;
+    (d < today ? over : main).push({ r, d });
+  });
+  const srt = (a, b) => a.d.localeCompare(b.d) || cmpText(a.r.pname, b.r.pname) || cmpText(a.r.desc, b.r.desc);
+  return { main: main.sort(srt), over: over.sort(srt) };
+}
+function todayDeliveryData(today){
+  const main = [], over = [];
+  state.projects.forEach(p => projDeliveries(p).drops.forEach(x => {
+    if(!x.date || x.delivered || x.date > today) return;
+    (x.date < today ? over : main).push({ p, x, d: x.date });
+  }));
+  const srt = (a, b) => a.d.localeCompare(b.d) || cmpText(a.p.name, b.p.name) || cmpText(a.x.supplier, b.x.supplier);
+  return { main: main.sort(srt), over: over.sort(srt) };
+}
+function todayOrderData(today){
+  const main = [], over = [];
+  (state.purchaseOrders || []).forEach(po => {
+    if(po.status !== 'Draft' && po.status !== 'Approved') return;   // a Sent PO is waiting for its delivery, which is in the Deliveries list
+    const p = state.projects.find(x => x.id === po.pid), od = p ? projOrderDate(p) : '';
+    const ds = [po.deliveryDate, od].filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x || '')).sort(), d = ds[0];
+    if(!d || d > today) return;
+    (d < today ? over : main).push({ po, p, d });
+  });
+  const srt = (a, b) => a.d.localeCompare(b.d) || a.po.no - b.po.no;
+  return { main: main.sort(srt), over: over.sort(srt) };
+}
+function todayReadyData(){
+  const hasProject = q => (q.linkedIds || []).some(c => state.projects.some(p => p.id === linkedRoot(c)));
+  const jobs = new Map();
+  state.quotes.forEach(q => { const j = jobs.get(q.jobNumber) || { linked: false, best: null }; if(hasProject(q)) j.linked = true; if(q.status === 'Accepted' && (!j.best || q.version > j.best.version)) j.best = q; jobs.set(q.jobNumber, j); });
+  return [...jobs.values()].filter(j => j.best && !j.linked).map(j => j.best).sort((a, b) => b.id - a.id);
+}
+const todayTick = (attrs, label) => `<button type="button" class="td-tick" ${attrs} role="checkbox" aria-checked="false" aria-label="${escAttr(label)}" title="${escAttr(label)}"><span class="cbx">${CHECK_SVG}</span></button>`;
+const todayDue = (d, over) => over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(d)))}</span>` : '';
+function todayInvoiceRow(x, over){
+  const r = x.r, key = r.vid ? 'v' + r.vid : String(r.idx);
+  return `<div class="td-row" data-today="nav" data-spec="invoicing:${r.pid}:${escAttr(key)}">${todayTick(`data-inv-a="sent" data-inv-pid="${r.pid}" data-inv-k="${escAttr(key)}"`, 'Mark invoice sent: ' + r.pname + ' · ' + r.desc)}
+      <span class="td-title">${escHtml(r.pname)} · ${escHtml(r.desc)}</span>
+      <span class="td-meta"><span>Invoice to raise</span><span>${qm(r.amount)}</span>${todayDue(x.d, over)}</span></div>`;
+}
+function todayDeliveryRow(y, over){
+  const x = y.x, collect = x.method === 'collect';
+  return `<div class="td-row" data-today="nav" data-spec="project:${y.p.id}:materials">${todayTick(`data-today="tick-del" data-pid="${y.p.id}" data-did="${escAttr(x.d.id)}"`, 'Mark ' + (collect ? 'collected' : 'delivered') + ': ' + y.p.name + ' · ' + x.supplier)}
+      <span class="td-title">${escHtml(y.p.name)} · ${collect ? 'Collection' : 'Delivery'}: ${escHtml(x.supplier)}${x.items.length ? `<span class="td-sub">${escHtml(x.items.join(', '))}</span>` : ''}</span>
+      <span class="td-meta"><span>${collect ? 'Collection' : 'Delivery'}</span>${todayDue(y.d, over)}</span></div>`;
+}
+function todayOrderRow(y, over){
+  const po = y.po, need = poNeedsApproval(po) && !poApproved(po);
+  return `<div class="td-row" data-today="nav" data-spec="po:${po.id}">${todayTick(`data-po="sent" data-id="${po.id}"`, 'Mark order placed: ' + po.ref + ' · ' + po.supplierName)}
+      <span class="td-title">${escHtml(po.ref)} · ${escHtml(po.supplierName)}<span class="td-sub">${escHtml(y.p ? y.p.name : '')}</span></span>
+      <span class="td-meta"><span>${po.status === 'Draft' ? 'Order to place' : 'Approved, to place'}</span>${need ? '<span class="td-due">Needs approval</span>' : ''}<span>${qm(poTotals(po).payable)}</span>${todayDue(y.d, over)}</span></div>`;
+}
+function todayDatedSection(key, title, d, rowFn, emptyText){
+  const open = todayUi.od[key];
+  return `<div class="td-head"><h3>${title}</h3><span class="n">${d.main.length}</span></div>
+    ${d.over.length ? `<button type="button" class="td-od${open ? ' open' : ''}" data-today="od" data-k="${key}" aria-expanded="${open}">Overdue (${d.over.length})${CHEV_SVG}</button><div class="td-od-list"${open ? '' : ' hidden'}>${d.over.map(x => rowFn(x, true)).join('')}</div>` : ''}
+    ${d.main.length ? d.main.map(x => rowFn(x, false)).join('') : `<div class="td-empty">${emptyText}</div>`}`;
+}
+function todayReadySection(list){
+  return `<div class="td-head"><h3>Ready to turn into a job</h3><span class="n">${list.length}</span></div>
+    ${list.length ? list.map(q => `<div class="td-row" data-today="nav" data-spec="quote:${q.id}"><span class="td-title">${escHtml(qRef(q))} · ${escHtml(q.customer || '—')}${q.project ? `<span class="td-sub">${escHtml(q.project)}</span>` : ''}</span><span class="td-meta"><span>Accepted, no job yet</span><button type="button" class="link-btn" data-today="nav" data-spec="quote:${q.id}">Open quote</button></span></div>`).join('') : '<div class="td-empty">No accepted quotes are waiting for a job.</div>'}`;
+}
+/* greeting: London time, first name from the login / who-picker */
+function londonHour(d){
+  try{ const h = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: 'numeric', hourCycle: 'h23' }).formatToParts(d || new Date()).find(x => x.type === 'hour'), n = h ? Number(h.value) : NaN; if(!isNaN(n)) return n % 24; }catch(e){}
+  return (d || new Date()).getHours();
+}
+function greetFirstName(){
+  let n = ''; try{ n = whoAmI().name || ''; }catch(e){} if(!n) n = (session && session.username) || '';
+  n = String(n).trim().split(/[\s._@-]+/)[0] || '';
+  return n && n === n.toLowerCase() ? n.charAt(0).toUpperCase() + n.slice(1) : n;
+}
+function updateGreeting(){
+  const el = document.getElementById('todayGreeting'); if(!el) return;
+  const h = londonHour(), n = greetFirstName(), t = n ? (h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening') + ', ' + n : 'Hello';
+  if(el.textContent !== t) el.textContent = t;   // only the text changes: nothing is re-rendered and focus never moves
+}
 function renderToday(){
   if(!state) return;
   const now = new Date(), today = fmt(now);
   todayUi.key = today;
   const d = todayData(today);
-  const dueNow = d.crmToday.filter(t => t.status === 'open').length + d.actToday.filter(x => x.r.status !== 'Done').length;
-  const overNow = d.crmOver.filter(t => t.status === 'open').length + d.actOver.filter(x => x.r.status !== 'Done').length;
+  const inv = todayInvoiceData(today), dl = todayDeliveryData(today), ord = todayOrderData(today), ready = todayReadyData();
+  const dueNow = d.crmToday.filter(t => t.status === 'open').length + d.actToday.filter(x => x.r.status !== 'Done').length + inv.main.length + dl.main.length + ord.main.length;
+  const overNow = d.crmOver.filter(t => t.status === 'open').length + d.actOver.filter(x => x.r.status !== 'Done').length + inv.over.length + dl.over.length + ord.over.length;   // the Ready-to-turn-into-a-job list is not counted
   const badge = document.getElementById('todayBadge');
   if(badge){ badge.textContent = dueNow + overNow; badge.hidden = !(dueNow + overNow); badge.classList.toggle('over', overNow > 0); badge.title = dueNow + ' due today, ' + overNow + ' overdue'; }
   const crm = document.getElementById('todayCrm'); if(!crm) return;
@@ -10999,6 +11249,10 @@ function renderToday(){
   document.getElementById('todaySummary').textContent = dueNow + ' due today, ' + overNow + ' overdue';
   document.getElementById('todayScope').innerHTML = `<button data-today="scope" data-v="mine" class="${todayUi.scope === 'mine' ? 'active' : ''}">My items</button><button data-today="scope" data-v="all" class="${todayUi.scope === 'all' ? 'active' : ''}">Everyone</button>`;
   crm.innerHTML = todaySection('crm', 'CRM tasks', '+ Add', 'add-task', '+ New task', d.crmToday, d.crmOver, todayTaskRow, t => t.status === 'open');
+  updateGreeting();
+  const secs = [['todayInvoices', () => todayDatedSection('inv', 'Invoices', inv, todayInvoiceRow, 'Nothing due today')], ['todayDeliveries', () => todayDatedSection('del', 'Deliveries', dl, todayDeliveryRow, 'Nothing due today')],
+    ['todayOrders', () => todayDatedSection('ord', 'Orders', ord, todayOrderRow, 'Nothing due today')], ['todayReady', () => todayReadySection(ready)]];
+  secs.forEach(([id, fn]) => { const el = document.getElementById(id); if(el) el.innerHTML = fn(); });
   document.getElementById('todayActions').innerHTML = todaySection('act', 'Actions', '+ Add', 'add-action', '+ New action', d.actToday, d.actOver, todayActionRow, x => x.r.status !== 'Done');
   const pe = todayProjectEvents(today), pr = document.getElementById('todayProjects');
   if(pr){ const open = todayUi.od.proj;
@@ -11008,7 +11262,7 @@ function renderToday(){
   refreshActionPanel();
 }
 /* roll over at midnight and when the tab or window regains focus, so the lists never show yesterday's "today" */
-function checkTodayRollover(){ if(state && todayUi.key && todayUi.key !== fmt(new Date())) render(); }
+function checkTodayRollover(){ updateGreeting(); if(state && todayUi.key && todayUi.key !== fmt(new Date())) render(); }   // every 30 seconds: the greeting text is re-checked in place, the page only re-renders at midnight
 setInterval(checkTodayRollover, 30000);
 document.addEventListener('visibilitychange', () => { if(!document.hidden) checkTodayRollover(); });
 window.addEventListener('focus', checkTodayRollover);
@@ -11050,6 +11304,12 @@ document.addEventListener('click', (e) => {
   else if(a === 'add-task') openNewTask('');
   else if(a === 'add-action') openNewAction();
   else if(a === 'proj-open'){ openProjectWorkspace(Number(b.dataset.id)); }
+  else if(a === 'nav'){ const inner = e.target.closest('input,select,textarea,button,.cbx,a'); if(inner && inner !== b) return; navGo(() => navOpen(b.dataset.spec)); }
+  else if(a === 'tick-del'){
+    const p = state.projects.find(x => x.id === Number(b.dataset.pid)), id = b.dataset.did; if(!p) return;
+    projEnsure(p); const st = p.dropState[id] = p.dropState[id] || {};
+    pwSetDate('Delivered', () => st.delivered || '', v => { st.delivered = v; }, fmt(new Date()));
+  }
   else if(a === 'act-open'){ const inner = e.target.closest('input,select,textarea,button,.cbx,a'); if(inner && inner !== b) return; openActionPanel(state.actions[Number(b.dataset.idx)]); }
   else if(a === 'act-rec' || a === 'act-rec-panel'){
     const r = a === 'act-rec' ? state.actions[Number(b.dataset.idx)] : (actionPanel && actionPanel.ref);
@@ -11338,6 +11598,7 @@ const SET_SECTIONS = [
   { id: 'docs',      label: 'Documents & email' },
   { id: 'approvals', label: 'Approvals' },
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'phonemenu', label: 'Phone menu' },
   { id: 'data',      label: 'Data' },
   { id: 'admin',     label: 'Admin', admin: true }   // same admin-only gating as the cards inside it
 ];
@@ -11666,8 +11927,10 @@ document.getElementById('importFile').addEventListener('change', (e) => {
   e.target.value = '';
 });
 function closeMobileSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
+  const sb = document.getElementById('sidebar'), had = sb.classList.contains('open') && sb.contains(document.activeElement);
+  sb.classList.remove('open');
   document.getElementById('sidebarBackdrop').classList.remove('open');
+  const mb = document.getElementById('menuBtn'); if(mb){ mb.setAttribute('aria-expanded', 'false'); if(had && document.body.classList.contains('pm-burger')) mb.focus(); }   // focus goes back to the menu button, never lost
 }
 document.getElementById('menuBtn').addEventListener('click', () => {
   document.getElementById('sidebar').classList.add('open');
@@ -11782,6 +12045,7 @@ function activateTab(name){
   panel.classList.add('active');
   if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
   updateScrollCues();
+  try{ menuSync(); }catch(e){}   // the menus (folding group, rail, bottom bar) follow the current page
 }
 document.querySelector('.skip-link').addEventListener('click', (e) => {
   e.preventDefault();
@@ -11794,6 +12058,360 @@ document.querySelectorAll('.tab').forEach(tab => {
     closeMobileSidebar();
   });
 });
+
+/* ---------- Menu modes ----------
+   One menu, four looks. The sidebar above stays the single list of pages (every route, data-tab, badge id and the Undo / logout controls live there).
+   Laptop / tablet (700px and wider): PINNED = folding sidebar (one group open at a time) or COLLAPSED = 64px icon rail with a flyout per group.
+   Phone (under 700px): bottom bar (default, 4 shortcuts + More sheet), top bar with group drop-downs, or hamburger + folding drawer.
+   The choices are PER DEVICE: they live in localStorage under STORAGE_PREFIX (so test and live never share) and never in the saved state. */
+const MENU_KEY = STORAGE_PREFIX + 'business-tracker-menu';
+const MENU_BOTTOM_DEFAULT = ['today', 'quotations', 'projectpipeline', 'crm'];
+const MENU_BADGE_IDS = { today: 'todayBadge', approvals: 'apBadge', contacts: 'dupBadge' };   // the existing badges, read as they are
+const MENU_BAR_LABEL = { crm: 'CRM' };
+const MENU_ICONS = {
+  command: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  growth: '<polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/>',
+  revenue: '<circle cx="12" cy="12" r="9"/><path d="M14.5 8.5A3 3 0 0 0 9 10v4.5c0 1-.6 1.8-1.5 2.5h8"/><line x1="7.5" y1="12.5" x2="13" y2="12.5"/>',
+  finance: '<path d="M3 10l9-6 9 6"/><line x1="5" y1="10" x2="5" y2="18"/><line x1="10" y1="10" x2="10" y2="18"/><line x1="14" y1="10" x2="14" y2="18"/><line x1="19" y1="10" x2="19" y2="18"/><line x1="3" y1="21" x2="21" y2="21"/>',
+  operations: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><line x1="12" y1="13" x2="12" y2="21"/>',
+  organisation: '<path d="M4 21V4h10v17"/><path d="M14 9h6v12"/><line x1="2" y1="21" x2="22" y2="21"/><line x1="8" y1="8" x2="10" y2="8"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="8" y1="16" x2="10" y2="16"/>',
+  today: '<rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/><polyline points="9 15 11 17 15 13"/>',
+  contacts: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+  companies: '<path d="M4 21V4h10v17"/><path d="M14 9h6v12"/><line x1="2" y1="21" x2="22" y2="21"/><line x1="8" y1="8" x2="10" y2="8"/><line x1="8" y1="12" x2="10" y2="12"/>',
+  crm: '<rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12 11 15 16 9"/>',
+  leads: '<path d="M3 4h18l-7 9v6l-4 2v-8z"/>',
+  salespipeline: '<path d="M3 4h18l-7 9v6l-4 2v-8z"/>',
+  quotations: '<path d="M6 2h9l5 5v15H6z"/><polyline points="15 2 15 7 20 7"/><line x1="9" y1="13" x2="17" y2="13"/><line x1="9" y1="17" x2="17" y2="17"/>',
+  approvals: '<circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/>',
+  cashflow: '<path d="M3 12c3-6 6-6 9 0s6 6 9 0"/>',
+  invoicing: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/>',
+  transactions: '<polyline points="17 3 21 7 17 11"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 13 3 17 7 21"/><line x1="3" y1="17" x2="15" y2="17"/>',
+  pricing: '<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
+  projectpipeline: '<rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="13" rx="1"/>',
+  suppliers: '<path d="M2 6h11v10H2zM13 9h5l3 3v4h-8z"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+  purchaseorders: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l3 12h11l2-8H6"/>',
+  admin: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+  businessplan: '<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><line x1="8" y1="8" x2="15" y2="8"/>',
+  actions: '<polyline points="3 6 5 8 8 4"/><line x1="11" y1="6" x2="21" y2="6"/><polyline points="3 14 5 16 8 12"/><line x1="11" y1="14" x2="21" y2="14"/>',
+  assets: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><line x1="12" y1="13" x2="12" y2="21"/>',
+  settings: '<line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2.2"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="15" cy="17" r="2.2"/>',
+  more: '<circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/>',
+  undo: '<polyline points="3 4 3 10 9 10"/><path d="M5.5 15a8 8 0 1 0 1-8.6L3 10"/>',
+  logout: '<path d="M9 21H5V3h4"/><polyline points="16 7 21 12 16 17"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  pin: '<rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/><polyline points="13 9 16 12 13 15"/>',
+  close: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>'
+};
+const menuPrefs = { mode: '', open: '', phone: 'bottom', bottom: MENU_BOTTOM_DEFAULT.slice() };
+const menuMQ = window.matchMedia('(max-width: 700px)');
+const menuUi = { sig: '', pop: null, hoverT: 0, sheetFrom: null, built: false };
+const menuEl = id => document.getElementById(id);
+const menuSvg = (key, cls) => `<svg${cls ? ' class="' + cls + '"' : ''} viewBox="0 0 24 24" aria-hidden="true">${MENU_ICONS[key] || MENU_ICONS.command}</svg>`;
+function menuCatalog(){
+  return [...document.querySelectorAll('#sidebar .nav-group')].map(g => ({ id: g.dataset.group, label: g.dataset.label, short: g.dataset.short, tabs: [...g.querySelectorAll('.tab')].map(t => ({ tab: t.dataset.tab, label: navTabLabel(t.dataset.tab) })) }));
+}
+function menuGroupOf(tab){ const t = document.querySelector('#sidebar .tab[data-tab="' + tab + '"]'), g = t && t.closest('.nav-group'); return g ? g.dataset.group : ''; }
+function menuCurrent(){ const t = document.querySelector('#sidebar .tab.active'); return t ? t.dataset.tab : ''; }
+function menuLabel(tab){ return navTabLabel(tab); }
+function menuBarLabel(tab){ return MENU_BAR_LABEL[tab] || menuLabel(tab); }
+function menuValidTabs(){ return new Set([...document.querySelectorAll('#sidebar .tab')].map(t => t.dataset.tab)); }
+function menuCleanBottom(list){
+  const ok = menuValidTabs(), out = [];
+  (Array.isArray(list) ? list : []).forEach(t => { t = String(t); if(ok.has(t) && !out.includes(t)) out.push(t); });
+  if(out.length > 5) out.length = 5;
+  return out.length < 3 ? MENU_BOTTOM_DEFAULT.slice() : out;
+}
+function menuLoad(){
+  try{
+    const o = JSON.parse(localStorage.getItem(MENU_KEY) || 'null');
+    if(o && typeof o === 'object'){
+      if(o.mode === 'pinned' || o.mode === 'collapsed') menuPrefs.mode = o.mode;
+      if(typeof o.open === 'string') menuPrefs.open = o.open;
+      if(['bottom', 'top', 'burger'].includes(o.phone)) menuPrefs.phone = o.phone;
+      if(Array.isArray(o.bottom)) menuPrefs.bottom = o.bottom;
+    }
+  }catch(e){}
+  menuPrefs.bottom = menuCleanBottom(menuPrefs.bottom);
+}
+function menuSave(){ try{ localStorage.setItem(MENU_KEY, JSON.stringify(menuPrefs)); }catch(e){} }
+/* alert counts: read from the badges that already exist (today, approvals, duplicate contacts), rolled up per group */
+function menuBadge(tab){ const id = MENU_BADGE_IDS[tab], el = id && menuEl(id), n = el && !el.hidden ? (parseInt(el.textContent, 10) || 0) : 0; return { n, over: !!(n && el.classList.contains('over')) }; }
+function menuGroupCount(g){ let n = 0, over = false; g.tabs.forEach(t => { const b = menuBadge(t.tab); n += b.n; over = over || b.over; }); return { n, over }; }
+function menuPillSet(el, c){ if(!el) return; const t = c.n > 99 ? '99+' : String(c.n); if(el.textContent !== t) el.textContent = t; el.hidden = !c.n; el.classList.toggle('over', !!c.over); }
+function menuPill(attr, extra){ return `<span class="tab-count${extra ? ' ' + extra : ''}" ${attr} hidden>0</span>`; }
+let menuBadgeQueued = false;
+function menuBadgesSync(){
+  menuBadgeQueued = false;
+  const cat = menuCatalog(), inBar = new Set(menuPrefs.bottom);
+  cat.forEach(g => {
+    const c = menuGroupCount(g);
+    document.querySelectorAll('[data-bgroup="' + g.id + '"]').forEach(el => menuPillSet(el, c));
+    document.querySelectorAll('[data-mgroup="' + g.id + '"]').forEach(b => { b.setAttribute('aria-label', g.label + (c.n ? ', ' + c.n + ' to look at' : '')); });
+  });
+  document.querySelectorAll('[data-btab]').forEach(el => menuPillSet(el, menuBadge(el.dataset.btab)));
+  let more = { n: 0, over: false };
+  cat.forEach(g => g.tabs.forEach(t => { if(!inBar.has(t.tab)){ const b = menuBadge(t.tab); more.n += b.n; more.over = more.over || b.over; } }));
+  document.querySelectorAll('[data-bmore]').forEach(el => menuPillSet(el, more));
+  const u = menuEl('undoBadge'), un = u && !u.hidden ? (parseInt(u.textContent, 10) || 0) : 0;
+  document.querySelectorAll('[data-bundo]').forEach(el => menuPillSet(el, { n: un, over: false }));
+  const hasLogout = !!document.querySelector('#logoutBar .logout-link');
+  document.querySelectorAll('[data-mact="logout"]').forEach(el => { el.hidden = !hasLogout; });
+}
+function menuQueueBadges(){ if(menuBadgeQueued) return; menuBadgeQueued = true; requestAnimationFrame(menuBadgesSync); }
+/* ---- sidebar: folding groups ---- */
+function menuOpenGroup(id, save){
+  document.querySelectorAll('#sidebar .nav-group').forEach(g => { const on = g.dataset.group === id; g.classList.toggle('open', on); const b = g.querySelector('.nav-gbtn'); if(b) b.setAttribute('aria-expanded', String(on)); });
+  if(save){ menuPrefs.open = id; menuSave(); }
+}
+/* ---- build the rail, top bar, bottom bar ---- */
+function menuGroupBtns(cat){ return cat.map(g => `<button type="button" class="rail-btn g-${g.id}" data-mgroup="${g.id}" aria-haspopup="menu" aria-expanded="false">${menuSvg(g.id)}<span>${g.short}</span>${menuPill('data-bgroup="' + g.id + '"', 'rb-badge')}</button>`).join(''); }
+function menuBuild(){
+  const cat = menuCatalog();
+  menuEl('rail').innerHTML = `<button type="button" class="rail-btn rail-top" id="railPin" data-mact="pin" aria-label="Pin the menu open" title="Pin the menu open">${menuSvg('pin')}</button>` + menuGroupBtns(cat) + '<div class="rail-sep"></div>'
+    + `<button type="button" class="rail-btn" data-mact="undo" title="Undo history">${menuSvg('undo')}<span>Undo</span>${menuPill('data-bundo', 'rb-badge')}</button><button type="button" class="rail-btn" data-mact="logout" title="Log out" hidden>${menuSvg('logout')}<span>Log out</span></button>`;
+  menuEl('topMenu').innerHTML = menuGroupBtns(cat);
+  document.querySelectorAll('#sidebar .nav-group').forEach(g => { const gi = g.querySelector('.gi'); if(gi) gi.innerHTML = MENU_ICONS[g.dataset.group] || ''; const c = g.querySelector('.grp-count'); if(c) c.setAttribute('data-bgroup', g.dataset.group); });
+  menuBuildBottom();
+}
+function menuBuildBottom(){
+  menuEl('bottomBar').innerHTML = menuPrefs.bottom.map(t => { const g = menuGroupOf(t); return `<button type="button" class="bb-btn g-${g}" data-go="${t}">${menuSvg(MENU_ICONS[t] ? t : g)}<span class="bb-l">${escHtml(menuBarLabel(t))}</span>${menuPill('data-btab="' + t + '"', 'rb-badge')}</button>`; }).join('')
+    + `<button type="button" class="bb-btn bb-more" data-mact="more" aria-haspopup="dialog">${menuSvg('more')}<span class="bb-l">More</span>${menuPill('data-bmore', 'rb-badge')}</button>`;
+  menuSync();
+}
+/* ---- keep everything in step with the current page (called from activateTab; updates in place so focus is never lost) ---- */
+function menuSync(){
+  if(!menuUi.built) return;
+  const cur = menuCurrent(), grp = menuGroupOf(cur), inBar = menuPrefs.bottom.includes(cur);
+  document.querySelectorAll('#sidebar .nav-group').forEach(g => g.classList.toggle('has-current', g.dataset.group === grp));
+  if(grp && menuUi.synced !== cur){ menuUi.synced = cur; menuOpenGroup(grp, true); }
+  document.querySelectorAll('.rail-btn[data-mgroup]').forEach(b => b.classList.toggle('has-current', b.dataset.mgroup === grp));
+  document.querySelectorAll('#bottomBar .bb-btn[data-go]').forEach(b => { if(b.dataset.go === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  const more = document.querySelector('#bottomBar .bb-more'); if(more) more.classList.toggle('has-current', !inBar);
+  const t = document.querySelector('#mobileBar .title'); if(t && cur && document.body.classList.contains('pm-bottom')) t.textContent = menuLabel(cur);
+  menuBadgesSync();
+}
+/* ---- which look is on ---- */
+function menuEff(){ return menuPrefs.mode || (window.innerWidth < 1100 ? 'collapsed' : 'pinned'); }   // no saved choice: a Surface Pro (912px) starts on the rail, a laptop on the pinned menu
+function menuApply(force){
+  const phone = menuMQ.matches, eff = menuEff(), sig = [phone, eff, menuPrefs.phone].join('|');
+  if(sig === menuUi.sig && !force) return;
+  menuUi.sig = sig; menuPopClose(false); menuSheetClose(false); closeMobileSidebar();
+  const b = document.body;
+  b.classList.toggle('menu-phone', phone); b.classList.toggle('menu-rail', !phone && eff === 'collapsed'); b.classList.toggle('menu-pinned', !phone && eff === 'pinned');
+  ['bottom', 'top', 'burger'].forEach(m => b.classList.toggle('pm-' + m, phone && menuPrefs.phone === m));
+  menuSync(); menuKbSync();
+  const mb = menuEl('menuBtn'); if(mb){ mb.setAttribute('aria-controls', 'sidebar'); mb.setAttribute('aria-expanded', 'false'); }
+}
+function menuSetMode(m, focusId){ menuPrefs.mode = m; menuSave(); menuApply(true); const f = menuEl(focusId); if(f) f.focus(); menuSettingsRender(); }
+/* the on-screen keyboard: the bottom bar steps aside while a text box is being edited */
+function menuKbSync(){
+  const a = document.activeElement, typing = !!a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && !/^(checkbox|radio|button|submit|reset|range|color|file|image)$/.test(a.type)));
+  const vv = window.visualViewport, squeezed = !!vv && vv.height < window.innerHeight - 140;
+  document.body.classList.toggle('kb-open', menuMQ.matches && (typing || squeezed));
+}
+/* ---- flyout (rail) and drop-down (phone top bar) ---- */
+function menuPopOpen(gid, btn, o){
+  o = o || {}; const g = menuCatalog().find(x => x.id === gid), pop = menuEl('menuPop'); if(!g || !btn) return;
+  if(menuUi.pop && menuUi.pop.btn !== btn) menuPopClose(false);
+  clearTimeout(menuUi.hoverT);
+  const cur = menuCurrent(), top = !!o.top;
+  let html = `<div class="mp-head">${escHtml(g.label)}</div>` + g.tabs.map(t => { const c = menuBadge(t.tab); return `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('');
+  if(top && gid === 'organisation'){
+    const ue = menuEl('undoBadge'), un = ue && !ue.hidden ? (parseInt(ue.textContent, 10) || 0) : 0;
+    html += '<div class="mp-sep"></div>' + `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="undo"><span>Undo history</span>${un ? `<span class="tab-count">${un}</span>` : ''}</button>`;
+    if(document.querySelector('#logoutBar .logout-link')) html += '<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="logout"><span>Log out</span></button>';
+  }
+  pop.innerHTML = html; pop.className = 'menu-pop g-' + gid + (top ? ' pop-top' : ''); pop.setAttribute('aria-label', g.label + ' pages'); pop.hidden = false;
+  if(top){ const bar = menuEl('topMenu').getBoundingClientRect(); pop.style.top = bar.bottom + 'px'; pop.style.left = ''; pop.style.maxHeight = Math.max(160, window.innerHeight - bar.bottom - 8) + 'px'; }
+  else { const r = btn.getBoundingClientRect(), rail = menuEl('rail').getBoundingClientRect(), h = pop.offsetHeight, bn = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bt-banner-h'), 10) || 0; pop.style.left = rail.right + 'px'; pop.style.top = Math.max(bn + 8, Math.min(r.top, window.innerHeight - h - 8)) + 'px'; pop.style.maxHeight = ''; }
+  menuUi.pop = { gid, btn, sticky: !!o.sticky, top };
+  btn.setAttribute('aria-expanded', 'true');
+  if(o.focus){ const first = pop.querySelector('.mp-item[aria-current="page"]') || pop.querySelector('.mp-item'); if(first) first.focus(); }
+}
+function menuPopClose(ret){
+  const p = menuUi.pop; clearTimeout(menuUi.hoverT); if(!p) return;
+  const pop = menuEl('menuPop'); pop.hidden = true; pop.innerHTML = ''; menuUi.pop = null;
+  p.btn.setAttribute('aria-expanded', 'false');
+  if(ret) p.btn.focus();
+}
+function menuPopSoonClose(){ clearTimeout(menuUi.hoverT); menuUi.hoverT = setTimeout(() => { if(menuUi.pop && !menuUi.pop.sticky) menuPopClose(false); }, 240); }
+function menuFocusMove(list, from, step){ const i = list.indexOf(from), n = list.length; if(!n) return; list[((i < 0 ? (step > 0 ? -1 : 0) : i) + step + n) % n].focus(); }
+/* ---- the More sheet (phone bottom bar) ---- */
+function menuSheetOpen(){
+  const cat = menuCatalog(), cur = menuCurrent(), u = menuEl('undoBadge'), un = u && !u.hidden ? (parseInt(u.textContent, 10) || 0) : 0;
+  menuEl('moreSheet').innerHTML = `<div class="ms-head"><h2>All pages</h2><button type="button" class="btn secondary" data-mact="sheetclose" aria-label="Close the page list">Close</button></div>`
+    + cat.map(g => `<div class="ms-group g-${g.id}"><h3>${escHtml(g.label)}</h3><div class="ms-grid">${g.tabs.map(t => { const c = menuBadge(t.tab); return `<button type="button" class="ms-item g-${g.id}" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('')}</div></div>`).join('')
+    + `<div class="ms-foot"><button type="button" class="btn secondary" data-mact="editbar">Edit bottom bar</button><button type="button" class="btn secondary" data-mact="undo">Undo history${un ? ' (' + un + ')' : ''}</button>${document.querySelector('#logoutBar .logout-link') ? '<button type="button" class="btn secondary" data-mact="logout">Log out</button>' : ''}</div>`;
+  menuUi.sheetFrom = document.activeElement;
+  document.body.classList.add('sheet-open');
+  const sh = menuEl('moreSheet'); sh.scrollTop = 0; const first = sh.querySelector('.ms-item[aria-current="page"]') || sh.querySelector('.ms-item'); if(first) first.focus({ preventScroll: true }); else sh.focus();
+}
+function menuSheetClose(ret){
+  if(!document.body.classList.contains('sheet-open')) return;
+  document.body.classList.remove('sheet-open');
+  const f = menuUi.sheetFrom; menuUi.sheetFrom = null; if(ret){ const t = f && document.contains(f) ? f : document.querySelector('#bottomBar .bb-more'); if(t) t.focus(); }
+}
+function menuTrap(box, e){
+  const f = [...box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(x => !x.disabled && !x.hidden && x.offsetParent !== null);
+  if(!f.length) return; const first = f[0], last = f[f.length - 1];
+  if(e.shiftKey && (document.activeElement === first || !box.contains(document.activeElement))){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && (document.activeElement === last || !box.contains(document.activeElement))){ e.preventDefault(); first.focus(); }
+}
+/* ---- going to a page from any of the menus ---- */
+function menuGo(tab, from){
+  const trig = menuUi.pop && menuUi.pop.btn, fromPop = !!(from && from.closest('#menuPop')), fromSheet = !!(from && from.closest('#moreSheet'));
+  navClear(); activateTab(tab); closeMobileSidebar(); menuPopClose(false);
+  if(fromSheet) menuSheetClose(false);
+  if(fromPop && trig) trig.focus();
+  else if(fromSheet){ const t = document.querySelector('#bottomBar .bb-btn[aria-current="page"]') || document.querySelector('#bottomBar .bb-more'); if(t) t.focus(); }
+}
+function menuAct(a){
+  if(a === 'pin') menuSetMode('pinned', 'menuCollapseBtn');
+  else if(a === 'collapse') menuSetMode('collapsed', 'railPin');
+  else if(a === 'more') menuSheetOpen();
+  else if(a === 'sheetclose') menuSheetClose(true);
+  else if(a === 'undo'){ menuPopClose(false); menuSheetClose(false); const b = document.querySelector('.undo-hist-btn'); if(b) b.click(); }
+  else if(a === 'logout'){ menuPopClose(false); menuSheetClose(false); const b = document.querySelector('#logoutBar .logout-link'); if(b) b.click(); }
+  else if(a === 'editbar'){ menuSheetClose(false); navClear(); activateTab('settings'); settingsShow('phonemenu', true); window.scrollTo(0, 0); const f = document.querySelector('#phoneMenuCard .bbe-list button:not([disabled])'); if(f) f.focus(); }
+}
+document.addEventListener('click', (e) => {
+  const t = e.target; if(!t || !t.closest) return;
+  const go = t.closest('[data-go]');
+  if(go && (go.closest('#menuPop') || go.closest('#bottomBar') || go.closest('#moreSheet'))){ menuGo(go.dataset.go, go); return; }
+  const act = t.closest('[data-mact]');
+  if(act && act.closest('#rail, #topMenu, #menuPop, #bottomBar, #moreSheet') && !act.dataset.mgroup){ menuAct(act.dataset.mact); return; }
+  const gb = t.closest('[data-mgroup]');
+  if(gb && gb.closest('#rail, #topMenu')){
+    const top = !!gb.closest('#topMenu'), p = menuUi.pop, keyboard = e.detail === 0;
+    if(p && p.btn === gb){ if(p.sticky && !keyboard) menuPopClose(false); else if(p.sticky) menuPopClose(true); else { p.sticky = true; if(keyboard){ const f = menuEl('menuPop').querySelector('.mp-item'); if(f) f.focus(); } } }
+    else menuPopOpen(gb.dataset.mgroup, gb, { sticky: true, focus: keyboard, top });
+    return;
+  }
+  const gh = t.closest('#sidebar .nav-gbtn');
+  if(gh){ const g = gh.closest('.nav-group'); menuOpenGroup(g.classList.contains('open') ? '' : g.dataset.group, true); return; }
+  if(t.closest('#menuCollapseBtn')){ menuAct('collapse'); return; }
+  if(t.closest('#sheetBackdrop')){ menuSheetClose(true); return; }
+  if(menuUi.pop && !t.closest('#menuPop')) menuPopClose(false);
+});
+/* hover opens the flyout too (mouse only; touch and keyboard use click / Enter) */
+(function(){
+  const rail = menuEl('rail'), pop = menuEl('menuPop');
+  rail.addEventListener('pointerover', (e) => {
+    if(e.pointerType !== 'mouse') return; const b = e.target.closest('[data-mgroup]');
+    if(b){ if(!(menuUi.pop && menuUi.pop.btn === b)) menuPopOpen(b.dataset.mgroup, b, { sticky: false }); else clearTimeout(menuUi.hoverT); }
+    else menuPopSoonClose();
+  });
+  rail.addEventListener('pointerleave', (e) => { if(e.pointerType === 'mouse') menuPopSoonClose(); });
+  pop.addEventListener('pointerenter', (e) => { if(e.pointerType === 'mouse') clearTimeout(menuUi.hoverT); });
+  pop.addEventListener('pointerleave', (e) => { if(e.pointerType === 'mouse') menuPopSoonClose(); });
+})();
+/* keyboard: arrows move, Enter / Space open, Esc closes */
+document.addEventListener('keydown', (e) => {
+  const k = e.key, a = document.activeElement;
+  if(k === 'Escape'){
+    if(document.body.classList.contains('sheet-open')){ e.preventDefault(); menuSheetClose(true); return; }
+    const sb = menuEl('sidebar'); if(menuMQ.matches && sb.classList.contains('open')){ e.preventDefault(); closeMobileSidebar(); const mb = menuEl('menuBtn'); if(mb) mb.focus(); return; }
+    if(menuUi.pop){ e.preventDefault(); menuPopClose(true); }
+    return;
+  }
+  if(k === 'Tab'){
+    if(document.body.classList.contains('sheet-open')) menuTrap(menuEl('moreSheet'), e);
+    else if(menuMQ.matches && menuEl('sidebar').classList.contains('open')) menuTrap(menuEl('sidebar'), e);
+    else if(menuUi.pop && a && a.closest && a.closest('#menuPop')){ e.preventDefault(); menuPopClose(true); }
+    return;
+  }
+  if(!a || !a.closest) return;
+  const pop = a.closest('#menuPop');
+  if(pop){
+    const items = [...pop.querySelectorAll('.mp-item')], top = !!(menuUi.pop && menuUi.pop.top);
+    if(k === 'ArrowDown'){ e.preventDefault(); menuFocusMove(items, a, 1); }
+    else if(k === 'ArrowUp'){ e.preventDefault(); menuFocusMove(items, a, -1); }
+    else if(k === 'Home'){ e.preventDefault(); items[0].focus(); }
+    else if(k === 'End'){ e.preventDefault(); items[items.length - 1].focus(); }
+    else if(!top && (k === 'ArrowLeft')){ e.preventDefault(); menuPopClose(true); }
+    else if(top && (k === 'ArrowLeft' || k === 'ArrowRight')){
+      e.preventDefault(); const btns = [...menuEl('topMenu').querySelectorAll('[data-mgroup]')], i = btns.indexOf(menuUi.pop.btn), n = btns[(i + (k === 'ArrowRight' ? 1 : -1) + btns.length) % btns.length];
+      menuPopClose(false); menuPopOpen(n.dataset.mgroup, n, { sticky: true, focus: true, top: true });
+    }
+    return;
+  }
+  const rail = a.closest('#rail'), topm = a.closest('#topMenu');
+  if(rail || topm){
+    const list = [...(rail || topm).querySelectorAll('.rail-btn:not([hidden])')], isGroup = !!a.dataset.mgroup;
+    const prev = rail ? 'ArrowUp' : 'ArrowLeft', next = rail ? 'ArrowDown' : 'ArrowRight';
+    if(k === prev || k === next){ e.preventDefault(); if(menuUi.pop) menuPopClose(false); menuFocusMove(list, a, k === next ? 1 : -1); }
+    else if(k === 'Home'){ e.preventDefault(); list[0].focus(); } else if(k === 'End'){ e.preventDefault(); list[list.length - 1].focus(); }
+    else if(isGroup && ((rail && k === 'ArrowRight') || (topm && k === 'ArrowDown'))){ e.preventDefault(); menuPopOpen(a.dataset.mgroup, a, { sticky: true, focus: true, top: !!topm }); }
+    return;
+  }
+  const bb = a.closest('#bottomBar');
+  if(bb && (k === 'ArrowLeft' || k === 'ArrowRight')){ e.preventDefault(); menuFocusMove([...bb.querySelectorAll('.bb-btn')], a, k === 'ArrowRight' ? 1 : -1); }
+});
+/* scrolling or resizing closes a flyout that would otherwise float in the wrong place */
+window.addEventListener('resize', () => { menuApply(); if(menuUi.pop) menuPopClose(false); menuKbSync(); });
+menuMQ.addEventListener && menuMQ.addEventListener('change', () => menuApply());
+document.addEventListener('focusin', menuKbSync);
+document.addEventListener('focusout', () => setTimeout(menuKbSync, 60));
+if(window.visualViewport) window.visualViewport.addEventListener('resize', menuKbSync);
+/* the phone drawer (hamburger mode) keeps focus inside while open and hands it back when it closes */
+menuEl('menuBtn').addEventListener('click', () => { const mb = menuEl('menuBtn'); mb.setAttribute('aria-expanded', 'true'); setTimeout(() => { const f = document.querySelector('#sidebar .nav-group.open .tab.active') || document.querySelector('#sidebar .nav-gbtn'); if(f) f.focus(); }, 40); });
+/* ---- Settings > Phone menu ---- */
+function menuSettingsRender(){
+  const el = menuEl('phoneMenuCard'); if(!el) return;
+  const cat = menuCatalog(), list = menuPrefs.bottom, n = list.length, bar = t => `${escHtml(menuLabel(t))}<em>${escHtml((cat.find(g => g.id === menuGroupOf(t)) || {}).label || '')}</em>`;
+  const opt = (name, v, cur, t, d) => `<label class="pm-opt"><input type="radio" name="${name}" value="${v}"${cur === v ? ' checked' : ''}><span>${t}<small>${d}</small></span></label>`;
+  const free = cat.map(g => `<optgroup label="${escAttr(g.label)}">${g.tabs.filter(t => !list.includes(t.tab)).map(t => `<option value="${t.tab}">${escHtml(t.label)}</option>`).join('')}</optgroup>`).join('');
+  el.innerHTML = `<p class="pm-note">These choices are kept on this device only (this phone or browser). They are not part of your business data and do not change what anyone else sees.</p>
+    <fieldset class="pm-opts"><legend>Phone menu (screens narrower than 700px)</legend>
+      ${opt('pmPhone', 'bottom', menuPrefs.phone, 'Bottom bar (default)', 'Four shortcuts and a More button that lists every page.')}
+      ${opt('pmPhone', 'top', menuPrefs.phone, 'Top bar menu', 'Group tabs across the top, each with a drop-down list of pages.')}
+      ${opt('pmPhone', 'burger', menuPrefs.phone, 'Hamburger icon only', 'The menu icon opens the folding menu as a drawer.')}
+    </fieldset>
+    <fieldset class="pm-opts"><legend>Laptop and tablet menu (700px and wider)</legend>
+      ${opt('pmLap', '', menuPrefs.mode, 'Automatic', 'Icon rail on tablets such as a Surface Pro, pinned menu on a laptop.')}
+      ${opt('pmLap', 'pinned', menuPrefs.mode, 'Pinned folding menu', 'Group headings fold open one at a time.')}
+      ${opt('pmLap', 'collapsed', menuPrefs.mode, 'Collapsed icon rail', 'A narrow rail of group icons; the page content gets wider.')}
+    </fieldset>
+    <h4 id="bbeTitle" style="margin:0 0 6px;">Edit bottom bar</h4>
+    <p class="bbe-count" id="bbeCount">${n} of 5 shortcuts (choose 3 to 5). "More" is always the last button.</p>
+    <ol class="bbe-list" aria-labelledby="bbeTitle">${list.map((t, i) => `<li><span class="bbe-n">${i + 1}</span><span class="bbe-l">${bar(t)}</span><span class="bbe-btns">
+      <button type="button" class="btn secondary" data-bbe="up" data-i="${i}" aria-label="Move ${escAttr(menuLabel(t))} up"${i === 0 ? ' disabled' : ''}>▲</button>
+      <button type="button" class="btn secondary" data-bbe="down" data-i="${i}" aria-label="Move ${escAttr(menuLabel(t))} down"${i === n - 1 ? ' disabled' : ''}>▼</button>
+      <button type="button" class="btn secondary" data-bbe="del" data-i="${i}" aria-label="Remove ${escAttr(menuLabel(t))} from the bottom bar"${n <= 3 ? ' disabled' : ''}>✕</button></span></li>`).join('')}</ol>
+    <div class="bbe-add"><label for="bbeAdd" class="bbe-count" style="margin:0;">Add a page</label><select id="bbeAdd" aria-label="Page to add to the bottom bar"${n >= 5 ? ' disabled' : ''}><option value="">Choose a page…</option>${free}</select><button type="button" class="btn" data-bbe="add"${n >= 5 ? ' disabled' : ''}>Add</button></div>
+    <button type="button" class="btn secondary" data-bbe="reset">Reset to default</button>`;
+}
+(function(){
+  const card = menuEl('phoneMenuCard'); if(!card) return;
+  card.addEventListener('change', (e) => {
+    const t = e.target; if(t.name === 'pmPhone'){ menuPrefs.phone = t.value; menuSave(); menuApply(true); }
+    else if(t.name === 'pmLap'){ menuPrefs.mode = t.value; menuSave(); menuApply(true); }
+  });
+  card.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-bbe]'); if(!b || b.disabled) return; const a = b.dataset.bbe, i = Number(b.dataset.i), l = menuPrefs.bottom;
+    let focus = '';
+    if(a === 'up' && i > 0){ [l[i - 1], l[i]] = [l[i], l[i - 1]]; focus = `[data-bbe="up"][data-i="${i - 1}"]`; if(i - 1 === 0) focus = `[data-bbe="down"][data-i="0"]`; }
+    else if(a === 'down' && i < l.length - 1){ [l[i + 1], l[i]] = [l[i], l[i + 1]]; focus = `[data-bbe="down"][data-i="${i + 1}"]`; if(i + 1 === l.length - 1) focus = `[data-bbe="up"][data-i="${i + 1}"]`; }
+    else if(a === 'del' && l.length > 3){ l.splice(i, 1); focus = `[data-bbe="del"][data-i="${Math.min(i, l.length - 1)}"]`; }
+    else if(a === 'add'){ const sel = menuEl('bbeAdd'), v = sel && sel.value; if(!v || l.length >= 5 || l.includes(v) || !menuValidTabs().has(v)){ if(sel) sel.focus(); return; } l.push(v); focus = '#bbeAdd'; }
+    else if(a === 'reset'){ menuPrefs.bottom = MENU_BOTTOM_DEFAULT.slice(); focus = '[data-bbe="reset"]'; }
+    else return;
+    menuSave(); menuBuildBottom(); menuSettingsRender();
+    const f = card.querySelector(focus) || card.querySelector('[data-bbe="reset"]'); if(f && !f.disabled) f.focus(); else { const g = card.querySelector('.bbe-list button:not([disabled])'); if(g) g.focus(); }
+  });
+})();
+/* ---- start-up ---- */
+function menuInit(){
+  const bn = menuEl('envBanner'); if(bn) document.documentElement.style.setProperty('--bt-banner-h', bn.offsetHeight + 'px');
+  menuLoad(); menuBuild(); menuUi.built = true;
+  const cur = menuCurrent(), cg = menuGroupOf(cur);
+  menuOpenGroup(menuPrefs.open && document.querySelector('#sidebar .nav-group[data-group="' + menuPrefs.open + '"]') ? menuPrefs.open : cg, false);
+  menuUi.synced = cur;
+  menuApply(true); menuSettingsRender();
+  const mo = new MutationObserver(menuQueueBadges);
+  ['todayBadge', 'apBadge', 'dupBadge', 'undoBadge'].forEach(id => { const el = menuEl(id); if(el) mo.observe(el, { attributes: true, childList: true, characterData: true, subtree: true }); });
+  const lb = menuEl('logoutBar'); if(lb) mo.observe(lb, { childList: true });
+}
+menuInit();
 
 document.getElementById('modalOverlay').addEventListener('click', (e) => {
   if(e.target.id === 'modalOverlay') resolveConfirm(false);
