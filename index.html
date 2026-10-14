@@ -1693,6 +1693,7 @@
 /* the "Back to previous view" button stays reachable above an open side panel's backdrop */
 body.lp-open .navbar, body.dr-open .navbar { z-index: 64; width: fit-content; max-width: calc(100% - 20px); margin: -4px 0 6px; padding: 6px var(--bt-s2); background: var(--bt-card); border-radius: var(--bt-r-btn); box-shadow: var(--bt-shadow-2); }
 body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none; }
+.cx-showrep { margin: var(--bt-s2) 0; }
 /* BT:css end */
 </style>
 </head>
@@ -1720,16 +1721,16 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
   </div>
 
   <div class="nav-group g-growth">
-    <div class="nav-label">Growth</div>
-    <button type="button" class="tab g-growth" data-tab="leads">Lead Pipeline</button>
-    <button type="button" class="tab g-growth" data-tab="salespipeline">Sales Pipeline</button>
-    <button type="button" class="tab g-growth" data-tab="crm">CRM</button>
-  </div>
-
-  <div class="nav-group g-growth">
     <div class="nav-label">CRM</div>
     <button type="button" class="tab g-growth" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
     <button type="button" class="tab g-growth" data-tab="companies">Companies</button>
+    <button type="button" class="tab g-growth" data-tab="crm">Tasks</button>
+  </div>
+
+  <div class="nav-group g-growth">
+    <div class="nav-label">Growth</div>
+    <button type="button" class="tab g-growth" data-tab="leads">Lead Pipeline</button>
+    <button type="button" class="tab g-growth" data-tab="salespipeline">Sales Pipeline</button>
   </div>
 
   <div class="nav-group g-revenue">
@@ -1739,19 +1740,19 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
     <button type="button" class="tab g-revenue" data-tab="revenue">Revenue Forecast</button>
   </div>
 
+  <div class="nav-group g-operations">
+    <div class="nav-label">Operations</div>
+    <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
+    <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
+    <button type="button" class="tab g-operations" data-tab="purchaseorders">Purchase Orders</button>
+  </div>
+
   <div class="nav-group g-finance">
     <div class="nav-label">Finance</div>
     <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
     <button type="button" class="tab g-finance" data-tab="invoicing">Invoicing</button>
     <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
     <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
-  </div>
-
-  <div class="nav-group g-operations">
-    <div class="nav-label">Operations</div>
-    <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
-    <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
-    <button type="button" class="tab g-operations" data-tab="purchaseorders">Purchase Orders</button>
   </div>
 
   <div class="nav-group g-organisation">
@@ -1924,7 +1925,7 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
   <div class="panel" id="panel-crm">
     <div class="page-head crm-head">
       <div>
-        <h2>CRM</h2>
+        <h2>Tasks</h2>
         <div class="desc">The task queue. Every task can be linked to a lead, sale or project by its code; because those records share one ID as a deal moves along, a task follows the deal from lead to sale to project. Tick a task to complete it, click a row to open it, or add tasks from any record's detail.</div>
       </div>
       <button class="btn" data-crm="new">+ New task</button>
@@ -11944,7 +11945,7 @@ function cxEnsureModel(o){
   o.companies = uniq((Array.isArray(o.companies) ? o.companies : []).filter(c => c && typeof c === 'object' && c.id).map(cxNormCompany));
   o.cxLinks = uniq((Array.isArray(o.cxLinks) ? o.cxLinks : []).filter(l => l && typeof l === 'object' && l.id && l.a && l.b && (l.kind === 'cc' || l.kind === 'co')).map(l => ({ id: String(l.id), kind: l.kind, a: String(l.a), b: String(l.b), label: l.label == null ? '' : String(l.label) })));
   const x = (o.cx && typeof o.cx === 'object') ? o.cx : {};
-  o.cx = { migratedAt: typeof x.migratedAt === 'string' ? x.migratedAt : '', report: (x.report && typeof x.report === 'object') ? x.report : null, dupIgnore: Array.isArray(x.dupIgnore) ? x.dupIgnore.map(String) : [] };
+  o.cx = { migratedAt: typeof x.migratedAt === 'string' ? x.migratedAt : '', reportHidden: x.reportHidden === true, report: (x.report && typeof x.report === 'object') ? x.report : null, dupIgnore: Array.isArray(x.dupIgnore) ? x.dupIgnore.map(String) : [] };
   [o.leads, o.pipeline, o.projects, o.quotes].forEach(arr => (arr || []).forEach(r => { if(r && typeof r === 'object'){ if(r.contactIds !== undefined && !Array.isArray(r.contactIds)) r.contactIds = []; if(r.companyId !== undefined && typeof r.companyId !== 'string') r.companyId = ''; } }));
   return o;
 }
@@ -12269,12 +12270,12 @@ function cxListRowsHtml(){
 function cxDupCount(){ try{ return cxDupPairs().length; }catch(e){ return 0; } }
 function cxContactsListHtml(){
   const m = state.cx, dups = cxDupCount(), r = cxListRowsHtml();
-  const needMig = !m.migratedAt && (state.leads.length + state.pipeline.length + state.projects.length + state.quotes.length) > 0 && cxUnmigratedCount() > 0;
+  const needMig = cxUnmigratedCount() > 0;   // shows again whenever records exist that have a customer name but no contact
   const sel = (id, opts, v, ph) => `<select id="${id}" data-cxq="${id}" aria-label="${escAttr(ph)}"><option value="">${escHtml(ph)}</option>${opts.map(([k, n]) => `<option value="${k}"${v === k ? ' selected' : ''}>${escHtml(n)}</option>`).join('')}</select>`;
   return `<div class="page-head crm-head"><div><h2>Contacts</h2><div class="desc">Everyone you quote, build for or take referrals from: leads, customers and past customers. Every lead, sale, project, quote and invoice links to its contact, so you can see the whole history in one place. Suppliers stay in their own area.</div></div>
       <div class="btn-row" style="margin:0"><button type="button" class="btn secondary" data-cx="dups">Review duplicates${dups ? ` <span class="tab-count">${dups}</span>` : ''}</button><button type="button" class="btn" data-cx="new-contact">+ New contact</button></div></div>
-    ${needMig ? `<div class="card cx-mig"><b>Build contacts from your existing records</b><p class="q-help" style="margin:4px 0 8px;">${cxUnmigratedCount()} lead, sale, project and quote records have a customer name but no contact yet. This creates a contact (and a company where there is one) for each, links it, and flags likely duplicates for you to review. <b>Nothing is merged automatically</b> and nothing existing is changed or removed.</p><button type="button" class="btn" data-cx="migrate">Build contacts now</button></div>` : ''}
-    ${m.report ? cxReportHtml(m.report) : ''}
+    ${needMig ? `<div class="card cx-mig"><b>${m.migratedAt ? 'Some records are not linked to a contact yet' : 'Build contacts from your existing records'}</b><p class="q-help" style="margin:4px 0 8px;">${cxUnmigratedCount()} lead, sale, project and quote records have a customer name but no contact yet. This creates a contact (and a company where there is one) for each, links it, and flags likely duplicates for you to review. <b>Nothing is merged automatically</b> and nothing existing is changed or removed.</p><button type="button" class="btn" data-cx="migrate">Build contacts now</button></div>` : ''}
+    ${m.report ? (m.reportHidden ? `<div class="cx-showrep"><button type="button" class="link-btn" data-cx="show-report">Show the summary of the last build (${escHtml(dShow(m.migratedAt))})</button></div>` : cxReportHtml(m.report)) : ''}
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quick"><input data-cxqa="first" placeholder="First name" aria-label="First name" autocomplete="off"><input data-cxqa="last" placeholder="Last name" aria-label="Last name" autocomplete="off"><input data-cxqa="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"><input data-cxqa="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
     <div class="crm-filters cx-filters"><input type="search" id="cxSearch" class="crm-search" data-cxq="q" value="${escAttr(cxUi.q)}" placeholder="Search name, phone, email, postcode…" aria-label="Search contacts" autocomplete="off">
       ${sel('cxType', CX_TAGS, cxUi.type, 'Any type')}${sel('cxStatus', [['live', 'Live deal'], ['past', 'Past customer'], ['lost', 'Lost only'], ['none', 'No deals']], cxUi.status, 'Any status')}
@@ -12362,7 +12363,7 @@ function cxTimelineHtml(owner, sc, kind){
 function cxContactProfileHtml(c){
   const sc = cxScopeContact(c), st = cxStats(sc), s = cxContactStatus(c);
   const dupWith = cxDupPairs().filter(p => p.a.id === c.id || p.b.id === c.id).length;
-  return `<div class="cx-prof"><div id="cxHead"><div class="page-head crm-head"><div><button type="button" class="btn secondary qb-sm" data-cx="close-profile">← All contacts</button>
+  return `<div class="cx-prof"><div id="cxHead"><div class="page-head crm-head"><div>${nav.stack.length ? '' : '<button type="button" class="btn secondary qb-sm" data-cx="close-profile">← All contacts</button>'}
       <h2 style="margin-top:8px;">${escHtml(ctName(c))} ${cxStatusPill(s)}</h2><div class="desc">${c.tags.map(cxTagHtml).join(' ')} <span class="qb-dim">${[ctPhone(c), ctEmail(c)].filter(Boolean).map(escHtml).join(' · ')}</span></div>${dupWith ? `<div class="cx-dupwarn">⚠ ${dupWith} possible duplicate${dupWith > 1 ? 's' : ''}. <button type="button" class="link-btn" data-cx="dups">Review</button></div>` : ''}</div>
       <div class="btn-row" style="margin:0"><button type="button" class="btn secondary" data-cx="export" data-cid="${escAttr(c.id)}">Export this contact's data</button><button type="button" class="btn secondary" data-cx="merge-into" data-cid="${escAttr(c.id)}">Merge into another…</button><button type="button" class="btn secondary cx-danger" data-cx="delete-contact" data-cid="${escAttr(c.id)}">Delete contact</button></div></div></div>
     <div id="cxRest">${cxKpiHtml(st)}</div>
@@ -12391,7 +12392,7 @@ function cxCompaniesListHtml(){
 }
 function cxCompanyProfileHtml(co){
   const sc = cxScopeCompany(co), st = cxStats(sc), people = cxContactsOfCompany(co.id), f = (label, field, val, o) => `<div class="lp-f"><label>${label}</label><input data-cxco="${field}" data-oid="${escAttr(co.id)}" value="${escAttr(val)}" autocomplete="off"${o && o.type ? ` type="${o.type}"` : ''}></div>`;
-  return `<div class="cx-prof"><div id="cxHead"><div class="page-head crm-head"><div><button type="button" class="btn secondary qb-sm" data-cx="close-profile">← All companies</button><h2 style="margin-top:8px;">${escHtml(cxCompanyName(co))}</h2><div class="desc">${escHtml(co.type || 'Company')}</div></div>
+  return `<div class="cx-prof"><div id="cxHead"><div class="page-head crm-head"><div>${nav.stack.length ? '' : '<button type="button" class="btn secondary qb-sm" data-cx="close-profile">← All companies</button>'}<h2${nav.stack.length ? '' : ' style="margin-top:8px;"'}>${escHtml(cxCompanyName(co))}</h2><div class="desc">${escHtml(co.type || 'Company')}</div></div>
       <div class="btn-row" style="margin:0"><button type="button" class="btn secondary cx-danger" data-cx="delete-company" data-oid="${escAttr(co.id)}">Delete company</button></div></div></div>
     <div id="cxRest">${cxKpiHtml(st)}</div>
     <div class="cx-two"><div class="card" id="cxDetails"><div class="qb-sec-h"><h4>Details</h4></div><div class="assumptions-grid">${f('Name', 'name', co.name)}<div class="lp-f"><label>Type</label><select data-cxco="type" data-oid="${escAttr(co.id)}"><option value="">—</option>${CX_CO_TYPES.map(t => `<option${co.type === t ? ' selected' : ''}>${t}</option>`).join('')}</select></div>${f('Phone', 'phone', co.phone, { type: 'tel' })}${f('Email', 'email', co.email, { type: 'email' })}${f('Website', 'website', co.website)}${f('Postcode', 'postcode', co.postcode)}</div>
@@ -12571,7 +12572,7 @@ function cxUnmigratedCount(){
   return n;
 }
 function cxMigrate(){
-  const rep = { contacts: 0, companies: 0, deals: 0, quotes: 0, extra: 0, skipped: 0, flagged: 0, skippedList: [] };
+  state.cx.reportHidden = false; const rep = { contacts: 0, companies: 0, deals: 0, quotes: 0, extra: 0, skipped: 0, flagged: 0, skippedList: [] };
   const one = (pl, rec) => {
     if((rec.contactIds && rec.contactIds.length) || rec.companyId) return;
     const cu = cxCustomerOf(rec); if(!cu.name && !cu.company){ rep.skipped++; rep.skippedList.push({ code: recordCode(rec.id, pl), name: boardTitle(pl, rec), root: rec.id }); return; }
@@ -12629,7 +12630,8 @@ document.addEventListener('click', async (e) => {
   else if(a === 'close-profile'){ cxUi.cid = ''; cxUi.coid = ''; cxUi.view = ''; render(); window.scrollTo(0, 0); }
   else if(a === 'dups'){ cxUi.view = 'dups'; cxUi.cid = ''; activateTab('contacts'); render(); window.scrollTo(0, 0); }
   else if(a === 'migrate') cxMigrate();
-  else if(a === 'hide-report'){ state.cx.report = null; saveState(); render(); }
+  else if(a === 'hide-report'){ state.cx.reportHidden = true; saveState(); render(); }
+  else if(a === 'show-report'){ state.cx.reportHidden = false; saveState(); render(); }
   else if(a === 'list-add' && c){ c[b.dataset.list].push(b.dataset.list === 'addresses' ? { v: '', postcode: '', label: '' } : { v: '', label: '' }); saveState(); const d = document.getElementById('cxDetails'); if(d) d.innerHTML = '<div class="qb-sec-h"><h4>Details</h4></div>' + cxContactDetailsHtml(c); const last = d && d.querySelectorAll(`[data-cxl="${b.dataset.list}"][data-k="v"]`); if(last && last.length) last[last.length - 1].focus(); }
   else if(a === 'list-del' && c){ c[b.dataset.list].splice(Number(b.dataset.i), 1); saveState(); render(); const d = document.getElementById('cxDetails'); if(d) d.innerHTML = '<div class="qb-sec-h"><h4>Details</h4></div>' + cxContactDetailsHtml(c); }
   else if(a === 'addr-primary' && c){ const i = Number(b.dataset.i), x = c.addresses.splice(i, 1)[0]; c.addresses.unshift(x); saveState(); render(); const d = document.getElementById('cxDetails'); if(d) d.innerHTML = '<div class="qb-sec-h"><h4>Details</h4></div>' + cxContactDetailsHtml(c); }
