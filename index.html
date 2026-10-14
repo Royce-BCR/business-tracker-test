@@ -1491,6 +1491,32 @@
   .pw-var-h { display: flex; align-items: center; gap: 10px; margin-bottom: var(--bt-s2); flex-wrap: wrap; } .pw-var-a { display: flex; gap: var(--bt-s2); flex-wrap: wrap; margin-top: 10px; }
   .pw-var-links { margin: var(--bt-s2) 0; font-size: 12.5px; } .pw-var-links summary { cursor: pointer; color: var(--slate); font-weight: 600; } .pw-var-links label { display: flex; gap: var(--bt-s2); padding: 3px 0; }
   .pw-var-ap { margin-top: var(--bt-s2); font-size: 12.5px; color: var(--bt-ok-fg); }
+  /* ---- collapsible sections and tiles ---- */
+  .pw-sec > h3 { margin: 0 0 var(--bt-s3); }
+  .pw-sec-t { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; border-radius: 8px; }
+  .pw-sec:not(.open) { margin-top: 8px; } .pw-sec:not(.open) > h3 { margin: 0; border-bottom: 1px solid var(--line); } .pw-sec:not(.open) .pw-sec-t { padding: 10px 0; }
+  .pw-sec-t:hover { color: var(--oak-text); }
+  .pw-chev { flex: none; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .15s; margin: 0 4px 0 2px; opacity: .7; }
+  .pw-sec.open > h3 .pw-chev, .pw-fold.open > .pw-fold-h .pw-chev { transform: rotate(45deg); }
+  .pw-fold { padding: 0; } .pw-fold-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px var(--bt-s4); }
+  .pw-fold-t { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; border: 0; background: none; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  .pw-fold-t h4 { margin: 0; } .pw-fold-sub { display: block; font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 2px; font-weight: 400; }
+  .pw-fold-b { padding: 0 var(--bt-s4) 14px; } .pw-fold > .pw-fold-b[hidden] { display: none; }
+  .pw-info > .pw-card, .pw-sec-b > .pw-fold { margin-bottom: 10px; }
+  /* ---- overview: one screen on a laptop ---- */
+  .pw-ov { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; } .pw-ov > .pw-card { margin-bottom: 0; }
+  .pw-span2 { grid-column: span 2; } .pw-span3 { grid-column: 1 / -1; }
+  .pw-stack { display: grid; gap: 14px; align-content: start; } .pw-stack > .pw-card { margin-bottom: 0; }
+  .pw-evlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 22px; } .pw-evlist .pw-ev:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+  .pw-cgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 10px; } .pw-cgrid .qual-field label { margin-bottom: 2px; }
+  .pw-notes2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 1199px) { .pw-ov { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pw-span3 { grid-column: 1 / -1; } .pw-stack { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 760px) { .pw-ov { grid-template-columns: minmax(0, 1fr); } .pw-span2, .pw-span3, .pw-stack { grid-column: auto; } .pw-stack { grid-template-columns: minmax(0, 1fr); } .pw-evlist { grid-template-columns: minmax(0, 1fr); } .pw-cgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pw-notes2 { grid-template-columns: minmax(0, 1fr); } }
+  @media (min-width: 701px) and (pointer: fine) {
+    .pw-compact { padding: 10px var(--bt-s3); } .pw-compact h4 { margin-bottom: 6px; }
+    .pw-compact .qual-field input { padding: 3px 8px; font-size: 12.5px; border-radius: 6px; } .pw-compact .qual-field label { font-size: 9.5px; }
+    .pw-compact .pw-quick { gap: 6px; } .pw-compact .btn { padding: 5px 10px; font-size: 11.5px; } .pw-compact .qual-field input, .pw-compact .btn { min-height: 0 !important; }
+  }
   .q-st-Invoiced { background: #e3f0e7; color: #2f6b45; } .q-st-Invoiced::before { content: '✓\00a0'; }
 
   /* ---------------- Finance: totals, cash-flow lines, invoicing, pending transactions ---------------- */
@@ -5307,9 +5333,12 @@ function projOnQuoteAccepted(q){   // a quote linked to a project has just been 
 }
 
 /* ---------- Project workspace (the open project) ---------- */
-const pwUi = { id: 0, sec: 'overview', quick: null, edit: null, lock: 0 };
-const PW_SECS = [['overview', 'Overview'], ['timeline', 'Timeline'], ['money', 'Money'], ['materials', 'Materials & deliveries'], ['plan', 'Working plan'], ['variations', 'Variations'], ['changes', 'Change log'], ['notes', 'Notes & files'], ['history', 'Lead & sales history']];
-function openProjectWorkspace(id){ if(pwUi.edit && pwUi.edit.pid !== id) pwUi.edit = null; pwUi.id = id; pwUi.sec = 'overview'; activateTab('projectpipeline'); closeDetail(); renderProjects(); window.scrollTo(0, 0); }
+const pwUi = { id: 0, sec: 'overview', quick: null, edit: null, lock: 0, open: new Set(['overview']), folds: {}, moneyEdit: false };
+const PW_SECS = [['overview', 'Overview'], ['timeline', 'Timeline'], ['money', 'Money'], ['materials', 'Materials & deliveries'], ['plan', 'Working plan'], ['variations', 'Variations'], ['info', 'Information']];
+const PW_SEC_ALIAS = { notes: 'overview', history: 'info', changes: 'info' };   // older section names (saved views, links) land on the section that now holds them
+const pwSecKey = k => PW_SEC_ALIAS[k] || k;
+function pwOpenReset(sec){ pwUi.open = new Set(['overview']); pwUi.folds = {}; pwUi.moneyEdit = false; if(sec) pwUi.open.add(pwSecKey(sec)); }
+function openProjectWorkspace(id){ if(pwUi.edit && pwUi.edit.pid !== id) pwUi.edit = null; pwUi.id = id; pwUi.sec = 'overview'; pwOpenReset(); activateTab('projectpipeline'); closeDetail(); renderProjects(); window.scrollTo(0, 0); }
 function closeProjectWorkspace(){ pwUi.id = 0; renderProjects(); }
 function pwRel(d){
   if(!d) return ''; const n = Math.round((toDate(d) - toDate(fmt(new Date()))) / 86400000);
@@ -5348,7 +5377,7 @@ function pwHeaderHtml(p, i){
 }
 function pwCustomerCardHtml(p, i){
   const cu = projCustomer(p), f = (label, field, val, ph) => `<div class="qual-field"><label>${label}</label><input data-tab="projects" data-idx="${i}" data-field="${field}" value="${escAttr(val || '')}" placeholder="${escAttr(ph || '')}"></div>`;
-  return `<div class="pw-card pw-wide"><h4>Customer and site <span class="qb-dim">(carried from the lead and the deal; shown even when the record was created without them)</span></h4><div class="qual-grid">
+  return `<div class="pw-card pw-span2 pw-compact"><h4 title="Carried from the lead and the deal; shown even when the record was created without them">Customer and site</h4><div class="pw-cgrid">
     ${f('Contact', 'contact', p.contact, cu.name)}${f('Company', 'company', p.company, '')}${f('Phone', 'phone', p.phone, cu.phone)}${f('Email', 'email', p.email, cu.email)}${f('Address', 'address', p.address, cu.address)}${f('Postcode', 'postcode', p.postcode, cu.postcode)}${f('Source', 'source', p.source, '')}${f('Project name', 'projectName', p.projectName, cu.projectName)}</div></div>`;
 }
 function pwEventRow(e){
@@ -5470,11 +5499,6 @@ function pwMaterialsHtml(p, i){
 /* ---------- change log ---------- */
 const CHANGE_CAUSES = [['price', 'Price rise'], ['qty', 'Quantity or waste'], ['customer', 'Customer-driven'], ['unforeseen', 'Unforeseen'], ['ours', 'Our error']];
 const causeName = k => (CHANGE_CAUSES.find(c => c[0] === k) || [k, k])[1];
-function pwChangeLogHtml(p){
-  const log = (p.changeLog || []).slice().reverse();
-  return `<section class="pw-sec" id="pw-changes" data-sec="changes"><h3>Change log</h3><div class="pw-card pw-wide">${log.length ? log.map(c => `<details class="pw-chg"><summary><span class="pw-chg-when">${escHtml(new Date(c.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }))}</span> · <b>${escHtml(c.by || 'someone')}</b> · ${escHtml(PW_EDIT_NAME[c.kind] || c.kind)} <span class="qb-flag">${escHtml(causeName(c.cause))}</span> <span class="pw-chg-r">${escHtml(c.reason)}</span></summary>
-      <ul>${(c.changes || []).map(x => `<li>${escHtml(x)}</li>`).join('')}</ul></details>`).join('') : '<div class="pw-empty">No changes logged yet. Saving an edit to the timeline, deliveries or the Working plan records who, when, what and why here.</div>'}</div></section>`;
-}
 let chgResolver = null;
 function chgAsk(title, lines){
   return new Promise(resolve => {
@@ -5577,10 +5601,34 @@ function planDiff(a, b){
   return out;
 }
 
+/* every section is a collapsible block: Overview opens with the project, the others open when picked on the section bar (or by their own heading) */
+const PW_CHEV = '<span class="pw-chev" aria-hidden="true"></span>';
+function pwSecWrap(html){
+  const m = html.match(/^<section class="pw-sec" id="pw-(\w+)" data-sec="(\w+)"><h3>([\s\S]*?)<\/h3>([\s\S]*)<\/section>\s*$/); if(!m) return html;
+  const k = m[2], open = pwUi.open.has(k);
+  return `<section class="pw-sec${open ? ' open' : ''}" id="pw-${k}" data-sec="${k}"><h3><button type="button" class="pw-sec-t" data-pw="sec-toggle" data-sec="${k}" aria-expanded="${open}" aria-controls="pw-${k}-b">${PW_CHEV}${m[3]}</button></h3><div class="pw-sec-b" id="pw-${k}-b"${open ? '' : ' hidden'}>${m[4]}</div></section>`;
+}
+/* a collapsible tile inside a section: title, an optional subtitle under it, tools on the right (they never toggle it) */
+function pwFold(id, title, sub, tools, body, defOpen){
+  const open = pwUi.folds[id] === undefined ? !!defOpen : !!pwUi.folds[id];
+  return `<div class="pw-card pw-wide pw-fold${open ? ' open' : ''}" data-fold="${id}"><div class="pw-fold-h"><button type="button" class="pw-fold-t" data-pw="fold" data-fold="${id}" aria-expanded="${open}">${PW_CHEV}<span><h4>${title}</h4>${sub ? `<span class="pw-fold-sub">${sub}</span>` : ''}</span></button>${tools ? `<div class="qb-sec-tools">${tools}</div>` : ''}</div><div class="pw-fold-b"${open ? '' : ' hidden'}>${body}</div></div>`;
+}
+function pwSetSecOpen(key, open){
+  if(open) pwUi.open.add(key); else pwUi.open.delete(key);
+  const sec = document.getElementById('pw-' + key); if(!sec) return;
+  sec.classList.toggle('open', open); const b = sec.querySelector(':scope > h3 > .pw-sec-t'), body = sec.querySelector(':scope > .pw-sec-b');
+  if(b) b.setAttribute('aria-expanded', open); if(body) body.hidden = !open;
+  if(open && typeof pwCashMount === 'function') pwCashMount();
+}
+function pwToggleFold(id){
+  const el = document.querySelector('#projectWorkspace [data-fold="' + id + '"]'); if(!el) return;
+  const open = !el.classList.contains('open'); pwUi.folds[id] = open; el.classList.toggle('open', open);
+  const b = el.querySelector('.pw-fold-t'), body = el.querySelector('.pw-fold-b'); if(b) b.setAttribute('aria-expanded', open); if(body) body.hidden = !open;
+}
 function renderProjectWorkspace(p){
   const el = document.getElementById('projectWorkspace'), i = state.projects.indexOf(p); projEnsure(p);
   const top = window.scrollY;
-  el.innerHTML = pwHeaderHtml(p, i) + pwOverviewHtml(p, i) + pwTimelineHtml(p, i) + pwMoneyHtml(p, i) + pwMaterialsHtml(p, i) + pwPlanHtml(p, i) + pwVariationsHtml(p, i) + pwChangeLogHtml(p) + pwNotesHtml(p, i) + pwHistoryHtml(p, i);
+  el.innerHTML = pwHeaderHtml(p, i) + [pwOverviewHtml(p, i), pwTimelineHtml(p, i), pwMoneyHtml(p, i), pwMaterialsHtml(p, i), pwPlanHtml(p, i), pwVariationsHtml(p, i), pwInfoHtml(p, i)].map(pwSecWrap).join('');
   window.scrollTo(0, top);
   pwStick(); pwSpy();
 }
@@ -5593,7 +5641,8 @@ function pwStickBottom(){
 function pwStick(){ const b = pwStickBottom(); if(b) document.documentElement.style.setProperty('--pw-stick', b + 'px'); }
 window.addEventListener('resize', () => { if(pwUi.id) pwStick(); });
 function pwGoSection(key){
-  const t = document.getElementById('pw-' + key); if(!t) return; pwStick();
+  key = pwSecKey(key); const t = document.getElementById('pw-' + key); if(!t) return;
+  if(!pwUi.open.has(key)) pwSetSecOpen(key, true); pwStick();
   const y = window.scrollY + t.getBoundingClientRect().top - pwStickBottom() - 10;
   window.scrollTo({ top: Math.max(0, Math.round(y)), behavior: 'smooth' });
   pwUi.sec = key; document.querySelectorAll('#projectWorkspace .pw-nav button').forEach(b => b.classList.toggle('active', b.dataset.sec === key));
@@ -5664,6 +5713,8 @@ function pwClick(b){
     closeProjectWorkspace(); return;
   }
   if(a === 'sec'){ pwGoSection(b.dataset.sec); return; }
+  if(a === 'sec-toggle'){ pwSetSecOpen(b.dataset.sec, !pwUi.open.has(b.dataset.sec)); return; }
+  if(a === 'fold'){ pwToggleFold(b.dataset.fold); return; }
   if(a === 'edit-begin'){ pwEditBegin(b.dataset.kind); return; }
   if(a === 'edit-save'){ pwEditSave(); return; }
   if(a === 'edit-discard'){ pwEditDiscard(); return; }
@@ -5870,21 +5921,38 @@ function pwPlanClick(a, b, p){
   return false;
 }
 
+function pwQuotesCardHtml(p){
+  const qs = state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === p.id)).sort((a, b) => b.jobNumber - a.jobNumber || b.version - a.version);
+  return `<div class="pw-card"><h4>Quotes</h4>${qs.length ? qs.map(q => `<div class="q-chip" style="margin:0 0 6px;"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>v${q.version}</span><span class="q-st q-st-${q.status}">${q.status}</span><span>${qm(qCalc(q).totalEx)} ex VAT</span><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open</button></div>`).join('') : '<div class="pw-empty">No quotes linked.</div>'}</div>`;
+}
+function pwLinksCardHtml(p){
+  const links = p.links.map((l, li) => `<div class="pw-link"><input data-pw-link="name" data-li="${li}" value="${escAttr(l.name)}" placeholder="Name (e.g. Drawings)" aria-label="Link name"><input data-pw-link="url" data-li="${li}" value="${escAttr(l.url)}" placeholder="https://…" aria-label="Link address">${/^https?:\/\//i.test(l.url) ? `<a class="btn secondary qb-sm" href="${escAttr(l.url)}" target="_blank" rel="noopener">Open</a>` : ''}<button class="icon-btn" data-pw="del-link" data-li="${li}" aria-label="Remove link">${X_SVG}</button></div>`).join('');
+  return `<div class="pw-card"><h4>Files and links <span class="qb-dim">(drawings, photos, folders: paste the link)</span></h4>${links || '<div class="pw-empty">No links yet.</div>'}<button class="btn secondary qb-sm" data-pw="add-link" style="margin-top:8px;">+ Add link</button></div>`;
+}
+function pwNotesCardHtml(p, i){
+  return `<div class="pw-card pw-span3"><h4>Notes</h4><div class="pw-notes2"><div class="detail-notes" style="margin:0;"><label>Notes</label><input data-tab="projects" data-idx="${i}" data-field="notes" value="${escAttr(p.notes || '')}"></div>
+    <div class="detail-notes" style="margin:0;"><label>Testimonial</label><input data-tab="projects" data-idx="${i}" data-field="testimonial" value="${escAttr(p.testimonial || '')}" placeholder="Capture the client's words at sign-off"></div></div></div>`;
+}
 function pwOverviewHtml(p, i){
   const today = fmt(new Date()), ev = projEventsUnique(p), upcoming = ev.filter(e => e.kind !== 'stage' ? (!e.done && e.date >= today && !e.planned) : (e.end >= today)).slice(0, 7);
   const over = ev.filter(e => e.overdue).sort((a, b) => a.date.localeCompare(b.date)), mm = projMonthMoney(p);
-  const quick = [['time', 'Log time'], ['milestone', 'Mark milestone done'], ['invoice', 'Mark invoice sent'], ['paid', 'Mark paid'], ['note', 'Add note']].map(([k, n]) => `<button type="button" class="btn secondary" data-pw="quick" data-q="${k}">${n}</button>`).join('');
+  const quick = [['time', 'Log time'], ['milestone', 'Mark milestone done'], ['invoice', 'Mark invoice sent'], ['paid', 'Mark paid'], ['note', 'Add note']].map(([k, n]) => `<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="${k}">${n}</button>`).join('');
   return `<section class="pw-sec" id="pw-overview" data-sec="overview"><h3>Overview</h3>
-    <div class="pw-grid">
-      <div class="pw-card"><h4>What happens next</h4>${upcoming.length ? upcoming.map(pwEventRow).join('') : '<div class="pw-empty">Nothing dated coming up. Add dates in Timeline.</div>'}</div>
-      <div class="pw-card${over.length ? ' pw-alert' : ''}"><h4>Overdue${over.length ? ` <span class="db-count">${over.length}</span>` : ''}</h4>${over.length ? over.map(pwEventRow).join('') : '<div class="pw-ok-big">✓ Nothing overdue</div>'}</div>
-      <div class="pw-card"><h4>Money this month</h4><div class="pw-money">
-        <div><small>In, still due</small><b>${qm(mm.inDue)}</b></div><div><small>In, received</small><b class="ok">${qm(mm.inPaid)}</b></div>
-        <div><small>Out, still due</small><b>${qm(mm.outDue)}</b></div><div><small>Out, paid</small><b>${qm(mm.outPaid)}</b></div></div>
-        <div class="pw-empty" style="padding-top:6px;">Net expected this month: <b>${qm(mm.inDue + mm.inPaid - mm.outDue - mm.outPaid)}</b></div></div>
-      <div class="pw-card"><h4>Open actions</h4>${recTasksHtml('project', p)}</div>
+    <div class="pw-ov">
+      <div class="pw-card pw-span2"><h4>What happens next</h4>${upcoming.length ? `<div class="pw-evlist">${upcoming.slice(0, 6).map(pwEventRow).join('')}</div>` : '<div class="pw-empty">Nothing dated coming up. Add dates in Timeline.</div>'}</div>
+      <div class="pw-stack">
+        <div class="pw-card${over.length ? ' pw-alert' : ''}"><h4>Overdue${over.length ? ` <span class="db-count">${over.length}</span>` : ''}</h4>${over.length ? over.map(pwEventRow).join('') : '<div class="pw-ok-big">✓ Nothing overdue</div>'}</div>
+        <div class="pw-card"><h4>Money this month</h4><div class="pw-money">
+          <div><small>In, still due</small><b>${qm(mm.inDue)}</b></div><div><small>In, received</small><b class="ok">${qm(mm.inPaid)}</b></div>
+          <div><small>Out, still due</small><b>${qm(mm.outDue)}</b></div><div><small>Out, paid</small><b>${qm(mm.outPaid)}</b></div></div>
+          <div class="pw-empty" style="padding-top:6px;">Net expected this month: <b>${qm(mm.inDue + mm.inPaid - mm.outDue - mm.outPaid)}</b></div></div>
+      </div>
       ${pwCustomerCardHtml(p, i)}
-      <div class="pw-card pw-wide"><h4>Quick actions</h4><div class="pw-quick">${quick}</div></div>
+      <div class="pw-card pw-compact"><h4>Quick actions</h4><div class="pw-quick">${quick}</div></div>
+      <div class="pw-card"><h4>Open actions</h4>${recTasksHtml('project', p)}</div>
+      ${pwQuotesCardHtml(p)}
+      ${pwLinksCardHtml(p)}
+      ${pwNotesCardHtml(p, i)}
     </div></section>`;
 }
 function pwMoneyHtml(p, i){
@@ -5913,20 +5981,30 @@ function pwMoneyHtml(p, i){
         <div class="qual-grid" style="margin-top:8px;"><div class="qual-field"><label>Budgeted cost (£)</label><input type="number" step="1" data-tab="projects" data-idx="${i}" data-field="budgetedCost" value="${p.budgetedCost || 0}"></div><div class="qual-field"><label>Actual cost (£)</label><input type="number" step="1" data-tab="projects" data-idx="${i}" data-field="actualCost" value="${p.actualCost || 0}"></div></div></div>
     </div></section>`;
 }
-function pwNotesHtml(p, i){
-  const links = p.links.map((l, li) => `<div class="pw-link"><input data-pw-link="name" data-li="${li}" value="${escAttr(l.name)}" placeholder="Name (e.g. Drawings)" aria-label="Link name"><input data-pw-link="url" data-li="${li}" value="${escAttr(l.url)}" placeholder="https://…" aria-label="Link address">${/^https?:\/\//i.test(l.url) ? `<a class="btn secondary qb-sm" href="${escAttr(l.url)}" target="_blank" rel="noopener">Open</a>` : ''}<button class="icon-btn" data-pw="del-link" data-li="${li}" aria-label="Remove link">${X_SVG}</button></div>`).join('');
-  return `<section class="pw-sec" id="pw-notes" data-sec="notes"><h3>Notes and files</h3><div class="pw-grid">
-    <div class="pw-card"><h4>Notes</h4><div class="detail-notes" style="margin:0 0 8px;"><label>Notes</label><input data-tab="projects" data-idx="${i}" data-field="notes" value="${escAttr(p.notes || '')}"></div>
-      <div class="detail-notes" style="margin:0;"><label>Testimonial</label><input data-tab="projects" data-idx="${i}" data-field="testimonial" value="${escAttr(p.testimonial || '')}" placeholder="Capture the client's words at sign-off"></div></div>
-    <div class="pw-card"><h4>Files and links <span class="qb-dim">(drawings, photos, folders: paste the link)</span></h4>${links || '<div class="pw-empty">No links yet.</div>'}<button class="btn secondary" data-pw="add-link" style="margin-top:8px;">+ Add link</button></div>
-    <div class="pw-card pw-wide"><h4>Timeline of notes</h4>${commsBlockHtml('project', p, i, 'projcomms')}</div></div></section>`;
+function pwChangeLogBody(p){
+  const log = (p.changeLog || []).slice().reverse();
+  return log.length ? log.map(c => `<details class="pw-chg"><summary><span class="pw-chg-when">${escHtml(new Date(c.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }))}</span> · <b>${escHtml(c.by || 'someone')}</b> · ${escHtml(PW_EDIT_NAME[c.kind] || c.kind)} <span class="qb-flag">${escHtml(causeName(c.cause))}</span> <span class="pw-chg-r">${escHtml(c.reason)}</span></summary>
+      <ul>${(c.changes || []).map(x => `<li>${escHtml(x)}</li>`).join('')}</ul></details>`).join('') : '<div class="pw-empty">No changes logged yet. Saving an edit to the timeline, deliveries or the Working plan records who, when, what and why here.</div>';
 }
-function pwHistoryHtml(p, i){
-  const ss = p.salesSnapshot, qs = state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === p.id)).sort((a, b) => b.jobNumber - a.jobNumber || b.version - a.version);
-  return `<section class="pw-sec" id="pw-history" data-sec="history"><h3>Lead and sales history</h3><div class="pw-grid">
-    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Original lead info</h4><button class="btn secondary" data-action="return-record" data-pl="project" data-id="${p.id}">← Return to Sales Pipeline</button></div>${leadInfoHtml(p)}</div>
-    <div class="pw-card"><h4>As a sales deal</h4>${ss ? `<dl class="ro-grid"><dt>Sales stage</dt><dd>${escHtml(stageName('sales', ss.stageId))}</dd><dt>Quoted value</dt><dd>${ss.quoteValue ? money(ss.quoteValue) : '—'}</dd><dt>Contract signed</dt><dd>${pwD(ss.contractSigned)}</dd></dl>` : '<div class="pw-empty">This project was promoted before sales details were kept.</div>'}</div>
-    <div class="pw-card"><h4>Quotes</h4>${qs.length ? qs.map(q => `<div class="q-chip" style="margin:0 0 6px;"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>v${q.version}</span><span class="q-st q-st-${q.status}">${q.status}</span><span>${qm(qCalc(q).totalEx)} ex VAT</span><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open</button></div>`).join('') : '<div class="pw-empty">No quotes linked.</div>'}</div></div></section>`;
+function pwProjectInfoBody(p){
+  const cu = projCustomer(p), ct = projContract(p), aq = projAcceptedQuote(p), ms = state.pipelineStages.project.filter(s => s.key), done = ms.filter(s => p.milestones[s.key] && p.milestones[s.key] <= fmt(new Date())).length, pg = projProgress(p);
+  const row = (k, v) => `<dt>${k}</dt><dd>${v || '—'}</dd>`;
+  return `<dl class="ro-grid">${row('Project code', recordCode(p.id, 'project'))}${row('Project name', escHtml(p.name))}${row('Stage', pg.i >= 0 ? escHtml(stageName('project', p.stageId)) + ' (stage ' + (pg.i + 1) + ' of ' + pg.n + ')' : 'Not started')}
+    ${row('Customer', escHtml([cu.company, cu.name].filter(Boolean).join(' — ')))}${row('Site', escHtml([cu.address, cu.postcode].filter(Boolean).join(', ')))}${row('Source', escHtml(p.source || ''))}
+    ${row('Contract value (ex VAT)', qm(ct.value) + (ct.live ? ' <span class="qb-dim">live from the accepted quote</span>' : ' <span class="qb-dim">typed, no accepted quote yet</span>'))}${row('Accepted quote', aq ? escHtml(qRef(aq)) : '')}${row('Milestones done', done + ' of ' + ms.length)}</dl>`;
+}
+function pwSalesBody(p){
+  const ss = p.salesSnapshot;
+  return ss ? `<dl class="ro-grid"><dt>Sales stage</dt><dd>${escHtml(stageName('sales', ss.stageId))}</dd><dt>Quoted value</dt><dd>${ss.quoteValue ? money(ss.quoteValue) : '—'}</dd><dt>Contract signed</dt><dd>${pwD(ss.contractSigned)}</dd></dl>` : '<div class="pw-empty">This project was promoted before sales details were kept.</div>';
+}
+function pwInfoHtml(p, i){
+  const nc = (p.comms || []).length, nl = (p.changeLog || []).length;
+  return `<section class="pw-sec" id="pw-info" data-sec="info"><h3>Information</h3>
+    ${pwFold('i-notes', 'Timeline of notes', nc ? nc + (nc === 1 ? ' entry' : ' entries') : 'No entries yet', '', commsBlockHtml('project', p, i, 'projcomms'), false)}
+    ${pwFold('i-lead', 'Lead info', 'The original lead details carried across when this was promoted', `<button class="btn secondary qb-sm" data-action="return-record" data-pl="project" data-id="${p.id}">← Return to Sales Pipeline</button>`, leadInfoHtml(p), false)}
+    ${pwFold('i-sales', 'Sales', 'How this began as a sales deal', '', pwSalesBody(p), false)}
+    ${pwFold('i-proj', 'Project info', 'The project record at a glance', '', pwProjectInfoBody(p), false)}
+    ${pwFold('i-log', 'Change log', nl ? nl + (nl === 1 ? ' change' : ' changes') + ' recorded' : 'No changes recorded yet', '', pwChangeLogBody(p), false)}</section>`;
 }
 /* one-click actions: the date defaults to today; clearing offers Undo */
 function pwSetDate(label, get, set, date){
@@ -11442,7 +11520,7 @@ function navRestore(s){
   expandedProjectsP.clear(); (s.open.proj || []).forEach(x => expandedProjectsP.add(x));
   expandedLeads.clear(); (s.open.leads || []).forEach(x => expandedLeads.add(x));
   Object.keys(s.ex || {}).forEach(k => { if(nav.extras[k]) try{ nav.extras[k].set(s.ex[k]); }catch(e){} });
-  pwUi.id = s.pw ? s.pw.id : 0; if(s.pw) pwUi.sec = s.pw.sec;
+  pwUi.id = s.pw ? s.pw.id : 0; if(s.pw){ pwUi.sec = pwSecKey(s.pw.sec); pwOpenReset(pwUi.sec); }
   qUi.openId = s.q ? s.q.id : 0; if(s.q) qUi.tab = s.q.tab;
   detailRef = s.detail && findRec(s.detail.pl, s.detail.id) && s.detail.pl !== 'lead' && s.detail.pl !== 'project' ? { pl: s.detail.pl, id: s.detail.id, view: 'current' } : null;
   if(!detailRef) closeDetail();
