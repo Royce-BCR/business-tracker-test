@@ -1293,6 +1293,78 @@
   .crm-tab.active { color: var(--ink); border-bottom-color: var(--g-growth); font-weight: 600; }
   .crm-tab .n { font-size: var(--bt-fs-xs); font-weight: 700; background: var(--bt-neu-bg); color: var(--slate); border-radius: var(--bt-r-pill); padding: 1px var(--bt-s2); }
   .crm-tab.over .n.some { background: var(--bt-bad-bg); color: var(--bt-bad-fg); }
+
+  /* ---------------- CRM > Projects overview (read-only) ---------------- */
+  .pj-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--bt-s3); margin: 0 0 var(--bt-s4); }
+  .pj-tile { text-align: left; font-family: inherit; color: var(--ink); background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3) var(--bt-s4); box-shadow: var(--shadow); min-height: var(--bt-control); display: flex; flex-direction: column; gap: 2px; }
+  button.pj-tile { cursor: pointer; }
+  button.pj-tile:hover { border-color: var(--bt-bronze); }
+  button.pj-tile[aria-pressed="true"] { border-color: var(--bt-focus); box-shadow: inset 0 0 0 1px var(--bt-focus); }
+  .pj-tile .k { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+  .pj-tile .v { font-size: var(--bt-fs-xl); font-weight: 700; line-height: 1.15; }
+  .pj-tile .s { font-size: var(--bt-fs-xs); color: var(--slate); }
+  .pj-warn { color: var(--bt-warn-fg); font-weight: 600; }
+  .pj-controls { display: flex; flex-wrap: wrap; gap: var(--bt-s3); align-items: flex-end; margin: 0 0 var(--bt-s2); }
+  .pj-field { display: flex; flex-direction: column; gap: var(--bt-s1); font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; min-width: 0; }
+  .pj-field input, .pj-field select { min-height: var(--bt-control); font-size: var(--bt-fs-sm); text-transform: none; letter-spacing: 0; font-weight: 400; max-width: 100%; }
+  .pj-search { flex: 1 1 220px; } .pj-search input { width: 100%; }
+  .pj-check { display: inline-flex; align-items: center; gap: var(--bt-s2); min-height: var(--bt-control); font-size: var(--bt-fs-sm); color: var(--ink); cursor: pointer; }
+  .pj-check input { width: 20px; height: 20px; min-height: 0; margin: 0; }
+  .pj-count { font-size: var(--bt-fs-xs); color: var(--text-muted); margin: 0 0 var(--bt-s2); min-height: 1.2em; }
+  .pj-tablewrap { background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); box-shadow: var(--shadow); overflow-x: auto; }
+  .pj-table { width: 100%; border-collapse: collapse; font-size: var(--bt-fs-sm); }
+  .pj-table th { text-align: left; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; padding: var(--bt-s2) var(--bt-s3); border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .pj-table td { padding: var(--bt-s2) var(--bt-s3); border-bottom: 1px solid var(--line); vertical-align: top; }
+  .pj-table tbody tr:last-child td { border-bottom: none; }
+  .pj-row { cursor: pointer; } .pj-row:hover { background: var(--bt-surface-2); }
+  .pj-row.pj-done td { color: var(--text-muted); }
+  .pj-r { text-align: right !important; white-space: nowrap; }
+  .pj-sub { display: block; font-size: var(--bt-fs-xs); color: var(--text-muted); font-weight: 400; white-space: normal; }
+  .pj-sub-c, .pj-sub-o { display: none; } .pj-sub-c:empty { display: none !important; }
+  .pj-code { font-size: var(--bt-fs-2xs); font-weight: 700; color: var(--slate); background: var(--bt-neu-bg); border-radius: var(--bt-r-pill); padding: 2px var(--bt-s2); white-space: nowrap; display: inline-block; }
+  .pj-open { font-family: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--ink); background: none; border: none; padding: 0; text-align: left; cursor: pointer; min-height: var(--bt-control); display: inline-flex; align-items: center; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; }
+  .pj-open:hover { text-decoration-color: currentColor; }
+  .pj-st, .pj-stage { display: inline-block; padding: 2px 9px; border-radius: var(--bt-r-pill); font-size: var(--bt-fs-xs); font-weight: 600; white-space: nowrap; background: var(--bt-neu-bg); color: var(--bt-neu-fg); }
+  .pj-st-ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); } .pj-st-warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .pj-st-bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); }
+  .pj-stage-lead { background: var(--bt-info-bg); color: var(--bt-info-fg); } .pj-stage-sales { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .pj-stage-project { background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
+  .pj-next-t { display: block; } .pj-next-d { display: block; font-size: var(--bt-fs-xs); color: var(--slate); } .pj-next-d.over, .pj-over { color: var(--bt-bad-fg); font-weight: 600; }
+  .pj-cards { display: none; }
+  .pj-card { display: flex; flex-direction: column; gap: var(--bt-s2); text-align: left; font-family: inherit; color: var(--ink); width: 100%; background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3) var(--bt-s4); box-shadow: var(--shadow); cursor: pointer; min-height: var(--bt-control); }
+  .pj-card.pj-done { opacity: 0.8; }
+  .pj-card-top { display: flex; flex-wrap: wrap; gap: var(--bt-s2); align-items: center; }
+  .pj-card-name { font-size: var(--bt-fs-md); font-weight: 700; line-height: 1.25; }
+  .pj-card-cust { font-size: var(--bt-fs-sm); color: var(--slate); }
+  .pj-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-s2) var(--bt-s3); font-size: var(--bt-fs-sm); }
+  .pj-card-grid > span, .pj-card-next { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+  .pj-card i { font-style: normal; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+  .pj-card-why { font-size: var(--bt-fs-xs); color: var(--bt-warn-fg); font-weight: 600; }
+  @media (max-width: 1500px) { .pj-c-owner, .pj-c-prog { display: none; } .pj-sub-o { display: block; } .pj-sub-o:empty { display: none; } }   /* owner and in-progress move under the name when the page is narrow */
+  @media (max-width: 1100px) { .pj-c-cust { display: none; } .pj-sub-c { display: block; } .pj-table td, .pj-table th { padding-left: var(--bt-s2); padding-right: var(--bt-s2); } }
+  @media (max-width: 699.98px) { .pj-tablewrap { display: none; } .pj-cards { display: grid; gap: var(--bt-s3); } .pj-strip { grid-template-columns: 1fr 1fr; } }
+  /* the side panel: same floating card as the task panel; a full-screen sheet on a phone */
+  .pj-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--bt-ink) 11%, transparent); z-index: 64; animation: fade 0.15s ease; }
+  .pj-panel { position: fixed; top: calc(10px + var(--bt-banner-h, 0px)); right: 10px; bottom: 10px; width: min(560px, calc(100% - 20px)); background: var(--card); z-index: 65; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--bt-r-card); overflow: hidden; animation: drIn 0.18s ease; box-shadow: 0 1px 2px color-mix(in srgb, var(--bt-ink) 6%, transparent), 0 6px 16px color-mix(in srgb, var(--bt-ink) 8%, transparent), 0 22px 48px color-mix(in srgb, var(--bt-ink) 12%, transparent); }
+  .pj-backdrop[hidden], .pj-panel[hidden] { display: none; }
+  @media (max-width: 700px) { .pj-panel { top: var(--bt-banner-h, 0px); right: 0; bottom: 0; width: 100%; border: none; border-radius: 0; box-shadow: none; } }
+  @media (prefers-reduced-motion: reduce) { .pj-panel, .pj-backdrop { animation: none; } }
+  .pj-head { display: flex; align-items: flex-start; gap: var(--bt-s3); padding: var(--bt-s4); border-bottom: 1px solid var(--line); }
+  .pj-head-main { flex: 1; min-width: 0; } .pj-head h3 { margin: var(--bt-s2) 0 2px; font-size: var(--bt-fs-lg); line-height: 1.2; overflow-wrap: anywhere; } .pj-head h3:focus { outline: none; } .pj-head h3:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+  .pj-head-top { display: flex; flex-wrap: wrap; gap: var(--bt-s2); align-items: center; }
+  .pj-body { flex: 1; overflow-y: auto; padding: var(--bt-s4); overscroll-behavior: contain; }
+  .pj-why { display: flex; flex-wrap: wrap; gap: var(--bt-s2); align-items: center; font-size: var(--bt-fs-sm); margin-bottom: var(--bt-s3); }
+  .pj-hist { display: flex; flex-wrap: wrap; gap: var(--bt-s2); align-items: center; font-size: var(--bt-fs-xs); color: var(--slate); margin-bottom: var(--bt-s3); } .pj-hist i { font-style: normal; color: var(--text-muted); }
+  .pj-actions { margin: 0 0 var(--bt-s4); }
+  .pj-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--bt-s2); margin-bottom: var(--bt-s4); }
+  .pj-stat { background: var(--bt-surface-2); border: 1px solid var(--line); border-radius: var(--bt-r-btn); padding: var(--bt-s2) var(--bt-s3); display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+  .pj-stat .k { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; } .pj-stat .v { font-size: var(--bt-fs-md); font-weight: 700; } .pj-stat .s { font-size: var(--bt-fs-xs); color: var(--slate); }
+  .pj-stat.bad { border-color: var(--bt-bad-bd); } .pj-stat.bad .v { color: var(--bt-bad-fg); } .pj-stat.warn .v { color: var(--bt-warn-fg); }
+  .pj-sec { margin-bottom: var(--bt-s4); } .pj-sec h4 { margin: 0 0 var(--bt-s2); font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; }
+  .pj-n { background: var(--bt-neu-bg); color: var(--slate); border-radius: var(--bt-r-pill); padding: 1px var(--bt-s2); font-size: var(--bt-fs-2xs); margin-left: 4px; }
+  .pj-assoc { display: flex; flex-wrap: wrap; gap: var(--bt-s1) var(--bt-s3); align-items: center; padding: 2px 0; font-size: var(--bt-fs-sm); } .pj-assoc .qb-dim { font-size: var(--bt-fs-xs); }
+  .pj-more { margin-top: var(--bt-s1); }
+  .pj-tl { display: grid; grid-template-columns: 92px 1fr auto; gap: var(--bt-s2); padding: 4px 0; font-size: var(--bt-fs-sm); border-bottom: 1px solid var(--line); } .pj-tl:last-child { border-bottom: none; }
+  .pj-tl-d { color: var(--text-muted); font-size: var(--bt-fs-xs); } .pj-tl-t { overflow-wrap: anywhere; } .pj-tl-g { font-size: var(--bt-fs-2xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .pj-gone { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-radius: var(--bt-r-btn); padding: var(--bt-s3) var(--bt-s4); margin-bottom: var(--bt-s3); font-size: var(--bt-fs-sm); }
   .crm-filters { display: flex; gap: var(--bt-s2) 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
   .crm-filters-dyn { display: contents; }
   .crm-filters select, .crm-filters input[type=search] { width: auto; border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); font-size: var(--bt-fs-xs); max-width: 190px; }
@@ -1974,6 +2046,7 @@ body.logged-out .fav-btn { display: none; }
       <button type="button" class="tab g-growth" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
       <button type="button" class="tab g-growth" data-tab="companies">Companies</button>
       <button type="button" class="tab g-growth" data-tab="crm">Tasks</button>
+      <button type="button" class="tab g-growth" data-tab="crmprojects">Projects</button>
     </div>
   </div>
 
@@ -2210,6 +2283,25 @@ body.logged-out .fav-btn { display: none; }
     <div class="crm-filters"><span id="crmFilters" class="crm-filters-dyn"></span><input type="search" id="crmSearch" class="crm-search" placeholder="Search tasks…" autocomplete="off"></div>
     <div class="table-scroll" id="crmTableWrap"></div>
     <datalist id="crmRecList"></datalist>
+  </div>
+
+  <!-- CRM > PROJECTS OVERVIEW (read-only) -->
+  <div class="panel" id="panel-crmprojects">
+    <div class="page-head">
+      <h2>Projects</h2>
+      <div class="desc">Every lead, sales deal and project in one read-only list. A job that moved from lead to deal to project shows once, at its furthest stage. Click a job for the detail, or use “Open in pipeline” to work on it.</div>
+    </div>
+    <div class="pj-strip" id="pjStrip"></div>
+    <div class="pj-controls" role="search">
+      <label class="pj-field pj-search">Search<input type="search" id="pjSearch" placeholder="Code, name, customer, owner…" autocomplete="off"></label>
+      <label class="pj-field">Stage<select id="pjStage"><option value="">All stages</option><option value="lead">Lead</option><option value="sales">Sales</option><option value="project">Project</option></select></label>
+      <label class="pj-field">Status<select id="pjStatus"><option value="">All statuses</option><option>On track</option><option>Needs attention</option><option>Stalled</option><option>Lost</option><option>Completed</option></select></label>
+      <label class="pj-field">Owner<select id="pjOwner"><option value="">All owners</option></select></label>
+      <label class="pj-field">Sort<select id="pjSort"><option value="attention">Needs attention first</option><option value="value">Value, highest first</option><option value="touched">Longest since touched</option><option value="next">Next action date</option><option value="name">Name A to Z</option><option value="code">Code</option></select></label>
+      <label class="pj-check"><input type="checkbox" id="pjDone"> Show lost and completed</label>
+    </div>
+    <div class="pj-count" id="pjCount" role="status" aria-live="polite"></div>
+    <div id="pjList"></div>
   </div>
 
 <!-- BT:panels begin -->
@@ -2542,6 +2634,8 @@ create policy "app update" on tracker_data for update using (true) with check (t
   <div class="tk-head" id="tkHead"></div>
   <div class="dr-body" id="tkBody"></div>
 </aside>
+<div class="pj-backdrop" id="pjBackdrop" hidden></div>
+<aside class="pj-panel" id="pjPanel" role="dialog" aria-modal="true" aria-labelledby="pjPanelTitle" hidden></aside>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button class="toast-btn" id="toastUndo" type="button">Undo</button></div>
 <div class="gantt-tip" id="ganttTip" hidden></div>
 
@@ -11686,6 +11780,403 @@ document.getElementById('setMenuSelect').addEventListener('change', (e) => setti
   renderLoginBrand();
 })();
 
+/* BT:js-projects begin */
+/* ---------- CRM > Projects: one read-only overview of leads, sales deals and projects ----------
+   Nothing on this page is saved (no new fields). A lead, its sales deal and its project share ONE record id as the deal moves along
+   (promoteLead / promoteToProject keep it), so that id is the only link used: one row per id, shown at its furthest stage.
+   Two records in the same list with the same id are never merged (no guessing): they get a row each.
+   The only things kept are the filter choices, per device, in localStorage (STORAGE_PREFIX aware). */
+const PJ_KEY = STORAGE_PREFIX + 'business-tracker-projects-view';
+const PJ_STAGE_NAME = { lead: 'Lead', sales: 'Sales', project: 'Project' };
+const PJ_STATUSES = ['On track', 'Needs attention', 'Stalled', 'Lost', 'Completed'];
+const PJ_SORTS = [['attention', 'Needs attention first'], ['value', 'Value, highest first'], ['touched', 'Longest since touched'], ['next', 'Next action date'], ['name', 'Name A to Z'], ['code', 'Code']];
+const pjUi = { q: '', stage: '', status: '', owner: '', sort: 'attention', showDone: false, openKey: '', msg: '', lastList: '', lastPanel: '', lastStrip: '' };
+(function pjLoadPrefs(){
+  try{
+    const o = JSON.parse(localStorage.getItem(PJ_KEY) || 'null'); if(!o || typeof o !== 'object') return;
+    if(['lead', 'sales', 'project'].includes(o.stage)) pjUi.stage = o.stage;
+    if(PJ_STATUSES.includes(o.status)) pjUi.status = o.status;
+    if(typeof o.owner === 'string') pjUi.owner = o.owner.slice(0, 80);
+    if(PJ_SORTS.some(s => s[0] === o.sort)) pjUi.sort = o.sort;
+    pjUi.showDone = o.showDone === true;
+  }catch(e){}
+})();
+function pjSavePrefs(){ try{ localStorage.setItem(PJ_KEY, JSON.stringify({ stage: pjUi.stage, status: pjUi.status, owner: pjUi.owner, sort: pjUi.sort, showDone: pjUi.showDone })); }catch(e){} }
+navExtra('pj', () => ({ k: pjUi.openKey }), v => { pjUi.openKey = (v && v.k) || ''; });   // "Back" from a linked page returns to the open panel
+
+const pjDay = v => { const m = /^(\d{4}-\d{2}-\d{2})/.exec(String(v == null ? '' : v)); return m ? m[1] : ''; };
+const pjPush = (m, k, v) => { let a = m.get(k); if(!a){ a = []; m.set(k, a); } a.push(v); };
+function pjNum(v){ const n = Number(v); return isFinite(n) ? n : 0; }
+function pjPickQuote(qs){
+  const by = (a, b) => b.version - a.version || b.id - a.id;
+  const acc = qs.filter(q => q.status === 'Accepted').sort(by)[0]; if(acc) return { q: acc, kind: 'Accepted' };
+  const sent = qs.filter(q => q.status === 'Sent').sort(by)[0]; if(sent) return { q: sent, kind: 'Sent' };
+  const any = qs.filter(q => q.status !== 'Declined' && q.status !== 'Expired').sort(by)[0] || qs.slice().sort(by)[0];
+  return any ? { q: any, kind: any.status } : null;
+}
+/* the earliest open task or action is "next"; undated ones come after dated ones */
+function pjNextAction(ctx){
+  const items = [];
+  ctx.tasks.forEach(t => { if(t.status === 'open') items.push({ kind: 'task', id: t.id, text: t.title, date: t.dueDate || '', owner: t.owner || '', o: taskNum(t) }); });
+  ctx.actions.forEach((a, i) => { if(a.status !== 'Done') items.push({ kind: 'action', ref: a, text: a.action || 'Action', date: a.deadline || '', owner: a.owner && a.owner !== 'TBC' ? a.owner : '', o: 1e6 + i }); });
+  items.sort((a, b) => (a.date || '9999-99-99').localeCompare(b.date || '9999-99-99') || a.o - b.o);
+  return { items, next: items[0] || null };
+}
+function pjBuildRow(g, shared, today, staleN){
+  const recs = g.recs, pl = recs.project ? 'project' : recs.sales ? 'sales' : 'lead', rec = recs[pl], root = rec.id;
+  const ctx = { tasks: shared.tasks.get(root) || [], actions: shared.actions.get(root) || [], quotes: shared.quotes.get(root) || [], inv: shared.inv.get(root) || [], pos: shared.pos.get(root) || [], txns: shared.txns.get(root) || [] };
+  const lost = pl === 'lead' && !!rec.lost, completed = cxCompleted(pl, rec), done = lost || completed, p = recs.project || null;
+  const na = pjNextAction(ctx), openItems = na.items;
+  // value: what applies at this stage, and which number it is
+  let value = null, valueLabel = '', qpick = pjPickQuote(ctx.quotes);
+  const est = pjNum(rec.estValue) > 0 ? pjNum(rec.estValue) : (recs.lead && pjNum(recs.lead.estValue) > 0 ? pjNum(recs.lead.estValue) : 0);
+  try{
+    if(pl === 'project'){ const ct = projContract(p); if(ct.value > 0){ value = ct.value; valueLabel = ct.live ? 'Accepted quote (ex VAT)' : 'Contract value'; } }
+    else if(pl === 'sales'){
+      if(qpick && (qpick.kind === 'Accepted' || qpick.kind === 'Sent')){ value = qCalc(qpick.q).totalEx; valueLabel = qpick.kind + ' quote (ex VAT)'; }
+      else if(pjNum(rec.quoteValue) > 0){ value = pjNum(rec.quoteValue); valueLabel = 'Deal value'; }
+    }
+    if(value === null && est > 0){ value = est; valueLabel = 'Lead estimate'; }
+  }catch(e){ value = null; valueLabel = ''; }
+  // last touched: the newest dated thing on any of its records, tasks, quotes, money or milestones (never a future date)
+  const touch = []; const put = v => { const d = pjDay(v); if(d && d <= today) touch.push(d); };
+  Object.values(recs).forEach(r => { (r.comms || []).forEach(c => c && put(c.date)); put(r.createdAt); });
+  ctx.tasks.forEach(t => { put(t.completedAt); });   // finishing a task is a touch; merely creating one is not
+  ctx.quotes.forEach(q => { put(q.sentAt); put(q.acceptedDate); put(q.date); });
+  ctx.txns.forEach(t => put(t.date));
+  if(p){ (p.paymentLines || []).forEach(l => { put(l.invoicedDate); put(l.paidDate); }); Object.values(p.milestones || {}).forEach(put); }
+  const lastTouch = touch.sort().slice(-1)[0] || '', days = lastTouch ? Math.max(0, dashDays(lastTouch, today)) : null;
+  // overdue items
+  const overdue = [], seenDrops = new Set();
+  ctx.tasks.forEach(t => { if(t.status === 'open' && t.dueDate && t.dueDate < today) overdue.push({ kind: 'Task', text: t.title, date: t.dueDate }); });
+  ctx.actions.forEach(a => { if(a.status !== 'Done' && a.deadline && a.deadline < today) overdue.push({ kind: 'Action', text: a.action || 'Action', date: a.deadline }); });
+  let deliveries = [];
+  if(p){
+    ctx.inv.forEach(r => { if(r.status === 'Overdue' || r.status === 'Warning') overdue.push({ kind: 'Invoice', text: r.desc, date: r.dueDate }); });
+    try{ deliveries = projDeliveries(p).drops; }catch(e){ deliveries = []; }
+    deliveries.forEach(x => { if(x.date && !x.delivered && x.date < today){ seenDrops.add(x.d.id); overdue.push({ kind: 'Delivery', text: x.supplier, date: x.date }); } });
+    ctx.pos.forEach(po => { if(po.status === 'Sent' && po.deliveryDate && po.deliveryDate < today && !poDelivered(po) && !seenDrops.has(po.did)) overdue.push({ kind: 'Order', text: po.ref + ' ' + (po.supplierName || ''), date: po.deliveryDate }); });
+  }
+  const noOpenTask = !done && openItems.length === 0, stale = !done && days !== null && days >= staleN;
+  let status = 'On track';
+  if(lost) status = 'Lost'; else if(completed) status = 'Completed';
+  else if(stale && noOpenTask && days >= staleN * 2) status = 'Stalled';
+  else if(overdue.length || noOpenTask || stale) status = 'Needs attention';
+  const reasons = [];
+  if(status === 'Needs attention' || status === 'Stalled'){
+    if(overdue.length) reasons.push(overdue.length + ' overdue item' + (overdue.length === 1 ? '' : 's'));
+    if(noOpenTask) reasons.push('no open task');
+    if(stale) reasons.push('not touched for ' + days + ' days (limit ' + staleN + ')');
+  }
+  // owner: the owner of the next open task or action, else of any open one (records themselves carry no owner)
+  let owner = na.next && na.next.owner || ''; if(!owner){ const o = openItems.find(x => x.owner); owner = o ? o.owner : ''; }
+  // in progress: a project that has started on site (typed or planned date reached) and whose build is not yet complete
+  let inProgress = null;
+  if(pl === 'project'){
+    let startD = ''; try{ const m = p.milestones || {}; startD = m.onSiteStart || projMsDerived(p, 'onSiteStart').date || ''; }catch(e){}
+    const bc = (p.milestones || {}).buildComplete; inProgress = !done && !!startD && startD <= today && !(bc && bc <= today);
+  }
+  // customer
+  let customer = '';
+  try{
+    if(pl === 'project'){ const c = projCustomer(p); customer = [c.name, c.company].filter(Boolean).join(' · '); }
+    else { const qq = qpick && qpick.q; customer = [rec.contact || (qq && qq.customer) || '', rec.company].filter(Boolean).join(' · '); }
+  }catch(e){ customer = [rec.contact, rec.company].filter(Boolean).join(' · '); }
+  const stageText = stageName(pl, rec.stageId);
+  return { key: g.key, root, pl, rec, recs, ctx, code: recordCode(root, pl), name: boardTitle(pl, rec), customer, stageLabel: PJ_STAGE_NAME[pl], stageText: stageText === '—' ? '' : stageText,
+    status, reasons, lost, completed, done, live: !done, inProgress, value, valueLabel, owner, next: na.next, lastTouch, days, overdue, stale, noOpenTask, qpick, deliveries };
+}
+function pjRows(){
+  if(!state) return [];
+  const today = fmt(new Date()), staleN = dashStaleDays();
+  const shared = { tasks: new Map(), actions: new Map(), quotes: new Map(), inv: new Map(), pos: new Map(), txns: new Map() };
+  (state.crmTasks || []).forEach(t => recRoots(t).forEach(r => pjPush(shared.tasks, r, t)));
+  (state.actions || []).forEach(a => recRoots(a).forEach(r => pjPush(shared.actions, r, a)));
+  (state.quotes || []).forEach(q => [...new Set((q.linkedIds || []).map(linkedRoot))].forEach(r => { if(r) pjPush(shared.quotes, r, q); }));
+  try{ invRows().forEach(r => pjPush(shared.inv, r.pid, r)); }catch(e){}
+  (state.purchaseOrders || []).forEach(po => pjPush(shared.pos, po.pid, po));
+  (state.transactions || []).forEach(t => { let pid = Number(t.projectId) || 0; if(!pid){ const m = /^P-?(\d+)/i.exec(String(t.linkedCode || '')); if(m) pid = Number(m[1]); } if(pid) pjPush(shared.txns, pid, t); });
+  const groups = [], byId = new Map(), used = new Set();
+  const add = (pl, rec) => {
+    let g = byId.get(rec.id);
+    if(!g || g.recs[pl]){ let key = String(rec.id), n = 1; while(used.has(key)) key = rec.id + '#' + (++n); used.add(key); g = { key, recs: {} }; if(!byId.has(rec.id)) byId.set(rec.id, g); groups.push(g); }
+    g.recs[pl] = rec;
+  };
+  (state.leads || []).forEach(r => add('lead', r)); (state.pipeline || []).forEach(r => add('sales', r)); (state.projects || []).forEach(r => add('project', r));
+  const rows = [];
+  groups.forEach(g => { try{ rows.push(pjBuildRow(g, shared, today, staleN)); }catch(e){ /* one odd record must never blank the page */ } });
+  return rows;
+}
+const pjSortFns = {
+  attention: (a, b) => (pjRank(a) - pjRank(b)) || ((b.days || 0) - (a.days || 0)) || a.root - b.root,
+  value: (a, b) => (b.value || 0) - (a.value || 0) || a.root - b.root,
+  touched: (a, b) => (b.days === null ? -1 : b.days) - (a.days === null ? -1 : a.days) || a.root - b.root,
+  next: (a, b) => ((a.next && a.next.date) || '9999-99-99').localeCompare((b.next && b.next.date) || '9999-99-99') || a.root - b.root,
+  name: (a, b) => a.name.localeCompare(b.name, 'en-GB', { sensitivity: 'base' }) || a.root - b.root,
+  code: (a, b) => a.root - b.root || a.code.localeCompare(b.code)
+};
+function pjRank(r){ return r.status === 'Stalled' ? 0 : r.status === 'Needs attention' ? 1 : r.status === 'On track' ? 2 : 3; }
+function pjFilter(rows){
+  const q = pjUi.q.trim().toLowerCase(), doneOk = pjUi.showDone || pjUi.status === 'Lost' || pjUi.status === 'Completed';
+  return rows.filter(r => {
+    if(r.done && !doneOk) return false;
+    if(pjUi.stage && r.pl !== pjUi.stage) return false;
+    if(pjUi.status && r.status !== pjUi.status) return false;
+    if(pjUi.owner){ if(pjUi.owner === '__none'){ if(r.owner) return false; } else if(r.owner !== pjUi.owner) return false; }
+    if(q){ const hay = [r.code, r.name, r.customer, r.stageLabel, r.stageText, r.status, r.owner, r.next ? r.next.text : '', r.rec.company, r.rec.contact].join(' ').toLowerCase(); if(!q.split(/\s+/).every(w => hay.includes(w))) return false; }
+    return true;
+  }).sort(pjSortFns[pjUi.sort] || pjSortFns.attention);
+}
+const pjMoney = n => money(n);
+const pjStChip = s => `<span class="pj-st pj-st-${s === 'On track' ? 'ok' : s === 'Needs attention' ? 'warn' : s === 'Stalled' ? 'bad' : 'neu'}">${s === 'On track' ? '✓ ' : s === 'Needs attention' ? '▲ ' : s === 'Stalled' ? '! ' : ''}${escHtml(s)}</span>`;
+const pjStageChip = r => `<span class="pj-stage pj-stage-${r.pl}">${escHtml(r.stageLabel)}</span>`;
+function pjNextHtml(r){
+  if(!r.next) return '<span class="qb-dim">None</span>';
+  const od = r.next.date && r.next.date < fmt(new Date());
+  return `<span class="pj-next-t">${escHtml(r.next.text)}</span>${r.next.date ? `<span class="pj-next-d${od ? ' over' : ''}">${od ? 'Overdue · ' : ''}${escHtml(dShow(r.next.date))}</span>` : '<span class="pj-next-d qb-dim">No date</span>'}`;
+}
+const pjDaysText = r => r.days === null ? '—' : r.days === 0 ? 'Today' : r.days + (r.days === 1 ? ' day' : ' days');
+const pjProgText = r => r.inProgress === null ? '—' : r.inProgress ? 'Yes' : 'No';
+function pjTableHtml(list){
+  const head = `<thead><tr><th scope="col" class="pj-c-code">Code</th><th scope="col">Name</th><th scope="col" class="pj-c-cust">Customer</th><th scope="col">Stage</th><th scope="col">Status</th><th scope="col" class="pj-c-prog">In progress?</th><th scope="col" class="pj-r">Value</th><th scope="col" class="pj-c-owner">Owner</th><th scope="col">Next action</th><th scope="col" class="pj-r">Last touched</th></tr></thead>`;
+  const rows = list.map(r => `<tr class="pj-row${r.done ? ' pj-done' : ''}" data-pj-row="${escAttr(r.key)}">
+    <td class="pj-c-code"><span class="pj-code">${escHtml(r.code)}</span></td>
+    <td class="pj-name"><button type="button" class="pj-open" data-pj="open" data-key="${escAttr(r.key)}" data-pj-key="${escAttr(r.key)}">${escHtml(r.name)}</button><span class="pj-sub pj-sub-c">${r.customer === r.name ? '' : escHtml(r.customer)}</span><span class="pj-sub pj-sub-o">${[r.inProgress ? 'In progress' : '', r.owner ? 'Owner ' + escHtml(r.owner) : ''].filter(Boolean).join(' · ')}</span></td>
+    <td class="pj-c-cust">${escHtml(r.customer) || '<span class="qb-dim">—</span>'}</td>
+    <td>${pjStageChip(r)}${r.stageText ? `<span class="pj-sub">${escHtml(r.stageText)}</span>` : ''}</td>
+    <td>${pjStChip(r.status)}${r.reasons.length ? `<span class="pj-sub">${escHtml(r.reasons.join(', '))}</span>` : ''}</td>
+    <td class="pj-c-prog">${pjProgText(r)}</td>
+    <td class="pj-r">${r.value !== null ? `<b>${pjMoney(r.value)}</b><span class="pj-sub">${escHtml(r.valueLabel)}</span>` : '<span class="qb-dim">—</span>'}</td>
+    <td class="pj-c-owner">${r.owner ? escHtml(r.owner) : '<span class="qb-dim">Unassigned</span>'}</td>
+    <td class="pj-next">${pjNextHtml(r)}</td>
+    <td class="pj-r">${pjDaysText(r)}</td></tr>`).join('');
+  return `<div class="pj-tablewrap"><table class="pj-table">${head}<tbody>${rows}</tbody></table></div>`;
+}
+function pjCardsHtml(list){
+  return `<div class="pj-cards">${list.map(r => `<button type="button" class="pj-card${r.done ? ' pj-done' : ''}" data-pj="open" data-key="${escAttr(r.key)}" data-pj-key="${escAttr(r.key)}">
+    <span class="pj-card-top"><span class="pj-code">${escHtml(r.code)}</span>${pjStageChip(r)}${pjStChip(r.status)}</span>
+    <span class="pj-card-name">${escHtml(r.name)}</span>
+    <span class="pj-card-cust">${escHtml(r.customer) || 'No customer name'}</span>
+    <span class="pj-card-grid">
+      <span><i>Value</i>${r.value !== null ? pjMoney(r.value) + ' · ' + escHtml(r.valueLabel) : '—'}</span>
+      <span><i>In progress?</i>${pjProgText(r)}</span>
+      <span><i>Owner</i>${r.owner ? escHtml(r.owner) : 'Unassigned'}</span>
+      <span><i>Last touched</i>${pjDaysText(r)}</span></span>
+    <span class="pj-card-next"><i>Next action</i>${pjNextHtml(r)}</span>
+    ${r.reasons.length ? `<span class="pj-card-why">${escHtml(r.reasons.join(', '))}</span>` : ''}</button>`).join('')}</div>`;
+}
+function pjStripHtml(rows){
+  const live = rows.filter(r => r.live), tile = (pl, label) => { const l = live.filter(r => r.pl === pl), v = l.reduce((a, r) => a + (r.value || 0), 0), att = l.filter(r => r.status === 'Needs attention' || r.status === 'Stalled').length;
+    return `<button type="button" class="pj-tile" data-pj="tile" data-stage="${pl}" aria-pressed="${pjUi.stage === pl}"><span class="k">${label}</span><span class="v">${l.length}</span><span class="s">${pjMoney(v)} live value${att ? ` · <b class="pj-warn">${att} need attention</b>` : ''}</span></button>`; };
+  const all = live.reduce((a, r) => a + (r.value || 0), 0);
+  return tile('lead', 'Leads') + tile('sales', 'Sales deals') + tile('project', 'Projects') + `<div class="pj-tile pj-tile-total" role="group" aria-label="Total live"><span class="k">All live jobs</span><span class="v">${live.length}</span><span class="s">${pjMoney(all)} live value</span></div>`;
+}
+function pjOwnerOptions(rows){
+  const names = [...new Set(rows.map(r => r.owner).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'en-GB', { sensitivity: 'base' }));
+  if(pjUi.owner && pjUi.owner !== '__none' && !names.includes(pjUi.owner)) names.push(pjUi.owner);
+  return `<option value="">All owners</option><option value="__none">Unassigned</option>` + names.map(n => `<option value="${escAttr(n)}">${escHtml(n)}</option>`).join('');
+}
+/* replace an element's content only when it changed, and keep the focused button focused and the scroll where it was */
+function pjSet(el, html, memoKey){
+  if(!el || pjUi[memoKey] === html) return false;
+  const a = document.activeElement, fk = a && a !== document.body && el.contains(a) ? (a.dataset.pjKey || a.dataset.pjFocus || '') : '';
+  const sc = el.scrollTop; pjUi[memoKey] = html; el.innerHTML = html; if(el.scrollTop !== sc) el.scrollTop = sc;
+  if(fk){ const n = el.querySelector(`[data-pj-key="${CSS.escape(fk)}"],[data-pj-focus="${CSS.escape(fk)}"]`); if(n){ try{ n.focus({ preventScroll: true }); }catch(e){} } }
+  return true;
+}
+function pjRender(){
+  const panel = document.getElementById('panel-crmprojects'); if(!panel || !state) return;
+  const active = panel.classList.contains('active');
+  if(!active){ if(pjUi.openKey){ pjUi.openKey = ''; pjRenderPanel(); } return; }   // the panel belongs to this page: leaving the page closes it
+  const rows = pjRows();
+  if(active){
+    const list = pjFilter(rows), sel = (id, v) => { const el = document.getElementById(id); if(el && el.value !== v) el.value = v; };
+    pjSet(document.getElementById('pjStrip'), pjStripHtml(rows), 'lastStrip');
+    const ownerSel = document.getElementById('pjOwner'), oh = pjOwnerOptions(rows);
+    if(ownerSel && ownerSel.dataset.opts !== oh){ ownerSel.innerHTML = oh; ownerSel.dataset.opts = oh; }
+    sel('pjOwner', pjUi.owner); sel('pjStage', pjUi.stage); sel('pjStatus', pjUi.status); sel('pjSort', pjUi.sort);
+    const sr = document.getElementById('pjSearch'); if(sr && document.activeElement !== sr && sr.value !== pjUi.q) sr.value = pjUi.q;
+    const dn = document.getElementById('pjDone'); if(dn) dn.checked = pjUi.showDone;
+    const hidden = rows.length - rows.filter(r => !r.done || pjUi.showDone).length;
+    const cnt = document.getElementById('pjCount'); if(cnt) cnt.textContent = rows.length ? `Showing ${list.length} of ${rows.length} job${rows.length === 1 ? '' : 's'}${!pjUi.showDone && hidden && pjUi.status !== 'Lost' && pjUi.status !== 'Completed' ? ` · ${hidden} lost or completed hidden` : ''}` : '';
+    const filtered = !!(pjUi.q || pjUi.stage || pjUi.status || pjUi.owner);
+    const body = list.length ? pjTableHtml(list) + pjCardsHtml(list)
+      : `<div class="sup-empty">${rows.length ? 'No jobs match these filters.' + (filtered || !pjUi.showDone ? ' <button type="button" class="btn secondary" data-pj="clear">Clear filters</button>' : '') : 'No leads, sales deals or projects yet. Add a lead on the Lead Pipeline and it will appear here.'}</div>`;
+    pjSet(document.getElementById('pjList'), body, 'lastList');
+  }
+  pjRenderPanel(rows);
+}
+/* ---------- the side panel (full-screen sheet on a phone) ---------- */
+function pjStat(k, v, sub, cls){ return `<div class="pj-stat${cls ? ' ' + cls : ''}"><span class="k">${escHtml(k)}</span><span class="v">${v}</span>${sub ? `<span class="s">${sub}</span>` : ''}</div>`; }
+function pjLink(nav, text, sub){ return `<div class="pj-assoc"><button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(text)}</button>${sub ? `<span class="qb-dim">${sub}</span>` : ''}</div>`; }
+function pjSection(title, inner, n){ return `<section class="pj-sec"><h4>${escHtml(title)}${n !== undefined ? ` <span class="pj-n">${n}</span>` : ''}</h4>${inner}</section>`; }
+function pjHeadlineHtml(r){
+  const today = fmt(new Date()), rec = r.rec, S = [];
+  const lastContact = leadLastContact(rec);
+  if(r.pl === 'lead'){
+    S.push(pjStat('Estimate', r.value !== null ? pjMoney(r.value) : 'Not set', r.value !== null ? 'Lead estimate' : ''));
+    S.push(pjStat('Source', rec.source ? escHtml(rec.source) : 'Not set'));
+    S.push(pjStat('Last contact', lastContact ? escHtml(dShow(lastContact)) : 'None logged', lastContact ? (dashDays(lastContact, today) <= 0 ? 'Today' : pjDaysText({ days: dashDays(lastContact, today) }) + ' ago') : ''));
+    S.push(pjStat('Stale?', r.stale ? 'Yes' : 'No', r.stale ? 'Not touched for ' + r.days + ' days (limit ' + dashStaleDays() + ')' : 'Limit is ' + dashStaleDays() + ' days', r.stale ? 'bad' : ''));
+    S.push(pjStat('Next task', r.next ? escHtml(r.next.text) : 'None', r.next ? (r.next.date ? escHtml(dShow(r.next.date)) : 'No date') : '', !r.next ? 'warn' : ''));
+  } else if(r.pl === 'sales'){
+    const q = r.qpick && r.qpick.q;
+    S.push(pjStat('Quote', q ? escHtml(qRef(q)) + ` <span class="q-st q-st-${q.status}">${q.status}</span>` : 'No quote yet'));
+    if(r.value !== null) S.push(pjStat('Quote value', pjMoney(r.value), escHtml(r.valueLabel)));
+    if(q){
+      const fu = r.ctx.tasks.filter(t => t.status === 'open' && t.quoteId === q.id && t.dueDate).sort((a, b) => a.dueDate.localeCompare(b.dueDate))[0];
+      if(fu) S.push(pjStat('Follow-up due', escHtml(dShow(fu.dueDate)), escHtml(fu.title), fu.dueDate < today ? 'bad' : ''));
+      if(q.status === 'Sent'){ const vu = qValidUntil(q); if(vu) S.push(pjStat('Quote valid until', escHtml(dShow(vu)), '', vu < today ? 'bad' : '')); }
+    }
+    S.push(pjStat('Contract signed', rec.contractSigned ? escHtml(dShow(rec.contractSigned)) : 'Not yet'));
+    if(rec.probOverride !== undefined && rec.probOverride !== null && rec.probOverride !== ''){ S.push(pjStat('Win chance', Math.round(effectiveProb(rec) * 100) + '%', 'Set on the deal')); }
+    else { const st = stageById('sales', rec.stageId); if(st && st.pct !== undefined && st.pct !== '') S.push(pjStat('Win chance', Math.round(effectiveProb(rec) * 100) + '%', 'From the stage “' + escHtml(st.name) + '”')); }
+  } else {
+    const p = rec; let f = {};
+    try{
+      const ct = projContract(p), pr = projProgress(p), inv = r.ctx.inv, invoiced = inv.filter(x => x.invoicedDate).reduce((a, x) => a + x.amount, 0),
+        paid = inv.reduce((a, x) => a + (x.status === 'Paid' ? x.amount : (x.paidAmount || 0)), 0), outstanding = inv.filter(x => x.invoicedDate && x.status !== 'Paid').reduce((a, x) => a + x.amount - (x.paidAmount || 0), 0);
+      const aq = projAcceptedQuote(p); let matBudget = null;
+      if(aq){ try{ matBudget = p.plan && p.plan.quoteId === aq.id ? projPlanItems(p).tot.matPlan : qCalc(aq).materialsCost; }catch(e){} }
+      const matSpent = projActualCost(p).materials;
+      let margin = null;
+      try{ if(aq){ const m = projMargin(p); if(m) margin = { v: m.now, pct: m.nowPct, note: m.basis }; } else if(pjNum(p.agreedValue) > 0){ const cost = pjNum(p.actualCost) > 0 ? pjNum(p.actualCost) : pjNum(p.budgetedCost), v = pjNum(p.agreedValue) - cost; margin = { v, pct: v / pjNum(p.agreedValue) * 100, note: pjNum(p.actualCost) > 0 ? 'agreed value less the actual cost typed on the project' : 'agreed value less the budgeted cost' }; } }catch(e){}
+      const nd = r.deliveries.filter(x => x.date && !x.delivered).sort((a, b) => a.date.localeCompare(b.date))[0];
+      const ni = inv.filter(x => !x.invoicedDate && x.kind === 'contract' && (x.dueDate || x.raiseBy)).sort((a, b) => (a.raiseBy || a.dueDate).localeCompare(b.raiseBy || b.dueDate))[0];
+      const openVars = (p.variations || []).filter(v => v.status !== 'Invoiced').length;
+      f = { ct, pr, invoiced, paid, outstanding, matBudget, matSpent, margin, nd, ni, openVars, hasInv: inv.length > 0 };
+    }catch(e){ f = null; }
+    if(f){
+      S.push(pjStat('Contract value', f.ct.value > 0 ? pjMoney(f.ct.value) : 'Not set', f.ct.value > 0 ? escHtml(r.valueLabel) : ''));
+      if(f.pr.n) S.push(pjStat('Stage progress', Math.max(0, f.pr.i + 1) + ' of ' + f.pr.n, escHtml(stageName('project', p.stageId))));
+      if(f.hasInv){ S.push(pjStat('Invoiced', pjMoney(f.invoiced), 'As on the Invoicing page')); S.push(pjStat('Paid', pjMoney(f.paid))); S.push(pjStat('Outstanding', pjMoney(f.outstanding), '', f.outstanding > 0 && r.overdue.some(o => o.kind === 'Invoice') ? 'bad' : '')); }
+      if(f.matBudget !== null) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'of ' + pjMoney(f.matBudget) + ' budget', f.matSpent > f.matBudget + 0.5 ? 'bad' : ''));
+      else if(f.matSpent > 0) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'No budget set'));
+      if(f.margin) S.push(pjStat('Estimated margin', pjMoney(f.margin.v), Math.round(f.margin.pct) + '% · ' + escHtml(f.margin.note)));
+      S.push(pjStat('Next delivery', f.nd ? escHtml(dShow(f.nd.date)) : 'None booked', f.nd ? escHtml(f.nd.supplier) : ''));
+      S.push(pjStat('Next invoice', f.ni ? escHtml(dShow(f.ni.raiseBy || f.ni.dueDate)) : 'None to raise', f.ni ? escHtml(f.ni.desc) + ' · ' + pjMoney(f.ni.amount) : ''));
+      S.push(pjStat('Overdue items', String(r.overdue.length), r.overdue.length ? escHtml(r.overdue.slice(0, 3).map(o => o.kind + ': ' + o.text).join('; ')) : '', r.overdue.length ? 'bad' : ''));
+      S.push(pjStat('Open variations', String(f.openVars)));
+      S.push(pjStat('In progress?', pjProgText(r)));
+    }
+  }
+  return `<div class="pj-stats">${S.join('')}</div>`;
+}
+function pjAssocHtml(r){
+  const rec = r.rec, root = r.root, ctx = r.ctx, out = [];
+  // company and contacts
+  const co = rec.companyId ? coFind(rec.companyId) : null, cts = (rec.contactIds || []).map(ctFind).filter(Boolean);
+  out.push(pjSection('Company', co ? pjLink('company:' + co.id, co.name, escHtml(co.type || '')) : (rec.company ? `<div class="pj-assoc">${escHtml(rec.company)} <span class="qb-dim">(not linked to a company record)</span></div>` : '<div class="lp-empty">None.</div>')));
+  out.push(pjSection('Contacts', cts.length ? cts.map(c => pjLink('contact:' + c.id, ctName(c), escHtml([ctPhone(c), ctEmail(c)].filter(Boolean).join(' · ')))).join('') : (rec.contact ? `<div class="pj-assoc">${escHtml(rec.contact)} <span class="qb-dim">(not linked to a contact record)</span></div>` : '<div class="lp-empty">None.</div>'), cts.length));
+  // tasks and actions
+  const openT = ctx.tasks.filter(t => t.status === 'open').sort((a, b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999')), doneT = ctx.tasks.length - openT.length, today = fmt(new Date());
+  out.push(pjSection('Tasks', (openT.length ? openT.slice(0, 8).map(t => `<div class="pj-assoc"><button type="button" class="sp-link" data-pj="task" data-id="${escAttr(t.id)}">${escHtml(t.title)}</button><span class="qb-dim${t.dueDate && t.dueDate < today ? ' pj-over' : ''}">${t.dueDate ? escHtml(dShow(t.dueDate)) : 'No date'}${t.owner ? ' · ' + escHtml(t.owner) : ''}</span></div>`).join('') + (openT.length > 8 ? `<div class="qb-dim">and ${openT.length - 8} more</div>` : '') : '<div class="lp-empty">No open tasks.</div>')
+    + `<div class="pj-more"><button type="button" class="link-btn" data-pj="tasks-all" data-root="${root}">All tasks for this job${doneT ? ' (' + doneT + ' done)' : ''}</button></div>`, openT.length));
+  const openA = ctx.actions.filter(a => a.status !== 'Done');
+  out.push(pjSection('Actions', openA.length ? openA.slice(0, 6).map(a => `<div class="pj-assoc"><button type="button" class="sp-link" data-pj="action" data-i="${state.actions.indexOf(a)}">${escHtml(a.action || 'Action')}</button><span class="qb-dim${a.deadline && a.deadline < today ? ' pj-over' : ''}">${a.deadline ? escHtml(dShow(a.deadline)) : 'No deadline'}${a.owner && a.owner !== 'TBC' ? ' · ' + escHtml(a.owner) : ''}</span></div>`).join('') : '<div class="lp-empty">No open actions.</div>', openA.length));
+  // money
+  const qs = ctx.quotes.slice().sort((a, b) => b.version - a.version || b.id - a.id);
+  out.push(pjSection('Quotes', qs.length ? qs.map(q => { let t = ''; try{ t = qm(qCalc(q).totalEx) + ' ex VAT'; }catch(e){} return pjLink('quote:' + q.id, qRef(q), `<span class="q-st q-st-${q.status}">${q.status}</span> ${escHtml(t)}`); }).join('') : '<div class="lp-empty">None.</div>', qs.length));
+  out.push(pjSection('Invoices', ctx.inv.length ? ctx.inv.map(x => pjLink('invoicing:' + x.pid + ':' + (x.vid ? 'v' + x.vid : x.idx), x.desc, invPill(x.status) + ' ' + escHtml(qm(x.amount)) + (x.dueDate ? ' · due ' + escHtml(dShow(x.dueDate)) : ''))).join('') : '<div class="lp-empty">None.</div>', ctx.inv.length));
+  const pos = ctx.pos.slice().sort((a, b) => a.no - b.no);
+  out.push(pjSection('Purchase orders', pos.length ? pos.map(po => pjLink('po:' + po.id, po.ref, escHtml(po.supplierName || '') + ' ' + poPill(po))).join('') : '<div class="lp-empty">None.</div>', pos.length));
+  const supIds = [...new Set(pos.map(po => po.supplierId).concat((r.recs.project ? (r.deliveries || []).map(x => x.d.supplierId) : []).filter(Boolean)).filter(Boolean))].filter(id => supFind(id));
+  out.push(pjSection('Suppliers', supIds.length ? supIds.map(id => `<div class="pj-assoc"><button type="button" class="sp-link" data-pj="supplier" data-id="${escAttr(id)}">${escHtml(supFind(id).name || supCode(supFind(id)))}</button></div>`).join('') : '<div class="lp-empty">None.</div>', supIds.length));
+  const tx = ctx.txns.map(t => ({ t, ix: state.transactions.indexOf(t) })).sort((a, b) => String(b.t.date || '').localeCompare(String(a.t.date || '')));
+  out.push(pjSection('Transactions', tx.length ? tx.slice(0, 6).map(({ t, ix }) => pjLink('txn:' + (t.uid || ix), t.description || 'Transaction', escHtml(dShow(t.date)) + ' · ' + (Number(t.moneyIn) > 0 ? '+' + qm(t.moneyIn) : '−' + qm(t.moneyOut)))).join('') + (tx.length > 6 ? `<div class="qb-dim">and ${tx.length - 6} more on the Transactions page</div>` : '') : '<div class="lp-empty">None.</div>', tx.length));
+  const as = (state.assetPlan || []).filter(a => Number(a.projectId) === root);
+  out.push(pjSection('Assets', as.length ? as.map(a => pjLink('asset:' + a.id, a.item || 'Asset', escHtml(a.status || ''))).join('') : '<div class="lp-empty">None.</div>', as.length));
+  return out.join('');
+}
+function pjTimelineHtml(r){
+  const items = [];
+  (r.rec.comms || []).forEach(c => { if(c && c.date) items.push({ d: c.date, t: String(c.note || ''), tag: c.src === 'move' ? 'moved' : '' , o: c.created || 0 }); });
+  r.ctx.quotes.forEach(q => { if(q.sentAt) items.push({ d: q.sentAt, t: 'Quote ' + qRef(q) + ' sent', tag: 'quote', o: 0 }); if(q.acceptedDate) items.push({ d: q.acceptedDate, t: 'Quote ' + qRef(q) + ' accepted', tag: 'quote', o: 0 }); });
+  if(r.recs.project) (r.recs.project.paymentLines || []).forEach(l => { if(l.invoicedDate) items.push({ d: l.invoicedDate, t: 'Invoiced: ' + (l.desc || 'payment'), tag: 'money', o: 0 }); if(l.paidDate) items.push({ d: l.paidDate, t: 'Paid: ' + (l.desc || 'payment'), tag: 'money', o: 0 }); });
+  const today = fmt(new Date());
+  items.sort((a, b) => pjDay(b.d).localeCompare(pjDay(a.d)) || (b.o - a.o));
+  const shown = items.filter(i => pjDay(i.d) <= today).slice(0, 8);
+  return shown.length ? shown.map(i => `<div class="pj-tl"><span class="pj-tl-d">${escHtml(dShow(i.d))}</span><span class="pj-tl-t">${escHtml(i.t)}</span>${i.tag ? `<span class="pj-tl-g">${i.tag}</span>` : ''}</div>`).join('') : '<div class="lp-empty">Nothing logged yet.</div>';
+}
+function pjHistoryHtml(r){
+  const moves = (r.rec.comms || []).filter(c => c && c.src === 'move' && /^(Promoted|Returned)/.test(String(c.note || ''))).sort((a, b) => String(a.date).localeCompare(String(b.date)) || (a.created || 0) - (b.created || 0));
+  const parts = [];
+  const started = r.recs.lead ? null : (r.rec.leadSnapshot ? 'Started as a lead' : null); if(started) parts.push(started);
+  moves.forEach(m => parts.push(`${escHtml(m.note.replace(/ Pipeline/g, '').replace(/ \(.*\)$/, ''))} <span class="qb-dim">${escHtml(dShow(m.date))}</span>`));
+  const sources = r.pl !== 'lead' ? 'Now at the ' + r.stageLabel.toLowerCase() + ' stage' : '';
+  return parts.length ? `<div class="pj-hist">${parts.map(p => `<span>${p}</span>`).join('<i>→</i>')}${sources ? `<i>→</i><span><b>${escHtml(sources)}</b></span>` : ''}</div>` : '';
+}
+function pjPanelHtml(r){
+  const why = r.reasons.length ? `<div class="pj-why">${escHtml(r.status === 'Stalled' ? 'Stalled' : 'Why it needs attention')}: ${escHtml(r.reasons.join(' · '))}</div>` : '';
+  return `<div class="pj-head"><div class="pj-head-main"><div class="pj-head-top"><span class="pj-code">${escHtml(r.code)}</span>${pjStageChip(r)}${r.stageText ? `<span class="qb-dim">${escHtml(r.stageText)}</span>` : ''}${pjStChip(r.status)}</div>
+      <h3 id="pjPanelTitle" tabindex="-1" data-pj-focus="title">${escHtml(r.name)}</h3><div class="qb-dim">${escHtml(r.customer) || 'No customer name'}${r.owner ? ' · Owner ' + escHtml(r.owner) : ''}</div></div>
+      <button type="button" class="icon-btn pj-close" data-pj="close" data-pj-focus="close" aria-label="Close">${X_SVG}</button></div>
+    <div class="pj-body" id="pjBody2">${why}${pjHistoryHtml(r)}
+      <div class="btn-row pj-actions"><button type="button" class="btn" data-nav="deal2:${r.root}">Open in pipeline</button></div>
+      ${pjHeadlineHtml(r)}
+      ${pjAssocHtml(r)}
+      ${pjSection('Timeline', pjTimelineHtml(r))}</div>`;
+}
+function pjRenderPanel(rows){
+  const el = document.getElementById('pjPanel'), bd = document.getElementById('pjBackdrop'); if(!el || !bd) return;
+  if(!pjUi.openKey){ if(!el.hidden){ el.hidden = true; bd.hidden = true; pjUi.lastPanel = ''; pjUi.msg = ''; } return; }
+  rows = rows || pjRows();
+  const r = rows.find(x => x.key === pjUi.openKey);
+  const html = r ? pjPanelHtml(r) : `<div class="pj-head"><div class="pj-head-main"><h3 id="pjPanelTitle" tabindex="-1" data-pj-focus="title">This job is no longer here</h3></div><button type="button" class="icon-btn pj-close" data-pj="close" data-pj-focus="close" aria-label="Close">${X_SVG}</button></div>
+    <div class="pj-body"><div class="pj-gone" role="status">${escHtml(pjUi.msg || 'It was deleted, or moved on, by someone else. Nothing here has been changed.')}</div><div class="btn-row"><button type="button" class="btn" data-pj="close" data-pj-focus="back">Back to the list</button></div></div>`;
+  if(r) pjUi.msg = '';
+  const opening = el.hidden;
+  if(opening){ el.hidden = false; bd.hidden = false; pjUi.lastPanel = ''; }
+  const body = el, before = body.scrollTop, inner = el.querySelector('.pj-body'), ib = inner ? inner.scrollTop : 0;
+  pjSet(el, html, 'lastPanel');
+  const inner2 = el.querySelector('.pj-body'); if(inner2 && ib) inner2.scrollTop = ib; if(before) body.scrollTop = before;
+  if(opening){ const t = document.getElementById('pjPanelTitle'); if(t) try{ t.focus({ preventScroll: true }); }catch(e){} }
+}
+function pjOpen(key){ pjUi.openKey = key; pjRender(); }
+function pjOnTab(name){ if(name === 'crmprojects') pjRender(); else if(pjUi.openKey){ pjUi.openKey = ''; pjRenderPanel(); } }
+function pjClose(){
+  const key = pjUi.openKey; pjUi.openKey = ''; pjUi.msg = ''; pjRenderPanel();
+  const back = key && document.querySelector(`#pjList [data-pj-key="${CSS.escape(key)}"]`);
+  const vis = back && back.offsetParent !== null ? back : [...document.querySelectorAll(`#pjList [data-pj-key="${CSS.escape(key || '')}"]`)].find(n => n.offsetParent !== null);
+  if(vis) try{ vis.focus({ preventScroll: true }); }catch(e){}
+}
+/* ---------- events ---------- */
+document.addEventListener('click', (e) => {
+  if(!state) return;
+  const b = e.target.closest && e.target.closest('[data-pj]');
+  if(b){
+    const a = b.dataset.pj;
+    if(a === 'open') pjOpen(b.dataset.key);
+    else if(a === 'close') pjClose();
+    else if(a === 'clear'){ pjUi.q = ''; pjUi.stage = ''; pjUi.status = ''; pjUi.owner = ''; pjUi.showDone = false; pjSavePrefs(); const s = document.getElementById('pjSearch'); if(s) s.value = ''; pjRender(); }
+    else if(a === 'tile'){ pjUi.stage = pjUi.stage === b.dataset.stage ? '' : b.dataset.stage; pjSavePrefs(); pjRender(); }
+    else if(a === 'task'){ openTaskPanel(b.dataset.id); }
+    else if(a === 'action'){ const ref = state.actions[Number(b.dataset.i)]; if(ref) openActionPanel(ref); }
+    else if(a === 'supplier'){ const id = Number(b.dataset.id) || b.dataset.id; if(supFind(id)){ activateTab('suppliers'); openSupplierPanel(id); } }
+    else if(a === 'tasks-all'){ crmUi.linked = String(b.dataset.root); crmUi.scope = 'all'; crmUi.owner = ''; crmUi.tab = 'all'; activateTab('crm'); renderCrm(); }
+    return;
+  }
+  const bk = e.target.closest && e.target.closest('#pjBackdrop'); if(bk){ pjClose(); return; }
+  const nv = e.target.closest && e.target.closest('#pjPanel [data-nav]'); if(nv){ pjUi.openKey = ''; pjRenderPanel(); return; }   // going to the linked page: the back button (nav stack) brings the panel back
+  const row = e.target.closest && e.target.closest('tr[data-pj-row]');
+  if(row && !e.target.closest('button,a,input,select')){ pjOpen(row.dataset.pjRow); }
+});
+document.getElementById('pjSearch').addEventListener('input', (e) => { pjUi.q = e.target.value; pjRender(); });
+['pjStage:stage', 'pjStatus:status', 'pjOwner:owner', 'pjSort:sort'].forEach(s => { const [id, k] = s.split(':'); document.getElementById(id).addEventListener('change', (e) => { pjUi[k] = e.target.value; pjSavePrefs(); pjRender(); }); });
+document.getElementById('pjDone').addEventListener('change', (e) => { pjUi.showDone = e.target.checked; pjSavePrefs(); pjRender(); });
+document.addEventListener('keydown', (e) => {
+  const el = document.getElementById('pjPanel'); if(!el || el.hidden || !pjUi.openKey) return;
+  if(e.key === 'Escape' && document.getElementById('modalOverlay').hidden && document.getElementById('tkPanel').hidden){ e.preventDefault(); pjClose(); return; }
+  if(e.key === 'Tab' && document.getElementById('tkPanel').hidden){   // keep Tab inside the open panel
+    const f = [...el.querySelectorAll('button,a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(n => !n.disabled && n.offsetParent !== null);
+    if(!f.length) return; const first = f[0], last = f[f.length - 1], act = document.activeElement;
+    if(e.shiftKey && (act === first || act === el.querySelector('#pjPanelTitle'))){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && act === last){ e.preventDefault(); first.focus(); }
+    else if(!el.contains(act)){ e.preventDefault(); first.focus(); }
+  }
+});
+/* BT:js-projects end */
+
 /* ---------- master render ---------- */
 function render(){
   cxDirty(); cxSyncAll();   // CRM: deals and draft quotes read their customer details from the contact
@@ -11716,6 +12207,7 @@ function render(){
   renderActions();
   renderCrm();
   cxRender();
+  pjRender();
   renderToday();
   renderTaskOptions();
   applyResizable();
@@ -12091,6 +12583,7 @@ function activateTab(name){
   tab.setAttribute('aria-current', 'page');
   panel.classList.add('active');
   if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
+  try{ pjOnTab(name); }catch(e){}   // the Projects overview draws when shown and closes its panel when left
   updateScrollCues();
   try{ menuSync(); }catch(e){}   // the menus (folding group, rail, bottom bar) follow the current page
 }
