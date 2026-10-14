@@ -1529,6 +1529,11 @@
   .pw-cash .c-today { stroke: var(--bt-bad-fg); stroke-width: 1.5; opacity: .6; } .pw-cash .c-todaytx { fill: var(--bt-bad-fg); font-weight: 600; font-size: 10px; }
   .pw-cash .c-order { stroke: #8a5a7a; stroke-dasharray: 3 3; opacity: .7; } .pw-cash .c-chip { fill: #f1e6ee; stroke: #cfb3c6; } .pw-cash .c-chiptx { fill: #6a3a5a; font-weight: 600; font-size: 10px; }
   .pw-cash .c-stage { fill: var(--green); opacity: .45; }
+  .pw-pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 10px; }
+  .pw-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--bt-card); color: var(--text-muted); border-radius: 99px; padding: 3px 11px 3px 9px; font: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25); }
+  .pw-pill b { font-weight: 600; font-variant-numeric: tabular-nums; } .pw-pill .pdot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid currentColor; box-sizing: border-box; }
+  .pw-pill.on { text-decoration: none; color: var(--ink); border-color: #cfc9bb; background: #faf8f4; } .pw-pill.on.in .pdot { background: var(--bt-ok-fg); border-color: var(--bt-ok-fg); } .pw-pill.on.out .pdot { background: #8a5a7a; border-color: #8a5a7a; }
+  .pw-pill:hover { border-color: var(--oak); }
   .pw-cash-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; font-size: var(--bt-fs-xs); color: var(--text-muted); } .pw-cash-key span { display: inline-flex; align-items: center; gap: 5px; }
   .pw-cash-key .k { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--slate); display: inline-block; box-sizing: border-box; } .pw-cash-key .k.in { border-color: var(--bt-ok-fg); } .pw-cash-key .k.out { border-color: #8a5a7a; } .pw-cash-key .k.done { background: var(--slate); }
 
@@ -1537,14 +1542,19 @@
   .pw-ov { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; } .pw-ov > .pw-card { margin-bottom: 0; }
   .pw-span2 { grid-column: span 2; } .pw-span3 { grid-column: 1 / -1; }
   .pw-stack { display: grid; gap: 14px; align-content: start; } .pw-stack > .pw-card { margin-bottom: 0; }
-  .pw-evlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 22px; } .pw-evlist .pw-ev:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+
   .pw-cgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 10px; } .pw-cgrid .qual-field label { margin-bottom: 2px; }
-  .pw-notes2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .pw-notes2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .pw-custtile { display: block; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; margin-bottom: 0; } .pw-custtile:hover { border-color: var(--oak); }
+  .pw-ct-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; } .pw-ct-h b { font-size: 13px; } .pw-ct-edit { font-size: var(--bt-fs-xs); font-weight: 600; color: var(--oak-text); }
+  .pw-ct-name { display: block; font-weight: 600; font-size: 13px; overflow-wrap: anywhere; } .pw-ct-line { display: block; font-size: 12.5px; color: var(--ink); margin-top: 2px; overflow-wrap: anywhere; } .pw-ct-dim { color: var(--text-muted); }
+  .pw-cform { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; } @media (max-width: 520px) { .pw-cform { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 1199px) { .pw-ov { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pw-span3 { grid-column: 1 / -1; } .pw-stack { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 760px) { .pw-ov { grid-template-columns: minmax(0, 1fr); } .pw-span2, .pw-span3, .pw-stack { grid-column: auto; } .pw-stack { grid-template-columns: minmax(0, 1fr); } .pw-evlist { grid-template-columns: minmax(0, 1fr); } .pw-cgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pw-notes2 { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 760px) { .pw-ov { grid-template-columns: minmax(0, 1fr); } .pw-span2, .pw-span3, .pw-stack { grid-column: auto; } .pw-stack { grid-template-columns: minmax(0, 1fr); } .pw-cgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pw-notes2 { grid-template-columns: minmax(0, 1fr); } }
   @media (min-width: 701px) and (pointer: fine) {
     .pw-compact { padding: 10px var(--bt-s3); } .pw-compact h4 { margin-bottom: 6px; }
     .pw-compact .qual-field input { padding: 3px 8px; font-size: 12.5px; border-radius: 6px; } .pw-compact .qual-field label { font-size: 9.5px; }
+    .pw-evlist .pw-ev { padding: 5px 0; } .pw-evlist .pw-ev .btn { min-height: 30px; padding: 4px 10px; font-size: 11.5px; }
     .pw-compact .pw-quick { gap: 6px; } .pw-compact .btn { padding: 5px 10px; font-size: 11.5px; } .pw-compact .qual-field input, .pw-compact .btn { min-height: 0 !important; }
   }
   .q-st-Invoiced { background: #e3f0e7; color: #2f6b45; } .q-st-Invoiced::before { content: '✓\00a0'; }
@@ -5363,12 +5373,12 @@ function projOnQuoteAccepted(q){   // a quote linked to a project has just been 
 }
 
 /* ---------- Project workspace (the open project) ---------- */
-const pwUi = { id: 0, sec: 'overview', quick: null, edit: null, lock: 0, open: new Set(['overview']), folds: {}, moneyEdit: false };
+const pwUi = { id: 0, sec: 'overview', quick: null, edit: null, lock: 0, open: new Set(['overview', 'timeline']), folds: {}, moneyEdit: false, cashOff: new Set() };
 const PW_SECS = [['overview', 'Overview'], ['timeline', 'Timeline'], ['money', 'Money'], ['materials', 'Materials & deliveries'], ['plan', 'Working plan'], ['variations', 'Variations'], ['info', 'Information']];
 const PW_SEC_ALIAS = { notes: 'overview', history: 'info', changes: 'info' };   // older section names (saved views, links) land on the section that now holds them
 const pwSecKey = k => PW_SEC_ALIAS[k] || k;
-function pwOpenReset(sec){ pwUi.open = new Set(['overview']); pwUi.folds = {}; pwUi.moneyEdit = false; if(sec) pwUi.open.add(pwSecKey(sec)); }
-function openProjectWorkspace(id){ if(pwUi.edit && pwUi.edit.pid !== id) pwUi.edit = null; pwUi.id = id; pwUi.sec = 'overview'; pwOpenReset(); activateTab('projectpipeline'); closeDetail(); renderProjects(); window.scrollTo(0, 0); }
+function pwOpenReset(sec, all){ pwUi.open = new Set(['overview', 'timeline']); pwUi.folds = {}; pwUi.moneyEdit = false; pwUi.cashOff = new Set(); if(all) PW_SECS.forEach(([k]) => { if(k !== 'info') pwUi.open.add(k); }); if(sec) pwUi.open.add(pwSecKey(sec)); }   // all: a project just promoted from Sales opens every section (bar the information one) so it is clear what needs working through
+function openProjectWorkspace(id, fresh){ if(pwUi.edit && pwUi.edit.pid !== id) pwUi.edit = null; pwUi.id = id; pwUi.sec = 'overview'; pwOpenReset('', !!fresh); activateTab('projectpipeline'); closeDetail(); renderProjects(); window.scrollTo(0, 0); }
 function closeProjectWorkspace(){ pwUi.id = 0; renderProjects(); }
 function pwRel(d){
   if(!d) return ''; const n = Math.round((toDate(d) - toDate(fmt(new Date()))) / 86400000);
@@ -5406,9 +5416,12 @@ function pwHeaderHtml(p, i){
     <nav class="pw-nav" aria-label="Project sections">${PW_SECS.map(([k, n]) => `<button type="button" data-pw="sec" data-sec="${k}" class="${pwUi.sec === k ? 'active' : ''}">${n}</button>`).join('')}</nav></div>`;
 }
 function pwCustomerCardHtml(p, i){
-  const cu = projCustomer(p), f = (label, field, val, ph) => `<div class="qual-field"><label>${label}</label><input data-tab="projects" data-idx="${i}" data-field="${field}" value="${escAttr(val || '')}" placeholder="${escAttr(ph || '')}"></div>`;
-  return `<div class="pw-card pw-span2 pw-compact"><h4 title="Carried from the lead and the deal; shown even when the record was created without them">Customer and site</h4><div class="pw-cgrid">
-    ${f('Contact', 'contact', p.contact, cu.name)}${f('Company', 'company', p.company, '')}${f('Phone', 'phone', p.phone, cu.phone)}${f('Email', 'email', p.email, cu.email)}${f('Address', 'address', p.address, cu.address)}${f('Postcode', 'postcode', p.postcode, cu.postcode)}${f('Source', 'source', p.source, '')}${f('Project name', 'projectName', p.projectName, cu.projectName)}</div></div>`;
+  const cu = projCustomer(p), name = [cu.company, cu.name].filter(Boolean).join(' — '), site = [cu.address, cu.postcode && !String(cu.address || '').includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ');
+  const contact = [cu.phone, cu.email].filter(Boolean).join(' · '), src = [p.projectName || cu.projectName, p.source ? 'Source: ' + p.source : ''].filter(Boolean).join(' · ');
+  return `<button type="button" class="pw-card pw-compact pw-custtile" data-pw="quick" data-q="customer" title="Open to edit the customer and site details (they are first recorded in the Lead Pipeline)">
+    <span class="pw-ct-h"><b>Customer and site</b><span class="pw-ct-edit">✎ Edit</span></span>
+    <span class="pw-ct-name">${name ? escHtml(name) : '<i>Not recorded</i>'}</span>
+    ${contact ? `<span class="pw-ct-line">${escHtml(contact)}</span>` : ''}${site ? `<span class="pw-ct-line">${escHtml(site)}</span>` : ''}${src ? `<span class="pw-ct-line pw-ct-dim">${escHtml(src)}</span>` : ''}</button>`;
 }
 function pwEventRow(e){
   const flags = (e.flags || []).map(f => `<span class="qb-flag bad">⚠ ${escHtml(f)}</span>`).join(' '), amt = e.amount !== undefined ? `<b class="pw-amt ${e.kind}">${e.kind === 'out' ? '−' : ''}${qm(e.amount)}</b>` : '';
@@ -5776,6 +5789,7 @@ function pwClick(b){
   if(a === 'sec-toggle'){ pwSetSecOpen(b.dataset.sec, !pwUi.open.has(b.dataset.sec)); return; }
   if(a === 'fold'){ pwToggleFold(b.dataset.fold); return; }
   if(a === 'money-edit'){ pwUi.moneyEdit = !pwUi.moneyEdit; renderProjects(); return; }
+  if(a === 'cash-tog'){ const k = b.dataset.k, off = !pwUi.cashOff.has(k); if(off) pwUi.cashOff.add(k); else pwUi.cashOff.delete(k); b.classList.toggle('on', !off); b.setAttribute('aria-pressed', String(!off)); b.title = off ? 'Click to put this back in the chart' : 'Click to leave this out of the chart'; pwCashMount(); const cap = document.querySelector('#projectWorkspace .pw-cash-cap'); if(cap) cap.innerHTML = pwCashCap(p); return; }
   if(a === 'edit-begin'){ pwEditBegin(b.dataset.kind); return; }
   if(a === 'edit-save'){ pwEditSave(); return; }
   if(a === 'edit-discard'){ pwEditDiscard(); return; }
@@ -5991,7 +6005,7 @@ function pwLinksCardHtml(p){
   return `<div class="pw-card"><h4>Files and links <span class="qb-dim">(drawings, photos, folders: paste the link)</span></h4>${links || '<div class="pw-empty">No links yet.</div>'}<button class="btn secondary qb-sm" data-pw="add-link" style="margin-top:8px;">+ Add link</button></div>`;
 }
 function pwNotesCardHtml(p, i){
-  return `<div class="pw-card pw-span3"><h4>Notes</h4><div class="pw-notes2"><div class="detail-notes" style="margin:0;"><label>Notes</label><input data-tab="projects" data-idx="${i}" data-field="notes" value="${escAttr(p.notes || '')}"></div>
+  return `<div class="pw-card"><h4>Notes</h4><div class="pw-notes2"><div class="detail-notes" style="margin:0;"><label>Notes</label><input data-tab="projects" data-idx="${i}" data-field="notes" value="${escAttr(p.notes || '')}"></div>
     <div class="detail-notes" style="margin:0;"><label>Testimonial</label><input data-tab="projects" data-idx="${i}" data-field="testimonial" value="${escAttr(p.testimonial || '')}" placeholder="Capture the client's words at sign-off"></div></div></div>`;
 }
 function pwOverviewHtml(p, i){
@@ -6055,18 +6069,26 @@ function pwMoneyHtml(p, i){
     </div></section>`;
 }
 /* money in and out against the timeline: a step line of the running balance (in minus out), drawn from the payment lines, the supplier due dates and the order date */
-function pwCashEvents(p){
+const PW_CASH = [['cust', 'Customer payments', true], ['var', 'Variations', true], ['sup', 'Supplier payments', false], ['direct', 'Direct costs', false], ['lab', 'Labour', false]];   // [key, label, money in?]
+function pwCashAll(p){
   const today = fmt(new Date()), ev = [];
-  p.paymentLines.forEach(l => { const amt = Number(l.amount) || 0, d = l.paidDate || l.dueDate || l.invoicedDate; if(!amt || !d) return; ev.push({ date: d, amt, inn: true, done: !!l.paidDate, title: l.desc || 'Payment' }); });
-  projDeliveries(p).drops.forEach(x => { const d = x.paid || x.due; if(!(x.out > 0) || !d) return; ev.push({ date: d, amt: -x.out, inn: false, done: !!x.paid, title: x.supplier, ordered: projOrderDate(p) }); });
-  ev.forEach(e => { e.when = e.date; e.late = !e.done && e.date < today; if(e.late) e.date = today; });   // money still owed from the past is drawn at today, flagged
-  return ev.sort((a, b) => a.date.localeCompare(b.date) || b.amt - a.amt);
+  finLines().filter(x => x.pid === p.id && (x.kind === 'custPay' || x.kind === 'supPay')).forEach(x => { const d = x.paidDate || x.date; if(!(x.amount > 0) || !d) return; ev.push({ k: x.kind === 'supPay' ? 'sup' : x.variation ? 'var' : 'cust', date: d, when: d, amt: x.kind === 'supPay' ? -x.amount : x.amount, done: !!x.done, title: x.label.replace(/^Scope addition /, '') }); });
+  (state.transactions || []).filter(t => t.projectId === p.id && Number(t.moneyOut) > 0 && !t.planned && t.date).forEach(t => ev.push({ k: 'direct', date: t.date, when: t.date, amt: -Number(t.moneyOut), done: true, title: t.description || 'Direct cost' }));   // paid and not part of a plan line (planned ones already show as supplier payments)
+  const wq = projWorkQuote(p); let unplaced = 0;
+  if(wq && wq.labour && wq.labour.length){   // planned labour cost, placed at the end of the stage it belongs to
+    const c = qCalc(wq), prof = 1 + (Number(state.settings.labourProfitPct) || 0) / 100, by = {};
+    wq.labour.forEach(r => { const x = c.labour[r.id]; if(!x || x.excluded || !(x.amount > 0)) return; const st = r.stageId && (p.stages || []).find(g => slEnsure(g).id === r.stageId), d = st && (st.end || st.start); if(!d){ unplaced++; return; } (by[st.id] = by[st.id] || { st, d, sum: 0 }).sum += x.amount / prof; });
+    Object.values(by).forEach(g => ev.push({ k: 'lab', date: g.d, when: g.d, amt: -r2(g.sum), done: g.d <= today, title: (g.st.label || 'Stage') + ' labour (planned)' }));
+  }
+  ev.forEach(e => { e.inn = e.amt > 0; e.late = !e.done && e.date < today; if(e.late) e.date = today; });   // money still owed from the past is drawn at today, flagged
+  ev.unplaced = unplaced; return ev;
 }
+function pwCashEvents(p){ const ev = pwCashAll(p).filter(e => !pwUi.cashOff.has(e.k)); return ev.sort((a, b) => a.date.localeCompare(b.date) || b.amt - a.amt); }
 const pwK = v => { const a = Math.abs(v), t = a >= 10000 ? Math.round(a / 1000) + 'k' : a >= 1000 ? (Math.round(a / 100) / 10) + 'k' : String(Math.round(a)); return (v < 0 ? '−' : '') + '£' + t; };
 function pwNiceStep(raw){ const m = Math.pow(10, Math.floor(Math.log10(raw || 1))), r = raw / m; return (r <= 1 ? 1 : r <= 2 ? 2 : r <= 5 ? 5 : 10) * m; }
 function pwCashSvg(p, W){
-  const ev = pwCashEvents(p), today = fmt(new Date()), order = projOrderDate(p), hasDrops = ev.some(e => !e.inn);
-  if(!ev.length) return '<div class="pw-empty">Nothing to draw yet: add payment lines (money in) and supplier due dates (money out).</div>';
+  const ev = pwCashEvents(p), today = fmt(new Date()), order = projOrderDate(p), hasDrops = ev.some(e => e.k === 'sup');
+  if(!ev.length) return '<div class="pw-empty">Nothing to draw: switch a component back on above, or add payment lines (money in) and supplier due dates (money out).</div>';
   const st = (p.stages || []).filter(s => s.start || s.end).slice(0, 8), H = 250 + st.length * 9, ml = 50, mr = 22, mt = 20, mb = 26 + (st.length ? st.length * 9 + 8 : 0), pw = Math.max(120, W - ml - mr), ph = H - mt - mb;
   const ds = ev.map(e => e.date).concat([today]); if(order && hasDrops) ds.push(order); st.forEach(s => ds.push(s.start || s.end, s.end || s.start)); ds.sort();
   const lo = addDaysIso(ds[0], -2), hi = addDaysIso(ds[ds.length - 1], 6), span = Math.max(1, Math.round((toDate(hi) - toDate(lo)) / 86400000)), X = d => ml + Math.round((toDate(d) - toDate(lo)) / 86400000) / span * pw;
@@ -6076,8 +6098,8 @@ function pwCashSvg(p, W){
   let xt = ''; for(let d = new Date(toDate(lo).getFullYear(), toDate(lo).getMonth() + 1, 1); d <= toDate(hi); d = new Date(d.getFullYear(), d.getMonth() + 1, 1)){ const x = X(fmt(d)); if(x > ml + pw - 34) break; xt += `<line x1="${x}" x2="${x}" y1="${mt}" y2="${mt + ph}" class="c-grid"/><text x="${x + 3}" y="${mt + ph + 14}">${d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}</text>`; }
   let path = `M${X(lo)},${yz}`, prev = 0; ev.forEach((e, k) => { path += ` L${X(e.date)},${Y(prev)} L${X(e.date)},${Y(pts[k])}`; prev = pts[k]; }); path += ` L${X(hi)},${Y(prev)}`;
   const area = path + ` L${X(hi)},${yz} L${X(lo)},${yz} Z`, tx = X(today), id = 'pwc' + p.id;
-  const marks = ev.map((e, k) => `<circle cx="${X(e.date)}" cy="${Y(pts[k])}" r="4.5" class="c-pt ${e.inn ? 'in' : 'out'}${e.done ? ' done' : ''}${e.late ? ' late' : ''}"><title>${escHtml(e.title)}: ${e.inn ? '+' : '−'}${qm(Math.abs(e.amt))} · ${e.done ? 'paid ' : e.late ? 'was due ' : 'due '}${pwD(e.when)}${e.late ? ' (overdue, drawn at today)' : ''} · balance after ${qm(pts[k])}</title></circle>${ev.length <= 8 ? `<text x="${X(e.date)}" y="${Y(pts[k]) + (e.inn ? -9 : 17)}" text-anchor="middle" class="c-lab ${e.inn ? 'in' : 'out'}">${e.inn ? '+' : '−'}${pwK(Math.abs(e.amt)).replace('−', '')}</text>` : ''}`).join('');
-  const dues = ev.filter(e => !e.inn).map(e => e.when).sort(), note = order && hasDrops ? `<line x1="${X(order)}" x2="${X(order)}" y1="${mt}" y2="${mt + ph}" class="c-order"/><g transform="translate(${Math.min(X(order), ml + pw - 66)},${mt - 17})"><rect width="66" height="15" rx="7.5" class="c-chip"/><text x="33" y="10.5" text-anchor="middle" class="c-chiptx">Ordered</text><title>Materials ordered ${pwD(order)}. A purchase is a commitment, not cash out: suppliers are paid on their due dates${dues.length ? ' (' + pwD(dues[0]) + (dues.length > 1 ? ' to ' + pwD(dues[dues.length - 1]) : '') + ')' : ''}.</title></g>` : '';
+  const marks = ev.map((e, k) => `<circle cx="${X(e.date)}" cy="${Y(pts[k])}" r="4.5" class="c-pt ${e.inn ? 'in' : 'out'}${e.done ? ' done' : ''}${e.late ? ' late' : ''}"><title>${escHtml(e.title)}: ${e.inn ? '+' : '−'}${qm(Math.abs(e.amt))} · ${e.done ? 'paid ' : e.late ? 'was due ' : 'due '}${pwD(e.when)}${e.late ? ' (overdue, drawn at today)' : ''} · balance after ${qm(pts[k])}</title></circle>${ev.length <= 10 ? `<text x="${X(e.date)}" y="${Y(pts[k]) + (e.inn ? -9 : 17)}" text-anchor="middle" class="c-lab ${e.inn ? 'in' : 'out'}">${e.inn ? '+' : '−'}${pwK(Math.abs(e.amt)).replace('−', '')}</text>` : ''}`).join('');
+  const dues = ev.filter(e => e.k === 'sup').map(e => e.when).sort(), note = order && hasDrops ? `<line x1="${X(order)}" x2="${X(order)}" y1="${mt}" y2="${mt + ph}" class="c-order"/><g transform="translate(${Math.min(X(order), ml + pw - 66)},${mt - 17})"><rect width="66" height="15" rx="7.5" class="c-chip"/><text x="33" y="10.5" text-anchor="middle" class="c-chiptx">Ordered</text><title>Materials ordered ${pwD(order)}. A purchase is a commitment, not cash out: suppliers are paid on their due dates${dues.length ? ' (' + pwD(dues[0]) + (dues.length > 1 ? ' to ' + pwD(dues[dues.length - 1]) : '') + ')' : ''}.</title></g>` : '';
   const strip = st.map((s, k) => { const a = s.start || s.end, b = s.end || s.start; return `<rect x="${X(a)}" y="${mt + ph + 26 + k * 9}" width="${Math.max(3, X(addDaysIso(b, 1)) - X(a))}" height="6" rx="3" class="c-stage"><title>${escHtml(s.label || 'Stage')} · ${pwD(a)} → ${pwD(b)}</title></rect>`; }).join('');
   return `<svg class="pw-cash" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Running balance of money in minus money out across the project timeline">
     <defs><clipPath id="${id}up"><rect x="${ml}" y="${mt}" width="${pw}" height="${Math.max(0, yz - mt)}"/></clipPath><clipPath id="${id}dn"><rect x="${ml}" y="${yz}" width="${pw}" height="${Math.max(0, mt + ph - yz)}"/></clipPath><clipPath id="${id}now"><rect x="${ml}" y="0" width="${Math.max(0, Math.min(pw, tx - ml))}" height="${H}"/></clipPath></defs>
@@ -6086,17 +6108,23 @@ function pwCashSvg(p, W){
     ${note}<line x1="${tx}" x2="${tx}" y1="${mt}" y2="${mt + ph}" class="c-today"/><text x="${tx + 3}" y="${mt + ph - 5}" class="c-todaytx">Today</text>${marks}
     <line x1="${ml}" x2="${ml + pw}" y1="${mt + ph}" y2="${mt + ph}" class="c-axis"/>${strip}</svg>`;
 }
+function pwCashCap(p){
+  const ev = pwCashEvents(p), all = pwCashAll(p); let cum = 0, low = 0, lowAt = ''; ev.forEach(e => { cum += e.amt; if(cum < low){ low = cum; lowAt = e.when; } });
+  const parts = [!ev.length ? '' : low < -0.5 ? `Lowest point <b class="over">${qm(low)}</b> on ${pwD(lowAt)}: more has gone out than has come in by then.` : 'The balance never drops below zero: the money in lands before the money out.'];
+  if(all.unplaced && !pwUi.cashOff.has('lab')) parts.push(`${all.unplaced} labour line${all.unplaced === 1 ? ' has' : 's have'} no stage dates, so ${all.unplaced === 1 ? 'it is' : 'they are'} left off.`);
+  return parts.filter(Boolean).join(' ');
+}
 function pwCashCardHtml(p){
-  const ev = pwCashEvents(p); let cum = 0, low = 0, lowAt = ''; ev.forEach(e => { cum += e.amt; if(cum < low){ low = cum; lowAt = e.when; } });
-  const cap = !ev.length ? '' : low < -0.5 ? `Lowest point <b class="over">${qm(low)}</b> on ${pwD(lowAt)}: supplier payments are due before enough has come in.` : `The balance never drops below zero: the money in lands before the money out.`;
-  return `<div class="pw-card"><h4>Money in and out <span class="qb-dim">(running balance against the timeline)</span></h4><div class="pw-cash-box" data-pid="${p.id}"></div>
-    <div class="pw-cash-key"><span><i class="k in"></i>Money in</span><span><i class="k out"></i>Money out</span><span><i class="k done"></i>Paid</span><span><i class="k"></i>Expected</span><span>Solid line to today, dashed after</span></div>${cap ? `<p class="q-help">${cap}</p>` : ''}
-    <p class="q-help">A purchase made before the first payment is shown as an “Ordered” note: it is a commitment, and the money only leaves on the supplier’s due date. Stage bars sit under the dates.</p></div>`;
+  const all = pwCashAll(p), pills = PW_CASH.filter(c => all.some(e => e.k === c[0])).map(([k, n, inn]) => { const on = !pwUi.cashOff.has(k), tot = all.filter(e => e.k === k).reduce((a, e) => a + Math.abs(e.amt), 0); return `<button type="button" class="pw-pill ${inn ? 'in' : 'out'}${on ? ' on' : ''}" data-pw="cash-tog" data-k="${k}" aria-pressed="${on}" title="${on ? 'Click to leave this out of the chart' : 'Click to put this back in the chart'}"><i class="pdot"></i>${n} <b>${pwK(tot).replace('−', '')}</b></button>`; }).join('');
+  const cap = pwCashCap(p);
+  return `<div class="pw-card"><h4>Money in and out <span class="qb-dim">(running balance against the timeline)</span></h4>${pills ? `<div class="pw-pills" role="group" aria-label="What the chart includes">${pills}</div>` : ''}<div class="pw-cash-box" data-pid="${p.id}"></div>
+    <div class="pw-cash-key"><span><i class="k in"></i>Money in</span><span><i class="k out"></i>Money out</span><span><i class="k done"></i>Paid</span><span><i class="k"></i>Expected</span><span>Solid line to today, dashed after</span></div><p class="q-help pw-cash-cap">${cap}</p>
+    <p class="q-help">A purchase made before the first payment is shown as an “Ordered” note: it is a commitment, and the money only leaves on the supplier’s due date. Labour is the planned cost placed at the end of each stage. Stage bars sit under the dates.</p></div>`;
 }
 function pwCashMount(){
   document.querySelectorAll('#projectWorkspace .pw-cash-box').forEach(box => {
     const w = Math.floor(box.clientWidth), p = state.projects.find(x => x.id === Number(box.dataset.pid)); if(!p || w < 120) return;
-    if(box.dataset.w === String(w) && box.firstChild) return; box.dataset.w = w; box.innerHTML = pwCashSvg(p, w);
+    const key = w + '|' + [...pwUi.cashOff].sort().join(','); if(box.dataset.w === key && box.firstChild) return; box.dataset.w = key; box.innerHTML = pwCashSvg(p, w);
   });
 }
 let pwCashT = 0; window.addEventListener('resize', () => { clearTimeout(pwCashT); pwCashT = setTimeout(pwCashMount, 120); });
@@ -6105,24 +6133,32 @@ function pwChangeLogBody(p){
   return log.length ? log.map(c => `<details class="pw-chg"><summary><span class="pw-chg-when">${escHtml(new Date(c.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }))}</span> · <b>${escHtml(c.by || 'someone')}</b> · ${escHtml(PW_EDIT_NAME[c.kind] || c.kind)} <span class="qb-flag">${escHtml(causeName(c.cause))}</span> <span class="pw-chg-r">${escHtml(c.reason)}</span></summary>
       <ul>${(c.changes || []).map(x => `<li>${escHtml(x)}</li>`).join('')}</ul></details>`).join('') : '<div class="pw-empty">No changes logged yet. Saving an edit to the timeline, deliveries or the Working plan records who, when, what and why here.</div>';
 }
-function pwProjectInfoBody(p){
-  const cu = projCustomer(p), ct = projContract(p), aq = projAcceptedQuote(p), ms = state.pipelineStages.project.filter(s => s.key), done = ms.filter(s => p.milestones[s.key] && p.milestones[s.key] <= fmt(new Date())).length, pg = projProgress(p);
-  const row = (k, v) => `<dt>${k}</dt><dd>${v || '—'}</dd>`;
-  return `<dl class="ro-grid">${row('Project code', recordCode(p.id, 'project'))}${row('Project name', escHtml(p.name))}${row('Stage', pg.i >= 0 ? escHtml(stageName('project', p.stageId)) + ' (stage ' + (pg.i + 1) + ' of ' + pg.n + ')' : 'Not started')}
-    ${row('Customer', escHtml([cu.company, cu.name].filter(Boolean).join(' — ')))}${row('Site', escHtml([cu.address, cu.postcode].filter(Boolean).join(', ')))}${row('Source', escHtml(p.source || ''))}
-    ${row('Contract value (ex VAT)', qm(ct.value) + (ct.live ? ' <span class="qb-dim">live from the accepted quote</span>' : ' <span class="qb-dim">typed, no accepted quote yet</span>'))}${row('Accepted quote', aq ? escHtml(qRef(aq)) : '')}${row('Milestones done', done + ' of ' + ms.length)}</dl>`;
-}
+/* Sales: the deal as it stood in the Sales Pipeline when it was promoted */
 function pwSalesBody(p){
-  const ss = p.salesSnapshot;
-  return ss ? `<dl class="ro-grid"><dt>Sales stage</dt><dd>${escHtml(stageName('sales', ss.stageId))}</dd><dt>Quoted value</dt><dd>${ss.quoteValue ? money(ss.quoteValue) : '—'}</dd><dt>Contract signed</dt><dd>${pwD(ss.contractSigned)}</dd></dl>` : '<div class="pw-empty">This project was promoted before sales details were kept.</div>';
+  const ss = p.salesSnapshot; if(!ss) return '<div class="pw-empty">This project was promoted before sales details were kept.</div>';
+  const row = (k, v) => `<dt>${k}</dt><dd>${v || '—'}</dd>`, prob = Math.round(effectiveProb(ss) * 100);
+  return `<dl class="ro-grid">${row('Sales stage', escHtml(stageName('sales', ss.stageId)))}${row('Quoted value', ss.quoteValue ? money(ss.quoteValue) : '')}${row('Win chance', prob + '%' + (ss.probOverride !== undefined && ss.probOverride !== null && ss.probOverride !== '' ? ' <span class="qb-dim">typed, not from the stage</span>' : ''))}${row('Deal tier', escHtml(ss.tier || ''))}${row('Deal type', ss.type === 'example' ? 'Worked example' : 'Real')}${row('Contract signed', ss.contractSigned ? pwD(ss.contractSigned) : '')}</dl>`;
+}
+/* Project info: what was collected while this was a sales project that is not a lead detail and is not shown elsewhere in the project view (the scoped cost of each stage, any other sales field, the sales notes if they have since changed) */
+const pwSalesKnown = () => ['id', 'name', 'comms', 'stages', 'leadSnapshot', 'projectHold', 'salesHold', 'stageId', 'quoteValue', 'contractSigned', 'probability', 'probOverride', 'tier', 'type', 'notes', 'leadNotes'].concat(CARRY_FIELDS);
+function pwProjectInfoBody(p){
+  const ss = p.salesSnapshot, st = (p.stages || []).filter(s => Number(s.cost) > 0), tot = st.reduce((a, s) => a + (Number(s.cost) || 0), 0), out = [];
+  if(st.length) out.push(`<div class="q-sub" style="margin-top:0;">Scoped cost of each stage <span class="qb-dim">(estimated in the Sales Pipeline)</span></div><table class="qb-table qb-narrow pw-itab"><thead><tr><th>Stage</th><th>Kind</th><th class="r">Scoped cost</th></tr></thead><tbody>${st.map(s => `<tr><td>${escHtml(s.label || 'Stage')}</td><td>${escHtml((STAGE_KINDS[s.kind] || {}).label || s.kind || '')}</td><td class="qb-calc">${qm(s.cost)}</td></tr>`).join('')}</tbody><tfoot><tr class="qb-foot"><td><b>Total</b></td><td></td><td class="qb-calc"><b>${qm(tot)}</b></td></tr></tfoot></table>`);
+  if(ss){
+    const extra = Object.keys(ss).filter(k => !pwSalesKnown().includes(k) && ss[k] !== '' && ss[k] !== null && ss[k] !== undefined && typeof ss[k] !== 'object');
+    const rows = extra.map(k => `<dt>${escHtml(k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()))}</dt><dd>${escHtml(String(ss[k]))}</dd>`);
+    if(ss.notes && String(ss.notes).trim() !== String(p.notes || '').trim()) rows.push(`<dt>Sales notes when promoted</dt><dd>${escHtml(ss.notes)}</dd>`);
+    if(rows.length) out.push(`<dl class="ro-grid"${out.length ? ' style="margin-top:10px;"' : ''}>${rows.join('')}</dl>`);
+  }
+  return out.length ? out.join('') : '<div class="pw-empty">Nothing further was collected in the Sales Pipeline: the lead details, the sales deal and the stage dates are all shown elsewhere.</div>';
 }
 function pwInfoHtml(p, i){
   const nc = (p.comms || []).length, nl = (p.changeLog || []).length;
   return `<section class="pw-sec" id="pw-info" data-sec="info"><h3>Information</h3>
     ${pwFold('i-notes', 'Timeline of notes', nc ? nc + (nc === 1 ? ' entry' : ' entries') : 'No entries yet', '', commsBlockHtml('project', p, i, 'projcomms'), false)}
     ${pwFold('i-lead', 'Lead info', 'The original lead details carried across when this was promoted', `<button class="btn secondary qb-sm" data-action="return-record" data-pl="project" data-id="${p.id}">← Return to Sales Pipeline</button>`, leadInfoHtml(p), false)}
-    ${pwFold('i-sales', 'Sales', 'How this began as a sales deal', '', pwSalesBody(p), false)}
-    ${pwFold('i-proj', 'Project info', 'The project record at a glance', '', pwProjectInfoBody(p), false)}
+    ${pwFold('i-sales', 'Sales', 'The deal as it stood when it was promoted', '', pwSalesBody(p), false)}
+    ${pwFold('i-proj', 'Project info', 'Collected in the Sales Pipeline and not shown elsewhere', '', pwProjectInfoBody(p), false)}
     ${pwFold('i-log', 'Change log', nl ? nl + (nl === 1 ? ' change' : ' changes') + ' recorded' : 'No changes recorded yet', '', pwChangeLogBody(p), false)}</section>`;
 }
 /* one-click actions: the date defaults to today; clearing offers Undo */
@@ -6145,6 +6181,8 @@ function pwQuickOpen(kind, sid){
   else if(kind === 'milestone'){ const open = state.pipelineStages.project.filter(s => s.key && !(p.milestones[s.key] && p.milestones[s.key] <= today)); title = 'Mark milestone done'; body = `<div class="lp-f"><label>Milestone</label><select id="pwqMs">${o(open.map(s => [s.key, s.name]), open[0] && open[0].key)}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>`; }
   else if(kind === 'invoice' || kind === 'paid'){ const f = kind === 'invoice' ? 'invoicedDate' : 'paidDate', open = p.paymentLines.map((l, ix) => [String(ix), `${l.desc || 'Payment'} · ${qm(l.amount)}${l.dueDate ? ' · due ' + l.dueDate : ''}`, l]).filter(x => !x[2][f]); title = kind === 'invoice' ? 'Mark invoice sent' : 'Mark paid'; body = open.length ? `<div class="lp-f"><label>Payment line</label><select id="pwqPay">${o(open.map(x => [x[0], x[1]]), open[0][0])}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>` : '<div class="pw-empty">Every payment line already has this date.</div>'; }
   else if(kind === 'varapprove'){ const v = (p.variations || []).find(x => x.id === sid); title = 'Approve ' + (v ? v.ref : 'variation'); body = `<p class="q-help" style="margin:0 0 8px;">${v ? escHtml(v.desc) + ' · ' + qm(v.price) + ' ex VAT' : ''}</p><label class="q-check"><input type="checkbox" id="pwqTick"> The customer has approved this variation</label><div class="lp-f"><label>Who approved it</label><input id="pwqWho" value="${escAttr(projCustomer(p).name)}"></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>When</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>How</label><select id="pwqHow">${VAR_HOW.map(h => `<option value="${h[0]}">${h[1]}</option>`).join('')}</select></div></div><div class="lp-f"><label>Attachment (optional, up to 1.2 MB)</label><input type="file" id="pwqFile" accept="image/*,application/pdf,.eml,.msg"></div><div class="chg-err" id="pwqErr"></div>`; }
+  else if(kind === 'customer'){ const cu = projCustomer(p), f = (label, field, val, ph) => `<div class="lp-f"><label>${label}</label><input id="pwqc_${field}" value="${escAttr(val || '')}" placeholder="${escAttr(ph || '')}"></div>`; title = 'Customer and site';
+    body = `<p class="q-help" style="margin:0 0 8px;">First recorded in the Lead Pipeline and carried across. Change it here only if it has changed since.</p><div class="pw-cform">${f('Contact', 'contact', p.contact, cu.name)}${f('Company', 'company', p.company, '')}${f('Phone', 'phone', p.phone, cu.phone)}${f('Email', 'email', p.email, cu.email)}${f('Address', 'address', p.address, cu.address)}${f('Postcode', 'postcode', p.postcode, cu.postcode)}${f('Source', 'source', p.source, '')}${f('Project name', 'projectName', p.projectName, cu.projectName)}</div>`; }
   else if(kind === 'note'){ title = 'Add note'; body = `<div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>Note</label><textarea id="pwqNote" rows="3" maxlength="300"></textarea></div>`; }
   document.getElementById('pwqTitle').textContent = title; document.getElementById('pwqBody').innerHTML = body + '<div class="modal-actions"><button class="btn secondary" type="button" data-pwq="cancel">Cancel</button><button class="btn" type="button" data-pwq="save">Save</button></div>';
   document.getElementById('pwqOverlay').hidden = false; const f = document.querySelector('#pwqBody input:not([type=date]), #pwqBody textarea, #pwqBody select'); if(f) f.focus();
@@ -6156,6 +6194,7 @@ function pwQuickSave(){
     slEnsure(s); s.log.push({ id: qRand('lg_'), date, hours: h, note: v('pwqNote').trim() }); showToast(`Logged ${hrs(h)} on ${s.label || 'the stage'}`);
   } else if(qk.kind === 'milestone'){ const key = v('pwqMs'); if(!key) return; p.milestones[key] = date; const auto = autoProjectStageId(p), list = state.pipelineStages.project; if(auto && list.findIndex(x => x.id === auto) > list.findIndex(x => x.id === p.stageId)) p.stageId = auto; showToast('Milestone marked done'); }
   else if(qk.kind === 'invoice' || qk.kind === 'paid'){ const l = p.paymentLines[Number(v('pwqPay'))]; if(!l){ pwQuickClose(); return; } if(qk.kind === 'invoice') l.invoicedDate = date; else { l.paidDate = date; if(!l.invoicedDate) l.invoicedDate = date; } showToast(qk.kind === 'invoice' ? 'Invoice marked sent' : 'Marked paid'); }
+  else if(qk.kind === 'customer'){ ['contact', 'company', 'phone', 'email', 'address', 'postcode', 'source', 'projectName'].forEach(k => { p[k] = v('pwqc_' + k).trim(); }); showToast('Customer and site details saved'); }
   else if(qk.kind === 'note'){ const n = v('pwqNote').trim(); if(!n) return; p.comms = p.comms || []; p.comms.push({ date, note: n, created: Date.now() }); showToast('Note added'); }
   pwQuickClose(); render(); saveState();
 }
@@ -9478,7 +9517,7 @@ function promoteToProject(id){
   { const aq = projAcceptedQuote(proj); if(aq && !s.projectHold && !(Number(proj.agreedValue) > 0)) proj.agreedValue = qCalc(aq).totalEx; }
   { const aq = projAcceptedQuote(proj); if(aq && !s.projectHold){ projApplyPlan(proj, aq, projPlanSync(proj, aq), false); proj.paymentLines.sort((a, b) => String(a.dueDate || '9999').localeCompare(String(b.dueDate || '9999'))); moveLog(proj, `Payment lines built from the accepted quote ${qRef(aq)}`); } }   // on win: the money events come from the quote's payment schedule
   render(); saveState();
-  openProjectWorkspace(proj.id);
+  openProjectWorkspace(proj.id, true);
 }
 function returnToLead(id){
   const idx = state.pipeline.findIndex(p => p.id === id); if(idx < 0) return;
