@@ -1501,6 +1501,8 @@
   .inv-st { display: inline-block; padding: 2px 10px; border-radius: var(--bt-r-pill); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
   .inv-st-Unconfirmed { background: #ebe8e1; color: #4d4a43; } .inv-st-Pending { background: #e2ecf8; color: #234f8a; } .inv-st-Sent { background: #e2ecf8; color: #234f8a; } .inv-st-Due { background: #fdeccb; color: #7a4b00; }
   .inv-st-Overdue { background: #fbe3e0; color: #a4302a; } .inv-st-Queried { background: #fdeccb; color: #7a4b00; } .inv-st-Partpaid { background: #e2ecf8; color: #234f8a; } .inv-st-Paid { background: #e3f0e7; color: #2f6b45; } .inv-st-Warning { background: #7a1f1a; color: #fff; }
+  .inv-st-Issued { background: #ebe8e1; color: #4d4a43; } .inv-st-Void { background: #fbe3e0; color: #a4302a; text-decoration: line-through; } .inv-st-Credited, .inv-st-Creditnote { background: #fdeccb; color: #7a4b00; } .inv-st-Issued::before { content: '○\00a0'; }
+  .inv-sect td { background: var(--bt-chalk); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
   .inv-st-Unconfirmed::before { content: '○\00a0'; } .inv-st-Pending::before, .inv-st-Sent::before, .inv-st-Partpaid::before { content: '●\00a0'; } .inv-st-Due::before, .inv-st-Queried::before { content: '▲\00a0'; } .inv-st-Overdue::before, .inv-st-Warning::before { content: '!\00a0'; } .inv-st-Paid::before { content: '✓\00a0'; }
   .inv-tools { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: var(--bt-s3) 0; } .inv-legend { display: flex; gap: 6px; flex-wrap: wrap; } .inv-filter { font-size: var(--bt-fs-xs); color: var(--slate); display: flex; align-items: center; gap: 6px; }
   .inv-table td { vertical-align: top; } .inv-table input[type=date] { min-width: 128px; } .inv-table input.qb-n { width: 92px; } .inv-acts { white-space: nowrap; } .inv-acts .btn { margin: 0 var(--bt-s1) var(--bt-s1) 0; }
@@ -1673,10 +1675,10 @@
 .rf-lines { max-height: 280px; overflow: auto; border: 1px solid var(--bt-line); border-radius: var(--bt-r-btn); }
 .rf-lines label.q-check { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--bt-line); margin: 0; }
 .rf-out { border: 1px solid var(--bt-line); border-radius: var(--bt-r-btn); padding: var(--bt-s3); margin-bottom: var(--bt-s3); }
-.iv-frame { width: 100%; height: 420px; border: 1px solid var(--bt-line); border-radius: var(--bt-r-btn); background: #e9e7e2; }
+.iv-frame { width: 100%; height: 560px; border: 1px solid var(--bt-line); border-radius: var(--bt-r-btn); background: #e9e7e2; }
 .iv-acts { display: flex; flex-wrap: wrap; gap: var(--bt-s2); margin: var(--bt-s3) 0; }
 .iv-hist { font-size: 13px; } .iv-hist div { padding: 3px 0; border-bottom: 1px dotted var(--bt-line); }
-.iv-two { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: var(--bt-s4); }
+.iv-two { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: var(--bt-s4); } .iv-g2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-s3); }
 @media (max-width: 900px){ .cx-prof .cx-two, .iv-two { grid-template-columns: 1fr; } }
 @media (max-width: 760px){ .cx-hide-m { display: none; } .cx-quick .cx-qa, .cx-qa { grid-template-columns: 1fr 1fr; } .cx-dup-cols { grid-template-columns: 1fr; } .cx-tl-row { grid-template-columns: 78px 1fr 28px; } .cx-tl-row .cx-tl-tag { display: none; } }
 @media (max-width: 560px){ .cx-hide-s { display: none; } .cx-listrow .cx-lab { width: 40%; flex-basis: 40%; } .cx-qa { grid-template-columns: 1fr; } .mail-sent { flex-wrap: wrap; } }
@@ -1687,6 +1689,7 @@
 .rf-banner { border-left: 4px solid var(--bt-oak-500); margin-bottom: var(--bt-s4); }
 .rf-hist summary { cursor: pointer; font-size: 13px; color: var(--text-muted); }
 @media (max-width: 700px){ .qb-sec-h { flex-wrap: wrap; gap: var(--bt-s2); } .qb-sec-tools { flex-wrap: wrap; } .qb-sec-tools select { max-width: 100%; } }
+.inv-tools .view-toggle { flex-wrap: wrap; max-width: 100%; }
 /* BT:css end */
 </style>
 </head>
@@ -8824,7 +8827,7 @@ function invRows(){
   state.projects.forEach(p => {
     projEnsure(p); const code = recordCode(p.id, 'project'), n = p.paymentLines.length;
     p.paymentLines.forEach((l, idx) => {
-      const r = { pid: p.id, pname: p.name, code, kind: 'contract', idx, seq: idx + 1, of: n, desc: l.desc || 'Payment', amount: Number(l.amount) || 0, dueDate: l.dueDate || '', invoicedDate: l.invoicedDate || '', paidDate: l.paidDate || '', paidAmount: Number(l.paidAmount) || 0, queried: !!l.queried, queryNote: l.queryNote || '', confirmed: !!l.confirmed };
+      const r = { pid: p.id, pname: p.name, code, kind: 'contract', idx, uid: l.uid || '', seq: idx + 1, of: n, desc: l.desc || 'Payment', amount: Number(l.amount) || 0, dueDate: l.dueDate || '', invoicedDate: l.invoicedDate || '', paidDate: l.paidDate || '', paidAmount: Number(l.paidAmount) || 0, queried: !!l.queried, queryNote: l.queryNote || '', confirmed: !!l.confirmed };
       r.raiseBy = r.dueDate ? addDaysIso(r.dueDate, -terms) : ''; r.status = invStatus(r); rows.push(r);
     });
     (p.variations || []).forEach(v => {
@@ -8843,12 +8846,13 @@ function invRowHtml(r, i){
   const acts = []; const st = r.status;
   if(r.blocked) acts.push(`<button type="button" class="btn secondary qb-sm" disabled title="A variation cannot be invoiced until it is Approved">Blocked: awaiting approval</button>${finSrcLink({ t: 'project', id: r.pid, sec: 'variations' }, 'Approve →')}`);
   else {
+    { const ib = ivRowBtns(r); if(ib) acts.push(ib); }   // Create invoice / the invoice number / Create reminder
     if(st === 'Unconfirmed') acts.push(`<button type="button" class="btn secondary qb-sm" data-inv-a="confirm" ${at}>Confirm ready</button>`);
     if(!r.invoicedDate && !r.blocked) acts.push(`<button type="button" class="btn qb-sm" data-inv-a="sent" ${at}>Mark sent</button>`);
     if(r.invoicedDate && st !== 'Paid') acts.push(`<button type="button" class="btn qb-sm" data-inv-a="paid" ${at}>Mark paid</button>`);
     if(r.invoicedDate && st !== 'Paid') acts.push(`<button type="button" class="btn secondary qb-sm" data-inv-a="query" ${at}>${r.queried ? 'Clear query' : 'Mark queried'}</button>`);
   }
-  const inp = (f, val, type) => `<input type="${type || 'date'}" ${at} data-inv="${f}" value="${escAttr(val === 0 && type === 'number' ? 0 : (val || ''))}"${type === 'number' ? ' step="any" min="0" class="qb-n"' : ''}${r.blocked ? ' disabled' : ''}>`;
+  const inp = (f, val, type) => `<input type="${type || 'date'}" ${at} data-inv="${f}" value="${escAttr(val === 0 && type === 'number' ? 0 : (val || ''))}"${type === 'number' ? ' step="any" min="0" class="qb-n"' : ''}${r.blocked || ((f === 'amount' || f === 'dueDate') && ivRowDoc(r)) ? ' disabled title="Locked: this line has an invoice. Void the invoice to change it."' : ''}>`;
   const flash = invUi.flash === r.pid + ':' + key;
   return `<tr class="inv-row inv-${r.status.replace(/\s+/g, '')}${r.kind === 'variation' ? ' inv-var' : ''}${flash ? ' inv-flash' : ''}"><td><button type="button" class="sp-link" data-nav="project:${r.pid}:money">${escHtml(r.code)}</button><div class="qb-dim">${escHtml(r.pname)}</div></td>
     <td>${r.kind === 'variation' ? '<span class="qb-flag manual">scope addition</span> ' : ''}${escHtml(r.desc)}${r.kind === 'contract' ? `<div class="qb-dim">${r.seq} of ${r.of}</div>` : ''}${r.queried && r.queryNote ? `<div class="qb-warn">Query: ${escHtml(r.queryNote)}</div>` : ''}</td>
@@ -8867,7 +8871,7 @@ function invStrip(p, rows){
 }
 function renderInvoicing(){
   const el = document.getElementById('invoicingBody'); if(!el) return;
-  const all = invRows(), views = [['all', 'All invoices'], ['project', 'By project'], ['live', 'Live'], ['pending', 'Pending']];
+  const all = invRows(), views = [['all', 'All invoices'], ['project', 'By project'], ['live', 'Live'], ['pending', 'Pending'], ['docs', 'Invoice documents']];
   const f = r => invUi.status === 'all' || r.status === invUi.status;
   const unraised = all.filter(r => !r.invoicedDate), outstanding = all.filter(r => r.invoicedDate && r.status !== 'Paid').reduce((a, r) => a + r.amount - (r.paidAmount || 0), 0), overdue = all.filter(r => r.status === 'Overdue' || r.status === 'Warning');
   const kpi = (l, v, s, c) => `<div class="kpi" style="--accent:${c}"><div class="label">${l}</div><div class="value">${v}</div><div class="fin-sub">${s}</div></div>`;
@@ -8875,11 +8879,12 @@ function renderInvoicing(){
   if(invUi.view === 'project'){
     const byP = {}; all.forEach(r => (byP[r.pid] = byP[r.pid] || []).push(r));
     body = Object.keys(byP).map(id => { const p = state.projects.find(x => x.id === Number(id)), rows = byP[id].filter(f); if(!p || (invUi.status !== 'all' && !rows.length)) return '';
-      return `<div class="card inv-proj"><div class="qb-sec-h"><h4><button type="button" class="sp-link" data-nav="project:${p.id}:money">${escHtml(recordCode(p.id, 'project'))}</button> ${escHtml(p.name)}</h4></div>${invStrip(p, byP[id])}<div class="qb-scroll"><table class="qb-table inv-table">${INV_HEAD}<tbody>${rows.map(invRowHtml).join('')}</tbody></table></div></div>`; }).join('') || '<div class="sup-empty">No projects with invoices yet.</div>';
+      return `<div class="card inv-proj"><div class="qb-sec-h"><h4><button type="button" class="sp-link" data-nav="project:${p.id}:money">${escHtml(recordCode(p.id, 'project'))}</button> ${escHtml(p.name)}</h4></div>${invStrip(p, byP[id])}<div class="qb-scroll"><table class="qb-table inv-table">${INV_HEAD}<tbody>${ivRowsHtml(rows)}</tbody></table></div></div>`; }).join('') || '<div class="sup-empty">No projects with invoices yet.</div>';
+  } else if(invUi.view === 'docs'){ body = ivDocsHtml();
   } else {
     let rows = all.filter(f); if(invUi.view === 'live') rows = rows.filter(r => INV_LIVE.includes(r.status)); else if(invUi.view === 'pending') rows = rows.filter(r => r.status === 'Unconfirmed' || r.status === 'Pending');
     rows.sort((a, b) => String(a.dueDate || '9999').localeCompare(String(b.dueDate || '9999')));
-    body = `<div class="card"><div class="qb-scroll"><table class="qb-table inv-table">${INV_HEAD}<tbody>${rows.map(invRowHtml).join('') || '<tr><td colspan="9"><div class="sup-empty">Nothing in this view.</div></td></tr>'}</tbody></table></div></div>`;
+    body = `<div class="card"><div class="qb-scroll"><table class="qb-table inv-table">${INV_HEAD}<tbody>${ivRowsHtml(rows) || '<tr><td colspan="9"><div class="sup-empty">Nothing in this view.</div></td></tr>'}</tbody></table></div></div>`;
   }
   el.innerHTML = `<div class="kpi-row">${kpi('Not yet raised', qm(unraised.reduce((a, r) => a + r.amount, 0)), unraised.length + ' invoice' + (unraised.length === 1 ? '' : 's') + ' (' + all.filter(r => r.status === 'Pending').length + ' ready to raise)', 'var(--slate)')}${kpi('Outstanding', qm(outstanding), 'raised, not yet paid', 'var(--oak)')}${kpi('Overdue', qm(overdue.reduce((a, r) => a + r.amount - (r.paidAmount || 0), 0)), overdue.length + ' invoice' + (overdue.length === 1 ? '' : 's') + (overdue.some(r => r.status === 'Warning') ? ' · ' + overdue.filter(r => r.status === 'Warning').length + ' beyond ' + invWarnDays() + ' days' : ''), '#b3453f')}</div>
     <div class="inv-tools"><div class="view-toggle" role="group" aria-label="View">${views.map(([v, n]) => `<button type="button" data-inv-view="${v}" class="${invUi.view === v ? 'active' : ''}">${n}</button>`).join('')}</div>
@@ -8892,6 +8897,7 @@ document.addEventListener('click', async (e) => {
   const p = state.projects.find(x => x.id === Number(b.dataset.invPid)); if(!p) return; const k = b.dataset.invK, t = k.startsWith('v') ? (p.variations || []).find(x => x.id === k.slice(1)) : p.paymentLines[Number(k)]; if(!t) return;
   const today = fmt(new Date()), a = b.dataset.invA;
   if(a === 'confirm') t.confirmed = true;
+  else if(a === 'sent' && ivInterceptSent(p, k, t)){ return; }   // a line with an invoice document is marked sent through the invoice
   else if(a === 'sent'){ if(k.startsWith('v') && !varCanInvoice(t)){ showToast('A variation cannot be invoiced until it is Approved'); return; } t.invoicedDate = today; if(k.startsWith('v')){ t.status = 'Invoiced'; t.dueDate = addDaysIso(today, Number(state.settings.paymentTermsDays) || 0); } }
   else if(a === 'paid'){ if(typeof txnOpenComplete === 'function'){ txnOpenComplete(k.startsWith('v') ? 'vp:' + p.id + ':' + k.slice(1) : 'cp:' + p.id + ':' + k); return; } t.paidDate = today; }
   else if(a === 'query'){
@@ -9011,6 +9017,7 @@ function txnCompleteSave(){
   const tx = { uid: qRand('tx_'), date, description: (t.dir === 'out' ? 'Payment: ' : 'Receipt: ') + t.label, category: t.dir === 'out' ? 'Materials' : 'Income', moneyIn: t.dir === 'in' ? a : 0, moneyOut: t.dir === 'out' ? a : 0, linkedCode: '', projectId: p.id, projCat: t.dir === 'out' ? 'Materials' : '', planned: true, srcKey: t.key, plannedAmount: t.amount, variance: d, varianceReason: reason, file: finUi.file };
   if(kind === 'sp'){ p.dropState[ref] = p.dropState[ref] || {}; p.dropState[ref].paid = date; if(poNote) tx.poNote = poNote; if(typeof poMarkFromTxn === 'function') poMarkFromTxn(p, ref, tx); }
   else { const tgt = kind === 'vp' ? (p.variations || []).find(x => x.id === ref) : p.paymentLines[Number(ref)]; if(!tgt) return finClose(); tx.linkedCode = kind === 'cp' ? recordCode(p.id, 'project') + '-INV' + (Number(ref) + 1) : recordCode(p.id, 'project') + '-' + (tgt.ref || 'VAR');
+    try{ ivOnPayment(p, kind, tgt, a, date); }catch(e){}
     tgt.paidAmount = (Number(tgt.paidAmount) || 0) + a; if(!tgt.invoicedDate) tgt.invoicedDate = date; if(part) tgt.paidDate = ''; else { tgt.paidDate = date; } }
   state.transactions.push(tx); finClose(); saveState(); render(); showToast('Transaction recorded' + (diff ? ' with a variance note' : ''));
 }
@@ -11727,7 +11734,7 @@ table.dfoot{margin-left:auto;min-width:48%;border-collapse:collapse}table.dfoot 
 @media print{body{background:#fff;padding:0}.dbar{display:none}.dsheet{padding:0;max-width:none}}`;
 }
 function docBodyHtml(spec){
-  const B = docBusiness(), e = escHtml, nl = s => e(s).replace(/\n/g, '<br>');
+  const B = Object.assign(docBusiness(), spec.biz || {}), e = escHtml, nl = s => e(s).replace(/\n/g, '<br>');
   const brand = `<div class="dbrand">${B.logo ? `<img src="${escAttr(B.logo)}" alt="">` : ''}<div class="nm">${e(B.name)}</div>${B.tagline ? `<div class="tg">${e(B.tagline)}</div>` : ''}</div>`;
   const from = `<div class="dfrom"><b>${e(B.name)}</b><br>${nl(B.address)}${B.phone ? '<br>' + e(B.phone) : ''}${B.email ? '<br>' + e(B.email) : ''}${B.website ? '<br>' + e(B.website) : ''}${B.vatNumber ? '<br>VAT no. ' + e(B.vatNumber) : ''}${B.companyNumber ? '<br>Company no. ' + e(B.companyNumber) : ''}</div>`;
   const meta = (spec.meta || []).filter(m => m[1] !== '' && m[1] != null).map(m => `<span>${e(m[0])}</span><span>${e(m[1])}</span>`).join('');
@@ -11742,9 +11749,9 @@ function docBodyHtml(spec){
     ${(spec.footer || []).filter(Boolean).length ? `<div class="dfooter">${spec.footer.filter(Boolean).map(f => nl(f)).join('<br>')}</div>` : ''}</div>`;
 }
 function docHtml(spec, o){
-  o = o || {}; const B = docBusiness(), e = escHtml;
+  o = o || {}; const B = Object.assign(docBusiness(), spec.biz || {}), e = escHtml;
   return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(spec.fileName || spec.number || spec.docType)}</title><style>${docCss(B)}</style></head><body>
-    <div class="dbar"><span>Choose <b>Save as PDF</b> as the destination in the print dialog.</span><button onclick="window.print()">Print / Save as PDF</button></div>${docBodyHtml(spec)}
+    ${o.noBar ? '' : '<div class="dbar"><span>Choose <b>Save as PDF</b> as the destination in the print dialog.</span><button onclick="window.print()">Print / Save as PDF</button></div>'}${docBodyHtml(spec)}
     ${o.autoPrint ? '<script>window.addEventListener("load",function(){setTimeout(function(){try{window.print()}catch(e){}},500)})<\/script>' : ''}</body></html>`;
 }
 /* opens the document in a new tab (print dialog = Download PDF). If pop-ups are blocked the HTML file is downloaded instead. */
@@ -12324,7 +12331,7 @@ function cxQuotesHtml(sc){
 }
 function cxInvoicesHtml(sc){
   const docs = sc.docs.slice().sort((a, b) => b.seq - a.seq).map(i => { const st = ivDisplayStatus(i); return `<tr><td><button type="button" class="sp-link" data-iv="open" data-id="${escAttr(i.id)}">${escHtml(i.number)}</button></td><td>${escHtml(i.desc || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(Math.abs(i.total))}</td><td>${invPill(st)}</td></tr>`; }).join('');
-  const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : String(r.idx)))).map(r => `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${r.vid ? 'v' + r.vid : r.idx}">${escHtml(r.code)}</button></td><td>${escHtml(r.desc)}</td><td>${r.invoicedDate ? escHtml(dShow(r.invoicedDate)) : '—'}</td><td>${r.dueDate ? escHtml(dShow(r.dueDate)) : '—'}</td><td class="qb-calc">${qm(r.amount)}</td><td>${invPill(r.status)}</td></tr>`).join('');
+  const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : r.uid))).map(r => `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${r.vid ? 'v' + r.vid : r.idx}">${escHtml(r.code)}</button></td><td>${escHtml(r.desc)}</td><td>${r.invoicedDate ? escHtml(dShow(r.invoicedDate)) : '—'}</td><td>${r.dueDate ? escHtml(dShow(r.dueDate)) : '—'}</td><td class="qb-calc">${qm(r.amount)}</td><td>${invPill(r.status)}</td></tr>`).join('');
   return `<div class="card"><div class="qb-sec-h"><h4>Invoices <span class="qb-dim">(status colours as on the Invoicing page${qVatOn() ? '; amounts inc VAT' : ''})</span></h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Invoice</th><th>For</th><th>Issued / sent</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${docs}${rest || ''}${docs || rest ? '' : '<tr><td colspan="6"><div class="sup-empty">No invoices yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function cxPaymentsHtml(sc){
@@ -12340,7 +12347,7 @@ function cxTimeline(owner, sc, isCompany){
     if(d.rec.createdAt) out.push({ date: d.rec.createdAt, created: 0, text: `${d.pl === 'lead' ? 'Lead' : d.pl === 'sales' ? 'Deal' : 'Project'} ${d.code} created (${d.name})`, tag: d.code, nav: 'deal2:' + d.root, auto: true });
   });
   sc.quotes.forEach(q => (q.timeline || []).forEach(t => { if(t.kind === 'rfq') return; out.push({ date: t.date, created: t.created || 0, text: t.note, tag: qRef(q), nav: 'quote:' + q.id }); }));
-  sc.docs.forEach(i => (i.history || []).forEach(h => out.push({ date: h.date, created: h.at || 0, text: h.what + (h.by ? ' · by ' + h.by : ''), tag: i.number, iv: i.id })));
+  sc.docs.filter(i => !sc.deals.some(d => d.root === i.pid)).forEach(i => (i.history || []).forEach(h => out.push({ date: h.date, created: h.at || 0, text: h.what + (h.by ? ' · by ' + h.by : ''), tag: i.number, iv: i.id })));
   return out.sort((a, b) => String(b.date).localeCompare(String(a.date)) || b.created - a.created);
 }
 function cxTimelineHtml(owner, sc, kind){
@@ -12952,10 +12959,280 @@ document.addEventListener('click', (e) => {
 }, true);
 /* BT:js-rfq end */
 /* BT:js-invoice begin */
-function invEnsureModel(o){ o.invoices = Array.isArray(o.invoices) ? o.invoices : []; return o; }
-function invSettingsMissing(){ return []; }
-function invMaxUsed(){ return 0; }
-function ivDisplayStatus(i){ return i.status; }
+/* =====================================================================
+   PHASE 3: INVOICE CREATION AND SENDING
+   There is no accounting software: the tracker makes the invoice. The Invoicing page keeps working from the projects' payment schedule and approved variations;
+   this adds a locked invoice DOCUMENT for a schedule line or a variation.
+   state.invoices[] = { id, number, seq, kind 'invoice'|'credit', status 'Issued'|'Sent'|'Void', pid, key ('v'+variationId | payment line uid), lineUid, vid, desc,
+     issueDate, termsDays, dueDate, customer{ contactId, name, company, address, email }, contactIds[], companyId, projectRef, projectName, siteAddress,
+     lines[{ desc, amountEx }], amountEx, vatOn, vatRate, vat, total, reference, lateWording, footer, note, biz{ …business and bank details as they were },
+     sentDate, sentTo, voidedAt, voidedBy, voidReason, replacedBy, replaces, creditFor, creditedBy, prevDue, reminders[{ date, to, by }], history[{ at, date, by, what }] }
+   Once created nothing on it is edited. A mistake is corrected by voiding (with a reason) and issuing a replacement, or by a credit note. Numbers are never reused.
+   Amounts follow the existing VAT handling: the payment schedule stores what is payable (inc VAT when VAT is on), so the net and VAT are split back out using the
+   accepted quote's own ex / inc totals; variations are stored ex VAT and VAT is added per Settings.
+   ===================================================================== */
+function ivNorm(i){
+  const str = v => v == null ? '' : String(v), iso = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : '', num = v => Number(v) || 0;
+  i.id = str(i.id); i.number = str(i.number); i.seq = Math.max(0, Math.floor(num(i.seq))); i.kind = i.kind === 'credit' ? 'credit' : 'invoice'; i.status = ['Issued', 'Sent', 'Void'].includes(i.status) ? i.status : 'Issued';
+  i.pid = num(i.pid); i.key = str(i.key); i.contactIds = Array.isArray(i.contactIds) ? i.contactIds.map(String) : [];
+  ['issueDate', 'dueDate', 'sentDate', 'voidedAt', 'prevDue'].forEach(k => { i[k] = iso(i[k]); });
+  i.lines = (Array.isArray(i.lines) ? i.lines : []).filter(x => x && typeof x === 'object').map(x => ({ desc: str(x.desc), amountEx: num(x.amountEx) }));
+  i.history = (Array.isArray(i.history) ? i.history : []).filter(h => h && typeof h === 'object').map(h => ({ at: num(h.at), date: iso(h.date), by: str(h.by), what: str(h.what) }));
+  i.reminders = (Array.isArray(i.reminders) ? i.reminders : []).filter(h => h && typeof h === 'object').map(h => ({ date: iso(h.date), to: str(h.to), by: str(h.by) }));
+  ['amountEx', 'vat', 'total', 'vatRate', 'termsDays'].forEach(k => { i[k] = num(i[k]); }); i.customer = (i.customer && typeof i.customer === 'object') ? i.customer : {};
+  return i;
+}
+function invEnsureModel(o){
+  o.invoices = (Array.isArray(o.invoices) ? o.invoices : []).filter(i => i && typeof i === 'object' && i.id).map(ivNorm);
+  const st = o.settings; if(st){ const mi = o.invoices.filter(i => i.kind === 'invoice').reduce((a, i) => Math.max(a, i.seq), 0), mc = o.invoices.filter(i => i.kind === 'credit').reduce((a, i) => Math.max(a, i.seq), 0); if(st.invoiceNext <= mi) st.invoiceNext = mi + 1; if(st.creditNext <= mc) st.creditNext = mc + 1; }
+  return o;
+}
+function invMaxUsed(){ return (state.invoices || []).filter(i => i.kind === 'invoice').reduce((a, i) => Math.max(a, i.seq), 0); }
+function ivPad(n){ return String(n).padStart(4, '0'); }
+function ivAlloc(kind){
+  const st = state.settings;
+  if(kind === 'credit'){ const seq = Math.max(st.creditNext, (state.invoices || []).filter(i => i.kind === 'credit').reduce((a, i) => Math.max(a, i.seq), 0) + 1); st.creditNext = seq + 1; return { seq, number: st.creditPrefix + ivPad(seq) }; }
+  const seq = Math.max(st.invoiceNext, invMaxUsed() + 1); st.invoiceNext = seq + 1; return { seq, number: st.invoicePrefix + ivPad(seq) };
+}
+function invSettingsMissing(){
+  const st = state.settings, B = docBusiness(), out = [];
+  if(!String((state.branding && state.branding.name) || '').trim()) out.push('Business name (Settings > General > Branding)');
+  if(!B.address) out.push('Business address (Settings > Quotes & pricing)');
+  if(!B.email && !B.phone) out.push('Business email or phone (Settings > Quotes & pricing)');
+  if(st.vatRegistered && !String(st.vatNumber || '').trim()) out.push('VAT number');
+  if(!B.bank.account) out.push('Bank account name'); if(!B.bank.sort) out.push('Bank sort code'); if(!B.bank.no) out.push('Bank account number');
+  return out;
+}
+/* ---------- finding the thing being invoiced ---------- */
+function ivTarget(p, key){
+  if(!p) return null; if(String(key).startsWith('v')) return (p.variations || []).find(v => v.id === String(key).slice(1)) || null;
+  return (p.paymentLines || []).find(l => l.uid === key) || null;
+}
+function ivActive(pid, key){ if(!key) return null; return (state.invoices || []).find(i => i.kind === 'invoice' && i.pid === pid && i.key === key && i.status !== 'Void' && !i.creditedBy) || null; }
+function ivRowFor(i){ return invRows().find(r => r.pid === i.pid && (String(i.key).startsWith('v') ? r.vid === String(i.key).slice(1) : r.uid === i.key)) || null; }
+function ivDisplayStatus(i){
+  if(i.kind === 'credit') return 'Credit note'; if(i.status === 'Void') return 'Void'; if(i.creditedBy) return 'Credited'; if(i.status === 'Issued') return 'Issued';
+  const r = ivRowFor(i); return r ? r.status : 'Sent';
+}
+function ivVatRate(){ return qVatOn() ? Number(state.settings.vatRate) || 0 : 0; }
+function ivCompute(p, key){
+  const t = ivTarget(p, key); if(!t) return null;
+  if(String(key).startsWith('v')){ const net = r2(Number(t.price) || 0), vat = varVat(t); return { net, vat, total: r2(net + vat), label: 'Scope addition ' + t.ref + (t.desc ? ': ' + t.desc : ''), short: t.ref, variation: true, t }; }
+  const total = r2(Number(t.amount) || 0); let net = total, vat = 0;
+  if(qVatOn()){ const aq = projAcceptedQuote(p), c = aq ? (aq.asSold || qCalc(aq)) : null, ratio = c && c.totalInc > 0 ? c.totalEx / c.totalInc : 1 / vatMul(); net = r2(total * ratio); vat = r2(total - net); }
+  const aq = projAcceptedQuote(p);
+  return { net, vat, total, label: (t.desc || 'Payment') + (aq ? ' (quote ' + qRef(aq) + ')' : ''), short: t.desc || 'Payment', variation: false, t };
+}
+function ivCustomerSnap(contactIds, addrIdx, p){
+  const c = ctFind((contactIds || []).find(id => ctFind(id))), cu = projCustomer(p), co = coFind(p.companyId) || null;
+  if(c){ const a = c.addresses[Math.min(addrIdx || 0, Math.max(0, c.addresses.length - 1))]; return { contactId: c.id, name: ctName(c), company: co ? co.name : (cu.company || ''), address: a ? [a.v, a.postcode && !a.v.includes(a.postcode) ? a.postcode : ''].filter(Boolean).join('\n') : '', email: ctEmail(c) }; }
+  return { contactId: '', name: cu.name || co && co.name || '', company: co ? co.name : (cu.company || ''), address: [cu.address, cu.postcode && !String(cu.address).includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join('\n'), email: cu.email || '' };
+}
+function ivBizSnap(){ const B = docBusiness(); return { name: B.name, tagline: B.tagline, address: B.address, phone: B.phone, email: B.email, website: B.website, vatNumber: B.vatNumber, companyNumber: B.companyNumber, bank: Object.assign({}, B.bank) }; }
+function ivRef(number){ return String(state.settings.invoiceRefFormat || '{invoice_number}').replace(/\{invoice_number\}/g, number); }
+function ivBuild(d, number, seq){
+  const p = state.projects.find(x => x.id === d.pid), c = ivCompute(p, d.key), cust = ivCustomerSnap(d.contactIds, d.addrIdx, p), st = state.settings, aq = projAcceptedQuote(p);
+  return { id: '', number, seq: seq || 0, kind: 'invoice', status: 'Issued', pid: p.id, key: d.key, desc: d.desc, issueDate: d.issueDate, termsDays: d.terms, dueDate: d.due, customer: cust, contactIds: (d.contactIds || []).slice(), companyId: p.companyId || '',
+    projectRef: recordCode(p.id, 'project') + ' ' + p.name, projectName: p.name, quoteRef: aq ? qRef(aq) : '', siteAddress: [p.address, p.postcode && !String(p.address || '').includes(p.postcode) ? p.postcode : ''].filter(Boolean).join(', '),
+    lines: [{ desc: d.desc, amountEx: c.net }], amountEx: c.net, vatOn: qVatOn(), vatRate: ivVatRate(), vat: c.vat, total: c.total, reference: ivRef(number), lateWording: st.invoiceLateWording, footer: st.invoiceFooter, note: d.note || '', biz: ivBizSnap(),
+    sentDate: '', sentTo: '', replaces: d.replaces || '', reminders: [], history: [] };
+}
+function ivSpec(inv, draft){
+  const B = inv.biz || docBusiness(), bank = B.bank || {}, cu = inv.customer || {}, credit = inv.kind === 'credit', sign = credit ? -1 : 1, f = n => (credit && n ? '−' : '') + qm(Math.abs(n));
+  const rows = inv.lines.map(l => [l.desc, f(l.amountEx)]), foot = [['Subtotal ex VAT', f(inv.amountEx)]]; if(inv.vatOn) foot.push([`VAT at ${inv.vatRate}%`, f(inv.vat)]); foot.push([credit ? 'Total credited' : 'Total due', f(inv.total), true]);
+  const pay = [`<table class="dask"><tr><td class="l">Account name</td><td>${escHtml(bank.account || '')}</td></tr><tr><td class="l">Sort code</td><td>${escHtml(bank.sort || '')}</td></tr><tr><td class="l">Account number</td><td>${escHtml(bank.no || '')}</td></tr>${bank.name ? `<tr><td class="l">Bank</td><td>${escHtml(bank.name)}</td></tr>` : ''}<tr><td class="l">Payment reference</td><td><b>${escHtml(inv.reference)}</b></td></tr></table>`];
+  return { docType: credit ? 'Credit note' : 'Invoice', number: inv.number, fileName: inv.number + ' ' + (cu.name || ''), draft: !!draft, voided: inv.status === 'Void', biz: B,
+    meta: [[credit ? 'Credit date' : 'Invoice date', docDateLong(inv.issueDate)], [credit ? '' : 'Due date', credit ? '' : docDateLong(inv.dueDate)], ['Project', inv.projectRef], ['Quote', inv.quoteRef], credit ? ['Credits invoice', inv.creditForNumber || ''] : ['Payment terms', inv.termsDays + ' days']],
+    to: { title: credit ? 'Credit to' : 'Invoice to', lines: [cu.name, cu.company && cu.company !== cu.name ? cu.company : '', ...String(cu.address || '').split('\n'), cu.email].filter(Boolean) },
+    aside: inv.siteAddress ? [{ title: 'Site', lines: [inv.siteAddress] }] : [],
+    tables: [{ head: [{ t: 'Description' }, { t: 'Amount ex VAT', n: 1 }], rows, foot }],
+    blocks: credit ? [] : [{ title: 'How to pay', html: pay[0] }],
+    notes: [inv.note, credit ? ('Reason: ' + (inv.reason || '')) : inv.lateWording, B.vatNumber ? '' : ''].filter(Boolean),
+    footer: [inv.footer, [B.companyNumber ? 'Company no. ' + B.companyNumber : '', B.vatNumber ? 'VAT no. ' + B.vatNumber : ''].filter(Boolean).join(' · ')] };
+}
+function ivLog(inv, text, contact){
+  tlHist(inv, text); tlDeal(inv.pid, `${inv.kind === 'credit' ? 'Credit note' : 'Invoice'} ${inv.number} · ${text}`, { src: 'invoice', contact: !!contact });
+}
+/* ---------- the Invoicing page hooks ---------- */
+function ivRowBtns(r){
+  const key = r.vid ? 'v' + r.vid : r.uid, doc = r.uid || r.vid ? ivActive(r.pid, key) : null, at = `data-iv-pid="${r.pid}" data-iv-k="${escAttr(r.vid ? 'v' + r.vid : String(r.idx))}"`, out = [];
+  if(doc) out.push(`<button type="button" class="btn secondary qb-sm" data-iv="open" data-id="${escAttr(doc.id)}" title="Open the invoice">${escHtml(doc.number)}</button>`);
+  else if(!r.invoicedDate && !r.paidDate && (r.status === 'Pending' || r.status === 'Unconfirmed' || (r.vid && !r.blocked))) out.push(`<button type="button" class="btn qb-sm" data-iv="create" ${at}>Create invoice</button>`);
+  if(doc && (r.status === 'Overdue' || r.status === 'Warning')) out.push(`<button type="button" class="btn secondary qb-sm" data-iv="reminder" data-id="${escAttr(doc.id)}">Create reminder</button>`);
+  return out.join(' ');
+}
+/* the schedule's "Mark sent" for a line that has an invoice document goes through the invoice, so the document and the schedule never disagree */
+function ivInterceptSent(p, k, t){
+  const key = k.startsWith('v') ? k : t.uid; const doc = key ? ivActive(p.id, key) : null; if(!doc || doc.status !== 'Issued') return false;
+  ivSentDialog(doc); return true;
+}
+function ivOnPayment(p, kind, tgt, amount, date){
+  const key = kind === 'vp' ? 'v' + tgt.id : tgt.uid, doc = key ? ivActive(p.id, key) : null;
+  tlDeal(p.id, `Payment received ${qm(amount)}${doc ? ' against ' + doc.number : ''} on ${dShow(date)}`, { src: 'payment', contact: true });
+  if(doc) tlHist(doc, `Payment received ${qm(amount)} on ${dShow(date)}`);
+}
+/* ---------- create ---------- */
+const ivUi = { d: null, vid: '' };
+function ivGoSettings(){ btClose(1); navGo(() => { activateTab('settings'); settingsShow('docs', true); window.scrollTo(0, 0); }); }
+function ivCreateOpen(pid, k, replaces){
+  const p = state.projects.find(x => x.id === pid); if(!p) return; const isVar = String(k).startsWith('v');
+  let key = k, t;
+  if(isVar){ t = ivTarget(p, k); if(!t) return; if(!varCanInvoice(t)){ showToast('A variation cannot be invoiced until it is Approved (ticked, who, when and how).'); return; } }
+  else { t = p.paymentLines[Number(k)]; if(!t) return; if(!t.uid){ t.uid = qRand('pl_'); saveState(); } key = t.uid; }
+  const existing = ivActive(p.id, key); if(existing){ ivView(existing.id); return; }
+  if(t.invoicedDate && !replaces){ showToast('This line is already marked as invoiced (made outside the tracker).'); return; }
+  const miss = invSettingsMissing();
+  if(miss.length){ btModal('Fill these in before your first invoice', `<p>An invoice needs these details, and they are not set yet:</p><ul>${miss.map(m => `<li>${escHtml(m)}</li>`).join('')}</ul><p class="q-help">Business and bank details live in Settings &gt; Documents &amp; email. Nothing has been created.</p><div class="modal-actions"><button type="button" class="btn secondary" data-bt="close">Not now</button><button type="button" class="btn" data-iv="goto-settings">Open Settings</button></div>`, { narrow: true }); return; }
+  const c = ivCompute(p, key), deal = dealRecord(p.id), ids = (deal && deal.rec.contactIds || []).filter(id => ctFind(id)), terms = Number(state.settings.paymentTermsDays) || 0, issue = fmt(new Date());
+  ivUi.d = { pid, key, issueDate: issue, terms, due: addDaysIso(issue, terms), dueManual: false, contactIds: ids, addrIdx: 0, desc: (isVar ? c.label : (c.label + ' · ' + p.name)), note: '', replaces: replaces || '' };
+  ivRenderCreate();
+}
+function ivRenderCreate(){
+  const d = ivUi.d, p = state.projects.find(x => x.id === d.pid), c = ivCompute(p, d.key), at = ivBuild(d, ivAllocPreview()), cu = at.customer, ct = ctFind(d.contactIds[0]);
+  btModal('Create invoice' + (d.replaces ? ' (replacement)' : ''), `<div class="iv-two"><div>
+      <div class="lp-f"><label>Customer <span class="qb-dim">(from Contacts)</span></label>${d.contactIds.length ? d.contactIds.filter(id => ctFind(id)).map((id, i) => cxChip(ctFind(id), { primary: false })).join('<br>') : `<div class="qb-dim">No contact linked: the name typed on the project is used.</div>`}
+        <div style="margin-top:6px"><button type="button" class="btn secondary qb-sm" data-iv="pick-customer">${d.contactIds.length ? 'Change customer' : 'Choose a contact'}</button></div>
+        ${ct && ct.addresses.length > 1 ? `<label class="qb-dim" style="display:block;margin-top:6px">Address to use<select data-ivd="addrIdx">${ct.addresses.map((a, i) => `<option value="${i}"${d.addrIdx === i ? ' selected' : ''}>${escHtml((a.label ? a.label + ': ' : '') + a.v.replace(/\n/g, ', ').slice(0, 50))}</option>`).join('')}</select></label>` : ''}
+        <p class="q-help">The name and address are copied onto the invoice and frozen: editing the contact later does not change it.</p></div>
+      <div class="iv-g2"><div class="lp-f"><label>Issue date</label><input type="date" data-ivd="issueDate" value="${escAttr(d.issueDate)}"></div><div class="lp-f"><label>Terms (days)</label><input type="number" min="0" step="1" data-ivd="terms" value="${d.terms}"></div>
+        <div class="lp-f" style="grid-column:1/-1"><label>Due date</label><input type="date" data-ivd="due" id="ivDue" value="${escAttr(d.due)}"><p class="q-help">Issue date + terms. Pick a different date to override.</p></div></div>
+      <div class="lp-f"><label>Description</label><textarea rows="2" data-ivd="desc">${escHtml(d.desc)}</textarea></div>
+      <div class="lp-f"><label>Extra note on the invoice (optional)</label><textarea rows="2" data-ivd="note">${escHtml(d.note)}</textarea></div>
+      <div class="fin-var">${qm(c.net)} ex VAT${qVatOn() ? ` + ${qm(c.vat)} VAT` : ''} = <b>${qm(c.total)}</b></div>
+      <p class="q-help">The amount comes from the schedule and cannot be changed here. Once issued, the invoice is locked.</p>
+      <div class="modal-actions"><button type="button" class="btn secondary" data-bt="close">Cancel</button><button type="button" class="btn" data-iv="issue">Issue invoice</button></div></div>
+      <div><iframe class="iv-frame" id="ivPrev" title="Invoice preview" sandbox srcdoc="${escAttr(docHtml(ivSpec(at, true), { noBar: true }))}"></iframe><p class="q-help">Preview. The number is allocated when you press Issue invoice.</p></div></div>`, { wide: true });
+  void cu;
+}
+function ivAllocPreview(){ return state.settings.invoicePrefix + ivPad(Math.max(state.settings.invoiceNext, invMaxUsed() + 1)); }
+function ivPreviewRefresh(){
+  const d = ivUi.d; if(!d) return; const f = document.getElementById('ivPrev'); if(!f) return; f.srcdoc = docHtml(ivSpec(ivBuild(d, ivAllocPreview()), true), { noBar: true });
+}
+document.addEventListener('input', (e) => {
+  const k = e.target.dataset && e.target.dataset.ivd; if(!k || !ivUi.d) return; const d = ivUi.d, v = e.target.value;
+  if(k === 'desc') d.desc = v; else if(k === 'note') d.note = v;
+  else if(k === 'issueDate' || k === 'terms'){ if(k === 'issueDate' && isoOk(v)) d.issueDate = v; if(k === 'terms'){ const n = Math.floor(Number(v)); if(!isNaN(n) && n >= 0) d.terms = n; } if(!d.dueManual){ d.due = addDaysIso(d.issueDate, d.terms); const du = document.getElementById('ivDue'); if(du) du.value = d.due; } }
+  else if(k === 'due'){ if(isoOk(v)){ d.due = v; d.dueManual = true; } }
+  clearTimeout(window._ivPrevT); window._ivPrevT = setTimeout(ivPreviewRefresh, 250);
+});
+document.addEventListener('change', (e) => { const k = e.target.dataset && e.target.dataset.ivd; if(k === 'addrIdx' && ivUi.d){ ivUi.d.addrIdx = Number(e.target.value) || 0; ivPreviewRefresh(); } });
+function ivIssue(){
+  const d = ivUi.d; if(!d) return; const p = state.projects.find(x => x.id === d.pid); if(!p) return;
+  if(!isoOk(d.issueDate) || !isoOk(d.due)){ showToast('Check the issue and due dates'); return; }
+  if(ivActive(d.pid, d.key)){ showToast('This line already has an invoice'); return; }
+  const a = ivAlloc('invoice'), inv = ivBuild(d, a.number, a.seq); inv.id = qRand('inv_'); inv.lineUid = String(d.key).startsWith('v') ? '' : d.key; inv.vid = String(d.key).startsWith('v') ? String(d.key).slice(1) : ''; inv.createdAt = Date.now(); inv.createdBy = whoName();
+  state.invoices.push(inv); ivUi.d = null;
+  tlHist(inv, `Invoice created: ${qm(inv.total)}, issued ${dShow(inv.issueDate)}, due ${dShow(inv.dueDate)}${inv.replaces ? ' (replaces ' + ((state.invoices.find(x => x.id === inv.replaces) || {}).number || '') + ')' : ''}`);
+  tlDeal(inv.pid, `Invoice ${inv.number} created for ${inv.customer.name || 'the customer'}: ${qm(inv.total)}, due ${dShow(inv.dueDate)}`, { src: 'invoice', contact: false });
+  if(inv.replaces){ const old = state.invoices.find(x => x.id === inv.replaces); if(old){ old.replacedBy = inv.id; tlHist(old, `Replaced by ${inv.number}`); } }
+  saveState(); render(); ivView(inv.id); showToast(inv.number + ' created');
+}
+/* ---------- the invoice: preview and actions ---------- */
+function ivFind(id){ return (state.invoices || []).find(i => i.id === id) || null; }
+function ivView(id){
+  const inv = ivFind(id); if(!inv) return; const p = state.projects.find(x => x.id === inv.pid), st = ivDisplayStatus(inv), row = inv.kind === 'invoice' ? ivRowFor(inv) : null, credit = inv.kind === 'credit';
+  const live = inv.status !== 'Void' && !credit && !inv.creditedBy, paid = row && row.status === 'Paid', at = `data-id="${escAttr(inv.id)}"`, od = row && (row.status === 'Overdue' || row.status === 'Warning');
+  const replaced = inv.replacedBy ? ivFind(inv.replacedBy) : null, replaces = inv.replaces ? ivFind(inv.replaces) : null;
+  btModal(`${credit ? 'Credit note' : 'Invoice'} ${inv.number}`, `<div class="iv-two"><div>
+      <div class="fin-var"><b>${qm(inv.total)}</b>${inv.vatOn ? ` <span class="qb-dim">inc ${qm(inv.vat)} VAT</span>` : ''} · ${invPill(st)}</div>
+      <div class="q-help" style="margin:6px 0">${escHtml(inv.customer.name || '')} · issued ${escHtml(dShow(inv.issueDate))}${credit ? '' : ' · due ' + escHtml(dShow(inv.dueDate))}${inv.sentDate ? ' · sent ' + escHtml(dShow(inv.sentDate)) + (inv.sentTo ? ' to ' + escHtml(inv.sentTo) : '') : ''}<br>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:money" data-bt="close">${escHtml(recordCode(p.id, 'project') + ' ' + p.name)}</button>` : ''}${inv.customer.contactId && ctFind(inv.customer.contactId) ? ` · <button type="button" class="sp-link" data-nav="contact:${escAttr(inv.customer.contactId)}" data-bt="close">${escHtml(ctName(ctFind(inv.customer.contactId)))}</button>` : ''}</div>
+      ${inv.status === 'Void' ? `<div class="pw-qbar pw-alert-bar">Voided ${escHtml(dShow(inv.voidedAt))} by ${escHtml(inv.voidedBy || '')}: ${escHtml(inv.voidReason || '')}.${replaced ? ` Replaced by <button type="button" class="sp-link" data-iv="open" data-id="${escAttr(replaced.id)}">${escHtml(replaced.number)}</button>.` : ''}</div>` : ''}
+      ${inv.creditedBy && ivFind(inv.creditedBy) ? `<div class="pw-qbar pw-alert-bar">Credited by <button type="button" class="sp-link" data-iv="open" data-id="${escAttr(inv.creditedBy)}">${escHtml(ivFind(inv.creditedBy).number)}</button>.</div>` : ''}
+      ${replaces ? `<div class="q-help">Replaces <button type="button" class="sp-link" data-iv="open" data-id="${escAttr(replaces.id)}">${escHtml(replaces.number)}</button>.</div>` : ''}
+      ${credit && ivFind(inv.creditFor) ? `<div class="q-help">Credits <button type="button" class="sp-link" data-iv="open" data-id="${escAttr(inv.creditFor)}">${escHtml(ivFind(inv.creditFor).number)}</button>.</div>` : ''}
+      <div class="iv-acts"><button type="button" class="btn secondary qb-sm" data-iv="pdf" ${at}>Download PDF</button><button type="button" class="btn secondary qb-sm" data-iv="print" ${at}>Print</button>
+        ${live ? `<button type="button" class="btn qb-sm" data-iv="send" ${at}>Send…</button>` : ''}${live && inv.status === 'Issued' ? `<button type="button" class="btn secondary qb-sm" data-iv="marksent" ${at}>Mark as sent</button>` : ''}
+        ${live && od ? `<button type="button" class="btn secondary qb-sm" data-iv="reminder" ${at}>Create reminder</button>` : ''}
+        ${live && !paid ? `<button type="button" class="btn secondary qb-sm cx-danger" data-iv="void" ${at}>Void…</button>` : ''}${live && inv.status === 'Sent' && !paid ? `<button type="button" class="btn secondary qb-sm" data-iv="credit" ${at}>Credit note…</button>` : ''}
+        ${inv.status === 'Void' && !replaced && !credit ? `<button type="button" class="btn qb-sm" data-iv="replace" ${at}>Create replacement</button>` : ''}</div>
+      ${live ? `<p class="q-help">The invoice is locked. To correct it, void it (with a reason) and create a replacement${inv.status === 'Sent' ? ', or issue a credit note' : ''}. Numbers are never reused.</p>` : ''}
+      ${inv.reminders.length ? `<div class="q-help">${inv.reminders.length} reminder${inv.reminders.length === 1 ? '' : 's'}: ${inv.reminders.map(r => escHtml(dShow(r.date))).join(', ')}</div>` : ''}
+      <div class="q-sub">History</div><div class="iv-hist">${inv.history.slice().reverse().map(h => `<div>${escHtml(dShow(h.date))} · ${escHtml(h.what)}${h.by ? ' · ' + escHtml(h.by) : ''}</div>`).join('') || '<div class="qb-dim">Nothing yet.</div>'}</div></div>
+      <div><iframe class="iv-frame" title="Invoice" sandbox srcdoc="${escAttr(docHtml(ivSpec(inv), { noBar: true }))}"></iframe></div></div>`, { wide: true });
+}
+function ivSentDialog(inv){
+  const cu = inv.customer || {};
+  btModal('Mark ' + inv.number + ' as sent', `<p class="q-help" style="margin-top:0">Confirm only once you have actually sent it. Marking it sent starts the due and overdue clock on the Invoicing page (due ${escHtml(dShow(inv.dueDate))}). This app has not sent anything.</p>
+    <div class="lp-f"><label>Date sent</label><input type="date" id="ivSentDate" value="${fmt(new Date())}"></div><div class="lp-f"><label>Sent to (optional)</label><input type="email" id="ivSentTo" value="${escAttr(cu.email || '')}" autocomplete="off"></div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-bt="close2">Cancel</button><button type="button" class="btn" data-iv="sent-ok" data-id="${escAttr(inv.id)}">Mark as sent</button></div>`, { layer: 2, narrow: true });
+}
+function ivMarkSent(inv, info){
+  const p = state.projects.find(x => x.id === inv.pid), t = ivTarget(p, inv.key); if(!t) return;
+  inv.status = 'Sent'; inv.sentDate = info.date || fmt(new Date()); inv.sentTo = info.to || ''; inv.prevDue = t.dueDate || ''; inv.prevDueManual = !!t.dueManual;
+  t.invoicedDate = inv.sentDate; t.dueDate = inv.dueDate; if(String(inv.key).startsWith('v')) t.status = 'Invoiced'; else t.dueManual = true;
+  ivLog(inv, `marked as sent on ${dShow(inv.sentDate)}${inv.sentTo ? ' to ' + inv.sentTo : ''}; due ${dShow(inv.dueDate)}`, true);
+  saveState(); render(); if(btOpen(1)) ivView(inv.id);
+}
+function ivRelease(inv){   // the schedule goes back to "not invoiced" so a replacement can be raised
+  const p = state.projects.find(x => x.id === inv.pid), t = ivTarget(p, inv.key); if(!t) return;
+  if(inv.sentDate && t.invoicedDate){ t.invoicedDate = ''; t.dueDate = inv.prevDue || ''; if(inv.prevDueManual === false && !String(inv.key).startsWith('v')) t.dueManual = false; if(String(inv.key).startsWith('v')){ t.status = 'Approved'; t.dueDate = ''; } }
+}
+function ivVoidDialog(inv){
+  btModal('Void ' + inv.number, `<p class="q-help" style="margin-top:0">The invoice stays on record, marked VOID, and ${escHtml(inv.number)} is never used again. The schedule line goes back to “not invoiced”.</p><div class="lp-f"><label>Reason (required)</label><textarea id="ivVoidReason" rows="3" data-focus></textarea></div>
+    <label class="q-check"><input type="checkbox" id="ivVoidReplace" checked> Create a replacement invoice now</label><div class="q-err" id="ivVoidErr" role="alert"></div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-bt="close2">Cancel</button><button type="button" class="btn cx-danger" data-iv="void-ok" data-id="${escAttr(inv.id)}">Void invoice</button></div>`, { layer: 2, narrow: true });
+}
+function ivCreditDialog(inv){
+  btModal('Credit note for ' + inv.number, `<p class="q-help" style="margin-top:0">A credit note cancels the whole invoice (${qm(inv.total)}). It gets its own number, and the schedule line goes back to “not invoiced” so a corrected invoice can be raised.</p><div class="lp-f"><label>Reason (required)</label><textarea id="ivCreditReason" rows="3" data-focus></textarea></div><div class="q-err" id="ivCreditErr" role="alert"></div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-bt="close2">Cancel</button><button type="button" class="btn" data-iv="credit-ok" data-id="${escAttr(inv.id)}">Issue credit note</button></div>`, { layer: 2, narrow: true });
+}
+function ivSend(inv){
+  const t = docTpl('invoice'), cu = inv.customer || {}, row = ivRowFor(inv), v = ivEmailVals(inv);
+  sendEmail({ kind: 'invoice', to: cu.email || '', subject: docMerge(t.subject, v), body: docMerge(t.body, v), attach: { spec: ivSpec(inv) }, title: `Email invoice ${inv.number}`,
+    onPrepared: () => { tlHist(inv, 'Email prepared in the mail app'); saveState(); }, onSent: info => { if(inv.status === 'Issued') ivMarkSent(inv, { date: info.date, to: info.to }); else { ivLog(inv, `emailed again${info.to ? ' to ' + info.to : ''} on ${dShow(info.date)}`, true); saveState(); render(); if(btOpen(1)) ivView(inv.id); } } });
+  void row;
+}
+function ivEmailVals(inv){
+  const cu = inv.customer || {}, c = ctFind(cu.contactId), first = c ? (c.firstName || '') : String(cu.name || '').split(/\s+/)[0], row = ivRowFor(inv), od = inv.dueDate ? Math.max(0, daysBetween(inv.dueDate, fmt(new Date()))) : 0;
+  const out = row ? Math.max(0, inv.total - (row.paidAmount || 0)) : inv.total;
+  return { customer_first_name: first || 'there', project: inv.projectName, invoice_number: inv.number, amount: qm(inv.status === 'Sent' && od > 0 ? out : inv.total), due_date: docDateLong(inv.dueDate), business_name: (inv.biz || {}).name || docBusiness().name, payment_reference: inv.reference, days_overdue: od + (od === 1 ? ' day' : ' days'), sender_name: whoName(), reply_by_date: '' };
+}
+function ivReminder(inv){
+  const t = docTpl('reminder'), cu = inv.customer || {}, v = ivEmailVals(inv);
+  sendEmail({ kind: 'reminder', to: cu.email || '', subject: docMerge(t.subject, v), body: docMerge(t.body, v), attach: { spec: ivSpec(inv) }, title: `Payment reminder for ${inv.number}`,
+    onPrepared: () => { ivLog(inv, `payment reminder prepared (${v.days_overdue} overdue)`, false); saveState(); },
+    onSent: info => { inv.reminders.push({ date: info.date, to: info.to, by: whoName() }); ivLog(inv, `payment reminder sent${info.to ? ' to ' + info.to : ''} on ${dShow(info.date)}`, true); saveState(); render(); if(btOpen(1)) ivView(inv.id); } });
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-iv]'); if(!b || !state) return; const a = b.dataset.iv, inv = b.dataset.id ? ivFind(b.dataset.id) : null;
+  if(a === 'create'){ ivCreateOpen(Number(b.dataset.ivPid), b.dataset.ivK); }
+  else if(a === 'goto-settings') ivGoSettings();
+  else if(a === 'pick-customer') cxPick({ title: 'Choose the customer', onPick: id => { ivUi.d.contactIds = [id].concat(ivUi.d.contactIds.filter(x => x !== id)); ivUi.d.addrIdx = 0; ivRenderCreate(); } });
+  else if(a === 'issue') ivIssue();
+  else if(a === 'open' && inv) ivView(inv.id);
+  else if(a === 'pdf' && inv) docOpen(ivSpec(inv), false);
+  else if(a === 'print' && inv) docOpen(ivSpec(inv), true);
+  else if(a === 'send' && inv) ivSend(inv);
+  else if(a === 'marksent' && inv) ivSentDialog(inv);
+  else if(a === 'sent-ok' && inv){ const d = isoOk((document.getElementById('ivSentDate') || {}).value) || fmt(new Date()), to = ((document.getElementById('ivSentTo') || {}).value || '').trim(); btClose(2); ivMarkSent(inv, { date: d, to }); }
+  else if(a === 'reminder' && inv) ivReminder(inv);
+  else if(a === 'void' && inv) ivVoidDialog(inv);
+  else if(a === 'void-ok' && inv){
+    const r = (document.getElementById('ivVoidReason').value || '').trim(), er = document.getElementById('ivVoidErr'); if(r.length < 3){ er.textContent = 'Give a reason.'; return; }
+    const replace = document.getElementById('ivVoidReplace').checked; btClose(2);
+    ivRelease(inv); inv.status = 'Void'; inv.voidedAt = fmt(new Date()); inv.voidedBy = whoName(); inv.voidReason = r; ivLog(inv, `voided: ${r}`, false); saveState(); render();
+    if(replace){ const p = state.projects.find(x => x.id === inv.pid), idx = String(inv.key).startsWith('v') ? inv.key : String(p.paymentLines.findIndex(l => l.uid === inv.key)); btClose(1); ivCreateOpen(inv.pid, idx, inv.id); } else ivView(inv.id);
+  }
+  else if(a === 'replace' && inv){ const p = state.projects.find(x => x.id === inv.pid), idx = String(inv.key).startsWith('v') ? inv.key : String(p.paymentLines.findIndex(l => l.uid === inv.key)); btClose(1); ivCreateOpen(inv.pid, idx, inv.id); }
+  else if(a === 'credit' && inv){ const row = ivRowFor(inv); if(row && (row.paidAmount > 0 || row.paidDate)){ showToast('This invoice has a payment recorded. Sort out the payment first, then credit it.'); return; } ivCreditDialog(inv); }
+  else if(a === 'credit-ok' && inv){
+    const r = (document.getElementById('ivCreditReason').value || '').trim(), er = document.getElementById('ivCreditErr'); if(r.length < 3){ er.textContent = 'Give a reason.'; return; } btClose(2);
+    const n = ivAlloc('credit'), cn = JSON.parse(JSON.stringify(inv)); Object.assign(cn, { id: qRand('inv_'), number: n.number, seq: n.seq, kind: 'credit', status: 'Sent', issueDate: fmt(new Date()), dueDate: '', sentDate: '', sentTo: '', creditFor: inv.id, creditForNumber: inv.number, reason: r, replaces: '', replacedBy: '', creditedBy: '', voidedAt: '', voidReason: '', reminders: [], history: [], createdAt: Date.now(), createdBy: whoName() });
+    cn.lines = inv.lines.map(l => ({ desc: l.desc, amountEx: l.amountEx })); cn.reference = n.number; cn.note = ''; cn.key = ''; cn.lineUid = ''; cn.vid = '';
+    state.invoices.push(cn); ivRelease(inv); inv.creditedBy = cn.id; tlHist(cn, `Credit note created for ${inv.number}: ${qm(cn.total)}. Reason: ${r}`); ivLog(inv, `credited by ${cn.number}: ${r}`, false); saveState(); render(); ivView(cn.id); showToast(cn.number + ' issued');
+  }
+});
+function ivRowDoc(r){ return (r.uid || r.vid) ? ivActive(r.pid, r.vid ? 'v' + r.vid : r.uid) : null; }
+/* contract lines first, then the "Scope additions" section (approved variations can be invoiced; the others show as awaiting approval) */
+function ivRowsHtml(rows){
+  const con = rows.filter(r => r.kind !== 'variation'), vars = rows.filter(r => r.kind === 'variation'); let h = con.map(invRowHtml).join('');
+  if(vars.length) h += `<tr class="inv-sect"><td colspan="9">Scope additions <span class="qb-dim" style="text-transform:none;letter-spacing:0">(only an approved variation can be invoiced)</span></td></tr>` + vars.map(invRowHtml).join('');
+  return h;
+}
+function ivDocsHtml(){
+  const docs = (state.invoices || []).slice().sort((a, b) => b.createdAt - a.createdAt || b.seq - a.seq);
+  return `<div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>Number</th><th>Customer</th><th>Project</th><th>Issued</th><th>Due</th><th>Total</th><th>Status</th></tr></thead><tbody>${docs.map(i => `<tr><td><button type="button" class="sp-link" data-iv="open" data-id="${escAttr(i.id)}">${escHtml(i.number)}</button></td><td>${escHtml(i.customer.name || '')}</td><td>${escHtml(i.projectRef || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(i.total)}</td><td>${invPill(ivDisplayStatus(i))}</td></tr>`).join('') || '<tr><td colspan="7"><div class="sup-empty">No invoices made in the tracker yet. Use “Create invoice” on a pending line.</div></td></tr>'}</tbody></table></div></div>`;
+}
 /* BT:js-invoice end */
 /* ---------- init ---------- */
 (async () => {
