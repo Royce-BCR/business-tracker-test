@@ -2191,6 +2191,103 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .bt-cards > tbody > tr.bt-empty-row > td::before { display: none; }
 }
 @media (max-width:700px) { .bt-matrix { min-width: 0; } }
+
+/* =====================================================================
+   QUOTE BUILDER (Batch 4, Part B): three steps, collapsible sections, a sticky totals bar, phone cards. Layout only: the same fields,
+   formulas and values; it moves the finished builder around after it is drawn (see "Quote builder shell" in the script).
+   ===================================================================== */
+:root { --qbs-steps-h: 56px; }
+.qbs-nav { position: sticky; top: var(--bt-banner-h, 0px); z-index: 24; background: var(--bt-paper); display: flex; flex-wrap: wrap; align-items: stretch; gap: var(--bt-s2) var(--bt-s4); padding: var(--bt-s2) 0; margin: 0 0 var(--bt-s3); box-shadow: 0 1px 0 var(--line); }
+.qbs-steps { display: flex; gap: var(--bt-s2); flex: 0 1 330px; min-width: 0; }
+.qbs-step { flex: 1 1 0; min-width: 0; min-height: var(--bt-control); display: inline-flex; align-items: center; justify-content: center; gap: var(--bt-s2); font: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-text); background: var(--bt-card); border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-btn); cursor: pointer; padding: 0 var(--bt-s2); }
+.qbs-step:hover { background: var(--bt-surface-2); }
+.qbs-step:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+.qbs-step .qbs-n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: var(--bt-fs-xs); background: var(--bt-neu-bg); color: var(--bt-neu-fg); flex: none; }
+.qbs-step[aria-current="step"] { background: var(--bt-brand-ctl); color: var(--bt-on-brand-ctl); border-color: var(--bt-brand-ctl); }
+.qbs-step[aria-current="step"] .qbs-n { background: var(--bt-on-brand-ctl); color: var(--bt-brand-ctl); }
+.qbs-step .qbs-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bt-bad-fg); flex: none; }
+.qbs-step .qbs-dot[hidden] { display: none; }
+.qbs-totals { flex: 1 1 560px; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--bt-s1) var(--bt-s4); background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s1) var(--bt-s3); font-variant-numeric: tabular-nums; }
+.qbs-t { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.qbs-t .qbs-l { font-size: var(--bt-fs-2xs); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--bt-text-muted); }
+.qbs-t .qbs-v { font-size: var(--bt-fs-md); font-weight: 700; }
+.qbs-t .qbs-s { font-size: var(--bt-fs-xs); color: var(--bt-text-muted); }
+.qbs-t.qbs-main .qbs-v { font-size: var(--bt-fs-md); }
+.qbs-alloc { margin-left: auto; font: inherit; font-size: var(--bt-fs-xs); font-weight: 700; border-radius: var(--bt-r-pill); padding: 0 var(--bt-s3); min-height: var(--bt-control); display: inline-flex; align-items: center; cursor: pointer; border: 1px solid var(--bt-ok-bd); background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
+.qbs-alloc.bad { border-color: var(--bt-bad-bd); background: var(--bt-bad-bg); color: var(--bt-bad-fg); }
+.qbs-alloc:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+.qbs-pane[hidden] { display: none; }
+.qbs-sec > .qb-sec-h { align-items: center; justify-content: flex-start; }
+.qbs-sec > .qb-sec-h > .qb-sec-tools, .qbs-sec > .qb-sec-h > .btn { margin-left: auto; }
+.qbs-sec > .qb-sec-h .qbs-sum { order: 0; }
+@media (min-width:701px) and (pointer:fine) { #quoteBuilderView .bt-cols-btn { min-height: 32px; } }
+#quoteBuilderView .bt-bar { margin-bottom: 4px; }
+.qbs-toggle { flex: none; width: var(--bt-control); height: var(--bt-control); display: inline-grid; place-items: center; background: none; border: 0; border-radius: var(--bt-r-btn); color: var(--bt-text); cursor: pointer; padding: 0; margin: calc(-1 * var(--bt-s2)) 0 calc(-1 * var(--bt-s2)) calc(-1 * var(--bt-s2)); }
+.qbs-toggle:hover { background: var(--bt-surface-2); }
+.qbs-toggle:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 0; }
+.qbs-toggle svg { width: 18px; height: 18px; transition: transform var(--bt-fast) var(--bt-ease); transform: rotate(90deg); }
+.qbs-sec.closed .qbs-toggle svg { transform: rotate(0deg); }
+.qbs-sec > .qb-sec-h h3 { cursor: pointer; flex: 0 1 auto; }
+.qbs-sum { display: none; flex: 1 1 200px; min-width: 0; font-size: var(--bt-fs-sm); color: var(--bt-text-muted); overflow-wrap: anywhere; }
+.qbs-sec.closed .qbs-sum { display: block; }
+.qbs-sec.closed > .qb-sec-h { margin-bottom: 0; }
+.qbs-sec.closed > .qb-sec-h .qb-sec-tools, .qbs-sec.closed > .qb-sec-h > .btn { display: none; }
+.qbs-body[hidden] { display: none; }
+.qbs-how { margin: 0 0 var(--bt-s3); }
+.qbs-how > summary { cursor: pointer; display: inline-flex; align-items: center; min-height: var(--bt-control); font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-brand-text); text-decoration: underline; text-underline-offset: 2px; }
+.qbs-how > summary:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; border-radius: 4px; }
+.qbs-how[open] > summary { margin-bottom: var(--bt-s1); }
+.qbs-how-body { background: var(--bt-surface-2); border: 1px solid var(--line); border-radius: var(--bt-r-btn); padding: var(--bt-s2) var(--bt-s3); }
+.qbs-how-body p { margin: 0 0 var(--bt-s2); }
+.qbs-how-body p:last-child { margin-bottom: 0; }
+.qbs-foot { display: flex; justify-content: space-between; gap: var(--bt-s3); margin: var(--bt-s2) 0 var(--bt-s6); }
+.qbs-foot .btn { min-height: var(--bt-control); }
+.qb-supname { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; text-transform: none; letter-spacing: 0; font-size: var(--bt-fs-xs); line-height: 1.2; max-width: 11em; white-space: normal; }
+.qbs-more { display: none; }
+/* phone: the quote's tables become cards; each material line shows item, quantity, unit, chosen supplier, price and line total, with the rest under More */
+@media (max-width:700px) {
+  .qbs-nav { top: calc(var(--bt-banner-h, 0px) + 52px); padding: var(--bt-s1) 0; gap: 0; }
+  .qbs-steps { flex-basis: 100%; }
+  .qbs-step { font-size: var(--bt-fs-xs); gap: 6px; }
+  .qbs-totals { position: fixed; left: var(--bt-s2); right: var(--bt-s2); bottom: calc(var(--bt-s2) + env(safe-area-inset-bottom, 0px)); z-index: 24; flex: none; display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: var(--bt-s1) var(--bt-s2); padding: var(--bt-s2) var(--bt-s3); box-shadow: var(--bt-shadow-2); }
+  body.menu-phone.pm-bottom .qbs-totals { bottom: calc(var(--bt-bar-h) + env(safe-area-inset-bottom, 0px) + var(--bt-s2)); }
+  body.kb-open .qbs-totals { bottom: auto; top: calc(var(--bt-banner-h, 0px) + 52px + var(--qbs-steps-h)); box-shadow: 0 8px 18px color-mix(in srgb, var(--bt-ink) 16%, transparent); }   /* the keyboard is up: the bar moves to the top so it is never hidden behind it */
+  .qbs-t.qbs-main .qbs-v { font-size: var(--bt-fs-md); }
+  .qbs-alloc { grid-column: 1 / -1; margin-left: 0; justify-content: center; }
+  #quoteBuilderView { padding-bottom: 170px; }
+  .qbs-t .qbs-l { font-size: 10px; letter-spacing: .03em; }
+  .qbs-t .qbs-s { font-size: 11px; }
+  body.kb-open #quoteBuilderView { padding-bottom: 40px; }
+  .bt-bar:has(+ .qb-scroll > table.qbs-cards) { display: none; }
+  table.qbs-cards, table.qbs-cards > tbody { display: block; width: 100% !important; min-width: 0 !important; max-width: 100%; }
+  table.qbs-cards > thead { display: block; position: absolute; left: 0; width: 1px !important; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  table.qbs-cards > tbody > tr { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--bt-s2) var(--bt-s3); background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3); margin-bottom: var(--bt-s3); position: relative; }
+  table.qbs-cards > tbody > tr > td { display: block; padding: 0 !important; border: 0 !important; height: auto !important; min-width: 0; flex: 1 1 42%; position: static !important; background: transparent !important; overflow: visible; white-space: normal !important; }
+  table.qbs-cards > tbody > tr > td::before { content: attr(data-qbs-l); display: block; font-size: var(--bt-fs-2xs); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--bt-text-muted); margin-bottom: 2px; }
+  table.qbs-cards > tbody > tr > td[data-qbs-l=""]::before { display: none; }
+  table.qbs-cards > tbody > tr > td input:not([type=checkbox]):not([type=radio]), table.qbs-cards > tbody > tr > td select { width: 100% !important; min-width: 0 !important; max-width: 100%; min-height: var(--bt-control); }
+  table.qbs-cards > tbody > tr > td button, table.qbs-cards > tbody > tr > td .icon-btn { min-height: var(--bt-control); min-width: var(--bt-control); }
+  table.qbs-cards > tbody > tr > td.qb-c { flex: 0 0 auto; }
+  table.qbs-cards .dg { padding-left: 0 !important; } table.qbs-cards .drag-h { display: none; }
+  table.qbs-cards > tbody > tr > td.qb-calc { text-align: left; font-weight: 600; }
+  table.qbs-cards > tbody > tr.qb-warnrow, table.qbs-cards > tbody > tr.qb-opthead { display: block; }
+  table.qbs-cards > tbody > tr.qb-warnrow[hidden] { display: none; }
+  table.qbs-cards > tbody > tr > td.qbs-title { flex: 1 1 100%; order: 1; font-weight: 700; }
+  table.qbs-cards > tbody > tr > td.qbs-title::before { display: none; }
+  table.qbs-cards > tbody > tr > td.qbs-pri { order: 2; }
+  table.qbs-cards > tbody > tr > td.qbs-sup { order: 3; flex: 1 1 100%; }
+  table.qbs-cards > tbody > tr > td.qbs-tot { order: 4; }
+  table.qbs-cards > tbody > tr > td.qbs-acts { order: 5; flex: 1 1 100%; }
+  table.qbs-cards > tbody > tr > td.qbs-acts::before { display: none; }
+  table.qbs-cards > tbody > tr > td.qbs-acts .qb-ra { display: flex; flex-wrap: wrap; gap: var(--bt-s2); }
+  table.qbs-cards > tbody > tr:not(.qbs-open) [data-qba="line-up"], table.qbs-cards > tbody > tr:not(.qbs-open) [data-qba="line-down"] { display: none; }   /* moving a line is under More on a phone */
+  table.qbs-cards > tbody > tr > td.qbs-extra { order: 7; display: none; }
+  table.qbs-cards > tbody > tr.qbs-open > td.qbs-extra { display: block; }
+  table.qbs-cards .qbs-more { margin-top: var(--bt-s2); width: 100%; display: inline-flex; align-items: center; justify-content: center; min-height: var(--bt-control); font: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-brand-text); background: var(--bt-surface-2); border: 1px solid var(--line); border-radius: var(--bt-r-btn); cursor: pointer; }
+  table.qbs-cards .qbs-more:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+  #qbFoot tr.qb-foot { display: block; }
+  #qbFoot tr.qb-foot > td { display: block; }
+}
 </style>
 </head>
 <body>
@@ -7629,7 +7726,7 @@ function qbMaterialsHtml(q){
   const avail = state.suppliers.filter(s => s.status === 'Active' && !cols.includes(s.id)).map(s => [s.id, s.name]);
   const stLines = qStageLines(q).map(slEnsure), stageCols = stLines.length > 0;   // stage columns only when the quote is linked to a deal with stage lines
   const totalCols = 6 + cols.length + 1 + 10 + (vatOn ? 2 : 0) + (stageCols ? 2 : 0);
-  let h = `<tr><th class="qb-sticky-l">Description</th><th>Category</th><th>Unit</th><th>Qty</th><th>Waste %</th><th>To order</th>${cols.map(id => { const sp = supFind(id); return `<th class="qb-supcol" title="${escAttr(qbSupName(id))}${sp && sp.pricesIncVat ? ' (prices entered inc VAT, netted to ex VAT)' : ''}">${escHtml(sp ? supShort(sp) : '?')}${sp && sp.pricesIncVat ? '<span class="qb-vi">inc VAT</span>' : ''}<button class="qb-x" data-qba="del-supcol" data-sid="${id}" title="Remove ${escAttr(qbSupName(id))}" aria-label="Remove supplier column">×</button></th>`; }).join('')}
+  let h = `<tr><th class="qb-sticky-l">Description</th><th>Category</th><th>Unit</th><th>Qty</th><th>Waste %</th><th>To order</th>${cols.map(id => { const sp = supFind(id); return `<th class="qb-supcol" title="${escAttr(qbSupName(id))}${sp && sp.pricesIncVat ? ' (prices entered inc VAT, netted to ex VAT)' : ''}"><span class="qb-supname">${escHtml(sp ? sp.name : '?')}</span>${sp && sp.pricesIncVat ? '<span class="qb-vi">inc VAT</span>' : ''}<button class="qb-x" data-qba="del-supcol" data-sid="${id}" title="Remove ${escAttr(qbSupName(id))}" aria-label="Remove supplier column">×</button></th>`; }).join('')}
     <th title="Lines with no supplier price but a typed cost override">No price / estimate</th><th>Supplier</th><th class="qb-sticky-r">Materials cost</th><th>Cost total</th><th>Markup %</th><th>Price ex VAT</th>${vatOn ? '<th>VAT</th><th>Price inc VAT</th>' : ''}<th>Customer group</th><th>Optional group</th><th>Show</th>${stageCols ? '<th title="The stage line these materials are for">Stage</th><th title="When the materials are delivered: the stage start, an earlier stage, or a typed date">Delivery date</th>' : ''}<th>Drop</th><th></th></tr>`;
   const stOpts = [['', '—']].concat(stLines.map(s => [s.id, s.label || 'Stage']));
   const delCell = l => {
@@ -13042,7 +13139,7 @@ function bttRefresh(t){
   const key = bttKey(t), spec = bttSpec(key), head = t.tHead.rows[t.tHead.rows.length - 1];
   t.classList.add('bt-t');
   const sc = t.closest('.table-scroll, .qb-scroll, .pj-tablewrap');
-  if(sc){ sc.classList.add('bt-scroller'); if(sc.closest('.qb-wrap, #quoteBuilder, .qb')) sc.classList.add('bt-nocap'); }
+  if(sc){ sc.classList.add('bt-scroller'); if(sc.closest('#quoteBuilderView')) sc.classList.add('bt-nocap'); }
   const lab = bttLabel(t, spec); if(lab && !t.getAttribute('aria-label')){ t.setAttribute('aria-label', lab); t.dataset.bttLabel = '1'; }
   [...t.tHead.rows].forEach(r => [...r.cells].forEach(c => { if(c.tagName === 'TH' && !c.hasAttribute('scope')) c.setAttribute('scope', 'col'); }));
   [...t.querySelectorAll('tbody > tr > th')].forEach(c => { if(!c.hasAttribute('scope')) c.setAttribute('scope', 'row'); });
@@ -15026,6 +15123,194 @@ function rfqPost(){
     root.querySelectorAll('tr[data-line]').forEach(tr => { if(!ids.has(tr.dataset.line)) tr.classList.add('rf-dim'); }); } }
 }
 (function(){ const o = qbRefresh; qbRefresh = function(){ const r = o.apply(this, arguments); try{ rfqPost(); }catch(e){} return r; }; })();
+
+/* =====================================================================
+   QUOTE BUILDER SHELL (Batch 4, Part B) — layout only. After the builder is drawn (qbRender) and after every live refresh (qbRefresh),
+   this puts its sections into three steps (1 Build, 2 Check, 3 Customer view), makes each section fold away with a summary line, tucks the
+   long explanations under "How this works", keeps a totals bar in view, and turns the tables into cards on phones. It reads the numbers the
+   page has already worked out (the same [data-qc] cells the tiles and Summary use); it never calculates, edits or saves a quote.
+   Which sections are open is remembered per device in localStorage under STORAGE_PREFIX, never in the saved data.
+   ===================================================================== */
+const QBS_KEY = STORAGE_PREFIX + 'business-tracker-qb-sections';
+const QBS_DEFAULT_CLOSED = { cash: 1, timeline: 1, asSold: 1 };
+const qbs = { step: 1, qid: 0, saved: null, cur: {}, prob: {}, more: new Set() };
+function qbsSaved(){
+  if(qbs.saved) return qbs.saved;
+  let p = null; try{ p = JSON.parse(localStorage.getItem(QBS_KEY) || 'null'); }catch(e){}
+  qbs.saved = (p && typeof p === 'object') ? p : {}; return qbs.saved;
+}
+function qbsSaveOpen(key, open){ qbsSaved()[key] = open ? 1 : 0; try{ localStorage.setItem(QBS_KEY, JSON.stringify(qbs.saved)); }catch(e){} }
+function qbsIsOpen(key){ if(key in qbs.cur) return qbs.cur[key]; const s = qbsSaved(); return key in s ? !!s[key] : !QBS_DEFAULT_CLOSED[key]; }
+const QBS_CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const QBS_STEPS = [[1, 'Build'], [2, 'Check'], [3, 'Customer view']];
+/* which section is this, and which step does it belong to */
+function qbsClassify(el){
+  if(el.classList.contains('qb-head')) return { key: 'details', step: 1, title: 'Quote details' };
+  if(el.id === 'qbCustomer') return { key: 'customer', step: 3, title: 'Customer view' };
+  if(el.classList.contains('qbs-kpi')) return { key: 'kpi', step: 2, title: 'Key figures' };
+  const h = el.querySelector(':scope > .qb-sec-h h3'), t = h ? h.textContent.trim() : '';
+  const map = { 'Optional groups': ['optional', 1], 'Materials': ['materials', 1], 'Supplier quote requests': ['rfq', 1], 'Labour': ['labour', 1], 'Delivery': ['delivery', 1],
+    'Customer payment schedule': ['payments', 2], 'Summary': ['summary', 2], 'Cash by month (this project)': ['cash', 2], 'Timeline': ['timeline', 2], 'Approvals': ['approvals', 2] };
+  if(map[t]) return { key: map[t][0], step: map[t][1], title: t };
+  return { key: 'x-' + (el.id || t || 'other'), step: 2, title: t };
+}
+function qbsBuildNav(box){
+  const nav = document.createElement('div'); nav.className = 'qbs-nav'; nav.id = 'qbsNav';
+  nav.innerHTML = `<nav class="qbs-steps" aria-label="Quote steps">${QBS_STEPS.map(([n, l]) => `<button type="button" class="qbs-step" data-qbs-step="${n}"><span class="qbs-n" aria-hidden="true">${n}</span><span>${l}</span><span class="qbs-dot" hidden aria-hidden="true"></span><span class="sr-only qbs-attn" hidden> (needs attention)</span></button>`).join('')}</nav>
+    <div class="qbs-totals" id="qbsTotals" role="group" aria-label="Quote totals (update as you type)">
+      <div class="qbs-t qbs-main"><span class="qbs-l">${qVatOn() ? 'Customer total inc VAT' : 'Customer total ex VAT'}</span><b class="qbs-v" data-qc="tile|${qVatOn() ? 'totalInc' : 'totalEx'}">—</b>${qVatOn() ? '<span class="qbs-s"><span data-qc="tile|totalEx">—</span> ex VAT</span>' : ''}</div>
+      <div class="qbs-t"><span class="qbs-l">Materials cost</span><b class="qbs-v" data-qc="tile|materialsCost">—</b></div>
+      <div class="qbs-t"><span class="qbs-l">Margin after wages</span><b class="qbs-v" data-qc="tile|marginAfter">—</b><span class="qbs-s" data-qc="tile|marginAfterPct"></span></div>
+      <button type="button" class="qbs-alloc" id="qbsAlloc" data-qbs-go-pay="1" aria-label="Payment allocation: open the payment schedule">—</button></div>`;
+  return nav;
+}
+/* fold a card: header toggle + summary line, "How this works", body */
+function qbsWrap(card, spec, afterEl){
+  if(card.dataset.qbs) return; card.dataset.qbs = spec.key; card.classList.add('qbs-sec');
+  let head = afterEl ? null : card.querySelector(':scope > .qb-sec-h');
+  if(!head){ head = document.createElement('div'); head.className = 'qb-sec-h'; head.innerHTML = `<h3>${escHtml(spec.title)}</h3>`; if(afterEl) afterEl.after(head); else card.prepend(head); }
+  const bodyId = 'qbs-body-' + spec.key + '-' + (card.id || 'c'), h3 = head.querySelector('h3'); if(h3 && !h3.id) h3.id = bodyId + '-h';
+  const body = document.createElement('div'); body.className = 'qbs-body'; body.id = bodyId;
+  const help = []; for(let n = head.nextSibling; n; ){ const next = n.nextSibling; if(n.nodeType === 1 && n.matches('p.q-help') && !n.id && !n.querySelector('.qb-warn') && !n.classList.contains('qb-warn')) help.push(n); else body.appendChild(n); n = next; }
+  if(help.length){ const d = document.createElement('details'); d.className = 'qbs-how'; d.innerHTML = '<summary>How this works</summary><div class="qbs-how-body"></div>'; const hb = d.querySelector('.qbs-how-body'); help.forEach(p => { p.style.margin = ''; hb.appendChild(p); }); body.prepend(d); }
+  card.appendChild(body);
+  const tg = document.createElement('button'); tg.type = 'button'; tg.className = 'qbs-toggle'; tg.dataset.qbsToggle = spec.key; tg.setAttribute('aria-controls', bodyId); tg.setAttribute('aria-labelledby', h3 ? h3.id : ''); tg.innerHTML = QBS_CHEV;
+  head.prepend(tg); const sum = document.createElement('span'); sum.className = 'qbs-sum'; sum.dataset.qbsSum = spec.key; if(h3) h3.after(sum); else head.appendChild(sum);
+  qbsApplyOpen(card, qbsIsOpen(spec.key));
+}
+function qbsApplyOpen(card, open){
+  const key = card.dataset.qbs, body = card.querySelector(':scope > .qbs-body'), tg = card.querySelector(':scope > .qb-sec-h > .qbs-toggle'); if(!body) return;
+  card.classList.toggle('closed', !open); body.hidden = !open; if(tg) tg.setAttribute('aria-expanded', String(open)); qbs.cur[key] = open;
+}
+function qbsBuild(box, q){
+  if(box.querySelector(':scope > #qbsNav')) return;
+  const nav = qbsBuildNav(box), panes = [1, 2, 3].map(n => { const p = document.createElement('div'); p.className = 'qbs-pane'; p.dataset.pane = n; p.id = 'qbs-pane-' + n; return p; });
+  // tiles + their long note become one "Key figures" section
+  const tiles = box.querySelector(':scope > .qb-tiles');
+  if(tiles){ const note = tiles.nextElementSibling && tiles.nextElementSibling.matches('p.q-help') ? tiles.nextElementSibling : null; const kpi = document.createElement('div'); kpi.className = 'card qbs-kpi'; tiles.before(kpi); kpi.appendChild(tiles); if(note){ note.style.margin = ''; kpi.appendChild(note); } }
+  const keep = el => el.tagName === 'DATALIST' || el.classList.contains('qb-banner') || el.id === 'qbFlags';
+  const first = box.firstElementChild; box.insertBefore(nav, first);
+  const anchor = [...box.children].find(el => el !== nav && !keep(el)) || null;
+  panes.forEach(p => box.insertBefore(p, anchor));
+  qbsPlace(box);
+  nav.querySelectorAll('[data-qc]').forEach(el => { const src = box.querySelector('.qbs-kpi [data-qc="' + el.dataset.qc + '"]'); if(src) el.textContent = src.textContent; });   // start from the figures already on screen
+}
+/* every top-level block that is not yet in a step goes into one (also catches blocks added later: the supplier quote requests card, the timeline) */
+function qbsPlace(box){
+  [...box.children].forEach(el => {
+    if(el.id === 'qbsNav' || el.classList.contains('qbs-pane') || el.tagName === 'DATALIST' || el.classList.contains('qb-banner') || el.id === 'qbFlags') return;
+    let spec; if(el.id === 'rfqCard'){ spec = { key: 'rfq', step: 1, title: 'Supplier quote requests' }; } else spec = qbsClassify(el);
+    if(el.id === 'qbAppr' || el.classList.contains('qb-pair') || el.id === 'qbCash'){ spec = { key: el.id || 'asSold', step: 2, title: '' }; }
+    const pane = box.querySelector(':scope > .qbs-pane[data-pane="' + spec.step + '"]'); if(pane) pane.appendChild(el);
+  });
+  box.querySelectorAll(':scope > .qbs-pane').forEach(pane => pane.querySelectorAll(':scope > .card, :scope > #rfqCard > .card, :scope > #qbCash > .card').forEach(card => {
+    if(card.dataset.qbs || card.classList.contains('rf-banner')) return; const spec = qbsClassify(card);
+    if(spec.key === 'details'){ const top = card.querySelector(':scope > .qb-top'); qbsWrap(card, spec, top); }
+    else qbsWrap(card, spec);
+  }));
+  const pair = box.querySelector(':scope > .qbs-pane [class~="qb-pair"]');
+}
+function qbsShowStep(box, n, scroll){
+  qbs.step = n; box.querySelectorAll(':scope > .qbs-pane').forEach(p => { p.hidden = Number(p.dataset.pane) !== n; });
+  box.querySelectorAll('.qbs-step').forEach(b => { if(Number(b.dataset.qbsStep) === n) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+  if(scroll){ const nav = document.getElementById('qbsNav'); const y = box.getBoundingClientRect().top + window.scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bt-banner-h'), 10) || 0) - (window.innerWidth <= 700 ? 52 : 0) - 4; window.scrollTo({ top: Math.max(0, y), behavior: 'auto' }); void nav; }
+}
+function qbsFoot(box){
+  box.querySelectorAll(':scope > .qbs-pane').forEach(p => {
+    if(p.querySelector(':scope > .qbs-foot')) return; const n = Number(p.dataset.pane), f = document.createElement('div'); f.className = 'qbs-foot';
+    f.innerHTML = (n > 1 ? `<button type="button" class="btn secondary" data-qbs-step="${n - 1}">← ${QBS_STEPS[n - 2][1]}</button>` : '<span></span>') + (n < 3 ? `<button type="button" class="btn" data-qbs-step="${n + 1}">${QBS_STEPS[n][1]} →</button>` : '<span></span>');
+    p.appendChild(f);
+  });
+}
+/* the "how long" lines shown when a section is closed */
+function qbsSummaries(q, c){
+  const set = (k, t) => document.querySelectorAll(`[data-qbs-sum="${k}"]`).forEach(e => { if(e.textContent !== t) e.textContent = t; });
+  const n = (x, one, many) => x + ' ' + (x === 1 ? one : many);
+  set('details', [qRef(q), q.customer, q.project, q.status].filter(Boolean).join(' · '));
+  set('materials', `Materials – ${n(q.lines.length, 'line', 'lines')} – ${qm(c.materialsCost)} cost`);
+  set('labour', `Labour – ${n(q.labour.length, 'row', 'rows')} – ${qm(c.labourEx)}`);
+  set('delivery', `Delivery – ${n(q.drops.length, 'drop', 'drops')} – ${qm(c.deliveryEx)} ex VAT`);
+  set('optional', qOptNames(q).join(', '));
+  set('rfq', `${n((q.rfqs || []).length, 'request', 'requests')}`);
+  set('summary', `Summary – ${qVatOn() ? qm(c.totalInc) + ' inc VAT' : qm(c.totalEx) + ' ex VAT'}`);
+  const ua = document.getElementById('qbUnalloc'); const ut = ua ? ua.textContent : '';
+  set('payments', `Payment schedule – ${n(q.payments.length, 'payment', 'payments')} – ${/^Fully/.test(ut) ? 'fully allocated' : ut.replace(/^Unallocated: /, 'unallocated ')}`);
+  set('kpi', `Total ${qm(c.totalEx)} ex VAT · margin ${qm(c.marginAfter)}`);
+  set('timeline', n((q.timeline || []).length, 'note', 'notes'));
+  const cash = document.querySelectorAll('#qbCash table[data-flip="qcash-d"] tbody tr').length; set('cash', cash ? `Cash by month – ${n(cash, 'movement', 'movements')}` : 'Cash by month');
+  set('customer', 'Customer view');
+}
+/* sections that hold an error or a warning open by themselves; the steps show a dot */
+function qbsProblems(box){
+  const shown = (el, root) => { for(let n = el; n && n !== root; n = n.parentElement){ if(n.hidden && !n.classList.contains('qbs-body') && !n.classList.contains('qbs-pane')) return false; } return true; };
+  const sel = '.qb-warn, .qb-flag.bad, .qb-unalloc.bad, .qb-stageflag, .qb-warnrow:not([hidden]) .qb-warn, .q-err:not(:empty), .qcd-msg.err';
+  const stepBad = {};
+  box.querySelectorAll('.qbs-sec').forEach(card => {
+    const key = card.dataset.qbs; let bad = false;
+    card.querySelectorAll(sel).forEach(e => { if(!bad && shown(e, card) && (e.textContent.trim() || e.matches('.qb-unalloc'))) bad = true; });
+    if(key === 'details' || key === 'kpi' || key === 'customer') { /* the header form has no warnings of its own except the stage flag */ }
+    const was = !!qbs.prob[key]; qbs.prob[key] = bad;
+    if(bad && !was && card.classList.contains('closed')) qbsApplyOpen(card, true);
+    const pane = card.closest('.qbs-pane'); if(pane && bad) stepBad[pane.dataset.pane] = true;
+  });
+  box.querySelectorAll('.qbs-step').forEach(b => { const bad = !!stepBad[b.dataset.qbsStep]; const d = b.querySelector('.qbs-dot'), a = b.querySelector('.qbs-attn'); if(d) d.hidden = !bad; if(a) a.hidden = !bad; });
+}
+function qbsAlloc(){
+  const ua = document.getElementById('qbUnalloc'), bt = document.getElementById('qbsAlloc'); if(!ua || !bt) return;
+  const ok = /^Fully/.test(ua.textContent), t = ok ? 'Fully allocated' : ua.textContent.replace(/^Unallocated: ?/, 'Unallocated ').replace(/\s+/g, ' ');
+  if(bt.textContent !== t) bt.textContent = t; bt.classList.toggle('bad', !ok && ua.textContent.trim() !== '—'); bt.hidden = ua.textContent.trim() === '—';
+}
+/* tables become cards on phones: labels from the header cells; material lines get a More button */
+function qbsCards(box, q){
+  box.querySelectorAll('.qbs-pane[data-pane="1"] table.qb-table, .qbs-pane[data-pane="2"] #qbApprCard table').forEach(t => {
+    if(!t.tHead || !t.tHead.rows[0] || t.dataset.flip || t.closest('#qbCash')) return;
+    const mat = !!t.querySelector('#qbFoot'), heads = [...t.tHead.rows[0].cells].map(th => { const nm = th.querySelector('.qb-supname'); return nm ? nm.textContent.trim() : th.dataset.bttText || th.textContent.replace(/×/g, '').replace(/\s+/g, ' ').trim(); });
+    t.classList.add('qbs-cards'); t.dataset.qbsMat = mat ? '1' : '';
+    const rows = [...t.querySelectorAll(':scope > tbody:not(#qbFoot) > tr[data-line], :scope > tbody > tr:not([data-line]):not(.qb-opthead):not(.qb-warnrow):not(.qb-foot)')];
+    rows.forEach(tr => {
+      if(tr.cells.length !== heads.length) return;
+      [...tr.cells].forEach((td, i) => {
+        const h = heads[i]; td.dataset.qbsL = (mat && h === 'Materials cost') ? 'Cost each' : h;
+        if(!mat) return;
+        td.classList.remove('qbs-title', 'qbs-pri', 'qbs-sup', 'qbs-tot', 'qbs-acts', 'qbs-extra');
+        if(i === 0) td.classList.add('qbs-title'); else if(h === 'Qty' || h === 'Unit' || h === 'Materials cost') td.classList.add('qbs-pri'); else if(h === 'Supplier') td.classList.add('qbs-sup'); else if(h === 'Cost total') td.classList.add('qbs-tot'); else if(i === heads.length - 1) td.classList.add('qbs-acts'); else td.classList.add('qbs-extra');
+      });
+      if(mat){
+        const acts = tr.cells[tr.cells.length - 1]; if(acts && !acts.querySelector('.qbs-more')){ const b = document.createElement('button'); b.type = 'button'; b.className = 'qbs-more'; b.dataset.qbsMore = tr.dataset.line || ''; b.setAttribute('aria-expanded', 'false'); b.textContent = 'More'; acts.appendChild(b); }
+        const open = qbs.more.has(tr.dataset.line); tr.classList.toggle('qbs-open', open); const b = tr.querySelector('.qbs-more'); if(b){ b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'Less' : 'More'; }
+      }
+    });
+    // the per-supplier footer rows: label each figure with its supplier
+    if(mat){ const names = q.supplierCols.map(id => qbSupName(id)); t.querySelectorAll('#qbFoot tr.qb-foot').forEach(tr => [...tr.cells].forEach((td, i) => { td.dataset.qbsL = i === 0 ? '' : (names[i - 1] || ''); })); }
+  });
+}
+function qbsSync(){
+  const box = document.getElementById('quoteBuilderView'), q = qFind(qUi.openId); if(!box || !q || !box.firstElementChild) return;
+  if(!box.querySelector(':scope > #qbsNav')) return;
+  qbsPlace(box); qbsFoot(box); qbsShowStep(box, qbs.step, false);
+  const c = qCalc(q);   // only to read the figures the page has already shown (the same function the tiles use)
+  qbsSummaries(q, c); qbsAlloc(); qbsCards(box, q); qbsProblems(box);
+}
+(function(){
+  const oRender = qbRender;
+  qbRender = function(){
+    const q0 = qFind(qUi.openId); if(q0 && qbs.qid !== q0.id){ qbs.qid = q0.id; qbs.step = 1; qbs.cur = {}; qbs.prob = {}; qbs.more = new Set(); }
+    const sy = window.scrollY, r = oRender.apply(this, arguments);
+    try{ const box = document.getElementById('quoteBuilderView'), q = qFind(qUi.openId); if(box && q){ qbsBuild(box, q); qbsSync(); window.scrollTo(0, sy); } }catch(e){ if(window.console) console.warn('quote builder shell', e); }
+    return r;
+  };
+  const oRefresh = qbRefresh;   // wraps the supplier-quote-request patch above, so it runs last
+  qbRefresh = function(){ const r = oRefresh.apply(this, arguments); try{ qbsSync(); }catch(e){} return r; };
+})();
+document.addEventListener('click', (e) => {
+  const t = e.target; if(!t || !t.closest) return;
+  const box = document.getElementById('quoteBuilderView'); if(!box || !box.contains(t)) return;
+  const st = t.closest('[data-qbs-step]'); if(st){ qbsShowStep(box, Number(st.dataset.qbsStep), true); return; }
+  const go = t.closest('[data-qbs-go-pay]'); if(go){ qbsShowStep(box, 2, false); const card = box.querySelector('.qbs-sec[data-qbs="payments"]'); if(card){ qbsApplyOpen(card, true); card.scrollIntoView({ block: 'start' }); const f = card.querySelector('input,select,button'); if(f) f.focus({ preventScroll: true }); } return; }
+  const mo = t.closest('[data-qbs-more]'); if(mo){ const id = mo.dataset.qbsMore; if(qbs.more.has(id)) qbs.more.delete(id); else qbs.more.add(id); const tr = mo.closest('tr'); const open = qbs.more.has(id); tr.classList.toggle('qbs-open', open); mo.setAttribute('aria-expanded', String(open)); mo.textContent = open ? 'Less' : 'More'; return; }
+  const tg = t.closest('[data-qbs-toggle]') || (t.closest('.qbs-sec > .qb-sec-h h3') ? t.closest('.qbs-sec').querySelector(':scope > .qb-sec-h > .qbs-toggle') : null) || (t.closest('.qbs-sum') ? t.closest('.qbs-sec').querySelector(':scope > .qb-sec-h > .qbs-toggle') : null);
+  if(tg){ const card = tg.closest('.qbs-sec'), open = card.classList.contains('closed'); qbsApplyOpen(card, open); qbsSaveOpen(card.dataset.qbs, open); }
+});
 function rfBannerHtml(q, fo){
   const r = rfqOf(q, fo.rid); if(!r) return ''; const s = supFind(r.supplierId);
   return `<div class="card rf-banner"><div class="qb-sec-h"><h4>Entering prices from ${escHtml(rfqSupplierName(r.supplierId))} <span class="qb-dim">for ${escHtml(r.number)}</span></h4><div class="qb-sec-tools"><button type="button" class="btn qb-sm" data-rf="prices-done" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Finished: mark quote received</button><button type="button" class="btn secondary qb-sm" data-rf="prices-close">Close</button></div></div>
