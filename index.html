@@ -2073,6 +2073,124 @@ body.logged-out .fav-btn { display: none; }
 .pvx-qn { font-family: var(--bt-font-brand); font-weight: var(--bt-font-brand-w); font-size: var(--bt-fs-lg); color: var(--bt-brand-text); }
 .pvx-qt { display: flex; justify-content: space-between; background: var(--bt-brand-text); color: var(--bt-on-brand-ctl); font-size: var(--bt-fs-xs); padding: var(--bt-s1) var(--bt-s2); }
 .pvx-qtot { display: flex; justify-content: space-between; margin-top: var(--bt-s2); padding: var(--bt-s2); background: var(--bt-brand-soft); border-top: 3px solid var(--bt-brand-accent-fill); font-size: var(--bt-fs-sm); }
+
+/* =====================================================================
+   ONE TABLE SYSTEM (Batch 4, Part A). Every table that has a header row gets .bt-t from the table enhancer (see "One table system"
+   in the script): sticky header inside its own scroll area, one row height, numbers right-aligned, sort cues, wrapped names with a
+   tooltip, columns ranked essential / normal / extra, a saved "Columns" choice, cards on phones for the list tables, and one
+   empty / loading look. Display choices live in localStorage under STORAGE_PREFIX, never in the saved data.
+   ===================================================================== */
+:root { --bt-row: 44px; --bt-th-h: 36px; --bt-cell-x: var(--bt-s3); --bt-cell-y: var(--bt-s2); --bt-sticky-bg: var(--bt-surface-2); }
+@media (max-width:700px),(pointer:coarse) { :root { --bt-row: 52px; } }
+.bt-scroller { max-height: max(360px, calc(100vh - 230px)); overflow: auto; overscroll-behavior-x: contain; }
+.bt-scroller.bt-nocap { max-height: none; }
+.bt-t { font-variant-numeric: tabular-nums; }
+.bt-t > thead > tr > th { position: sticky; top: 0; z-index: 2; background: var(--bt-sticky-bg); box-shadow: inset 0 -1.5px 0 var(--stone-deep); border-bottom: 0; height: var(--bt-th-h); vertical-align: middle; }
+.bt-t:not(.qb-table):not(.pj-table):not(.quotes-table) > thead > tr > th { padding: var(--bt-s2) var(--bt-cell-x); }
+.bt-t > thead > tr > th:first-child { z-index: 4; }
+.bt-t.qb-table:not(.qb-narrow) > thead > tr > th { height: auto; vertical-align: bottom; }   /* the Materials grid keeps its own two-line supplier headers */
+.bt-t.qb-table:not(.qb-narrow) > tbody > tr > td { height: auto; }
+.bt-t:not(.qb-table):not(.pj-table):not(.quotes-table) > tbody > tr > td, .bt-t:not(.qb-table):not(.pj-table):not(.quotes-table) > tbody > tr > th { padding: var(--bt-cell-y) var(--bt-cell-x); }
+.bt-t > tbody > tr:not(.detail-row):not(.bt-empty-row) > td { height: var(--bt-row); }
+.bt-t td.bt-num, .bt-t th.bt-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bt-t td.bt-num:has(input, select) { text-align: left; }   /* a box stays where it was; the figure inside it is right-aligned */
+.bt-t td.bt-num input:not([type=checkbox]):not([type=radio]), .bt-t td.bt-num select { text-align: right; font-variant-numeric: tabular-nums; }
+.bt-t th.bt-num .bt-sort-btn { flex-direction: row-reverse; }
+.bt-t td.bt-nowrap, .bt-t td.bt-date { white-space: nowrap; }
+/* headers wrap (up to two lines) instead of ending in an ellipsis; the full text is also the tooltip */
+.bt-t.rt-table > thead > tr > th { white-space: normal; line-height: 1.2; text-overflow: clip; overflow-wrap: normal; word-break: normal; hyphens: none; }
+.bt-t.rt-table > thead > tr > th { padding-right: 10px; }
+/* names and titles: wrap up to two lines, then the full text is the tooltip (title) */
+.bt-clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; line-height: 1.3; max-width: 100%; min-width: 0; }
+.bt-t td { overflow-wrap: anywhere; }
+.bt-t td.bt-num, .bt-t td.bt-date, .bt-t td.bt-status { overflow-wrap: normal; }
+/* sort cues */
+.bt-sort-btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; min-height: 28px; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; }
+.bt-sort-btn:hover { color: var(--bt-text); }
+.bt-sort-btn:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 1px; border-radius: 4px; }
+.bt-arrow { display: inline-block; width: 1em; text-align: center; color: var(--bt-border-strong); font-size: 10px; line-height: 1; }
+.bt-arrow::after { content: '\2195'; }
+th[aria-sort="ascending"] .bt-arrow::after { content: '\25B2'; }
+th[aria-sort="descending"] .bt-arrow::after { content: '\25BC'; }
+th[aria-sort="ascending"] .bt-arrow, th[aria-sort="descending"] .bt-arrow { color: var(--oak-text); }
+th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
+.crm-sort[role=button]:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; border-radius: 4px; }
+/* focus and keyboard */
+.bt-t tbody tr[tabindex]:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: -2px; }
+.bt-t tbody tr[tabindex] { cursor: pointer; }
+.bt-t button:focus-visible, .bt-t a:focus-visible, .bt-t [role=button]:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 1px; }
+/* column priority: "extra" columns go first on tablet widths; a saved choice always wins */
+@media (max-width:700px),(pointer:coarse) { .bt-sort-btn { min-height: var(--bt-control); min-width: 44px; } input[type=color] { min-width: var(--bt-control); } }
+@media (max-width:1100px) { .bt-t .bt-pri-x:not(.bt-show) { display: none; } }
+.bt-t.bt-auto-x .bt-pri-x:not(.bt-show), .bt-t.bt-auto-n .bt-pri-n:not(.bt-show) { display: none; }   /* and on any width where the table would not fit: extra columns step aside first, then normal ones */
+.bt-t .bt-hide { display: none !important; }
+/* the Columns button and its panel */
+.bt-bar { display: flex; justify-content: flex-end; align-items: center; gap: var(--bt-s3); margin-bottom: 6px; position: relative; }
+.bt-cols-btn { font: inherit; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--bt-text); background: var(--bt-card); border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-btn); padding: 0 var(--bt-s3); min-height: var(--bt-control); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.bt-cols-btn:hover { background: var(--bt-surface-2); }
+.bt-cols-btn:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+.bt-cols-pop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 30; min-width: 220px; max-width: min(320px, calc(100vw - 32px)); background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); box-shadow: var(--bt-shadow-2); padding: var(--bt-s2); }
+.bt-cols-pop[hidden] { display: none; }
+.bt-cols-pop label { display: flex; align-items: center; gap: var(--bt-s2); min-height: var(--bt-control); padding: 0 var(--bt-s2); font-size: var(--bt-fs-sm); cursor: pointer; border-radius: var(--bt-r-chip); }
+.bt-cols-pop label:hover { background: var(--bt-surface-2); }
+.bt-cols-pop label, .bt-cols-pop input { text-align: left; justify-content: flex-start; width: auto; margin: 0; }
+.bt-cols-pop label { width: 100%; text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--bt-text); }
+.bt-cols-pop input[type=checkbox] { flex: none; }
+.bt-cols-pop .bt-cols-note { font-size: var(--bt-fs-xs); color: var(--bt-text-muted); padding: var(--bt-s1) var(--bt-s2) var(--bt-s2); }
+.bt-cols-pop .bt-cols-foot { display: flex; justify-content: space-between; gap: var(--bt-s2); border-top: 1px solid var(--line); margin-top: var(--bt-s1); padding-top: var(--bt-s2); }
+.bt-cols-pop .bt-cols-foot button { font: inherit; font-size: var(--bt-fs-sm); min-height: var(--bt-control); padding: 0 var(--bt-s3); border-radius: var(--bt-r-btn); border: 1px solid var(--bt-border-strong); background: var(--bt-card); color: var(--bt-text); cursor: pointer; }
+.bt-cols-pop .bt-cols-foot button:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+/* one empty state and one loading state */
+.bt-t > tbody > tr.bt-empty-row > td, .bt-tbl-state { text-align: center; color: var(--bt-text-muted); padding: var(--bt-s6) var(--bt-s4); font-size: var(--bt-fs-sm); font-style: normal; height: auto; background: transparent; }
+.bt-tbl-loading { display: flex; align-items: center; justify-content: center; gap: var(--bt-s2); }
+.bt-tbl-loading::before { content: ''; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bt-border-strong); border-top-color: var(--bt-oak-600); animation: bt-spin .8s linear infinite; }
+@keyframes bt-spin { to { transform: rotate(360deg); } }
+/* wide matrices (cash flow, revenue forecast, pricing model, the quote cash tables): horizontal scroll with a sticky first column and an edge shadow */
+.bt-matrix > thead > tr > th:first-child, .bt-matrix > tbody > tr > :first-child, .bt-matrix > tfoot > tr > :first-child { position: sticky; left: 0; z-index: 2; background-color: var(--bt-card); }
+.bt-matrix > thead > tr > th:first-child { z-index: 5; background-color: var(--bt-sticky-bg); }
+.bt-matrix > tbody > tr:hover > :first-child { background-color: var(--bt-surface-2); }
+.bt-matrix > tbody > tr > :first-child { box-shadow: 1px 0 0 var(--line); }
+.bt-scroller.bt-sl .bt-matrix > thead > tr > th:first-child, .bt-scroller.bt-sl .bt-matrix > tbody > tr > :first-child { box-shadow: 8px 0 8px -6px color-mix(in srgb, var(--bt-ink) 28%, transparent); }
+.bt-scroller.bt-sr { -webkit-mask-image: linear-gradient(to right, var(--bt-ink) calc(100% - 28px), transparent); mask-image: linear-gradient(to right, var(--bt-ink) calc(100% - 28px), transparent); }
+.bt-scroller.bt-sr:has(tr.detail-row) { -webkit-mask-image: none; mask-image: none; }
+/* cards on phones (Leads, Sales Pipeline, Project Pipeline, Actions, CRM tasks, Invoicing, Purchase Orders, Suppliers, Transactions). The rows stay the same rows,
+   so a tap, a button or an input does exactly what it did in the table. */
+@media (max-width:700px) {
+  .bt-scroller:has(> .bt-cards) { max-height: none; overflow: visible; background: transparent; border: 0; box-shadow: none; -webkit-mask-image: none; mask-image: none; }
+  .bt-cards, .bt-cards > tbody, .bt-cards > tfoot { display: block; width: 100% !important; min-width: 0 !important; max-width: 100%; }
+  #suppliersTableWrap.fitmode > table.bt-cards { min-width: 0 !important; }
+  .bt-cards td { white-space: normal !important; text-overflow: clip; }
+  .bt-cards > colgroup { display: none; }
+  .table-tools:has(+ .bt-scroller > .bt-cards) .link-btn { display: none; }
+  .bt-cards > thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .bt-cards > tbody > tr { display: flex; flex-wrap: wrap; align-items: center; gap: var(--bt-s1) var(--bt-s3); background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); box-shadow: var(--bt-shadow-1); padding: var(--bt-s3); margin-bottom: var(--bt-s3); position: relative; }
+  .bt-cards > tbody > tr:hover td { background: transparent; }
+  .bt-cards > tbody > tr > td { display: block; border: 0; padding: 0; height: auto !important; min-width: 0; max-width: 100%; flex: 0 1 auto; background: transparent !important; position: static !important; overflow: visible; }
+  .bt-cards > tbody > tr > td::before { content: attr(data-label); display: block; font-size: var(--bt-fs-2xs); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--bt-text-muted); margin-bottom: 2px; }
+  .bt-cards > tbody > tr > td[data-label=""]::before, .bt-cards > tbody > tr > td.bt-r-title::before, .bt-cards > tbody > tr > td.bt-r-code::before, .bt-cards > tbody > tr > td.bt-r-status::before, .bt-cards > tbody > tr > td.bt-r-lead::before, .bt-cards > tbody > tr > td.bt-r-end::before { display: none; }
+  .bt-cards > tbody > tr > td.bt-r-lead { order: 0; flex: 0 0 auto; }
+  .bt-cards > tbody > tr > td.bt-r-code { order: 1; font-weight: 700; color: var(--slate); }
+  .bt-cards > tbody > tr > td.bt-r-status { order: 2; margin-left: auto; }
+  .bt-cards > tbody > tr > td.bt-r-title { order: 3; flex: 1 1 100%; font-size: var(--bt-fs-md); font-weight: 700; line-height: 1.25; }
+  .bt-cards > tbody > tr > td.bt-r-field, .bt-cards > tbody > tr > td.bt-r-value, .bt-cards > tbody > tr > td.bt-r-date { order: 5; flex: 1 1 42%; }
+  .bt-cards > tbody > tr > td.bt-r-value { order: 6; font-weight: 700; }
+  .bt-cards > tbody > tr > td.bt-r-date { order: 7; }
+  .bt-cards > tbody > tr > td.bt-r-next { order: 8; flex: 1 1 100%; }
+  .bt-cards > tbody > tr > td.bt-r-end { order: 20; margin-left: auto; }
+  .bt-cards > tbody > tr > td.bt-num { text-align: left; }
+  .bt-cards > tbody > tr > td.bt-num input { text-align: left; }
+  .bt-cards > tbody > tr > td input:not([type=checkbox]):not([type=radio]), .bt-cards > tbody > tr > td select, .bt-cards > tbody > tr > td textarea { width: 100%; min-width: 0; min-height: var(--bt-control); }
+  .bt-cards > tbody > tr > td .icon-btn, .bt-cards > tbody > tr > td button { min-height: var(--bt-control); min-width: var(--bt-control); }
+  .bt-cards > tbody > tr > td.bt-r-title input { font-weight: 700; font-size: var(--bt-fs-md); }
+  .bt-cards > tbody > tr.detail-row, .bt-cards > tbody > tr.crm-group, .bt-cards > tbody > tr.bt-empty-row { display: block; }
+  .bt-cards > tbody > tr.detail-row { margin-top: calc(-1 * var(--bt-s2)); border-top-left-radius: 0; border-top-right-radius: 0; }
+  .bt-cards > tbody > tr.detail-row > td { display: block; width: 100%; }
+  .bt-cards > tbody > tr.crm-group { background: transparent; border: 0; box-shadow: none; padding: var(--bt-s2) 0 0; }
+  .bt-cards > tbody > tr.crm-group > td { font-weight: 700; }
+  .bt-cards > tbody > tr.bt-empty-row > td { display: block; }
+  .bt-cards > tbody > tr.bt-empty-row > td::before { display: none; }
+}
+@media (max-width:700px) { .bt-matrix { min-width: 0; } }
 </style>
 </head>
 <body>
@@ -3475,7 +3593,7 @@ function renderAuthUI(){
 }
 async function renderUsers(){
   const wrap = document.getElementById('usersWrap'); if(!wrap || !isAdmin()) return;
-  wrap.innerHTML = '<div class="breakdown-hint">Loading users…</div>';
+  wrap.innerHTML = '<div class="bt-tbl-state bt-tbl-loading" role="status">Loading users…</div>';
   try{
     const users = await sbRpc('app_list_users', {});
     const rows = (users || []).map(u => `<tr>
@@ -12764,6 +12882,363 @@ new MutationObserver(updateScrollCues).observe(document.querySelector('.main'), 
 PHONE_MQ.addEventListener('change', () => { rtApply(); updateScrollCues(); });
 updateScrollCues();
 
+/* =====================================================================
+   ONE TABLE SYSTEM (Batch 4, Part A) — display only. Nothing here reads or writes the saved data: it looks at the tables the
+   pages have already drawn and adds classes, labels, sort cues and a Columns choice. Sorting only re-orders the rows on screen
+   (a third click puts the original order back); hidden columns are only hidden. Per-device choices (which columns are shown)
+   live in localStorage under STORAGE_PREFIX, never in the saved state.
+   Column priority: E = essential (always shown), N = normal, X = extra (first to go on tablet widths, and the Columns button
+   can show or hide it). On phones the list tables below turn into cards.
+   ===================================================================== */
+const BTT_PREFS_KEY = STORAGE_PREFIX + 'business-tracker-tables';
+const BTT_TABLET_MQ = window.matchMedia('(max-width: 1100px)');
+const BTT_CARD_MQ = window.matchMedia('(max-width: 700px)');
+/* per-table settings, matched by the start of the table key (see bttKey). cards: which header is the code / title / status / value / date / next action.
+   pri: header (lowercase) -> 'e' | 'n' | 'x' where the default guess is wrong. sort: list tables whose columns may be sorted by clicking the header. */
+const BTT_SPECS = [
+  { k: 'leadsTableWrap', label: 'Leads', sort: 1, cards: { code: ['code'], title: ['project name'], status: ['lead status'], date: ['last contacted'] }, pri: { 'tier': 'x', 'postcode': 'x', 'company': 'n', 'contact': 'e' } },
+  { k: 'pipelineTableWrap', label: 'Sales pipeline', sort: 1, cards: { code: ['code'], title: ['project / client'], status: ['sales stage'], value: ['quote (£)'], date: ['start'] }, pri: { 'type': 'x', 'tier': 'x', 'prob.': 'x', 'complete': 'x', 'cost (£)': 'x' } },
+  { k: 'projectsTableWrap', label: 'Project pipeline', sort: 1, cards: { code: ['code'], title: ['project'], status: ['stage'], value: ['agreed value'], next: ['budget vs actual'] } },
+  { k: 'crmTableWrap', label: 'Tasks', own: 1, noCols: 1, cards: { title: ['title'], status: ['priority'], date: ['due date'], next: ['linked record'] }, pri: { 'type': 'x', 'notes': 'x', 'owner': 'n' } },
+  { k: 'actionsTableWrap', label: 'Actions', sort: 1, noCols: 1, cards: { title: ['action'], status: ['status'], date: ['deadline'], next: ['notes'] }, pri: { 'date raised': 'x', '+ owner': 'x', 'notes': 'n' } },
+  { k: 'suppliersTableWrap', label: 'Suppliers', sort: 1, cards: { code: ['code'], title: ['supplier'], status: ['status'], next: ['main contact'] }, pri: { 'categories': 'n', 'phone': 'n', 'email': 'x', 'payment terms': 'x', 'delivery': 'x', 'lead time': 'x' } },
+  { k: 'transactionsTableWrap', label: 'Transactions', sort: 1, cards: { title: ['description'], date: ['date'], value: ['in (£)', 'out (£)'], status: ['category'] }, pri: { 'linked code': 'x', 'invoice / variation': 'x', 'project': 'n' } },
+  { k: 'panel-invoicing:project-invoice', label: 'Invoices', sort: 1, cards: { code: ['invoice'], title: ['project'], status: ['status'], value: ['amount'], date: ['due'], next: ['raise by'] }, pri: { 'sent': 'x', 'paid': 'x' } },
+  { k: 'panel-purchaseorders:po-project', label: 'Purchase orders', sort: 1, cards: { code: ['po'], title: ['supplier'], status: ['status'], value: ['value'], date: ['delivery'], next: ['project'] }, pri: { 'approval': 'n' } },
+  { k: 'panel-quotations:reference-customer', label: 'Quotes', sort: 1 },
+  { k: 'panel-contacts:name-phone', label: 'Contacts', sort: 1 },
+  { k: 'panel-companies:company-type', label: 'Companies', sort: 1 },
+  { k: 'panel-assets:name-category', label: 'Assets', sort: 1 },
+  { k: 'adminTableWrap', label: 'Admin tasks', sort: 1 },
+  { k: 'cashflowTableWrap', label: 'Cash flow forecast', matrix: 1 },
+  { k: 'revenueTableWrap', label: 'Revenue forecast', matrix: 1 },
+  { k: 'pricingTableWrap', label: 'Pricing model', matrix: 1 },
+  { k: 'goalsTableWrap', label: 'Long-term goals' },
+  { k: 'capabilityTableWrap', label: 'Trade capability' },
+  { k: 'networkTableWrap', label: 'Network and contacts' },
+  { k: 'milestonesTableWrap', label: 'Milestones' },
+  { k: 'panel-crmprojects:code-name', label: 'Projects overview' }
+];
+const BTT_CARD_KEYS = ['leadsTableWrap', 'pipelineTableWrap', 'projectsTableWrap', 'crmTableWrap', 'actionsTableWrap', 'suppliersTableWrap', 'transactionsTableWrap', 'panel-invoicing:project-invoice', 'panel-purchaseorders:po-project'];
+const BTT_EXTRA_RE = /^(notes?|comments?|description|email|phone|postcode|address|website|serial|residual|life|insurance|service|created|source|payment terms|lead time|categories|linked|replacement|book value|last contacted|last touched|in progress|raised|version|prob|owner|sent|tier|type|date raised|\+ owner)\b/i;
+const BTT_ESS_RE = /^(code|ref|reference|po|invoice|name|title|project|project name|project \/ client|supplier|customer|company|contact|item|action|stage|status|lead status|sales stage|month|date|due|deadline|amount|value|total|quote|agreed value|total ex vat|tier name|in \(|out \()/i;
+const BTT_NAME_RE = /^(name|title|project|project name|project \/ client|supplier|customer|company|contact|description|item|action|stage|long-term goal|trade area|role|category|linked record|linked lead|main contact|categories)/i;
+const BTT_SORTABLE_RE = /name|title|project|customer|supplier|company|contact|status|stage|priority|owner|code|ref|description|item|action|category|type|tier|date|due|deadline|start|complete|raised|value|amount|total|quote|price|cost|invoice|paid|sent|delivery|po$|^in |^out |£/i;
+const bttState = { prefs: null, sort: {}, dirty: new Set(), raf: 0, queued: false, popFor: null };
+function bttPrefs(){
+  if(bttState.prefs) return bttState.prefs;
+  let p = null; try{ p = JSON.parse(localStorage.getItem(BTT_PREFS_KEY) || 'null'); }catch(e){}
+  bttState.prefs = (p && typeof p === 'object' && p.cols && typeof p.cols === 'object') ? p : { cols: {} };
+  return bttState.prefs;
+}
+function bttSavePrefs(){ try{ localStorage.setItem(BTT_PREFS_KEY, JSON.stringify(bttState.prefs)); }catch(e){} }
+const bttSlug = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const bttNorm = s => String(s == null ? '' : s).replace(/[▲▼↕⇅⇄]/g, '').replace(/\s+/g, ' ').trim();
+function bttHeadText(th){ if(th.dataset.bttText === undefined) th.dataset.bttText = bttNorm(th.textContent); return th.dataset.bttText; }
+function bttSkip(t){ return !!t.closest('.cd, .pp-sheet, [data-bt-skip]') || !t.tHead || !t.tHead.rows.length; }
+function bttKey(t){
+  if(t.dataset.bttKey) return t.dataset.bttKey;
+  const head = t.tHead.rows[t.tHead.rows.length - 1], sig = [...head.cells].map(c => bttSlug(bttHeadText(c))).join('-').slice(0, 70);
+  const sc = t.closest('.table-scroll[id]'), panel = t.closest('.panel');
+  const base = t.dataset.rt || (sc && sc.id) || (panel && panel.id) || (t.closest('#projectWorkspace') ? 'pw' : t.closest('.modal, [role=dialog]') ? 'modal' : 'page');
+  const key = (t.dataset.rt || (sc && sc.id)) ? base : base + ':' + sig;
+  t.dataset.bttKey = key; return key;
+}
+function bttSpec(key){ return BTT_SPECS.find(s => key === s.k || key.startsWith(s.k + ':')) || null; }
+function bttLabel(t, spec){
+  const lab = t.getAttribute('aria-label'); if(lab && t.dataset.bttLabel) return lab;
+  let txt = '';
+  if(t.caption && t.caption.textContent.trim()) return '';
+  if(spec && spec.label) return spec.label;
+  const panel = t.closest('.panel') || document.body;
+  for(let el = t; el && el !== panel.parentElement && !txt; el = el.parentElement){
+    for(let s = el.previousElementSibling; s && !txt; s = s.previousElementSibling){
+      const h = /^H[1-6]$/.test(s.tagName) ? s : (s.querySelector ? s.querySelector('h2,h3,h4') : null);
+      if(h && h.textContent.trim()) txt = bttNorm(h.textContent);
+      else if(s.matches && s.matches('.q-sub, .qb-sec-h, .card-title, .pw-fold-h') && s.textContent.trim()) txt = bttNorm(s.textContent).slice(0, 60);
+    }
+    if(el === panel) break;
+  }
+  if(!txt && spec && spec.label) txt = spec.label;
+  if(!txt){ const h = panel.querySelector && panel.querySelector('h2'); txt = h ? bttNorm(h.textContent) : 'Table'; }
+  return txt;
+}
+function bttCellText(td){
+  const c = td.querySelector('input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea');
+  if(c){ if(c.tagName === 'SELECT') return bttNorm((c.selectedOptions[0] || {}).textContent); return bttNorm(c.value); }
+  const cb = td.querySelector('input[type=checkbox]'); if(cb) return cb.checked ? '1' : '0';
+  return bttNorm(td.textContent);
+}
+const BTT_NUM_RE = /^\(?[-−–]?\s*[£$€]?\s*[-−–]?\d[\d,]*(\.\d+)?\)?\s*(%|x|d|days?|hrs?|h|yrs?|m²|m2|m)?$/i;
+const BTT_MON = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, sept: 8, oct: 9, nov: 10, dec: 11 };
+function bttDate(s){
+  s = String(s || '').trim(); let m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s); if(m) return Date.UTC(+m[1], +m[2] - 1, +m[3]);
+  m = /^(\d{1,2})\s+([A-Za-z]{3,4})\.?\s+(\d{4})$/.exec(s); if(m && BTT_MON[m[2].toLowerCase()] !== undefined) return Date.UTC(+m[3], BTT_MON[m[2].toLowerCase()], +m[1]);
+  return NaN;
+}
+const bttBlank = s => s === '' || /^[—–-]$/.test(s) || s === 'TBC';
+function bttNum(s){ const neg = /^\(|^[-−–]/.test(s.trim()); const v = parseFloat(s.replace(/[^\d.]/g, '')); return isNaN(v) ? NaN : (neg ? -v : v); }
+function bttKind(cells, th){
+  const vals = cells.map(bttCellText).filter(v => !bttBlank(v)); if(!vals.length) return 'text';
+  const inp = cells.some(td => td.querySelector('input[type=number]')), inpDate = cells.some(td => td.querySelector('input[type=date]'));
+  if(inpDate || vals.every(v => !isNaN(bttDate(v)))) return 'date';
+  const numHead = th && /(^|\s)(r|n|num|right)(\s|$)/.test(th.className || '');
+  const textHead = /^(code|ref|reference|po|invoice|no\.?|number|#|phone|postcode|tier|id)\b/i.test(bttHeadText(th));
+  const hit = vals.filter(v => BTT_NUM_RE.test(v)).length;
+  if(!textHead && (inp || numHead || hit / vals.length >= 0.7)) return hit ? 'num' : (numHead ? 'num' : 'text');
+  return 'text';
+}
+function bttPri(txt, idx, role, spec){
+  const k = txt.toLowerCase();
+  if(spec && spec.pri && spec.pri[k]) return spec.pri[k];
+  if(role === 'lead' || role === 'end') return 'e';
+  if(role !== 'field') return 'e';
+  if(BTT_ESS_RE.test(txt)) return 'e';
+  if(BTT_EXTRA_RE.test(txt)) return 'x';
+  return 'n';
+}
+function bttRoles(heads, spec){
+  const cards = (spec && spec.cards) || {}, out = heads.map(() => 'field');
+  heads.forEach((h, i) => {
+    const k = h.toLowerCase();
+    if(!h){ out[i] = (i === 0 && heads.length > 2) ? 'lead' : 'end'; return; }
+    for(const r of ['code', 'title', 'status', 'value', 'date', 'next']) if((cards[r] || []).includes(k)){ out[i] = r; return; }
+  });
+  return out;
+}
+function bttGroups(tb){   // a row and the detail rows that belong to it move together when sorting
+  const groups = []; [...tb.rows].forEach(r => {
+    const detail = r.classList.contains('detail-row') || (r.cells.length === 1 && r.cells[0].colSpan > 1);
+    if(detail && groups.length) groups[groups.length - 1].push(r); else groups.push([r]);
+  });
+  return groups;
+}
+function bttApplySort(t, N, heads, kinds){
+  const key = bttKey(t), st = bttState.sort[key];
+  if(t.tBodies.length !== 1) return;
+  const tb = t.tBodies[0], rows = [...tb.rows];
+  rows.forEach((r, i) => { if(r.dataset.bti === undefined) r.dataset.bti = String(i); });
+  const groups = bttGroups(tb); if(groups.some(g => g[0].cells.length !== N)) return;
+  const orig = groups.slice().sort((a, b) => a[0].dataset.bti - b[0].dataset.bti);
+  let want = orig;
+  if(st){
+    const ci = heads.findIndex(h => bttSlug(h) === st.col); if(ci < 0){ delete bttState.sort[key]; }
+    else {
+      const kind = kinds[ci], dir = st.dir === 'desc' ? -1 : 1;
+      const val = g => { const s = bttCellText(g[0].cells[ci]); if(bttBlank(s)) return null; return kind === 'num' ? bttNum(s) : kind === 'date' ? bttDate(s) : s; };
+      want = orig.map(g => ({ g, v: val(g) })).sort((a, b) => {
+        if(a.v === null || b.v === null || (typeof a.v === 'number' && isNaN(a.v)) || (typeof b.v === 'number' && isNaN(b.v))){ const an = a.v === null || a.v !== a.v, bn = b.v === null || b.v !== b.v; return an === bn ? 0 : an ? 1 : -1; }
+        const c = typeof a.v === 'number' ? a.v - b.v : String(a.v).localeCompare(String(b.v), undefined, { numeric: true, sensitivity: 'base' });
+        return c * dir;
+      }).map(x => x.g);
+    }
+  }
+  const cur = groups.map(g => g[0]), nxt = want.map(g => g[0]);
+  if(cur.every((r, i) => r === nxt[i])) return;
+  const frag = document.createDocumentFragment(); want.forEach(g => g.forEach(r => frag.appendChild(r))); tb.appendChild(frag);
+}
+function bttRefresh(t){
+  if(bttSkip(t)) return;
+  const key = bttKey(t), spec = bttSpec(key), head = t.tHead.rows[t.tHead.rows.length - 1];
+  t.classList.add('bt-t');
+  const sc = t.closest('.table-scroll, .qb-scroll, .pj-tablewrap');
+  if(sc){ sc.classList.add('bt-scroller'); if(sc.closest('.qb-wrap, #quoteBuilder, .qb')) sc.classList.add('bt-nocap'); }
+  const lab = bttLabel(t, spec); if(lab && !t.getAttribute('aria-label')){ t.setAttribute('aria-label', lab); t.dataset.bttLabel = '1'; }
+  [...t.tHead.rows].forEach(r => [...r.cells].forEach(c => { if(c.tagName === 'TH' && !c.hasAttribute('scope')) c.setAttribute('scope', 'col'); }));
+  [...t.querySelectorAll('tbody > tr > th')].forEach(c => { if(!c.hasAttribute('scope')) c.setAttribute('scope', 'row'); });
+  const matrix = !!((spec && spec.matrix) || t.hasAttribute('data-flip')); t.classList.toggle('bt-matrix', matrix); if(sc) sc.classList.toggle('bt-wide', matrix);
+  const ths = [...head.cells], N = ths.length, simpleHead = t.tHead.rows.length === 1 && ths.every(c => c.colSpan === 1);
+  const bodyRows = [...t.querySelectorAll('tbody > tr')];
+  // empty state: a body that is only one wide message row
+  const only = bodyRows.length === 1 && bodyRows[0].cells.length === 1 && bodyRows[0].cells[0].colSpan > 1 && !bodyRows[0].querySelector('input,select,textarea');
+  bodyRows.forEach(r => r.classList.toggle('bt-empty-row', only && r === bodyRows[0]));
+  if(!simpleHead || N < 2) return;
+  const heads = ths.map(bttHeadText), roles = bttRoles(heads, spec);
+  const data = bodyRows.filter(r => r.cells.length === N && !r.classList.contains('detail-row') && !r.classList.contains('bt-empty-row'));
+  const kinds = ths.map((th, i) => (roles[i] === 'lead' || roles[i] === 'end' || !heads[i]) ? 'text' : bttKind(data.map(r => r.cells[i]), th));
+  const first = heads.findIndex(h => h);
+  const pri = heads.map((h, i) => ((i === first && !(spec && spec.pri && spec.pri[heads[i].toLowerCase()])) || matrix) ? 'e' : bttPri(h, i, roles[i] === 'field' ? 'field' : (roles[i] === 'lead' || roles[i] === 'end' ? roles[i] : 'title'), spec));
+  const prefs = bttPrefs().cols[key] || {}, shown = new Set(prefs.s || []), hidden = new Set(prefs.h || []);
+  const many = N >= 6, autoOk = !!spec && !spec.matrix, ids = heads.map((h, i) => bttSlug(h) || 'c' + i);
+  const cards = BTT_CARD_KEYS.some(k => key === k || key.startsWith(k + ':'));
+  t.classList.toggle('bt-cards', cards);
+  if(cards){ t.setAttribute('role', 'table'); [...t.rows].forEach(r => { r.setAttribute('role', 'row'); [...r.cells].forEach(c => c.setAttribute('role', c.tagName === 'TH' ? 'columnheader' : 'cell')); }); if(t.tHead) t.tHead.setAttribute('role', 'rowgroup'); [...t.tBodies].forEach(b => b.setAttribute('role', 'rowgroup')); }
+  const cols = t.querySelectorAll(':scope > colgroup > col');
+  const clampOk = i => roles[i] === 'title' || (roles[i] === 'field' && BTT_NAME_RE.test(heads[i]));
+  const colClass = i => {
+    const id = ids[i], r = [];
+    if(many && autoOk && pri[i] === 'x') r.push('bt-pri-x'); else if(many && autoOk && pri[i] === 'n') r.push('bt-pri-n'); if(shown.has(id)) r.push('bt-show'); if(hidden.has(id) && pri[i] !== 'e') r.push('bt-hide');
+    return r;
+  };
+  ths.forEach((th, i) => {
+    th.classList.toggle('bt-num', kinds[i] === 'num');
+    ['bt-pri-x', 'bt-pri-n', 'bt-show', 'bt-hide'].forEach(c => { th.classList.remove(c); if(cols[i]) cols[i].classList.remove(c); });
+    colClass(i).forEach(c => { th.classList.add(c); if(cols[i]) cols[i].classList.add(c); });
+    th.dataset.btId = ids[i];
+  });
+  data.forEach(r => [...r.cells].forEach((td, i) => {
+    td.dataset.label = heads[i];
+    td.className = td.className.replace(/\bbt-(num|date|status|pri-x|pri-n|show|hide|r-\w+|nowrap)\b/g, '').replace(/\s+/g, ' ').trim();
+    const add = [];
+    if(kinds[i] === 'num') add.push('bt-num'); else if(kinds[i] === 'date') add.push('bt-date');
+    if(roles[i] === 'status') add.push('bt-status');
+    add.push('bt-r-' + roles[i]); colClass(i).forEach(c => add.push(c)); td.classList.add(...add);
+    if(clampOk(i) && !td.querySelector('input,select,textarea,button,svg,img,.bt-clamp') && td.textContent.trim().length > 24 && !cards){
+      const w = document.createElement('div'); w.className = 'bt-clamp'; while(td.firstChild) w.appendChild(td.firstChild); td.appendChild(w);
+    }
+    if(clampOk(i) && cards && !td.querySelector('input,select,textarea,button,svg,img,.bt-clamp') && td.textContent.trim().length > 24){
+      const w = document.createElement('div'); w.className = 'bt-clamp'; while(td.firstChild) w.appendChild(td.firstChild); td.appendChild(w);
+    }
+  }));
+  // keyboard: a row that does something when clicked can be reached and opened from the keyboard
+  data.forEach(r => { if(r.hasAttribute('tabindex')) return; if(getComputedStyle(r).cursor === 'pointer'){ r.setAttribute('tabindex', '0'); } });
+  // sorting: list tables only, never the editable line grids; tables with their own sort keep it (cue + aria-sort only)
+  if(spec && spec.own){
+    ths.forEach(th => { const s = th.querySelector('.crm-sort'); if(!s) return; if(!s.hasAttribute('role')){ s.setAttribute('role', 'button'); s.setAttribute('tabindex', '0'); }
+      const a = s.querySelector('.arr'); th.setAttribute('aria-sort', a ? (a.textContent.indexOf('▲') >= 0 ? 'ascending' : 'descending') : 'none'); });
+  } else if(spec && spec.sort && t.tBodies.length === 1){
+    ths.forEach((th, i) => {
+      const can = heads[i] && roles[i] !== 'lead' && roles[i] !== 'end' && (kinds[i] !== 'text' || BTT_SORTABLE_RE.test(heads[i]));
+      if(!can || th.dataset.bttSort){ if(can){ const st = bttState.sort[key]; th.setAttribute('aria-sort', st && st.col === ids[i] ? (st.dir === 'desc' ? 'descending' : 'ascending') : 'none'); } return; }
+      th.dataset.bttSort = '1';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'bt-sort-btn'; b.dataset.bttCol = ids[i];
+      b.title = 'Sort by ' + heads[i]; const arrow = document.createElement('span'); arrow.className = 'bt-arrow'; arrow.setAttribute('aria-hidden', 'true');
+      [...th.childNodes].filter(n => !(n.nodeType === 1 && n.classList.contains('col-handle'))).forEach(n => b.appendChild(n)); b.appendChild(arrow); th.insertBefore(b, th.firstChild);
+      const st = bttState.sort[key]; th.setAttribute('aria-sort', st && st.col === ids[i] ? (st.dir === 'desc' ? 'descending' : 'ascending') : 'none');
+    });
+    bttApplySort(t, N, heads, kinds);
+  }
+  bttBar(t, key, heads, ids, pri, N, many, spec);
+}
+/* the Columns button (6+ columns): sits in the table's tools bar, or in a small bar of its own above the table */
+function bttBar(t, key, heads, ids, pri, N, many, spec){
+  const sc = t.closest('.table-scroll, .qb-scroll, .pj-tablewrap') || t, optional = ids.filter((id, i) => pri[i] !== 'e' && heads[i]);
+  const want = many && optional.length && !(spec && spec.noCols) && !t.closest('.detail-row, .modal, [role=dialog]');
+  let host = sc.previousElementSibling && sc.previousElementSibling.matches('.table-tools, .bt-bar') ? sc.previousElementSibling : null;
+  const old = host && host.querySelector(':scope > .bt-cols-wrap');
+  if(!want){ if(old) old.remove(); if(host && host.classList.contains('bt-bar') && !host.children.length) host.remove(); return; }
+  if(!host){ host = document.createElement('div'); host.className = 'bt-bar'; sc.parentNode.insertBefore(host, sc); }
+  let wrap = old;
+  if(!wrap){
+    wrap = document.createElement('div'); wrap.className = 'bt-cols-wrap'; wrap.style.position = 'relative';
+    wrap.innerHTML = '<button type="button" class="bt-cols-btn" aria-haspopup="true" aria-expanded="false">Columns</button><div class="bt-cols-pop" role="group" hidden></div>';
+    host.insertBefore(wrap, host.firstChild);
+  }
+  wrap.dataset.bttFor = key; wrap._btt = { t, heads, ids, pri, optional, N };
+  const btn = wrap.querySelector('.bt-cols-btn'), pop = wrap.querySelector('.bt-cols-pop');
+  const lab = (t.getAttribute('aria-label') || 'table'); btn.setAttribute('aria-label', 'Columns shown in ' + lab);
+  const hasChoice = !!(bttPrefs().cols[key] && ((bttPrefs().cols[key].h || []).length || (bttPrefs().cols[key].s || []).length));
+  btn.textContent = hasChoice ? 'Columns •' : 'Columns';
+  if(!pop.hidden) bttFillPop(wrap);
+}
+function bttColShown(t, id, i){
+  const th = t.tHead.rows[t.tHead.rows.length - 1].cells[i]; if(!th) return true;
+  return getComputedStyle(th).display !== 'none';
+}
+function bttFillPop(wrap){
+  const c = wrap._btt; if(!c) return; const pop = wrap.querySelector('.bt-cols-pop'), key = wrap.dataset.bttFor;
+  pop.innerHTML = '<div class="bt-cols-note">Choose which columns to show. Remembered on this device.</div>' + c.ids.map((id, i) => c.pri[i] === 'e' || !c.heads[i] ? '' :
+    `<label><input type="checkbox" data-btt-col="${escAttr(id)}"${bttColShown(c.t, id, i) ? ' checked' : ''}> ${escHtml(c.heads[i])}</label>`).join('') +
+    '<div class="bt-cols-foot"><button type="button" data-btt-reset="1">Reset</button><button type="button" data-btt-close="1">Done</button></div>';
+}
+function bttQueue(t){
+  if(t) bttState.dirty.add(t);
+  if(bttState.queued) return; bttState.queued = true;
+  requestAnimationFrame(() => { bttState.queued = false; bttRun(); });
+}
+function bttRun(){
+  bttNote(bttObs.takeRecords());   // changes that arrived since the last look are not lost
+  const set = bttState.dirty; bttState.dirty = new Set();
+  let all = false; if(!set.size) all = true;
+  const list = all ? [...document.querySelectorAll('table')] : [...set].filter(t => t.isConnected);
+  bttObs.disconnect();
+  try{
+    list.forEach(t => { try{ bttRefresh(t); }catch(e){ if(window.console) console.warn('table system', e); } });
+    document.querySelectorAll('.bt-cols-wrap').forEach(w => { if(!w._btt || !w._btt.t.isConnected){ const bar = w.parentElement; w.remove(); if(bar && bar.classList.contains('bt-bar') && !bar.children.length) bar.remove(); } });
+    bttMeasure();
+  } finally { bttObs.observe(document.body, { childList: true, subtree: true }); }
+}
+/* any text that is cut off gets its full text as a tooltip */
+function bttMeasure(){
+  document.querySelectorAll('.bt-t:not([hidden])').forEach(t => {
+    if(!t.offsetParent) return;
+    const sc = t.closest('.bt-scroller');
+    if(sc && !(t.classList.contains('bt-cards') && BTT_CARD_MQ.matches) && t.querySelector('thead .bt-pri-x, thead .bt-pri-n')){   // does the table fit? if not, its extra columns step aside
+      t.classList.remove('bt-auto-x', 'bt-auto-n');
+      if(sc.scrollWidth > sc.clientWidth + 2){ t.classList.add('bt-auto-x'); if(sc.scrollWidth > sc.clientWidth + 2 && t.querySelector('thead .bt-pri-n')) t.classList.add('bt-auto-n'); }
+    }
+    t.querySelectorAll('.bt-clamp').forEach(w => { const full = bttNorm(w.textContent); const cut = w.scrollHeight > w.clientHeight + 1; if(cut){ w.title = full; } else if(w.title === full) w.removeAttribute('title'); });
+    t.querySelectorAll('thead th').forEach(th => { const full = th.dataset.bttText; if(!full) return; const cut = th.scrollWidth > th.clientWidth + 1 || th.scrollHeight > th.clientHeight + 1; if(cut && !th.getAttribute('title')) th.setAttribute('title', full); });
+  });
+  document.querySelectorAll('.bt-scroller').forEach(bttScrollCue);
+}
+function bttScrollCue(el){
+  el.classList.toggle('bt-sl', el.scrollLeft > 2);
+  el.classList.toggle('bt-sr', el.scrollWidth - el.clientWidth - el.scrollLeft > 2);
+}
+function bttNote(recs){
+  const own = n => n.nodeType === 1 && (n.classList.contains('bt-bar') || n.classList.contains('bt-cols-wrap'));
+  for(const r of recs){
+    const tgt = r.target; let t = tgt.closest ? tgt.closest('table') : null;
+    if(t) bttState.dirty.add(t);
+    r.addedNodes.forEach(n => { if(n.nodeType !== 1 || own(n)) return; if(n.tagName === 'TABLE') bttState.dirty.add(n); else if(n.querySelectorAll) n.querySelectorAll('table').forEach(x => bttState.dirty.add(x)); });
+  }
+}
+const bttObs = new MutationObserver((recs) => { bttNote(recs); if(bttState.dirty.size) bttQueue(); });
+bttObs.observe(document.body, { childList: true, subtree: true });
+function bttTouch(){ requestAnimationFrame(() => { try{ bttMeasure(); }catch(e){} }); }   // a page that was hidden has just been shown: measure it
+/* sort: click a header button; ascending, then descending, then the original order */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('.bt-sort-btn'); 
+  if(b){
+    const t = b.closest('table'), key = bttKey(t), col = b.dataset.bttCol, cur = bttState.sort[key];
+    if(!cur || cur.col !== col) bttState.sort[key] = { col, dir: 'asc' }; else if(cur.dir === 'asc') bttState.sort[key] = { col, dir: 'desc' }; else delete bttState.sort[key];
+    t.querySelectorAll('th[data-btt-sort]').forEach(th => { const st = bttState.sort[key]; const id = th.dataset.btId; th.setAttribute('aria-sort', st && st.col === id ? (st.dir === 'desc' ? 'descending' : 'ascending') : 'none'); });
+    bttObs.disconnect(); try{ bttRefresh(t); } finally { bttObs.observe(document.body, { childList: true, subtree: true }); }
+    return;
+  }
+  const cb = e.target.closest && e.target.closest('.bt-cols-btn');
+  if(cb){ const wrap = cb.closest('.bt-cols-wrap'), pop = wrap.querySelector('.bt-cols-pop'), open = pop.hidden; document.querySelectorAll('.bt-cols-pop').forEach(p => { p.hidden = true; const bb = p.parentElement.querySelector('.bt-cols-btn'); if(bb) bb.setAttribute('aria-expanded', 'false'); });
+    if(open){ bttFillPop(wrap); pop.hidden = false; cb.setAttribute('aria-expanded', 'true'); const f = pop.querySelector('input'); if(f) f.focus(); } return; }
+  const rs = e.target.closest && e.target.closest('[data-btt-reset]');
+  if(rs){ const wrap = rs.closest('.bt-cols-wrap'), key = wrap.dataset.bttFor; delete bttPrefs().cols[key]; bttSavePrefs(); bttRefreshNow(wrap._btt.t); bttFillPop(wrap); return; }
+  const cl = e.target.closest && e.target.closest('[data-btt-close]');
+  if(cl){ const wrap = cl.closest('.bt-cols-wrap'); wrap.querySelector('.bt-cols-pop').hidden = true; const bb = wrap.querySelector('.bt-cols-btn'); bb.setAttribute('aria-expanded', 'false'); bb.focus(); return; }
+  if(!(e.target.closest && e.target.closest('.bt-cols-wrap'))) document.querySelectorAll('.bt-cols-pop:not([hidden])').forEach(p => { p.hidden = true; const bb = p.parentElement.querySelector('.bt-cols-btn'); if(bb) bb.setAttribute('aria-expanded', 'false'); });
+});
+function bttRefreshNow(t){ bttObs.disconnect(); try{ bttRefresh(t); bttMeasure(); } finally { bttObs.observe(document.body, { childList: true, subtree: true }); } }
+document.addEventListener('change', (e) => {
+  const c = e.target.closest && e.target.closest('[data-btt-col]'); if(!c) return;
+  const wrap = c.closest('.bt-cols-wrap'), key = wrap.dataset.bttFor, id = c.dataset.bttCol, i = wrap._btt.ids.indexOf(id), p = bttPrefs();
+  const e0 = p.cols[key] || (p.cols[key] = { h: [], s: [] }); e0.h = (e0.h || []).filter(x => x !== id); e0.s = (e0.s || []).filter(x => x !== id);
+  (c.checked ? e0.s : e0.h).push(id);
+  // a choice that matches what the default would show anyway is not worth keeping
+  if(!e0.h.length && !e0.s.length) delete p.cols[key];
+  bttSavePrefs(); bttRefreshNow(wrap._btt.t); void i;
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){ const p = document.querySelector('.bt-cols-pop:not([hidden])'); if(p){ p.hidden = true; const bb = p.parentElement.querySelector('.bt-cols-btn'); if(bb){ bb.setAttribute('aria-expanded', 'false'); bb.focus(); } } return; }
+  const s = e.target.closest && e.target.closest('.crm-sort[role=button]'); if(s && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); s.click(); return; }
+  const r = e.target; if(r && r.tagName === 'TR' && r.hasAttribute('tabindex') && (e.key === 'Enter' || e.key === ' ') && r.closest('.bt-t')){ e.preventDefault(); r.click(); }
+});
+/* a cut-off input or select shows its full text as a tooltip when pointed at or focused */
+function bttTitleFor(el){
+  if(!el || !el.closest || !el.closest('.bt-t')) return;
+  if(el.tagName === 'INPUT' && /^(checkbox|radio|date|number)$/.test(el.type)) return;
+  if(el.tagName !== 'INPUT' && el.tagName !== 'SELECT' && el.tagName !== 'TEXTAREA') return;
+  if(el.dataset.bttTitled !== undefined){ if(el.title === el.dataset.bttTitled) el.removeAttribute('title'); delete el.dataset.bttTitled; }
+  if(el.title) return;
+  const txt = el.tagName === 'SELECT' ? bttNorm((el.selectedOptions[0] || {}).textContent) : el.value;
+  if(txt && el.scrollWidth > el.clientWidth + 1){ el.title = txt; el.dataset.bttTitled = txt; }
+}
+document.addEventListener('mouseover', (e) => bttTitleFor(e.target));
+document.addEventListener('focusin', (e) => bttTitleFor(e.target));
+document.addEventListener('scroll', (e) => { const t = e.target; if(t && t.classList && t.classList.contains('bt-scroller')) bttScrollCue(t); }, true);
+window.addEventListener('resize', () => bttQueue());
+BTT_TABLET_MQ.addEventListener('change', () => bttQueue());
+BTT_CARD_MQ.addEventListener('change', () => bttQueue());
+bttQueue();
+
 function activateTab(name){
   const tab = document.querySelector('.tab[data-tab="' + name + '"]'), panel = document.getElementById('panel-' + name);
   if(!tab || !panel) return;
@@ -12775,6 +13250,7 @@ function activateTab(name){
   if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
   try{ pjOnTab(name); }catch(e){}   // the Projects overview draws when shown and closes its panel when left
   updateScrollCues();
+  try{ bttTouch(); }catch(e){}   // tables on the page just shown are measured
   try{ menuSync(); }catch(e){}   // the menus (folding group, rail, bottom bar) follow the current page
 }
 document.querySelector('.skip-link').addEventListener('click', (e) => {
