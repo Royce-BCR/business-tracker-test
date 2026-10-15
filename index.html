@@ -31,6 +31,15 @@
   --bt-shadow-1:0 1px 2px color-mix(in srgb, var(--bt-ink) 6%, transparent); --bt-shadow-2:0 8px 24px color-mix(in srgb, var(--bt-ink) 14%, transparent);
   --bt-fast:120ms; --bt-base:200ms; --bt-ease:cubic-bezier(.2,.7,.2,1);
   --bt-control:40px; /* 48px under 700px wide or on touch */
+  /* brand tokens: applyBranding() derives these from Settings > Branding (colours + font). The values here ARE today's look, so the default brand changes nothing.
+     primary = chrome + buttons + headings; secondary = accent lines, focus ring, indicator; accent = tabs, totals, Accept. Status colours (ok / warn / bad / info) never use them. */
+  --bt-brand:var(--bt-ink); --bt-brand-2:var(--bt-oak-500); --bt-brand-accent:var(--bt-green-600);
+  --bt-brand-surface:var(--bt-ink); --bt-brand-edge:transparent; --bt-on-brand:var(--bt-on-dark); --bt-on-brand-muted:var(--bt-on-dark-muted); --bt-on-brand-dim:var(--bt-on-dark-dim);
+  --bt-brand-ctl:var(--bt-ink); --bt-brand-hover:var(--bt-ink-2); --bt-brand-pressed:var(--bt-ink-2); --bt-on-brand-ctl:var(--bt-on-dark);
+  --bt-brand-text:var(--bt-ink); --bt-brand-soft:var(--bt-oak-100); --bt-brand-border:var(--bt-border-strong);
+  --bt-brand-2-text:var(--bt-oak-600); --bt-brand-2-line:var(--bt-oak-500);
+  --bt-brand-accent-line:var(--g-growth); --bt-brand-accent-fill:var(--bt-green-600); --bt-on-brand-accent:var(--bt-on-dark);
+  --bt-font-brand:var(--bt-font-serif); --bt-font-brand-w:600;
 }
 @media (max-width:700px),(pointer:coarse){:root{--bt-control:48px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -78,13 +87,17 @@
   }
 
   /* ---------------- Sidebar ---------------- */
+  /* chrome surfaces (sidebar, rail, bars, flyouts, login) paint with the brand surface; their text tokens follow it so light brand colours stay readable */
+  .sidebar, .rail, .topmenu, .bottombar, .menu-pop, .mobile-bar, .login-overlay { --bt-on-dark: var(--bt-on-brand); --bt-on-dark-muted: var(--bt-on-brand-muted); --bt-on-dark-dim: var(--bt-on-brand-dim); }
+  .login-overlay .login-box { --bt-on-dark: var(--bt-on-brand-ctl); }
   .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     width: 244px;
     height: 100vh;
-    background: var(--ink);
+    background: var(--bt-brand-surface);
+    box-shadow: inset -1px 0 0 var(--bt-brand-edge);
     color: var(--bt-on-dark-muted);
     padding: 22px 14px 30px 14px;
     display: flex;
@@ -134,7 +147,7 @@
   .g-operations .nav-label, .tab.g-operations { --accent: var(--g-operations); }
   .g-revenue .nav-label, .tab.g-revenue { --accent: var(--g-revenue); }
   .g-organisation .nav-label, .tab.g-organisation { --accent: var(--g-organisation); }
-  .nav-label { color: var(--accent); }
+  .nav-label { color: var(--bt-nav-label, var(--accent)); }
 
   .tab {
     display: flex;
@@ -166,9 +179,9 @@
   body.logged-out .skip-link { display: none; }
   .tab:hover { background: color-mix(in srgb, var(--bt-on-dark) 5%, transparent); color: var(--bt-on-dark); }
   .tab.active {
-    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    background: color-mix(in srgb, var(--bt-indicator, var(--accent)) 22%, transparent);
     color: var(--bt-on-dark);
-    border-left-color: var(--accent);
+    border-left-color: var(--bt-indicator, var(--accent));
     font-weight: 500;
   }
   .save-status {   /* sits in the brand row, to the left of the brand pill */
@@ -230,6 +243,7 @@
   .page-head { margin-bottom: 22px; }
   .page-head h2 {
     font-family: var(--serif);
+    color: var(--bt-brand-text);
     font-weight: 600;
     font-size: 29px;
     margin: 0;
@@ -257,7 +271,7 @@
     font-size: var(--bt-fs-2xs);
     text-transform: uppercase;
     letter-spacing: 0.09em;
-    color: var(--oak-text);
+    color: var(--bt-brand-2-text);
     font-weight: 600;
     margin: 26px 0 10px 0;
   }
@@ -318,7 +332,7 @@
   .rt-table th { overflow: hidden; text-overflow: ellipsis; }
   .rt-table td { overflow: hidden; }
   .link-btn { background: none; border: none; padding: 0; font-family: inherit; font-size: var(--bt-fs-xs); color: var(--text-muted); text-decoration: underline; cursor: pointer; }
-  .link-btn:hover { color: var(--ink); }
+  .link-btn:hover { color: var(--bt-brand-text); }
 
   input, select, textarea {
     width: 100%;
@@ -332,21 +346,21 @@
   }
   input:hover, select:hover, textarea:hover { border-color: var(--stone-deep); background: var(--bt-card); }
   input:focus, select:focus, textarea:focus {
-    border-color: var(--oak); background: var(--bt-card);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bt-oak-500) 10%, transparent);
+    border-color: var(--bt-brand-2-line); background: var(--bt-card);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bt-brand-2) 10%, transparent);
   }
   input[type="date"] { min-width: 118px; }
   .computed { color: var(--slate); font-weight: 600; background: var(--bt-paper) !important; border-radius: var(--bt-r-chip); }
   textarea { resize: vertical; min-height: 54px; line-height: 1.5; }
 
   .btn {
-    background: var(--ink); color: var(--bt-on-dark); border: none;
+    background: var(--bt-brand-ctl); color: var(--bt-on-brand-ctl); border: none;
     padding: var(--bt-s2) 15px; font-size: var(--bt-fs-xs); font-weight: 500;
     cursor: pointer; border-radius: var(--bt-r-btn); font-family: inherit;
     transition: transform 0.08s ease, background 0.12s ease;
   }
-  .btn:hover { background: var(--bt-ink-2); }
-  .btn:active { transform: translateY(1px); }
+  .btn:hover { background: var(--bt-brand-hover); }
+  .btn:active { background: var(--bt-brand-pressed); transform: translateY(1px); }
   .btn.secondary { background: var(--bt-card); color: var(--ink); border: 1px solid var(--stone-deep); }
   .btn.secondary:hover { background: var(--bt-paper); }
   .btn.danger { background: transparent; color: var(--bt-bad-fg); border: 1px solid var(--bt-bad-bd); padding: 3px 9px; font-size: var(--bt-fs-sm); line-height: 1; border-radius: var(--bt-r-chip); }
@@ -356,7 +370,7 @@
   .callout {
     background: linear-gradient(0deg, var(--bt-card), var(--bt-card));
     border: 1px solid var(--bt-line);
-    border-left: 3px solid var(--oak);
+    border-left: 3px solid var(--bt-brand-2-line);
     border-radius: var(--radius-sm);
     padding: 13px var(--bt-s4); font-size: 12.5px; line-height: 1.55;
     margin: 6px 0 var(--bt-s1) 0;
@@ -598,7 +612,7 @@
   .sup-empty { padding: var(--bt-s6) var(--bt-s4); text-align: center; color: var(--text-muted); font-size: var(--bt-fs-sm); }   /* one empty-state look: .sup-empty, .crm-empty, .td-empty */
   .lp-contact-top .sp-primary { font-size: var(--bt-fs-xs); font-weight: 600; color: var(--bt-ok-fg); background: var(--bt-ok-bg); border: 1px solid var(--bt-ok-bd); padding: 1px 9px; border-radius: var(--bt-r-pill); }
   .sp-link { background: none; border: none; padding: 0; font-family: inherit; font-size: var(--bt-fs-xs); font-weight: 500; color: var(--slate); text-decoration: underline; cursor: pointer; }
-  .sp-link:hover { color: var(--ink); }
+  .sp-link:hover { color: var(--bt-brand-text); }
   .sp-link.danger { color: var(--bt-bad-fg); }
   .lp-contact-top .sp-ctl { display: flex; align-items: center; gap: var(--bt-s2); }
   .sp-check { display: flex; align-items: center; gap: 9px; font-size: 13px; padding: 5px var(--bt-s2) 5px 0; cursor: pointer; width: fit-content; max-width: 100%; }
@@ -764,7 +778,7 @@
 
   /* auth */
   body.logged-out .sidebar, body.logged-out .main, body.logged-out .save-status, body.logged-out .mobile-bar, body.logged-out .sidebar-backdrop { display: none !important; }
-  .login-overlay { --stone-deep:var(--bt-neu-bd); --line:var(--bt-line); --radius:var(--bt-r-card); --shadow:var(--bt-shadow-1); --ink:var(--bt-ink); --oak:var(--bt-oak-500); --serif:'Source Serif 4', Georgia, 'Times New Roman', serif; position: fixed; inset: 0; background: var(--ink); display: flex; overflow-y: auto; z-index: 200; }
+  .login-overlay { --stone-deep:var(--bt-neu-bd); --line:var(--bt-line); --radius:var(--bt-r-card); --shadow:var(--bt-shadow-1); --ink:var(--bt-ink); --oak:var(--bt-brand-2-line); --serif:var(--bt-font-brand); position: fixed; inset: 0; background: var(--bt-brand-surface); display: flex; overflow-y: auto; z-index: 200; }
   .login-stack { margin: auto; padding: 24px 0; display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; }
   .login-brand { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: calc(100% - 32px); color: var(--bt-on-dark); text-align: center; }
   .login-brand:empty { display: none; }
@@ -776,14 +790,14 @@
   .login-brand .lb-name { font-size: 30px; line-height: 1.1; overflow-wrap: anywhere; min-width: 0; }
   .login-overlay.hidden { display: none; }
   .login-box { background: var(--bt-card); border-radius: var(--bt-r-card); padding: 32px 34px; width: 340px; max-width: calc(100% - 32px); box-shadow: 0 20px 60px color-mix(in srgb, var(--bt-ink) 40%, transparent); }
-  .login-box h1 { font-family: var(--serif); font-weight: 600; font-size: 26px; margin: 0 0 2px; letter-spacing: -0.3px; }
-  .login-box .sub { font-size: var(--bt-fs-2xs); letter-spacing: 0.15em; text-transform: uppercase; color: var(--oak-text); margin-bottom: 22px; }
+  .login-box h1 { font-family: var(--bt-font-brand); color: var(--bt-brand-text); font-weight: var(--bt-font-brand-w); font-size: 26px; margin: 0 0 2px; letter-spacing: -0.3px; }
+  .login-box .sub { font-size: var(--bt-fs-2xs); letter-spacing: 0.15em; text-transform: uppercase; color: var(--bt-brand-2-text); margin-bottom: 22px; }
   .login-field { margin-bottom: 14px; }
   .login-field label { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; }
   .login-field input { width: 100%; border: 1px solid var(--stone-deep); border-radius: var(--bt-r-btn); padding: 9px 11px; font-size: 13.5px; font-family: inherit; }
-  .login-field input:focus { border-color: var(--oak); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bt-oak-500) 12%, transparent); }
-  .login-btn { width: 100%; background: var(--ink); color: var(--bt-on-dark); border: none; border-radius: var(--bt-r-btn); padding: 11px; font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 6px; }
-  .login-btn:hover { background: var(--bt-ink-2); }
+  .login-field input:focus { border-color: var(--bt-brand-2-line); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bt-brand-2) 12%, transparent); }
+  .login-btn { width: 100%; background: var(--bt-brand-ctl); color: var(--bt-on-brand-ctl); border: none; border-radius: var(--bt-r-btn); padding: 11px; font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 6px; }
+  .login-btn:hover { background: var(--bt-brand-hover); }
   .login-err { color: var(--bt-bad-fg); font-size: 12px; min-height: 16px; margin-top: 10px; text-align: center; }
   .logout-bar { margin-top: auto; padding: 14px var(--bt-s3) 2px; border-top: 1px solid color-mix(in srgb, var(--bt-on-dark) 12%, transparent); display: flex; align-items: center; justify-content: space-between; gap: var(--bt-s2); }
   .logout-bar:empty { display: none; }
@@ -798,7 +812,7 @@
   .set-menu { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 2px; max-height: calc(100vh - 80px); overflow-y: auto; }
   .set-menu button { border: none; background: none; font-family: inherit; font-size: 13px; color: var(--slate); text-align: left; padding: 9px var(--bt-s3); border-radius: var(--radius-sm); border-left: 2.5px solid transparent; cursor: pointer; }
   .set-menu button:hover { background: var(--bt-neu-bg); color: var(--ink); }
-  .set-menu button.active { background: var(--card); color: var(--ink); font-weight: 600; border-left-color: var(--oak); box-shadow: var(--shadow); }
+  .set-menu button.active { background: var(--card); color: var(--ink); font-weight: 600; border-left-color: var(--bt-brand-2-line); box-shadow: var(--shadow); }
   .set-menu button:focus-visible { outline: 2px solid var(--oak); outline-offset: 1px; }
   .set-menu-select { display: none; }
   .set-content { min-width: 0; container-type: inline-size; container-name: setc; }
@@ -832,7 +846,7 @@
   .br-logos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
   .br-slot-label { font-size: var(--bt-fs-xs); font-weight: 500; color: var(--text-muted); margin-bottom: 5px; }
   .br-swatch { display: flex; align-items: center; justify-content: center; height: 84px; border: 1px solid var(--line); border-radius: var(--bt-r-btn); background: var(--bt-card); padding: 10px; overflow: hidden; }
-  .br-swatch.dark { background: var(--ink); border-color: var(--ink); }
+  .br-swatch.dark { background: var(--bt-ink); border-color: var(--bt-ink); }
   .br-swatch img { display: block; max-width: 100%; max-height: 62px; object-fit: contain; }
   .br-swatch .br-empty { font-size: var(--bt-fs-xs); color: var(--text-muted); }
   .br-swatch.dark .br-empty { color: var(--slate); }
@@ -850,7 +864,7 @@
   .br-preview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
   .br-pv { border: 1px solid var(--line); border-radius: var(--bt-r-btn); min-height: 92px; display: flex; align-items: center; justify-content: center; padding: 14px; overflow: hidden; }
   .br-pv.paper { background: var(--paper); justify-content: flex-end; }
-  .br-pv.dark { background: var(--ink); }
+  .br-pv.dark { background: var(--bt-brand-surface); --bt-on-dark: var(--bt-on-brand); --bt-on-dark-muted: var(--bt-on-brand-muted); }
   @media (max-width: 700px) { .br-grid, .br-logos, .br-preview { grid-template-columns: minmax(0, 1fr); } .br-cols { grid-template-columns: minmax(0, 1fr); } }
 
   /* view toggle */
@@ -870,7 +884,7 @@
 
   /* project detail (expanded) */
   tr.detail-row > td { background: var(--bt-surface-2) !important; padding: 0; }
-  .detail-box { padding: var(--bt-s4) 18px 18px; border-left: 3px solid var(--oak); margin: 2px 0; }
+  .detail-box { padding: var(--bt-s4) 18px 18px; border-left: 3px solid var(--bt-brand-2-line); margin: 2px 0; }
   .detail-head { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; margin-bottom: var(--bt-s3); }
   .detail-code { font-family: var(--sans); font-size: 11px; font-weight: 700; color: var(--bt-on-dark); background: var(--slate); padding: 3px 9px; border-radius: var(--bt-r-pill); }
   .detail-head > span:nth-child(2) { font-weight: 600; font-size: var(--bt-fs-sm); }
@@ -878,7 +892,7 @@
   .detail-notes { margin-bottom: var(--bt-s3); max-width: 640px; }
   .detail-notes label { display:block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: var(--bt-s1); }
   .detail-notes input { border: 1px solid var(--line); background: var(--bt-card); padding: 7px 9px; border-radius: var(--bt-r-btn); }
-  .stage-label-row { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--oak-text); font-weight: 600; margin-bottom: var(--bt-s2); }
+  .stage-label-row { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--bt-brand-2-text); font-weight: 600; margin-bottom: var(--bt-s2); }
 
   /* Gantt (Sales + Project): sticky label column + sticky header, bars coloured by current stage */
   .gantt-controls { display: flex; align-items: center; justify-content: space-between; gap: var(--bt-s3); flex-wrap: wrap; margin-bottom: 10px; }
@@ -1102,7 +1116,8 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     height: 52px;
-    background: var(--ink);
+    background: var(--bt-brand-surface);
+    box-shadow: inset 0 -1px 0 var(--bt-brand-edge);
     color: var(--bt-on-dark);
     align-items: center;
     gap: var(--bt-s3);
@@ -1115,6 +1130,10 @@
   }
   .mobile-bar .menu-btn svg { width: 21px; height: 21px; }
   .mobile-bar .title { font-family: var(--serif); font-weight: 600; font-size: 16.5px; }
+  .mobile-bar .mb-mark { display: flex; align-items: center; flex: none; }
+  .mobile-bar .mb-mark:empty { display: none; }
+  .mobile-bar .mb-mark img { display: block; height: 32px; width: auto; max-width: 120px; object-fit: contain; }
+  .mobile-bar .title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .sidebar-backdrop {
     display: none;
     position: fixed; inset: 0; background: color-mix(in srgb, var(--bt-ink) 48%, transparent);
@@ -1290,7 +1309,7 @@
   .crm-tabs { display: flex; gap: 2px; flex-wrap: wrap; margin: 0 0 var(--bt-s3); border-bottom: 1px solid var(--line); }
   .crm-tab { border: none; background: none; font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--text-muted); padding: 9px 13px; cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; gap: 7px; }
   .crm-tab:hover { color: var(--ink); }
-  .crm-tab.active { color: var(--ink); border-bottom-color: var(--g-growth); font-weight: 600; }
+  .crm-tab.active { color: var(--bt-brand-text); border-bottom-color: var(--bt-brand-accent-line); font-weight: 600; }
   .crm-tab .n { font-size: var(--bt-fs-xs); font-weight: 700; background: var(--bt-neu-bg); color: var(--slate); border-radius: var(--bt-r-pill); padding: 1px var(--bt-s2); }
   .crm-tab.over .n.some { background: var(--bt-bad-bg); color: var(--bt-bad-fg); }
 
@@ -1322,7 +1341,7 @@
   .pj-sub { display: block; font-size: var(--bt-fs-xs); color: var(--text-muted); font-weight: 400; white-space: normal; }
   .pj-sub-c, .pj-sub-o { display: none; } .pj-sub-c:empty { display: none !important; }
   .pj-code { font-size: var(--bt-fs-2xs); font-weight: 700; color: var(--slate); background: var(--bt-neu-bg); border-radius: var(--bt-r-pill); padding: 2px var(--bt-s2); white-space: nowrap; display: inline-block; }
-  .pj-open { font-family: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--ink); background: none; border: none; padding: 0; text-align: left; cursor: pointer; min-height: var(--bt-control); display: inline-flex; align-items: center; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; }
+  .pj-open { font-family: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-brand-text); background: none; border: none; padding: 0; text-align: left; cursor: pointer; min-height: var(--bt-control); display: inline-flex; align-items: center; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; }
   .pj-open:hover { text-decoration-color: currentColor; }
   .pj-st, .pj-stage { display: inline-block; padding: 2px 9px; border-radius: var(--bt-r-pill); font-size: var(--bt-fs-xs); font-weight: 600; white-space: nowrap; background: var(--bt-neu-bg); color: var(--bt-neu-fg); }
   .pj-st-ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); } .pj-st-warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .pj-st-bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); }
@@ -1398,7 +1417,7 @@
   .crm-due { min-width: 0 !important; padding: 3px var(--bt-s1); }
   .crm-due.over { color: var(--bt-bad-fg); font-weight: 600; }
   .crm-link { text-align: left; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--bt-fs-xs); color: var(--slate); text-decoration: none; }
-  .crm-link:hover { color: var(--ink); text-decoration: underline; }
+  .crm-link:hover { color: var(--bt-brand-text); text-decoration: underline; }
   .crm-link.dim { color: var(--text-muted); }
   .tk-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
   .tk-pill { display: inline-block; font-size: var(--bt-fs-xs); font-weight: 700; padding: 2px 9px; border-radius: var(--bt-r-pill); white-space: nowrap; }
@@ -1518,7 +1537,7 @@
   .td-title { flex: 1 1 160px; min-width: 0; font-weight: 500; font-size: 13px; overflow-wrap: anywhere; }
   .td-meta { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--bt-s1) 10px; font-size: var(--bt-fs-xs); color: var(--slate); }
   .td-meta .link-btn { font-size: var(--bt-fs-xs); text-decoration: none; color: var(--slate); max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .td-meta .link-btn:hover { text-decoration: underline; color: var(--ink); }
+  .td-meta .link-btn:hover { text-decoration: underline; color: var(--bt-brand-text); }
   .td-meta .link-btn.dim { color: var(--text-muted); }
   .td-due { color: var(--bt-bad-fg); font-weight: 600; }
   .td-row.archiving { opacity: 0.38; transition: opacity 1.8s ease; pointer-events: none; }
@@ -1777,7 +1796,7 @@
     outline: 2px solid var(--bt-focus) !important; outline-offset: 2px;
   }
   :is(input, select, textarea):focus-visible:not(.login-overlay *) { outline-offset: 0; }
-  .sidebar :focus-visible { outline-color: var(--bt-paper) !important; outline-offset: -2px; }  /* dark sidebar: ring needs a light colour to be seen */
+  .sidebar :focus-visible { outline-color: var(--bt-on-brand) !important; outline-offset: -2px; }  /* dark sidebar: ring needs a light colour to be seen */
 /* BT:css begin */
 /* ===== CRM, documents and email ===== */
 .cx-locked { background: var(--bt-neu-bg) !important; color: var(--bt-neu-fg); cursor: not-allowed; }
@@ -1879,12 +1898,12 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
 .nav-group.has-current .nav-gbtn { color: var(--bt-on-dark); }
 /* icon rail (laptop / tablet, collapsed) */
 .rail, .topmenu, .bottombar, .sheet-backdrop, .more-sheet { display: none; }
-.rail { position: fixed; left: 0; top: var(--bt-banner-h, 0px); height: calc(100vh - var(--bt-banner-h, 0px)); width: var(--bt-rail-w); background: var(--ink); color: var(--bt-on-dark-muted); flex-direction: column; padding: var(--bt-s2) 4px var(--bt-s3); gap: 2px; overflow-y: auto; overflow-x: hidden; z-index: 20; }
+.rail { position: fixed; left: 0; top: var(--bt-banner-h, 0px); height: calc(100vh - var(--bt-banner-h, 0px)); width: var(--bt-rail-w); background: var(--bt-brand-surface); box-shadow: inset -1px 0 0 var(--bt-brand-edge); color: var(--bt-on-dark-muted); flex-direction: column; padding: var(--bt-s2) 4px var(--bt-s3); gap: 2px; overflow-y: auto; overflow-x: hidden; z-index: 20; }
 .rail-sep { flex: 1 1 0; min-height: var(--bt-s2); }
 .rail-btn { position: relative; width: 100%; min-height: 56px; padding: 6px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: none; border: 0; border-left: 2.5px solid transparent; border-radius: var(--bt-r-btn); color: var(--bt-on-dark-muted); font: inherit; font-size: var(--bt-fs-2xs); line-height: 1.1; cursor: pointer; text-align: center; }
 .rail-btn svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .rail-btn:hover, .rail-btn[aria-expanded="true"] { background: color-mix(in srgb, var(--bt-on-dark) 9%, transparent); color: var(--bt-on-dark); }
-.rail-btn.has-current { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--bt-on-dark); border-left-color: var(--accent); }
+.rail-btn.has-current { background: color-mix(in srgb, var(--bt-indicator, var(--accent)) 22%, transparent); color: var(--bt-on-dark); border-left-color: var(--bt-indicator, var(--accent)); }
 .rail-btn .rb-badge { position: absolute; top: 3px; right: 4px; }
 .rail-btn .rb-badge[hidden] { display: none; }
 .rail .rail-top { min-height: var(--bt-control); }
@@ -1895,28 +1914,28 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
   body.menu-rail .main { margin-left: var(--bt-rail-w); }
 }
 /* flyout / drop-down list (shared by the rail and the phone top bar) */
-.menu-pop { position: fixed; z-index: 40; min-width: 230px; max-width: min(320px, calc(100vw - 16px)); max-height: calc(100vh - var(--bt-banner-h, 0px) - 16px); overflow-y: auto; background: var(--ink); color: var(--bt-on-dark-muted); border: 1px solid color-mix(in srgb, var(--bt-on-dark) 16%, transparent); border-radius: var(--bt-r-card); box-shadow: var(--bt-shadow-2); padding: var(--bt-s2); }
+.menu-pop { position: fixed; z-index: 40; min-width: 230px; max-width: min(320px, calc(100vw - 16px)); max-height: calc(100vh - var(--bt-banner-h, 0px) - 16px); overflow-y: auto; background: var(--bt-brand-surface); color: var(--bt-on-dark-muted); border: 1px solid color-mix(in srgb, var(--bt-on-dark) 16%, transparent); border-radius: var(--bt-r-card); box-shadow: var(--bt-shadow-2); padding: var(--bt-s2); }
 .menu-pop[hidden] { display: none; }
-.mp-head { padding: 6px 10px; font-size: var(--bt-fs-2xs); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+.mp-head { padding: 6px 10px; font-size: var(--bt-fs-2xs); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; color: var(--bt-nav-label, var(--accent)); }
 .mp-item { width: 100%; min-height: var(--bt-control); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: var(--bt-s2); background: none; border: 0; border-left: 2.5px solid transparent; border-radius: var(--bt-r-btn); color: inherit; font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
 .mp-item:hover, .mp-item:focus-visible { background: color-mix(in srgb, var(--bt-on-dark) 9%, transparent); color: var(--bt-on-dark); }
-.mp-item[aria-current="page"] { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--bt-on-dark); border-left-color: var(--accent); }
+.mp-item[aria-current="page"] { background: color-mix(in srgb, var(--bt-indicator, var(--accent)) 22%, transparent); color: var(--bt-on-dark); border-left-color: var(--bt-indicator, var(--accent)); }
 .mp-sep { height: 1px; margin: var(--bt-s2) 4px; background: color-mix(in srgb, var(--bt-on-dark) 14%, transparent); }
 .menu-pop.pop-top { left: 0 !important; right: 0 !important; width: 100%; max-width: none; border-radius: 0 0 var(--bt-r-card) var(--bt-r-card); border-top: 0; }
 /* phone: top bar */
-.topmenu { position: fixed; top: var(--bt-banner-h, 0px); left: 0; right: 0; height: 52px; background: var(--ink); z-index: 25; padding: 0 2px; align-items: stretch; }
+.topmenu { position: fixed; top: var(--bt-banner-h, 0px); left: 0; right: 0; height: 52px; background: var(--bt-brand-surface); box-shadow: inset 0 -1px 0 var(--bt-brand-edge); z-index: 25; padding: 0 2px; align-items: stretch; }
 .topmenu .rail-btn { flex: 1 1 0; min-width: 0; min-height: 52px; border-left: 0; border-bottom: 2.5px solid transparent; border-radius: 0; gap: 2px; padding: 4px 1px; }
-.topmenu .rail-btn.has-current { border-left-color: transparent; border-bottom-color: var(--accent); }
+.topmenu .rail-btn.has-current { border-left-color: transparent; border-bottom-color: var(--bt-indicator, var(--accent)); }
 .topmenu .rail-btn svg { width: 20px; height: 20px; }
 body.menu-phone.pm-top .topmenu { display: flex; }
 body.menu-phone.pm-top .mobile-bar, body.menu-phone.pm-bottom .sidebar, body.menu-phone.pm-top .sidebar { display: none; }
 body.menu-phone.pm-top .sidebar-backdrop { display: none !important; }
 /* phone: bottom bar */
-.bottombar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 26; background: var(--ink); padding: 0 4px env(safe-area-inset-bottom, 0px); box-shadow: 0 -2px 12px color-mix(in srgb, var(--bt-ink) 22%, transparent); }
+.bottombar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 26; background: var(--bt-brand-surface); padding: 0 4px env(safe-area-inset-bottom, 0px); box-shadow: 0 -2px 12px color-mix(in srgb, var(--bt-ink) 22%, transparent), 0 -1px 0 var(--bt-brand-edge); }
 .bb-btn { position: relative; flex: 1 1 0; min-width: 0; min-height: var(--bt-bar-h); padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: 0; border-top: 2.5px solid transparent; color: var(--bt-on-dark-muted); font: inherit; font-size: var(--bt-fs-2xs); line-height: 1.15; text-align: center; cursor: pointer; }
 .bb-btn svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .bb-btn .bb-l { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; max-width: 100%; }
-.bb-btn[aria-current="page"], .bb-btn.has-current { color: var(--bt-on-dark); border-top-color: var(--accent); }
+.bb-btn[aria-current="page"], .bb-btn.has-current { color: var(--bt-on-dark); border-top-color: var(--bt-indicator, var(--accent)); }
 .bb-btn .rb-badge { position: absolute; top: 3px; left: calc(50% + 6px); }
 .bb-btn .rb-badge[hidden] { display: none; }
 .bb-more { --accent: var(--bt-on-dark-dim); }
@@ -1940,7 +1959,7 @@ body.sheet-open { overflow: hidden; }
 .ms-group h3 { margin: 0 0 var(--bt-s1); font-size: var(--bt-fs-2xs); letter-spacing: 0.15em; text-transform: uppercase; color: var(--bt-text-muted); }
 .ms-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--bt-s2); }
 .ms-item { min-height: var(--bt-control); padding: 6px var(--bt-s3); display: flex; align-items: center; justify-content: space-between; gap: var(--bt-s2); background: var(--bt-surface-2); color: var(--ink); border: 1px solid var(--bt-line); border-left: 3px solid var(--accent, var(--bt-line)); border-radius: var(--bt-r-btn); font: inherit; font-size: var(--bt-fs-sm); text-align: left; cursor: pointer; overflow-wrap: anywhere; }
-.ms-item[aria-current="page"] { background: var(--bt-oak-100); font-weight: 600; }
+.ms-item[aria-current="page"] { background: var(--bt-brand-soft); font-weight: 600; }
 .ms-foot { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--bt-s2); margin-top: var(--bt-s4); padding-top: var(--bt-s3); border-top: 1px solid var(--bt-line); }
 .ms-foot .btn { width: 100%; }
 .ms-item:focus-visible, .ms-head .btn:focus-visible, .ms-foot .btn:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
@@ -1961,8 +1980,8 @@ body.sheet-open { overflow: hidden; }
 .bbe-add select { flex: 1 1 200px; max-width: 320px; }
 .bbe-count { font-size: var(--bt-fs-xs); color: var(--bt-text-muted); margin: 0 0 var(--bt-s2); }
 /* Today: greeting tile and the extra sections */
-.td-greet { background: var(--bt-card); border: 1px solid var(--line); border-left: 4px solid var(--bt-oak-600, var(--bt-focus)); border-radius: var(--radius); padding: var(--bt-s4) var(--bt-s5); margin-bottom: var(--bt-s4); box-shadow: var(--shadow); }
-.td-greeting { margin: 0; font-family: var(--serif); font-weight: 600; font-size: var(--bt-fs-xl); line-height: 1.2; }
+.td-greet { background: var(--bt-card); border: 1px solid var(--line); border-left: 4px solid var(--bt-brand-2-text); border-radius: var(--radius); padding: var(--bt-s4) var(--bt-s5); margin-bottom: var(--bt-s4); box-shadow: var(--shadow); }
+.td-greeting { margin: 0; font-family: var(--serif); font-weight: 600; font-size: var(--bt-fs-xl); line-height: 1.2; color: var(--bt-brand-text); }
 .td-greet-sum { margin-top: var(--bt-s1); font-size: var(--bt-fs-sm); color: var(--slate); }
 .td-tick { flex: none; display: inline-grid; place-items: center; min-width: var(--bt-control); min-height: var(--bt-control); margin: calc(-1 * var(--bt-s2)) -8px calc(-1 * var(--bt-s2)) calc(-1 * var(--bt-s2)); padding: 0; background: none; border: 0; cursor: pointer; border-radius: var(--bt-r-btn); }
 .td-tick .cbx { pointer-events: none; }
@@ -2017,6 +2036,43 @@ body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, bod
   .brandbar.off .save-status { right: 62px; top: 62px; }
 }
 body.logged-out .fav-btn { display: none; }
+
+/* ===== Batch 3: brand font, brand marks, Settings preview ===== */
+/* the brand font: business name, app title and page headings. Body text stays the app UI font (Inter). */
+.brand h1, .mobile-bar .title, .page-head h2, .db-head h2, .td-greeting, .placeholder h3, .ms-head h2 { font-family: var(--bt-font-brand); font-weight: var(--bt-font-brand-w); }
+.db-head h2 { color: var(--bt-brand-text); }
+.brand-mark { display: flex; align-items: center; flex-wrap: wrap; gap: var(--bt-s2); min-width: 0; max-width: 100%; margin: 0 0 var(--bt-s3); color: var(--bt-on-dark); }
+.brand-mark:empty, .rail-mark:empty { display: none; }
+.brand-mark img, .rail-mark img { display: block; width: auto; height: auto; object-fit: contain; }
+.brand-mark img.bm-full { max-height: 48px; max-width: 100%; }
+.brand-mark img.bm-badge { max-height: 40px; max-width: 56px; }
+.brand-mark .bm-name { font-size: var(--bt-fs-md); line-height: 1.2; overflow-wrap: anywhere; min-width: 0; }
+.rail-mark { display: grid; place-items: center; padding: var(--bt-s2) 0 var(--bt-s1); color: var(--bt-on-dark); }
+.rail-mark img.bm-badge { max-height: 36px; max-width: 48px; }
+.rail-mark .bm-init { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid color-mix(in srgb, var(--bt-on-dark) 40%, transparent); border-radius: var(--bt-r-pill); font-size: var(--bt-fs-sm); line-height: 1; }
+.br-warn { font-size: var(--bt-fs-xs); line-height: 1.4; color: var(--bt-warn-fg); background: var(--bt-warn-bg); border-radius: var(--bt-r-chip); padding: 0 var(--bt-s2); margin-top: var(--bt-s1); }
+.br-warn:empty { display: none; padding: 0; }
+.br-warn:not(:empty) { padding: var(--bt-s1) var(--bt-s2); }
+.pvx { display: grid; grid-template-columns: minmax(120px, 160px) 1fr; border: 1px solid var(--line); border-radius: var(--bt-r-btn); overflow: hidden; background: var(--bt-card); max-width: 560px; }
+.pvx-side { background: var(--bt-brand-surface); box-shadow: inset -1px 0 0 var(--bt-brand-edge); color: var(--bt-on-brand-muted); padding: var(--bt-s3) var(--bt-s2); display: flex; flex-direction: column; gap: var(--bt-s1); min-width: 0; }
+.pvx-brand { color: var(--bt-on-brand); } .pvx-brand:empty { display: none; }
+.pvx-brand img { display: block; max-height: 28px; max-width: 100%; width: auto; object-fit: contain; } .pvx-brand .bm-name { font-size: var(--bt-fs-sm); }
+.pvx-title { font-family: var(--bt-font-brand); font-weight: var(--bt-font-brand-w); font-size: var(--bt-fs-md); color: var(--bt-on-brand); margin-bottom: var(--bt-s2); }
+.pvx-item { font-size: var(--bt-fs-xs); padding: var(--bt-s1) var(--bt-s2); border-left: 2.5px solid transparent; border-radius: var(--bt-r-chip); color: var(--bt-on-brand-muted); }
+.pvx-item.act { color: var(--bt-on-brand); border-left-color: var(--bt-indicator); background: color-mix(in srgb, var(--bt-indicator) 22%, transparent); }
+.pvx-main { padding: var(--bt-s3); display: flex; flex-direction: column; gap: var(--bt-s3); min-width: 0; }
+.pvx-row { display: flex; align-items: center; gap: var(--bt-s3); }
+.pvx-btn { background: var(--bt-brand-ctl); color: var(--bt-on-brand-ctl); font-size: var(--bt-fs-xs); font-weight: 500; padding: var(--bt-s2) 15px; border-radius: var(--bt-r-btn); }
+.pvx-link { color: var(--bt-brand-text); font-size: var(--bt-fs-sm); text-decoration: underline; }
+.pvx-tabs { display: flex; gap: var(--bt-s4); border-bottom: 1px solid var(--line); }
+.pvx-tab { font-size: var(--bt-fs-sm); padding: var(--bt-s1) 0; color: var(--bt-text-muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.pvx-tab.act { color: var(--bt-brand-text); font-weight: 600; border-bottom-color: var(--bt-brand-accent-line); }
+.pvx-quote { border: 1px solid var(--line); border-radius: var(--bt-r-chip); padding: var(--bt-s3); }
+.pvx-qh { display: flex; align-items: center; gap: var(--bt-s2); border-bottom: 3px solid var(--bt-brand-2-line); padding-bottom: var(--bt-s2); margin-bottom: var(--bt-s2); }
+.pvx-qh img { display: block; max-height: 28px; max-width: 120px; width: auto; object-fit: contain; }
+.pvx-qn { font-family: var(--bt-font-brand); font-weight: var(--bt-font-brand-w); font-size: var(--bt-fs-lg); color: var(--bt-brand-text); }
+.pvx-qt { display: flex; justify-content: space-between; background: var(--bt-brand-text); color: var(--bt-on-brand-ctl); font-size: var(--bt-fs-xs); padding: var(--bt-s1) var(--bt-s2); }
+.pvx-qtot { display: flex; justify-content: space-between; margin-top: var(--bt-s2); padding: var(--bt-s2); background: var(--bt-brand-soft); border-top: 3px solid var(--bt-brand-accent-fill); font-size: var(--bt-fs-sm); }
 </style>
 </head>
 <body>
@@ -2026,6 +2082,7 @@ body.logged-out .fav-btn { display: none; }
   <button class="menu-btn" id="menuBtn" aria-label="Open menu">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
   </button>
+  <span class="mb-mark" id="mbMark"></span>
   <div class="title">Business Tracker</div>
 </div>
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
@@ -2033,6 +2090,7 @@ body.logged-out .fav-btn { display: none; }
 <nav class="sidebar" id="sidebar" aria-label="Main">
   <div class="brand">
     <div class="brand-tools"><button type="button" class="menu-mode-btn" id="menuCollapseBtn" aria-label="Collapse the menu" title="Collapse the menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 5 8 12 15 19"/></svg></button></div>
+    <div class="brand-mark" id="brandMark"></div>
     <h1>Business Tracker</h1>
     <div class="sub" id="envSub">Live system</div>
   </div>
@@ -8473,13 +8531,19 @@ function qDocDays(q){
   return d > 0 ? d : 0;
 }
 function qHex(h, fb){ const m = /^#?([0-9a-f]{6})$/i.exec(String(h || '')); return m ? m[1].toUpperCase() : fb; }
-function qLum(hex){ const n = parseInt(hex, 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255; return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; }
 function qBrand(){
-  const b = state.branding || defaultBranding(), f = brandFont(b.font), st = state.settings, lg = b.logos || {};
-  const logoUrl = lg.fullStd || lg.badgeStd || '', showLogo = !!logoUrl && (b.mode === 'logo' || b.mode === 'both');
-  let heading = qHex(b.colours && b.colours.primary, '1C1F22'); if(qLum(heading) > 0.62) heading = qHex(b.colours && b.colours.secondary, '1C1F22'); if(qLum(heading) > 0.62) heading = '1C1F22';
-  return { name: String(b.name || '').trim(), tagline: String(st.bizTagline || '').trim(), logo: showLogo ? logoUrl : '', showName: !showLogo || b.mode === 'both',
-    heading, rule: qHex(b.colours && b.colours.secondary, 'A8763E'), fontName: f.name, fontStack: f.stack, weight: f.weight };
+  const b = state.branding || defaultBranding(), f = brandFont(b.font), st = state.settings, lg = b.logos || {}, tk = btBrandTokens(b.colours || defaultBranding().colours, { all: true });
+  const logoUrl = lg.fullStd || lg.badgeStd || '', showLogo = !!logoUrl && (b.mode === 'logo' || b.mode === 'both'), nm = String(b.name || '').trim();   // the quote is on white: Standard logos, Full where there is room
+  const showName = !!nm && b.mode !== 'hidden' && (b.mode === 'name' || b.mode === 'both' || !showLogo);
+  const hx = c => qHex(c, '1C1F22');
+  // heading = the primary colour (darkened if it is too light to read on white; white table-header text sits on it too); rule = the secondary colour, nudged to 3:1
+  return { name: nm, tagline: String(st.bizTagline || '').trim() || String(b.tagline || '').trim(), logo: showLogo ? logoUrl : '', showName,
+    heading: hx(tk.text), rule: hx(tk.line2), fontName: f.name, fontStack: f.stack, weight: f.weight };
+}
+/* extra quote colours, worked out at draw time (never saved with a sent quote): totals / Accept accent and a soft tint for the totals box */
+function qBrandExtra(){
+  const b = state.branding || defaultBranding(), tk = btBrandTokens(b.colours || defaultBranding().colours, { all: true }), hx = c => qHex(c, '1C1F22');
+  return { accent: hx(tk.accFill), soft: hx(btMix(tk.text, '#ffffff', 0.93)), edge: hx(btReach(tk.text, ['#ffffff'], 3, '#000000')) };
 }
 /* customer groups: every line counts, hidden or not; groups add up to the grand total to the penny (any rounding difference lands on the largest group) */
 function qGroups(q, c){
@@ -8536,7 +8600,7 @@ function qCustomerDoc(q, mode, c){
 function qDocFor(q, mode){
   mode = mode || qViewMode(q); const sn = q.sentSnapshot;
   if(sn && q.status !== 'Draft' && sn.docs && sn.docs[mode]){
-    const d = JSON.parse(JSON.stringify(sn.docs[mode])); d.terms = sn.terms; d.acceptance = sn.terms.acceptance; d.brand.logo = qBrand().logo; d.snapshot = sn.date; return d;
+    const d = JSON.parse(JSON.stringify(sn.docs[mode])); d.terms = sn.terms; d.acceptance = sn.terms.acceptance; Object.assign(d.brand, qBrand()); d.snapshot = sn.date; return d;   // a sent quote keeps its prices and terms; the look (logo, colours, font) follows the current brand
   }
   return qCustomerDoc(q, mode);
 }
@@ -8548,25 +8612,30 @@ function qDocName(q, doc, ext){ return (doc.ref + ' ' + (q.customer || '') + ' '
 
 /* ---- HTML (preview and print page) ---- */
 function qDocCss(b){
-  return `.cd{color:#1b1b1b;background:#fff;font:13px/1.5 'Inter','Segoe UI',Arial,sans-serif}.cd *{box-sizing:border-box}
-.cd-head{display:flex;align-items:center;gap:14px;border-bottom:3px solid #${b.rule};padding-bottom:8px;margin-bottom:12px}.cd-logo{max-height:56px;max-width:240px;display:block}
-.cd-name{font-family:${b.fontStack};font-weight:${b.weight};font-size:26px;color:#${b.heading};line-height:1.15}.cd-tag{font-size:12px;color:#555;font-style:italic;margin-top:2px}
-.cd h1{font-family:${b.fontStack};font-weight:${b.weight};font-size:28px;letter-spacing:.14em;color:#${b.heading};margin:4px 0 12px}
-.cd h2{font-family:${b.fontStack};font-weight:${b.weight};font-size:20px;color:#${b.heading};margin:0 0 8px}.cd h3{font-family:${b.fontStack};font-weight:${b.weight};font-size:14px;color:#${b.heading};margin:12px 0 2px;break-after:avoid}
-.cd-meta{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px 18px;margin-bottom:12px}.cd-k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6a6a6a;font-weight:600}.cd-v{font-size:13px}
-.cd-desc{margin:0 0 12px;white-space:pre-wrap}.cd table{border-collapse:collapse;width:100%}.cd th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;text-align:left;color:#fff;background:#${b.heading};padding:6px 8px}
-.cd td{padding:5px 8px;border-bottom:1px solid #ddd;vertical-align:top}.cd .n{text-align:right;white-space:nowrap}.cd tr{break-inside:avoid;page-break-inside:avoid}
+  const x = qBrandExtra();
+  return `.cd{color:#1b1b1b;background:#fff;font:14px/1.55 'Inter','Segoe UI',Arial,sans-serif}.cd *{box-sizing:border-box}
+.cd-head{display:flex;align-items:center;gap:16px;border-bottom:3px solid #${b.rule};padding-bottom:12px;margin-bottom:18px}.cd-head:empty{display:none}.cd-logo{max-height:56px;max-width:240px;width:auto;height:auto;object-fit:contain;display:block}
+.cd-name{font-family:${b.fontStack};font-weight:${b.weight};font-size:26px;color:#${b.heading};line-height:1.15}.cd-tag{font-size:13px;color:#555;margin-top:3px}
+.cd h1{font-family:${b.fontStack};font-weight:${b.weight};font-size:28px;letter-spacing:.14em;color:#${b.heading};margin:6px 0 16px}
+.cd h2{font-family:${b.fontStack};font-weight:${b.weight};font-size:20px;color:#${b.heading};margin:0 0 8px}.cd h3{font-family:${b.fontStack};font-weight:${b.weight};font-size:15px;color:#${b.heading};margin:14px 0 2px;break-after:avoid}
+.cd-meta{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px 20px;margin-bottom:16px}.cd-k{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#595959;font-weight:600}.cd-v{font-size:14px}
+.cd-desc{margin:0 0 16px;white-space:pre-wrap}.cd table{border-collapse:collapse;width:100%}.cd th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;text-align:left;color:#fff;background:#${b.heading};padding:8px 9px}
+.cd td{padding:7px 9px;border-bottom:1px solid #ddd;vertical-align:top}.cd .n{text-align:right;white-space:nowrap}.cd tr{break-inside:avoid;page-break-inside:avoid}
 .cd .cd-grp td{background:#f3f1ec;font-weight:600;color:#${b.heading}}.cd .cd-tot td{font-weight:700;border-top:2px solid #${b.rule}}
-.cd-sum{width:auto!important;min-width:60%;margin:14px 0 0 auto}.cd-sum td{border-bottom:1px solid #e3e3e3}.cd-sum .cd-tot td{font-size:14px}
-.cd-big{font-family:${b.fontStack};font-size:26px;color:#${b.heading};font-weight:${b.weight}}.cd-box{border:1px solid #bbb;border-radius:6px;padding:10px 14px;margin-top:14px;break-inside:avoid;page-break-inside:avoid}
-.cd-sign{display:grid;grid-template-columns:2fr 3fr 1.3fr;gap:18px;margin-top:22px}.cd-sign span{border-top:1px solid #333;padding-top:3px;font-size:11px;color:#555}
-.cd-foot{margin-top:18px;padding-top:8px;border-top:3px solid #${b.rule};font-size:11px;color:#444;break-inside:avoid}.cd p{margin:0 0 6px}
+.cd-totbox{width:fit-content;min-width:60%;max-width:100%;margin:18px 0 0 auto;border:1px solid #${x.edge};border-top:4px solid #${x.accent};background:#${x.soft};border-radius:6px;padding:6px 12px 8px;break-inside:avoid;page-break-inside:avoid}
+.cd-sum{width:100%!important;margin:0}.cd-sum td{border-bottom:1px solid #e3e3e3}.cd-sum .cd-tot td{font-size:15px;color:#${b.heading};border-top:2px solid #${x.accent}}
+.cd-big{font-family:${b.fontStack};font-size:26px;color:#${b.heading};font-weight:${b.weight}}.cd-box{border:1px solid #bbb;border-radius:6px;padding:12px 16px;margin-top:18px;break-inside:avoid;page-break-inside:avoid}
+.cd-accept{border-left:4px solid #${x.accent}}
+.cd-sign{display:grid;grid-template-columns:2fr 3fr 1.3fr;gap:18px;margin-top:26px}.cd-sign span{border-top:1px solid #333;padding-top:4px;font-size:12px;color:#555}
+.cd-foot{margin-top:24px;padding-top:10px;border-top:3px solid #${b.rule};font-size:12px;color:#444;break-inside:avoid}.cd p{margin:0 0 6px}
 .cd-list{margin:2px 0 6px 18px;padding:0}.cd-list li{margin:1px 0}.cd-gh{display:flex;justify-content:space-between;gap:12px;font-weight:600;color:#${b.heading};margin-top:10px;break-after:avoid}
-.cd-terms{margin-top:30px;padding-top:18px;border-top:2px dashed #ccc}.cd-terms .cd-t-sec{break-inside:avoid;page-break-inside:avoid}.cd-snap{font-size:11px;color:#777;margin-top:4px}`;
+.cd-terms{margin-top:30px;padding-top:18px;border-top:2px dashed #ccc}.cd-terms .cd-t-sec{break-inside:avoid;page-break-inside:avoid}.cd-snap{font-size:12px;color:#666;margin-top:4px}
+@media (max-width:560px){.cd-meta{grid-template-columns:1fr 1fr}.cd-sign{grid-template-columns:1fr}.cd-totbox{min-width:100%}.cd table{font-size:13px}}`;
 }
 function qDocHtml(d){
   const e = escHtml, b = d.brand, M = qm, vat = d.vatOn, br = s => e(s).replace(/\n/g, '<br>');
-  const head = `<div class="cd-head">${b.logo ? `<img class="cd-logo" src="${escAttr(b.logo)}" alt="${escAttr(b.name)}">` : ''}<div>${(b.showName || !b.logo) && b.name ? `<div class="cd-name">${e(b.name)}</div>` : ''}${b.tagline ? `<div class="cd-tag">${e(b.tagline)}</div>` : ''}</div></div>`;
+  const hasHead = !!(b.logo || (b.showName && b.name) || b.tagline);
+  const head = !hasHead ? '<div class="cd-head" style="display:none"></div>' : `<div class="cd-head">${b.logo ? `<img class="cd-logo" src="${escAttr(b.logo)}" alt="${escAttr(b.name)}">` : ''}<div>${b.showName && b.name ? `<div class="cd-name">${e(b.name)}</div>` : ''}${b.tagline ? `<div class="cd-tag">${e(b.tagline)}</div>` : ''}</div></div>`;
   const meta = `<div class="cd-meta"><div><div class="cd-k">Prepared for</div><div class="cd-v"><b>${e(d.prepared.name || '—')}</b>${d.prepared.address ? '<br>' + br(d.prepared.address) : ''}</div></div>
     <div><div class="cd-k">Project</div><div class="cd-v">${e(d.project || '—')}</div></div><div><div class="cd-k">Quotation reference</div><div class="cd-v">${e(d.ref)}</div></div>
     <div></div><div><div class="cd-k">Date</div><div class="cd-v">${e(d.date)}</div></div><div><div class="cd-k">Valid until</div><div class="cd-v">${e(d.validUntil)}</div></div></div>`;
@@ -8589,9 +8658,9 @@ function qDocHtml(d){
       ${mats.map(g => `<tbody><tr class="cd-grp"><td colspan="4">${e(g.name)}</td></tr>${g.items.filter(i => i.kind === 'line').map(i => `<tr><td>${e(i.desc)}</td><td class="n">${i.qty}</td><td class="n">${M(i.each)}</td><td class="n">${M(vat ? i.inc : i.ex)}</td></tr>`).join('')}</tbody>`).join('')}</table>`;
   }
   const opts = (d.body.optional || []).length ? `<div class="cd-box"><div class="cd-k">Optional extras (not included in the total above)</div><table><tbody>${d.body.optional.map(g => `<tr><td><b>${e(g.name)}</b>${g.items.length ? `<ul class="cd-list">${g.items.map(i => `<li>${e(i.desc)}${i.qty != null && i.qty !== '' ? ' — qty ' + e(String(i.qty)) : (i.qtyText ? ' — ' + e(i.qtyText) : '')}</li>`).join('')}</ul>` : ''}</td><td class="n">${vat ? M(g.ex) + ' ex VAT<br>' + M(g.inc) + ' incl. VAT' : M(g.ex)}</td></tr>`).join('')}</tbody></table></div>` : '';
-  const sum = `<table class="cd-sum"><tbody>${d.summary.map(r => `<tr class="${r.total ? 'cd-tot' : ''}"><td>${e(r.label)}</td><td class="n">${r.text ? e(r.text) : M(r.amount)}</td></tr>`).join('')}</tbody></table>`;
+  const sum = `<div class="cd-totbox"><table class="cd-sum"><tbody>${d.summary.map(r => `<tr class="${r.total ? 'cd-tot' : ''}"><td>${e(r.label)}</td><td class="n">${r.text ? e(r.text) : M(r.amount)}</td></tr>`).join('')}</tbody></table></div>`;
   const pay = d.payments.length ? `<div class="cd-box"><div class="cd-k">Payment</div><p>${e(d.paymentLine)}</p><table><tbody>${d.payments.map(p => `<tr><td>${e(p.label)}</td><td>${e(p.due)}</td><td class="n">${M(p.amount)}</td></tr>`).join('')}</tbody></table></div>` : '';
-  const acc = `<div class="cd-box"><p><b>${e(d.acceptance.text)}</b></p><div class="cd-sign">${d.acceptance.fields.map(f => `<span>${e(f)}</span>`).join('')}</div></div>`;
+  const acc = `<div class="cd-box cd-accept"><p><b>${e(d.acceptance.text)}</b></p><div class="cd-sign">${d.acceptance.fields.map(f => `<span>${e(f)}</span>`).join('')}</div></div>`;
   const f = d.footer, foot = `<div class="cd-foot"><b>${e(f.name)}</b>${f.address ? ' · ' + e(f.address) : ''}${f.phone ? ' · ' + e(f.phone) : ''}${f.email ? ' · ' + e(f.email) : ''}<br>Quotation ${e(f.ref)}${f.vatNumber ? ' · VAT number: ' + e(f.vatNumber) : ''}</div>`;
   const t = d.terms, tb = t.business;
   const terms = `<section class="cd-terms">${head}
@@ -8602,10 +8671,11 @@ function qDocHtml(d){
 function qPrintPage(d, title){
   const fonts = [...document.querySelectorAll('link[rel="stylesheet"]')].map(l => `<link rel="stylesheet" href="${escAttr(l.href)}">`).join('');
   return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escHtml(title)}</title>${fonts}
-<style>@page{size:A4;margin:15mm}html,body{margin:0;background:#e9e7e2}body{padding:0 0 30px}.pp-bar{position:sticky;top:0;background:#1c1f22;color:#fff;padding:10px 16px;font:13px/1.4 Arial,sans-serif;display:flex;gap:14px;align-items:center;z-index:5}
+<style>@page{size:A4;margin:15mm}html,body{margin:0;background:#e9e7e2}body{padding:0 0 30px}.pp-bar{position:sticky;top:0;background:#${d.brand.heading};color:#fff;padding:10px 16px;font:13px/1.4 Arial,sans-serif;display:flex;gap:14px;align-items:center;z-index:5}
 .pp-bar button{font:inherit;padding:6px 14px;border-radius:6px;border:0;cursor:pointer}.pp-sheet{width:210mm;max-width:100%;margin:16px auto;background:#fff;padding:15mm;box-shadow:0 2px 10px rgba(0,0,0,.2)}
-.pp-sheet .cd{font-size:12px;line-height:1.38}.pp-sheet .cd td{padding:3px 7px}.pp-sheet .cd th{padding:5px 7px}.pp-sheet .cd h1{font-size:24px;margin:2px 0 8px}.pp-sheet .cd-meta{margin-bottom:8px}.pp-sheet .cd-box{margin-top:9px;padding:7px 12px}.pp-sheet .cd-sign{margin-top:14px}.pp-sheet .cd-sum{margin-top:10px}.pp-sheet .cd-foot{margin-top:12px}.pp-sheet .cd p{margin:0 0 4px}.pp-sheet .cd h3{margin:8px 0 1px;font-size:13px}.pp-sheet .cd h2{font-size:18px;margin:0 0 4px}
-.pp-sheet .cd-terms{break-before:page;page-break-before:always;margin-top:0;padding-top:0;border-top:0}
+.pp-sheet .cd{font-size:11pt;line-height:1.35}.pp-sheet .cd td{padding:3px 8px}.pp-sheet .cd th{padding:5px 8px}.pp-sheet .cd h1{font-size:24px;margin:2px 0 8px}.pp-sheet .cd-head{margin-bottom:12px;padding-bottom:10px}.pp-sheet .cd-meta{margin-bottom:10px}.pp-sheet .cd-box{margin-top:10px;padding:7px 14px}.pp-sheet .cd-sign{margin-top:16px}.pp-sheet .cd-totbox{margin-top:12px;padding:4px 12px 6px}.pp-sheet .cd-foot{margin-top:12px}.pp-sheet .cd p{margin:0 0 4px}.pp-sheet .cd h3{margin:10px 0 2px;font-size:13pt}.pp-sheet .cd h2{font-size:18px;margin:0 0 6px}
+@media (max-width:700px){.pp-sheet{width:auto;margin:8px;padding:16px}.pp-sheet .cd{font-size:14px}}
+.pp-sheet .cd-terms{break-before:page;page-break-before:always;margin-top:0;padding-top:0;border-top:0;font-size:10pt;line-height:1.35}.pp-sheet .cd-terms .cd-head{margin-bottom:8px}.pp-sheet .cd-terms h3{font-size:11pt;margin:7px 0 1px}
 @media print{html,body{background:#fff}.pp-bar{display:none!important}.pp-sheet{width:auto;margin:0;padding:0;box-shadow:none}.cd-snap{display:none}}</style></head>
 <body><div class="pp-bar"><span>Choose <b>Save as PDF</b> as the destination in the print dialog.</span><button onclick="window.print()">Print / Save as PDF</button></div><div class="pp-sheet">${qDocHtml(d)}</div>
 <script>window.addEventListener('load',function(){setTimeout(function(){try{window.print()}catch(e){}},700)})<\/script></body></html>`;
@@ -11544,11 +11614,88 @@ function brandPillParts(b){
   const short = (sh.name && !sh.logo) ? `<span class="bp-short" aria-hidden="true" style="${brandNameStyle(b)}">${escHtml(brandInitials(sh.name))}</span>` : '';   // phones show this instead of the full name
   return { cls, html: img + nm + short };
 }
-/* the login screen (dark background): Reversed logos only — Full, else Badge. '' = nothing, as before branding existed. b needs mode, name, tagline, font, logos.fullRev / badgeRev */
-function brandLoginHtml(b){
+/* ---------- brand tokens: colour maths, contrast guard, logo picker (everything here is derived from state.branding; nothing new is saved) ----------
+   The saved colours are never changed. Each role gets the shade the app actually uses: the saved colour when it already reads well, otherwise the nearest darker (or lighter) shade that meets WCAG AA
+   (4.5:1 text, 3:1 lines and UI parts). Status colours (ok / warn / bad / info) are not part of this, so their meaning never changes. */
+const BT_WHITE = '#ffffff', BT_INK = '#1c1f22', BT_BLACK = '#000000';
+const BT_LIGHT_BGS = ['#ffffff', '#f4f2ed', '#e8e5df'];   // card, paper, stone: the lightest and darkest light surfaces text sits on (same values as --bt-card / --bt-paper / --bt-stone)
+function btRgb(h){ const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function btHexOf(c){ return '#' + c.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
+function btLum(h){ const [r, g, b] = btRgb(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; }
+function btContrast(a, b){ const x = btLum(a), y = btLum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+function btMix(a, b, t){ const x = btRgb(a), y = btRgb(b); return btHexOf(x.map((v, i) => v + (y[i] - v) * t)); }
+function btReach(c, bgs, min, toward){   // the least change toward `toward` that gives `c` at least `min` contrast on every background in bgs
+  const ok = x => bgs.every(b => btContrast(x, b) >= min);
+  if(ok(c)) return c;
+  let lo = 0, hi = 1; for(let i = 0; i < 14; i++){ const m = (lo + hi) / 2; if(ok(btMix(c, toward, m))) hi = m; else lo = m; }
+  return btMix(c, toward, hi);
+}
+function btStrong(c, bgs, toward){ const a = btReach(c, bgs, 4.5, toward); return a === c ? c : btReach(c, bgs, 7, toward); }   // a colour that already reads is kept; one that had to change goes to 7:1 so it looks solid, not washed out
+function btOn(fill){ return btContrast(BT_WHITE, fill) >= 4.5 ? BT_WHITE : btContrast(BT_INK, fill) >= 4.5 ? BT_INK : ''; }   // text colour for a fill; '' = neither reads
+function btTint(on, surf, t, min){ for(; t > 0; t -= 0.05){ const c = btMix(on, surf, t); if(btContrast(c, surf) >= min) return c; } return on; }   // a softer text colour that still clears `min`
+function btRgba(h, a){ const c = btRgb(h); return 'rgba(' + c.join(',') + ',' + a + ')'; }
+/* one role at a time. Only roles that differ from the default colours are written as overrides, so the default brand is exactly today's look (opts.all forces every role: the Settings preview). */
+function btBrandTokens(colours, opts){
+  const D = defaultBranding().colours, all = !!(opts && opts.all), P = colours.primary, S2 = colours.secondary, A = colours.accent;
+  const vars = {}, notes = {}, out = {};
+  const surfaceOn = btOn(P), surface = surfaceOn ? P : btReach(P, [BT_WHITE], 4.5, BT_BLACK), on = surfaceOn || BT_WHITE;   // chrome: the colour itself when white or dark text reads on it
+  const dark = on === BT_WHITE;
+  const ctl = btStrong(P, [BT_WHITE], BT_BLACK), ctlHover = btReach(btMix(ctl, BT_WHITE, 0.14), [BT_WHITE], 4.5, BT_BLACK), ctlPressed = btReach(btMix(ctl, BT_WHITE, 0.08), [BT_WHITE], 4.5, BT_BLACK);
+  const text = btStrong(P, BT_LIGHT_BGS, BT_BLACK);   // headings, links, active tab text on light surfaces
+  const text2 = btStrong(S2, BT_LIGHT_BGS, BT_BLACK), line2 = btReach(S2, ['#ffffff', '#f4f2ed'], 3, BT_BLACK);
+  const accFill = btStrong(A, [BT_WHITE], BT_BLACK), accLine = btReach(A, ['#ffffff', '#f4f2ed'], 3, BT_BLACK);
+  const primaryOn = all || P !== D.primary, secondOn = all || S2 !== D.secondary, accentOn = all || A !== D.accent;
+  if(primaryOn){
+    Object.assign(vars, { '--bt-brand': P, '--bt-brand-surface': surface, '--bt-brand-edge': btRgba(on, 0.22), '--bt-on-brand': on,
+      '--bt-on-brand-muted': btTint(on, surface, 0.22, 4.5), '--bt-on-brand-dim': btTint(on, surface, 0.4, 4.5),
+      '--bt-brand-ctl': ctl, '--bt-brand-hover': ctlHover, '--bt-brand-pressed': ctlPressed, '--bt-on-brand-ctl': BT_WHITE,
+      '--bt-brand-text': text, '--bt-brand-soft': btMix(P, BT_WHITE, 0.9), '--bt-brand-border': btReach(P, ['#ffffff', '#f4f2ed'], 3, BT_BLACK),
+      '--bt-nav-label': btTint(on, surface, 0.3, 4.5) });
+  }
+  if(secondOn) Object.assign(vars, { '--bt-brand-2': S2, '--bt-brand-2-text': text2, '--bt-brand-2-line': line2, '--bt-focus': text2 });
+  if(primaryOn || secondOn){   // the menu's active-item marker: the secondary colour, nudged until it shows (3:1) against the menu surface
+    const surf = primaryOn ? surface : BT_INK;
+    vars['--bt-indicator'] = btReach(S2, [surf], 3, dark ? BT_WHITE : BT_BLACK);
+  }
+  if(accentOn) Object.assign(vars, { '--bt-brand-accent': A, '--bt-brand-accent-line': accLine, '--bt-brand-accent-fill': accFill, '--bt-on-brand-accent': BT_WHITE });
+  const sentence = 'This colour is too light for text, using a darker shade in the app.';
+  if(P !== D.primary && (text !== P || ctl !== P)) notes.primary = sentence;
+  if(S2 !== D.secondary && (text2 !== S2 || line2 !== S2)) notes.secondary = sentence;
+  if(A !== D.accent && (accFill !== A || accLine !== A)) notes.accent = sentence;
+  Object.assign(out, { vars, notes, dark, on, surface, ctl, text, text2, line2, accFill, accLine });
+  return out;
+}
+const BT_ALL_VARS = ['--bt-brand', '--bt-brand-surface', '--bt-brand-edge', '--bt-on-brand', '--bt-on-brand-muted', '--bt-on-brand-dim', '--bt-brand-ctl', '--bt-brand-hover', '--bt-brand-pressed', '--bt-on-brand-ctl', '--bt-brand-text', '--bt-brand-soft', '--bt-brand-border', '--bt-nav-label',
+  '--bt-brand-2', '--bt-brand-2-text', '--bt-brand-2-line', '--bt-focus', '--bt-indicator', '--bt-brand-accent', '--bt-brand-accent-line', '--bt-brand-accent-fill', '--bt-on-brand-accent'];
+function btApplyTokens(colours, fontName){
+  const root = document.documentElement.style, tk = btBrandTokens(colours), f = brandFont(fontName);
+  BT_ALL_VARS.forEach(k => { if(k in tk.vars) root.setProperty(k, tk.vars[k]); else root.removeProperty(k); });
+  root.setProperty('--bt-font-brand', f.stack); root.setProperty('--bt-font-brand-w', String(f.weight));
+  return tk;
+}
+/* which logo for which surface: Standard on light, Reversed on dark; Full where there is room, Badge where it is small. null = none fits, so the caller falls back to the name in the brand font. */
+function brandLogoFor(b, dark, small, allowFullWhenSmall){
+  const lg = b.logos || {}, full = dark ? lg.fullRev : lg.fullStd, badge = dark ? lg.badgeRev : lg.badgeStd;
+  if(small) return badge ? { url: badge, kind: 'badge' } : (allowFullWhenSmall && full ? { url: full, kind: 'full' } : null);
+  return full ? { url: full, kind: 'full' } : badge ? { url: badge, kind: 'badge' } : null;
+}
+/* sidebar header / rail / phone bar marks. Name-only and Hide leave the app title on its own, as before. size: 'side' | 'rail' | 'bar' */
+function brandMarkHtml(b, dark, size){
+  if(b.mode !== 'logo' && b.mode !== 'both') return '';
+  const lg = brandLogoFor(b, dark, size !== 'side', size === 'bar'), nm = brandName(b);
+  const sh = brandShow(b, lg ? lg.url : '');
+  const img = lg ? `<img class="${lg.kind === 'full' ? 'bm-full' : 'bm-badge'}" src="${escHtml(lg.url)}" alt="${sh.name || size !== 'side' ? '' : escHtml(nm)}">` : '';
+  if(size === 'rail') return img || (nm ? `<span class="bm-init" aria-hidden="true" style="${brandNameStyle(b)}">${escHtml(brandInitials(nm))}</span>` : '');
+  if(size === 'bar') return img;
+  const name = sh.name && !(lg && lg.kind === 'full') ? `<span class="bm-name" style="${brandNameStyle(b)}">${escHtml(sh.name)}</span>` : '';
+  return img + name;
+}
+/* the login screen paints on the brand surface: Reversed logos when it is dark, Standard when it is light. b needs mode, name, tagline, font, logos, colours */
+function brandLoginHtml(b, dark){
   if(b.mode === 'hidden') return '';
-  const lg = b.logos || {}, sh = brandShow(b, lg.fullRev || lg.badgeRev);
-  const img = sh.logo ? `<img class="${lg.fullRev ? 'lb-full' : 'lb-badge'}" src="${escHtml(sh.logo)}" alt="${sh.name ? '' : escHtml(brandName(b))}">` : '';
+  if(dark === undefined) dark = btBrandTokens(b.colours || defaultBranding().colours).dark;
+  const lg = brandLogoFor(b, dark, false), sh = brandShow(b, lg ? lg.url : '');
+  const img = sh.logo ? `<img class="${lg.kind === 'full' ? 'lb-full' : 'lb-badge'}" src="${escHtml(sh.logo)}" alt="${sh.name ? '' : escHtml(brandName(b))}">` : '';
   const nm = sh.name ? `<span class="lb-name" style="${brandNameStyle(b)}">${escHtml(sh.name)}</span>` : '';
   if(!img && !nm) return '';
   const tag = (sh.name && String(b.tagline || '').trim()) ? `<div class="lb-tag">${escHtml(String(b.tagline).trim())}</div>` : '';   // under the name, login screen only
@@ -11556,31 +11703,65 @@ function brandLoginHtml(b){
 }
 function renderLoginBrand(b){
   const el = document.getElementById('loginBrand'); if(!el) return;
+  let dark;
   if(!b){
     let c = null; try{ c = JSON.parse(localStorage.getItem(BRAND_CACHE_KEY) || 'null'); }catch(e){}
-    b = normaliseBranding(c && typeof c === 'object' ? { mode: c.mode, name: c.name, tagline: c.tagline, font: c.font, logos: { fullRev: c.fullRev, badgeRev: c.badgeRev } } : null);   // no cache yet: default name, default font
-  }
-  el.innerHTML = brandLoginHtml(b);
+    c = c && typeof c === 'object' ? c : null;
+    const colours = normaliseBranding({ colours: c && c.colours }).colours;   // no cache yet (or an older one without colours): default colours, name and font
+    dark = btBrandTokens(colours).dark;
+    const full = c ? (c.full !== undefined ? c.full : c.fullRev) : '', badge = c ? (c.badge !== undefined ? c.badge : c.badgeRev) : '';   // older caches only held the Reversed pair
+    b = normaliseBranding(c ? { mode: c.mode, name: c.name, tagline: c.tagline, font: c.font, colours, logos: dark ? { fullRev: full, badgeRev: badge } : { fullStd: full, badgeStd: badge } } : null);
+    btApplyTokens(b.colours, b.font);   // the login background, card and buttons use the brand straight away, before any data has loaded
+  } else dark = btBrandTokens(b.colours).dark;
+  el.innerHTML = brandLoginHtml(b, dark);
 }
-let _brandSig = '', _brandPillSig = '';
+let _brandSig = '', _brandPillSig = '', _brandMarkSig = '';
+function applyBrandMarks(){
+  const b = state && state.branding; if(!b) return;
+  const dark = btBrandTokens(b.colours).dark;
+  [['brandMark', 'side'], ['railMark', 'rail'], ['mbMark', 'bar']].forEach(([id, size]) => {
+    const el = document.getElementById(id); if(!el) return;
+    const h = brandMarkHtml(b, dark, size), sig = size + dark + b.mode + b.name + b.font + h;
+    if(el.dataset.sig !== sig){ el.dataset.sig = sig; el.innerHTML = h; }
+  });
+}
 function applyBranding(){
   const b = state && state.branding; if(!b) return;
+  const tk = btApplyTokens(b.colours, b.font);
   const parts = brandPillParts(b), pillSig = parts ? parts.cls + parts.html : '';
   const pill = document.getElementById('brandPill'), bar = document.getElementById('brandBar');
   if(pill && pillSig !== _brandPillSig){ _brandPillSig = pillSig; pill.className = parts ? parts.cls : 'brand-pill'; pill.innerHTML = parts ? parts.html : ''; }
   if(bar) bar.classList.toggle('off', !parts);
-  const cache = JSON.stringify({ mode: b.mode, name: b.name, tagline: b.tagline, font: b.font, fullRev: b.logos.fullRev, badgeRev: b.logos.badgeRev });
+  const lgin = tk.dark ? { full: b.logos.fullRev, badge: b.logos.badgeRev } : { full: b.logos.fullStd, badge: b.logos.badgeStd };
+  const cache = JSON.stringify({ mode: b.mode, name: b.name, tagline: b.tagline, font: b.font, dark: tk.dark, full: lgin.full, badge: lgin.badge, colours: b.colours });
   if(cache !== _brandSig){   // refreshed after every data load / change so the login screen can use it next time
     _brandSig = cache;
     try{ localStorage.setItem(BRAND_CACHE_KEY, cache); }catch(e){}
     renderLoginBrand();
+    btApplyTokens(b.colours, b.font);   // renderLoginBrand() read the cache; make sure the live state wins
   }
+  applyBrandMarks();
   const none = '<span class="br-empty">Nothing shown</span>';
   const pv = document.getElementById('brPvPill');
   if(pv) pv.innerHTML = parts ? `<div class="${parts.cls}">${parts.html}</div>` : none;
-  const pl = document.getElementById('brPvLogin'), lh = brandLoginHtml(b);
+  const pl = document.getElementById('brPvLogin'), lh = brandLoginHtml(b, tk.dark);
   if(pl){ pl.innerHTML = lh; pl.style.display = lh ? '' : 'none'; const e = document.getElementById('brPvLoginNone'); if(e) e.style.display = lh ? 'none' : ''; }
+  const px = document.getElementById('brPvLive'); if(px) px.innerHTML = brandPreviewHtml(b);
+  ['primary', 'secondary', 'accent'].forEach(k => { const w = document.getElementById('brColWarn-' + k); if(w) w.textContent = tk.notes[k] || ''; });
   requestAnimationFrame(brandPanelSync);   // pill width may have changed
+}
+/* Settings: a small live preview of the menu, a button, a tab and the quote header in the chosen colours (all roles forced on, so it always shows what the colours will do) */
+function brandPreviewHtml(b){
+  const tk = btBrandTokens(b.colours, { all: true }), f = brandFont(b.font), nm = escHtml(brandName(b) || BRAND_DEFAULT_NAME);
+  const style = Object.keys(tk.vars).map(k => k + ':' + tk.vars[k]).join(';') + ';--bt-font-brand:' + f.stack + ';--bt-font-brand-w:' + f.weight;
+  const qLogo = brandLogoFor(b, false, false), side = brandMarkHtml(b, tk.dark, 'side');
+  const qShow = brandShow(b, qLogo ? qLogo.url : '');
+  const qHead = (qShow.logo ? `<img src="${escHtml(qShow.logo)}" alt="">` : '') + (qShow.name || (b.mode !== 'hidden' && !qShow.logo) ? `<span class="pvx-qn">${nm}</span>` : '');
+  return `<div class="pvx" style="${escHtml(style)}" role="img" aria-label="Preview of the menu, a button, a tab and the quote header in your brand colours">
+    <div class="pvx-side"><div class="pvx-brand">${side}</div><div class="pvx-title">Business Tracker</div><div class="pvx-item">Today</div><div class="pvx-item act">CRM</div></div>
+    <div class="pvx-main"><div class="pvx-row"><span class="pvx-btn">Save</span><span class="pvx-link">A link</span></div>
+      <div class="pvx-tabs"><span class="pvx-tab act">Tab</span><span class="pvx-tab">Other</span></div>
+      <div class="pvx-quote"><div class="pvx-qh">${qHead}</div><div class="pvx-qt"><span>ITEM</span><span>PRICE</span></div><div class="pvx-qtot"><span>Total</span><b>£1,000.00</b></div></div></div></div>`;
 }
 /* the pill slides clear of any open right-hand panel (record drawer, lead / supplier panel, task / action panel) */
 function brandPanelSync(){
@@ -11612,7 +11793,7 @@ function renderBranding(){
       <div class="br-col-row"><input type="color" value="${hx}" data-br-col="${k}" aria-label="${label} colour picker"${dis}>
         <input type="text" value="${hx}" maxlength="7" spellcheck="false" autocomplete="off" data-br-hex="${k}" aria-label="${label} hex colour"${dis}>
         <span class="br-swatch-dot" id="brDot-${k}" style="background:${hx}"></span></div>
-      <div class="br-err" id="brColErr-${k}"></div></div>`; };
+      <div class="br-err" id="brColErr-${k}"></div><div class="br-warn" id="brColWarn-${k}" role="status"></div></div>`; };
   const moreOpen = brMoreOpen === null ? b.mode !== 'name' : brMoreOpen;
   el.innerHTML = `
     ${ed ? '' : '<p class="br-note">Only admins can change the branding.</p>'}
@@ -11621,7 +11802,7 @@ function renderBranding(){
     <div class="br-grid">
       <div class="br-f"><label for="brName">Business name</label><input type="text" id="brName" data-br="name" maxlength="${BRAND_NAME_MAX}" value="${escHtml(b.name)}" placeholder="${escHtml(BRAND_DEFAULT_NAME)}"${dis}></div>
       <div class="br-f"><label for="brTag">Tagline (optional)</label><input type="text" id="brTag" data-br="tagline" maxlength="100" value="${escHtml(b.tagline)}"${dis}>
-        <div class="lp-hint">Shown under the name on the login screen only.</div></div>
+        <div class="lp-hint">Shown under the name on the login screen and on quotes.</div></div>
     </div>
     <div class="br-f"><label for="brFont">Name font</label>
       <select id="brFont" data-br="font"${dis}>${BRAND_FONTS.map(f => `<option value="${escHtml(f.name)}" style="font-family:${f.stack}"${f.name === b.font ? ' selected' : ''}>${escHtml(f.name)} — ${f.desc}</option>`).join('')}</select></div>
@@ -11631,6 +11812,8 @@ function renderBranding(){
       <div><div class="br-slot-label">Badge at the top of every page</div><div class="br-pv paper" id="brPvPill"></div></div>
       <div><div class="br-slot-label">Login screen</div><div class="br-pv dark"><div class="login-brand" id="brPvLogin"></div><span class="br-empty" id="brPvLoginNone" style="display:none">Nothing shown</span></div></div>
     </div>
+    <div class="br-slot-label" style="margin-top:12px;">Menu, button, tab and quote header</div>
+    <div id="brPvLive"></div>
 
     <details class="br-more" id="brMore"${moreOpen ? ' open' : ''}>
       <summary>Logos and colours${b.mode === 'name' ? ' (add later)' : ''}</summary>
@@ -11638,11 +11821,11 @@ function renderBranding(){
       <div class="br-logos">${slot(BRAND_SLOTS[0])}${slot(BRAND_SLOTS[1])}</div>
       <div class="br-h">Badge or mark <small>icon only · PNG, JPEG, WebP or SVG · shown up to 160×160</small></div>
       <div class="br-logos">${slot(BRAND_SLOTS[2])}${slot(BRAND_SLOTS[3])}</div>
-      <p class="br-note" style="margin:10px 0 0;">Standard logos are used on light backgrounds (the top badge), Reversed logos on the dark login screen.</p>
+      <p class="br-note" style="margin:10px 0 0;">Standard logos are used on light backgrounds (the top badge, quotes), Reversed logos on dark ones (the menu, the login screen). Badges are used where space is small, such as the collapsed menu and the phone top bar.</p>
 
       <div class="br-h">Brand colours</div>
       <div class="br-cols">${BRAND_COLOURS.map(colour).join('')}</div>
-      <p class="br-note" style="margin:10px 0 0;">Used on quotes and documents. App theming comes later.</p>
+      <p class="br-note" style="margin:10px 0 0;">Primary colours the menu, buttons and headings. Secondary is the accent line and focus ring. Accent marks tabs and the quote totals box. All three also colour customer quotes. If a colour is too light to read, the app uses a darker shade of it; your saved colour is never changed.</p>
     </details>`;
   applyBranding();
 }
@@ -11707,7 +11890,7 @@ document.addEventListener('input', (e) => {
     const k = d.brCol !== undefined ? d.brCol : d.brHex, hx = normHex(el.value);
     const hexEl = document.querySelector(`[data-br-hex="${k}"]`), colEl = document.querySelector(`[data-br-col="${k}"]`), er = document.getElementById('brColErr-' + k);
     if(hx){
-      b.colours[k] = hx; saveState();
+      b.colours[k] = hx; saveState(); applyBranding();
       if(colEl) colEl.value = hx;
       if(hexEl){ hexEl.classList.remove('invalid'); if(d.brCol !== undefined) hexEl.value = hx; }
       const dot = document.getElementById('brDot-' + k); if(dot) dot.style.background = hx;
@@ -12755,11 +12938,11 @@ function menuFavToggle(){
 function menuGroupBtns(cat){ return cat.map(g => `<button type="button" class="rail-btn g-${g.id}" data-mgroup="${g.id}" aria-haspopup="menu" aria-expanded="false">${menuSvg(MENU_GROUP_ICON[g.id] || g.id)}<span>${g.short}</span>${menuPill('data-bgroup="' + g.id + '"', 'rb-badge')}</button>`).join(''); }
 function menuBuild(){
   const cat = menuCatalog();
-  menuEl('rail').innerHTML = `<button type="button" class="rail-btn rail-top" id="railPin" data-mact="pin" aria-label="Expand the menu" title="Expand the menu">${menuSvg('chevR')}</button><div class="rail-favs" id="railFavs" role="group" aria-label="Favourite pages" hidden></div>` + menuGroupBtns(cat) + '<div class="rail-sep"></div>'
+  menuEl('rail').innerHTML = `<div class="rail-mark" id="railMark"></div><button type="button" class="rail-btn rail-top" id="railPin" data-mact="pin" aria-label="Expand the menu" title="Expand the menu">${menuSvg('chevR')}</button><div class="rail-favs" id="railFavs" role="group" aria-label="Favourite pages" hidden></div>` + menuGroupBtns(cat) + '<div class="rail-sep"></div>'
     + `<button type="button" class="rail-btn" data-mact="undo" title="Undo history">${menuSvg('undo')}<span>Undo</span>${menuPill('data-bundo', 'rb-badge')}</button><button type="button" class="rail-btn" data-mact="logout" title="Log out" hidden>${menuSvg('logout')}<span>Log out</span></button>`;
   menuEl('topMenu').innerHTML = menuGroupBtns(cat);
   document.querySelectorAll('#sidebar .nav-group').forEach(g => { const gi = g.querySelector('.gi'); if(gi) gi.innerHTML = MENU_ICONS[MENU_GROUP_ICON[g.dataset.group] || g.dataset.group] || ''; const c = g.querySelector('.grp-count'); if(c) c.setAttribute('data-bgroup', g.dataset.group); });
-  menuBuildBottom(); menuFavRender();
+  menuBuildBottom(); menuFavRender(); applyBrandMarks();
 }
 function menuBuildBottom(){
   menuEl('bottomBar').innerHTML = menuPrefs.bottom.map(t => { const g = menuGroupOf(t); return `<button type="button" class="bb-btn g-${g}" data-go="${t}">${menuSvg(MENU_ICONS[t] ? t : g)}<span class="bb-l">${escHtml(menuBarLabel(t))}</span>${menuPill('data-btab="' + t + '"', 'rb-badge')}</button>`; }).join('')
