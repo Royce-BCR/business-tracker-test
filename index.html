@@ -1587,6 +1587,9 @@
   .pw-chg { border-bottom: 1px solid var(--bt-chalk); padding: var(--bt-s2) 0; } .pw-chg:last-child { border-bottom: 0; } .pw-chg summary { cursor: pointer; font-size: 12.5px; } .pw-chg ul { margin: 6px 0 2px 18px; padding: 0; font-size: 12.5px; color: var(--slate); } .pw-chg-when { color: var(--text-muted); } .pw-chg-r { color: var(--ink); }
   .chg-list { margin: 0 0 10px 18px; padding: 0; font-size: 12.5px; max-height: 190px; overflow: auto; } .chg-err { color: var(--bt-bad-fg); font-size: var(--bt-fs-xs); min-height: 16px; }
 
+  .rc-nums { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 10px; } .rc-nums > div { display: flex; flex-direction: column; min-width: 110px; } .rc-nums small { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); } .rc-nums b { font-size: 1.1rem; } .rc-ok b { color: var(--bt-ok-fg); } .rc-bad b { color: var(--bt-bad-fg); }
+  .rc-m td { background: var(--bt-surface-2); } .rc-u td:first-child { box-shadow: inset 3px 0 0 var(--bt-warn-fg); } .rc-head, #reconBody .card { margin-bottom: var(--bt-s3); } .rc-status { font-size: var(--bt-fs-xs); color: var(--slate); } .rc-status.late { color: var(--bt-warn-fg); } .rc-line { margin: 6px 0; } .cf-act td { background: var(--bt-surface-2); } .cf-recon { grid-column: 1 / -1; }
+  @media (max-width: 700px) { .rc-nums > div { min-width: 44%; } #reconBody .q-inline { flex-direction: column; align-items: stretch; } }
   .pw-sm { font-size: var(--bt-fs-xs); } .qb-flag.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
   .pw-g-act { position: absolute; top: 17px; height: 5px; border-radius: var(--bt-r-chip); background: var(--bt-ok-fg); opacity: .9; } .pw-g-act.late { background: var(--bt-bad-fg); }
   .pw-g-act-k { width: 18px; height: 5px; border-radius: var(--bt-r-chip); background: var(--bt-ok-fg); display: inline-block; }
@@ -2359,6 +2362,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
       <button type="button" class="tab g-finance" data-tab="invoicing">Invoicing</button>
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
+      <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
     </div>
   </div>
@@ -2672,6 +2676,14 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div id="txnPending"></div>
     <div class="btn-row"><button class="btn" data-fin="txn-add">+ Add transaction</button></div>
     <div class="table-scroll" id="transactionsTableWrap"></div>
+  </div>
+
+  <div class="panel" id="panel-reconciliation">
+    <div class="page-head">
+      <h2>Bank Reconciliation</h2>
+      <div class="desc">Check the books against the bank statement one month at a time. Pick a month and an account, enter the statement closing balance, tick the transactions that appear on the statement and explain or fix any difference. Marking a month reconciled locks its transactions; changing them later needs an unlock with a reason. Loans are tracked here too, so you can see the net position.</div>
+    </div>
+    <div id="reconBody"></div>
   </div>
 
   <!-- SETTINGS -->
@@ -3082,6 +3094,7 @@ if(ENV_LABEL === 'TEST'){
 }
 
 /* ---------- date helpers ---------- */
+const BANK_DEFAULT_START_DATE = '2026-10-01', MAIN_ACC = 'acc_bank';
 function toDate(s){ return s ? new Date(s+'T00:00:00') : null; }
 function fmt(d){ if(!d) return ''; const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return y+'-'+m+'-'+day; }
 function dShow(s){ const m = /^\d{4}-\d{2}-\d{2}/.exec(String(s || '')); const d = m ? toDate(m[0]) : null; return d && !isNaN(d) ? fmtDisplay(d) : String(s || ''); }   // an ISO date string as 9 Oct 2026 (the stored value is not changed)
@@ -3488,6 +3501,7 @@ function mergeDefaults(loaded){
   ensureQuoteDocModel(out, true);   // quotes: normalise, and load the sample quote once
   out.branding = normaliseBranding(loaded.branding);   // old backups: default name and font, no logos
   out.undoLog = Array.isArray(loaded.undoLog) ? loaded.undoLog : [];   // old backups: no undo log yet
+  out.recon = reconNormalise(loaded.recon);   // bank accounts, loans and reconciliations (all default empty)
   out.blackouts = (Array.isArray(loaded.blackouts) ? loaded.blackouts : []).filter(b => b && typeof b === 'object' && /^\d{4}-\d{2}-\d{2}$/.test(b.start || '')).map(b => ({ id: String(b.id || 'bo_' + Math.random().toString(36).slice(2, 8)), start: b.start, end: /^\d{4}-\d{2}-\d{2}$/.test(b.end || '') && b.end >= b.start ? b.end : b.start, label: String(b.label || '') }));   // old backups: no blackout dates
   return out;
 }
@@ -3565,6 +3579,7 @@ async function loadState(){
 
 let saveTimer = null;
 function saveState(){
+  try{ finEnsureReceipts(); }catch(e){}
   if(typeof cxDirty === 'function') cxDirty();
   setSaveStatus('Saving…');
   clearTimeout(saveTimer);
@@ -3724,6 +3739,7 @@ async function startApp(){
   await loadState();
   undoPrune(); undoBadge();
   ensurePipelineIds();
+  finMarkLegacy();   // payment lines already paid at load are not given receipts behind your back
   loadTodayScope();
   render();
   activateTab('today');   // Today is the landing page after every login
@@ -4023,7 +4039,7 @@ function dashKpis(o){
   return [
     tile('salespipeline', 'Weighted pipeline', money(weighted), `of ${money(total)} total`),
     tile('projectpipeline', 'Work in progress', money(projValue), dashPlural(projCount, 'live project')),
-    tile('transactions', 'Bank balance', money(bank), 'actual, from transactions', bank < 0),
+    tile('reconciliation', 'Bank balance', money(bank), (reconLast(MAIN_ACC) ? 'reconciled to ' + escHtml(monthLabel(new Date(reconLast(MAIN_ACC) + '-01T00:00:00'))) : 'not reconciled yet'), bank < 0),
     tile('leads', 'Active leads', leadN, leadSub),
     tile('today', 'Tasks', taskN, `${dueToday} due today${over ? ` · <span class="db-bad">${over} overdue</span>` : ''}`),
     tile('projectpipeline', 'Won ' + range.noun, won.count, `${money(won.value)} signed`)
@@ -4055,7 +4071,7 @@ function dashCashHtml(){
     state.pipeline.some(r => { const d = derivePipelineRow(r); return d.invoice || d.paymentDue || d.materialsPaymentDue || d.materialsOrder; });
   const head = dashCardHead('Projected cash-flow balance', 'Closing balance at the end of each month, from the cash flow forecast.');
   if(!dated || !cf.length) return head + dashEmpty('No dated cash movements yet — add project payment lines or dated pipeline work.', ['cashflow', 'Open cash flow']);
-  return head + `<div class="db-chart">${dashCashSVG(cf, W)}</div>`;
+  return head + `<div class="db-chart">${dashCashSVG(cf.filter(c => !c.preStart), W)}</div>`;
 }
 function dashPipeRows(mode){
   const sales = state.pipeline, sum = (recs, f) => recs.reduce((s, r) => s + f(r), 0);
@@ -4141,13 +4157,12 @@ function renderDashboard(){
   const sales = state.pipeline, T = dashTasks(today), won = dashWon(range, today), lost = dashLostInPeriod(range);
   const weighted = sales.reduce((s, r) => s + (Number(r.quoteValue) || 0) * effectiveProb(r), 0), total = sales.reduce((s, r) => s + (Number(r.quoteValue) || 0), 0);
   const projValue = state.projects.reduce((s, p) => s + (Number(p.agreedValue) || 0), 0);
-  const startCash = (state.settings && Number(state.settings.startingCash)) || 0;
-  const totIn = state.transactions.reduce((a, t) => a + (Number(t.moneyIn) || 0), 0), totOut = state.transactions.reduce((a, t) => a + (Number(t.moneyOut) || 0), 0);
+  const totIn = state.transactions.filter(txCounted).reduce((a, t) => a + (Number(t.moneyIn) || 0), 0), totOut = state.transactions.filter(txCounted).reduce((a, t) => a + (Number(t.moneyOut) || 0), 0);
   const leads = activeLeads(), anyCreated = leads.some(l => leadCreatedDate(l));
   const leadSub = anyCreated ? `${leads.filter(l => dashIn(leadCreatedDate(l), range)).length} new ${range.noun}`
     : `${leads.filter(l => dashIn(leadLastContact(l), range)).length} contacted ${range.noun}`;   // older leads carry no created date, so show what can be counted
   const over = T.crmOver.length + T.actOver.length, dueToday = T.crmToday.length + T.actToday.length;
-  document.getElementById('dbKpis').innerHTML = dashKpis({ weighted, total, projCount: state.projects.length, projValue, bank: startCash + totIn - totOut,
+  document.getElementById('dbKpis').innerHTML = dashKpis({ weighted, total, projCount: state.projects.length, projValue, bank: bankBalance(),
     leadN: leads.length, leadSub, taskN: dueToday + over, dueToday, over, won, range });
 
   document.getElementById('dbPot').innerHTML = dbPotHtml();
@@ -6316,6 +6331,7 @@ function spSave(){
   spRefresh(); const did = spUi.did, items = spUi.items, mode = (document.querySelector('input[name="spMode"]:checked') || {}).value || 'cash', date = isoOk(g('spDate').value), due = mode === 'trade' ? isoOk(g('spDue').value) : '';
   if(spTx(p, did)){ er.textContent = 'A payment is already confirmed for this delivery.'; return; }
   if(!date){ er.textContent = 'Choose the date.'; return; } if(date > fmt(new Date())){ er.textContent = 'A payment cannot be dated in the future.'; return; }
+  if(mode === 'cash' && reconGuardDate(date)) return;
   if(mode === 'trade' && !due){ er.textContent = 'Say when the trade account is due.'; return; }
   if(!finUi.file){ er.textContent = 'Upload the invoice (or take a photo of it) first.'; return; }
   const ft = spTotals(items, ['fq', 'fp']), qt = spTotals(items, ['qq', 'qp']); if(!(ft.payable > 0)){ er.textContent = 'The final total is £0: enter the final quantities and prices.'; return; }
@@ -6356,12 +6372,13 @@ function spShowExisting(p, did, tx){
 async function spSettle(uid){
   const t = state.transactions.find(x => x.uid === uid); if(!t) return;
   const ok = await showConfirm('Settle the trade account?', `${t.description}: ${qm(t.moneyOut)} was due ${pwD(t.tradeDue)}. Mark the date it was actually paid; the cash leaves the bank on that date.`, `<div class="lp-f"><label>Date paid</label><input type="date" id="spSettleDate" value="${fmt(new Date())}"></div>`);
-  if(!ok) return; const d = isoOk((_confirmExtraNote || '')) || fmt(new Date()); t.settledDate = d;
+  if(!ok) return; const d = isoOk((_confirmExtraNote || '')) || fmt(new Date()); if(reconGuardDate(d, txAccId(t))) return; t.settledDate = d;
   const p = state.projects.find(x => x.id === t.projectId); if(p && t.dropId){ const st = p.dropState[t.dropId] = p.dropState[t.dropId] || {}; st.paid = d; }
   finClose(); saveState(); render(); showToast('Settled on ' + pwD(d));
 }
 async function spReverse(pid, did){
   const p = state.projects.find(x => x.id === pid), tx = p && spTx(p, did); if(!tx) return;
+  if(reconLockedTx(tx)){ showToast('That payment is in a reconciled month. Unlock the month in Bank Reconciliation first.', null, 9000); return; }
   const ok = await showConfirm('Reverse this payment?', `The transaction (${qm(tx.moneyOut)}) is removed and the delivery goes back to unpaid. Use this only if it was confirmed by mistake.`); if(!ok) return;
   const ix = state.transactions.indexOf(tx), st = p.dropState[did] || {}, was = { paid: st.paid, onAccount: st.onAccount, tradeDue: st.tradeDue, paidTx: st.paidTx, supplierUsed: st.supplierUsed }, po = tx.poId ? poFind(tx.poId) : null, poWas = po ? { status: po.status, match: po.match } : null;
   state.transactions.splice(ix, 1); st.paid = ''; st.onAccount = ''; st.tradeDue = ''; st.paidTx = ''; delete st.supplierUsed; if(po && po.match && po.match.txnUid === tx.uid){ po.match = null; po.status = po.deliveredAt ? 'Delivered' : (po.sentAt ? 'Sent' : 'Draft'); }
@@ -7542,7 +7559,8 @@ function renderSettings(){
   const s = state.settings;
   renderStageCards(); renderBlackouts();
   document.getElementById('financeSettingsGrid').innerHTML =
-    `<div><label>Starting cash balance (£)</label><input type="number" step="1" data-tab="settings" data-field="startingCash" value="${s.startingCash}"></div>
+    `<div><label>Starting balance (£)</label><input type="number" step="any" data-tab="settings" data-field="startingCash" value="${bankStart()}"></div>
+      <div><label>Starting balance as at</label><input type="date" data-tab="settings" data-field="startingBalanceDate" value="${bankStartDate()}"><div class="q-help">The bank balance counts only transactions dated on or after this date. A zero is used as zero.</div></div>
      <div><label>Trade account terms (days)</label><input type="number" step="1" data-tab="settings" data-field="tradeAccountDays" value="${s.tradeAccountDays}"></div>
      <div><label>Client payment terms (days)</label><input type="number" step="1" data-tab="settings" data-field="paymentTermsDays" value="${s.paymentTermsDays}"></div>
      <div><label>Profit share per hour (£)</label><input type="number" step="0.01" min="0" data-tab="settings" data-field="profitSharePerHour" value="${s.profitSharePerHour === undefined ? 0 : s.profitSharePerHour}"></div>
@@ -8789,7 +8807,7 @@ function qCashItems(q, c){
   const gross = l => c.lines[l.id].excluded ? 0 : c.lines[l.id].lineCost * (vatOn ? 1 + (Number(l.vatRate) || 0) / 100 : 1);
   q.drops.forEach((d, i) => {
     const tagged = q.lines.filter(l => l.deliveryDropId === d.id), mat = tagged.reduce((a, l) => a + gross(l), 0), del = (Number(d.charge) || 0) * (vatOn ? 1 + defRate : 1), amt = r2(mat + del);
-    if(amt > 0) out.push({ kind: 'out', date: d.paymentDueDate || anchor, estimated: !d.paymentDueDate, amount: amt, label: (d.method === 'collect' ? 'Collection: ' : 'Delivery: ') + (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop ' + (i + 1))), supplierId: d.supplierId || '', qid: q.id, ref: qRef(q), status: q.status });
+    if(amt > 0) out.push({ kind: 'out', date: d.paymentDueDate || anchor, estimated: !d.paymentDueDate, amount: amt, label: (d.method === 'collect' ? 'Collection: ' : 'Delivery: ') + (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop ' + (i + 1))), supplierId: d.supplierId || '', did: d.id, qid: q.id, ref: qRef(q), status: q.status });
   });
   const un = q.lines.filter(l => !l.deliveryDropId), unAmt = r2(un.reduce((a, l) => a + gross(l), 0));
   if(unAmt > 0) out.push({ kind: 'out', date: anchor, estimated: true, amount: unAmt, label: 'Materials not on a drop', supplierId: '', qid: q.id, ref: qRef(q), status: q.status });
@@ -8798,7 +8816,15 @@ function qCashItems(q, c){
   return out;
 }
 function qCashSource(q){ if(q.status === 'Accepted'){ const p = state.projects.find(x => projAcceptedQuote(x) === q); if(p && p.plan && p.plan.quoteId === q.id) return planAsQuote(q, p.plan); } return q; }   // a won project's supplier money follows its Working plan
-function qAllCashItems(){ const items = []; qLive().forEach(q => qCashItems(qCashSource(q)).forEach(i => items.push(i))); return items.sort((a, b) => a.date.localeCompare(b.date)); }
+/* the forecast shows only what is not yet settled: a supplier drop that has been paid leaves the forecast (it is an actual in the month it happened); one on a trade account shows on its due date */
+function qCashSettle(i){
+  if(i.kind !== 'out' || !i.did) return i;
+  const p = state.projects.find(x => { const aq = projAcceptedQuote(x); return aq && aq.id === i.qid; }); const st = p && p.dropState && p.dropState[i.did]; if(!st) return i;
+  if(st.paid) return null;
+  if(st.onAccount && st.tradeDue) return Object.assign({}, i, { date: st.tradeDue, estimated: false, label: i.label + ' (trade account)' });
+  return i;
+}
+function qAllCashItems(){ const items = []; qLive().forEach(q => qCashItems(qCashSource(q)).forEach(i => { const s = qCashSettle(i); if(s) items.push(s); })); return items.sort((a, b) => a.date.localeCompare(b.date)); }
 function qMonthly(items){
   const m = {}; items.forEach(i => { const k = i.date.slice(0, 7), r = m[k] || (m[k] = { key: k, inn: 0, out: 0 }); if(i.kind === 'in') r.inn += i.amount; else r.out += i.amount; });
   return Object.values(m).sort((a, b) => a.key.localeCompare(b.key));
@@ -10103,38 +10129,48 @@ function finNavOpen(kind, id, extra){
 const cfUi = { sel: null };
 navExtra('cf', () => cfUi.sel, v => { cfUi.sel = v; });
 const CF_ROWS = [['committed', 'Cash in: customer payments (projects, incl. scope additions)', 1], ['weighted', 'Cash in: weighted pipeline', 1], ['materials', 'Cash out: materials (stage costs)', -1], ['qIn', 'Quotes: cash in (accepted)', 1], ['qOut', 'Quotes and projects: supplier payments (accepted)', -1],
-  ['qInIf', 'Quotes: cash in (if won, sent)', 1], ['qOutIf', 'Quotes: cash out (if won, sent)', -1], ['fixed', 'Cash out: fixed overhead', -1], ['custOrder', 'Memo: customer orders placed (contract + variations)', 0], ['supOrder', 'Memo: supplier orders (by drop date)', 0]];
+  ['qInIf', 'Quotes: cash in (if won, sent)', 1], ['qOutIf', 'Quotes: cash out (if won, sent)', -1], ['fixed', 'Cash out: fixed overhead', -1], ['actIn', 'Actual: money in (bank)', 1], ['actOut', 'Actual: money out (bank)', -1], ['custOrder', 'Memo: customer orders placed (contract + variations)', 0], ['supOrder', 'Memo: supplier orders (by drop date)', 0]];
 function computeCashFlow(months){
-  const fixedMonthly = totalOverhead() / 12;
-  let closing = (state.settings && Number(state.settings.startingCash)) || Number(state.startingCash) || 0, closingIf = closing;
+  const fixedMonthly = totalOverhead() / 12, today = fmt(new Date()), curKey = today.slice(0, 7), startD = bankStartDate();
+  const colKey = d => { const k = String(d).slice(0, 7); return k < curKey ? curKey : k; };   // an unsettled item whose date has passed has not happened: it is still to come, so it sits in this month
+  const counted = state.transactions.filter(txCounted), actOf = (key, f) => counted.filter(t => txCashDate(t).slice(0, 7) === key && f(t));
   const projLines = qid => { const q = qFind(qid), root = q && (q.linkedIds || []).map(linkedRoot).find(id => state.projects.some(p => p.id === id)), pr = root && state.projects.find(p => p.id === root); return !!(pr && (pr.paymentLines || []).some(l => l.quoteRowId && q.payments.some(r => r.id === l.quoteRowId))); };
   const qItems = qAllCashItems().filter(i => !(i.kind === 'in' && projLines(i.qid))), liveRoots = new Set(qLive().flatMap(q => (q.linkedIds || []).map(linkedRoot)));   // a deal with a live quote is counted from the quote, not from its stage costs
   const tradeDays = (state.settings && state.settings.tradeAccountDays) || 30, FL = finLines(), srcQ = i => ({ t: 'quote', id: i.qid });
   const extra = typeof cfAssetLines === 'function' ? cfAssetLines : null;
+  let closing = null, closingIf = null;
   return months.map((m, mi) => {
-    const key = monthKey(m); let committedIn = 0, weightedIn = 0, materialsOut = 0; const ln = {}; CF_ROWS.forEach(r => ln[r[0]] = []); ln.assets = [];
+    const key = monthKey(m), past = key < curKey, cur = key === curKey; let committedIn = 0, weightedIn = 0, materialsOut = 0; const ln = {}; CF_ROWS.forEach(r => ln[r[0]] = []); ln.assets = [];
     const add = (row, label, amount, date, src, pname) => { if(!amount) return; ln[row].push({ label, amount, date, src, pname: pname || '' }); };
+    // actuals: transactions in the month they actually moved cash (settled items live here, not in the forecast)
+    let actIn = 0, actOut = 0;
+    actOf(key, t => Number(t.moneyIn) > 0).forEach(t => { const a = Number(t.moneyIn); actIn += a; add('actIn', t.description || 'Money in', a, txCashDate(t), { t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) }, (state.projects.find(p => p.id === t.projectId) || {}).name); });
+    actOf(key, t => Number(t.moneyOut) > 0).forEach(t => { const a = Number(t.moneyOut); actOut += a; add('actOut', (t.description || 'Money out') + (t.payMode === 'trade' ? ' (trade account settled)' : ''), a, txCashDate(t), { t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) }, (state.projects.find(p => p.id === t.projectId) || {}).name); });
+    // forecast: only items not yet settled
     state.projects.forEach(p => {
-      (p.paymentLines || []).forEach((pl, idx) => { if(pl.dueDate && monthKey(toDate(pl.dueDate)) === key){ const a = Number(pl.amount) || 0; committedIn += a; add('committed', (pl.desc || 'Payment') + (pl.dueManual ? ' (date typed)' : ''), a, pl.dueDate, { t: 'invoice', pid: p.id, idx }, p.name); } });
-      (p.variations || []).filter(v => v.status === 'Approved' || v.status === 'Invoiced').forEach(v => { if(v.paidDate) return; const d = v.dueDate || addDaysIso(v.approval ? v.approval.at : v.created, Number(state.settings.paymentTermsDays) || 0); if(d && monthKey(toDate(d)) === key){ const a = r2((Number(v.price) || 0) * vatMul()); committedIn += a; add('committed', 'Scope addition ' + v.ref + ' · ' + v.desc, a, d, { t: 'invoice', pid: p.id, vid: v.id }, p.name); } });
+      (p.paymentLines || []).forEach((pl, idx) => { if(pl.paidDate) return; if(pl.dueDate && colKey(pl.dueDate) === key){ const a = Number(pl.amount) || 0; committedIn += a; add('committed', (pl.desc || 'Payment') + (pl.dueManual ? ' (date typed)' : '') + (pl.dueDate < today ? ' (overdue)' : ''), a, pl.dueDate, { t: 'invoice', pid: p.id, idx }, p.name); } });
+      (p.variations || []).filter(v => v.status === 'Approved' || v.status === 'Invoiced').forEach(v => { if(v.paidDate) return; const d = v.dueDate || addDaysIso(v.approval ? v.approval.at : v.created, Number(state.settings.paymentTermsDays) || 0); if(d && colKey(d) === key){ const a = r2((Number(v.price) || 0) * vatMul()); committedIn += a; add('committed', 'Scope addition ' + v.ref + ' · ' + v.desc, a, d, { t: 'invoice', pid: p.id, vid: v.id }, p.name); } });
       (p.stages || []).filter(s => s.kind === 'materials' && s.start).forEach(s => {
         const due = addCalendarDays(toDate(s.start), tradeDays);
-        if(monthKey(due) === key){ materialsOut += Number(s.cost) || 0; add('materials', (s.label || 'Materials stage') + ' (stage cost)', Number(s.cost) || 0, fmt(due), { t: 'project', id: p.id, sec: 'timeline' }, p.name); }
+        if(colKey(fmt(due)) === key){ materialsOut += Number(s.cost) || 0; add('materials', (s.label || 'Materials stage') + ' (stage cost)', Number(s.cost) || 0, fmt(due), { t: 'project', id: p.id, sec: 'timeline' }, p.name); }
       });
     });
     state.pipeline.forEach(r => {
       if(liveRoots.has(r.id)) return;
       const d = derivePipelineRow(r);
-      if(d.paymentDue && monthKey(d.paymentDue) === key){ const a = (Number(r.quoteValue) || 0) * effectiveProb(r); weightedIn += a; add('weighted', r.name + ' (× ' + Math.round(effectiveProb(r) * 100) + '%)', a, fmt(d.paymentDue), { t: 'deal', id: r.id }); }
-      if(d.materialsPaymentDue && monthKey(d.materialsPaymentDue) === key){ const a = (Number(d.materialsCost) || 0) * effectiveProb(r); materialsOut += a; add('materials', r.name + ' materials (× ' + Math.round(effectiveProb(r) * 100) + '%)', a, fmt(d.materialsPaymentDue), { t: 'deal', id: r.id }); }
+      if(d.paymentDue && colKey(fmt(d.paymentDue)) === key){ const a = (Number(r.quoteValue) || 0) * effectiveProb(r); weightedIn += a; add('weighted', r.name + ' (× ' + Math.round(effectiveProb(r) * 100) + '%)', a, fmt(d.paymentDue), { t: 'deal', id: r.id }); }
+      if(d.materialsPaymentDue && colKey(fmt(d.materialsPaymentDue)) === key){ const a = (Number(d.materialsCost) || 0) * effectiveProb(r); materialsOut += a; add('materials', r.name + ' materials (× ' + Math.round(effectiveProb(r) * 100) + '%)', a, fmt(d.materialsPaymentDue), { t: 'deal', id: r.id }); }
     });
     let qIn = 0, qOut = 0, qInIf = 0, qOutIf = 0;
-    qItems.forEach(i => { if(i.date.slice(0, 7) !== key) return; const acc = i.status === 'Accepted', row = i.kind === 'in' ? (acc ? 'qIn' : 'qInIf') : (acc ? 'qOut' : 'qOutIf'); add(row, i.label + (i.estimated ? ' (est.)' : '') + ' · ' + i.ref, i.amount, i.date, srcQ(i)); if(i.kind === 'in'){ if(acc) qIn += i.amount; else qInIf += i.amount; } else { if(acc) qOut += i.amount; else qOutIf += i.amount; } });
+    qItems.forEach(i => { if(colKey(i.date) !== key) return; const acc = i.status === 'Accepted', row = i.kind === 'in' ? (acc ? 'qIn' : 'qInIf') : (acc ? 'qOut' : 'qOutIf'); add(row, i.label + (i.estimated ? ' (est.)' : '') + ' · ' + i.ref, i.amount, i.date, srcQ(i)); if(i.kind === 'in'){ if(acc) qIn += i.amount; else qInIf += i.amount; } else { if(acc) qOut += i.amount; else qOutIf += i.amount; } });
     FL.filter(x => (x.kind === 'custOrder' || x.kind === 'supOrder') && x.date && x.date.slice(0, 7) === key).forEach(x => add(x.kind, x.label, x.amount, x.date, x.src, x.pname));
-    add('fixed', 'Fixed monthly overhead (Settings > Pricing)', fixedMonthly, fmt(m), null);
-    let assetsOut = 0; if(extra){ extra(key).forEach(a => { assetsOut += a.amount; ln.assets.push(a); }); }
-    const net = committedIn + weightedIn + qIn - materialsOut - qOut - fixedMonthly - assetsOut; closing += net; closingIf += net + qInIf - qOutIf;
-    return { key, label: monthLabel(m), committedIn, weightedIn, materialsOut, fixedMonthly, assetsOut, qIn, qOut, qInIf, qOutIf, net, closing, closingIf, lines: ln, custOrders: ln.custOrder.reduce((a, x) => a + x.amount, 0), supOrders: ln.supOrder.reduce((a, x) => a + x.amount, 0) };
+    const overheadDone = r2(actOf(key, t => t.category === 'Overhead' && Number(t.moneyOut) > 0).reduce((a, t) => a + Number(t.moneyOut), 0)), fixed = past ? 0 : Math.max(0, r2(fixedMonthly - overheadDone));   // overhead already paid this month is an actual: only the rest is forecast
+    add('fixed', 'Fixed monthly overhead (Settings > Pricing)' + (overheadDone > 0 ? ' less ' + qm(overheadDone) + ' already paid' : ''), fixed, fmt(m), null);
+    let assetsOut = 0; if(extra && !past){ extra(key).forEach(a => { assetsOut += a.amount; ln.assets.push(a); }); }
+    const fnet = committedIn + weightedIn + qIn - materialsOut - qOut - fixed - assetsOut, anet = actIn - actOut, net = fnet + anet;
+    if(closing === null){ const pk = prevMonthKey(key), base = (key <= curKey) ? bankBalance(monthEnd(pk)) : bankBalance(); closing = base; closingIf = base; }
+    closing += net; closingIf += net + qInIf - qOutIf;
+    return { key, label: monthLabel(m), past, cur, preStart: monthEnd(key) < startD, actIn, actOut, committedIn, weightedIn, materialsOut, fixedMonthly: fixed, assetsOut, qIn, qOut, qInIf, qOutIf, net, closing, closingIf, lines: ln, custOrders: ln.custOrder.reduce((a, x) => a + x.amount, 0), supOrders: ln.supOrder.reduce((a, x) => a + x.amount, 0) };
   });
 }
 function cfCell(c, row, v, neg, extraCls){
@@ -10149,26 +10185,30 @@ function cfLinesHtml(cf){
     <table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Line</th><th>Project</th><th>Amount</th><th>Source</th></tr></thead><tbody>${lines.map(x => `<tr><td>${x.date ? pwD(x.date) : '—'}</td><td>${escHtml(x.label)}</td><td>${escHtml(x.pname || '')}</td><td class="qb-calc">${qm(x.amount)}</td><td>${finSrcLink(x.src, 'Open source →') || '<span class="qb-dim">Settings</span>'}</td></tr>`).join('')}</tbody></table></div>`;
 }
 function renderCashflow(){
-  const start = (state.settings && Number(state.settings.startingCash)) || Number(state.startingCash) || 0;
   document.getElementById('cashflowAssumptionsGrid').innerHTML =
-    `<div><label>Starting cash balance (£)</label><input type="number" step="1" data-tab="settings" data-field="startingCash" value="${start}"></div>
-     <div><label>Fixed monthly overhead (£)</label><input class="computed" disabled value="${money(totalOverhead()/12)}"></div>`;
+    `<div><label>Starting balance (£)</label><input type="number" step="any" data-tab="settings" data-field="startingCash" value="${bankStart()}"></div>
+     <div><label>Starting balance as at</label><input type="date" data-tab="settings" data-field="startingBalanceDate" value="${bankStartDate()}"></div>
+     <div><label>Bank balance now (actual)</label><input class="computed" disabled value="${qm(bankBalance())}"></div>
+     <div><label>Fixed monthly overhead (£)</label><input class="computed" disabled value="${money(totalOverhead()/12)}"></div>
+     <div class="cf-recon">${reconStatusHtml()}</div>`;
   document.getElementById('cashflowTotals').innerHTML = finTotalsHtml();
   const months = getMonthRange(); const cf = computeCashFlow(months), hasAssets = cf.some(c => c.assetsOut > 0);
   const R = (row, label, f, neg, cls) => `<tr${cls ? ` class="${cls}"` : ''}><td>${label}</td>${cf.map(c => cfCell(c, row, f(c), neg)).join('')}</tr>`;
   let html = `<table data-flip="cashflow" style="min-width:${200+cf.length*96}px"><thead><tr><th>Month</th>${cf.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>
-    ${R('committed', 'Cash in — customer payments (projects)', c => c.committedIn, false)}
+    ${R('actIn', 'Actual — money in (bank, when it happened)', c => c.actIn, false, 'cf-act')}
+    ${R('actOut', 'Actual — money out (bank, when it happened)', c => c.actOut, true, 'cf-act')}
+    ${R('committed', 'Forecast — customer payments not yet received', c => c.committedIn, false)}
     ${R('weighted', 'Cash in — weighted pipeline', c => c.weightedIn, false)}
-    ${R('materials', 'Cash out — materials', c => c.materialsOut, true)}
+    ${R('materials', 'Forecast — materials (stage costs)', c => c.materialsOut, true)}
     ${R('qIn', 'Quotes — cash in (accepted)', c => c.qIn, false)}
-    ${R('qOut', 'Cash out — supplier payments (accepted quotes and projects)', c => c.qOut, true)}
+    ${R('qOut', 'Cash out — supplier payments still to pay (accepted quotes and projects)', c => c.qOut, true)}
     ${R('qInIf', 'Quotes — cash in <em>(if won, sent)</em>', c => c.qInIf, false, 'cf-ifwon')}
     ${R('qOutIf', 'Quotes — cash out <em>(if won, sent)</em>', c => c.qOutIf, true, 'cf-ifwon')}
     ${R('fixed', 'Cash out — fixed overhead', c => c.fixedMonthly, true)}
     ${hasAssets ? R('assets', 'Cash out — approved asset plan', c => c.assetsOut, true) : ''}
     <tr><td><strong>Net cash flow</strong></td>${cf.map(c=>`<td><strong>${c.net<0?'-':''}${money(Math.abs(c.net))}</strong></td>`).join('')}</tr>
-    <tr><td>Closing balance</td>${cf.map(c=>`<td${c.closing<0?' style="color:var(--bt-bad-fg);font-weight:700;"':''}>${money(c.closing)}</td>`).join('')}</tr>
-    <tr class="cf-ifwon"><td>Closing balance <em>(if sent quotes are won)</em></td>${cf.map(c=>`<td${c.closingIf<0?' style="color:var(--bt-bad-fg);font-weight:700;"':''}>${money(c.closingIf)}</td>`).join('')}</tr>
+    <tr><td>Closing balance <em>(actual to date, then forecast)</em></td>${cf.map(c=>c.preStart ? '<td class="qb-dim" title="Before the starting balance date">—</td>' : `<td${c.closing<0?' style="color:var(--bt-bad-fg);font-weight:700;"':''}>${money(c.closing)}</td>`).join('')}</tr>
+    <tr class="cf-ifwon"><td>Closing balance <em>(if sent quotes are won)</em></td>${cf.map(c=>c.preStart ? '<td class="qb-dim">—</td>' : `<td${c.closingIf<0?' style="color:var(--bt-bad-fg);font-weight:700;"':''}>${money(c.closingIf)}</td>`).join('')}</tr>
     ${R('custOrder', 'Memo — customer orders placed (contract + variations)', c => c.custOrders, false, 'cf-memo')}
     ${R('supOrder', 'Memo — supplier orders (by drop date)', c => c.supOrders, false, 'cf-memo')}
     </tbody></table>`;
@@ -10183,6 +10223,98 @@ document.addEventListener('click', (e) => {
   if(cfUi.sel){ const el = document.getElementById('cashflowLines'); if(el && el.firstElementChild) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
 });
 
+/* ---------- Finance > Bank Reconciliation ---------- */
+const reconUi = { month: '', acc: MAIN_ACC };
+function reconMonths(){
+  const first = bankStartDate().slice(0, 7), cur = fmt(new Date()).slice(0, 7), out = []; let k = first, guard = 0;
+  while(k <= cur && guard++ < 240){ out.push(k); const [y, m] = k.split('-').map(Number); k = monthKey(new Date(y, m, 1)); }
+  return out.reverse();
+}
+function rcTxKey(t){ if(t.uid) return t.uid; const base = 'legacy|' + [t.date, t.description, t.moneyIn, t.moneyOut].join('|'); let n = 0; for(const x of state.transactions){ if(x === t) break; if(!x.uid && 'legacy|' + [x.date, x.description, x.moneyIn, x.moneyOut].join('|') === base) n++; } return base + '|' + n; }
+function reconGet(accId, key){ const r = recon(); return r.months[accId + '|' + key] = r.months[accId + '|' + key] || { statement: '', matched: {}, explanation: '', status: 'open' }; }
+function loanBalance(l, key){ if(l.balances[key] !== undefined && l.balances[key] !== '') return { v: Number(l.balances[key]), from: key }; const ks = Object.keys(l.balances).filter(k => k <= key && l.balances[k] !== '').sort(); return ks.length ? { v: Number(l.balances[ks[ks.length - 1]]), from: ks[ks.length - 1] } : { v: 0, from: '' }; }
+function renderRecon(force){
+  const el = document.getElementById('reconBody'); if(!el) return; const R = recon(), months = reconMonths();
+  if(!R.accounts.some(a => a.id === reconUi.acc)) reconUi.acc = MAIN_ACC;
+  const prev = prevMonthKey(fmt(new Date()).slice(0, 7)); if(!months.includes(reconUi.month)) reconUi.month = months.includes(prev) ? prev : (months[0] || '');
+  const acc = accFind(reconUi.acc), key = reconUi.month, active = el.contains(document.activeElement) && document.activeElement.dataset && document.activeElement.dataset.rc;
+  if(active && !force) return;   // a background redraw does not rebuild the page under a box being typed in
+  if(!key){ el.innerHTML = '<div class="pw-empty">The starting balance date is in the future, so there is nothing to reconcile yet.</div>'; return; }
+  const rec = reconRec(acc.id, key) || { statement: '', matched: {}, explanation: '', status: 'open' }, locked = rec.status === 'reconciled', o = accOpening(acc);
+  const txs = state.transactions.filter(t => txAccId(t) === acc.id && txCashDate(t) >= o.date && txCashDate(t).slice(0, 7) === key).sort((a, b) => txCashDate(a).localeCompare(txCashDate(b)));
+  const opening = bankBalance(monthEnd(prevMonthKey(key)), acc.id), book = bankBalance(monthEnd(key), acc.id), st = rec.statement === '' || rec.statement == null ? null : Number(rec.statement), diff = st === null ? null : r2(st - book);
+  const mt = k => !!(rec.matched || {})[k], matched = txs.filter(t => mt(rcTxKey(t))), un = txs.filter(t => !mt(rcTxKey(t)));
+  const sum = (arr, f) => r2(arr.reduce((a, t) => a + (Number(t[f]) || 0), 0)), ml = d => monthLabel(new Date(d + '-01T00:00:00'));
+  const miss = finUnrecorded().filter(u => u.date.slice(0, 7) === key && u.p);
+  const tin = sum(txs, 'moneyIn'), tout = sum(txs, 'moneyOut');
+  const head = `<div class="card rc-head"><div class="q-inline" style="gap:12px;align-items:flex-end;flex-wrap:wrap;">
+      <div class="lp-f"><label>Month</label><select data-rc="month">${months.map(m => `<option value="${m}"${m === key ? ' selected' : ''}>${escHtml(ml(m))}${reconLockedMonth(acc.id, m) ? ' ✓ reconciled' : ''}</option>`).join('')}</select></div>
+      <div class="lp-f"><label>Account</label><select data-rc="acc">${R.accounts.map(a => `<option value="${a.id}"${a.id === acc.id ? ' selected' : ''}>${escHtml(a.name)}</option>`).join('')}</select></div>
+      <div class="lp-f"><label>&nbsp;</label><button type="button" class="btn secondary qb-sm" data-rc="acc-add">+ Add account</button></div>
+      <div class="lp-f"><label>Statement closing balance (£)</label><input type="number" step="0.01" data-rc="stmt" value="${st === null ? '' : st}"${locked ? ' disabled' : ''} placeholder="from the statement"></div></div>
+    <div class="rc-nums"><div><small>Opening (books)</small><b>${qm(opening)}</b></div><div><small>Money in</small><b>${qm(tin)}</b></div><div><small>Money out</small><b>${tout ? '−' : ''}${qm(tout)}</b></div><div><small>Book balance</small><b>${qm(book)}</b></div>
+      <div><small>Statement</small><b>${st === null ? '—' : qm(st)}</b></div><div class="${diff === null ? '' : (Math.abs(diff) < 0.005 ? 'rc-ok' : 'rc-bad')}"><small>Difference</small><b>${diff === null ? '—' : (Math.abs(diff) < 0.005 ? '£0.00 ✓' : (diff > 0 ? '+' : '−') + qm(Math.abs(diff)))}</b></div></div>
+    <p class="q-help" style="margin:6px 0 0;">Starting balance ${qm(o.amount)} as at ${escHtml(dShow(o.date))}. Transactions dated before that day are not counted. A trade-account purchase counts on the day it is settled.</p>
+    ${locked ? `<div class="pw-qbar" style="display:block;margin-top:8px;">🔒 <b>${escHtml(ml(key))} is reconciled</b> by ${escHtml(rec.by || '')} on ${escHtml(dShow((rec.reconciledAt || '').slice(0, 10)))}${rec.explanation ? ` · “${escHtml(rec.explanation)}”` : ''}. Its transactions are locked. <button type="button" class="btn secondary qb-sm" data-rc="unlock">Unlock…</button></div>` : ''}</div>`;
+  const rows = txs.map(t => { const k = rcTxKey(t), i = state.transactions.indexOf(t); return `<tr class="${mt(k) ? 'rc-m' : 'rc-u'}"><td><input type="checkbox" data-rc="match" data-key="${escAttr(k)}"${mt(k) ? ' checked' : ''}${locked ? ' disabled' : ''} aria-label="Matched to the statement"></td><td>${pwD(txCashDate(t))}</td><td>${escHtml(t.description || '')}${t.payMode === 'trade' ? ' <span class="qb-flag">trade account, settled</span>' : ''}</td><td class="qb-calc">${Number(t.moneyIn) ? qm(t.moneyIn) : ''}</td><td class="qb-calc">${Number(t.moneyOut) ? qm(t.moneyOut) : ''}</td><td>${finSrcLink({ t: 'txn', id: t.uid || String(i) }, 'open')}</td></tr>`; }).join('');
+  const list = `<div class="card"><div class="qb-sec-h"><h4>Transactions in ${escHtml(ml(key))} <span class="qb-dim">${matched.length} matched · ${un.length} not ticked (${un.length ? qm(sum(un, 'moneyIn') - sum(un, 'moneyOut')) + ' net' : 'none'})</span></h4><div class="qb-sec-tools">${locked ? '' : `<button type="button" class="btn secondary qb-sm" data-rc="match-all">Tick all</button><button type="button" class="btn secondary qb-sm" data-rc="add-missing">+ Add a transaction missing from the books</button>`}</div></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>On statement</th><th>Date</th><th>Description</th><th>In</th><th>Out</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="6"><div class="sup-empty">No transactions in this month for this account.</div></td></tr>'}</tbody></table></div>
+    ${miss.length ? `<div class="pw-qbar pw-alert-bar" style="display:block;margin-top:8px;"><b>Paid in the project but not in Transactions:</b> ${miss.map(u => `${escHtml(u.p.name)} · ${escHtml(u.label)} ${qm(u.amount)} (${u.kind === 'in' ? 'received' : 'paid'} ${pwD(u.date)}) <button type="button" class="btn secondary qb-sm" data-rc="unrec" data-key="${escAttr(u.key)}">Add the transaction</button>`).join('<br>')}</div>` : ''}</div>`;
+  const closeBox = locked ? '' : `<div class="card"><div class="qb-sec-h"><h4>Close the month</h4></div>
+    <div class="lp-f"><label>${diff !== null && Math.abs(diff) >= 0.005 ? 'Explanation of the difference (required, or add the missing transactions above)' : 'Note (optional)'}</label><textarea rows="2" data-rc="explain" maxlength="300" placeholder="e.g. bank charge £12 not yet entered; cheque 4412 not cleared">${escHtml(rec.explanation || '')}</textarea></div>
+    <div class="chg-err" id="rcErr"></div><button type="button" class="btn" data-rc="close"${st === null ? ' disabled title="Enter the statement closing balance first"' : ''}>Mark ${escHtml(ml(key))} reconciled</button></div>`;
+  // loans
+  const loanRows = R.loans.map(l => { const b = loanBalance(l, key); return `<tr><td><input data-rc="loan" data-id="${l.id}" data-f="lender" value="${escAttr(l.lender)}" placeholder="Lender" aria-label="Lender"></td><td><input type="number" step="any" min="0" class="qb-n" data-rc="loan" data-id="${l.id}" data-f="original" value="${l.original || ''}" aria-label="Original amount"></td><td><input type="number" step="any" min="0" class="qb-n" data-rc="loan" data-id="${l.id}" data-f="rate" value="${l.rate === '' ? '' : l.rate}" aria-label="Rate %"></td><td><input type="number" step="any" min="0" class="qb-n" data-rc="loan" data-id="${l.id}" data-f="monthly" value="${l.monthly || ''}" aria-label="Monthly payment"></td>
+      <td><input type="number" step="0.01" class="qb-n" data-rc="loanbal" data-id="${l.id}" value="${l.balances[key] === undefined ? '' : l.balances[key]}" placeholder="${b.from && b.from !== key ? 'carried ' + b.v : ''}" aria-label="Statement balance at month end"></td><td><button class="icon-btn" data-rc="loan-del" data-id="${l.id}" title="Remove this loan" aria-label="Remove loan">${X_SVG}</button></td></tr>`; }).join('');
+  const loanTot = r2(R.loans.reduce((a, l) => a + loanBalance(l, key).v, 0)), bankTot = bankBalance(monthEnd(key));
+  const loans = `<div class="card"><div class="qb-sec-h"><h4>Loans</h4><button type="button" class="btn secondary qb-sm" data-rc="loan-add">+ Add loan</button></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Lender</th><th>Original £</th><th>Rate %</th><th>Monthly £</th><th>Balance at end of ${escHtml(ml(key))} (statement)</th><th></th></tr></thead><tbody>${loanRows || '<tr><td colspan="6"><div class="sup-empty">No loans recorded. Add one to see the net position.</div></td></tr>'}</tbody></table></div>
+    <div class="rc-nums" style="margin-top:8px;"><div><small>Total bank balance (books, all accounts)</small><b>${qm(bankTot)}</b></div><div><small>Total loans</small><b>${loanTot ? '−' : ''}${qm(loanTot)}</b></div><div class="${bankTot - loanTot < 0 ? 'rc-bad' : ''}"><small>Net position</small><b>${qm(bankTot - loanTot)}</b></div></div></div>`;
+  const hist = R.history.slice().reverse(); const history = `<div class="card"><div class="qb-sec-h"><h4>Reconciliation history</h4></div>${hist.length ? `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>When</th><th>Month</th><th>Account</th><th>What</th><th>Book</th><th>Statement</th><th>Difference</th><th>Note</th></tr></thead><tbody>${hist.map(h => `<tr><td>${escHtml(dShow((h.at || '').slice(0, 10)))} <span class="qb-dim pw-sm">${escHtml(h.by || '')}</span></td><td>${escHtml(ml(h.month))}</td><td>${escHtml(h.accName || '')}</td><td>${h.action === 'unlocked' ? '🔓 Unlocked' : '🔒 Reconciled'}</td><td class="qb-calc">${h.book === undefined ? '' : qm(h.book)}</td><td class="qb-calc">${h.statement === undefined || h.statement === null ? '' : qm(h.statement)}</td><td class="qb-calc">${h.diff === undefined ? '' : (Math.abs(h.diff) < 0.005 ? '£0.00' : qm(h.diff))}</td><td>${escHtml(h.note || '')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="q-help">Nothing reconciled yet.</p>'}</div>`;
+  el.innerHTML = head + list + closeBox + loans + history;
+}
+function rcAsk(title, html, saveLabel, onSave){
+  finUi.mode = 'rc'; finOpen(title, html + `<div class="chg-err" id="rcModalErr"></div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn" type="button" data-rc="modal-save">${saveLabel}</button></div>`, false); reconUi.onSave = onSave;
+}
+document.addEventListener('change', (e) => {
+  const el = e.target, a = el.dataset && el.dataset.rc; if(!a) return; const R = recon(), acc = accFind(reconUi.acc), key = reconUi.month;
+  if(a === 'month'){ reconUi.month = el.value; renderRecon(true); return; }
+  if(a === 'acc'){ reconUi.acc = el.value; renderRecon(true); return; }
+  if(a === 'stmt'){ if(reconLockedMonth(acc.id, key)) return; reconGet(acc.id, key).statement = el.value === '' ? '' : Number(el.value); saveState(); renderRecon(true); return; }
+  if(a === 'match'){ if(reconLockedMonth(acc.id, key)) return; const r = reconGet(acc.id, key); r.matched = r.matched || {}; if(el.checked) r.matched[el.dataset.key] = true; else delete r.matched[el.dataset.key]; saveState(); renderRecon(true); return; }
+  if(a === 'explain'){ reconGet(acc.id, key).explanation = el.value; saveState(); return; }
+  if(a === 'loan'){ const l = R.loans.find(x => x.id === el.dataset.id); if(!l) return; const f = el.dataset.f; l[f] = f === 'lender' ? el.value : (el.value === '' ? (f === 'rate' ? '' : 0) : Math.max(0, Number(el.value) || 0)); saveState(); renderRecon(true); return; }
+  if(a === 'loanbal'){ const l = R.loans.find(x => x.id === el.dataset.id); if(!l) return; if(el.value === '') delete l.balances[key]; else l.balances[key] = Number(el.value); saveState(); renderRecon(true); return; }
+});
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-rc]'); if(!b || b.tagName === 'SELECT' || b.tagName === 'INPUT' || b.tagName === 'TEXTAREA') return; const a = b.dataset.rc, R = recon(), acc = accFind(reconUi.acc), key = reconUi.month;
+  if(a === 'match-all'){ const r = reconGet(acc.id, key); r.matched = r.matched || {}; state.transactions.filter(t => txAccId(t) === acc.id && txCashDate(t) && txCashDate(t).slice(0, 7) === key && txCashDate(t) >= accOpening(acc).date).forEach(t => { r.matched[rcTxKey(t)] = true; }); saveState(); renderRecon(true); return; }
+  if(a === 'acc-add'){ rcAsk('Add an account', `<div class="lp-f"><label>Name</label><input id="rcAccName" placeholder="e.g. Savings, Card"></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Opening balance (£)</label><input type="number" step="0.01" id="rcAccBal" value="0"></div><div class="lp-f"><label>As at</label><input type="date" id="rcAccDate" value="${bankStartDate()}"></div></div>`, 'Add account', () => { const n = document.getElementById('rcAccName').value.trim(); if(!n) return 'Give the account a name.'; const acc2 = { id: 'acc_' + Math.random().toString(36).slice(2, 8), name: n, opening: Number(document.getElementById('rcAccBal').value) || 0, openingDate: isoOk(document.getElementById('rcAccDate').value) || bankStartDate() }; R.accounts.push(acc2); reconUi.acc = acc2.id; return ''; }); return; }
+  if(a === 'add-missing'){ rcAsk('Add a transaction missing from the books', `<p class="q-help" style="margin:0 0 8px;">It goes into ${escHtml(acc.name)}, dated in the month you are reconciling.</p><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Date</label><input type="date" id="rcTxDate" value="${key === fmt(new Date()).slice(0, 7) ? fmt(new Date()) : monthEnd(key)}"></div><div class="lp-f"><label>Direction</label><select id="rcTxDir"><option value="out">Money out</option><option value="in">Money in</option></select></div><div class="lp-f"><label>Amount (£)</label><input type="number" step="0.01" min="0" id="rcTxAmt"></div></div><div class="lp-f"><label>Description</label><input id="rcTxDesc" placeholder="e.g. Bank charges, interest"></div><div class="lp-f"><label>Category</label><select id="rcTxCat">${TXN_CATS.map(c => `<option${c === 'Other' ? ' selected' : ''}>${c}</option>`).join('')}</select></div>`, 'Add transaction', () => {
+      const d = isoOk(document.getElementById('rcTxDate').value), amt = Number(document.getElementById('rcTxAmt').value) || 0, desc = document.getElementById('rcTxDesc').value.trim(), dir = document.getElementById('rcTxDir').value;
+      if(!d) return 'Choose the date.'; if(!(amt > 0)) return 'Enter the amount.'; if(!desc) return 'Say what it was.'; if(d.slice(0, 7) !== key) return 'The date must be in ' + monthLabel(new Date(key + '-01T00:00:00')) + '.'; if(d < accOpening(acc).date) return 'That is before the account starting date.';
+      const tx = { uid: qRand('tx_'), date: d, description: desc, category: document.getElementById('rcTxCat').value, moneyIn: dir === 'in' ? amt : 0, moneyOut: dir === 'out' ? amt : 0, linkedCode: '', account: acc.id, origin: 'reconciliation' }; state.transactions.push(tx); reconGet(acc.id, key).matched[tx.uid] = true; return ''; }); return; }
+  if(a === 'modal-save'){ const err = reconUi.onSave ? reconUi.onSave() : ''; if(err){ document.getElementById('rcModalErr').textContent = err; return; } finClose(); saveState(); render(); return; }
+  if(a === 'unrec'){ const u = finUnrecorded().find(x => x.key === b.dataset.key); if(!u) return;
+    if(u.kind === 'in'){ const l = u.line; if(!l.uid) l.uid = qRand('pl_'); state.transactions.push({ uid: qRand('tx_'), date: u.date, description: 'Receipt: ' + u.label, category: 'Income', moneyIn: u.amount, moneyOut: 0, linkedCode: u.code, projectId: u.p.id, projCat: '', planned: true, srcKey: u.key, lineUid: l.uid, origin: 'receipt-sync', account: MAIN_ACC }); }
+    else { spOpen(u.p.id, u.did); return; }
+    saveState(); render(); showToast('Transaction added'); return; }
+  if(a === 'loan-add'){ R.loans.push({ id: 'ln_' + Math.random().toString(36).slice(2, 8), lender: '', original: 0, rate: '', monthly: 0, balances: {} }); saveState(); renderRecon(true); return; }
+  if(a === 'loan-del'){ const l = R.loans.find(x => x.id === b.dataset.id); if(!l) return; if(!(await showConfirm('Remove this loan?', (l.lender || 'This loan') + ' and its recorded balances are removed from the net position.'))) return; R.loans.splice(R.loans.indexOf(l), 1); saveState(); renderRecon(true); return; }
+  if(a === 'close'){
+    const r = reconGet(acc.id, key), er = document.getElementById('rcErr'), book = bankBalance(monthEnd(key), acc.id), st = r.statement === '' ? null : Number(r.statement); if(st === null){ er.textContent = 'Enter the statement closing balance first.'; return; }
+    const diff = r2(st - book), txs = state.transactions.filter(t => txAccId(t) === acc.id && txCashDate(t) && txCashDate(t).slice(0, 7) === key && txCashDate(t) >= accOpening(acc).date), un = txs.filter(t => !r.matched[rcTxKey(t)]);
+    if(Math.abs(diff) >= 0.005 && String(r.explanation || '').trim().length < 5){ er.textContent = 'The statement and the books differ by ' + qm(Math.abs(diff)) + '. Add the missing transactions, or explain the difference, before closing.'; return; }
+    if(un.length && !(await showConfirm('Close with transactions not ticked?', `${un.length} transaction${un.length === 1 ? ' is' : 's are'} not ticked as matched to the statement. Close ${monthLabel(new Date(key + '-01T00:00:00'))} anyway?`))) return;
+    r.status = 'reconciled'; r.reconciledAt = new Date().toISOString(); r.by = whoName(); r.book = book; r.diff = diff;
+    R.history.push({ id: qRand('rh_'), action: 'reconciled', account: acc.id, accName: acc.name, month: key, at: r.reconciledAt, by: r.by, book, statement: st, diff, note: String(r.explanation || '').trim() });
+    saveState(); render(); showToast(monthLabel(new Date(key + '-01T00:00:00')) + ' reconciled and locked'); return; }
+  if(a === 'unlock'){
+    const r = reconRec(acc.id, key); if(!r) return; const x = await chgAsk('Unlock ' + monthLabel(new Date(key + '-01T00:00:00')) + '?', ['Its transactions can then be added, changed and deleted. You will need to reconcile the month again.'], { causes: [['error', 'Found an error'], ['late', 'Late transaction'], ['statement', 'Statement corrected'], ['other', 'Other']], save: 'Unlock the month' }); if(!x) return;
+    r.status = 'open'; R.history.push({ id: qRand('rh_'), action: 'unlocked', account: acc.id, accName: acc.name, month: key, at: new Date().toISOString(), by: whoName(), note: (x.cause + ': ' + x.reason) });
+    saveState(); render(); showToast('Month unlocked'); return; }
+});
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-nav-tab]'); if(b){ navClear(); activateTab(b.dataset.navTab); window.scrollTo(0, 0); } });
 /* ---------- Finance > Invoicing ----------
    Invoices are the projects' payment lines (the agreed schedule) plus approved variations (scope additions), so editing here edits the same data as the project's Money section.
    Extra optional fields default empty: line.confirmed, line.queried, line.queryNote, line.paidAmount; variation.paidAmount. */
@@ -10324,7 +10456,7 @@ function renderTransactions(){
   document.getElementById('txnKpis').innerHTML = [
     { label:'Total in', value: money(totalIn), accent:'var(--green)' }, { label:'Total out', value: money(totalOut), accent:'var(--oak)' }, { label:'Net movement', value: money(totalIn-totalOut), accent:'var(--slate)', flag:(totalIn-totalOut)<0 }
   ].concat(owed > 0 ? [{ label:'On trade accounts (owed)', value: money(owed), accent:'var(--bt-plum)' }] : []).map(k=>`<div class="kpi" style="--accent:${k.accent}"><div class="label">${k.label}</div><div class="value${k.flag?' flag':''}">${k.value}</div></div>`).join('');
-  document.getElementById('txnTotals').innerHTML = finTotalsHtml();
+  document.getElementById('txnTotals').innerHTML = finTotalsHtml() + `<div class="rc-line">${reconStatusHtml()} <button type="button" class="sp-link" data-nav-tab="reconciliation">Open Bank Reconciliation →</button></div>`;
   document.getElementById('txnPending').innerHTML = txnPendingHtml();
   const sorted = state.transactions.map((t,i)=>({t,i})).sort((a,b)=> (b.t.date||'').localeCompare(a.t.date||''));
   let html = `<table style="min-width:1000px"><thead><tr>
@@ -10394,6 +10526,7 @@ document.addEventListener('input', (e) => { if(e.target.id === 'finAmt') finVarR
 function txnCompleteSave(){
   const t = finUi.pend, er = document.getElementById('finErr'); if(!t) return;
   const a = Number(document.getElementById('finAmt').value) || 0, date = isoOk(document.getElementById('finDate').value) || fmt(new Date()), d = r2(a - t.amount), diff = Math.abs(d) >= 0.005, reason = document.getElementById('finReason').value.trim() || ((document.getElementById('finPoReason') || {}).value || '').trim();   // one reason covers both the plan variance and the PO difference
+  if(reconGuardDate(date)) return;
   if(!finUi.file){ er.textContent = 'Upload the invoice (or take a photo of it) first.'; return; }
   if(!(a > 0)){ er.textContent = 'Enter the value ' + (t.dir === 'out' ? 'paid' : 'received') + '.'; return; }
   if(diff && reason.length < 3){ er.textContent = 'The value differs from the plan: give a reason.'; return; }
@@ -10435,6 +10568,7 @@ function txnAddSave(){
   if(!(a > 0)){ er.textContent = 'Enter an amount.'; return; } if(!desc){ er.textContent = 'Say what it was for.'; return; }
   const direct = dir === 'out' && (document.querySelector('input[name="finDirect"]:checked') || {}).value === 'yes';
   const tx = { uid: qRand('tx_'), date: isoOk(g('finDate').value) || fmt(new Date()), description: desc, category: g('finCat').value, moneyIn: dir === 'in' ? a : 0, moneyOut: dir === 'out' ? a : 0, linkedCode: '' };
+  if(reconGuardDate(tx.date)) return;
   if(direct){ const pid = Number(g('finProj').value); if(!pid){ er.textContent = 'Choose the project.'; return; } tx.projectId = pid; tx.projCat = g('finPcat').value; tx.planKey = g('finPlan').value; tx.planned = !!tx.planKey;
     const pj = state.projects.find(x => x.id === pid), cov = pj && tx.planKey ? spCovering(pj, tx.planKey) : null;
     if(cov){ er.textContent = `A confirmed supplier payment (${qm(cov.moneyOut)} on ${pwD(cov.date)}) already covers that item, so adding it again would count the cost twice. Use that payment instead.`; return; } }
@@ -10503,7 +10637,76 @@ function retainedBy(date){
 }
 const POT_BUCKETS = [['potAssetsPct', 'Assets', 30], ['potTaxPct', 'Tax', 25], ['potBufferPct', 'Buffer', 20], ['potGrowthPct', 'Growth', 25]];
 function potPct(f){ const d = POT_BUCKETS.find(b => b[0] === f)[2], v = state.settings[f]; const n = Number(v); return (v === undefined || v === '' || isNaN(n) || n < 0) ? d : n; }
-function cashPosition(){ const s = (state.settings && Number(state.settings.startingCash)) || 0; return s + state.transactions.filter(t => !txUnsettledTrade(t)).reduce((a, t) => a + (Number(t.moneyIn) || 0) - (Number(t.moneyOut) || 0), 0); }   // a trade-account purchase is not cash until it is settled
+/* A customer payment line marked paid becomes ONE receipt transaction (so the bank balance and the forecast agree). Lines that were already paid when the page loaded are left alone
+   (nothing existing is rewritten); the reconciliation page lists them as "paid but not in Transactions" for you to add on purpose. */
+let finLegacyPaid = new WeakSet();
+function finMarkLegacy(){ finLegacyPaid = new WeakSet(); (state.projects || []).forEach(p => { (p.paymentLines || []).forEach(l => { if(l.paidDate) finLegacyPaid.add(l); }); (p.variations || []).forEach(v => { if(v.paidDate) finLegacyPaid.add(v); }); }); }
+function finReceiptTargets(p){
+  const code = recordCode(p.id, 'project');
+  return (p.paymentLines || []).map((l, i) => ({ l, key: 'cp:' + p.id + ':' + i, label: l.desc || 'Payment', code: code + '-INV' + (i + 1) }))
+    .concat((p.variations || []).filter(v => v.status === 'Approved' || v.status === 'Invoiced').map(v => ({ l: v, key: 'vp:' + p.id + ':' + v.id, label: 'Variation ' + v.ref, code: code + '-' + (v.ref || 'VAR') })));
+}
+function finEnsureReceipts(){
+  if(!state || !Array.isArray(state.transactions)) return;
+  (state.projects || []).forEach(p => finReceiptTargets(p).forEach(t => {
+    const l = t.l, has = state.transactions.find(x => (l.uid && x.lineUid === l.uid) || x.srcKey === t.key), auto = has && has.origin === 'receipt-sync' ? has : null;
+    if(auto && !l.paidDate){ state.transactions.splice(state.transactions.indexOf(auto), 1); return; }   // un-paid again: the receipt it made goes
+    if(auto && l.paidDate && (auto.date !== l.paidDate)){ if(!reconLockedTx(auto)) auto.date = l.paidDate; return; }
+    if(has || !l.paidDate || finLegacyPaid.has(l)) return;
+    if(l.paidDate < bankStartDate() || reconGuardQuiet(l.paidDate)) return;
+    if(!l.uid) l.uid = qRand('pl_');
+    const amt = Number(l.paidAmount) || Number(l.amount) || (Number(l.price) ? r2(Number(l.price) * vatMul()) : 0); if(!(amt > 0)) return;
+    state.transactions.push({ uid: qRand('tx_'), date: l.paidDate, description: 'Receipt: ' + t.label, category: 'Income', moneyIn: amt, moneyOut: 0, linkedCode: t.code, projectId: p.id, projCat: '', planned: true, srcKey: t.key, lineUid: l.uid, origin: 'receipt-sync', account: MAIN_ACC });
+  }));
+}
+function reconGuardQuiet(dateIso){ return !!dateIso && reconLockedMonth(MAIN_ACC, dateIso.slice(0, 7)); }
+/* paid in the project but with no transaction behind it (older data, or a locked month): listed on the reconciliation page */
+function finUnrecorded(){
+  const out = [], sd = bankStartDate();
+  (state.projects || []).forEach(p => {
+    finReceiptTargets(p).forEach(t => { const l = t.l; if(!l.paidDate || l.paidDate < sd) return; if(state.transactions.some(x => (l.uid && x.lineUid === l.uid) || x.srcKey === t.key)) return; const amt = Number(l.paidAmount) || Number(l.amount) || 0; if(amt > 0) out.push({ kind: 'in', p, key: t.key, label: t.label, code: t.code, date: l.paidDate, amount: amt, line: l }); });
+    Object.keys(p.dropState || {}).forEach(did => { const st = p.dropState[did]; if(!st || !st.paid || st.paid < sd || spTx(p, did)) return; const x = projDeliveries(p).drops.find(d => d.d.id === did); if(x && x.out > 0) out.push({ kind: 'out', p, key: 'sp:' + p.id + ':' + did, label: x.supplier, code: recordCode(p.id, 'project'), date: st.paid, amount: x.out, did }); });
+  });
+  return out;
+}
+/* ---------- Bank balance, starting balance and accounts ----------
+   The bank balance is the starting balance (Settings: amount "as at" a date) plus the transactions that moved cash on or after that date. A trade-account purchase is not cash until
+   it is settled (txCashDate). The forecast starts from this actual position and adds only what is not yet settled. settings.startingBalanceDate defaults to 1 Oct 2026 when it has
+   not been set (read-time default: nothing is rewritten). state.recon holds accounts, loans and the month-by-month reconciliations. */
+function bankStart(){ const s = state.settings || {}, v = Number(s.startingCash); return (s.startingCash === undefined || s.startingCash === '' || s.startingCash === null || isNaN(v)) ? (Number(state.startingCash) || 0) : v; }   // zero is a real setting, never the old £2,000
+function bankStartDate(){ return isoOk((state.settings || {}).startingBalanceDate) || BANK_DEFAULT_START_DATE; }
+function reconNormalise(r){
+  r = (r && typeof r === 'object') ? r : {};
+  const accs = (Array.isArray(r.accounts) ? r.accounts : []).filter(a => a && a.id && a.id !== MAIN_ACC).map(a => ({ id: String(a.id), name: String(a.name || 'Account'), opening: Number(a.opening) || 0, openingDate: isoOk(a.openingDate) || BANK_DEFAULT_START_DATE }));
+  return { accounts: [{ id: MAIN_ACC, name: String((r.mainName) || 'Bank'), main: true }].concat(accs), mainName: String(r.mainName || 'Bank'),
+    loans: (Array.isArray(r.loans) ? r.loans : []).filter(l => l && l.id).map(l => ({ id: String(l.id), lender: String(l.lender || ''), original: Number(l.original) || 0, rate: l.rate === '' || l.rate == null ? '' : Number(l.rate) || 0, monthly: Number(l.monthly) || 0, balances: (l.balances && typeof l.balances === 'object') ? l.balances : {} })),
+    months: (r.months && typeof r.months === 'object' && !Array.isArray(r.months)) ? r.months : {}, history: Array.isArray(r.history) ? r.history : [] };
+}
+function recon(){ if(!state.recon || !Array.isArray(state.recon.accounts)) state.recon = reconNormalise(state.recon); return state.recon; }
+function accFind(id){ return recon().accounts.find(a => a.id === id) || recon().accounts[0]; }
+function txAccId(t){ const a = t.account; if(!a || a === 'Bank') return MAIN_ACC; return recon().accounts.some(x => x.id === a) ? a : MAIN_ACC; }
+function txCounted(t){ const d = txCashDate(t); return !!d && d >= bankStartDate(); }
+function accOpening(a){ return a.main ? { amount: bankStart(), date: bankStartDate() } : { amount: Number(a.opening) || 0, date: a.openingDate || BANK_DEFAULT_START_DATE }; }
+/* book balance of one account (or all accounts) at the end of a day (default: now) */
+function bankBalance(upTo, accId){
+  const accs = accId ? [accFind(accId)] : recon().accounts;
+  return r2(accs.reduce((sum, a) => { const o = accOpening(a); return sum + o.amount + state.transactions.filter(t => txAccId(t) === a.id && txCashDate(t) && txCashDate(t) >= o.date && (!upTo || txCashDate(t) <= upTo)).reduce((x, t) => x + (Number(t.moneyIn) || 0) - (Number(t.moneyOut) || 0), 0); }, 0));
+}
+function monthEnd(key){ const [y, m] = key.split('-').map(Number); return fmt(new Date(y, m, 0)); }
+function prevMonthKey(key){ const [y, m] = key.split('-').map(Number); return monthKey(new Date(y, m - 2, 1)); }
+function reconRec(accId, key){ return recon().months[accId + '|' + key] || null; }
+function reconLockedMonth(accId, key){ const r = reconRec(accId, key); return !!(r && r.status === 'reconciled'); }
+function reconLockedTx(t){ const d = txCashDate(t) || t.date || ''; return !!d && reconLockedMonth(txAccId(t), d.slice(0, 7)); }
+function reconGuardDate(dateIso, accId){ if(dateIso && reconLockedMonth(accId || MAIN_ACC, dateIso.slice(0, 7))){ showToast('That date is in a reconciled month. Unlock the month in Bank Reconciliation (with a reason) to add or change transactions in it.', null, 9000); return true; } return false; }
+function reconLast(accId){   // the latest reconciled month of an account
+  const ks = Object.keys(recon().months).filter(k => k.startsWith(accId + '|') && recon().months[k].status === 'reconciled').map(k => k.split('|')[1]).sort(); return ks.length ? ks[ks.length - 1] : '';
+}
+function reconStatusHtml(){
+  const acc = recon().accounts, parts = acc.map(a => { const l = reconLast(a.id); return `${escHtml(a.name)}: ${l ? 'reconciled to <b>' + escHtml(monthLabel(new Date(l + '-01T00:00:00'))) + '</b>' : '<b>never reconciled</b>'}`; });
+  const due = prevMonthKey(fmt(new Date()).slice(0, 7)), main = reconLast(MAIN_ACC), late = !main || main < due;
+  return `<span class="rc-status${late ? ' late' : ''}" title="Finance > Bank Reconciliation">${parts.join(' · ')}${late ? ` · ${escHtml(monthLabel(new Date(due + '-01T00:00:00')))} is not reconciled yet` : ''}</span>`;
+}
+function cashPosition(){ return bankBalance(); }   // starting balance plus the transactions that moved cash on or after its date; a trade-account purchase is not cash until settled
 function assetCommitted(){ return r2((state.assetPlan || []).filter(a => a.funding === 'retained' && ['Approved', 'Ordered', 'Bought'].includes(a.status)).reduce((s, a) => s + (Number(a.cost) || 0), 0)); }
 function dbPotHtml(){
   const rt = retainedTotals(), committed = assetCommitted(), un = r2(rt.toDate - committed), cash = cashPosition(), sum = POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) || 1;
@@ -13105,6 +13308,7 @@ document.addEventListener('keydown', (e) => {
 
 /* ---------- master render ---------- */
 function render(){
+  try{ finEnsureReceipts(); }catch(e){}
   cxDirty(); cxSyncAll();   // CRM: deals and draft quotes read their customer details from the contact
   undoBadge(); projSyncValues(); navMetrics();
   renderDashboard();
@@ -13123,6 +13327,7 @@ function render(){
   renderRevenue();
   renderCashflow();
   renderTransactions();
+  renderRecon();
   renderInvoicing();
   renderAssets();
   renderPOs();
@@ -13161,6 +13366,7 @@ function applyFieldChange(el){
   const tab = el.dataset.tab; if(!tab) return;
   const field = el.dataset.field; let value = el.value;
   touchFromEl(el);
+  if(tab === 'transactions'){ const tx0 = state.transactions[Number(el.dataset.idx)]; if(tx0 && (reconLockedTx(tx0) || (field === 'date' && value && reconGuardDate(value, txAccId(tx0))))){ if(reconLockedTx(tx0)) showToast('This transaction is in a reconciled month. Unlock the month in Bank Reconciliation (with a reason) to change it.', null, 9000); render(); return; } }
   if(el.type === 'number') value = value==='' ? 0 : Number(value);
   if(field === 'priority') value = Number(value);
   if(tab==='assumptions') state.assumptions[field] = value;
@@ -13243,7 +13449,9 @@ document.addEventListener('click', (e) => {
     state[tab].push(row); render(); saveState();
   }
   else if(action === 'delete-row'){
-    const tab = btn.dataset.tab, at = Number(btn.dataset.idx), gone = state[tab].splice(at, 1)[0];
+    const tab = btn.dataset.tab, at = Number(btn.dataset.idx);
+    if(tab === 'transactions' && state.transactions[at] && reconLockedTx(state.transactions[at])){ showToast('This transaction is in a reconciled month. Unlock the month in Bank Reconciliation (with a reason) to delete it.', null, 9000); return; }
+    const gone = state[tab].splice(at, 1)[0];
     if(gone !== undefined){ const nm = gone.name || gone.label || gone.description || gone.title || gone.goal || gone.item || ''; undoDeleted(`${({ pipeline: 'Sales deal', goals: 'Goal', transactions: 'Transaction', pricingTiers: 'Pricing tier' })[tab] || 'Row'} deleted${nm ? ': ' + String(nm).slice(0, 40) : ''}`, [tab], at, gone); }
     render(); saveState();
   }
