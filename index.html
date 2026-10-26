@@ -5520,7 +5520,7 @@ const RT_SPECS = {
   pipelineStages:    { cols: [[200,100],[140,90],[128,104],[128,104],[64,48],[100,70],[210,150],[34,34]], parent: 'pipelineTableWrap' },
   projectsTableWrap: { cols: [[34,34],[100,80],[240,120],[120,90],[200,120],[150,100],[34,34]], nested: ['projectPayments'] },
   projectPayments:   { cols: [[90,72],[220,100],[128,104],[100,72],[128,104],[128,104],[34,34]], parent: 'projectsTableWrap' },
-  suppliersTableWrap: { cols: [[84,64],[190,110],[180,110],[150,90],[116,84],[180,100],[112,72],[104,72],[84,64],[92,72]] },
+  suppliersTableWrap: { cols: [[84,64],[190,110],[180,110],[150,90],[116,84],[180,100],[112,72],[104,72],[84,64],[84,64],[84,64],[92,72]] },
   crmTableWrap:      { cols: [] }   // CRM task list: columns come from the visible-columns menu (see rtCols)
 };
 function rtCols(key){ return key === CRM_TABLE_ID ? crmVisibleCols().map(c => [c.w, c.min]) : RT_SPECS[key].cols; }
@@ -5659,9 +5659,9 @@ function renderSuppliers(){
   renderSupFilters();
   const list = supFiltered(), open = supOpenId();
   const dash = '<span class="v">—</span>';
-  let html = rtTable('suppliersTableWrap', ['Code', 'Supplier', 'Categories', 'Main contact', 'Phone', 'Email', 'Payment terms', 'Delivery', 'Lead time', 'Status'], 'suppliers-table' + (open ? ' lp-on' : ''));
+  let html = rtTable('suppliersTableWrap', ['Code', 'Supplier', 'Categories', 'Main contact', 'Phone', 'Email', 'Payment terms', 'Delivery', 'Lead time', 'Live quotes', 'Orders placed', 'Status'], 'suppliers-table' + (open ? ' lp-on' : ''));
   if(!list.length){
-    html += `<tr><td colspan="10"><div class="sup-empty">${state.suppliers.length ? 'No suppliers match these filters.' : 'No suppliers yet — add the first with “+ New supplier”.'}</div></td></tr>`;
+    html += `<tr><td colspan="12"><div class="sup-empty">${state.suppliers.length ? 'No suppliers match these filters.' : 'No suppliers yet — add the first with “+ New supplier”.'}</div></td></tr>`;
   } else list.forEach(s => {
     const c = supMainContact(s), cell = (v, cls) => `<td class="sup-cell${v ? '' : ' sup-dim'}${cls ? ' ' + cls : ''}"${v ? ` title="${escAttr(v)}"` : ''}>${v ? escHtml(v) : '—'}</td>`;
     html += `<tr class="sup-row${open === s.id ? ' sup-active' : ''}" data-sp="open" data-id="${s.id}" data-sup="${s.id}" tabindex="0">
@@ -5669,7 +5669,7 @@ function renderSuppliers(){
       <td class="sup-cell sup-name${s.name ? '' : ' sup-dim'}"${s.name ? ` title="${escAttr(s.name)}"` : ''}>${escHtml(s.name || '(no name yet)')}</td>
       <td>${supPillsHtml(s) || '<span class="sup-dim">—</span>'}</td>
       ${cell(c ? c.name : '')}${cell(supPhone(s))}${cell(supEmail(s))}${cell(supTermsText(s))}${cell(supDeliveryText(s))}${cell(supLeadText(s))}
-      <td>${supStatusHtml(s)}</td></tr>`;
+      ${supCountCells(s)}<td>${supStatusHtml(s)}</td></tr>`;
   });
   wrap.innerHTML = html + '</tbody></table>';
   rtApply(wrap); supFitPills();
@@ -5697,10 +5697,25 @@ function supContactHtml(s, i, c, ci){
 }
 /* Quotes & orders: nothing names a supplier yet. When quote lines do, return one { ref, detail, amount } per line here and the section fills itself in. */
 function supplierQuoteLines(id){ return qSupplierUses(id); }
+/* live quotes on open projects and orders (POs) placed, each a link to the record (the back button returns here) */
+function supRecords(id){
+  const openProj = new Set(state.projects.filter(p => !projIsCompleted(p)).map(p => p.id)), onProj = [], other = [];
+  qSupplierUses(id).filter(u => ['Draft', 'Sent', 'Accepted'].includes(u.q.status) && !qIsExpired(u.q)).forEach(u => { ((u.q.linkedIds || []).map(linkedRoot).some(r => openProj.has(r)) ? onProj : other).push(u); });
+  const pos = (state.purchaseOrders || []).filter(po => po.supplierId === id);
+  return { onProj, other, placed: pos.filter(po => po.status !== 'Draft' && po.status !== 'Approved'), drafts: pos.filter(po => po.status === 'Draft' || po.status === 'Approved') };
+}
+function supCountCells(s){
+  const r = supRecords(s.id), cell = (n, sec, title) => `<td class="sup-cell">${n ? `<button type="button" class="sp-link" data-sup-sec="${sec}" title="${escAttr(title)}">${n}</button>` : '<span class="sup-dim">0</span>'}</td>`;
+  return cell(r.onProj.length, 'quotes', 'Live quotes on open projects: open the list') + cell(r.placed.length, 'quotes', 'Purchase orders placed: open the list');
+}
 function supQuotesHtml(s){
-  const lines = supplierQuoteLines(s.id);
-  if(!lines.length) return '<div class="sp-q-empty">Recent quotes and orders with this supplier will appear here once quotes name them.</div>';
-  return lines.map(l => `<div class="sp-q-row"><span>${escHtml(l.ref)}${l.detail ? ` <span class="k">${escHtml(l.detail)}</span>` : ''}</span><span>${escHtml(l.amount || '')}</span></div>`).join('');
+  const r = supRecords(s.id), q = u => `<div class="sp-q-row"><span><button type="button" class="sp-link" data-nav="quote:${u.q.id}">${escHtml(u.ref)}</button> <span class="q-st q-st-${qStatusShown(u.q)}">${escHtml(qStatusShown(u.q))}</span>${u.detail ? ` <span class="k">${escHtml(u.detail)}</span>` : ''}</span><span>${escHtml(u.amount || '')}</span></div>`;
+  const po = o => `<div class="sp-q-row"><span><button type="button" class="sp-link" data-nav="po:${o.id}">${escHtml(o.ref)}</button> ${poPill(o)} <span class="k">${escHtml(recordCode(o.pid, 'project'))}${(state.projects.find(x => x.id === o.pid) || {}).name ? ' · ' + escHtml(state.projects.find(x => x.id === o.pid).name) : ''}</span></span><span>${qm(poTotals(o).payable)}</span></div>`;
+  const block = (title, n, rows, empty) => `<div class="sp-q-block"><b>${title} (${n})</b>${n ? rows : `<div class="sp-q-empty">${empty}</div>`}</div>`;
+  return block('Live quotes on open projects', r.onProj.length, r.onProj.map(q).join(''), 'None. A quote counts when it is Draft, Sent or Accepted, has not expired and is linked to a project that is still open.')
+    + block('Orders placed', r.placed.length, r.placed.map(po).join(''), 'No purchase orders have been sent to this supplier yet.')
+    + (r.other.length ? block('Other live quotes (leads and sales deals)', r.other.length, r.other.map(q).join(''), '') : '')
+    + (r.drafts.length ? block('Purchase orders not placed yet', r.drafts.length, r.drafts.map(po).join(''), '') : '');
 }
 function supNotesHtml(s, i){
   const notes = sortedComms(s, 'notes');
@@ -5848,7 +5863,7 @@ document.addEventListener('click', (e) => {
   if(supUi.catOpen && !t.closest('.crm-colwrap')){ supUi.catOpen = false; renderSupFilters(); }
   const b = t.closest('[data-sp]'); if(!b) return;
   const a = b.dataset.sp, id = Number(b.dataset.id), s = supFind(id);
-  if(a === 'open'){ if(t.closest('.col-handle')) return; openSupplierPanel(id); }
+  if(a === 'open'){ if(t.closest('.col-handle')) return; const sc = t.closest('[data-sup-sec]'); openSupplierPanel(id, sc ? sc.dataset.supSec : ''); }
   else if(a === 'new') newSupplier();
   else if(a === 'cat-toggle'){ supUi.catOpen = !supUi.catOpen; renderSupFilters(); }
   else if(a === 'cat-clear'){ supUi.cats.clear(); renderSuppliers(); }
@@ -6008,7 +6023,7 @@ function projDeliveries(p, wq){
     const stt = p.dropState[d.id] || {}, flags = [];
     if(d.date && order && d.date < order) flags.push('before the materials order date (' + order + ')');
     if(d.date && inst && d.date > inst) flags.push('after install starts (' + inst + ')');
-    return { d, i, q, date: d.date, supplier: d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop ' + (i + 1)), method: d.method, items: tagged.map(l => l.description || 'Item'), out: r2(mat + del), due: d.paymentDueDate, delivered: stt.delivered || '', paid: stt.paid || '', flags };
+    return { d, i, q, date: d.date, supplier: d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop ' + (i + 1)), method: d.method, items: tagged.map(l => l.description || 'Item'), out: r2(mat + del), due: d.paymentDueDate, ordered: stt.ordered || '', delivered: stt.delivered || '', paid: stt.paid || '', onAccount: stt.onAccount || '', tradeDue: stt.tradeDue || '', flags };
   });
   return { q, drops };
 }
@@ -6048,6 +6063,7 @@ function projMsPlanned(p, key){
 function projMsEvidence(p, key){
   const today = fmt(new Date()), ok = d => !!d && d <= today, lines = p.paymentLines || [];
   if(key === 'contractSigned'){ const q = projAcceptedQuote(p), ad = q ? (q.firstAcceptedDate || q.acceptedDate) : ''; return q && ok(ad) ? { date: ad, src: 'Quote accepted' } : null; }
+  if(key === 'materialsOrdered'){ const dl = projDeliveries(p).drops; if(!dl.length || !dl.every(x => x.ordered)) return null; const d = dl.map(x => x.ordered).sort().pop(); return ok(d) ? { date: d, src: 'Every delivery marked ordered' } : null; }
   if(key === 'materialsDelivered'){ const dl = projDeliveries(p).drops; if(!dl.length || !dl.every(x => x.delivered)) return null; const d = dl.map(x => x.delivered).sort().pop(); return ok(d) ? { date: d, src: 'Every delivery marked delivered' } : null; }
   if(key === 'invoiced'){ if(!lines.length || !lines.every(l => l.invoicedDate)) return null; const d = lines.map(l => l.invoicedDate).sort().pop(); return ok(d) ? { date: d, src: 'Every payment line invoiced' } : null; }
   if(key === 'paid'){ if(!lines.length || !lines.every(l => l.paidDate)) return null; const d = lines.map(l => l.paidDate).sort().pop(); return ok(d) ? { date: d, src: 'Every payment line paid' } : null; }
@@ -6135,7 +6151,7 @@ function projEvents(p){
   (p.stages || []).forEach(s => { slEnsure(s); const a = s.start || s.end; if(!a) return; ev.push({ key: 'st:' + s.id, kind: 'stage', date: a, end: s.end || s.start, title: s.label || 'Stage', sub: slPlannedHours(s) ? hrs(slPlannedHours(s)) + ' planned' + (slLogged(s) ? ' · ' + hrs(slLogged(s)) + ' logged' : '') : (slLogged(s) ? hrs(slLogged(s)) + ' logged' : ''), sid: s.id, done: !!(s.actEnd && s.actEnd.date), sl: slInfo(s), pa: pwPaText(s.start || s.end, s.actStart && s.actStart.date, s.actEnd && s.actEnd.date, s.end || s.start) }); });
   dl.drops.forEach(x => {
     if(x.date) ev.push({ key: 'dl:' + x.d.id, kind: 'delivery', date: x.date, title: (x.method === 'collect' ? 'Collection: ' : 'Delivery: ') + x.supplier, sub: x.items.join(', '), did: x.d.id, done: !!x.delivered, overdue: !x.delivered && x.date < today, flags: x.flags, qid: x.q.id });
-    if(x.due && x.out > 0) ev.push({ key: 'po:' + x.d.id, kind: 'out', date: x.due, title: x.supplier, sub: 'Supplier payment', amount: x.out, did: x.d.id, done: !!x.paid, overdue: !x.paid && x.due < today, qid: x.q.id });
+    if(x.due && x.out > 0) ev.push({ key: 'po:' + x.d.id, kind: 'out', date: x.due, title: x.supplier, sub: x.onAccount && !x.paid ? 'On trade account, due ' + x.tradeDue : 'Supplier payment', amount: x.out, did: x.d.id, pid: p.id, done: !!x.paid, overdue: !x.paid && x.due < today, qid: x.q.id });
   });
   p.paymentLines.forEach((l, i) => {
     const amt = Number(l.amount) || 0; if(!l.dueDate && !l.invoicedDate && !l.paidDate) return;
@@ -6230,6 +6246,156 @@ function projOnQuoteAccepted(q){   // a quote linked to a project has just been 
   const p = state.projects.find(x => x.id === root); if(p){ projEnsure(p); const pv = q.prevVersionId ? qFind(q.prevVersionId) : null; if(pv && p.planCarry && p.planCarry.to === q.id) p.planCarry.report.push(...projQuoteFieldSync(p, pv, q)); projSyncPayments(p, q); if(p.planCarry && p.planCarry.to === q.id) showToast('Project carried across to ' + qRef(q) + ': ' + p.planCarry.report.length + ' note' + (p.planCarry.report.length === 1 ? '' : 's') + ' in the Working plan', null, 9000); }
 }
 
+
+/* ---------- Supplier purchases: Ordered, Delivered, Paid, and "Confirm supplier payment" ----------
+   p.dropState[dropId] = { ordered, delivered, paid, onAccount, tradeDue } (dates). One flow confirms a payment, from the project, the PO or the Transactions tab.
+   It makes exactly ONE transaction per drop (srcKey 'sp:<project>:<drop>'): { projectId, category / split, planned: true, poId, dropId, payMode 'cash' | 'trade', tradeDue,
+   settledDate, supplierId (actually used), plannedAmount (the quote / Working plan, kept as the budget), variance, lines[{ desc, qtyQuoted, priceQuoted, qtyFinal, priceFinal, reason }], file }.
+   A trade-account purchase is a payable: cost counts on the project when bought, but it is not a cash movement until it is settled (settledDate). */
+const spUi = { pid: 0, did: '', items: [], base: [], po: null };
+function spTx(p, did){ return (state.transactions || []).find(t => t.srcKey === 'sp:' + p.id + ':' + did) || null; }
+function txUnsettledTrade(t){ return t.payMode === 'trade' && !t.settledDate; }
+function txCashDate(t){ return t.payMode === 'trade' ? (t.settledDate || '') : (t.date || ''); }   // the day the money actually moved ('' while a trade-account purchase is unpaid)
+function spTotals(items, f){
+  const defRate = (Number(state.settings.vatRate) || 0) / 100; let ex = 0, vat = 0;
+  items.forEach(i => { const a = (Number(f ? i[f[0]] : i.qty) || 0) * (Number(f ? i[f[1]] : i.price) || 0); ex += a; vat += a * (i.lineId === '' ? defRate : (Number(i.vatRate) || 0) / 100); });
+  ex = r2(ex); vat = qVatOn() ? r2(vat) : 0; return { ex, vat, payable: r2(ex + vat) };
+}
+function spItemsFor(p, did){
+  const base = poSnapshot(p, did); if(!base) return null; const po = poForDrop(p.id, did), ordered = po && po.status !== 'Draft' ? po.items : null, used = new Set();
+  const items = base.items.map(i => { const o = ordered ? ordered.find((x, ix) => !used.has(ix) && x.lineId === i.lineId && (i.lineId !== '' || x.desc === i.desc)) : null; if(o) used.add(ordered.indexOf(o)); return { lineId: i.lineId, desc: i.desc, unit: i.unit, vatRate: i.vatRate, qq: Number(i.qty) || 0, qp: Number(i.price) || 0, fq: o ? Number(o.qty) || 0 : Number(i.qty) || 0, fp: o ? Number(o.price) || 0 : Number(i.price) || 0, reason: '' }; });
+  if(ordered) ordered.forEach((o, ix) => { if(!used.has(ix)) items.push({ lineId: o.lineId, desc: o.desc, unit: o.unit, vatRate: o.vatRate, qq: 0, qp: 0, fq: Number(o.qty) || 0, fp: Number(o.price) || 0, reason: '' }); });
+  return { items, snap: base, po };
+}
+function spOpen(pid, did){
+  const p = state.projects.find(x => x.id === pid); if(!p) return; projEnsure(p);
+  const x = projDeliveries(p).drops.find(d => d.d.id === did); if(!x){ showToast('That delivery is not on the project any more'); return; }
+  const ex = spTx(p, did); if(ex){ spShowExisting(p, did, ex); return; }   // one payment per drop: show it instead of making another
+  const r = spItemsFor(p, did); if(!r || !r.items.length){ showToast('There is nothing on this drop to pay for'); return; }
+  spUi.pid = pid; spUi.did = did; spUi.items = r.items; spUi.po = r.po; finUi.mode = 'sp'; finUi.file = null;
+  const today = fmt(new Date()), qt = spTotals(r.items, ['qq', 'qp']), sups = state.suppliers.filter(s => s.status !== 'Inactive' || String(s.id) === String(x.d.supplierId));
+  const rows = r.items.map((it, i) => `<tr data-spr="${i}"><td>${escHtml(it.desc)}${it.qq === 0 && it.qp === 0 ? ' <span class="qb-flag manual">not in the plan</span>' : ''}</td><td class="qb-calc">${it.qq} ${escHtml(it.unit || '')}</td><td class="qb-calc">${qm(it.qp)}</td>
+    <td><input type="number" step="any" min="0" class="qb-n" data-spf="fq" data-i="${i}" value="${it.fq}" aria-label="Final quantity"></td><td><input type="number" step="any" min="0" class="qb-n" data-spf="fp" data-i="${i}" value="${it.fp}" aria-label="Final price each, ex VAT"></td>
+    <td class="qb-calc" data-spd="${i}"></td><td><input data-spf="reason" data-i="${i}" maxlength="160" placeholder="Why it differs" aria-label="Reason" hidden></td></tr>`).join('');
+  finOpen('Confirm supplier payment', `<p class="q-help" style="margin:0 0 8px;">${escHtml(p.name)} · ${escHtml(x.supplier)}${x.date ? ' · drop ' + pwD(x.date) : ''} · quoted <b>${qm(qt.payable)}</b>${r.po ? ' · ' + escHtml(r.po.ref) : ''}</p>
+    <div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Date</label><input type="date" id="spDate" value="${today}"></div>
+      <div class="lp-f"><label>Supplier actually used</label><select id="spSup">${sups.map(s => `<option value="${s.id}"${String(s.id) === String(x.d.supplierId) ? ' selected' : ''}>${escHtml(s.name)}</option>`).join('')}${x.d.supplierId ? '' : `<option value="" selected>${escHtml(x.supplier)}</option>`}</select></div></div>
+    <div class="lp-f"><label>How was it paid?</label><div class="q-inline"><label class="q-check"><input type="radio" name="spMode" value="cash" checked> Paid now from the cash / bank account</label><label class="q-check"><input type="radio" name="spMode" value="trade"> Put on a trade account</label></div></div>
+    <div class="lp-f" id="spDueBox" hidden><label>Trade account due on</label><input type="date" id="spDue"><p class="q-help">This is owed to the supplier. It is not a cash movement until you settle it.</p></div>
+    ${finFileHtml(true)}
+    <div class="qb-scroll"><table class="qb-table qb-narrow" id="spTable"><thead><tr><th>Ordered</th><th>Quoted qty</th><th>Quoted price</th><th>Final qty</th><th>Final price</th><th>Difference</th><th>Reason</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div id="spSum" class="fin-var"></div>
+    <label class="q-check" style="margin-top:6px;"><input type="checkbox" id="spPlan"> Also update the Working plan with these final prices and quantities</label><p class="q-help" style="margin:2px 0 0;">Left unticked, the plan and the quote keep the quoted cost as the budget and the final figures are stored as actuals.</p>
+    <div class="chg-err" id="finErr"></div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn" type="button" data-fin="save">Confirm payment</button></div>`, true);
+  spDueDefault(); spRefresh();
+}
+function spDueDefault(){
+  const d = document.getElementById('spDue'), date = document.getElementById('spDate'); if(!d || !date) return; const sup = supFind(Number(document.getElementById('spSup').value)), days = (sup && sup.paymentTerms !== '' ? Number(sup.paymentTerms) : 0) || Number(state.settings.tradeAccountDays) || 30;
+  d.value = addDaysIso(isoOk(date.value) || fmt(new Date()), days);
+}
+function spRead(){
+  document.querySelectorAll('#spTable [data-spf]').forEach(el => { const it = spUi.items[Number(el.dataset.i)]; if(!it) return; const f = el.dataset.spf; if(f === 'reason') it.reason = el.value; else it[f] = Math.max(0, Number(el.value) || 0); });
+}
+function spRefresh(){
+  spRead(); const qt = spTotals(spUi.items, ['qq', 'qp']), ft = spTotals(spUi.items, ['fq', 'fp']), v = r2(ft.payable - qt.payable);
+  spUi.items.forEach((it, i) => {
+    const diff = r2(it.fq * it.fp - it.qq * it.qp), differs = it.fq !== it.qq || it.fp !== it.qp, c = document.querySelector(`#spTable [data-spd="${i}"]`), r = document.querySelector(`#spTable [data-spf="reason"][data-i="${i}"]`);
+    if(c) c.innerHTML = Math.abs(diff) < 0.005 ? (differs ? '<span class="qb-dim">same total</span>' : '<span class="qb-dim">—</span>') : `<b class="${diff > 0 ? 'over' : 'under'}">${diff > 0 ? '+' : '−'}${qm(Math.abs(diff))}</b>`;
+    if(r) r.hidden = !differs;
+  });
+  const el = document.getElementById('spSum'); if(el) el.innerHTML = `Quoted <b>${qm(qt.payable)}</b> · final <b>${qm(ft.payable)}</b>${qVatOn() ? ' (inc VAT)' : ''} · variance <b class="${Math.abs(v) < 0.005 ? '' : (v > 0 ? 'over' : 'under')}">${Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v))}</b>`;
+}
+document.addEventListener('input', (e) => { if(finUi.mode === 'sp' && e.target.closest && e.target.closest('#spTable')) spRefresh(); });
+document.addEventListener('change', (e) => {
+  if(finUi.mode !== 'sp') return; const t = e.target;
+  if(t.name === 'spMode'){ document.getElementById('spDueBox').hidden = t.value !== 'trade'; if(t.value === 'trade') spDueDefault(); }
+  else if(t.id === 'spDate' || t.id === 'spSup'){ if(!document.getElementById('spDueBox').hidden) spDueDefault(); }
+});
+function spSave(){
+  const g = id => document.getElementById(id), er = g('finErr'), p = state.projects.find(x => x.id === spUi.pid); if(!p) return finClose();
+  spRefresh(); const did = spUi.did, items = spUi.items, mode = (document.querySelector('input[name="spMode"]:checked') || {}).value || 'cash', date = isoOk(g('spDate').value), due = mode === 'trade' ? isoOk(g('spDue').value) : '';
+  if(spTx(p, did)){ er.textContent = 'A payment is already confirmed for this delivery.'; return; }
+  if(!date){ er.textContent = 'Choose the date.'; return; } if(date > fmt(new Date())){ er.textContent = 'A payment cannot be dated in the future.'; return; }
+  if(mode === 'trade' && !due){ er.textContent = 'Say when the trade account is due.'; return; }
+  if(!finUi.file){ er.textContent = 'Upload the invoice (or take a photo of it) first.'; return; }
+  const ft = spTotals(items, ['fq', 'fp']), qt = spTotals(items, ['qq', 'qp']); if(!(ft.payable > 0)){ er.textContent = 'The final total is £0: enter the final quantities and prices.'; return; }
+  const bad = items.find(i => (i.fq !== i.qq || i.fp !== i.qp) && String(i.reason || '').trim().length < 3); if(bad){ er.textContent = `“${bad.desc}” differs from the quote: give a reason.`; return; }
+  const x = projDeliveries(p).drops.find(d => d.d.id === did), supId = g('spSup').value === '' ? '' : Number(g('spSup').value), po = spUi.po || poForDrop(p.id, did);
+  const matEx = spTotals(items.filter(i => i.lineId !== ''), ['fq', 'fp']).payable, delEx = r2(ft.payable - matEx), v = r2(ft.payable - qt.payable);
+  const lines = items.map(i => ({ lineId: i.lineId, desc: i.desc, unit: i.unit, qtyQuoted: i.qq, priceQuoted: i.qp, qtyFinal: i.fq, priceFinal: i.fp, reason: (i.fq !== i.qq || i.fp !== i.qp) ? String(i.reason).trim() : '' }));
+  const reasons = lines.filter(l => l.reason).map(l => l.desc + ': ' + l.reason).join('; '), supName = supId ? qbSupName(supId) : x.supplier;
+  const tx = { uid: qRand('tx_'), date, description: 'Supplier payment: ' + supName + (po ? ' (' + po.ref + ')' : ''), category: matEx > 0 ? 'Materials' : 'Delivery', moneyIn: 0, moneyOut: ft.payable, linkedCode: po ? po.ref : '', projectId: p.id, projCat: matEx > 0 ? 'Materials' : 'Delivery', planned: true,
+    srcKey: 'sp:' + p.id + ':' + did, dropId: did, split: { materials: matEx, delivery: delEx }, origin: 'supplier-payment', payMode: mode, supplierId: supId, plannedAmount: qt.payable, variance: v, varianceReason: reasons, lines, file: finUi.file };
+  if(po) tx.poId = po.id; if(mode === 'trade'){ tx.tradeDue = due; tx.settledDate = ''; } else tx.account = 'Bank';
+  state.transactions.push(tx); projEnsure(p); const st = p.dropState[did] = p.dropState[did] || {};
+  if(!st.ordered) st.ordered = date; if(mode === 'cash') st.paid = date; else { st.onAccount = date; st.tradeDue = due; st.paid = ''; }
+  st.paidTx = tx.uid; if(supId !== '' && String(supId) !== String(x.d.supplierId)) st.supplierUsed = supId;
+  if(po && po.status !== 'Draft'){ po.match = { txnUid: tx.uid, invoice: ft.payable, diff: r2(ft.payable - poTotals(po).payable), reason: reasons, at: date }; po.status = 'Matched'; }
+  let planNote = ''; if(g('spPlan').checked){ const ch = spApplyToPlan(p, did, items, supId, x); planNote = ch.length ? ' Working plan updated.' : ''; }
+  finClose(); saveState(); render(); showToast('Payment confirmed: ' + qm(ft.payable) + (mode === 'trade' ? ' on trade account, due ' + pwD(due) : '') + (Math.abs(v) >= 0.005 ? ' (' + (v > 0 ? '+' : '−') + qm(Math.abs(v)) + ' vs quote)' : '') + '.' + planNote);
+}
+function spApplyToPlan(p, did, items, supId, x){
+  const plan = projPlanEnsure(p), ch = []; if(!plan) return ch;
+  items.forEach(i => {
+    if(i.lineId === ''){ const d = plan.drops.find(y => y.id === did); if(d && Number(d.charge) !== i.fp){ ch.push(`Delivery charge ${qm(d.charge)} → ${qm(i.fp)}`); d.charge = i.fp; d.chargeManual = true; } return; }
+    const l = plan.lines.find(y => y.id === i.lineId); if(!l) return;
+    if(i.fp !== i.qp){ ch.push(`${l.description || 'Item'}: cost each ${qm(i.qp)} → ${qm(i.fp)}`); l.costOverride = i.fp; }
+    if(i.fq !== i.qq){ ch.push(`${l.description || 'Item'}: quantity ${i.qq} → ${i.fq}`); l.qty = i.fq; l.wastagePct = 0; }
+  });
+  const d = plan.drops.find(y => y.id === did); if(d && supId !== '' && String(d.supplierId) !== String(supId)){ ch.push(`Supplier ${d.supplierId ? qbSupName(d.supplierId) : '—'} → ${qbSupName(supId)}`); d.supplierId = supId; }
+  if(ch.length) chgLog(p, 'delivery', { cause: 'price', reason: 'Final prices and quantities from the supplier invoice' }, ch);
+  return ch;
+}
+function spShowExisting(p, did, tx){
+  const st = (p.dropState || {})[did] || {}, v = Number(tx.variance) || 0;
+  finUi.mode = 'spview'; finOpen('Supplier payment already confirmed', `<p class="q-help" style="margin:0 0 8px;">${escHtml(tx.description)} · ${escHtml(qm(tx.moneyOut))} on ${escHtml(pwD(tx.date))}. One payment is recorded per delivery, so it is shown here instead of making another.</p>
+    <div class="fin-var">${tx.payMode === 'trade' ? (tx.settledDate ? `Trade account, settled ${escHtml(pwD(tx.settledDate))}` : `On a trade account, due <b>${escHtml(pwD(tx.tradeDue))}</b> (not paid yet)`) : 'Paid from the cash / bank account'} · quoted ${qm(tx.plannedAmount)} · variance ${Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v))}</div>
+    ${(tx.lines || []).length ? `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Item</th><th>Quoted</th><th>Final</th><th>Reason</th></tr></thead><tbody>${tx.lines.map(l => `<tr><td>${escHtml(l.desc)}</td><td class="qb-calc">${l.qtyQuoted} × ${qm(l.priceQuoted)}</td><td class="qb-calc">${l.qtyFinal} × ${qm(l.priceFinal)}</td><td>${escHtml(l.reason || '')}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    <div class="modal-actions">${finSrcLink({ t: 'txn', id: tx.uid }, 'Open the transaction →')}<button class="btn secondary" type="button" data-fin="cancel">Close</button>${tx.payMode === 'trade' && !tx.settledDate ? `<button class="btn" type="button" data-spay="settle" data-uid="${escAttr(tx.uid)}">Settle trade account…</button>` : ''}<button class="btn secondary" type="button" data-spay="reverse" data-pid="${p.id}" data-did="${escAttr(did)}">Reverse this payment…</button></div>`, true);
+}
+async function spSettle(uid){
+  const t = state.transactions.find(x => x.uid === uid); if(!t) return;
+  const ok = await showConfirm('Settle the trade account?', `${t.description}: ${qm(t.moneyOut)} was due ${pwD(t.tradeDue)}. Mark the date it was actually paid; the cash leaves the bank on that date.`, `<div class="lp-f"><label>Date paid</label><input type="date" id="spSettleDate" value="${fmt(new Date())}"></div>`);
+  if(!ok) return; const d = isoOk((_confirmExtraNote || '')) || fmt(new Date()); t.settledDate = d;
+  const p = state.projects.find(x => x.id === t.projectId); if(p && t.dropId){ const st = p.dropState[t.dropId] = p.dropState[t.dropId] || {}; st.paid = d; }
+  finClose(); saveState(); render(); showToast('Settled on ' + pwD(d));
+}
+async function spReverse(pid, did){
+  const p = state.projects.find(x => x.id === pid), tx = p && spTx(p, did); if(!tx) return;
+  const ok = await showConfirm('Reverse this payment?', `The transaction (${qm(tx.moneyOut)}) is removed and the delivery goes back to unpaid. Use this only if it was confirmed by mistake.`); if(!ok) return;
+  const ix = state.transactions.indexOf(tx), st = p.dropState[did] || {}, was = { paid: st.paid, onAccount: st.onAccount, tradeDue: st.tradeDue, paidTx: st.paidTx, supplierUsed: st.supplierUsed }, po = tx.poId ? poFind(tx.poId) : null, poWas = po ? { status: po.status, match: po.match } : null;
+  state.transactions.splice(ix, 1); st.paid = ''; st.onAccount = ''; st.tradeDue = ''; st.paidTx = ''; delete st.supplierUsed; if(po && po.match && po.match.txnUid === tx.uid){ po.match = null; po.status = po.deliveredAt ? 'Delivered' : (po.sentAt ? 'Sent' : 'Draft'); }
+  finClose(); saveState(); render();
+  showToast('Payment reversed', () => { state.transactions.splice(ix, 0, tx); Object.assign(st, was); if(po && poWas){ po.status = poWas.status; po.match = poWas.match; } saveState(); render(); });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-spay]'); if(!b) return; const a = b.dataset.spay;
+  if(a === 'settle') spSettle(b.dataset.uid); else if(a === 'reverse') spReverse(Number(b.dataset.pid), b.dataset.did);
+  else if(a === 'confirm') spOpen(Number(b.dataset.pid), b.dataset.did);
+});
+/* Create PO: say why it is unavailable instead of showing a dash */
+function poCreateInfo(p, x){
+  const po = poForDrop(p.id, x.d.id); if(po) return { ok: false, why: 'Already created: ' + po.ref, po };
+  if(!projAcceptedQuote(p)) return { ok: false, why: 'Accept the quote first' };
+  const wq = projWorkQuote(p), c = wq ? qCalc(wq) : null, tagged = wq ? wq.lines.filter(l => l.deliveryDropId === x.d.id && c.lines[l.id] && !c.lines[l.id].excluded) : [];
+  if(!tagged.length) return { ok: false, why: 'No materials are assigned to this drop' };
+  if(!(x.out > 0)) return { ok: false, why: 'Nothing to order: the materials on this drop cost £0' };
+  return { ok: true, why: '' };
+}
+/* a confirmed supplier payment that already covers a Working plan item (m:line, d:drop), so the same cost is not added twice */
+function spCovering(p, planKey){
+  const plan = p.plan; if(!plan) return null; const kind = planKey.slice(0, 2), id = planKey.slice(2);
+  const did = kind === 'd:' ? id : kind === 'm:' ? ((plan.lines.find(l => l.id === id) || {}).deliveryDropId || '') : '';
+  return did ? spTx(p, did) : null;
+}
+/* what each actual on the project came from */
+function spOrigin(t){ return t.origin === 'supplier-payment' ? 'Confirmed supplier payment' : t.srcKey ? 'Completed from Pending transactions' : t.poId ? 'Matched to a purchase order' : 'Added on the Transactions tab'; }
+function spActualSources(p){
+  const tx = (state.transactions || []).filter(t => t.projectId === p.id && Number(t.moneyOut) > 0), keys = {}, rows = tx.map(t => ({ t, origin: spOrigin(t), dup: false }));
+  rows.forEach(r => { if(r.t.srcKey) keys[r.t.srcKey] = (keys[r.t.srcKey] || 0) + 1; });
+  rows.forEach(r => { if(r.t.srcKey && keys[r.t.srcKey] > 1) r.dup = true; if(!r.t.srcKey && rows.some(o => o !== r && o.t.srcKey && Math.abs(Number(o.t.moneyOut) - Number(r.t.moneyOut)) < 0.005 && o.t.date === r.t.date)) r.dup = true; });
+  return rows.sort((a, b) => String(a.t.date).localeCompare(String(b.t.date)));
+}
 /* ---------- Project workspace (the open project) ---------- */
 const pwUi = { id: 0, sec: 'overview', quick: null, edit: null, lock: 0, open: new Set(['overview', 'timeline']), folds: {}, moneyEdit: false, cashOff: new Set() };
 const PW_SECS = [['overview', 'Overview'], ['timeline', 'Timeline'], ['money', 'Money'], ['materials', 'Materials & deliveries'], ['plan', 'Working plan'], ['variations', 'Variations'], ['info', 'Information']];
@@ -6256,7 +6422,7 @@ function pwPaText(ps, as, ae, pe){
 function pwEventActions(e){
   if(e.kind === 'milestone') return !e.done ? `<button type="button" class="btn secondary qb-sm" data-pw="ms-done" data-key="${e.mkey}">Mark done</button>` : `<span class="pw-ok">✓ done${e.late ? ' <b class="pw-slip late">' + escHtml(diffText(e.diff)) + '</b>' : ''}</span>`;
   if(e.kind === 'delivery') return e.done ? '<span class="pw-ok">✓ delivered</span>' : `<button type="button" class="btn secondary qb-sm" data-pw="del-done" data-did="${escAttr(e.did)}">Delivered today</button>`;
-  if(e.kind === 'out') return e.done ? '<span class="pw-ok">✓ paid</span>' : `<button type="button" class="btn secondary qb-sm" data-pw="sup-paid" data-did="${escAttr(e.did)}">Paid today</button>`;
+  if(e.kind === 'out') return e.done ? '<span class="pw-ok">✓ paid</span>' : `<button type="button" class="btn secondary qb-sm" data-spay="confirm" data-pid="${e.pid || ''}" data-did="${escAttr(e.did)}">Confirm supplier payment</button>`;
   if(e.kind === 'in') return e.done ? '<span class="pw-ok">✓ paid</span>' : (e.invoiced ? `<button type="button" class="btn secondary qb-sm" data-pw="pay-paid" data-idx="${e.idx}">Paid today</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="inv-sent" data-idx="${e.idx}">Invoice sent today</button>`);
   if(e.kind === 'stage') return (e.done ? '<span class="pw-ok">✓ done</span>' : `<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="stact" data-sid="${escAttr(e.sid)}|end">Mark done</button>`) + `<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="time" data-sid="${escAttr(e.sid)}">Log time</button>`;
   return '';
@@ -6395,10 +6561,26 @@ function pwPvdBody(p){
   return tbl + hist;
 }
 function pwLineDropName(wq, id){ const d = wq.drops.find(x => x.id === id); return d ? (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop')) : 'No drop'; }
+function pwSpSummary(p){
+  const tx = (state.transactions || []).filter(t => t.projectId === p.id && t.origin === 'supplier-payment'); if(!tx.length) return '';
+  const q = r2(tx.reduce((a, t) => a + (Number(t.plannedAmount) || 0), 0)), f = r2(tx.reduce((a, t) => a + (Number(t.moneyOut) || 0), 0)), v = r2(f - q), owed = r2(tx.filter(txUnsettledTrade).reduce((a, t) => a + (Number(t.moneyOut) || 0), 0));
+  return `<div class="pw-qbar" style="margin-bottom:8px;display:block;"><b>Supplier payments confirmed:</b> ${tx.length} · quoted ${qm(q)} · final ${qm(f)} · variance <b class="${Math.abs(v) < 0.005 ? '' : (v > 0 ? 'over' : 'under')}">${Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v))}</b>${owed > 0 ? ` · <b class="over">${qm(owed)} still owed on trade accounts</b>` : ''}</div>`;
+}
+function pwSpPaidCell(p, x){
+  const tx = spTx(p, x.d.id);
+  if(!tx) return `<button type="button" class="btn secondary qb-sm" data-spay="confirm" data-pid="${p.id}" data-did="${escAttr(x.d.id)}">Confirm supplier payment</button>`;
+  const s = tx.payMode === 'trade' ? (tx.settledDate ? `<span class="pw-ok">✓ paid ${pwD(tx.settledDate)}</span><div class="qb-dim pw-sm">trade account</div>` : `<b class="over">On account</b><div class="qb-dim pw-sm">due ${pwD(tx.tradeDue)}</div><button type="button" class="sp-link" data-spay="settle" data-uid="${escAttr(tx.uid)}">settle…</button>`) : `<span class="pw-ok">✓ paid ${pwD(tx.date)}</span>`;
+  return s + ` <button type="button" class="sp-link" data-spay="confirm" data-pid="${p.id}" data-did="${escAttr(x.d.id)}">view</button>`;
+}
+function pwSpActualCell(p, x){
+  const tx = spTx(p, x.d.id); if(!tx) return '<span class="qb-dim">not paid yet</span>';
+  const v = Number(tx.variance) || 0; return `<b>${qm(tx.moneyOut)}</b><div class="pw-sm ${Math.abs(v) < 0.005 ? 'qb-dim' : (v > 0 ? 'over' : 'under')}">${Math.abs(v) < 0.005 ? 'on the quote' : (v > 0 ? '+' : '−') + qm(Math.abs(v)) + ' vs ' + qm(tx.plannedAmount)}</div>`;
+}
 function pwPoCell(p, x, plan){
   const po = poForDrop(p.id, x.d.id);
   if(po) return `<button type="button" class="sp-link" data-po="open" data-id="${po.id}">${escHtml(po.ref)}</button> ${poPill(po)}${poNeedsApproval(po) && !poApproved(po) ? ' <span class="po-flag">Requires approval</span>' : ''}`;
-  return plan && x.out > 0 ? `<button type="button" class="btn secondary qb-sm" data-po="create" data-pid="${p.id}" data-did="${escAttr(x.d.id)}">Create PO</button>` : '<span class="qb-dim">—</span>';
+  const info = poCreateInfo(p, x); if(!info.ok) return `<span class="qb-dim pw-sm">${escHtml(info.why)}</span>`;
+  return `<button type="button" class="btn secondary qb-sm" data-po="create" data-pid="${p.id}" data-did="${escAttr(x.d.id)}">Create PO</button>`;
 }
 function pwMaterialsHtml(p, i){
   const ed = pwEditOn(p, 'delivery') ? pwUi.edit : null, aq = projAcceptedQuote(p), wq = ed ? planAsQuote(aq, ed.draft.plan) : projWorkQuote(p), dl = projDeliveries(p, wq), order = projOrderDate(p), inst = projInstallStart(p), m = p.milestones, plan = !!(aq && p.plan);
@@ -6419,13 +6601,15 @@ function pwMaterialsHtml(p, i){
   } else {
     const rows = dl.drops.map(x => `<tr class="${x.flags.length ? 'qb-warnrow' : ''}"><td>${x.date ? pwD(x.date) : '<span class="qb-dim">no date</span>'}</td><td>${escHtml(x.supplier)}<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${x.method === 'collect' ? 'Collect' : 'Delivered'}</div></td><td>${escHtml(x.items.join(', ') || '—')}</td>
       <td>${x.flags.map(f => `<div class="qb-warn">⚠ ${escHtml(f)}</div>`).join('') || '<span class="pw-ok">✓</span>'}</td><td class="qb-calc">${qm(x.out)}</td>
-      <td>${x.delivered ? `${pwD(x.delivered)} <button type="button" class="sp-link" data-pw="del-undo" data-did="${escAttr(x.d.id)}">clear</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="del-done" data-did="${escAttr(x.d.id)}">Delivered today</button>`}</td><td>${pwPoCell(p, x, plan)}</td></tr>`).join('');
-    table = `<div class="qb-scroll" style="margin-top:8px;"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Supplier</th><th>Items</th><th>Checks</th><th>Owed</th><th>Delivered</th><th>PO</th></tr></thead><tbody>${rows || '<tr><td colspan="7"><div class="sup-empty">No deliveries: they come from the delivery drops on the linked quote.</div></td></tr>'}</tbody></table></div>`;
+      <td>${x.ordered ? `${pwD(x.ordered)} <button type="button" class="sp-link" data-pw="ord-undo" data-did="${escAttr(x.d.id)}">clear</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="ord-done" data-did="${escAttr(x.d.id)}">Mark ordered</button>`}</td>
+      <td>${x.delivered ? `${pwD(x.delivered)} <button type="button" class="sp-link" data-pw="del-undo" data-did="${escAttr(x.d.id)}">clear</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="del-done" data-did="${escAttr(x.d.id)}">Delivered today</button>`}</td>
+      <td>${pwSpPaidCell(p, x)}</td><td>${pwSpActualCell(p, x)}</td><td>${pwPoCell(p, x, plan)}</td></tr>`).join('');
+    table = `<div class="qb-scroll" style="margin-top:8px;"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Supplier</th><th>Items</th><th>Checks</th><th>Owed</th><th>Ordered</th><th>Delivered</th><th>Paid</th><th>Actual vs quoted</th><th>PO</th></tr></thead><tbody>${rows || '<tr><td colspan="10"><div class="sup-empty">No deliveries: they come from the delivery drops on the linked quote.</div></td></tr>'}</tbody></table></div>`;
   }
   const src = dl.q ? (plan ? `<div class="pw-qbar" style="margin-top:8px;">Deliveries are edited here, on the <b>Working plan</b> (copied from <b>${escHtml(qRef(dl.q))}</b> when the project was won). The quote keeps its as-sold copy untouched.${pwEditBtn(p, 'delivery', 'Edit deliveries')}<button type="button" class="btn secondary qb-sm" data-qba="open-drop" data-qid="${dl.q.id}" data-id="${dl.drops[0] ? escAttr(dl.drops[0].d.id) : ''}"${dl.drops.length ? '' : ' disabled'}>View as sold on the quote</button></div>`
     : `<div class="pw-qbar" style="margin-top:8px;">From <b>${escHtml(qRef(dl.q))}</b> (${dl.q.status}). Once the quote is accepted and the project is live, deliveries are edited here. A drop dated before the order date or after install starts is flagged.<button type="button" class="btn secondary qb-sm" data-qba="open-drop" data-qid="${dl.q.id}" data-id="${dl.drops[0] ? escAttr(dl.drops[0].d.id) : ''}"${dl.drops.length ? '' : ' disabled'}>Edit drops on the quote</button></div>`) : '';
   return `<section class="pw-sec" id="pw-materials" data-sec="materials"><h3>Materials and deliveries</h3>
-    <div class="pw-card pw-wide"><div class="pw-money"><div><small>Materials ordered</small><b>${projMsActual(p, 'materialsOrdered') ? pwD(projMsActual(p, 'materialsOrdered').date) : (order ? pwD(order) + ' (planned)' : '—')}</b></div><div><small>Install starts</small><b>${inst ? pwD(inst) : '—'}</b></div></div>
+    <div class="pw-card pw-wide">${pwSpSummary(p)}<div class="pw-money"><div><small>Materials ordered</small><b>${projMsActual(p, 'materialsOrdered') ? pwD(projMsActual(p, 'materialsOrdered').date) : (order ? pwD(order) + ' (planned)' : '—')}</b></div><div><small>Install starts</small><b>${inst ? pwD(inst) : '—'}</b></div></div>
       ${src}${table}</div></section>`;
 }
 /* ---------- change log ---------- */
@@ -6690,7 +6874,7 @@ function pwClick(b){
   if(a === 'st-undo'){ pwUndoActual(p, 'st', b.dataset.sid); return; }
   if(a === 'inv-sent' || a === 'pay-paid'){ const l = p.paymentLines[idx]; if(!l) return; const f = a === 'inv-sent' ? 'invoicedDate' : 'paidDate'; if(f === 'paidDate' && !l.invoicedDate) l.invoicedDate = today; pwSetDate((a === 'inv-sent' ? 'Invoice sent' : 'Paid') + ': ' + (l.desc || 'payment'), () => l[f] || '', v => { l[f] = v; }, today); return; }
   if(a === 'del-done' || a === 'del-undo'){ const id = b.dataset.did; const st = p.dropState[id] = p.dropState[id] || {}; pwSetDate('Delivered', () => st.delivered || '', v => { st.delivered = v; }, a === 'del-done' ? today : ''); return; }
-  if(a === 'sup-paid' || a === 'sup-unpaid'){ const id = b.dataset.did; const st = p.dropState[id] = p.dropState[id] || {}; pwSetDate('Supplier paid', () => st.paid || '', v => { st.paid = v; }, a === 'sup-paid' ? today : ''); return; }
+  if(a === 'ord-done' || a === 'ord-undo'){ const id = b.dataset.did; const st = p.dropState[id] = p.dropState[id] || {}; pwSetDate('Ordered', () => st.ordered || '', v => { st.ordered = v; if(v && !projMsActual(p, 'materialsOrdered')) projAdvance(p); }, a === 'ord-done' ? today : ''); return; }
   if(a === 'sync-pay'){ const q = projAcceptedQuote(p); if(q) projSyncPayments(p, q, { verbose: true }); return; }
   if(a === 'add-stage'){ p.stages = p.stages || []; p.stages.push({ label: 'New stage', kind: 'other', start: '', end: '', cost: 0 }); render(); saveState(); return; }
   if(a === 'del-stage'){ const ix = Number(b.dataset.ix), gone = (p.stages || []).splice(ix, 1)[0]; if(gone) undoDeleted('Stage line deleted: ' + String(gone.label || 'Stage').slice(0, 40), ['projects', { id: p.id }, 'stages'], ix, gone); render(); saveState(); return; }
@@ -6727,7 +6911,7 @@ function projPlanItems(p, plan){
 }
 /* what has actually happened: labour from the hours logged on Paid stage lines, the rest from transactions attributed to this project */
 function projActualCost(p){
-  const aq = projAcceptedQuote(p), tx = (state.transactions || []).filter(t => t.projectId === p.id && Number(t.moneyOut) > 0), cat = c => tx.filter(t => (t.projCat || t.category) === c).reduce((a, t) => a + Number(t.moneyOut), 0);
+  const aq = projAcceptedQuote(p), tx = (state.transactions || []).filter(t => t.projectId === p.id && Number(t.moneyOut) > 0), cat = c => tx.reduce((a, t) => a + (t.split ? Number(t.split[c === 'Materials' ? 'materials' : c === 'Delivery' ? 'delivery' : '_']) || 0 : ((t.projCat || t.category) === c ? Number(t.moneyOut) : 0)), 0);   // a confirmed supplier payment splits into materials and delivery
   const prof = 1 + (Number(state.settings.labourProfitPct) || 0) / 100, sold = aq && aq.asSold, dayRate = sold && sold.dayRate > 0 ? sold.dayRate : (Number(state.settings.labourRateDay) || 0), a = aq ? qActual(aq) : { paidDays: 0 };
   const unplanned = r2(tx.filter(t => !t.planned).reduce((s, t) => s + Number(t.moneyOut), 0)), materials = r2(cat('Materials')), delivery = r2(cat('Delivery')), labour = r2(a.paidDays > 0 && dayRate > 0 ? a.paidDays * dayRate / prof : 0), other = r2(tx.reduce((s, t) => s + Number(t.moneyOut), 0) - materials - delivery);
   return { materials, delivery, labour, other, unplanned, total: r2(materials + delivery + labour + other), hasTx: tx.length > 0 };
@@ -6769,7 +6953,8 @@ function pwPlanHtml(p, i){
   const matHead = ep === 'materials' ? '<th>Line</th><th>Qty</th><th>Wastage</th><th>Cost each ex VAT</th>' : '<th>Line</th><th>Qty</th><th>Wastage</th><th>Cost each</th>';
   const pc = p.planCarry && p.planCarry.to === aq.id ? p.planCarry : null, pcq = pc ? qFind(pc.from) : null;
   const carryHtml = pc ? `<details class="pw-chg pw-carry"><summary><b>Carried across from ${escHtml(pcq ? qRef(pcq) : 'the earlier version')} to ${escHtml(qRef(aq))}</b> <span class="pw-chg-when">${escHtml(fmtStamp(pc))} · ${pc.report.length} note${pc.report.length === 1 ? '' : 's'}</span></summary><ul>${pc.report.map(t => `<li>${escHtml(t)}</li>`).join('')}</ul></details>` : '';
-  return `<section class="pw-sec" id="pw-plan" data-sec="plan"><h3>Working plan</h3>${carryHtml}
+  const srcRows = spActualSources(p), srcHtml = `<details class="pw-chg pw-carry"><summary><b>Where each actual came from</b> <span class="pw-chg-when">${srcRows.length} transaction${srcRows.length === 1 ? '' : 's'} · materials, delivery and other costs read from these only; labour from hours logged on paid stage lines</span></summary>${srcRows.length ? `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>What</th><th>Amount</th><th>Came from</th><th></th></tr></thead><tbody>${srcRows.map(r => `<tr><td>${pwD(r.t.date)}</td><td>${escHtml(r.t.description || '')}${r.t.payMode === 'trade' ? ` <span class="qb-flag ${r.t.settledDate ? 'ok' : 'bad'}">trade account${r.t.settledDate ? ', settled' : ', unpaid'}</span>` : ''}</td><td class="qb-calc">${qm(r.t.moneyOut)}</td><td>${escHtml(r.origin)}</td><td>${r.dup ? '<span class="qb-flag bad">possible duplicate</span>' : ''}${finSrcLink({ t: 'txn', id: r.t.uid || String(state.transactions.indexOf(r.t)) }, 'open')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="q-help">No costs have been recorded against this project yet.</p>'}</details>`;
+  return `<section class="pw-sec" id="pw-plan" data-sec="plan"><h3>Working plan</h3>${carryHtml}${srcHtml}
     <div class="pw-card pw-wide"><p class="q-help" style="margin:0 0 10px;"><b>Sold</b> is the accepted quote (${escHtml(qRef(aq))}), frozen. The <b>Working plan</b> is the editable list carrying the true expected cost. <b>Actual</b> is hours logged and real transactions. This is not a requote: a big change means a new quote version. Costs are ex VAT.</p>
       ${over ? `<div class="pw-qbar pw-alert-bar">⚠ Approved variations are <b>${qpct(pct)}</b> of the contract, over your ${thr}% threshold. Consider a new quote version instead of more variations.<button type="button" class="btn secondary qb-sm" data-pw="new-version">Create a new quote version</button></div>` : ''}
       <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th></th><th>Sold</th><th>Working plan</th><th>Actual</th><th>Plan vs sold</th><th>Actual vs plan</th></tr></thead><tbody>
@@ -6941,7 +7126,7 @@ function pwMoneyInTable(p, i){
 }
 function pwMoneyHtml(p, i){
   const aq = projAcceptedQuote(p), q = projQuote(p), mg = projMargin(p), ed = pwUi.moneyEdit;
-  const dl = projDeliveries(p), outRows = dl.drops.filter(x => x.due && x.out > 0).map(x => `<tr><td>${escHtml(x.supplier)}</td><td>${pwD(x.due)}</td><td class="qb-calc">${qm(x.out)}</td><td>${x.paid ? `${pwD(x.paid)} <button type="button" class="sp-link" data-pw="sup-unpaid" data-did="${escAttr(x.d.id)}">clear</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="sup-paid" data-did="${escAttr(x.d.id)}">Paid today</button>`}</td></tr>`).join('');
+  const dl = projDeliveries(p), outRows = dl.drops.filter(x => x.due && x.out > 0).map(x => `<tr><td>${escHtml(x.supplier)}</td><td>${pwD(x.due)}</td><td class="qb-calc">${qm(x.out)}</td><td>${pwSpPaidCell(p, x)}</td></tr>`).join('');
   const quoteBar = aq ? `<div class="pw-qbar"><span>Payment lines follow <b>${escHtml(qRef(aq))}</b> (Accepted)</span><button type="button" class="btn secondary qb-sm" data-pw="sync-pay">Sync from the quote</button><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${aq.id}">Open quote (As sold, Actual vs sold)</button></div>` : (q ? `<div class="pw-qbar">Linked quote ${escHtml(qRef(q))} is ${q.status}, not Accepted yet. Payment lines come from it once it is accepted.<button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open quote</button></div>` : '<div class="pw-qbar">No quote is linked to this project, so these payment lines are typed by hand.</div>');
   const tools = ed ? `<button class="btn secondary qb-sm" data-action="add-payline" data-idx="${i}">+ Add payment line</button><button type="button" class="btn qb-sm" data-pw="money-edit">Done</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="money-edit" title="Unlock the grid to change the payment lines">✎ Edit</button>`;
   return `<section class="pw-sec" id="pw-money" data-sec="money"><h3>Money</h3>
@@ -9873,7 +10058,7 @@ function finLines(){
     projDeliveries(p).drops.forEach(x => {
       if(!(x.out > 0)) return; const src = { t: 'project', id: pid, sec: 'materials' };
       L.push(Object.assign({ kind: 'supOrder', date: x.date || projOrderDate(p) || '', amount: x.out, label: x.supplier + (x.date ? '' : ' (no drop date)'), src, did: x.d.id, done: !!x.delivered }, base));
-      L.push(Object.assign({ kind: 'supPay', date: x.due || '', amount: x.out, label: x.supplier + (x.d.dueManual ? ' (date typed)' : ''), src, did: x.d.id, done: !!x.paid, paidDate: x.paid, key: 'sp:' + pid + ':' + x.d.id }, base));
+      L.push(Object.assign({ kind: 'supPay', date: (x.onAccount && !x.paid && x.tradeDue) ? x.tradeDue : (x.due || ''), amount: x.out, label: x.supplier + (x.onAccount && !x.paid ? ' (trade account)' : (x.d.dueManual ? ' (date typed)' : '')), src, did: x.d.id, done: !!x.paid, paidDate: x.paid, key: 'sp:' + pid + ':' + x.d.id }, base));
     });
     if(aq){ const c = aq.asSold || qCalc(aq); L.push(Object.assign({ kind: 'custOrder', date: aq.acceptedDate || aq.date, amount: r2(qVatOn() ? c.totalInc : c.totalEx), label: 'Contract ' + qRef(aq), src: { t: 'quote', id: aq.id }, done: true }, base)); }
     else if(Number(p.agreedValue) > 0) L.push(Object.assign({ kind: 'custOrder', date: (p.milestones || {}).contractSigned || '', amount: r2(Number(p.agreedValue) * vatMul()), label: 'Agreed value', src: { t: 'project', id: pid, sec: 'money' }, done: true }, base));
@@ -10134,10 +10319,11 @@ function txnPendingHtml(){
 }
 function renderTransactions(){
   const txns = state.transactions;
-  const totalIn = txns.reduce((a,t)=>a+(Number(t.moneyIn)||0),0), totalOut = txns.reduce((a,t)=>a+(Number(t.moneyOut)||0),0);
+  const cashTx = txns.filter(t => !txUnsettledTrade(t)), owed = r2(txns.filter(txUnsettledTrade).reduce((a,t)=>a+(Number(t.moneyOut)||0),0));
+  const totalIn = cashTx.reduce((a,t)=>a+(Number(t.moneyIn)||0),0), totalOut = cashTx.reduce((a,t)=>a+(Number(t.moneyOut)||0),0);
   document.getElementById('txnKpis').innerHTML = [
     { label:'Total in', value: money(totalIn), accent:'var(--green)' }, { label:'Total out', value: money(totalOut), accent:'var(--oak)' }, { label:'Net movement', value: money(totalIn-totalOut), accent:'var(--slate)', flag:(totalIn-totalOut)<0 }
-  ].map(k=>`<div class="kpi" style="--accent:${k.accent}"><div class="label">${k.label}</div><div class="value${k.flag?' flag':''}">${k.value}</div></div>`).join('');
+  ].concat(owed > 0 ? [{ label:'On trade accounts (owed)', value: money(owed), accent:'var(--bt-plum)' }] : []).map(k=>`<div class="kpi" style="--accent:${k.accent}"><div class="label">${k.label}</div><div class="value${k.flag?' flag':''}">${k.value}</div></div>`).join('');
   document.getElementById('txnTotals').innerHTML = finTotalsHtml();
   document.getElementById('txnPending').innerHTML = txnPendingHtml();
   const sorted = state.transactions.map((t,i)=>({t,i})).sort((a,b)=> (b.t.date||'').localeCompare(a.t.date||''));
@@ -10151,7 +10337,7 @@ function renderTransactions(){
       <td><input type="date" data-tab="transactions" data-idx="${i}" data-field="date" value="${t.date||''}"></td>
       <td><input data-tab="transactions" data-idx="${i}" data-field="description" value="${escAttr(t.description||'')}"></td>
       <td><select data-tab="transactions" data-idx="${i}" data-field="category">${cats.map(c=>`<option${t.category===c?' selected':''}>${escHtml(c)}</option>`).join('')}</select></td>
-      <td>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button><div class="qb-dim">${escHtml(t.projCat || '')} ${t.planned === false || (t.projectId && !t.planned) ? '<span class="qb-flag bad">unplanned</span>' : '<span class="qb-flag ok">planned</span>'}</div>` : '<span class="qb-dim">—</span>'}</td>
+      <td>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button><div class="qb-dim">${escHtml(t.projCat || '')} ${t.planned === false || (t.projectId && !t.planned) ? '<span class="qb-flag bad">unplanned</span>' : '<span class="qb-flag ok">planned</span>'}${t.payMode === 'trade' ? (t.settledDate ? ' <span class="qb-flag ok">trade · settled ' + pwD(t.settledDate) + '</span>' : ' <span class="qb-flag bad">on account · due ' + pwD(t.tradeDue) + '</span> <button type="button" class="sp-link" data-spay="settle" data-uid="' + escAttr(t.uid) + '">settle…</button>') : ''}${t.origin === 'supplier-payment' ? ' <span class="qb-flag">confirmed payment</span>' : ''}</div>` : '<span class="qb-dim">—</span>'}</td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyIn" value="${t.moneyIn||0}"></td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyOut" value="${t.moneyOut||0}"></td>
       <td><input data-tab="transactions" data-idx="${i}" data-field="linkedCode" value="${escAttr(t.linkedCode||'')}" placeholder="e.g. P-201-INV1"></td>
@@ -10188,6 +10374,7 @@ document.addEventListener('change', async (e) => {
 });
 /* ---- complete a pending transaction ---- */
 function txnOpenComplete(key){
+  if(String(key).startsWith('sp:')){ const [, pid, did] = String(key).split(':'); finClose(); spOpen(Number(pid), did); return; }   // supplier payments all go through the one Confirm supplier payment flow
   const t = txnPending().find(x => x.key === key); if(!t){ showToast('That item is no longer pending'); return; }
   finUi.mode = 'complete'; finUi.key = key; finUi.file = null; finUi.pend = t;
   finOpen((t.dir === 'out' ? 'Complete payment: ' : 'Complete receipt: ') + t.label, `<p class="q-help" style="margin:0 0 8px;">${escHtml(t.pname)} · planned ${qm(t.amount)}${t.date ? ' · due ' + pwD(t.date) : ''}</p>${finFileHtml(true)}
@@ -10248,7 +10435,9 @@ function txnAddSave(){
   if(!(a > 0)){ er.textContent = 'Enter an amount.'; return; } if(!desc){ er.textContent = 'Say what it was for.'; return; }
   const direct = dir === 'out' && (document.querySelector('input[name="finDirect"]:checked') || {}).value === 'yes';
   const tx = { uid: qRand('tx_'), date: isoOk(g('finDate').value) || fmt(new Date()), description: desc, category: g('finCat').value, moneyIn: dir === 'in' ? a : 0, moneyOut: dir === 'out' ? a : 0, linkedCode: '' };
-  if(direct){ const pid = Number(g('finProj').value); if(!pid){ er.textContent = 'Choose the project.'; return; } tx.projectId = pid; tx.projCat = g('finPcat').value; tx.planKey = g('finPlan').value; tx.planned = !!tx.planKey; }
+  if(direct){ const pid = Number(g('finProj').value); if(!pid){ er.textContent = 'Choose the project.'; return; } tx.projectId = pid; tx.projCat = g('finPcat').value; tx.planKey = g('finPlan').value; tx.planned = !!tx.planKey;
+    const pj = state.projects.find(x => x.id === pid), cov = pj && tx.planKey ? spCovering(pj, tx.planKey) : null;
+    if(cov){ er.textContent = `A confirmed supplier payment (${qm(cov.moneyOut)} on ${pwD(cov.date)}) already covers that item, so adding it again would count the cost twice. Use that payment instead.`; return; } }
   if(finUi.file) tx.file = finUi.file;
   if(typeof assetOfferSave === 'function'){ const r = assetOfferSave(tx); if(r && r.err){ er.textContent = r.err; return; } }
   state.transactions.push(tx); finClose(); saveState(); render(); showToast(direct && !tx.planned ? 'Added: counted as an unplanned cost on the project' : 'Transaction added');
@@ -10270,7 +10459,7 @@ function txnPendAll(){
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-fin]'); if(!b) return; const a = b.dataset.fin;
   if(a === 'cancel') finClose(); else if(a === 'complete'){ finClose(); txnOpenComplete(b.dataset.key); }
-  else if(a === 'save'){ if(finUi.mode === 'complete') txnCompleteSave(); else if(finUi.mode === 'add') txnAddSave(); else if(finUi.mode === 'assetbuy') assetBuySave(); else if(finUi.mode === 'toasset') txnToAssetSave(); }
+  else if(a === 'save'){ if(finUi.mode === 'sp') spSave(); else if(finUi.mode === 'complete') txnCompleteSave(); else if(finUi.mode === 'add') txnAddSave(); else if(finUi.mode === 'assetbuy') assetBuySave(); else if(finUi.mode === 'toasset') txnToAssetSave(); }
   else if(a === 'to-asset') txnOpenToAsset(Number(b.dataset.idx));
   else if(a === 'txn-add') txnOpenAdd(); else if(a === 'pend-all') txnPendAll();
 });
@@ -10314,7 +10503,7 @@ function retainedBy(date){
 }
 const POT_BUCKETS = [['potAssetsPct', 'Assets', 30], ['potTaxPct', 'Tax', 25], ['potBufferPct', 'Buffer', 20], ['potGrowthPct', 'Growth', 25]];
 function potPct(f){ const d = POT_BUCKETS.find(b => b[0] === f)[2], v = state.settings[f]; const n = Number(v); return (v === undefined || v === '' || isNaN(n) || n < 0) ? d : n; }
-function cashPosition(){ const s = (state.settings && Number(state.settings.startingCash)) || 0; return s + state.transactions.reduce((a, t) => a + (Number(t.moneyIn) || 0) - (Number(t.moneyOut) || 0), 0); }
+function cashPosition(){ const s = (state.settings && Number(state.settings.startingCash)) || 0; return s + state.transactions.filter(t => !txUnsettledTrade(t)).reduce((a, t) => a + (Number(t.moneyIn) || 0) - (Number(t.moneyOut) || 0), 0); }   // a trade-account purchase is not cash until it is settled
 function assetCommitted(){ return r2((state.assetPlan || []).filter(a => a.funding === 'retained' && ['Approved', 'Ordered', 'Bought'].includes(a.status)).reduce((s, a) => s + (Number(a.cost) || 0), 0)); }
 function dbPotHtml(){
   const rt = retainedTotals(), committed = assetCommitted(), un = r2(rt.toDate - committed), cash = cashPosition(), sum = POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) || 1;
@@ -10483,6 +10672,8 @@ function poDetailHtml(po){
   if(draft && !appr){ acts.push(`<button type="button" class="btn qb-sm" data-po="approve" data-id="${po.id}"${can.ok ? '' : ' disabled'} title="${escAttr(can.ok ? '' : can.why)}">Approve</button>`); }
   if(po.status === 'Draft' || po.status === 'Approved') acts.push(`<button type="button" class="btn qb-sm" data-po="sent" data-id="${po.id}"${blockSend ? ' disabled' : ''} title="${blockSend ? 'Requires approval before it can be sent' : ''}">Mark sent</button>`);
   if(po.status === 'Sent') acts.push(`<button type="button" class="btn qb-sm" data-po="delivered" data-id="${po.id}">Mark delivered</button>`);
+  if(po.status !== 'Draft' && po.status !== 'Matched') acts.push(`<button type="button" class="btn qb-sm" data-spay="confirm" data-pid="${po.pid}" data-did="${escAttr(po.did)}">Confirm supplier payment</button>`);
+  else if(po.status === 'Matched') acts.push(`<button type="button" class="btn secondary qb-sm" data-spay="confirm" data-pid="${po.pid}" data-did="${escAttr(po.did)}">View the payment</button>`);
   if(draft) acts.push(`<button type="button" class="btn secondary qb-sm" data-po="refresh" data-id="${po.id}" title="Re-copy items, prices and dates from the Working plan">Refresh from plan</button><button type="button" class="btn secondary qb-sm" data-po="del" data-id="${po.id}">Delete</button>`);
   acts.push(`<button type="button" class="btn secondary qb-sm" data-po="print" data-id="${po.id}">Print / save as PDF</button><button type="button" class="btn secondary qb-sm" data-po="email" data-id="${po.id}">Email to supplier</button>`);
   return `<div class="card"><div class="qb-sec-h"><h4><button type="button" class="btn secondary qb-sm" data-po="list">← All POs</button> &nbsp;${escHtml(po.ref)} ${poPill(po)}</h4><div class="qb-sec-tools">${finSrcLink({ t: 'project', id: po.pid, sec: 'materials' }, 'Project ' + recordCode(po.pid, 'project') + ' →')}</div></div>
@@ -10535,7 +10726,7 @@ document.addEventListener('click', (e) => {
   if(a === 'open'){ navGo(() => poOpen(Number(b.dataset.id))); return; } if(a === 'list'){ poUi.open = 0; renderPOs(); return; } if(a === 'create'){ poCreate(Number(b.dataset.pid), b.dataset.did); return; }
   if(!po) return;
   if(a === 'approve'){ const c = poCanApprove(po); if(!c.ok){ showToast(c.why); return; } po.approval = { by: whoName(), at: fmt(new Date()) }; po.status = 'Approved'; }
-  else if(a === 'sent'){ if(poNeedsApproval(po) && !poApproved(po)){ showToast('This PO requires approval before it can be sent'); return; } po.status = 'Sent'; po.sentAt = fmt(new Date()); }
+  else if(a === 'sent'){ if(poNeedsApproval(po) && !poApproved(po)){ showToast('This PO requires approval before it can be sent'); return; } po.status = 'Sent'; po.sentAt = fmt(new Date()); const pp = state.projects.find(x => x.id === po.pid); if(pp){ projEnsure(pp); const ds = pp.dropState[po.did] = pp.dropState[po.did] || {}; if(!ds.ordered) ds.ordered = po.sentAt; } }
   else if(a === 'delivered'){ po.status = 'Delivered'; po.deliveredAt = fmt(new Date()); const p = state.projects.find(x => x.id === po.pid); if(p){ p.dropState[po.did] = p.dropState[po.did] || {}; if(!p.dropState[po.did].delivered) p.dropState[po.did].delivered = fmt(new Date()); } }
   else if(a === 'del'){ const ix = state.purchaseOrders.indexOf(po); state.purchaseOrders.splice(ix, 1); undoDeleted('Purchase order deleted: ' + po.ref, ['purchaseOrders'], ix, po); poUi.open = 0; }
   else if(a === 'refresh'){ const p = state.projects.find(x => x.id === po.pid), snap = p && poSnapshot(p, po.did); if(snap) Object.assign(po, snap); }
@@ -13327,7 +13518,7 @@ const BTT_SPECS = [
   { k: 'projectsTableWrap', label: 'Project pipeline', sort: 1, cards: { code: ['code'], title: ['project'], status: ['stage'], value: ['agreed value'], next: ['budget vs actual'] } },
   { k: 'crmTableWrap', label: 'Tasks', own: 1, noCols: 1, cards: { title: ['title'], status: ['priority'], date: ['due date'], next: ['linked record'] }, pri: { 'type': 'x', 'notes': 'x', 'owner': 'n' } },
   { k: 'actionsTableWrap', label: 'Actions', sort: 1, noCols: 1, cards: { title: ['action'], status: ['status'], date: ['deadline'], next: ['notes'] }, pri: { 'date raised': 'x', '+ owner': 'x', 'notes': 'n' } },
-  { k: 'suppliersTableWrap', label: 'Suppliers', sort: 1, cards: { code: ['code'], title: ['supplier'], status: ['status'], next: ['main contact'] }, pri: { 'categories': 'n', 'phone': 'n', 'email': 'x', 'payment terms': 'x', 'delivery': 'x', 'lead time': 'x' } },
+  { k: 'suppliersTableWrap', label: 'Suppliers', sort: 1, cards: { code: ['code'], title: ['supplier'], status: ['status'], value: ['live quotes'], date: ['orders placed'], next: ['main contact'] }, pri: { 'live quotes': 'e', 'orders placed': 'e', 'categories': 'n', 'phone': 'n', 'email': 'x', 'payment terms': 'x', 'delivery': 'x', 'lead time': 'x' } },
   { k: 'transactionsTableWrap', label: 'Transactions', sort: 1, cards: { title: ['description'], date: ['date'], value: ['in (£)', 'out (£)'], status: ['category'] }, pri: { 'linked code': 'x', 'invoice / variation': 'x', 'project': 'n' } },
   { k: 'panel-invoicing:project-invoice', label: 'Invoices', sort: 1, cards: { code: ['invoice'], title: ['project'], status: ['status'], value: ['amount'], date: ['due'], next: ['raise by'] }, pri: { 'sent': 'x', 'paid': 'x' } },
   { k: 'panel-purchaseorders:po-project', label: 'Purchase orders', sort: 1, cards: { code: ['po'], title: ['supplier'], status: ['status'], value: ['value'], date: ['delivery'], next: ['project'] }, pri: { 'approval': 'n' } },
