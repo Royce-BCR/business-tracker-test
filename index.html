@@ -964,6 +964,7 @@
   .q-st { display: inline-block; font-size: var(--bt-fs-xs); font-weight: 600; padding: 2px 10px; border-radius: var(--bt-r-pill); background: var(--bt-neu-bg); color: var(--bt-neu-fg); }
   .q-st::before { content: '○\00a0'; }
   .q-st-Sent { background: var(--bt-info-bg); color: var(--bt-info-fg); } .q-st-Accepted { background: var(--bt-ok-bg); color: var(--bt-ok-fg); } .q-st-Declined { background: var(--bt-bad-bg); color: var(--bt-bad-fg); } .q-st-Expired { background: var(--bt-warn-bg); color: var(--bt-warn-fg); }
+  .q-st-Superseded { background: var(--bt-neu-bg); color: var(--slate); } .q-st-Superseded::before { content: '↻\00a0'; }
   .q-st-Sent::before { content: '●\00a0'; } .q-st-Accepted::before { content: '✓\00a0'; } .q-st-Declined::before { content: '!\00a0'; } .q-st-Expired::before { content: '▲\00a0'; }
   .qb-scroll { overflow-x: auto; }
   .qb-head .qb-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -4504,7 +4505,7 @@ function dragTarget(tr){
 }
 function dragMove(tr, from, to){
   const t = dragTarget(tr); if(!t || from === to || !t.arr[from]) return;
-  if(t.q && qLocked(t.q)){ showToast('This quote is locked. Click “Edit anyway” to change it.'); return; }
+  if(t.q && qLocked(t.q)){ showToast('This quote is locked. Make a new version to change it.'); return; }
   t.arr.splice(to, 0, t.arr.splice(from, 1)[0]);
   if(t.q) qbTouch(t.q, true); else { render(); saveState(); }
 }
@@ -5935,9 +5936,22 @@ function projSyncValues(){ (state.projects || []).forEach(p => { const aq = proj
 function projPlanEnsure(p){
   const aq = projAcceptedQuote(p); if(!aq) return null;
   if(p.plan && p.plan.quoteId === aq.id) return p.plan;
+  const oldQ = p.plan ? qFind(p.plan.quoteId) : null;
   if(p.plan){ p.planHistory = Array.isArray(p.planHistory) ? p.planHistory : []; p.planHistory.push(p.plan); }
-  p.plan = { quoteId: aq.id, at: fmt(new Date()), lines: jclone(aq.lines), labour: jclone(aq.labour), drops: jclone(aq.drops) };
+  if(oldQ && oldQ.id !== aq.id && oldQ.jobNumber === aq.jobNumber){   // a newer version of the same job was accepted: carry the Working plan, delivery states, transactions and POs across by line and drop id
+    const r = planCarry(p, oldQ, p.plan, aq); p.plan = r.plan; p.planCarry = { at: new Date().toISOString(), by: whoName(), from: oldQ.id, to: aq.id, report: r.report };
+    projAfterCarry(p);
+  } else p.plan = { quoteId: aq.id, at: fmt(new Date()), lines: jclone(aq.lines), labour: jclone(aq.labour), drops: jclone(aq.drops) };
   return p.plan;
+}
+/* after a carry: Draft purchase orders are refreshed from the new plan; one that has already gone out is flagged if it no longer matches */
+function projAfterCarry(p){
+  (state.purchaseOrders || []).filter(o => o.pid === p.id).forEach(po => {
+    const snap = poSnapshot(p, po.did);
+    if(!snap){ p.planCarry.report.push(`${po.ref} is for a delivery that is no longer on the quote`); return; }
+    if(po.status === 'Draft'){ if(JSON.stringify(po.items) !== JSON.stringify(snap.items)){ Object.assign(po, snap); p.planCarry.report.push(`${po.ref} (Draft) refreshed from the new plan`); } }
+    else if(JSON.stringify(po.items) !== JSON.stringify(snap.items) || po.deliveryDate !== snap.deliveryDate) p.planCarry.report.push(`${po.ref} (${po.status}) has already gone out and no longer matches the plan: check it with the supplier`);
+  });
 }
 function planAsQuote(aq, plan){ return Object.assign({}, aq, { lines: plan.lines, labour: plan.labour, drops: plan.drops, _work: true }); }
 function projWorkQuote(p){ const aq = projAcceptedQuote(p); if(aq && p.plan && p.plan.quoteId === aq.id) return planAsQuote(aq, p.plan); return projQuote(p); }
@@ -6033,7 +6047,7 @@ function projMsPlanned(p, key){
 /* hard evidence that something happened, dated today or earlier (a future date is never an actual) */
 function projMsEvidence(p, key){
   const today = fmt(new Date()), ok = d => !!d && d <= today, lines = p.paymentLines || [];
-  if(key === 'contractSigned'){ const q = projAcceptedQuote(p); return q && ok(q.acceptedDate) ? { date: q.acceptedDate, src: 'Quote accepted' } : null; }
+  if(key === 'contractSigned'){ const q = projAcceptedQuote(p), ad = q ? (q.firstAcceptedDate || q.acceptedDate) : ''; return q && ok(ad) ? { date: ad, src: 'Quote accepted' } : null; }
   if(key === 'materialsDelivered'){ const dl = projDeliveries(p).drops; if(!dl.length || !dl.every(x => x.delivered)) return null; const d = dl.map(x => x.delivered).sort().pop(); return ok(d) ? { date: d, src: 'Every delivery marked delivered' } : null; }
   if(key === 'invoiced'){ if(!lines.length || !lines.every(l => l.invoicedDate)) return null; const d = lines.map(l => l.invoicedDate).sort().pop(); return ok(d) ? { date: d, src: 'Every payment line invoiced' } : null; }
   if(key === 'paid'){ if(!lines.length || !lines.every(l => l.paidDate)) return null; const d = lines.map(l => l.paidDate).sort().pop(); return ok(d) ? { date: d, src: 'Every payment line paid' } : null; }
@@ -6213,7 +6227,7 @@ async function projSyncPayments(p, q, opts){
 }
 function projOnQuoteAccepted(q){   // a quote linked to a project has just been accepted
   const root = (q.linkedIds || []).map(linkedRoot).find(id => state.projects.some(p => p.id === id)); if(!root) return;
-  const p = state.projects.find(x => x.id === root); if(p) projSyncPayments(p, q);
+  const p = state.projects.find(x => x.id === root); if(p){ projEnsure(p); const pv = q.prevVersionId ? qFind(q.prevVersionId) : null; if(pv && p.planCarry && p.planCarry.to === q.id) p.planCarry.report.push(...projQuoteFieldSync(p, pv, q)); projSyncPayments(p, q); if(p.planCarry && p.planCarry.to === q.id) showToast('Project carried across to ' + qRef(q) + ': ' + p.planCarry.report.length + ' note' + (p.planCarry.report.length === 1 ? '' : 's') + ' in the Working plan', null, 9000); }
 }
 
 /* ---------- Project workspace (the open project) ---------- */
@@ -6753,7 +6767,9 @@ function pwPlanHtml(p, i){
   const pct = projVarPct(p), thr = Number(state.settings.variationThresholdPct), over = thr > 0 && pct > thr;
   const barMat = ep === 'materials' ? pwEditBar(p, 'materials', '<button type="button" class="btn secondary qb-sm" data-pw="mat-add">+ Add material</button>') : '', barLab = ep === 'labour' ? pwEditBar(p, 'labour', '<button type="button" class="btn secondary qb-sm" data-pw="lab-add">+ Add labour</button>') : '';
   const matHead = ep === 'materials' ? '<th>Line</th><th>Qty</th><th>Wastage</th><th>Cost each ex VAT</th>' : '<th>Line</th><th>Qty</th><th>Wastage</th><th>Cost each</th>';
-  return `<section class="pw-sec" id="pw-plan" data-sec="plan"><h3>Working plan</h3>
+  const pc = p.planCarry && p.planCarry.to === aq.id ? p.planCarry : null, pcq = pc ? qFind(pc.from) : null;
+  const carryHtml = pc ? `<details class="pw-chg pw-carry"><summary><b>Carried across from ${escHtml(pcq ? qRef(pcq) : 'the earlier version')} to ${escHtml(qRef(aq))}</b> <span class="pw-chg-when">${escHtml(fmtStamp(pc))} · ${pc.report.length} note${pc.report.length === 1 ? '' : 's'}</span></summary><ul>${pc.report.map(t => `<li>${escHtml(t)}</li>`).join('')}</ul></details>` : '';
+  return `<section class="pw-sec" id="pw-plan" data-sec="plan"><h3>Working plan</h3>${carryHtml}
     <div class="pw-card pw-wide"><p class="q-help" style="margin:0 0 10px;"><b>Sold</b> is the accepted quote (${escHtml(qRef(aq))}), frozen. The <b>Working plan</b> is the editable list carrying the true expected cost. <b>Actual</b> is hours logged and real transactions. This is not a requote: a big change means a new quote version. Costs are ex VAT.</p>
       ${over ? `<div class="pw-qbar pw-alert-bar">⚠ Approved variations are <b>${qpct(pct)}</b> of the contract, over your ${thr}% threshold. Consider a new quote version instead of more variations.<button type="button" class="btn secondary qb-sm" data-pw="new-version">Create a new quote version</button></div>` : ''}
       <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th></th><th>Sold</th><th>Working plan</th><th>Actual</th><th>Plan vs sold</th><th>Actual vs plan</th></tr></thead><tbody>
@@ -6868,7 +6884,7 @@ function pwPlanClick(a, b, p){
 
 function pwQuotesCardHtml(p){
   const qs = state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === p.id)).sort((a, b) => b.jobNumber - a.jobNumber || b.version - a.version);
-  return `<div class="pw-card"><h4>Quotes</h4>${qs.length ? qs.map(q => `<div class="q-chip" style="margin:0 0 6px;"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>v${q.version}</span><span class="q-st q-st-${q.status}">${q.status}</span><span>${qm(qCalc(q).totalEx)} ex VAT</span><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open</button></div>`).join('') : '<div class="pw-empty">No quotes linked.</div>'}</div>`;
+  return `<div class="pw-card"><h4>Quotes</h4>${qs.length ? qs.map(q => `<div class="q-chip" style="margin:0 0 6px;"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>v${q.version}</span><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span><span>${qm(qCalc(q).totalEx)} ex VAT</span><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open</button></div>`).join('') : '<div class="pw-empty">No quotes linked.</div>'}</div>`;
 }
 function pwLinksCardHtml(p){
   const links = p.links.map((l, li) => `<div class="pw-link"><input data-pw-link="name" data-li="${li}" value="${escAttr(l.name)}" placeholder="Name (e.g. Drawings)" aria-label="Link name"><input data-pw-link="url" data-li="${li}" value="${escAttr(l.url)}" placeholder="https://…" aria-label="Link address">${/^https?:\/\//i.test(l.url) ? `<a class="btn secondary qb-sm" href="${escAttr(l.url)}" target="_blank" rel="noopener">Open</a>` : ''}<button class="icon-btn" data-pw="del-link" data-li="${li}" aria-label="Remove link">${X_SVG}</button></div>`).join('');
@@ -7574,6 +7590,7 @@ document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ const o = 
    drops[{ id, label, supplierId, date, method, charge, chargeManual, paymentDueDate, dueManual }] }
    state.nextQuoteId / state.nextJobNumber hand out ids. Template mode reproduces the Excel exactly; new mode is the tidier set of rules. */
 const QUOTE_STATUSES = ['Draft', 'Sent', 'Accepted', 'Declined', 'Expired'];
+const QUOTE_FILTERS = QUOTE_STATUSES.concat(['Superseded']);   // Superseded is set by making a new version, never picked by hand
 const PACK_UNITS = ['pack', 'bag', 'box'];
 const LAB_BASES = [['hour', 'Hour'], ['halfday', 'Half-day'], ['day', 'Day'], ['fixed', 'Fixed £']];
 const QUOTE_SAMPLE_SUPPLIERS = ['Decking Delivery', 'Kellaway Building Supplies', 'Travis Perkins', 'Selco', 'Screwfix'];
@@ -7629,7 +7646,7 @@ function ensureQuoteDocModel(o, seed){
       q.version = Math.max(0, Math.floor(Number(q.version)) || 0);
       q.refOverride = str(q.refOverride); q.customer = str(q.customer); q.address = str(q.address); q.project = str(q.project);
       q.date = iso(q.date) || fmt(new Date());
-      q.status = QUOTE_STATUSES.includes(q.status) ? q.status : 'Draft';
+      q.status = QUOTE_FILTERS.includes(q.status) ? q.status : 'Draft'; q.supersededBy = Number(q.supersededBy) || 0; q.prevVersionId = Number(q.prevVersionId) || 0; q.firstAcceptedDate = iso(q.firstAcceptedDate);
       q.vatMode = 'settings'; q.mode = q.mode === 'template' ? 'template' : 'new'; q.notes = str(q.notes);
       q.linkedIds = migrateLinkedIds(q); delete q.linkedId;
       q.timeline = (Array.isArray(q.timeline) ? q.timeline : []).filter(t => t && typeof t === 'object').map(t => ({ date: iso(t.date) || fmt(new Date()), note: str(t.note), created: Number(t.created) || 0, kind: str(t.kind) }));
@@ -7817,7 +7834,7 @@ function renderQuotes(){
   document.getElementById('quoteListTab').hidden = qUi.tab !== 'quotes'; document.getElementById('quoteAgeingView').hidden = qUi.tab !== 'ageing';
   if(qUi.tab === 'ageing') renderQuoteAgeing();
   const sf = document.getElementById('quoteFilters');
-  sf.innerHTML = `<div class="view-toggle" role="group" aria-label="Status">${[['all', 'All']].concat(QUOTE_STATUSES.map(s => [s, s])).map(([v, n]) => `<button type="button" data-qba="filter" data-v="${v}" class="${qUi.status === v ? 'active' : ''}">${n}</button>`).join('')}</div>`;
+  sf.innerHTML = `<div class="view-toggle" role="group" aria-label="Status">${[['all', 'All']].concat(QUOTE_FILTERS.map(s => [s, s])).map(([v, n]) => `<button type="button" data-qba="filter" data-v="${v}" class="${qUi.status === v ? 'active' : ''}">${n}</button>`).join('')}</div>`;
   const s = qUi.q.trim().toLowerCase();
   const list = state.quotes.filter(q => (qUi.status === 'all' || q.status === qUi.status) && (!s || [qRef(q), q.customer, q.project, q.status, qLinkedText(q)].join(' ').toLowerCase().includes(s)))
     .sort((a, b) => b.date.localeCompare(a.date) || b.jobNumber - a.jobNumber || b.version - a.version);
@@ -7827,7 +7844,7 @@ function renderQuotes(){
   list.forEach(q => {
     const c = qCalc(q);
     html += `<tr class="sup-row" data-qba="open" data-id="${q.id}" tabindex="0"><td class="code-cell">${escHtml(qRef(q))}</td><td class="q-strong">${escHtml(q.customer || '—')}</td><td>${escHtml(q.project || '—')}</td>
-      <td>${q.version}</td><td><span class="q-st q-st-${q.status}">${q.status}</span>${apListChips(q)}</td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
+      <td>${q.version}</td><td><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span>${apListChips(q)}</td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
       <td>${escHtml(dShow(q.date))}</td><td>${escHtml(qLinkedText(q) || '—')}</td></tr>`;
   });
   wrap.innerHTML = html + '</tbody></table>';
@@ -7862,10 +7879,10 @@ function qbHeaderHtml(q){
       <button type="button" class="btn secondary" data-qba="back">← All quotes</button>
       <div class="qb-ref">${pill}<span class="qb-mode ${q.mode}" title="${q.mode === 'template' ? 'Reproduces the Excel exactly' : 'The new, tidier rules'}">${q.mode === 'template' ? 'Template rules (matches the Excel)' : 'New rules'}</span></div>
       <div class="qb-acts">${q.mode === 'template' ? '<button type="button" class="btn secondary" data-qba="use-new">Use new rules</button>' : ''}
-        <button type="button" class="btn secondary" data-qba="new-version" title="Copy this quote as the next version (a Draft)">New version</button>
+        ${qLocked(q) ? '' : `<button type="button" class="btn secondary" data-qba="new-version" title="Copy this quote as the next version (a Draft)">New version</button>`}
         <button type="button" class="btn secondary" data-qba="del-quote" style="color:var(--bt-bad-fg);border-color:var(--bt-bad-bd);">Delete quote</button></div></div>
     <div class="qb-grid qb-compact">
-      ${f('Status', qbSel('hdr', '', 'status', qbOpts(QUOTE_STATUSES.map(s => [s, s]), q.status)))}
+      ${f('Status', qbSel('hdr', '', 'status', qbOpts(qStatusOptions(q).map(s => [s, s]), q.status)))}
       ${f('Quote date', `<input type="date" data-qb="hdr" data-f="date" value="${escAttr(q.date)}">`)}
       ${f('Job', `<div class="q-fixed" title="Job numbers are handed out automatically and cannot be edited">${escHtml(state.settings.quotePrefix + String(q.jobNumber).padStart(3, '0'))} · version ${q.version}</div>${clash ? '<p class="q-help"><b style="color:var(--bt-bad-fg)">Another quote has the same job number and version.</b></p>' : ''}`)}
       ${f('Reference override (optional)', qbIn('hdr', '', 'refOverride', q.refOverride, { ph: 'Shown instead of ' + state.settings.quotePrefix + String(q.jobNumber).padStart(3, '0') + q.version }))}
@@ -8099,25 +8116,40 @@ function qCreate(){
     linkedIds: [], recoverUnpaid: false, unpaidOverride: '', acceptedDate: '', asSold: null, payments: [qNewPayment()], supplierCols: [], lines: [], labour: [], drops: [], timeline: [{ date: fmt(new Date()), note: 'Quote created', created: Date.now(), kind: 'created' }] };
   state.quotes.push(q); saveState(); qUi.openId = q.id; renderQuotes();
 }
-function qNewVersion(q){
-  const c = JSON.parse(JSON.stringify(q)), map = {}, today = fmt(new Date());
-  c.id = state.nextQuoteId++; c.version = q.version + 1; c.status = 'Draft'; c.refOverride = ''; c.date = today; c.asSold = null; c.acceptedDate = ''; c.sentSnapshot = null;   // a new version is not sold yet
-  c.drops.forEach(d => { const n = qRand('dr_'); map[d.id] = n; d.id = n; });
-  c.lines.forEach(l => { l.id = qRand('ln_'); if(l.deliveryDropId) l.deliveryDropId = map[l.deliveryDropId] || ''; });
-  c.labour.forEach(r => { r.id = qRand('lb_'); });
+function qNewVersion(q, quiet){
+  const c = JSON.parse(JSON.stringify(q)), today = fmt(new Date());
+  c.id = state.nextQuoteId++; c.version = q.version + 1; c.status = 'Draft'; c.refOverride = ''; c.date = today; c.asSold = null; c.acceptedDate = ''; c.sentSnapshot = null; c.supersededBy = 0;   // a new version is not sold yet
+  c.firstAcceptedDate = q.firstAcceptedDate || q.acceptedDate || ''; c.prevVersionId = q.id; delete c.customerSnap;
+  // line, labour and drop ids are kept on purpose: the Working plan, delivery states, transactions and POs match the next version by them
   c.timeline = [{ date: today, note: `Created as version ${c.version} from ${qRef(q)}`, created: Date.now(), kind: 'version' }];
   q.timeline.push({ date: today, note: `Superseded by version ${c.version} (${qRef(c)})`, created: Date.now(), kind: 'superseded' });
+  if(q.status === 'Sent' || q.status === 'Expired') qSetStatus(q, 'Superseded');   // an Accepted original stays Accepted (the project runs on it) until this version is accepted
+  q.supersededBy = c.id;
   state.quotes.push(c); saveState(); qUi.openId = c.id; renderQuotes();
-  showToast(c.version >= 10 ? 'New version created. From version 10 the displayed reference becomes ambiguous.' : `New version created (${qRef(c)}), as a Draft`);
+  if(!quiet) showToast(c.version >= 10 ? 'New version created. From version 10 the displayed reference becomes ambiguous.' : `New version created (${qRef(c)}), as an editable Draft. ${qRef(q)} is kept as it was.`);
+  return c;
+}
+/* an expired quote: "Update quote" = new version dated today, asking whether stale supplier prices should be refreshed; "New quote" = a fresh quote for the same customer and project */
+async function qUpdateQuote(q){
+  const c = qNewVersion(q, true), n = qStaleCount(c);
+  const ok = await showConfirmLabel('Refresh before you send it again', `${qRef(c)} is a new Draft dated today, so it is valid again from today.${n ? ` ${n} supplier price${n === 1 ? ' is' : 's are'} older than the supplier's price validity. Check ${n === 1 ? 'it' : 'them'} on Price ageing before you send it.` : ' None of its supplier prices is older than the supplier\'s price validity.'}`, n ? 'Open Price ageing' : 'OK');
+  if(ok && n){ qUi.tab = 'ageing'; qUi.openId = 0; renderQuotes(); }
+}
+function qNewQuoteFrom(q){
+  const before = state.quotes.length; qCreate(); const nq = state.quotes[state.quotes.length - 1]; if(state.quotes.length === before) return;
+  nq.customer = q.customer; nq.address = q.address; nq.project = q.project; nq.linkedIds = (q.linkedIds || []).slice(); nq.timeline.push({ date: fmt(new Date()), note: `Started as a new quote for the same customer after ${qRef(q)} expired`, created: Date.now(), kind: 'created' });
+  saveState(); qbRender(); showToast('New quote started for ' + (q.customer || 'the same customer'));
 }
 function qbChange(el){
   const q = qFind(qUi.openId); if(!q) return;
   const k = el.dataset.qb, f = el.dataset.f, id = el.dataset.id, v = el.type === 'checkbox' ? el.checked : el.value;
   let rebuild = false;
+  if(qLocked(q) && !(k === 'hdr' && ['status', 'viewMode', 'openVersion'].includes(f))){ showToast('This quote is locked. Make a new version to change it.'); qbRender(); return; }   // no edit path round the lock
   if(k === 'hdr'){
     if(f === 'openVersion'){ const t = qFind(Number(v)); if(t){ qUi.openId = t.id; renderQuotes(); window.scrollTo(0, 0); } return; }
     if(f === 'status'){
-      const to = QUOTE_STATUSES.includes(v) ? v : q.status;
+      const to = qStatusOptions(q).includes(v) ? v : q.status;
+      if(to === 'Accepted' && q.status !== 'Accepted'){ const prev = qPrevAccepted(q); if(prev){ qReviewAccept(q, prev).then(ok => { qbTouch(q, true); }); return; } }
       if(to === 'Sent' && q.status !== 'Sent'){ const sb = apSendBlock(q); if(sb.blocked){ showToast(sb.reason); qbRender(); return; } }
       if(to === 'Sent' && q.status !== 'Sent'){
         const pa = qPayAlloc(q, qCalc(q));
@@ -8241,8 +8273,9 @@ function qbAction(a, b){
   if(a === 'doc-pdf'){ qDocPdf(q); return; }
   if(a === 'doc-word'){ qDocWord(q); return; }
   if(a === 'doc-xlsx'){ qXlsxDialog(q); return; }
-  if(a === 'unlock'){ qUi.unlock.add(q.id); qbRender(); return; }
-  if(a === 'relock'){ qUi.unlock.delete(q.id); qbRender(); return; }
+  if(a === 'open-version'){ const t = qFind(Number(b.dataset.id)); if(t){ qUi.openId = t.id; renderQuotes(); window.scrollTo(0, 0); } return; }
+  if(a === 'q-update'){ qUpdateQuote(q); return; }
+  if(a === 'q-new'){ qNewQuoteFrom(q); return; }
   if(a === 'unpaid-reset'){ q.unpaidOverride = ''; qbTouch(q, true); return; }
   if(a === 'add-allowance'){ q.labour.push({ id: qRand('lb_'), description: 'Allowance (site visit and quoting)', basis: 'fixed', qty: 1, rate: '', customerGroup: '', showOnQuote: true }); qbTouch(q, true); const el = document.querySelector(`#quoteBuilderView [data-qb="lab"][data-id="${q.labour[q.labour.length - 1].id}"][data-f="rate"]`); if(el) el.focus(); return; }
   if(a === 'add-pay'){ q.payments.push(qNewPayment({ label: 'Payment ' + (q.payments.length + 1), mode: 'amount', value: 0 })); qbTouch(q, true); return; }
@@ -8472,7 +8505,7 @@ function stqRender(){
     document.getElementById('stqTitle').textContent = 'Stage lines changed since this quote';
     box.innerHTML = `<p class="q-help" style="margin:0 0 10px;">${e(qRef(q))} was built from the stage lines of ${e(qDeal(q) ? boardTitle(qDeal(q).pl, qDeal(q).rec) : 'its deal')} on ${e(q.stageLink.date || 'an earlier date')}. The quote has not been changed.</p>
       <ul class="stq-diff">${diff.length ? diff.map(d => `<li class="${d.kind}">${e(d.text)}</li>`).join('') : '<li>No differences any more.</li>'}</ul>
-      <p class="q-help">${qLocked(q) ? '<b>This quote is Accepted and locked.</b> Make a New version to bring it up to date.' : 'Refreshing updates the labour hours of the stage rows, the delivery dates of materials tied to a stage (and their drops) and the unpaid-time recovery. Prices and anything you typed over stay as they are. New stage lines are not added automatically: use Create quote from stages to add them.'}</p>
+      <p class="q-help">${qLocked(q) ? '<b>This quote is ' + escHtml(qStatusShown(q)) + ' and locked.</b> Make a new version to bring it up to date.' : 'Refreshing updates the labour hours of the stage rows, the delivery dates of materials tied to a stage (and their drops) and the unpaid-time recovery. Prices and anything you typed over stay as they are. New stage lines are not added automatically: use Create quote from stages to add them.'}</p>
       <div class="modal-actions"><button class="btn secondary" type="button" data-action="stq-close">Cancel</button><button class="btn secondary" type="button" data-action="stq-keep">Keep the quote as it is</button><button class="btn" type="button" data-action="stq-apply"${qLocked(q) ? ' disabled' : ''}>Refresh the quote from the stage lines</button></div>`;
     return;
   }
@@ -8661,14 +8694,103 @@ function qSeedLink(o){
 }
 
 /* ---- builder additions ---- */
-function qLocked(q){ return q.status === 'Accepted' && !qUi.unlock.has(q.id); }
+/* ---------- Locked quotes, versions, expiry ----------
+   A Sent, Accepted, Superseded or Expired quote is read-only: it is what the customer was given. The one way to change it is "Make a new version to change this": the copy keeps
+   every line, labour row and drop id (so the project's Working plan, delivery states, transactions and POs still match), the original is kept untouched, and a Sent original is
+   marked Superseded. An Accepted original stays Accepted (the project runs on it) until the new version is Accepted, which carries the project across (planCarry). */
+const Q_LOCKED = ['Sent', 'Accepted', 'Superseded', 'Expired'];
+function qLocked(q){ return Q_LOCKED.includes(q.status); }
+function qValidUntilSet(q){ if(q.sentSnapshot && q.sentSnapshot.validUntil) return q.sentSnapshot.validUntil; const n = Number(state.settings.quoteValidityDays) || 0; return n > 0 ? addDaysIso(q.date, n) : ''; }
+function qIsExpired(q){ if(q.status === 'Expired') return true; const vu = q.status === 'Sent' ? qValidUntilSet(q) : ''; return !!vu && vu < fmt(new Date()); }
+function qStatusShown(q){ return qIsExpired(q) ? 'Expired' : q.status; }
+function qStatusOptions(q){
+  if(q.status === 'Sent') return ['Sent', 'Accepted', 'Declined', 'Expired'];
+  if(q.status === 'Accepted') return ['Accepted', 'Sent', 'Declined'];
+  if(q.status === 'Expired') return ['Expired', 'Declined'];
+  if(q.status === 'Superseded') return ['Superseded'];
+  return QUOTE_STATUSES;
+}
+function qStaleCount(q){ let n = 0; q.lines.forEach(l => (l.prices || []).forEach(p => { if(qPriceStale(p)) n++; })); return n; }
 function qbBannerHtml(q){
-  if(q.status !== 'Accepted') return '';
-  return qLocked(q)
-    ? `<div class="qb-banner"><b>This quote is Accepted.</b> The as-sold figures below are locked. To change the price, make a New version instead.
-        <span class="qb-banner-btns"><button class="btn" data-qba="new-version">New version</button><button class="btn secondary" data-qba="unlock">Edit anyway</button></span></div>`
-    : `<div class="qb-banner warn"><b>Warning: you are editing an Accepted quote.</b> The as-sold snapshot does not change, so the quote and what was sold will drift apart. A New version is safer.
-        <span class="qb-banner-btns"><button class="btn" data-qba="new-version">New version</button><button class="btn secondary" data-qba="relock">Lock again</button></span></div>`;
+  const nv = q.supersededBy ? qFind(q.supersededBy) : null, vu = qValidUntilSet(q);
+  const newVer = `<button class="btn" data-qba="new-version">Make a new version to change this</button>`;
+  if(q.status === 'Superseded') return `<div class="qb-banner"><b>Superseded.</b> This version is kept exactly as it was and cannot be changed.${nv ? ` It was replaced by <button type="button" class="sp-link" data-qba="open-version" data-id="${nv.id}">${escHtml(qRef(nv))}</button> (${escHtml(qStatusShown(nv))}).` : ''}</div>`;
+  if(qIsExpired(q)) return `<div class="qb-banner warn"><b>Expired${vu ? ' on ' + escHtml(qDocDate(vu)) : ''}.</b> The validity has passed, so its prices and date may be out of date. <span class="qb-banner-btns"><button class="btn" data-qba="q-update" title="A new version dated today; you are asked to refresh any stale supplier prices">Update quote</button><button class="btn secondary" data-qba="q-new" title="A new quote for the same customer and project, with no lines">New quote</button></span></div>`;
+  if(q.status === 'Sent') return `<div class="qb-banner"><b>This quote is Sent and locked.</b> It is what the customer has${vu ? ' (valid until ' + escHtml(qDocDate(vu)) + ')' : ''}, so it cannot be edited. <span class="qb-banner-btns">${newVer}</span></div>`;
+  if(q.status === 'Accepted') return `<div class="qb-banner"><b>This quote is Accepted and locked.</b> The as-sold figures cannot be changed.${nv && nv.status !== 'Accepted' ? ` A new version is being prepared: <button type="button" class="sp-link" data-qba="open-version" data-id="${nv.id}">${escHtml(qRef(nv))}</button> (${escHtml(nv.status)}). The project keeps running on this quote until that one is Accepted.` : ''} <span class="qb-banner-btns">${nv && nv.status === 'Draft' ? '' : newVer}</span></div>`;
+  return '';
+}
+/* what differs between two versions, in plain words (used before a new version is accepted) */
+function qVersionChanges(a, b){
+  const out = [], ca = qCalc(a), cb = qCalc(b);
+  if(r2(ca.totalEx) !== r2(cb.totalEx)) out.push(`Price ex VAT: ${qm(ca.totalEx)} → ${qm(cb.totalEx)}`);
+  [['customer', 'Customer'], ['address', 'Address'], ['project', 'Project name']].forEach(([f, n]) => { if(String(a[f] || '') !== String(b[f] || '')) out.push(`${n}: “${a[f] || '—'}” → “${b[f] || '—'}”`); });
+  out.push(...planDiff(a, b));
+  const ra = qPayAlloc(a, ca).rows, rb = qPayAlloc(b, cb).rows;
+  rb.forEach(r => { const o = ra.find(x => x.row.id === r.row.id); if(!o) out.push(`Payment added: ${r.row.label || 'Payment'} ${qm(r.amount)}${r.date ? ' due ' + pwD(r.date) : ''}`); else { const ch = []; if(r2(o.amount) !== r2(r.amount)) ch.push(`${qm(o.amount)} → ${qm(r.amount)}`); if((o.date || '') !== (r.date || '')) ch.push(`due ${pwD(o.date)} → ${pwD(r.date)}`); if(ch.length) out.push(`Payment ${r.row.label || ''}: ${ch.join(', ')}`); } });
+  ra.forEach(o => { if(!rb.some(x => x.row.id === o.row.id)) out.push(`Payment removed: ${o.row.label || 'Payment'} ${qm(o.amount)}`); });
+  return out;
+}
+/* the previous Accepted version of the same job on the same project, if any */
+function qPrevAccepted(q){
+  const roots = (q.linkedIds || []).map(linkedRoot);
+  return state.quotes.filter(x => x.id !== q.id && x.status === 'Accepted' && x.jobNumber === q.jobNumber && (x.linkedIds || []).some(c => roots.includes(linkedRoot(c)))).sort((a, b) => b.version - a.version)[0] || null;
+}
+/* three-way carry of the Working plan: base = the old quote as sold, ours = the old plan, theirs = the new quote. Your plan edits survive where the quote did not change the same
+   field; rows are matched by id (a new version keeps ids). Returns the new plan and a plain-English report; nothing is mutated. */
+function planCarry(p, oldQ, oldPlan, newQ){
+  const report = [], same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const rows = (baseRows, planRows, newRows, nameOf, label) => {
+    const out = [], seen = new Set();
+    newRows.forEach(n => {
+      seen.add(n.id); const b = baseRows.find(x => x.id === n.id), pl = planRows.find(x => x.id === n.id);
+      if(!b && !pl){ out.push(jclone(n)); report.push(`Added in the new version: ${label} “${nameOf(n)}”`); return; }
+      if(!pl){ if(b && !same(b, n)){ out.push(jclone(n)); report.push(`${label} “${nameOf(n)}” was out of the plan but changed in the new version, so it is back in`); } return; }
+      if(!b){ out.push(jclone(n)); return; }
+      const m = jclone(n), keep = [], replaced = [];
+      new Set(Object.keys(b).concat(Object.keys(pl), Object.keys(n))).forEach(k => {
+        if(k === 'id') return; const pc = !same(pl[k], b[k]), qc = !same(n[k], b[k]);
+        if(pc && !qc){ m[k] = jclone(pl[k]); keep.push(k); } else if(pc && qc && !same(pl[k], n[k])) replaced.push(k);
+      });
+      out.push(m);
+      if(keep.length) report.push(`${label} “${nameOf(n)}”: your plan changes kept (${keep.join(', ')})`);
+      if(replaced.length) report.push(`${label} “${nameOf(n)}”: the new quote also changed ${replaced.join(', ')}, so the quote's value is used and your plan edit there is replaced`);
+      if(!same(b, n)) { const ch = Object.keys(n).filter(k => k !== 'id' && !same(b[k], n[k]) && !keep.includes(k) && !replaced.includes(k)); if(ch.length) report.push(`${label} “${nameOf(n)}”: updated from the new quote (${ch.join(', ')})`); }
+    });
+    planRows.forEach(pl => { if(seen.has(pl.id)) return; const b = baseRows.find(x => x.id === pl.id); if(b) report.push(`Removed in the new version: ${label} “${nameOf(pl)}”`); else { out.push(jclone(pl)); report.push(`${label} “${nameOf(pl)}” was added to the plan only, so it is kept`); } });
+    return out;
+  };
+  const dn = d => d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop');
+  const lines = rows(oldQ.lines, oldPlan.lines, newQ.lines, l => l.description || 'Item', 'material');
+  const labour = rows(oldQ.labour, oldPlan.labour, newQ.labour, r => r.description || 'Labour', 'labour');
+  const drops = rows(oldQ.drops, oldPlan.drops, newQ.drops, dn, 'delivery');
+  const ids = new Set(drops.map(d => d.id)), st = p.dropState || {};
+  Object.keys(st).forEach(id => { if(!ids.has(id) && (st[id].delivered || st[id].paid)) report.push(`A delivery that was ${st[id].paid ? 'paid' : 'delivered'} is no longer on the quote; its record is kept`); });
+  const done = drops.filter(d => st[d.id] && (st[d.id].delivered || st[d.id].paid)).length; if(done) report.push(`${done} delivery state${done === 1 ? '' : 's'} (delivered / paid) carried across`);
+  const tx = (state.transactions || []).filter(t => t.projectId === p.id).length; if(tx) report.push(`${tx} transaction${tx === 1 ? '' : 's'} stay attached to the project`);
+  const pos = (state.purchaseOrders || []).filter(o => o.pid === p.id); if(pos.length) report.push(`${pos.length} purchase order${pos.length === 1 ? '' : 's'} stay attached to their deliveries`);
+  return { plan: { quoteId: newQ.id, at: fmt(new Date()), lines, labour, drops }, report };
+}
+/* customer, address and project name on the project follow the quote when a new version changes them, unless someone typed a different value on the project itself */
+function projQuoteFieldSync(p, prev, q, dry){
+  const notes = [];
+  [['contact', 'customer', 'Customer'], ['address', 'address', 'Site address'], ['projectName', 'project', 'Project name']].forEach(([pf, qf, name]) => {
+    const was = String(prev[qf] || ''), now = String(q[qf] || ''); if(was === now || !now) return;
+    if(!p[pf] || p[pf] === was){ notes.push(`${name} on the project changes: “${p[pf] || was || '—'}” → “${now}”`); if(!dry) p[pf] = now; }
+    else notes.push(`${name} on the project (“${p[pf]}”) was typed separately, so it is left as it is (the quote now says “${now}”)`);
+  });
+  return notes;
+}
+async function qReviewAccept(q, prev){
+  const roots = (q.linkedIds || []).map(linkedRoot), p = state.projects.find(x => roots.includes(x.id)), changes = qVersionChanges(prev, q);
+  const carry = (p && p.plan && p.plan.quoteId === prev.id ? planCarry(p, prev, p.plan, q).report : []).concat(p ? projQuoteFieldSync(p, prev, q, true) : []);
+  const li = arr => arr.length ? `<ul class="chg-list">${arr.map(t => `<li>${escHtml(t)}</li>`).join('')}</ul>` : '<p class="q-help">Nothing differs.</p>';
+  const ok = await showConfirm(`Accept ${qRef(q)} in place of ${qRef(prev)}?`, `${qRef(prev)} becomes Superseded (kept exactly as it was).${p ? ' ' + p.name + ' carries across: its Working plan, delivery states, transactions and POs are matched by line and drop.' : ''}`,
+    `<div class="qb-sm"><b>What changed in this version</b>${li(changes)}${p ? `<b>What happens to the project</b>${li(carry)}` : ''}</div>`);
+  if(!ok) return false;
+  qSetStatus(prev, 'Superseded'); prev.supersededBy = q.id; prev.timeline.push({ date: fmt(new Date()), note: `Superseded by ${qRef(q)}`, created: Date.now() + 1, kind: 'superseded' });
+  q.firstAcceptedDate = prev.firstAcceptedDate || prev.acceptedDate || ''; q.prevVersionId = prev.id;
+  qApplyStatus(q, 'Accepted'); return true;
 }
 function qbDealHtml(q){
   const d = qDeal(q); if(!d) return '';
@@ -8833,7 +8955,7 @@ document.addEventListener('change', (e) => { const el = e.target; if(el.dataset 
 function quoteChipHtml(root){
   const q = qLatestForRoot(root); if(!q) return '';
   const c = qCalc(q), vatOn = qVatOn();
-  return `<div class="q-chip"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>version ${q.version}</span><span class="q-st q-st-${q.status}">${q.status}</span>
+  return `<div class="q-chip"><span class="q-chip-ref">${escHtml(qRef(q))}</span><span>version ${q.version}</span><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span>
     <span>${qm(c.totalEx)} ex VAT${vatOn ? ' · ' + qm(c.totalInc) + ' inc VAT' : ''}</span><button type="button" class="btn secondary qb-sm" data-qba="open-quote" data-id="${q.id}">Open quote</button></div>`;
 }
 
@@ -8890,6 +9012,7 @@ function renderQuoteAgeing(){
 }
 function qAgeCheck(b){
   const q = qFind(Number(b.dataset.qid)), l = q && q.lines.find(x => x.id === b.dataset.lid), p = l && l.prices.find(x => String(x.supplierId) === b.dataset.sid); if(!p) return;
+  if(qLocked(q)){ showToast('That quote is locked. Make a new version to refresh its prices.'); return; }
   p.date = fmt(new Date());
   q.timeline.push({ date: p.date, note: `Price checked: ${l.description || 'line'} from ${qbSupName(p.supplierId)} at ${qm(p.price)}`, created: Date.now(), kind: 'price' });
   saveState(); renderQuotes();
@@ -9514,7 +9637,7 @@ function apRefresh(q){
   }
 }
 function qValidUntil(q){ return q.sentSnapshot && q.sentSnapshot.validUntil ? q.sentSnapshot.validUntil : addDaysIso(q.date, Number(state.settings.quoteValidityDays) || 0); }
-function qPastValid(q){ return q.status === 'Sent' && qValidUntil(q) && fmt(new Date()) > qValidUntil(q); }
+function qPastValid(q){ return q.status === 'Sent' && qIsExpired(q); }
 
 /* ---- submit dialog ---- */
 function apOpenSubmit(q){
@@ -12423,7 +12546,7 @@ function pjPickQuote(qs){
   const by = (a, b) => b.version - a.version || b.id - a.id;
   const acc = qs.filter(q => q.status === 'Accepted').sort(by)[0]; if(acc) return { q: acc, kind: 'Accepted' };
   const sent = qs.filter(q => q.status === 'Sent').sort(by)[0]; if(sent) return { q: sent, kind: 'Sent' };
-  const any = qs.filter(q => q.status !== 'Declined' && q.status !== 'Expired').sort(by)[0] || qs.slice().sort(by)[0];
+  const any = qs.filter(q => q.status !== 'Declined' && q.status !== 'Expired' && q.status !== 'Superseded').sort(by)[0] || qs.slice().sort(by)[0];
   return any ? { q: any, kind: any.status } : null;
 }
 /* the earliest open task or action is "next"; undated ones come after dated ones */
@@ -12633,7 +12756,7 @@ function pjHeadlineHtml(r){
     S.push(pjStat('Next task', r.next ? escHtml(r.next.text) : 'None', r.next ? (r.next.date ? escHtml(dShow(r.next.date)) : 'No date') : '', !r.next ? 'warn' : ''));
   } else if(r.pl === 'sales'){
     const q = r.qpick && r.qpick.q;
-    S.push(pjStat('Quote', q ? escHtml(qRef(q)) + ` <span class="q-st q-st-${q.status}">${q.status}</span>` : 'No quote yet'));
+    S.push(pjStat('Quote', q ? escHtml(qRef(q)) + ` <span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span>` : 'No quote yet'));
     if(r.value !== null) S.push(pjStat('Quote value', pjMoney(r.value), escHtml(r.valueLabel)));
     if(q){
       const fu = r.ctx.tasks.filter(t => t.status === 'open' && t.quoteId === q.id && t.dueDate).sort((a, b) => a.dueDate.localeCompare(b.dueDate))[0];
@@ -12688,7 +12811,7 @@ function pjAssocHtml(r){
   out.push(pjSection('Actions', openA.length ? openA.slice(0, 6).map(a => `<div class="pj-assoc"><button type="button" class="sp-link" data-pj="action" data-i="${state.actions.indexOf(a)}">${escHtml(a.action || 'Action')}</button><span class="qb-dim${a.deadline && a.deadline < today ? ' pj-over' : ''}">${a.deadline ? escHtml(dShow(a.deadline)) : 'No deadline'}${a.owner && a.owner !== 'TBC' ? ' · ' + escHtml(a.owner) : ''}</span></div>`).join('') : '<div class="lp-empty">No open actions.</div>', openA.length));
   // money
   const qs = ctx.quotes.slice().sort((a, b) => b.version - a.version || b.id - a.id);
-  out.push(pjSection('Quotes', qs.length ? qs.map(q => { let t = ''; try{ t = qm(qCalc(q).totalEx) + ' ex VAT'; }catch(e){} return pjLink('quote:' + q.id, qRef(q), `<span class="q-st q-st-${q.status}">${q.status}</span> ${escHtml(t)}`); }).join('') : '<div class="lp-empty">None.</div>', qs.length));
+  out.push(pjSection('Quotes', qs.length ? qs.map(q => { let t = ''; try{ t = qm(qCalc(q).totalEx) + ' ex VAT'; }catch(e){} return pjLink('quote:' + q.id, qRef(q), `<span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span> ${escHtml(t)}`); }).join('') : '<div class="lp-empty">None.</div>', qs.length));
   out.push(pjSection('Invoices', ctx.inv.length ? ctx.inv.map(x => pjLink('invoicing:' + x.pid + ':' + (x.vid ? 'v' + x.vid : x.idx), x.desc, invPill(x.status) + ' ' + escHtml(qm(x.amount)) + (x.dueDate ? ' · due ' + escHtml(dShow(x.dueDate)) : ''))).join('') : '<div class="lp-empty">None.</div>', ctx.inv.length));
   const pos = ctx.pos.slice().sort((a, b) => a.no - b.no);
   out.push(pjSection('Purchase orders', pos.length ? pos.map(po => pjLink('po:' + po.id, po.ref, escHtml(po.supplierName || '') + ' ' + poPill(po))).join('') : '<div class="lp-empty">None.</div>', pos.length));
@@ -14790,7 +14913,7 @@ function cxDealsHtml(sc, ownerKind, ownerId){
     <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Code</th><th>Deal</th><th>Pipeline · stage</th><th>Status</th><th>Value</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="6"><div class="sup-empty">No deals linked yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function cxQuotesHtml(sc){
-  const rows = sc.quotes.map(q => { const c = qCalc(q); return `<tr><td><button type="button" class="sp-link" data-nav="quote:${q.id}">${escHtml(qRef(q))}</button></td><td>${escHtml(q.project || '')}</td><td>v${q.version}</td><td><span class="q-st q-st-${q.status}">${q.status}</span></td><td class="qb-calc">${qm(c.totalEx)}${qVatOn() ? `<div class="qb-dim">${qm(c.totalInc)} inc VAT</div>` : ''}</td><td>${escHtml(dShow(q.date))}</td></tr>`; }).join('');
+  const rows = sc.quotes.map(q => { const c = qCalc(q); return `<tr><td><button type="button" class="sp-link" data-nav="quote:${q.id}">${escHtml(qRef(q))}</button></td><td>${escHtml(q.project || '')}</td><td>v${q.version}</td><td><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span></td><td class="qb-calc">${qm(c.totalEx)}${qVatOn() ? `<div class="qb-dim">${qm(c.totalInc)} inc VAT</div>` : ''}</td><td>${escHtml(dShow(q.date))}</td></tr>`; }).join('');
   return `<div class="card"><div class="qb-sec-h"><h4>Quotes <span class="qb-dim">(every version)</span></h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Quote</th><th>Project</th><th>Version</th><th>Status</th><th>Total ex VAT</th><th>Date</th></tr></thead><tbody>${rows || '<tr><td colspan="6"><div class="sup-empty">No quotes yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function cxInvoicesHtml(sc){
