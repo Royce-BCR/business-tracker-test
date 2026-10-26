@@ -6988,13 +6988,24 @@ function pwPlanHtml(p, i){
       <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Drop</th><th>Sold</th><th>Plan</th><th>Variance</th><th>Creep</th></tr></thead><tbody>${delRows || '<tr><td colspan="5"><div class="sup-empty">No deliveries.</div></td></tr>'}</tbody></table></div></div></section>`;
 }
 function pwRetainedHtml(p){
-  const r = projRetained(p), rate = profitShare(), row = (l, a, b) => `<tr><td>${l}</td><td class="qb-calc">${a}</td><td class="qb-calc">${b}</td></tr>`;
-  return `<div class="pw-card pw-wide"><h4>Retained profit <span class="qb-dim">(project profit minus profit share at ${rate ? qm(rate) + ' per labour hour' : 'no hourly share set (Settings > Finance)'})</span></h4>
+  const r = projRetained(p), ps = r.ps, row = (l, a, b) => `<tr><td>${l}</td><td class="qb-calc">${a}</td><td class="qb-calc">${b}</td></tr>`;
+  const calc = x => ps.method === 'pct' ? (r.hasQuote ? `${qm(x.labour)} labour cost × ${ps.value}% = ${qm(x.share)}` : 'needs an accepted quote for the labour cost') : `${x.hours.toFixed(1)} h × ${qm(ps.value)} = ${qm(x.share)}`;
+  const ov = p.profitShare && (p.profitShare.method === 'hour' || p.profitShare.method === 'pct') ? p.profitShare : null;
+  return `<div class="pw-card pw-wide"><h4>Retained profit <span class="qb-dim">(project profit minus profit share: ${escHtml(psMethodName(ps.method))}${ps.value ? ' at ' + (ps.method === 'pct' ? ps.value + '%' : qm(ps.value) + ' per hour') : ', value not set'}${ps.override ? ', set for this project' : ', the default'})</span></h4>
     <table class="qb-table qb-narrow"><thead><tr><th></th><th>${r.hasQuote ? 'As sold' : 'Typed budget'}</th><th>${r.hasQuote ? 'Working plan' : 'Current'}</th></tr></thead><tbody>
-      ${row('Project profit', qm(r.sold.profit), qm(r.plan.profit))}${row('Labour hours', r.sold.hours.toFixed(1) + ' h', r.plan.hours.toFixed(1) + ' h')}${row('Profit share', '−' + qm(r.sold.share), '−' + qm(r.plan.share))}
+      ${row('Project profit', qm(r.sold.profit), qm(r.plan.profit))}${row('Labour hours', r.sold.hours.toFixed(1) + ' h', r.plan.hours.toFixed(1) + ' h')}${r.hasQuote ? row('Labour cost', qm(r.sold.labour), qm(r.plan.labour)) : ''}${row('Profit share', '−' + qm(r.sold.share), '−' + qm(r.plan.share))}
       <tr class="qb-foot"><td><b>Retained profit</b></td><td class="qb-calc"><b>${qm(r.sold.retained)}</b></td><td class="qb-calc"><b>${qm(r.plan.retained)}</b></td></tr></tbody></table>
+    <p class="q-help">The calculation: as sold ${escHtml(calc(r.sold))}; working plan ${escHtml(calc(r.plan))}. Retained profit = project profit − profit share.</p>
+    <div class="q-inline" style="gap:10px;align-items:flex-end;flex-wrap:wrap;"><div class="lp-f"><label>Profit share method for this project</label><select data-ps="method" data-pid="${p.id}"><option value="">Use the default (${escHtml(psMethodName(psDefault().method))})</option><option value="hour"${ov && ov.method === 'hour' ? ' selected' : ''}>£ per labour hour</option><option value="pct"${ov && ov.method === 'pct' ? ' selected' : ''}>% of labour cost</option></select></div>
+      ${ov ? `<div class="lp-f"><label>${ov.method === 'pct' ? '% of labour cost' : '£ per labour hour'}</label><input type="number" step="0.01" min="0" data-ps="value" data-pid="${p.id}" value="${ov.value === '' || ov.value == null ? '' : ov.value}"></div>` : ''}</div>
     <p class="q-help">${r.loggedHours.toFixed(1)} h logged so far = ${qm(r.loggedShare)} of profit share. Recognised so far (${Math.round(r.frac * 100)}% of the job invoiced): <b>${qm(r.toDate)}</b>.</p></div>`;
 }
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.dataset || !el.dataset.ps) return; const p = state.projects.find(x => x.id === Number(el.dataset.pid)); if(!p) return;
+  if(el.dataset.ps === 'method'){ if(!el.value) delete p.profitShare; else p.profitShare = { method: el.value, value: p.profitShare && p.profitShare.method === el.value ? p.profitShare.value : (el.value === 'pct' ? psDefault().pct : psDefault().hour), at: new Date().toISOString(), by: whoName() }; }
+  else if(el.dataset.ps === 'value' && p.profitShare){ p.profitShare.value = el.value === '' ? '' : Math.max(0, Number(el.value) || 0); p.profitShare.at = new Date().toISOString(); p.profitShare.by = whoName(); }
+  render(); saveState();
+});
 function pwVariationsHtml(p, i){
   const aq = projAcceptedQuote(p), vars = p.variations || [], it = aq && p.plan ? projPlanItems(p) : null, pct = projVarPct(p), thr = Number(state.settings.variationThresholdPct), over = thr > 0 && pct > thr;
   if(!aq) return `<section class="pw-sec" id="pw-variations" data-sec="variations"><h3>Variations</h3><div class="pw-card pw-wide"><div class="pw-empty">Variations (scope additions) are agreed against an accepted quote. There is none on this project yet.</div></div></section>`;
@@ -7563,7 +7574,10 @@ function renderSettings(){
       <div><label>Starting balance as at</label><input type="date" data-tab="settings" data-field="startingBalanceDate" value="${bankStartDate()}"><div class="q-help">The bank balance counts only transactions dated on or after this date. A zero is used as zero.</div></div>
      <div><label>Trade account terms (days)</label><input type="number" step="1" data-tab="settings" data-field="tradeAccountDays" value="${s.tradeAccountDays}"></div>
      <div><label>Client payment terms (days)</label><input type="number" step="1" data-tab="settings" data-field="paymentTermsDays" value="${s.paymentTermsDays}"></div>
-     <div><label>Profit share per hour (£)</label><input type="number" step="0.01" min="0" data-tab="settings" data-field="profitSharePerHour" value="${s.profitSharePerHour === undefined ? 0 : s.profitSharePerHour}"></div>
+     <div><label>Profit share: default method</label><select data-tab="settings" data-field="profitShareMethod"><option value="hour"${psDefault().method === 'hour' ? ' selected' : ''}>£ per labour hour</option><option value="pct"${psDefault().method === 'pct' ? ' selected' : ''}>% of labour cost</option></select></div>
+     <div><label>£ per labour hour</label><input type="number" step="0.01" min="0" data-tab="settings" data-field="profitSharePerHour" value="${s.profitSharePerHour === undefined ? 0 : s.profitSharePerHour}"></div>
+     <div><label>% of labour cost</label><input type="number" step="0.1" min="0" data-tab="settings" data-field="profitSharePct" value="${s.profitSharePct === undefined ? 0 : s.profitSharePct}"></div>
+     <div class="fin-help ps-words"><b>How it is worked out (default: ${psMethodName(psDefault().method)}):</b> ${escHtml(psWordsGeneric(psDefault().method, psDefault().method === 'pct' ? psDefault().pct : psDefault().hour))} A project can use a different method or value: open the project, Working plan, Retained profit.</div>
      <div class="fin-help">Taken off project profit for every labour hour (sold, planned and logged) to give <b>retained profit</b>. This is separate from “Labour profit share (%)” in Quote settings: that percentage is the profit built into the labour <em>price</em> (labour cost = price ÷ (1 + %)) and is already inside project profit; the hourly figure is then deducted from it. Set one or the other to what you intend, so the same share is not taken twice.</div>
      ${POT_BUCKETS.map(b => `<div><label>Retained pot: ${b[1]} (%)</label><input type="number" step="1" min="0" data-tab="settings" data-field="${b[0]}" value="${potPct(b[0])}"></div>`).join('')}
      <div class="fin-help">The four buckets share the retained profit pot${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) === 100 ? '.' : ` (they add up to ${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0)}%, so they are scaled to 100% on the Dashboard).`}</div>
@@ -10602,7 +10616,21 @@ document.addEventListener('click', (e) => {
    Profit share per hour (Settings) is a flat £ per labour hour that goes to the people doing the work. It is separate from "Labour profit share (%)" in Quote settings,
    which is the share of the labour PRICE that is profit on top of wages (it is what makes labour cost = labour price ÷ (1 + %)). The percentage lives inside the project profit
    already; the hourly figure is then taken off that profit, so retained profit = project profit − (labour hours × £ per hour). Hours: sold (as-sold snapshot), planned (Working plan) and logged (stage line time). */
+/* Profit share has two methods: "£ per labour hour" (hours × a rate) or "% of labour cost" (labour cost × a percentage). Settings holds a value for each and picks the default method;
+   a project may override both the method and the value (p.profitShare { method: 'hour' | 'pct', value, at, by }). Labour cost is the quote's labour price ÷ (1 + labour profit %).
+   The existing £-per-hour setting stays the default method and value, so no figure changes until you choose otherwise. */
 function profitShare(){ const v = Number(state.settings.profitSharePerHour); return v > 0 ? v : 0; }
+function psDefault(){ const s = state.settings, method = s.profitShareMethod === 'pct' ? 'pct' : 'hour'; return { method, hour: Math.max(0, Number(s.profitSharePerHour) || 0), pct: Math.max(0, Number(s.profitSharePct) || 0) }; }
+function psFor(p){
+  const d = psDefault(), o = p && p.profitShare;
+  if(o && (o.method === 'hour' || o.method === 'pct') && o.value !== '' && o.value != null && !isNaN(Number(o.value)) && Number(o.value) >= 0) return { method: o.method, value: Number(o.value), override: true };
+  return { method: d.method, value: d.method === 'pct' ? d.pct : d.hour, override: false };
+}
+function psMethodName(m){ return m === 'pct' ? '% of labour cost' : '£ per labour hour'; }
+function psWordsGeneric(method, value){
+  return method === 'pct' ? `Profit share = labour cost × ${value}%. For example £2,000 of labour cost gives ${qm(2000 * value / 100)}. Labour cost is the labour price ÷ (1 + the labour profit % in Quote settings). Retained profit = project profit − profit share.`
+    : `Profit share = labour hours × ${qm(value)}. For example 40 labour hours gives ${qm(40 * value)}. Retained profit = project profit − profit share.`;
+}
 function projHours(p){
   const aq = projAcceptedQuote(p), logged = (p.stages || []).reduce((a, s) => a + slLogged(s), 0);
   if(!aq) return { sold: 0, plan: 0, logged };
@@ -10615,12 +10643,13 @@ function projInvoicedShare(p){
   return tot > 0 ? inv / tot : 0;
 }
 function projRetained(p){
-  const rate = profitShare(), h = projHours(p), aq = projAcceptedQuote(p), act = projActualCost(p); let sold, plan;
-  if(aq && p.plan){ const mg = projMarginCC(p); sold = { profit: mg.soldM, hours: h.sold }; plan = { profit: r2(mg.now - act.unplanned), hours: h.plan }; }
-  else { const prof = r2((Number(p.agreedValue) || 0) - (Number(p.actualCost) > 0 ? Number(p.actualCost) : Number(p.budgetedCost) || 0)); sold = { profit: prof, hours: h.logged }; plan = { profit: prof, hours: h.logged }; }
-  sold.share = r2(sold.hours * rate); sold.retained = r2(sold.profit - sold.share); plan.share = r2(plan.hours * rate); plan.retained = r2(plan.profit - plan.share);
-  const frac = projInvoicedShare(p);
-  return { sold, plan, loggedHours: h.logged, loggedShare: r2(h.logged * rate), frac, toDate: r2(plan.retained * frac), hasQuote: !!aq };
+  const ps = psFor(p), h = projHours(p), aq = projAcceptedQuote(p), act = projActualCost(p); let sold, plan;
+  if(aq && p.plan){ const mg = projMarginCC(p), pq = projWorkQuote(p); sold = { profit: mg.soldM, hours: h.sold, labour: r2(qCalc(aq).labourCost) }; plan = { profit: r2(mg.now - act.unplanned), hours: h.plan, labour: r2(qCalc(pq).labourCost) }; }
+  else { const prof = r2((Number(p.agreedValue) || 0) - (Number(p.actualCost) > 0 ? Number(p.actualCost) : Number(p.budgetedCost) || 0)); sold = { profit: prof, hours: h.logged, labour: 0 }; plan = { profit: prof, hours: h.logged, labour: 0 }; }
+  const share = x => ps.method === 'pct' ? r2(x.labour * ps.value / 100) : r2(x.hours * ps.value);   // £ per hour: hours × rate; % method: labour cost × percentage
+  sold.share = share(sold); sold.retained = r2(sold.profit - sold.share); plan.share = share(plan); plan.retained = r2(plan.profit - plan.share);
+  const frac = projInvoicedShare(p), loggedShare = ps.method === 'pct' ? (plan.hours > 0 ? r2(plan.share * h.logged / plan.hours) : 0) : r2(h.logged * ps.value);
+  return { sold, plan, ps, loggedHours: h.logged, loggedShare, frac, toDate: r2(plan.retained * frac), hasQuote: !!aq };
 }
 function retainedTotals(){
   const rows = state.projects.map(p => ({ p, r: projRetained(p) })), sum = f => r2(rows.reduce((a, x) => a + f(x.r), 0));
@@ -10711,7 +10740,7 @@ function assetCommitted(){ return r2((state.assetPlan || []).filter(a => a.fundi
 function dbPotHtml(){
   const rt = retainedTotals(), committed = assetCommitted(), un = r2(rt.toDate - committed), cash = cashPosition(), sum = POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) || 1;
   const bucket = b => { const pct = potPct(b[0]), amt = r2(rt.toDate * pct / sum); return `<div class="pot-b"><small>${b[1]} · ${Math.round(pct / sum * 100)}%</small><b>${money(amt)}</b>${b[0] === 'potAssetsPct' ? `<em>${money(committed)} committed</em>` : ''}</div>`; };
-  return `<div class="pot"><div class="pot-main"><div class="db-card-h"><h3>Retained profit</h3><span class="pot-sub">project profit minus profit share${profitShare() ? ' (£' + profitShare() + '/h)' : ' (no hourly share set)'}, recognised as invoices are raised</span></div>
+  return `<div class="pot"><div class="pot-main"><div class="db-card-h"><h3>Retained profit</h3><span class="pot-sub">project profit minus profit share (default ${escHtml(psMethodName(psDefault().method))}: ${psDefault().method === 'pct' ? (psDefault().pct ? psDefault().pct + '%' : 'not set') : (psDefault().hour ? '£' + psDefault().hour + '/h' : 'not set')}), recognised as invoices are raised</span></div>
       <div class="pot-fig"><div><small>Retained profit to date</small><b>${money(rt.toDate)}</b></div><div><small>Committed to the asset plan</small><b>${money(committed)}</b></div><div><small>Unallocated</small><b class="${un < 0 ? 'over' : ''}">${money(un)}</b></div></div>
       <div class="pot-buckets">${POT_BUCKETS.map(bucket).join('')}</div>
       <div class="pot-links"><button type="button" class="sp-link" data-dash="go" data-tab="assets">Asset plan &amp; register →</button> <span class="pot-sub">Whole-job retained profit forecast: ${money(rt.plan)}</span></div></div>
