@@ -1582,10 +1582,16 @@
   .pw-dia { display: inline-block; width: 9px; height: 9px; transform: rotate(45deg); border-radius: 2px; background: var(--bt-slate-blue); flex: none; }
   .ms-done .pw-dia, .pw-ms-chip.ms-done .pw-dia { background: var(--bt-ok-fg); } .ms-soon .pw-dia { background: var(--bt-warn-fg); } .ms-overdue .pw-dia { background: var(--bt-bad-fg); } .ms-future .pw-dia { background: var(--bt-slate-blue); }
   .pw-ev.milestone.ms-done .ic { stroke: var(--bt-ok-fg); } .pw-ev.milestone.ms-soon .ic { stroke: var(--bt-warn-fg); } .pw-ev.milestone.ms-overdue .ic { stroke: var(--bt-bad-fg); } .pw-ev.milestone.ms-future .ic { stroke: var(--bt-slate-blue); }
-  .pw-ms-chip { display: inline-flex; align-items: center; gap: 6px; margin: 2px var(--bt-s1) 2px 0; font-size: 11.5px; font-weight: 600; background: var(--bt-paper); border-radius: var(--bt-r-pill); padding: 1px var(--bt-s2) 1px 7px; }
+  .pw-ms-chip { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; margin: 2px var(--bt-s1) 2px 0; font-size: 11.5px; font-weight: 600; background: var(--bt-paper); border-radius: var(--bt-r-pill); padding: 1px var(--bt-s2) 1px 7px; }
   .pw-chg { border-bottom: 1px solid var(--bt-chalk); padding: var(--bt-s2) 0; } .pw-chg:last-child { border-bottom: 0; } .pw-chg summary { cursor: pointer; font-size: 12.5px; } .pw-chg ul { margin: 6px 0 2px 18px; padding: 0; font-size: 12.5px; color: var(--slate); } .pw-chg-when { color: var(--text-muted); } .pw-chg-r { color: var(--ink); }
   .chg-list { margin: 0 0 10px 18px; padding: 0; font-size: 12.5px; max-height: 190px; overflow: auto; } .chg-err { color: var(--bt-bad-fg); font-size: var(--bt-fs-xs); min-height: 16px; }
 
+  .pw-sm { font-size: var(--bt-fs-xs); } .qb-flag.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
+  .pw-g-act { position: absolute; top: 17px; height: 5px; border-radius: var(--bt-r-chip); background: var(--bt-ok-fg); opacity: .9; } .pw-g-act.late { background: var(--bt-bad-fg); }
+  .pw-g-act-k { width: 18px; height: 5px; border-radius: var(--bt-r-chip); background: var(--bt-ok-fg); display: inline-block; }
+  .pw-done-pill { display: inline-block; font-size: var(--bt-fs-xs); font-weight: 700; padding: 2px 10px; border-radius: var(--bt-r-pill); background: var(--bt-ok-bg); color: var(--bt-ok-fg); margin: 0 6px; }
+  .pvd-row { display: grid; grid-template-columns: minmax(150px, 1.1fr) 2fr auto; gap: 6px 12px; align-items: center; padding: 6px 0; border-top: 1px solid var(--bt-chalk); } .pvd-n { display: flex; flex-direction: column; } @media (max-width: 700px) { .pvd-row { grid-template-columns: 1fr; } }
+  .pvd-card { background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3) 14px; margin: 0 0 var(--bt-s3); } .pvd-card summary { cursor: pointer; } .pvd-proj { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; } .pvd-h { margin-bottom: 6px; } .pvd-acts { display: flex; gap: var(--bt-s2); flex-wrap: wrap; margin-top: 8px; } .pvd-tools { margin: 8px 0; }
   /* ---------------- Working plan and variations ---------------- */
   .pw-removed td { opacity: .55; text-decoration: line-through; } .pw-removed td:last-child { text-decoration: none; }
   .pw-alert-bar { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border: 1px solid var(--bt-bad-bd); }
@@ -2543,6 +2549,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <div class="desc">Delivery, from signed contract to sign-off and testimonial. A won deal is promoted here from the Sales Pipeline (once its contract is marked signed) and becomes a live project — code <strong>P-</strong>. Expand a project to track its delivery milestones, budgeted vs actual cost, and testimonial. Payment lines &amp; margin variance come in the finance pass.</div>
     </div>
     <div class="view-toggle" id="viewToggle-project"></div>
+    <div id="projectsPvd"></div>
     <div class="table-scroll" id="projectsTableWrap"></div>
     <div class="view-pane pane-board" id="projectsBoardWrap"></div>
     <div class="view-pane pane-gantt" id="projectsGanttWrap"></div>
@@ -3787,10 +3794,8 @@ function effectiveProb(r){
   const st = stageById('sales', r.stageId);
   return st ? clampPct(st.pct)/100 : 0;
 }
-function autoProjectStageId(p){   // the furthest stage whose milestone date is filled in ('' if none)
-  const m = p.milestones || {}; let id = '';
-  state.pipelineStages.project.forEach(s => { if(s.key && m[s.key]) id = s.id; });
-  return id;
+function autoProjectStageId(p){   // the furthest stage with a confirmed actual ('' if none). A planned date never moves a stage.
+  return projStageActualId(p);
 }
 function stageById(pl, id){ return ((state.pipelineStages||{})[pl]||[]).find(s => s.id === id) || null; }
 function stageName(pl, id){ const s = stageById(pl, id); return s ? s.name : '—'; }
@@ -3910,9 +3915,9 @@ function dashHasOpenTask(rec){
   return state.crmTasks.some(t => t.status === 'open' && linkedMatches(t, rec.id)) || state.actions.some(a => a.status !== 'Done' && linkedMatches(a, rec.id));
 }
 /* a delivery milestone is overdue when its date has passed but the project has not reached that stage yet */
-function dashOverdueMilestone(p, today){
-  const list = state.pipelineStages.project, cur = list.findIndex(s => s.id === p.stageId), m = p.milestones || {}; let hit = null;
-  list.forEach((s, i) => { const d = s.key && m[s.key]; if(d && d < today && i > cur && (!hit || d < hit.date)) hit = { name: s.name, date: d }; });
+function dashOverdueMilestone(p, today){   // planned date passed and no actual confirmed
+  let hit = null;
+  state.pipelineStages.project.forEach(s => { if(!s.key) return; const i = projMsInfo(p, s.key); if(i.status === 'overdue' && (!hit || i.planned < hit.date)) hit = { name: s.name, date: i.planned }; });
   return hit;
 }
 function dashUpcoming(today){
@@ -4399,7 +4404,7 @@ function touchFromEl(el){
 }
 function recActivity(pl, r){
   const ds = [], now = Date.now();
-  if(pl === 'project'){ Object.values(r.milestones||{}).forEach(d => ds.push(d)); (r.paymentLines||[]).forEach(x => ds.push(x.paidDate, x.invoicedDate)); }
+  if(pl === 'project'){ Object.values(r.msActual||{}).forEach(x => x && ds.push(x.date)); (r.paymentLines||[]).forEach(x => ds.push(x.paidDate, x.invoicedDate)); }
   else { (r.comms||[]).forEach(c => ds.push(c.date)); if(pl === 'sales') ds.push(r.contractSigned); }
   let best = 0;
   ds.forEach(d => { if(!d) return; const t = toDate(d); if(t && !isNaN(t) && t.getTime() <= now && t.getTime() > best) best = t.getTime(); });
@@ -4411,11 +4416,9 @@ function sortRecent(pl, list){
 }
 
 /* ---------- Board ---------- */
-function nextMilestone(p){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const ph = milestonePhases(p); if(!ph.length) return null;
-  const nx = ph.find(x => x.s >= today);
-  return nx ? { label: nx.label, d: nx.s, next: true } : { label: ph[ph.length-1].label, d: ph[ph.length-1].s, next: false };
+function nextMilestone(p){   // the first milestone nobody has confirmed, with its planned date
+  const nm = projNextMs(p); if(!nm) return null;
+  return { label: nm.name, d: nm.date ? toDate(nm.date) : null, next: true };
 }
 function tileHtml(pl, r, color){
   const title = boardTitle(pl, r);
@@ -4461,7 +4464,7 @@ function renderBoard(pl){
   wrap.querySelectorAll('.bd-col').forEach(c => { keepT[c.dataset.stage] = c.querySelector('.bd-col-body').scrollTop; });
   const stages = state.pipelineStages[pl], by = {}, orphans = [];
   stages.forEach(s => { by[s.id] = []; });
-  viewRecords(pl).forEach(r => (by[r.stageId] || orphans).push(r));
+  viewRecords(pl).forEach(r => (by[pl === 'project' ? projStageId(r) : r.stageId] || orphans).push(r));
   const cols = stages.map(s => colHtml(pl, s, by[s.id], false));
   if(orphans.length) cols.push(colHtml(pl, { id: '', name: 'No stage' }, orphans, true));
   const hints = {
@@ -4649,7 +4652,8 @@ setInterval(() => { if(state){ const n = (state.undoLog || []).length; undoPrune
    project dates / payment lines are never touched. */
 function moveRecord(pl, id, stageId){
   const r = findRec(pl, id), st = stageById(pl, stageId);
-  if(!r || !st || r.stageId === stageId) return;
+  if(!r || !st || (pl === 'project' ? projStageId(r) : r.stageId) === stageId) return;
+  if(pl === 'project') projAdopt(r);   // a stage dragged by hand is kept (the project now follows its own stage)
   const prev = r.stageId;
   r.stageId = stageId; touchRec(pl, id);
   let msg = `${recordCode(id, pl)} → ${st.name}`;
@@ -4833,7 +4837,7 @@ function ganttRows(pl){
   const sales = pl === 'sales';
   return viewRecords(pl).map(r => {
     const subs = subStageItems(r), phases = sales ? [] : milestonePhases(r), all = phases.concat(subs);
-    const row = { r, id: r.id, code: recordCode(r.id, pl), name: boardTitle(pl, r), stage: stageName(pl, r.stageId), color: stageColor(pl, r.stageId), phases, subs, kids: (sales || subs.length) ? subs : all, dated: all.length > 0 };   // a project with dated stage lines draws those; milestone dates stay as dots (older projects with only milestones keep their milestone bars)
+    const row = { r, id: r.id, code: recordCode(r.id, pl), name: boardTitle(pl, r), stage: stageName(pl, pl === 'project' ? projStageId(r) : r.stageId), color: stageColor(pl, pl === 'project' ? projStageId(r) : r.stageId), phases, subs, kids: (sales || subs.length) ? subs : all, dated: all.length > 0 };   // a project with dated stage lines draws those; milestone dates stay as dots (older projects with only milestones keep their milestone bars)
     if(row.dated){ row.s = new Date(Math.min(...all.map(x => x.s))); row.e = new Date(Math.max(...all.map(x => x.e))); }
     return row;
   });
@@ -4914,10 +4918,13 @@ function ganttMoveStage(pl, rid, sid, delta, solo){
   const olds = new Set(); shifted.forEach(x => { if(x.start) olds.add(x.start); if(x.end) olds.add(x.end); });
   shifted.forEach(x => { if(x.start) x.start = addDaysIso(x.start, delta); if(x.end) x.end = addDaysIso(x.end, delta); });
   let ms = 0; if(rec.milestones) Object.keys(rec.milestones).forEach(k => { const d = rec.milestones[k]; if(d && olds.has(d)){ rec.milestones[k] = addDaysIso(d, delta); ms++; } });
+  const logIds = [], nowIso = new Date().toISOString(), who = whoName(), why = 'Moved on the chart (' + (delta > 0 ? '+' : '') + delta + ' day' + (Math.abs(delta) !== 1 ? 's' : '') + ')';
+  (rec.stages || []).forEach((x, i) => { const o = prev[0][i]; if(o && (o[0] !== x.start || o[1] !== x.end)){ const id = qRand('pl_'); logIds.push(id); (x.planLog = x.planLog || []).push({ id, kind: 'planned', fromTxt: pwD(o[0]) + ' → ' + pwD(o[1]), toTxt: pwD(x.start) + ' → ' + pwD(x.end), at: nowIso, by: who, reason: why }); } });
+  if(rec.milestones && prev[1]) Object.keys(rec.milestones).forEach(k => { if(prev[1][k] !== rec.milestones[k]){ const id = qRand('pl_'); logIds.push(id); (rec.msPlanLog = rec.msPlanLog || []).push({ id, kind: 'planned', key: k, from: prev[1][k] || '', to: rec.milestones[k], at: nowIso, by: who, reason: why }); } });
   const hit = (state.blackouts || []).find(b => (s.start || s.end) <= b.end && (s.end || s.start) >= b.start);
   const msg = `Moved “${s.label || 'stage'}” ${delta > 0 ? '+' : ''}${delta} day${Math.abs(delta) !== 1 ? 's' : ''}` + (shifted.length > 1 ? ` with ${shifted.length - 1} later stage${shifted.length > 2 ? 's' : ''}` : '') + (ms ? ` and ${ms} milestone date${ms !== 1 ? 's' : ''}` : '') + (hit ? `. ⚠ It now overlaps the blackout “${hit.label || 'no work'}”` : '');
   render(); saveState();
-  showToast(msg, () => { (rec.stages || []).forEach((x, i) => { x.start = prev[0][i][0]; x.end = prev[0][i][1]; }); if(rec.milestones && prev[1]) Object.keys(prev[1]).forEach(k => { rec.milestones[k] = prev[1][k]; }); render(); saveState(); });
+  showToast(msg, () => { (rec.stages || []).forEach((x, i) => { x.start = prev[0][i][0]; x.end = prev[0][i][1]; if(x.planLog) x.planLog = x.planLog.filter(h => !logIds.includes(h.id)); }); if(rec.msPlanLog) rec.msPlanLog = rec.msPlanLog.filter(h => !logIds.includes(h.id)); if(rec.milestones && prev[1]) Object.keys(prev[1]).forEach(k => { rec.milestones[k] = prev[1][k]; }); render(); saveState(); });
 }
 (function(){
   let g = null;
@@ -5998,6 +6005,108 @@ function pwMsStatus(date, done){
   return Math.round((toDate(date) - toDate(today)) / 86400000) <= 7 ? 'soon' : 'future';
 }
 const PW_MS_LABEL = { done: 'Done', soon: 'Due soon', overdue: 'Overdue', future: 'Future' };
+
+/* ---------- Planned vs actual dates ----------
+   p.milestones[key] is the PLANNED date (set in the quote and sales steps, changeable). p.msActual[key] { date, at, by, src } is set only by "Mark done".
+   p.msPlanLog [{ id, kind, key, from, to, at, by, reason }] keeps every planned-date change. A stage line carries s.actStart / s.actEnd { date, at, by, src } and s.planLog.
+   Older projects: the dates already typed read as PLANNED (nothing is rewritten) and an actual shows only where there is hard evidence (projMsEvidence: the quote's accepted
+   date, deliveries marked delivered, payment lines invoiced / paid). p.actualsMode marks a project whose stage is driven by confirmations: it is set on the first
+   confirmation or manual stage choice, and when a project is created. Until then the stage is READ from the actuals (projStageId) and the stored stageId is left alone. */
+function stampNow(date, src){ return { date, at: new Date().toISOString(), by: whoName(), src: src || '' }; }
+function fmtStamp(s){ if(!s || !s.at) return ''; try{ return new Date(s.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + (s.by ? ' · ' + s.by : ''); }catch(e){ return ''; } }
+function diffText(d){ if(d === null || d === undefined) return ''; return d === 0 ? 'on time' : d > 0 ? d + ' day' + (d === 1 ? '' : 's') + ' late' : (-d) + ' day' + (d === -1 ? '' : 's') + ' early'; }
+const PLAN_CAUSES = [['customer', 'Customer delay'], ['supplier', 'Supplier delay'], ['weather', 'Weather or site access'], ['scheduling', 'Our scheduling'], ['scope', 'Scope change'], ['other', 'Other']];
+const planCauseName = k => (PLAN_CAUSES.find(c => c[0] === k) || [k, k])[1];
+function projFinalPayment(p){
+  const ls = (p.paymentLines || []).map((l, i) => ({ l, i })).sort((a, b) => String(a.l.dueDate || '9999').localeCompare(String(b.l.dueDate || '9999')) || a.i - b.i);
+  return ls.length ? ls[ls.length - 1].l : null;
+}
+/* the planned date: what is typed, else the date the stage lines / payment lines propose (never an actual) */
+function projMsPlanned(p, key){
+  const typed = ((p.milestones || {})[key]) || '';
+  if(typed) return { date: typed, typed: true };
+  let d = '';
+  if(key === 'invoiced' || key === 'paid'){ const ds = (p.paymentLines || []).map(l => l.dueDate).filter(Boolean).sort(); d = ds.length ? ds[ds.length - 1] : ''; }
+  else if(key !== 'contractSigned') d = projMsDerived(p, key).date;
+  return { date: d, typed: false };
+}
+/* hard evidence that something happened, dated today or earlier (a future date is never an actual) */
+function projMsEvidence(p, key){
+  const today = fmt(new Date()), ok = d => !!d && d <= today, lines = p.paymentLines || [];
+  if(key === 'contractSigned'){ const q = projAcceptedQuote(p); return q && ok(q.acceptedDate) ? { date: q.acceptedDate, src: 'Quote accepted' } : null; }
+  if(key === 'materialsDelivered'){ const dl = projDeliveries(p).drops; if(!dl.length || !dl.every(x => x.delivered)) return null; const d = dl.map(x => x.delivered).sort().pop(); return ok(d) ? { date: d, src: 'Every delivery marked delivered' } : null; }
+  if(key === 'invoiced'){ if(!lines.length || !lines.every(l => l.invoicedDate)) return null; const d = lines.map(l => l.invoicedDate).sort().pop(); return ok(d) ? { date: d, src: 'Every payment line invoiced' } : null; }
+  if(key === 'paid'){ if(!lines.length || !lines.every(l => l.paidDate)) return null; const d = lines.map(l => l.paidDate).sort().pop(); return ok(d) ? { date: d, src: 'Every payment line paid' } : null; }
+  return null;
+}
+function projMsActual(p, key){
+  const x = (p.msActual || {})[key]; if(x && x.date) return { date: x.date, at: x.at || '', by: x.by || '', src: x.src || 'Marked done', evidence: false };
+  const e = projMsEvidence(p, key); return e ? { date: e.date, at: '', by: '', src: e.src, evidence: true } : null;
+}
+function projMsInfo(p, key){
+  const today = fmt(new Date()), pl = projMsPlanned(p, key), ac = projMsActual(p, key), diff = ac && pl.date ? daysBetween(pl.date, ac.date) : null;
+  let status;
+  if(ac) status = 'done'; else if(!pl.date) status = 'future'; else if(pl.date < today) status = 'overdue'; else status = daysBetween(today, pl.date) <= 7 ? 'soon' : 'future';
+  return { key, planned: pl.date, typed: pl.typed, actual: ac, diff, status, late: diff !== null && diff > 0, overdueDays: status === 'overdue' ? daysBetween(pl.date, today) : 0 };
+}
+/* a stage line: planned start / end (s.start, s.end), actual start / end, status and days late */
+function slInfo(s){
+  const today = fmt(new Date()), ps = s.start || s.end || '', pe = s.end || s.start || '', as = (s.actStart && s.actStart.date) || '', ae = (s.actEnd && s.actEnd.date) || '';
+  const sd = as && ps ? daysBetween(ps, as) : null, ed = ae && pe ? daysBetween(pe, ae) : null;
+  let status = 'future';
+  if(ae) status = 'done'; else if(pe && pe < today) status = 'overdue'; else if(as) status = 'running'; else if(ps && daysBetween(today, ps) <= 7) status = 'soon';
+  return { ps, pe, as, ae, sd, ed, status, late: (ed !== null && ed > 0) || (ed === null && sd !== null && sd > 0) };
+}
+const PW_SL_LABEL = { done: 'Done', running: 'In progress', overdue: 'Overdue', soon: 'Due soon', future: 'Future' };
+function projStageActualId(p){ const list = state.pipelineStages.project; let id = ''; list.forEach(s => { if(s.key && projMsActual(p, s.key)) id = s.id; }); return id; }
+/* the stage a project is in: only confirmations move it. Until a project has its own confirmed stage (actualsMode) it is read from the actuals and the stored stageId is left alone. */
+function projStageId(p){
+  if(p.actualsMode) return stageById('project', p.stageId) ? p.stageId : (projStageActualId(p) || firstStageId('project'));
+  return projStageActualId(p) || firstStageId('project');
+}
+function projAdopt(p){ if(p.actualsMode) return; p.stageId = projStageId(p); p.actualsMode = true; }
+function projAdvance(p){ const list = state.pipelineStages.project, a = projStageActualId(p); if(a && list.findIndex(x => x.id === a) > list.findIndex(x => x.id === p.stageId)) p.stageId = a; }
+function projIsCompleted(p){
+  const c = p.completed; if(c && c.date) return true; if(p.reopened) return false;
+  const so = projMsActual(p, 'signOff'), fin = projFinalPayment(p); return !!(so && fin && fin.paidDate && fin.paidDate <= fmt(new Date()));
+}
+function projSetPlanned(p, key, to, reason){
+  p.milestones = p.milestones || {}; const from = p.milestones[key] || ''; if(from === to) return;
+  p.milestones[key] = to; (p.msPlanLog = p.msPlanLog || []).push({ id: qRand('pl_'), kind: 'planned', key, from, to, at: new Date().toISOString(), by: whoName(), reason: reason || '' });
+}
+function projMsConfirm(p, key, date, src){
+  projAdopt(p); p.msActual = p.msActual || {}; p.msActual[key] = stampNow(date, src || 'Marked done'); projAdvance(p);
+}
+function projMsUnconfirm(p, key, reason){
+  const x = (p.msActual || {})[key]; if(!x) return; delete p.msActual[key];
+  (p.msPlanLog = p.msPlanLog || []).push({ id: qRand('pl_'), kind: 'actual-cleared', key, from: x.date, to: '', at: new Date().toISOString(), by: whoName(), reason: reason || '' });
+}
+function msName(key){ return (state.pipelineStages.project.find(s => s.key === key) || {}).name || key; }
+/* a planned date typed in a date box: a change to an existing plan asks for a reason and is kept in the history */
+async function projMsPlanChange(p, key, value){
+  const from = (p.milestones || {})[key] || ''; if(from === value){ render(); return; }
+  let reason = 'First planned date';
+  if(from){
+    const r = await chgAsk('Change the planned date?', [`${msName(key)}: ${pwD(from)} → ${value ? pwD(value) : 'no planned date'}`], { causes: PLAN_CAUSES, save: 'Change planned date' });
+    if(!r){ render(); return; } reason = planCauseName(r.cause) + ': ' + r.reason;
+  }
+  projSetPlanned(p, key, value, reason); render(); saveState(); showToast('Planned date changed and kept in the history');
+}
+/* plan vs delivery: for each milestone and stage line with a planned and an actual date, days late (+) or early (-) */
+function projPlanVsDelivery(p){
+  const rows = [];
+  state.pipelineStages.project.forEach(st => { if(!st.key) return; const i = projMsInfo(p, st.key); if(i.diff !== null) rows.push({ kind: 'Milestone', name: st.name, key: st.key, planned: i.planned, actual: i.actual.date, diff: i.diff }); });
+  (p.stages || []).forEach(s => { const i = slInfo(s); if(i.ed !== null) rows.push({ kind: 'Stage', name: s.label || 'Stage', key: 'sl:' + (s.kind || 'other'), planned: i.pe, actual: i.ae, diff: i.ed }); });
+  return rows;
+}
+function pvdRollup(onlyCompleted){
+  const by = {};
+  state.projects.forEach(p => {
+    if(onlyCompleted && !projIsCompleted(p)) return;
+    projPlanVsDelivery(p).filter(r => r.kind === 'Milestone').forEach(r => { const o = by[r.key] = by[r.key] || { name: r.name, key: r.key, n: 0, sum: 0, worst: -1e9, onTime: 0 }; o.n++; o.sum += r.diff; o.worst = Math.max(o.worst, r.diff); if(r.diff <= 0) o.onTime++; });
+  });
+  return state.pipelineStages.project.filter(s => s.key && by[s.key]).map(s => by[s.key]);
+}
 /* the stage line each milestone belongs to, where it has one (the rest sit on deliveries, payments or the quote) */
 function projMsStageId(p, key){
   const st = projStagesDated(p), onsite = projOnsite(p), mats = st.filter(s => s.kind === 'materials'), scope = st.filter(s => s.kind === 'scope');
@@ -6008,8 +6117,8 @@ function projMsStageId(p, key){
 }
 function projEvents(p){
   projEnsure(p);
-  const ev = [], today = fmt(new Date()), ms = p.milestones, list = state.pipelineStages.project, cur = list.findIndex(x => x.id === p.stageId), dl = projDeliveries(p);
-  (p.stages || []).forEach(s => { slEnsure(s); const a = s.start || s.end; if(!a) return; ev.push({ key: 'st:' + s.id, kind: 'stage', date: a, end: s.end || s.start, title: s.label || 'Stage', sub: slPlannedHours(s) ? hrs(slPlannedHours(s)) + ' planned' + (slLogged(s) ? ' · ' + hrs(slLogged(s)) + ' logged' : '') : (slLogged(s) ? hrs(slLogged(s)) + ' logged' : ''), sid: s.id, done: (s.end || s.start) < today }); });
+  const ev = [], today = fmt(new Date()), list = state.pipelineStages.project, dl = projDeliveries(p);
+  (p.stages || []).forEach(s => { slEnsure(s); const a = s.start || s.end; if(!a) return; ev.push({ key: 'st:' + s.id, kind: 'stage', date: a, end: s.end || s.start, title: s.label || 'Stage', sub: slPlannedHours(s) ? hrs(slPlannedHours(s)) + ' planned' + (slLogged(s) ? ' · ' + hrs(slLogged(s)) + ' logged' : '') : (slLogged(s) ? hrs(slLogged(s)) + ' logged' : ''), sid: s.id, done: !!(s.actEnd && s.actEnd.date), sl: slInfo(s), pa: pwPaText(s.start || s.end, s.actStart && s.actStart.date, s.actEnd && s.actEnd.date, s.end || s.start) }); });
   dl.drops.forEach(x => {
     if(x.date) ev.push({ key: 'dl:' + x.d.id, kind: 'delivery', date: x.date, title: (x.method === 'collect' ? 'Collection: ' : 'Delivery: ') + x.supplier, sub: x.items.join(', '), did: x.d.id, done: !!x.delivered, overdue: !x.delivered && x.date < today, flags: x.flags, qid: x.q.id });
     if(x.due && x.out > 0) ev.push({ key: 'po:' + x.d.id, kind: 'out', date: x.due, title: x.supplier, sub: 'Supplier payment', amount: x.out, did: x.d.id, done: !!x.paid, overdue: !x.paid && x.due < today, qid: x.q.id });
@@ -6018,8 +6127,8 @@ function projEvents(p){
     const amt = Number(l.amount) || 0; if(!l.dueDate && !l.invoicedDate && !l.paidDate) return;
     ev.push({ key: 'pi:' + i, kind: 'in', date: l.dueDate || l.invoicedDate || l.paidDate, title: l.desc || 'Payment', amount: amt, idx: i, done: !!l.paidDate, invoiced: !!l.invoicedDate, overdue: !l.paidDate && !!l.dueDate && l.dueDate < today && amt > 0 });
   });
-  list.forEach((st, i) => { if(!st.key) return; const d = ms[st.key]; const dv = projMsDerived(p, st.key);
-    if(d || dv.date){ const date = d || dv.date, done = !!d && d <= today; ev.push({ key: 'ms:' + st.key, kind: 'milestone', date, planned: !d, title: st.name, mkey: st.key, done, ms: pwMsStatus(date, done), overdue: !done && date < today || (!!d && d < today && i > cur), derived: dv.date, sub: dv.text, msSid: projMsStageId(p, st.key) }); } });
+  list.forEach(st => { if(!st.key) return; const mi = projMsInfo(p, st.key), dv = projMsDerived(p, st.key), date = mi.actual ? mi.actual.date : mi.planned;
+    if(date){ ev.push({ key: 'ms:' + st.key, kind: 'milestone', date, planned: !mi.actual && !mi.typed, isPlan: !mi.actual, title: st.name, mkey: st.key, done: !!mi.actual, ms: mi.status, overdue: mi.status === 'overdue', late: mi.late, diff: mi.diff, plannedDate: mi.planned, actualDate: mi.actual ? mi.actual.date : '', derived: dv.date, sub: dv.text, pa: pwPaText(mi.planned, '', mi.actual ? mi.actual.date : '', mi.planned), msSid: projMsStageId(p, st.key) }); } });
   return ev.sort((a, b) => a.date.localeCompare(b.date));
 }
 /* the same list without doubles: a milestone that lines up with a stage start / end, a delivery or a payment on the same day rides on that item as one combined entry */
@@ -6038,12 +6147,12 @@ function projEventsUnique(p){
 }
 
 function projNextMs(p){
-  const m = p.milestones || {}, today = fmt(new Date()), l = state.pipelineStages.project.filter(s => s.key);
-  const open = l.find(s => !m[s.key] || m[s.key] > today); if(!open) return null;
-  const d = m[open.key] || projMsDerived(p, open.key).date;
-  return { name: open.name, key: open.key, date: d || '', planned: !!d };
+  const l = state.pipelineStages.project.filter(s => s.key);
+  const open = l.find(s => !projMsActual(p, s.key)); if(!open) return null;   // the first milestone nobody has confirmed
+  const i = projMsInfo(p, open.key);
+  return { name: open.name, key: open.key, date: i.planned || '', planned: true, status: i.status };
 }
-function projProgress(p){ const l = state.pipelineStages.project, i = l.findIndex(x => x.id === p.stageId); return { i, n: l.length, pct: l.length ? Math.round((i + 1) / l.length * 100) : 0 }; }
+function projProgress(p){ const l = state.pipelineStages.project, i = l.findIndex(x => x.id === projStageId(p)); return { i, n: l.length, pct: l.length ? Math.round((i + 1) / l.length * 100) : 0 }; }
 /* money this month, from the same events */
 function projMonthMoney(p){
   const key = fmt(new Date()).slice(0, 7), r = { inDue: 0, inPaid: 0, outDue: 0, outPaid: 0 };
@@ -6122,31 +6231,39 @@ function pwRel(d){
 const pwD = d => d ? fmtDisplay(toDate(d)) : '—';
 const PW_ICON = { stage: DASH_ICONS.task, milestone: DASH_ICONS.milestone, in: DASH_ICONS.in, out: DASH_ICONS.out, delivery: '<path d="M2 6h11v9H2zM13 9h5l3 3v3h-8z"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>' };
 const PW_KIND = { stage: 'Stage', milestone: 'Milestone', in: 'Money in', out: 'Money out', delivery: 'Delivery' };
+/* "Planned 5 Nov · Actual 7 Nov (2 days late)": planned and actual side by side (a stage line gives start and end) */
+function pwPaText(ps, as, ae, pe){
+  const rng = (a, b) => a && b && a !== b ? pwD(a) + ' → ' + pwD(b) : pwD(a || b);
+  const plan = ps || pe ? 'Planned ' + rng(ps, pe) : 'No planned date';
+  const act = as || ae ? 'Actual ' + (as && ae && as !== ae ? pwD(as) + ' → ' + pwD(ae) : pwD(ae || as)) : '';
+  const d = ae && pe ? daysBetween(pe, ae) : (!ae && as && ps ? daysBetween(ps, as) : null);
+  return plan + (act ? ' · ' + act : '') + (d !== null ? ' (' + diffText(d) + ')' : '');
+}
 function pwEventActions(e){
-  if(e.kind === 'milestone') return e.planned || !e.done ? `<button type="button" class="btn secondary qb-sm" data-pw="ms-done" data-key="${e.mkey}">Done today</button>` : `<span class="pw-ok">✓ done</span>`;
+  if(e.kind === 'milestone') return !e.done ? `<button type="button" class="btn secondary qb-sm" data-pw="ms-done" data-key="${e.mkey}">Mark done</button>` : `<span class="pw-ok">✓ done${e.late ? ' <b class="pw-slip late">' + escHtml(diffText(e.diff)) + '</b>' : ''}</span>`;
   if(e.kind === 'delivery') return e.done ? '<span class="pw-ok">✓ delivered</span>' : `<button type="button" class="btn secondary qb-sm" data-pw="del-done" data-did="${escAttr(e.did)}">Delivered today</button>`;
   if(e.kind === 'out') return e.done ? '<span class="pw-ok">✓ paid</span>' : `<button type="button" class="btn secondary qb-sm" data-pw="sup-paid" data-did="${escAttr(e.did)}">Paid today</button>`;
   if(e.kind === 'in') return e.done ? '<span class="pw-ok">✓ paid</span>' : (e.invoiced ? `<button type="button" class="btn secondary qb-sm" data-pw="pay-paid" data-idx="${e.idx}">Paid today</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="inv-sent" data-idx="${e.idx}">Invoice sent today</button>`);
-  if(e.kind === 'stage') return `<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="time" data-sid="${escAttr(e.sid)}">Log time</button>`;
+  if(e.kind === 'stage') return (e.done ? '<span class="pw-ok">✓ done</span>' : `<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="stact" data-sid="${escAttr(e.sid)}|end">Mark done</button>`) + `<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="time" data-sid="${escAttr(e.sid)}">Log time</button>`;
   return '';
 }
 function pwEditOn(p, kind){ const e = pwUi.edit; return !!(e && e.pid === p.id && (!kind || e.kind === kind)); }
 const PW_EDIT_NAME = { timeline: 'timeline', delivery: 'deliveries', materials: 'materials', labour: 'labour', variation: 'variation' };
 function pwHeaderHtml(p, i){
-  const nm = projNextMs(p), pg = projProgress(p), mg = projMargin(p), ct = projContract(p), cu = projCustomer(p), opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${p.stageId === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
+  const nm = projNextMs(p), pg = projProgress(p), mg = projMargin(p), ct = projContract(p), cu = projCustomer(p), opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${projStageId(p) === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
   const custName = [cu.company, cu.name].filter(Boolean).join(' — '), bits = [cu.phone ? `<a href="tel:${escAttr(cu.phone.replace(/\s+/g, ''))}">${escHtml(cu.phone)}</a>` : '', cu.email ? `<a href="mailto:${escAttr(cu.email)}">${escHtml(cu.email)}</a>` : '', cu.address ? escHtml([cu.address, cu.postcode && !cu.address.includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ')) : ''].filter(Boolean);
   const value = ct.live
     ? `<b>${qm(ct.value)}</b><em>${projVariationsValue(p) ? '+ ' + qm(projVariationsValue(p)) + ' variations · ' : ''}ex VAT · live from <button type="button" class="sp-link" data-qba="open-quote" data-id="${ct.q.id}">${escHtml(qRef(ct.q))}</button>${qVatOn() ? ' · ' + qm(ct.inc) + ' inc VAT' : ''}</em>`
     : `<input class="pw-val" type="number" step="1" data-tab="projects" data-idx="${i}" data-field="agreedValue" value="${p.agreedValue || 0}" aria-label="Agreed value ex VAT"><em>typed (no accepted quote yet)</em>`;
   return `<div class="pw-sticky"><div class="pw-top">
       <div class="pw-title"><button type="button" class="btn secondary qb-sm" data-pw="back">← All projects</button><span class="detail-code" style="background:var(--green);">${recordCode(p.id, 'project')}</span>
-        <input class="pw-name" data-tab="projects" data-idx="${i}" data-field="name" value="${escAttr(p.name)}" aria-label="Project name"><select class="lead-pill progress-pill pw-status" data-tab="projects" data-idx="${i}" data-field="stageId" title="Project stage" aria-label="Project stage">${opts}</select></div>
+        <input class="pw-name" data-tab="projects" data-idx="${i}" data-field="name" value="${escAttr(p.name)}" aria-label="Project name"><select class="lead-pill progress-pill pw-status" data-tab="projects" data-idx="${i}" data-field="stageId" title="Project stage" aria-label="Project stage">${opts}</select>${projIsCompleted(p) ? `<span class="pw-done-pill">Completed${p.completed && p.completed.date ? ' ' + escHtml(dShow(p.completed.date)) : ''}</span><button type="button" class="btn secondary qb-sm" data-pw="reopen">Reopen</button>` : `<button type="button" class="btn secondary qb-sm" data-pw="complete" title="Marks the whole project completed">Mark completed</button>`}</div>
       <div class="pw-stats">
         <div class="pw-cust"><small>Customer</small><b>${custName ? escHtml(custName) : '<span class="qb-dim">not recorded</span>'}</b><em>${bits.join(' · ') || 'no contact details on this record'}</em></div>
-        <div><small>Next milestone</small><b>${nm ? escHtml(nm.name) : 'All done'}</b><em>${nm ? (nm.date ? pwD(nm.date) + ' · ' + pwRel(nm.date) : 'not dated') : ''}</em></div>
+        <div><small>Next milestone</small><b>${nm ? escHtml(nm.name) : 'All confirmed'}</b><em>${nm ? (nm.date ? 'planned ' + pwD(nm.date) + ' · ' + (nm.status === 'overdue' ? '<b class="over">overdue, ' + pwRel(nm.date) + '</b>' : pwRel(nm.date)) : 'no planned date') : ''}</em></div>
         <div><small>Value (agreed)</small>${value}</div>
         <div><small>Margin</small><b>${mg ? qm(mg.now) + ' <span class="qb-dim">' + qpct(mg.nowPct) + '</span>' : '—'}</b><em>${mg ? (mg.hasSold ? 'sold ' + qm(mg.soldAfter) + ' (' + qpct(mg.soldPct) + ')' : 'no as-sold snapshot') : 'needs an accepted quote'}</em></div>
-        <div class="pw-prog"><small>${pg.i >= 0 ? `${escHtml(stageName('project', p.stageId))} · stage ${pg.i + 1} of ${pg.n}` : 'Not started'}</small><div class="pw-bar"><i style="width:${Math.max(0, pg.pct)}%"></i></div></div>
+        <div class="pw-prog"><small>${pg.i >= 0 ? `${escHtml(stageName('project', projStageId(p)))} · stage ${pg.i + 1} of ${pg.n}` : 'Not started'}</small><div class="pw-bar"><i style="width:${Math.max(0, pg.pct)}%"></i></div></div>
       </div>${pwUi.edit && pwUi.edit.pid === p.id ? `<div class="pw-editing">✎ Editing ${PW_EDIT_NAME[pwUi.edit.kind] || ''}: changes are a draft until you press Save below.</div>` : ''}</div>
     <nav class="pw-nav" aria-label="Project sections">${PW_SECS.map(([k, n]) => `<button type="button" data-pw="sec" data-sec="${k}" class="${pwUi.sec === k ? 'active' : ''}">${n}</button>`).join('')}</nav></div>`;
 }
@@ -6162,10 +6279,10 @@ function pwEventRow(e){
   const flags = (e.flags || []).map(f => `<span class="qb-flag bad">⚠ ${escHtml(f)}</span>`).join(' '), amt = e.amount !== undefined ? `<b class="pw-amt ${e.kind}">${e.kind === 'out' ? '−' : ''}${qm(e.amount)}</b>` : '';
   const when = e.end && e.end !== e.date ? `${pwD(e.date)} → ${pwD(e.end)}` : pwD(e.date);
   const msc = e.kind === 'milestone' ? ' ms-' + e.ms : '';
-  const also = (e.msList || []).map(m => `<span class="pw-ms-chip ms-${m.st}" title="Milestone: ${PW_MS_LABEL[m.st]}"><i class="pw-dia"></i>${escHtml(m.title)}${m.done ? '' : ` <button type="button" class="sp-link" data-pw="ms-done" data-key="${m.mkey}">done today</button>`}</span>`).join(' ');
+  const also = (e.msList || []).map(m => `<span class="pw-ms-chip ms-${m.st}" title="Milestone: ${PW_MS_LABEL[m.st]}"><i class="pw-dia"></i>${escHtml(m.title)}${m.done ? '' : ` <button type="button" class="sp-link" data-pw="ms-done" data-key="${m.mkey}">mark done</button>`}</span>`).join(' ');
   return `<div class="pw-ev ${e.kind}${msc}${e.overdue ? ' over' : ''}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${PW_ICON[e.kind]}</svg>
-    <div class="pw-ev-m"><div class="pw-ev-t">${escHtml(e.title)}${e.planned ? ' <span class="qb-flag">planned</span>' : ''} ${also} ${flags}</div>
-      <div class="pw-ev-s">${PW_KIND[e.kind]} · ${when} · ${e.overdue ? '<b class="over">overdue, ' + pwRel(e.date) + '</b>' : pwRel(e.date)}${e.sub ? ' · ' + escHtml(String(e.sub).slice(0, 90)) : ''}</div></div>${amt}<div class="pw-ev-a">${pwEventActions(e)}</div></div>`;
+    <div class="pw-ev-m"><div class="pw-ev-t">${escHtml(e.title)}${e.kind === 'milestone' ? (e.isPlan ? ' <span class="qb-flag">planned</span>' : ' <span class="qb-flag ok">actual</span>') : ''}${e.late ? ` <span class="pw-slip late">${escHtml(diffText(e.diff))}</span>` : ''}${e.sl && e.sl.status === 'overdue' ? ' <span class="pw-slip late">overdue</span>' : ''}${e.sl && e.sl.late ? ` <span class="pw-slip late">${escHtml(diffText(e.sl.ed !== null ? e.sl.ed : e.sl.sd))}</span>` : ''} ${also} ${flags}</div>
+      <div class="pw-ev-s">${PW_KIND[e.kind]} · ${e.pa ? escHtml(e.pa) : when} · ${e.overdue ? '<b class="over">overdue, ' + pwRel(e.date) + '</b>' : (e.done ? '' : pwRel(e.date))}${e.pa ? '' : (e.sub ? ' · ' + escHtml(String(e.sub).slice(0, 90)) : '')}</div></div>${amt}<div class="pw-ev-a">${pwEventActions(e)}</div></div>`;
 }
 function pwEditBar(p, kind, extra){
   if(pwEditOn(p, kind)){
@@ -6180,7 +6297,7 @@ function pwEditBtn(p, kind, label){
 function pwMiniGantt(p){
   const ed = pwEditOn(p, 'timeline') ? pwUi.edit : null, drafts = ed ? ed.draft.stages : {}, today = fmt(new Date()), base = (p.baseline && p.baseline.stages) || {};
   const ev = projEvents(p).map(e => (e.kind === 'stage' && drafts[e.sid]) ? Object.assign({}, e, { date: drafts[e.sid].start || drafts[e.sid].end, end: drafts[e.sid].end || drafts[e.sid].start, changed: true }) : e), st = ev.filter(e => e.kind === 'stage');
-  const ds = ev.map(e => e.date).concat(ev.map(e => e.end).filter(Boolean)).concat([today]); (state.blackouts || []).forEach(b => ds.push(b.start, b.end)); Object.values(base).forEach(b => { if(b.start || b.end) ds.push(b.start || b.end, b.end || b.start); });
+  const ds = ev.map(e => e.date).concat(ev.map(e => e.end).filter(Boolean)).concat([today]); ev.forEach(e => { if(e.sl){ if(e.sl.as) ds.push(e.sl.as); if(e.sl.ae) ds.push(e.sl.ae); } }); (state.blackouts || []).forEach(b => ds.push(b.start, b.end)); Object.values(base).forEach(b => { if(b.start || b.end) ds.push(b.start || b.end, b.end || b.start); });
   if(!st.length && ev.length < 2) return '<div class="pw-empty">No dated stages yet. Give the stage lines start and end dates below.</div>';
   ds.sort(); let lo = ds[0], hi = ds[ds.length - 1]; if(ed){ lo = addDaysIso(lo, -10); hi = addDaysIso(hi, 14); }
   const span = Math.max(1, Math.round((toDate(hi) - toDate(lo)) / 86400000) + 1), pc = d => ((toDate(d) - toDate(lo)) / 86400000) / span * 100, wpc = (a, b) => Math.max(0.8, (Math.round((toDate(b) - toDate(a)) / 86400000) + 1) / span * 100);
@@ -6193,8 +6310,9 @@ function pwMiniGantt(p){
     const b = base[e.sid], bs = b && (b.start || b.end), be = b && (b.end || b.start), moved = b && (bs !== e.date || be !== e.end), slip = b && be ? Math.round((toDate(e.end) - toDate(be)) / 86400000) : 0;
     const ghost = moved ? `<i class="pw-g-ghost" style="left:${pc(bs)}%;width:${wpc(bs, be)}%" title="${escAttr('Original: ' + pwD(bs) + ' → ' + pwD(be))}"></i>` : '';
     const bar = `<i class="pw-g-bar${ed ? ' editable' : ''}${e.changed ? ' draft' : ''}" data-sid="${escAttr(e.sid)}" data-s="${e.date}" data-e="${e.end}" style="left:${pc(e.date)}%;width:${wpc(e.date, e.end)}%" title="${escAttr(e.title + ' · ' + pwD(e.date) + ' → ' + pwD(e.end))}">${ed ? '<b class="pw-h l" aria-label="Drag to change the start"></b><b class="pw-h r" aria-label="Drag to change the finish"></b>' : ''}</i>`;
+    const act = e.sl && e.sl.as ? `<i class="pw-g-act${e.sl.late ? ' late' : ''}" style="left:${pc(e.sl.as)}%;width:${wpc(e.sl.as, e.sl.ae || today)}%" title="${escAttr('Actual: ' + pwD(e.sl.as) + ' → ' + (e.sl.ae ? pwD(e.sl.ae) : 'in progress'))}"></i>` : '';
     const dt = ed ? `<em class="pw-g-dt" style="left:${Math.min(88, pc(e.end) + wpc(e.date, e.end))}%">${pwD(e.date)} → ${pwD(e.end)}</em>` : '';
-    return `<div class="pw-g-row"><span class="pw-g-l" title="${escAttr(e.title)}">${escHtml(e.title)}${slip ? ` <b class="pw-slip ${slip > 0 ? 'late' : 'early'}" title="Finish vs the original date">${slip > 0 ? '+' : '−'}${Math.abs(slip)}d</b>` : ''}</span><div class="pw-g-t" data-lo="${lo}" data-span="${span}">${ghost}${bar}${ev.filter(m => m.kind === 'milestone' && m.msSid === e.sid && showMs(m)).map(msm).join('')}${dt}</div></div>`;
+    return `<div class="pw-g-row"><span class="pw-g-l" title="${escAttr(e.title)}">${escHtml(e.title)}${slip ? ` <b class="pw-slip ${slip > 0 ? 'late' : 'early'}" title="Finish vs the original date">${slip > 0 ? '+' : '−'}${Math.abs(slip)}d</b>` : ''}</span><div class="pw-g-t" data-lo="${lo}" data-span="${span}">${ghost}${bar}${act}${ev.filter(m => m.kind === 'milestone' && m.msSid === e.sid && showMs(m)).map(msm).join('')}${dt}</div></div>`;
   }).join('');
   const shared = ev.filter(e => {
     if(e.kind === 'stage' || (e.kind === 'milestone' && e.planned)) return false;
@@ -6212,7 +6330,7 @@ function pwMiniGantt(p){
   return `<div class="pw-gantt${ed ? ' editing' : ''}"><div class="pw-g-head">${months.map(m => `<span style="left:${Math.max(0, pc(fmt(m)))}%">${m.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}</span>`).join('')}</div>
     <div class="pw-g-body"><div class="pw-g-over" data-lo="${lo}" data-span="${span}">${dl}${we}${wl}${ml}${bo}<i class="pw-g-hl"></i><i class="pw-today" style="left:${pc(today)}%" title="Today"></i></div>${rows}
       <div class="pw-g-row"><span class="pw-g-l">Deliveries, payments, other milestones</span><div class="pw-g-t">${shared.map(e => e.kind === 'milestone' ? msm(e) : mk(e)).join('')}</div></div></div>
-    <div class="pw-g-legend"><span><i class="pw-mk delivery"></i>Delivery</span><span><i class="pw-mk in"></i>Money in</span><span><i class="pw-mk out"></i>Money out</span>${['done', 'soon', 'overdue', 'future'].map(k => `<span><i class="pw-mk milestone ms-${k}"></i>Milestone ${PW_MS_LABEL[k].toLowerCase()}</span>`).join('')}<span><i class="pw-g-ghost-k"></i>Original dates</span><span><i class="pw-bo-k"></i>Blackout</span><span><i class="pw-today-k"></i>Today</span></div></div>`;
+    <div class="pw-g-legend"><span><i class="pw-mk delivery"></i>Delivery</span><span><i class="pw-mk in"></i>Money in</span><span><i class="pw-mk out"></i>Money out</span>${['done', 'soon', 'overdue', 'future'].map(k => `<span><i class="pw-mk milestone ms-${k}"></i>Milestone ${PW_MS_LABEL[k].toLowerCase()}</span>`).join('')}<span><i class="pw-g-ghost-k"></i>Original planned dates</span><span><i class="pw-g-act-k"></i>Actual</span><span><i class="pw-bo-k"></i>Blackout</span><span><i class="pw-today-k"></i>Today</span></div></div>`;
 }
 function pwTimelineHtml(p, i){
   const q = projAcceptedQuote(p), m = p.milestones, list = state.pipelineStages.project.filter(s => s.key), today = fmt(new Date()), ed = pwEditOn(p, 'timeline') ? pwUi.edit : null, base = (p.baseline && p.baseline.stages) || {};
@@ -6221,32 +6339,46 @@ function pwTimelineHtml(p, i){
     const kinds = Object.keys(STAGE_KINDS).map(k => `<option value="${k}"${s.kind === k ? ' selected' : ''}>${STAGE_KINDS[k].label}</option>`).join('');
     const dr = ed && ed.draft.stages[s.id] ? ed.draft.stages[s.id] : { start: s.start || '', end: s.end || '' }, b = base[s.id], slip = b && (s.end || s.start) && (b.end || b.start) ? Math.round((toDate(dr.end || dr.start || s.end) - toDate(b.end || b.start)) / 86400000) : 0;
     const dates = ed ? `<td><input type="date" data-pwe="stage" data-sid="${escAttr(s.id)}" data-f="start" value="${escAttr(isoOk(dr.start))}" aria-label="Start (draft)"></td><td><input type="date" data-pwe="stage" data-sid="${escAttr(s.id)}" data-f="end" value="${escAttr(isoOk(dr.end))}" aria-label="End (draft)"></td>`
-      : `<td class="qb-calc">${s.start ? pwD(s.start) : '<span class="qb-dim">—</span>'}</td><td class="qb-calc">${s.end ? pwD(s.end) : '<span class="qb-dim">—</span>'}${slip ? ` <b class="pw-slip ${slip > 0 ? 'late' : 'early'}" title="Finish vs the original date (${b ? pwD(b.end || b.start) : ''})">${slip > 0 ? '+' : '−'}${Math.abs(slip)}d</b>` : ''}</td>`;
+      : `<td class="qb-calc">${s.start ? pwD(s.start) : '<span class="qb-dim">—</span>'}</td><td class="qb-calc">${s.end ? pwD(s.end) : '<span class="qb-dim">—</span>'}${slip ? ` <b class="pw-slip ${slip > 0 ? 'late' : 'early'}" title="Planned finish vs the original planned date (${b ? pwD(b.end || b.start) : ''})">${slip > 0 ? '+' : '−'}${Math.abs(slip)}d</b>` : ''}</td>`;
+    const sli = slInfo(s), actDiff = sli.ed !== null ? sli.ed : sli.sd, actTd = `<td class="qb-calc">${sli.as ? pwD(sli.as) : '<span class="qb-dim">—</span>'} → ${sli.ae ? pwD(sli.ae) : '<span class="qb-dim">—</span>'}${actDiff !== null ? ` <b class="pw-slip ${actDiff > 0 ? 'late' : 'early'}">${escHtml(diffText(actDiff))}</b>` : ''}${s.actEnd || s.actStart ? `<div class="qb-dim pw-sm">${escHtml(fmtStamp(s.actEnd || s.actStart))} <button type="button" class="sp-link" data-pw="st-undo" data-sid="${escAttr(s.id)}">undo</button></div>` : ''}</td><td><span class="pw-ms-chip ms-${sli.status === 'running' ? 'soon' : sli.status}"><i class="pw-dia"></i>${PW_SL_LABEL[sli.status]}</span></td>`;
     return `<tr data-drag="pstage" data-rid="${p.id}" data-ix="${si}"><td class="dg">${DRAG_H}<input ${at} data-lf="label" value="${escAttr(s.label || '')}" aria-label="Stage name"></td>
-      <td><select ${at} data-lf="kind" aria-label="Kind">${kinds}</select></td>${dates}
+      <td><select ${at} data-lf="kind" aria-label="Kind">${kinds}</select></td>${dates}${actTd}
       <td><div class="q-inline"><input type="number" step="any" min="0" ${at} data-lf="plannedValue" value="${s.plannedValue === '' ? '' : s.plannedValue}" placeholder="–" aria-label="Planned" style="width:64px"><select ${at} data-lf="plannedUnit"><option value="days"${s.plannedUnit === 'days' ? ' selected' : ''}>d</option><option value="hours"${s.plannedUnit === 'hours' ? ' selected' : ''}>h</option></select></div></td>
       <td class="qb-calc">${sold === null ? '<span class="qb-dim">—</span>' : hrs(sold)}</td><td class="qb-calc">${plan ? hrs(plan) : '—'}</td><td class="qb-calc${over ? ' q-over' : ''}">${lg ? hrs(lg) : '—'}</td>
       <td><select ${at} data-lf="paidMode" aria-label="Paid"><option value="auto"${s.paidMode === 'auto' ? ' selected' : ''}>Auto (${slPaid(s) ? 'Paid' : 'Unpaid'})</option><option value="paid"${s.paidMode === 'paid' ? ' selected' : ''}>Paid</option><option value="unpaid"${s.paidMode === 'unpaid' ? ' selected' : ''}>Unpaid</option></select></td>
-      <td class="qb-rowacts"><button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="time" data-sid="${escAttr(s.id)}">Log time</button><button class="icon-btn" data-pw="del-stage" data-ix="${si}" title="Delete stage" aria-label="Delete stage">${X_SVG}</button></td></tr>`;
+      <td class="qb-rowacts">${sli.ae ? '' : `<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="stact" data-sid="${escAttr(s.id)}|${sli.as ? 'end' : 'start'}">${sli.as ? 'Mark done' : 'Mark started'}</button>`}<button type="button" class="btn secondary qb-sm" data-pw="quick" data-q="time" data-sid="${escAttr(s.id)}">Log time</button><button class="icon-btn" data-pw="del-stage" data-ix="${si}" title="Delete stage" aria-label="Delete stage">${X_SVG}</button></td></tr>`;
   }).join('');
   const msRows = list.map(st => {
-    const d = m[st.key] || '', dv = projMsDerived(p, st.key), diff = dv.date && dv.date !== d, sid = projMsStageId(p, st.key), stg = sid && (p.stages || []).find(s => s.id === sid), sts = pwMsStatus(d || dv.date, !!d && d <= today);
-    return `<tr><td><span class="pw-ms-chip ms-${sts}"><i class="pw-dia"></i></span> <b>${escHtml(st.name)}</b>${stg ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">shown on the “${escHtml(stg.label || 'Stage')}” bar</div>` : ''}</td>
-      <td><input type="date" data-tab="projmilestone" data-idx="${i}" data-field="${st.key}" value="${escAttr(d)}" aria-label="${escAttr(st.name)} date"></td>
-      <td>${d && d <= today ? '<span class="pw-ok">✓ done</span>' : `<button type="button" class="btn secondary qb-sm" data-pw="ms-done" data-key="${st.key}">Done today</button>`}${d ? `<button type="button" class="sp-link" data-pw="ms-clear" data-key="${st.key}">clear</button>` : ''}</td>
-      <td class="qb-dim">${escHtml(dv.text)}</td><td class="qb-calc">${dv.date ? pwD(dv.date) : '—'}${diff ? `<button type="button" class="sp-link" data-pw="ms-use" data-key="${st.key}" title="Set this milestone to the date taken from its stage">use</button>` : (dv.date && dv.date === d ? ' <span class="pw-ok">✓</span>' : '')}</td></tr>`;
+    const mi = projMsInfo(p, st.key), dv = projMsDerived(p, st.key), sid = projMsStageId(p, st.key), stg = sid && (p.stages || []).find(s => s.id === sid), typed = m[st.key] || '', ac = mi.actual, hist = (p.msPlanLog || []).filter(h => h.key === st.key && h.kind === 'planned').length;
+    const planCell = `<input type="date" data-tab="projmilestone" data-idx="${i}" data-field="${st.key}" value="${escAttr(typed)}" aria-label="${escAttr(st.name)} planned date">${!mi.typed && mi.planned ? `<div class="qb-dim pw-sm">from the plan: ${pwD(mi.planned)} <button type="button" class="sp-link" data-pw="ms-use" data-key="${st.key}" title="Make this the planned date (it is logged)">set as planned</button></div>` : ''}${hist ? `<div class="qb-dim pw-sm">${hist} change${hist > 1 ? 's' : ''} logged</div>` : ''}`;
+    const actCell = ac ? `<b>${pwD(ac.date)}</b><div class="qb-dim pw-sm">${ac.evidence ? 'from the records: ' + escHtml(ac.src) : 'marked ' + escHtml(fmtStamp(ac) || '')}</div>${ac.evidence ? '' : `<button type="button" class="sp-link" data-pw="ms-undo" data-key="${st.key}">undo</button>`}` : `<button type="button" class="btn secondary qb-sm" data-pw="ms-done" data-key="${st.key}">Mark done</button>`;
+    const diffCell = mi.diff !== null ? `<b class="pw-slip ${mi.diff > 0 ? 'late' : 'early'}">${escHtml(diffText(mi.diff))}</b>` : (mi.status === 'overdue' ? `<b class="pw-slip late">${mi.overdueDays} day${mi.overdueDays === 1 ? '' : 's'} overdue</b>` : '<span class="qb-dim">—</span>');
+    return `<tr><td><b>${escHtml(st.name)}</b>${stg ? `<div class="qb-dim pw-sm">on the “${escHtml(stg.label || 'Stage')}” bar</div>` : ''}<div class="qb-dim pw-sm">${escHtml(dv.text)}</div></td>
+      <td>${planCell}</td><td>${actCell}</td><td>${diffCell}</td>
+      <td><span class="pw-ms-chip ms-${mi.status}"><i class="pw-dia"></i>${PW_MS_LABEL[mi.status]}</span>${mi.late ? ' <span class="pw-slip late">late</span>' : ''}</td></tr>`;
   }).join('');
   const sw = (state.blackouts || []).length;
   const bar = ed ? pwEditBar(p, 'timeline', `<button type="button" class="btn secondary qb-sm" data-pw="edit-baseline" title="Put every stage back to its original (baseline) dates in the draft">Reset to original dates</button>`) : '';
   return `<section class="pw-sec" id="pw-timeline" data-sec="timeline"><h3>Timeline</h3>
     <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan</h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div>
       <div class="pw-note pw-foot">The faint bar behind each stage is its original date. Weekends are shaded; rest the cursor on the chart for a moment to see the date.</div></div>
-    ${pwFold('t-stages', 'Stages', 'Stage lines: dates, planned and logged hours', '<button class="btn secondary" data-pw="add-stage">+ Add stage</button>', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Start</th><th>End</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
-      <tbody>${stageRows || '<tr><td colspan="10"><div class="sup-empty">No stage lines on this project yet. Add one, or promote a deal that has stage lines.</div></td></tr>'}</tbody></table></div>
+    ${pwFold('t-stages', 'Stages', 'Stage lines: dates, planned and logged hours', '<button class="btn secondary" data-pw="add-stage">+ Add stage</button>', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Planned start</th><th>Planned end</th><th>Actual start → end</th><th>Status</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
+      <tbody>${stageRows || '<tr><td colspan="12"><div class="sup-empty">No stage lines on this project yet. Add one, or promote a deal that has stage lines.</div></td></tr>'}</tbody></table></div>
       ${q ? '' : '<p class="q-help">Sold hours appear once an accepted quote is linked to this project.</p>'}${ed ? '' : '<p class="q-help">Dates change through Edit timeline (with Save, Discard and a reason), so slippage is always recorded.</p>'}`, true)}
     ${pwFold('t-lab', 'Labour check', 'Planned labour cost against time logged, stage by stage', '<button type="button" class="btn secondary" data-pw="quick" data-q="time">Log time</button>', pwLabourCheckBody(p), true)}
-    ${pwFold('t-ms', 'Milestones', 'The nine milestones and the stage or event each one lines up with', '', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Date</th><th></th><th>Lines up with</th><th>Date from there</th></tr></thead><tbody>${msRows}</tbody></table></div>
-      <p class="q-help">Milestone dates stay as you type them (and still drive the project stage). The diamond colour shows done, due soon (within a week), overdue or future; the right-hand columns show what the stages, deliveries and payments say; “use” copies that date across.</p>`, true)}</section>`;
+    ${pwFold('t-ms', 'Milestones: planned and actual', 'Planned dates come from the quote and sales steps; an actual date exists only once someone confirms it', '', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Planned</th><th>Actual</th><th>Early / late</th><th>Status</th></tr></thead><tbody>${msRows}</tbody></table></div>
+      <p class="q-help">A date passing never marks anything done: press <b>Mark done</b> (the date defaults to today and can be changed) when it has really happened. Done is green, red means the planned date has passed with no actual, or it was done later than planned. Changing a planned date asks for a reason and keeps the old date in the history. The project stage only moves when you confirm an actual.</p>`, true)}
+    ${pwFold('t-pvd', 'Plan vs delivery', 'Days late or early for everything confirmed so far, and the full history of planned-date changes', '', pwPvdBody(p), false)}</section>`;
+}
+function pwPvdBody(p){
+  const rows = projPlanVsDelivery(p), log = [];
+  (p.msPlanLog || []).forEach(h => log.push({ at: h.at, by: h.by, what: msName(h.key) + (h.kind === 'actual-cleared' ? ' (actual cleared)' : ' (planned)'), fromTxt: h.from ? pwD(h.from) : '', toTxt: h.to ? pwD(h.to) : '', reason: h.reason }));
+  (p.stages || []).forEach(s => (s.planLog || []).forEach(h => log.push({ at: h.at, by: h.by, what: (s.label || 'Stage') + (h.kind === 'actual-cleared' ? ' (actual cleared)' : ' (planned)'), fromTxt: h.fromTxt || (h.from ? pwD(h.from) : ''), toTxt: h.toTxt || '', reason: h.reason })));
+  log.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  const net = rows.reduce((a, r) => a + r.diff, 0);
+  const tbl = rows.length ? `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>What</th><th></th><th>Planned</th><th>Actual</th><th>Early / late</th></tr></thead><tbody>${rows.map(r => `<tr><td>${escHtml(r.name)}</td><td class="qb-dim">${r.kind}</td><td>${pwD(r.planned)}</td><td>${pwD(r.actual)}</td><td><b class="pw-slip ${r.diff > 0 ? 'late' : 'early'}">${escHtml(diffText(r.diff))}</b></td></tr>`).join('')}</tbody></table></div><p class="q-help">${rows.length} confirmed item${rows.length === 1 ? '' : 's'}: ${net === 0 ? 'on time overall' : escHtml(diffText(net)) + ' in total'}.</p>` : '<p class="q-help">Nothing has a planned and an actual date yet. Press Mark done on a milestone or stage when it has happened.</p>';
+  const hist = log.length ? `<details class="pw-chg"><summary>Planned-date history (${log.length})</summary><ul>${log.map(h => `<li>${escHtml(h.what)}: ${h.fromTxt || 'not set'} → ${h.toTxt || 'not set'} · ${escHtml(h.reason || 'no reason')} <span class="pw-chg-when">${escHtml(fmtStamp(h))}</span></li>`).join('')}</ul></details>` : '<p class="q-help">No planned dates have been changed.</p>';
+  return tbl + hist;
 }
 function pwLineDropName(wq, id){ const d = wq.drops.find(x => x.id === id); return d ? (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop')) : 'No drop'; }
 function pwPoCell(p, x, plan){
@@ -6279,20 +6411,21 @@ function pwMaterialsHtml(p, i){
   const src = dl.q ? (plan ? `<div class="pw-qbar" style="margin-top:8px;">Deliveries are edited here, on the <b>Working plan</b> (copied from <b>${escHtml(qRef(dl.q))}</b> when the project was won). The quote keeps its as-sold copy untouched.${pwEditBtn(p, 'delivery', 'Edit deliveries')}<button type="button" class="btn secondary qb-sm" data-qba="open-drop" data-qid="${dl.q.id}" data-id="${dl.drops[0] ? escAttr(dl.drops[0].d.id) : ''}"${dl.drops.length ? '' : ' disabled'}>View as sold on the quote</button></div>`
     : `<div class="pw-qbar" style="margin-top:8px;">From <b>${escHtml(qRef(dl.q))}</b> (${dl.q.status}). Once the quote is accepted and the project is live, deliveries are edited here. A drop dated before the order date or after install starts is flagged.<button type="button" class="btn secondary qb-sm" data-qba="open-drop" data-qid="${dl.q.id}" data-id="${dl.drops[0] ? escAttr(dl.drops[0].d.id) : ''}"${dl.drops.length ? '' : ' disabled'}>Edit drops on the quote</button></div>`) : '';
   return `<section class="pw-sec" id="pw-materials" data-sec="materials"><h3>Materials and deliveries</h3>
-    <div class="pw-card pw-wide"><div class="pw-money"><div><small>Materials ordered</small><b>${m.materialsOrdered ? pwD(m.materialsOrdered) : (order ? pwD(order) + ' (planned)' : '—')}</b></div><div><small>Install starts</small><b>${inst ? pwD(inst) : '—'}</b></div></div>
+    <div class="pw-card pw-wide"><div class="pw-money"><div><small>Materials ordered</small><b>${projMsActual(p, 'materialsOrdered') ? pwD(projMsActual(p, 'materialsOrdered').date) : (order ? pwD(order) + ' (planned)' : '—')}</b></div><div><small>Install starts</small><b>${inst ? pwD(inst) : '—'}</b></div></div>
       ${src}${table}</div></section>`;
 }
 /* ---------- change log ---------- */
 const CHANGE_CAUSES = [['price', 'Price rise'], ['qty', 'Quantity or waste'], ['customer', 'Customer-driven'], ['unforeseen', 'Unforeseen'], ['ours', 'Our error']];
 const causeName = k => (CHANGE_CAUSES.find(c => c[0] === k) || [k, k])[1];
 let chgResolver = null;
-function chgAsk(title, lines){
+function chgAsk(title, lines, opts){
+  const causes = (opts && opts.causes) || CHANGE_CAUSES, saveLabel = (opts && opts.save) || 'Save changes';
   return new Promise(resolve => {
     chgResolver = resolve; document.getElementById('chgTitle').textContent = title;
     document.getElementById('chgBody').innerHTML = `<ul class="chg-list">${lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul>
-      <div class="lp-f"><label>Cause</label><select id="chgCause"><option value="">Choose…</option>${CHANGE_CAUSES.map(c => `<option value="${c[0]}">${c[1]}</option>`).join('')}</select></div>
+      <div class="lp-f"><label>Cause</label><select id="chgCause"><option value="">Choose…</option>${causes.map(c => `<option value="${c[0]}">${c[1]}</option>`).join('')}</select></div>
       <div class="lp-f"><label>Reason (required)</label><textarea id="chgReason" rows="3" maxlength="300" placeholder="Short reason, e.g. supplier price rose on 1 Nov"></textarea></div><div class="chg-err" id="chgErr"></div>
-      <div class="modal-actions"><button class="btn secondary" type="button" data-chg="cancel">Back to editing</button><button class="btn" type="button" data-chg="save">Save changes</button></div>`;
+      <div class="modal-actions"><button class="btn secondary" type="button" data-chg="cancel">Back to editing</button><button class="btn" type="button" data-chg="save">${saveLabel}</button></div>`;
     document.getElementById('chgOverlay').hidden = false; document.getElementById('chgReason').focus();
   });
 }
@@ -6331,8 +6464,8 @@ function pwDraftChanges(p, e){
   }
   return planDiff(p.plan, e.draft.plan);
 }
-function pwDraftApply(p, e){
-  if(e.kind === 'timeline'){ Object.keys(e.draft.stages).forEach(sid => { const s = (p.stages || []).find(x => x.id === sid), d = e.draft.stages[sid]; if(s){ s.start = d.start || ''; s.end = d.end || ''; } }); }
+function pwDraftApply(p, e, r){
+  if(e.kind === 'timeline'){ Object.keys(e.draft.stages).forEach(sid => { const s = (p.stages || []).find(x => x.id === sid), d = e.draft.stages[sid]; if(s){ if((s.start || '') !== (d.start || '') || (s.end || '') !== (d.end || '')) (s.planLog = s.planLog || []).push({ id: qRand('pl_'), kind: 'planned', fromTxt: pwD(s.start) + ' → ' + pwD(s.end), toTxt: pwD(d.start) + ' → ' + pwD(d.end), at: new Date().toISOString(), by: whoName(), reason: r ? (r.cause ? causeName(r.cause) + ': ' : '') + r.reason : '' }); s.start = d.start || ''; s.end = d.end || ''; } }); }
   else p.plan = Object.assign({}, p.plan, e.draft.plan);
 }
 async function pwEditSave(){
@@ -6340,7 +6473,7 @@ async function pwEditSave(){
   const changes = pwDraftChanges(p, e);
   if(!changes.length){ pwUi.edit = null; renderProjects(); showToast('No changes to save'); return; }
   const r = await chgAsk('Save these changes?', changes); if(!r) return;
-  pwDraftApply(p, e); chgLog(p, e.kind, r, changes); pwUi.edit = null; saveState(); render(); showToast('Saved and logged');
+  pwDraftApply(p, e, r); chgLog(p, e.kind, r, changes); pwUi.edit = null; saveState(); render(); showToast('Saved and logged');
 }
 async function pwEditDiscard(){
   const e = pwUi.edit, p = e && state.projects.find(x => x.id === e.pid); if(!p) return;
@@ -6535,11 +6668,12 @@ function pwClick(b){
   if(a === 'new-version'){ const aq = projAcceptedQuote(p); if(aq) navGo(() => { qNewVersion(aq); activateTab('quotations'); window.scrollTo(0, 0); }); return; }
   if(a === 'drop-add' && pwUi.edit){ pwUi.edit.draft.plan.drops.push({ id: qRand('dr_'), label: 'New drop', supplierId: '', date: '', method: 'delivered', charge: 0, chargeManual: false, paymentDueDate: '', dueManual: false }); qAutoDrops(pwDraftQuote()); renderProjects(); return; }
   if(a === 'drop-del' && pwUi.edit){ const pl = pwUi.edit.draft.plan; pl.drops = pl.drops.filter(d => d.id !== b.dataset.id); pl.lines.forEach(l => { if(l.deliveryDropId === b.dataset.id) l.deliveryDropId = ''; }); renderProjects(); return; }
-  if(a === 'ms-done' || a === 'ms-use'){
-    const key = b.dataset.key, name = (state.pipelineStages.project.find(s => s.key === key) || {}).name || key, date = a === 'ms-use' ? projMsDerived(p, key).date : today;
-    pwSetDate(name, () => p.milestones[key] || '', v => { p.milestones[key] = v; const auto = autoProjectStageId(p), list = state.pipelineStages.project; if(v && auto && list.findIndex(x => x.id === auto) > list.findIndex(x => x.id === p.stageId)) p.stageId = auto; }, date); return;
-  }
-  if(a === 'ms-clear'){ const key = b.dataset.key; pwSetDate((state.pipelineStages.project.find(s => s.key === key) || {}).name || key, () => p.milestones[key] || '', v => { p.milestones[key] = v; }, ''); return; }
+  if(a === 'complete'){ pwMarkCompleted(p); return; }
+  if(a === 'reopen'){ pwReopen(p); return; }
+  if(a === 'ms-done'){ pwQuickOpen('milestone', b.dataset.key); return; }
+  if(a === 'ms-use'){ const key = b.dataset.key, d = projMsPlanned(p, key).date; if(d) projMsPlanChange(p, key, d); return; }
+  if(a === 'ms-undo'){ pwUndoActual(p, 'ms', b.dataset.key); return; }
+  if(a === 'st-undo'){ pwUndoActual(p, 'st', b.dataset.sid); return; }
   if(a === 'inv-sent' || a === 'pay-paid'){ const l = p.paymentLines[idx]; if(!l) return; const f = a === 'inv-sent' ? 'invoicedDate' : 'paidDate'; if(f === 'paidDate' && !l.invoicedDate) l.invoicedDate = today; pwSetDate((a === 'inv-sent' ? 'Invoice sent' : 'Paid') + ': ' + (l.desc || 'payment'), () => l[f] || '', v => { l[f] = v; }, today); return; }
   if(a === 'del-done' || a === 'del-undo'){ const id = b.dataset.did; const st = p.dropState[id] = p.dropState[id] || {}; pwSetDate('Delivered', () => st.delivered || '', v => { st.delivered = v; }, a === 'del-done' ? today : ''); return; }
   if(a === 'sup-paid' || a === 'sup-unpaid'){ const id = b.dataset.did; const st = p.dropState[id] = p.dropState[id] || {}; pwSetDate('Supplier paid', () => st.paid || '', v => { st.paid = v; }, a === 'sup-paid' ? today : ''); return; }
@@ -6814,7 +6948,7 @@ function pwLabourRows(p){
     let ph = 0, pc = 0; if(c) wq.labour.forEach(r => { const x = c.labour[r.id]; if(r.stageId !== st.id || !x || x.excluded) return; ph += qLabourDays(r) * hpd(); pc += (Number(x.amount) || 0) / prof; });
     if(!(pc > 0) && slPlannedHours(st) > 0){ ph = slPlannedHours(st); pc = ph * defHr; }
     const lh = slLogged(st), rate = ph > 0 && pc > 0 ? pc / ph : defHr, logs = (st.log || []).map(x => x.date).filter(Boolean).sort(), end = st.end || st.start || '';
-    return { id: st.id, label: st.label || 'Stage', ph, pc: r2(pc), lh, rate, lc: r2(lh * rate), end, last: logs.length ? logs[logs.length - 1] : '', done: !!end && end < today };
+    return { id: st.id, label: st.label || 'Stage', ph, pc: r2(pc), lh, rate, lc: r2(lh * rate), end, last: logs.length ? logs[logs.length - 1] : '', done: !!(st.actEnd && st.actEnd.date) };
   }).filter(g => g.ph > 0 || g.pc > 0 || g.lh > 0);
   const unplaced = c ? wq.labour.filter(r => !stages.some(s => s.id === r.stageId) && c.labour[r.id] && !c.labour[r.id].excluded && c.labour[r.id].amount > 0).length : 0;
   return { rows, unplaced };
@@ -6928,6 +7062,26 @@ function pwInfoHtml(p, i){
     ${pwFold('i-log', 'Change log', nl ? nl + (nl === 1 ? ' change' : ' changes') + ' recorded' : 'No changes recorded yet', '', pwChangeLogBody(p), false)}</section>`;
 }
 /* one-click actions: the date defaults to today; clearing offers Undo */
+async function pwMarkCompleted(p){
+  const so = projMsActual(p, 'signOff'), fin = projFinalPayment(p), miss = [];
+  if(!so) miss.push('sign-off has not been confirmed'); if(!(fin && fin.paidDate)) miss.push(fin ? 'the final payment is not marked paid' : 'there is no final payment line');
+  const ok = await showConfirmLabel('Mark this project completed?', miss.length ? `Not everything is in place: ${miss.join(' and ')}. You can still mark it completed; it is recorded as completed by you, and you can reopen it at any time.` : 'Sign-off is confirmed and the final payment is paid. The project is recorded as completed and can be reopened.', 'Mark completed'); if(!ok) return;
+  p.completed = { date: fmt(new Date()), at: new Date().toISOString(), by: whoName(), how: 'manual', warned: miss }; delete p.reopened; projAdopt(p);
+  saveState(); render(); showToast('Project marked completed', () => { p.completed = null; render(); saveState(); });
+}
+async function pwReopen(p){
+  const ok = await showConfirmLabel('Reopen this project?', 'It goes back to being a live project. Nothing is deleted; dates, payments and actuals stay as they are.', 'Reopen'); if(!ok) return;
+  p.completed = null; p.reopened = { at: new Date().toISOString(), by: whoName() }; saveState(); render(); showToast('Project reopened');
+}
+/* take an actual back: it asks why and the clearing is kept in the history */
+async function pwUndoActual(p, kind, id){
+  const what = kind === 'ms' ? msName(id) : ((p.stages || []).find(s => s.id === id) || {}).label || 'Stage';
+  const r = await chgAsk('Clear the actual date?', [`${what}: the confirmed date is removed and it goes back to planned. The planned date is not changed.`], { causes: [['mistake', 'Marked by mistake'], ['reopened', 'Work reopened'], ['other', 'Other']], save: 'Clear actual' }); if(!r) return;
+  const why = r.cause + ': ' + r.reason;
+  if(kind === 'ms') projMsUnconfirm(p, id, why);
+  else { const s = (p.stages || []).find(x => x.id === id); if(s){ const old = s.actEnd || s.actStart; s.actEnd = null; s.actStart = null; (s.planLog = s.planLog || []).push({ id: qRand('pl_'), kind: 'actual-cleared', from: old ? old.date : '', to: '', at: new Date().toISOString(), by: whoName(), reason: why }); } }
+  render(); saveState(); showToast('Actual cleared; back to planned');
+}
 function pwSetDate(label, get, set, date){
   const before = get(); set(date); const p = state.projects.find(x => x.id === pwUi.id); render(); saveState();
   showToast(date ? `${label}: ${pwD(date)}` : `${label} cleared`, () => { set(before); render(); saveState(); });
@@ -6944,7 +7098,8 @@ function pwQuickOpen(kind, sid){
   const today = fmt(new Date()), o = (arr, sel) => arr.map(([v, n]) => `<option value="${escAttr(v)}"${v === sel ? ' selected' : ''}>${escHtml(n)}</option>`).join('');
   let title = '', body = '';
   if(kind === 'time'){ title = 'Log time'; body = `<div class="lp-f"><label>Stage</label><select id="pwqStage">${o((p.stages || []).map(s => [slEnsure(s).id, s.label || 'Stage']), sid)}</select></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>Hours</label><input type="number" step="any" min="0" id="pwqHours" placeholder="e.g. 4"></div></div><div class="lp-f"><label>Note (optional)</label><input id="pwqNote"></div>`; }
-  else if(kind === 'milestone'){ const open = state.pipelineStages.project.filter(s => s.key && !(p.milestones[s.key] && p.milestones[s.key] <= today)); title = 'Mark milestone done'; body = `<div class="lp-f"><label>Milestone</label><select id="pwqMs">${o(open.map(s => [s.key, s.name]), open[0] && open[0].key)}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>`; }
+  else if(kind === 'milestone'){ const open = state.pipelineStages.project.filter(s => s.key && !projMsActual(p, s.key)); title = 'Mark milestone done'; body = open.length ? `<div class="lp-f"><label>Milestone</label><select id="pwqMs">${o(open.map(s => [s.key, s.name + (projMsPlanned(p, s.key).date ? ' (planned ' + pwD(projMsPlanned(p, s.key).date) + ')' : '')]), (sid && open.some(s => s.key === sid)) ? sid : open[0].key)}</select></div><div class="lp-f"><label>Date it actually happened</label><input type="date" id="pwqDate" value="${today}" max="${today}"></div><p class="q-help" style="margin:0;">This confirms it happened. The planned date is not changed, and the difference is shown as days early or late.</p>` : '<div class="pw-empty">Every milestone already has an actual date.</div>'; }
+  else if(kind === 'stact'){ const parts = String(sid).split('|'), s = (p.stages || []).find(x => slEnsure(x).id === parts[0]), which = parts[1] === 'start' ? 'start' : 'end'; pwUi.quick.sid = parts[0]; pwUi.quick.which = which; title = which === 'start' ? 'Mark stage started' : 'Mark stage done'; body = `<p class="q-help" style="margin:0 0 8px;">${escHtml(s ? (s.label || 'Stage') : 'Stage')} · planned ${s ? pwD(s.start || s.end) + ' → ' + pwD(s.end || s.start) : ''}</p><div class="lp-f"><label>Date it actually ${which === 'start' ? 'started' : 'finished'}</label><input type="date" id="pwqDate" value="${today}" max="${today}"></div>`; }
   else if(kind === 'invoice' || kind === 'paid'){ const f = kind === 'invoice' ? 'invoicedDate' : 'paidDate', open = p.paymentLines.map((l, ix) => [String(ix), `${l.desc || 'Payment'} · ${qm(l.amount)}${l.dueDate ? ' · due ' + l.dueDate : ''}`, l]).filter(x => !x[2][f]); title = kind === 'invoice' ? 'Mark invoice sent' : 'Mark paid'; body = open.length ? `<div class="lp-f"><label>Payment line</label><select id="pwqPay">${o(open.map(x => [x[0], x[1]]), open[0][0])}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>` : '<div class="pw-empty">Every payment line already has this date.</div>'; }
   else if(kind === 'varapprove'){ const v = (p.variations || []).find(x => x.id === sid); title = 'Approve ' + (v ? v.ref : 'variation'); body = `<p class="q-help" style="margin:0 0 8px;">${v ? escHtml(v.desc) + ' · ' + qm(v.price) + ' ex VAT' : ''}</p><label class="q-check"><input type="checkbox" id="pwqTick"> The customer has approved this variation</label><div class="lp-f"><label>Who approved it</label><input id="pwqWho" value="${escAttr(projCustomer(p).name)}"></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>When</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>How</label><select id="pwqHow">${VAR_HOW.map(h => `<option value="${h[0]}">${h[1]}</option>`).join('')}</select></div></div><div class="lp-f"><label>Attachment (optional, up to 1.2 MB)</label><input type="file" id="pwqFile" accept="image/*,application/pdf,.eml,.msg"></div><div class="chg-err" id="pwqErr"></div>`; }
   else if(kind === 'customer'){ const cu = projCustomer(p), f = (label, field, val, ph) => `<div class="lp-f"><label>${label}</label><input id="pwqc_${field}" value="${escAttr(val || '')}" placeholder="${escAttr(ph || '')}"></div>`; title = 'Customer and site';
@@ -6958,7 +7113,8 @@ function pwQuickSave(){
   if(qk.kind === 'time'){
     const s = (p.stages || []).find(x => x.id === v('pwqStage')), h = Number(v('pwqHours')); if(!s || !(h > 0)){ showToast('Choose a stage and enter the hours'); return; }
     slEnsure(s); s.log.push({ id: qRand('lg_'), date, hours: h, note: v('pwqNote').trim() }); showToast(`Logged ${hrs(h)} on ${s.label || 'the stage'}`);
-  } else if(qk.kind === 'milestone'){ const key = v('pwqMs'); if(!key) return; p.milestones[key] = date; const auto = autoProjectStageId(p), list = state.pipelineStages.project; if(auto && list.findIndex(x => x.id === auto) > list.findIndex(x => x.id === p.stageId)) p.stageId = auto; showToast('Milestone marked done'); }
+  } else if(qk.kind === 'milestone'){ const key = v('pwqMs'); if(!key) return; if(date > fmt(new Date())){ showToast('An actual date cannot be in the future. A future date belongs in the planned date.'); return; } projMsConfirm(p, key, date); const mi = projMsInfo(p, key); showToast(msName(key) + ' done ' + pwD(date) + (mi.diff !== null ? ' (' + diffText(mi.diff) + ')' : '')); }
+  else if(qk.kind === 'stact'){ const s = (p.stages || []).find(x => x.id === qk.sid); if(!s){ pwQuickClose(); return; } if(date > fmt(new Date())){ showToast('An actual date cannot be in the future.'); return; } if(qk.which === 'start') s.actStart = stampNow(date, 'Marked started'); else s.actEnd = stampNow(date, 'Marked done'); showToast((s.label || 'Stage') + (qk.which === 'start' ? ' started ' : ' done ') + pwD(date)); }
   else if(qk.kind === 'invoice' || qk.kind === 'paid'){ const l = p.paymentLines[Number(v('pwqPay'))]; if(!l){ pwQuickClose(); return; } if(qk.kind === 'invoice') l.invoicedDate = date; else { l.paidDate = date; if(!l.invoicedDate) l.invoicedDate = date; } showToast(qk.kind === 'invoice' ? 'Invoice marked sent' : 'Marked paid'); }
   else if(qk.kind === 'customer'){ ['contact', 'company', 'phone', 'email', 'address', 'postcode', 'source', 'projectName'].forEach(k => { p[k] = v('pwqc_' + k).trim(); }); showToast('Customer and site details saved'); }
   else if(qk.kind === 'note'){ const n = v('pwqNote').trim(); if(!n) return; p.comms = p.comms || []; p.comms.push({ date, note: n, created: Date.now() }); showToast('Note added'); }
@@ -6975,13 +7131,13 @@ const expandedProjectsP = new Set();
 function projectDetailHtml(p, i){
   const m = p.milestones || {}, projStages = state.pipelineStages.project;
       let html = `<div class="detail-box">
-        <div class="detail-head"><span class="detail-code" style="background:var(--green);">${recordCode(p.id,'project')}</span><span>${escAttr(p.name)}</span><span class="detail-meta">Stage: ${escHtml(stageName('project', p.stageId))}</span></div>
+        <div class="detail-head"><span class="detail-code" style="background:var(--green);">${recordCode(p.id,'project')}</span><span>${escAttr(p.name)}</span><span class="detail-meta">Stage: ${escHtml(stageName('project', projStageId(p)))}</span></div>
         ${moveStripHtml('project', p, i)}
         ${recTasksHtml('project', p)}
         ${quoteChipHtml(p.id)}${projStageTimeHtml(p)}
         <div class="stage-label-row">Delivery milestones</div>
         <div class="milestone-grid">
-          ${projStages.filter(st => st.key).map(st => `<div><label>${escHtml(st.name)}</label><input type="date" data-tab="projmilestone" data-idx="${i}" data-field="${st.key}" value="${m[st.key]||''}"></div>`).join('')}
+          ${projStages.filter(st => st.key).map(st => { const mi = projMsInfo(p, st.key); return `<div><label>${escHtml(st.name)} · planned</label><input type="date" data-tab="projmilestone" data-idx="${i}" data-field="${st.key}" value="${m[st.key]||''}"><div class="qb-dim pw-sm">${mi.actual ? 'Actual ' + escHtml(dShow(mi.actual.date)) + (mi.diff !== null ? ' (' + escHtml(diffText(mi.diff)) + ')' : '') : PW_MS_LABEL[mi.status] + ' · open the project to mark it done'}</div></div>`; }).join('')}
         </div>
         <div class="qual-grid">
           <div class="qual-field"><label>Budgeted cost (£)</label><input type="number" step="1" data-tab="projects" data-idx="${i}" data-field="budgetedCost" value="${p.budgetedCost||0}"></div>
@@ -7010,12 +7166,58 @@ function projectDetailHtml(p, i){
   return html;
 }
 
+/* ---------- Plan vs delivery roll-up, and the one-off check of existing projects ---------- */
+const pvdUi = { all: false };
+function pvdCheckRows(){   // existing projects: every typed date that used to show as done, and what it shows as now
+  const today = fmt(new Date()), out = [];
+  state.projects.forEach(p => {
+    if(p.pvaV || p.reviewDone) return;
+    const rows = [];
+    state.pipelineStages.project.forEach(st => { if(!st.key) return; const typed = (p.milestones || {})[st.key]; if(!typed || typed > today) return; const mi = projMsInfo(p, st.key), ex = (p.msActual || {})[st.key];
+      rows.push({ key: st.key, name: st.name, typed, kept: !!mi.actual, explicit: !!ex, src: mi.actual ? (ex ? 'confirmed' : mi.actual.src) : '', overdueDays: mi.overdueDays }); });
+    const stored = stageName('project', p.stageId), now = stageName('project', projStageId(p));
+    if(rows.length) out.push({ p, rows, stored, now });
+  });
+  return out;
+}
+function renderProjectsPvd(){
+  const el = document.getElementById('projectsPvd'); if(!el) return;
+  if(pwUi.id){ el.innerHTML = ''; return; }
+  const chk = pvdCheckRows(), roll = pvdRollup(!pvdUi.all);
+  let html = '';
+  if(chk.length){
+    html += `<details class="pvd-card" open><summary><b>Check existing projects</b> <span class="qb-dim">Planned and actual dates now work differently: ${chk.length} project${chk.length > 1 ? 's have' : ' has'} dates that used to count as done</span></summary>
+      <p class="q-help">Dates already typed are now read as <b>planned</b> dates. Nothing stored has changed. A milestone shows as done only where the records prove it (a paid or invoiced payment line, a delivery marked delivered, the quote's accepted date) or where it has been confirmed. Check each line, then confirm what really happened.</p>
+      ${chk.map(c => `<div class="pvd-proj"><div class="pvd-h"><b>${escHtml(c.p.name)}</b> <span class="qb-dim">${recordCode(c.p.id, 'project')} · stage stored as “${escHtml(c.stored)}”, shown now as “${escHtml(c.now)}”</span></div>
+        ${c.rows.map(r => `<div class="pvd-row"><div class="pvd-n"><b>${escHtml(r.name)}</b><span class="qb-dim pw-sm">typed ${escHtml(dShow(r.typed))} · before: Done</span></div>
+          <div class="pvd-now">${r.kept ? `<span class="pw-ms-chip ms-done"><i class="pw-dia"></i>Still done</span> <span class="qb-dim pw-sm">${escHtml(r.src)}</span>` : `<span class="pw-ms-chip ms-overdue"><i class="pw-dia"></i>Now planned, overdue ${r.overdueDays} day${r.overdueDays === 1 ? '' : 's'}</span> <span class="qb-dim pw-sm">no hard evidence</span>`}</div>
+          <div class="pvd-btn">${r.kept ? '' : `<button type="button" class="btn secondary qb-sm" data-pvd="confirm" data-id="${c.p.id}" data-key="${r.key}">Confirm done ${escHtml(dShow(r.typed))}</button>`}</div></div>`).join('')}
+        <div class="pvd-acts"><button type="button" class="btn secondary qb-sm" data-pvd="confirm-all" data-id="${c.p.id}">Confirm all as done on their typed dates</button><button type="button" class="btn secondary qb-sm" data-pvd="dismiss" data-id="${c.p.id}">Leave as planned, hide this check</button></div></div>`).join('')}</details>`;
+  }
+  html += `<details class="pvd-card"><summary><b>Plan vs delivery roll-up</b> <span class="qb-dim">where plans miss, from confirmed dates</span></summary>
+    <div class="pvd-tools"><label class="q-check"><input type="checkbox" data-pvd="all"${pvdUi.all ? ' checked' : ''}> Include projects that are not completed yet</label></div>
+    ${roll.length ? `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Projects</th><th>Average</th><th>Worst</th><th>On time or early</th></tr></thead><tbody>${roll.map(r => { const avg = Math.round(r.sum / r.n * 10) / 10; return `<tr><td>${escHtml(r.name)}</td><td>${r.n}</td><td><b class="pw-slip ${avg > 0 ? 'late' : 'early'}">${avg === 0 ? 'on time' : Math.abs(avg) + ' day' + (Math.abs(avg) === 1 ? '' : 's') + (avg > 0 ? ' late' : ' early')}</b></td><td>${r.worst > 0 ? r.worst + ' days late' : 'none late'}</td><td>${r.onTime} of ${r.n}</td></tr>`; }).join('')}</tbody></table></div>` : `<p class="q-help">${pvdUi.all ? 'No milestone has both a planned and an actual date yet.' : 'No completed project has milestones with both a planned and an actual date yet. Tick the box above to include live projects.'}</p>`}</details>`;
+  el.innerHTML = html;
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-pvd]'); if(!b) return; const a = b.dataset.pvd;
+  if(a === 'all') return;
+  const p = state.projects.find(x => String(x.id) === b.dataset.id); if(!p) return;
+  if(a === 'dismiss'){ p.reviewDone = true; saveState(); render(); return; }
+  const rows = pvdCheckRows().find(c => c.p === p); if(!rows) return;
+  const todo = a === 'confirm' ? rows.rows.filter(r => r.key === b.dataset.key) : rows.rows.filter(r => !r.kept);
+  if(a === 'confirm-all' && !(await showConfirm('Confirm all as done?', `${todo.length} milestone${todo.length === 1 ? '' : 's'} on ${p.name} will be recorded as done on the dates already typed (${todo.map(r => r.name).join(', ')}). The typed dates stay as the planned dates. Only do this if they really happened.`))) return;
+  todo.forEach(r => projMsConfirm(p, r.key, r.typed, 'Confirmed from the date previously typed'));
+  saveState(); render(); showToast(todo.length + ' milestone' + (todo.length === 1 ? '' : 's') + ' confirmed on ' + p.name);
+});
+document.addEventListener('change', (e) => { const el = e.target; if(el.dataset && el.dataset.pvd === 'all'){ pvdUi.all = el.checked; renderProjectsPvd(); } });
 function renderProjects(){
   clearTimeout(pwLazyT);
   const pwPanel = document.getElementById('panel-projectpipeline'), pwEl = document.getElementById('projectWorkspace'), pwOpen = pwUi.id ? state.projects.find(x => x.id === pwUi.id) : null;
   if(pwUi.id && !pwOpen) pwUi.id = 0;
   pwPanel.classList.toggle('pw-open', !!pwOpen); pwEl.hidden = !pwOpen;
-  if(pwOpen){ renderProjectWorkspace(pwOpen); return; }
+  if(pwOpen){ renderProjectWorkspace(pwOpen); renderProjectsPvd(); return; }
+  renderProjectsPvd();
   if(state.projects.length === 0){
     document.getElementById('projectsTableWrap').innerHTML = `<div class="placeholder" style="border:none;background:none;"><div class="tag">No live projects yet</div><h3>Nothing here yet</h3><p>When a Sales Pipeline deal has its contract marked signed, promote it here and it becomes a live project.</p></div>`;
     return;
@@ -7031,7 +7233,7 @@ function renderProjects(){
       <td class="code-cell">${recordCode(p.id,'project')}${tierBadgeSmall(p.id, p)}</td>
       <td><input data-tab="projects" data-idx="${i}" data-field="name" value="${escAttr(p.name)}"></td>
       <td><input type="number" step="1" data-tab="projects" data-idx="${i}" data-field="agreedValue" value="${p.agreedValue||0}"${projAcceptedQuote(p) ? ' readonly title="Live from the accepted quote (ex VAT)"' : ''}></td>
-      <td><select class="lead-pill progress-pill" data-tab="projects" data-idx="${i}" data-field="stageId" title="Project stage">${projStages.map(s=>`<option value="${escHtml(s.id)}"${p.stageId===s.id?' selected':''}>${escHtml(s.name)}</option>`).join('')}</select></td>
+      <td><select class="lead-pill progress-pill" data-tab="projects" data-idx="${i}" data-field="stageId" title="Project stage">${projStages.map(s=>`<option value="${escHtml(s.id)}"${projStageId(p)===s.id?' selected':''}>${escHtml(s.name)}</option>`).join('')}</select></td>
       <td class="${costFlag?'':''}" style="${costFlag?'color:var(--bt-bad-fg);font-weight:600;':''}">${money(p.budgetedCost)} / ${money(p.actualCost)}</td>
       <td><button class="icon-btn" data-action="delete-projrec" data-idx="${i}" title="Delete project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
     </tr>`;
@@ -10299,7 +10501,12 @@ function promoteToProject(id){
   carryFields(s, proj);   // contact, address, qualification… stay with the record so it can go back (a filled-in value is never blanked by an empty one)
   if(s.leadSnapshot) proj.leadSnapshot = s.leadSnapshot;
   proj.salesSnapshot = salesSnap;
+  if(!s.projectHold){   // a new project follows confirmations; the contract signed date typed in Sales is an event that happened, so it is its first actual
+    proj.actualsMode = true; proj.pvaV = 1; proj.stageId = firstStageId('project');
+    const cs = proj.milestones.contractSigned; if(cs && cs <= fmt(new Date())){ proj.msActual = proj.msActual || {}; proj.msActual.contractSigned = stampNow(cs, 'Contract marked signed in Sales'); }
+  }
   if(!stageById('project', proj.stageId)) proj.stageId = autoProjectStageId(proj) || firstStageId('project');
+  if(proj.actualsMode) projAdvance(proj);
   moveLog(proj, s.projectHold ? 'Promoted again: Sales Pipeline → Project Pipeline (earlier project details restored)' : 'Promoted: Sales Pipeline → Project Pipeline');
   state.pipeline.splice(idx, 1);
   state.projects.push(proj);
@@ -10372,7 +10579,7 @@ function moveStripHtml(pl, r, i){
       ${r.contractSigned ? `<button class="promote-btn" data-action="promote-project" data-id="${r.id}">Promote to Project Pipeline →</button>` : `<span class="gate-msg">Set the contract signed date to promote.</span>`}
       <button class="btn secondary" data-action="return-record" data-pl="sales" data-id="${r.id}">← Return to Lead Pipeline</button></div>`;
   }
-  const opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${r.stageId === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
+  const opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${projStageId(r) === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
   return `<div class="move-strip"><label>Project stage <select data-tab="projects" data-idx="${i}" data-field="stageId">${opts}</select></label>
     <button class="btn secondary" data-action="return-record" data-pl="project" data-id="${r.id}">← Return to Sales Pipeline</button></div>`;
 }
@@ -12249,7 +12456,7 @@ function pjBuildRow(g, shared, today, staleN){
   ctx.tasks.forEach(t => { put(t.completedAt); });   // finishing a task is a touch; merely creating one is not
   ctx.quotes.forEach(q => { put(q.sentAt); put(q.acceptedDate); put(q.date); });
   ctx.txns.forEach(t => put(t.date));
-  if(p){ (p.paymentLines || []).forEach(l => { put(l.invoicedDate); put(l.paidDate); }); Object.values(p.milestones || {}).forEach(put); }
+  if(p){ (p.paymentLines || []).forEach(l => { put(l.invoicedDate); put(l.paidDate); }); Object.values(p.msActual || {}).forEach(x => x && put(x.date)); }
   const lastTouch = touch.sort().slice(-1)[0] || '', days = lastTouch ? Math.max(0, dashDays(lastTouch, today)) : null;
   // overdue items
   const overdue = [], seenDrops = new Set();
@@ -12278,8 +12485,8 @@ function pjBuildRow(g, shared, today, staleN){
   // in progress: a project that has started on site (typed or planned date reached) and whose build is not yet complete
   let inProgress = null;
   if(pl === 'project'){
-    let startD = ''; try{ const m = p.milestones || {}; startD = m.onSiteStart || projMsDerived(p, 'onSiteStart').date || ''; }catch(e){}
-    const bc = (p.milestones || {}).buildComplete; inProgress = !done && !!startD && startD <= today && !(bc && bc <= today);
+    let started = false, built = false; try{ started = !!projMsActual(p, 'onSiteStart'); built = !!projMsActual(p, 'buildComplete'); }catch(e){}
+    inProgress = !done && started && !built;   // on site (confirmed), build not yet confirmed complete
   }
   // customer
   let customer = '';
@@ -12287,7 +12494,7 @@ function pjBuildRow(g, shared, today, staleN){
     if(pl === 'project'){ const c = projCustomer(p); customer = [c.name, c.company].filter(Boolean).join(' · '); }
     else { const qq = qpick && qpick.q; customer = [rec.contact || (qq && qq.customer) || '', rec.company].filter(Boolean).join(' · '); }
   }catch(e){ customer = [rec.contact, rec.company].filter(Boolean).join(' · '); }
-  const stageText = stageName(pl, rec.stageId);
+  const stageText = stageName(pl, pl === 'project' ? projStageId(rec) : rec.stageId);
   return { key: g.key, root, pl, rec, recs, ctx, code: recordCode(root, pl), name: boardTitle(pl, rec), customer, stageLabel: PJ_STAGE_NAME[pl], stageText: stageText === '—' ? '' : stageText,
     status, reasons, lost, completed, done, live: !done, inProgress, value, valueLabel, owner, next: na.next, lastTouch, days, overdue, stale, noOpenTask, qpick, deliveries };
 }
@@ -12453,7 +12660,7 @@ function pjHeadlineHtml(r){
     }catch(e){ f = null; }
     if(f){
       S.push(pjStat('Contract value', f.ct.value > 0 ? pjMoney(f.ct.value) : 'Not set', f.ct.value > 0 ? escHtml(r.valueLabel) : ''));
-      if(f.pr.n) S.push(pjStat('Stage progress', Math.max(0, f.pr.i + 1) + ' of ' + f.pr.n, escHtml(stageName('project', p.stageId))));
+      if(f.pr.n) S.push(pjStat('Stage progress', Math.max(0, f.pr.i + 1) + ' of ' + f.pr.n, escHtml(stageName('project', projStageId(p)))));
       if(f.hasInv){ S.push(pjStat('Invoiced', pjMoney(f.invoiced), 'As on the Invoicing page')); S.push(pjStat('Paid', pjMoney(f.paid))); S.push(pjStat('Outstanding', pjMoney(f.outstanding), '', f.outstanding > 0 && r.overdue.some(o => o.kind === 'Invoice') ? 'bad' : '')); }
       if(f.matBudget !== null) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'of ' + pjMoney(f.matBudget) + ' budget', f.matSpent > f.matBudget + 0.5 ? 'bad' : ''));
       else if(f.matSpent > 0) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'No budget set'));
@@ -12655,10 +12862,9 @@ function applyFieldChange(el){
   }
   else if(tab==='projmilestone' && state.projects[Number(el.dataset.idx)]){
     const p = state.projects[Number(el.dataset.idx)];
-    p.milestones = p.milestones||{}; p.milestones[field] = value;
-    const list = state.pipelineStages.project, auto = autoProjectStageId(p);   // a milestone date moves the project on to that stage (never back)
-    if(auto && list.findIndex(x => x.id === auto) > list.findIndex(x => x.id === p.stageId)) p.stageId = auto;
+    projMsPlanChange(p, field, value); return;   // a typed milestone date is the PLANNED date: it never marks anything done or moves the stage, and a change is logged with a reason
   }
+  else if(tab==='projects' && field==='stageId' && state.projects[Number(el.dataset.idx)]){ const p = state.projects[Number(el.dataset.idx)]; p.stageId = value; p.actualsMode = true; }   // a stage chosen by hand is kept
   else if(tab==='payline'){ const p=Number(el.dataset.idx), pl=Number(el.dataset.pli); if(state.projects[p] && state.projects[p].paymentLines[pl]){ const ln = state.projects[p].paymentLines[pl]; ln[field] = value; if(field === 'dueDate' && ln.quoteRowId) ln.dueManual = !!value; } }   // a due date typed on a quote-built line is kept when the quote syncs
   else if(COMMS_TABS[tab]){ const r = state[COMMS_TABS[tab]][Number(el.dataset.idx)], ci = Number(el.dataset.cidx); if(r && r.comms && r.comms[ci]) r.comms[ci][field] = value; }
   else if(tab==='pipeline' && field==='contractSigned' && state.pipeline[Number(el.dataset.idx)]){
@@ -14264,14 +14470,12 @@ function cxContactsOfCompany(coId){ return state.cxLinks.filter(l => l.kind === 
 /* ---------- the index: every deal with its contacts, built once per change ---------- */
 let cxCache = null, cxDupCache = null;
 function cxDirty(){ cxCache = null; cxDupCache = null; }
-function cxCompleted(pl, rec){
-  if(pl !== 'project') return false;
-  const list = (state.pipelineStages && state.pipelineStages.project) || [], last = list[list.length - 1];
-  return !!((last && rec.stageId === last.id) || (rec.milestones && rec.milestones.signOff));
+function cxCompleted(pl, rec){   // same rule as the project: sign-off has an actual date AND the final payment is paid, or it was marked completed
+  return pl === 'project' ? projIsCompleted(rec) : false;
 }
 function cxDealInfo(pl, rec){
   const lost = pl === 'lead' && !!rec.lost, completed = cxCompleted(pl, rec);
-  return { pl, rec, root: rec.id, code: recordCode(rec.id, pl), name: boardTitle(pl, rec), lost, completed, live: !lost && !completed, status: lost ? 'Lost' : completed ? 'Completed' : 'Live', stage: pl === 'lead' ? stageName('lead', rec.stageId) : pl === 'sales' ? stageName('sales', rec.stageId) : stageName('project', rec.stageId) };
+  return { pl, rec, root: rec.id, code: recordCode(rec.id, pl), name: boardTitle(pl, rec), lost, completed, live: !lost && !completed, status: lost ? 'Lost' : completed ? 'Completed' : 'Live', stage: pl === 'lead' ? stageName('lead', rec.stageId) : pl === 'sales' ? stageName('sales', rec.stageId) : stageName('project', projStageId(rec)) };
 }
 function cxIndex(){
   if(cxCache) return cxCache;
