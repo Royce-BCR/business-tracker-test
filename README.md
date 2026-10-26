@@ -43,3 +43,14 @@ Added on the test site (all stored in the same document, all optional and defaul
 ### Adding direct email sending later
 
 Today the app only *prepares* emails (it opens your mail app; you attach the PDF and press send). `sendEmailDirect()` in `index.html` is the empty hook, and "Direct sending: coming soon" is a disabled setting. To build it you need: an email provider (or Microsoft 365 sending), a Supabase edge function (for example `send-email`) that the page calls with the signed-in session, a verified sender domain (SPF / DKIM), the provider key stored as an edge-function secret (never in the page), and a way to attach the generated PDF (render it server-side or upload it to storage and pass a reference).
+
+## Planned vs actual, quote locking, supplier payments, reconciliation (Lynton fixes)
+
+Added on the test site, all optional and defaulting safely so existing data loads unchanged:
+
+- **Planned and actual dates.** Typed milestone and stage dates are *planned* dates (changes need a reason and are kept in the history). A milestone or stage is done only when someone presses Mark done (or the records prove it: paid or invoiced payment lines, deliveries marked delivered, the quote's accepted date). The project stage only moves on confirmed actuals. The Project Pipeline shows a one-off "Check existing projects" card listing what changed from Done to Planned on screen; nothing stored is rewritten until you confirm it.
+- **Quotes.** Sent and Accepted quotes are read-only; "Make a new version to change this" copies to an editable Draft (keeping line and drop ids) and marks a Sent original Superseded. Accepting a new version shows a change list and carries the Working plan, delivery states, transactions and POs across.
+- **Supplier payments.** "Confirm supplier payment" (project, PO or Transactions tab) records one transaction per delivery, cash or trade account, with the supplier used, the invoice and a quoted-vs-final table.
+- **Cash.** Starting balance has an "as at" date (default 1 Oct 2026). The forecast shows only unsettled items; settled items are actuals in the month they happened. Finance > Bank Reconciliation reconciles a month per account, tracks loans and locks reconciled months.
+- **Profit share** can be £ per labour hour or % of labour cost, with a per-project override.
+- **Projects** show a journey strip and a Next step; completed projects move to a Completed view and can be reopened.
