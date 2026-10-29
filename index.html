@@ -2558,6 +2558,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
       <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
       <button type="button" class="tab g-operations" data-tab="purchaseorders">Orders and deliveries</button>
+      <button type="button" class="tab g-operations" data-tab="supplierinvoices">Supplier invoices</button>
       <button type="button" class="tab g-operations" data-tab="assets">Assets</button>
     </div>
   </div>
@@ -2845,6 +2846,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <div class="desc">One order per supplier, raised from a project's delivery drops (and a second order for the same supplier when a job needs one): supplier, items, agreed prices, planned and actual delivery. Draft, Approved, Sent, Delivered, Matched (to the supplier's invoice in Transactions).</div>
     </div>
     <div id="poBody"></div>
+  </div>
+
+  <!-- SUPPLIER INVOICES -->
+  <div class="panel" id="panel-supplierinvoices">
+    <div class="page-head">
+      <h2>Supplier invoices</h2>
+      <div class="desc">The invoices and receipts entered when prices were confirmed, each linked to its order and project. Quote prices never change: differences sit beside them as variances.</div>
+    </div>
+    <div id="siBody"></div>
   </div>
 
   <!-- ASSETS -->
@@ -11695,6 +11705,37 @@ document.addEventListener('click', (e) => {
   else if(a === 'delivered') dcOpen(p.id, did);
   else if(a === 'prices'){ const po = pcOrderFor(p.id, did); if(po){ saveState(); render(); pcOpen(po.id); } }
 });
+/* ---------- Stage 2: Supplier invoices ----------
+   A list over what already exists: the receipts entered when prices were confirmed (po.receipts), plus the invoice file attached to a confirmed supplier payment when it is not the same file.
+   Each row links to its order, project and supplier, and opens the file. Nothing is stored for the page itself. */
+const siUi = { q: '', sup: '' };
+function siRows(){
+  const rows = [], seen = new Set();
+  (state.purchaseOrders || []).forEach(po => {
+    (po.receipts || []).forEach(r => { if(r.file && r.file.data) seen.add(r.file.data.length + ':' + r.file.data.slice(-40)); rows.push({ po, p: poProject(po), r, src: 'receipt', date: r.date || (r.at || '').slice(0, 10), ref: r.ref, total: r.total, file: r.file }); });
+  });
+  (state.transactions || []).filter(t => t.origin === 'supplier-payment' && t.file && t.file.data).forEach(t => {
+    const key = t.file.data.length + ':' + t.file.data.slice(-40); if(seen.has(key)) return;
+    const po = t.poId ? poFind(t.poId) : null; rows.push({ po, p: state.projects.find(x => x.id === t.projectId) || null, r: null, src: 'payment', date: t.date, ref: '', total: Number(t.moneyOut) || 0, file: t.file, txn: t });
+  });
+  return rows.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+}
+function renderSupInvoices(){
+  const el = document.getElementById('siBody'); if(!el) return; const all = siRows(), q = siUi.q.trim().toLowerCase();
+  const sups = [...new Set(all.map(x => x.po ? x.po.supplierName : '').filter(Boolean))].sort();
+  const list = all.filter(x => (!siUi.sup || (x.po && x.po.supplierName === siUi.sup)) && (!q || [x.po && x.po.ref, x.po && x.po.supplierName, x.p && x.p.name, x.ref, x.file && x.file.name].join(' ').toLowerCase().includes(q)));
+  const tot = list.reduce((a, x) => a + (Number(x.total) || 0), 0);
+  el.innerHTML = `<div class="po-tools"><input type="search" id="siQ" placeholder="Search order, supplier, project or number" value="${escAttr(siUi.q)}" aria-label="Search supplier invoices" style="max-width:320px;"><select id="siSup" aria-label="Supplier"><option value="">All suppliers</option>${sups.map(n => `<option${siUi.sup === n ? ' selected' : ''}>${escHtml(n)}</option>`).join('')}</select><span class="qb-dim">${list.length} document${list.length === 1 ? '' : 's'} · ${qm(tot)}</span></div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>Date</th><th>Supplier</th><th>Order</th><th>Project</th><th>Number</th><th>Total</th><th>Variance</th><th>File</th></tr></thead><tbody>${list.map(x => {
+      const v = x.po && x.po.pc ? x.po.pc.variance : null;
+      return `<tr><td>${x.date ? escHtml(pwD(x.date)) : '—'}</td><td>${x.po && x.po.supplierId ? `<button type="button" class="sp-link" data-nav="supplier:${x.po.supplierId}">${escHtml(x.po.supplierName)}</button>` : escHtml(x.po ? x.po.supplierName : '—')}</td>
+        <td>${x.po ? `<button type="button" class="sp-link" data-nav="po:${x.po.id}">${escHtml(x.po.ref)}</button>` : '<span class="qb-dim">not on an order</span>'}${x.src === 'payment' ? '<div class="qb-dim" style="font-size:var(--bt-fs-xs);">with a supplier payment</div>' : ''}</td>
+        <td>${x.p ? `<button type="button" class="sp-link" data-nav="project:${x.p.id}:materials">${escHtml(recordCode(x.p.id, 'project'))}</button>` : '—'}</td><td>${escHtml(x.ref || '—')}</td><td class="qb-calc">${qm(x.total)}</td>
+        <td>${v == null ? '<span class="qb-dim">prices not confirmed</span>' : (Math.abs(v) < 0.005 ? 'none' : `<b class="${v > 0 ? 'over' : 'under'}">${v > 0 ? '+' : '−'}${qm(Math.abs(v))}</b>`)}</td>
+        <td>${x.file ? `<a href="${escAttr(x.file.data)}" target="_blank" rel="noopener" download="${escAttr(x.file.name)}">${escHtml(x.file.name)}</a>` : '<span class="qb-dim">no file</span>'}</td></tr>`; }).join('') || '<tr><td colspan="8"><div class="sup-empty">No supplier invoices yet. They appear here when you confirm prices after a delivery and attach the invoice or receipt.</div></td></tr>'}</tbody></table></div></div>`;
+}
+document.addEventListener('input', (e) => { if(e.target.id === 'siQ'){ siUi.q = e.target.value; const pos = e.target.selectionStart; renderSupInvoices(); const n = document.getElementById('siQ'); if(n){ n.focus(); try{ n.setSelectionRange(pos, pos); }catch(x){} } } });
+document.addEventListener('change', (e) => { if(e.target.id === 'siSup'){ siUi.sup = e.target.value; renderSupInvoices(); } });
 /* ---------- moving a record between the three pipelines ----------
    Promotion and return keep everything. The record keeps its id (so its code, quotes and tasks stay linked) and carries:
      leadSnapshot  the lead as it was when promoted (the read-only "Original lead info" view)
@@ -14186,7 +14227,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
-  renderPOs();
+  renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
   settingsMenuSync();
@@ -14979,6 +15020,7 @@ const MENU_ICONS = {
   pricing: '<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
   projectpipeline: '<rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="13" rx="1"/>',
   suppliers: '<path d="M2 6h11v10H2zM13 9h5l3 3v4h-8z"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+  supplierinvoices: '<path d="M6 2h9l5 5v15H6z"/><polyline points="15 2 15 7 20 7"/><line x1="9" y1="13" x2="17" y2="13"/><line x1="9" y1="17" x2="14" y2="17"/>',
   purchaseorders: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l3 12h11l2-8H6"/>',
   admin: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
   businessplan: '<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><line x1="8" y1="8" x2="15" y2="8"/>',
