@@ -2417,6 +2417,12 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 
 .rp-left .assumptions-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 0; }
 .rp-cscroll .qb-table { min-width: 540px; } .rp-cscroll .qb-scroll { overflow-x: auto; }
+
+.biz-jump { display: flex; flex-wrap: wrap; gap: var(--bt-s4); margin: 0 0 var(--bt-s4); font-size: var(--bt-fs-sm); }
+.biz-sec { margin-bottom: var(--bt-s8); } .biz-h { display: flex; align-items: center; gap: var(--bt-s3); margin-bottom: var(--bt-s2); flex-wrap: wrap; } .biz-h h3 { margin: 0; font-size: var(--bt-fs-md); font-family: var(--bt-font-brand); flex: 1; }
+.biz-people { display: flex; flex-wrap: wrap; gap: var(--bt-s2) var(--bt-s5); } .biz-people .q-check { min-height: var(--bt-control); display: inline-flex; align-items: center; gap: 8px; }
+.crm-dues { display: inline-flex; align-items: center; gap: 6px; } .crm-dues input { min-height: var(--bt-control); padding: 4px 8px; }
+.tk-pickgrp { padding: 8px 10px 2px; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -2494,8 +2500,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <button type="button" class="nav-label nav-gbtn" id="gh-business" aria-expanded="false" aria-controls="gp-business"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Business</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-business" role="group" aria-labelledby="gh-business">
       <button type="button" class="tab g-business" data-tab="businessplan">Business Plan</button>
-      <button type="button" class="tab g-business" data-tab="actions">Actions</button>
-      <button type="button" class="tab g-business" data-tab="admin">Setup &amp; Admin</button>
+      <button type="button" class="tab g-business" data-tab="actions">Business tasks</button>
     </div>
   </div>
 
@@ -2841,6 +2846,12 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
         <section class="set-sec" data-sec="crm">
     <div class="section-label">CRM task options</div>
     <div class="card" id="taskOptionsCard"></div>
+
+    <div class="section-label">Who can see business tasks and costs</div>
+    <div class="card" id="bizAccessCard"></div>
+
+    <div class="section-label">Today</div>
+    <div class="card" id="todayLimitCard"></div>
         </section>
 
         <section class="set-sec" data-sec="suppliers">
@@ -3006,28 +3017,33 @@ create policy "app update" on tracker_data for update using (true) with check (t
     <div class="pw" id="supplierRecord" hidden></div>
   </div>
 
-  <!-- SETUP & ADMIN -->
-  <div class="panel" id="panel-admin">
-    <div class="page-head">
-      <h2>Setup &amp; Admin Checklist</h2>
-      <div class="desc">The temporary setup list — registration, insurance, and purchases needed to start taking on paid work. Retires once complete.</div>
-    </div>
-    <div class="btn-row"><button class="btn" data-action="add-row" data-tab="admin">+ Add item</button></div>
-    <div class="table-scroll" id="adminTableWrap"></div>
-  </div>
-
-  <!-- ACTIONS -->
+  <!-- BUSINESS TASKS: business tasks, the weekly Actions and the Setup & Admin checklist, kept as stored -->
   <div class="panel" id="panel-actions">
     <div class="page-head">
-      <h2>Actions</h2>
-      <div class="desc">The action log from the weekly catch-up. Click any cell to edit. Drag the edge of a column header to resize it. Owner fields suggest from the team but accept anyone. Overdue items (deadline passed, not Done) highlight automatically.</div>
+      <h2>Business tasks</h2>
+      <div class="desc">Work on the business rather than on a job. Business tasks (some repeat), the weekly Actions and the Setup &amp; Admin checklist are kept together here. Only the people named under Settings, CRM &amp; tasks can see this page.</div>
     </div>
-    <div class="btn-row"><button class="btn" data-action="add-row" data-tab="actions">+ Add action</button><div class="crm-colwrap" id="actColsWrap"></div></div>
-    <datalist id="ownersList">
-      <option value="Royce"><option value="Lynton"><option value="Gerry"><option value="Peter"><option value="Mike"><option value="TBC">
-    </datalist>
-    <div class="table-scroll" id="actionsTableWrap"></div>
-    <div id="archivedWrap"></div>
+    <div class="biz-jump"><button type="button" class="sp-link" data-biz="go" data-to="bizTasksSec">Business tasks</button><button type="button" class="sp-link" data-biz="go" data-to="bizActionsSec">Actions</button><button type="button" class="sp-link" data-biz="go" data-to="bizAdminSec">Setup &amp; Admin checklist</button></div>
+    <section class="biz-sec" id="bizTasksSec">
+      <div class="biz-h"><h3>Business tasks</h3><label class="crm-check"><input type="checkbox" id="bizShowDone"> Show completed</label><button type="button" class="btn" data-biz="new-task">+ New business task</button></div>
+      <div id="bizTasksWrap"></div>
+    </section>
+    <section class="biz-sec" id="bizActionsSec">
+      <div class="biz-h"><h3>Actions</h3></div>
+      <div class="desc">The action log from the weekly catch-up. Click any cell to edit. Drag the edge of a column header to resize it. Owner fields suggest from the team but accept anyone. Overdue items (deadline passed, not Done) highlight automatically.</div>
+      <div class="btn-row"><button class="btn" data-action="add-row" data-tab="actions">+ Add action</button><div class="crm-colwrap" id="actColsWrap"></div></div>
+      <datalist id="ownersList">
+        <option value="Royce"><option value="Lynton"><option value="Gerry"><option value="Peter"><option value="Mike"><option value="TBC">
+      </datalist>
+      <div class="table-scroll" id="actionsTableWrap"></div>
+      <div id="archivedWrap"></div>
+    </section>
+    <section class="biz-sec" id="bizAdminSec">
+      <div class="biz-h"><h3>Setup &amp; Admin checklist</h3></div>
+      <div class="desc">The temporary setup list: registration, insurance, and purchases needed to start taking on paid work. Retires once complete.</div>
+      <div class="btn-row"><button class="btn" data-action="add-row" data-tab="admin">+ Add item</button></div>
+      <div class="table-scroll" id="adminTableWrap"></div>
+    </section>
   </div>
 
   </main>
@@ -11695,6 +11711,9 @@ function migrateTaskTimeline(r){
   if(!r || !Array.isArray(r.comms)) return;
   r.comms.forEach(c => { if(c && typeof c === 'object' && (TASK_NOTE_PREFIX_RE.test(String(c.note || '')) || c.src === 'action') && c.src !== 'task') c.src = 'task'; });
 }
+const TASK_REF_KINDS = ['contact', 'company', 'supplier', 'quote', 'po'];   // records a task can attach to besides a lead, sale or project (those use linkedIds)
+const RECUR_UNITS = ['day', 'week', 'month', 'year'];
+function normRecur(r){ const n = r && Math.floor(Number(r.every)); return n >= 1 && n <= 52 && RECUR_UNITS.includes(r.unit) ? { every: n, unit: r.unit } : null; }
 function ensureTaskModel(o){
   const src = (o.taskOptions && typeof o.taskOptions === 'object') ? o.taskOptions : {};
   const clean = (list, seed, isType) => {
@@ -11725,7 +11744,10 @@ function ensureTaskModel(o){
       if(/^\d{4}-\d{2}-\d{2}$/.test(n.date || '')) r.date = n.date; return r; }),
     quoteId: Number(t.quoteId) > 0 ? Number(t.quoteId) : 0,
     description: iso(t.description), notesMigrated: !!t.notesMigrated, descNoteIds: Array.isArray(t.descNoteIds) ? t.descNoteIds.map(String) : [],
-    createdAt: iso(t.createdAt), createdBy: iso(t.createdBy)
+    createdAt: iso(t.createdAt), createdBy: iso(t.createdBy),
+    scope: t.scope === 'business' ? 'business' : 'job',   // a job task belongs with a customer's work; a business task with running the business
+    refs: (Array.isArray(t.refs) ? t.refs : []).filter(r => r && typeof r === 'object' && TASK_REF_KINDS.includes(r.kind) && r.id !== undefined && r.id !== '').map(r => ({ kind: r.kind, id: String(r.id) })),
+    recur: normRecur(t.recur), spawnedId: iso(t.spawnedId)
   }));
   o.crmTasks.forEach(t => migrateNotesToDescription(t, t.notes));
   (Array.isArray(o.actions) ? o.actions : []).concat(Array.isArray(o.archivedActions) ? o.archivedActions : []).forEach(a => {
@@ -11735,6 +11757,9 @@ function ensureTaskModel(o){
   });
   [o.leads, o.pipeline, o.projects].forEach(list => (Array.isArray(list) ? list : []).forEach(r => migrateTaskTimeline(r)));
   o.nextTaskNo = Math.max(Number(o.nextTaskNo) || 0, maxNo + 1);
+  { const st = (o.settings && typeof o.settings === 'object') ? o.settings : (o.settings = {});
+    st.bizAccess = Array.isArray(st.bizAccess) ? st.bizAccess.map(x => String(x).trim()).filter(Boolean) : ['Lynton', 'Royce'];   // who can see business tasks and costs
+    const tl = Math.floor(Number(st.todayLimit)); st.todayLimit = tl >= 1 && tl <= 200 ? tl : 10; }
   const pr = (o.crmPrefs && typeof o.crmPrefs === 'object') ? o.crmPrefs : {};
   o.crmPrefs = { hiddenCols: (Array.isArray(pr.hiddenCols) ? pr.hiddenCols : []).filter(x => typeof x === 'string') };
   const ap = (o.actionPrefs && typeof o.actionPrefs === 'object') ? o.actionPrefs : {};   // optional Actions columns that are switched on (none by default)
@@ -11836,7 +11861,8 @@ function createTask(f){
     id: 'T-' + String(state.nextTaskNo++).padStart(3, '0'), title: String(f.title).trim(),
     dueDate: f.dueDate || '', priorityId: prioOpt(f.priorityId) ? f.priorityId : defaultPrioId(), typeId: typeOpt(f.typeId) ? f.typeId : defaultTypeId(),
     status: 'open', completedAt: '', completedBy: '', owner: f.owner == null ? meName() : f.owner, linkedId: '', linkedIds: [],
-    description: String(f.description || ''), quoteId: Number(f.quoteId) > 0 ? Number(f.quoteId) : 0, notes: [], notesMigrated: true, descNoteIds: [], createdAt: new Date().toISOString(), createdBy: meName()
+    description: String(f.description || ''), quoteId: Number(f.quoteId) > 0 ? Number(f.quoteId) : 0, notes: [], notesMigrated: true, descNoteIds: [], createdAt: new Date().toISOString(), createdBy: meName(),
+    scope: f.scope === 'business' ? 'business' : 'job', refs: (Array.isArray(f.refs) ? f.refs : []).map(r => ({ kind: r.kind, id: String(r.id) })), recur: normRecur(f.recur), spawnedId: ''
   };
   t.linkedIds = migrateLinkedIds({ linkedIds: Array.isArray(f.linkedIds) ? f.linkedIds : (f.linkedId ? [f.linkedId] : []) });
   t.linkedId = t.linkedIds[0] || '';   // the old single field, kept in step only when the task is created (safety net)
@@ -11880,15 +11906,35 @@ async function completeTask(id){
   }
   t.status = 'done'; t.completedAt = new Date().toISOString(); t.completedBy = meName();
   if(outcome) addTaskNote(t, outcome);
+  const nx = taskSpawnNext(t);
   fadeThenRender(id); render(); saveState();
-  showToast(`${t.id} marked done`, () => { const x = findTask(id); if(x && x.status === 'done'){ reopenTask(id, false); showToast('Task reopened'); } });
+  showToast(nx ? `${t.id} marked done. Next one, ${nx.id}, is due ${fmtDisplay(toDate(nx.dueDate))}` : `${t.id} marked done`, () => { const x = findTask(id); if(x && x.status === 'done'){ reopenTask(id, false); showToast('Task reopened'); } });
 }
 function reopenTask(id, fade){
   const t = findTask(id); if(!t || t.status !== 'done') return;
   t.status = 'open'; t.completedAt = ''; t.completedBy = '';
+  if(t.spawnedId){ const nx = findTask(t.spawnedId); if(nx && nx.status === 'open' && !nx.notes.length) state.crmTasks.splice(state.crmTasks.indexOf(nx), 1); t.spawnedId = ''; }   // the repeat it made goes again, unless it has been worked on
   if(fade) fadeThenRender(id);
   render(); saveState();
 }
+/* repeating tasks: finishing one creates the next, due one step on from the date it was due (never in the past) */
+function recurAdd(iso, r){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if(!m || !r) return '';
+  if(r.unit === 'day') return addDaysIso(iso, r.every); if(r.unit === 'week') return addDaysIso(iso, 7 * r.every);
+  const months = r.unit === 'year' ? 12 * r.every : r.every, y = +m[1], mo = +m[2] - 1 + months, last = new Date(Date.UTC(y + Math.floor(mo / 12), (mo % 12 + 12) % 12 + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(y + Math.floor(mo / 12), (mo % 12 + 12) % 12, Math.min(+m[3], last))).toISOString().slice(0, 10);
+}
+function taskSpawnNext(t){
+  if(!t.recur) return null; let d = t.dueDate || fmt(new Date()), n = 0; const today = fmt(new Date());
+  do { d = recurAdd(d, t.recur); n++; } while(d && d < today && n < 400);
+  if(!d) return null;
+  const nx = createTask({ title: t.title, dueDate: d, priorityId: t.priorityId, typeId: t.typeId, owner: t.owner, linkedIds: t.linkedIds, description: t.description, quoteId: t.quoteId, scope: t.scope, refs: t.refs, recur: t.recur });
+  t.spawnedId = nx.id; return nx;
+}
+const RECUR_OPTS = [['', 'Does not repeat'], ['day1', 'Every day'], ['week1', 'Every week'], ['week2', 'Every 2 weeks'], ['month1', 'Every month'], ['month3', 'Every 3 months'], ['year1', 'Every year']];
+const recurKey = r => r ? r.unit + r.every : '';
+const recurLabel = r => r ? ((RECUR_OPTS.find(x => x[0] === recurKey(r)) || [0, `Every ${r.every} ${r.unit}s`])[1]) : '';
+function recurFromKey(k){ const m = /^(day|week|month|year)(\d+)$/.exec(k || ''); return m ? { every: Number(m[2]), unit: m[1] } : null; }
 function toggleTaskTick(id){
   const t = findTask(id); if(!t) return;
   if(t.status === 'done'){ reopenTask(id, true); showToast(`${t.id} reopened`, () => { const x = findTask(id); if(x && x.status === 'open') completeTask(id); }); }
@@ -11902,7 +11948,7 @@ document.addEventListener('keydown', (e) => {
 const taskForms = {};    // 'pl:id' → inline add form open
 const taskDrafts = {};   // 'pl:id' → what was typed so far (survives re-renders)
 function recordTasks(rec){
-  return state.crmTasks.filter(t => linkedMatches(t, rec.id) && (t.status === 'open' || fadingTasks.has(t.id))).sort(taskCmp('due', 'asc'));
+  return state.crmTasks.filter(t => linkedMatches(t, rec.id) && (t.status === 'open' || fadingTasks.has(t.id)) && taskVisible(t)).sort(taskCmp('due', 'asc'));
 }
 function recTasksHtml(pl, rec, opts){
   opts = opts || {};   // compact (the Lead card): no code chip, own heading, first `limit` rows then a "View all" link to the CRM
@@ -11988,7 +12034,7 @@ function commsBlockHtml(pl, r, i, tabKey, opts){
 }
 
 /* ---- CRM tab: state of the view (session only, except visible columns + widths which are remembered in the document) ---- */
-const crmUi = { tab: 'today', scope: 'mine', type: '', prio: '', owner: '', linked: '', q: '', showLost: false, groupBy: 'none', sortKey: 'due', sortDir: 'asc', colsOpen: false };
+const crmUi = { tab: 'today', scope: 'mine', type: '', prio: '', owner: '', linked: '', scopeType: '', customer: '', dueFrom: '', dueTo: '', q: '', showLost: false, groupBy: 'none', sortKey: 'due', sortDir: 'asc', colsOpen: false };
 function crmVisibleCols(){ const hid = new Set((state && state.crmPrefs && state.crmPrefs.hiddenCols) || []); return CRM_COLS.filter(c => c.fixed || !hid.has(c.id)); }
 function taskBucket(t, today){
   if(t.status === 'done') return 'completed';
@@ -12016,6 +12062,10 @@ function taskCmp(key, dir){
 function crmFiltered(){
   const me = meName(), q = crmUi.q.trim().toLowerCase();
   return state.crmTasks.filter(t => {
+    if(!taskVisible(t)) return false;
+    if(crmUi.scopeType && t.scope !== crmUi.scopeType) return false;
+    if(crmUi.customer && !taskCustomerKeys(t).has(crmUi.customer)) return false;
+    if((crmUi.dueFrom || crmUi.dueTo) && (!t.dueDate || (crmUi.dueFrom && t.dueDate < crmUi.dueFrom) || (crmUi.dueTo && t.dueDate > crmUi.dueTo))) return false;
     if(t.status === 'open' && !crmUi.showLost && taskOnLostLead(t)) return false;
     if(crmUi.scope === 'mine' ? (me && t.owner !== me) : (crmUi.owner && t.owner !== crmUi.owner)) return false;
     if(crmUi.type && t.typeId !== crmUi.type) return false;
@@ -12055,8 +12105,8 @@ function crmCell(c, t, today){
     case 'prio': return `<td>${prioPill(t.priorityId)}</td>`;
     case 'due': return `<td><input type="date" class="crm-due${!done && t.dueDate && t.dueDate < today ? ' over' : ''}" data-ctask="due" data-id="${t.id}" value="${t.dueDate}"></td>`;
     case 'linked': {
-      const sm = linkSummaryHtml(t, `data-crm="rec" data-id="${t.id}"`, 'crm-link');
-      return `<td>${sm || '<span class="tier-none">—</span>'}</td>`;
+      const sm = linkSummaryHtml(t, `data-crm="rec" data-id="${t.id}"`, 'crm-link') || taskRefsSummary(t);
+      return `<td>${sm || '<span class="tier-none">—</span>'}${t.scope === 'business' ? ' <span class="rp-pill neu" title="A business task">business</span>' : ''}${t.recur ? ` <span class="rp-dim" title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}</td>`;
     }
     case 'owner': return `<td>${t.owner ? escHtml(t.owner) : '<span class="tier-none">—</span>'}</td>`;
     case 'notes': return `<td>${t.notes.length ? t.notes.length : '<span class="tier-none">—</span>'}</td>`;
@@ -12098,9 +12148,12 @@ function renderCrmFilters(){
   el.innerHTML = `<div class="view-toggle" title="Whose tasks">
       <button data-crm="scope" data-v="mine" class="${crmUi.scope === 'mine' ? 'active' : ''}">My tasks</button><button data-crm="scope" data-v="all" class="${crmUi.scope === 'all' ? 'active' : ''}">All users</button></div>
     <select data-cf="owner" aria-label="Owner"${crmUi.scope === 'mine' ? ' disabled title="Switch to All users to pick an owner"' : ''}><option value="">Any owner</option>${taskUsers(crmUi.owner).map(u => `<option value="${escAttr(u)}"${u === crmUi.owner ? ' selected' : ''}>${escHtml(u)}</option>`).join('')}</select>
+    <select data-cf="scopeType" aria-label="Job or business"><option value="">Job and business</option><option value="job"${crmUi.scopeType === 'job' ? ' selected' : ''}>Job tasks</option>${canSeeBusiness() ? `<option value="business"${crmUi.scopeType === 'business' ? ' selected' : ''}>Business tasks</option>` : ''}</select>
     ${sel('type', 'Any type', optionsHtml(typeList(), crmUi.type))}
+    <select data-cf="customer" aria-label="Customer"><option value="">Any customer</option>${taskCustomerOptions(crmUi.customer)}</select>
+    <label class="crm-dues" title="Show tasks due between these dates"><span class="crm-lbl">Due</span><input type="date" data-cf="dueFrom" value="${escAttr(crmUi.dueFrom)}" aria-label="Due from"><span class="crm-lbl">to</span><input type="date" data-cf="dueTo" value="${escAttr(crmUi.dueTo)}" aria-label="Due to"></label>
     ${sel('prio', 'Any priority', optionsHtml(prioList(), crmUi.prio))}
-    <select data-cf="linked" aria-label="Linked record"><option value="">Any record</option><option value="none"${crmUi.linked === 'none' ? ' selected' : ''}>No linked record</option>${roots.map(r => `<option value="${r}"${crmUi.linked === String(r) ? ' selected' : ''}>${escHtml(lname(r))}</option>`).join('')}</select>
+    <select data-cf="linked" aria-label="Project or record"><option value="">Any project or record</option><option value="none"${crmUi.linked === 'none' ? ' selected' : ''}>No linked record</option>${roots.map(r => `<option value="${r}"${crmUi.linked === String(r) ? ' selected' : ''}>${escHtml(lname(r))}</option>`).join('')}</select>
     <label class="crm-check"><input type="checkbox" data-cf="showLost"${crmUi.showLost ? ' checked' : ''}> Show tasks on lost leads</label>
     <div class="crm-colwrap"><button class="btn secondary" style="padding:6px 12px;" data-crm="cols-toggle">Columns ▾</button>${crmUi.colsOpen ? `<div class="crm-colmenu">${CRM_COLS.filter(c => !c.fixed).map(c => `<label><input type="checkbox" data-ccol="${c.id}"${hid.has(c.id) ? '' : ' checked'}> ${c.label}</label>`).join('')}</div>` : ''}</div>
     <span class="crm-grp"><span class="crm-lbl">Group by</span><span class="view-toggle">${CRM_GROUPS.map(([k, l]) => `<button data-crm="group" data-v="${k}" class="${crmUi.groupBy === k ? 'active' : ''}">${l}</button>`).join('')}</span></span>`;
@@ -12126,9 +12179,9 @@ function tkObj(){ return taskPanel ? panelTask() : (actionPanel ? actionPanel.re
 function tkIsNew(){ return taskPanel ? taskPanel.mode === 'new' : !!(actionPanel && actionPanel.isNew); }
 function actionPanelValid(){ return !!actionPanel && (actionPanel.isNew || state.actions.includes(actionPanel.ref)); }
 function openTaskPanel(id){ if(!findTask(id)) return; actionPanel = null; taskPanel = { mode: 'edit', id }; tkReset(); renderTaskPanel(); }
-function openNewTask(linked){
-  actionPanel = null; tkReset();
-  taskPanel = { mode: 'new', draft: { title: '', dueDate: fmt(new Date()), priorityId: defaultPrioId(), typeId: defaultTypeId(), owner: meName(), linkedIds: linked ? [linked] : [], description: '' } };
+function openNewTask(linked, o){
+  o = o || {}; actionPanel = null; tkReset();
+  taskPanel = { mode: 'new', draft: { title: '', dueDate: o.undated ? '' : fmt(new Date()), priorityId: defaultPrioId(), typeId: defaultTypeId(), owner: meName(), linkedIds: linked ? [linked] : [], description: '', scope: o.scope === 'business' ? 'business' : 'job', refs: (o.refs || []).slice(), recur: null } };
   renderTaskPanel(); setTimeout(() => { const el = document.getElementById('tkTitle'); if(el) el.focus(); }, 30);
 }
 function openActionPanel(ref){ if(!ref || !state.actions.includes(ref)) return; taskPanel = null; tkReset(); actionPanel = { ref, isNew: false }; renderActionPanel(); }
@@ -12165,8 +12218,10 @@ function tkPropsHtml(){
   if(taskPanel) return `<div class="tk-props">
       <div><label for="tkpType">Type</label><select id="tkpType" data-tf="typeId">${optionsHtml(typeList(), o.typeId)}</select></div>
       <div><label for="tkpPrio">Priority</label><select id="tkpPrio" data-tf="priorityId">${optionsHtml(prioList(), o.priorityId)}</select></div>
-      <div><label for="tkpOwner">Owner</label><select id="tkpOwner" data-tf="owner">${userOptions(o.owner)}</select></div>
+      <div><label for="tkpOwner">Assigned to</label><select id="tkpOwner" data-tf="owner">${userOptions(o.owner)}</select></div>
       <div><label for="tkpDue">Due date</label><input id="tkpDue" type="date" data-tf="dueDate" value="${escAttr(o.dueDate)}"></div>
+      <div><label for="tkpScope">Job or business</label><select id="tkpScope" data-tf="scope"><option value="job"${o.scope === 'business' ? '' : ' selected'}>Job (a customer's work)</option>${canSeeBusiness() || o.scope === 'business' ? `<option value="business"${o.scope === 'business' ? ' selected' : ''}>Business (running the company)</option>` : ''}</select></div>
+      <div><label for="tkpRecur">Repeats</label><select id="tkpRecur" data-tf="recurKey">${RECUR_OPTS.map(([k, n]) => `<option value="${k}"${recurKey(o.recur) === k ? ' selected' : ''}>${n}</option>`).join('')}${o.recur && !RECUR_OPTS.some(x => x[0] === recurKey(o.recur)) ? `<option value="${recurKey(o.recur)}" selected>${escHtml(recurLabel(o.recur))}</option>` : ''}</select></div>
     </div>`;
   return `<div class="tk-props">
       <div><label for="tkpStatus">Status</label><select id="tkpStatus" data-af="status">${['Not Started', 'In Progress', 'Waiting', 'Done'].map(x => `<option${o.status === x ? ' selected' : ''}>${x}</option>`).join('')}</select></div>
@@ -12202,18 +12257,19 @@ function refreshTaskPanel(){ if(taskPanel) tkRefresh(); }
 function refreshActionPanel(){ if(actionPanel) tkRefresh(); }
 
 function tkLinksHtml(){
-  const infos = linkedInfos(tkObj());
-  return `<button type="button" class="tk-linkbtn" data-tk="pick-toggle" aria-expanded="${tkUi.pickOpen ? 'true' : 'false'}">Linked records (${infos.length})${CHEV_SVG}</button>
-    <span class="tk-chips">${infos.map(i => `<span class="tk-chip${i.missing || i.lost ? ' dim' : ''}"><button type="button" class="open" data-tk="chip-open" data-code="${escAttr(i.code)}" title="${escAttr(infoText(i))}"><b>${escHtml(i.code)}</b>${escHtml(i.name)}${i.lost ? ' (lost)' : ''}</button><button type="button" class="x" data-tk="chip-x" data-code="${escAttr(i.code)}" aria-label="Remove link to ${escAttr(i.code)}" title="Remove link">×</button></span>`).join('')}</span>`;
+  const infos = linkedInfos(tkObj()), refs = taskPanel ? (tkObj().refs || []) : [];
+  return `<button type="button" class="tk-linkbtn" data-tk="pick-toggle" aria-expanded="${tkUi.pickOpen ? 'true' : 'false'}">Linked records (${infos.length + refs.length})${CHEV_SVG}</button>
+    <span class="tk-chips">${refs.map(r => { const i = refInfo(r); return `<span class="tk-chip${i.missing ? ' dim' : ''}"><button type="button" class="open" data-tk="ref-open" data-kind="${escAttr(r.kind)}" data-id="${escAttr(r.id)}" title="${escAttr(i.kind + ' · ' + i.name)}"><b>${escHtml(i.kind)}</b>${escHtml(i.name)}</button><button type="button" class="x" data-tk="ref-x" data-kind="${escAttr(r.kind)}" data-id="${escAttr(r.id)}" aria-label="Remove link to ${escAttr(i.name)}" title="Remove link">×</button></span>`; }).join('')}${infos.map(i => `<span class="tk-chip${i.missing || i.lost ? ' dim' : ''}"><button type="button" class="open" data-tk="chip-open" data-code="${escAttr(i.code)}" title="${escAttr(infoText(i))}"><b>${escHtml(i.code)}</b>${escHtml(i.name)}${i.lost ? ' (lost)' : ''}</button><button type="button" class="x" data-tk="chip-x" data-code="${escAttr(i.code)}" aria-label="Remove link to ${escAttr(i.code)}" title="Remove link">×</button></span>`).join('')}</span>`;
 }
 function tkPickRows(){
   const q = tkUi.pickQ.trim().toLowerCase();
   return activeRecordCodes().filter(r => !q || (r.code + ' ' + r.name + ' ' + (r.contact || '')).toLowerCase().includes(q));
 }
 function tkPickListHtml(){
-  const have = new Set(recRoots(tkObj())), rows = tkPickRows();
+  const have = new Set(recRoots(tkObj())), rows = tkPickRows(), refHtml = taskPanel ? tkRefPickHtml() : '';
+  if(!rows.length && refHtml) return refHtml;
   if(!rows.length) return `<div class="tk-pickempty">${tkUi.pickQ.trim() ? 'No active records match.' : 'No active leads, sales or projects yet.'}</div>`;
-  return rows.map(r => `<label class="tk-pick"><input type="checkbox" data-tk="pick" data-code="${escAttr(r.code)}"${have.has(linkedRoot(r.code)) ? ' checked' : ''}><span class="code">${escHtml(r.code)}</span><span class="nm">${escHtml(r.name)}${r.contact && r.contact !== r.name ? `<span class="ct">${escHtml(r.contact)}</span>` : ''}</span></label>`).join('');
+  return rows.map(r => `<label class="tk-pick"><input type="checkbox" data-tk="pick" data-code="${escAttr(r.code)}"${have.has(linkedRoot(r.code)) ? ' checked' : ''}><span class="code">${escHtml(r.code)}</span><span class="nm">${escHtml(r.name)}${r.contact && r.contact !== r.name ? `<span class="ct">${escHtml(r.contact)}</span>` : ''}</span></label>`).join('') + refHtml;
 }
 function tkRenderPicker(focusSearch){
   const box = document.getElementById('tkPicker'); if(!box) return;
@@ -12362,7 +12418,7 @@ function panelFieldChange(el){
   const f = el.dataset.tf, isNew = taskPanel.mode === 'new', t = panelTask(); if(!t) return;
   let v = el.value;
   if(f === 'title'){ v = v.trim(); if(!v && !isNew){ el.value = t.title; autosizeTa(el); return; } el.value = v; autosizeTa(el); }
-  t[f] = v;
+  if(f === 'recurKey') t.recur = recurFromKey(v); else t[f] = v;
   tkAfterChange();
 }
 document.addEventListener('change', (e) => { if(e.target.dataset && e.target.dataset.tf && taskPanel) panelFieldChange(e.target); });
@@ -12502,11 +12558,13 @@ function todayData(today){
     if(!open && !fadingTasks.has(t.id)) return false;      // a just-ticked row stays for its short fade
     if(open && taskOnLostLead(t)) return false;             // same rule as the CRM tab's default view
     if(mine && t.owner !== me) return false;
+    if(!taskVisible(t)) return false;                       // business tasks only for the people allowed to see them
     return !!t.dueDate && t.dueDate <= today;
   });
   const prioRank = t => { const i = prioIdx(t.priorityId); return i < 0 ? 99 : i; };
   const taskSort = (a, b) => prioRank(a) - prioRank(b) || cmpText(a.title, b.title);
   const acts = state.actions.map((r, i) => ({ r, i })).filter(({ r }) => {
+    if(!canSeeBusiness()) return false;                     // Actions are business work
     if(r.status === 'Done' && !archiving.has(r)) return false;   // archiving rows stay for their grey fade
     if(mine && !sameUser(r.owner, me)) return false;
     return !!r.deadline && r.deadline <= today;
@@ -13597,11 +13655,12 @@ function render(){
   settingsMenuSync();
   renderAdmin();
   renderActions();
+  renderBizTasks(); bizSyncMenu();
   renderCrm();
   cxRender();
   pjRender();
   renderToday();
-  renderTaskOptions();
+  renderTaskOptions(); renderBizAccess(); renderTodayLimit();
   applyResizable();
 }
 
@@ -14326,6 +14385,8 @@ BTT_CARD_MQ.addEventListener('change', () => bttQueue());
 bttQueue();
 
 function activateTab(name){
+  if(name === 'admin'){ name = 'actions'; setTimeout(() => { const t = document.getElementById('bizAdminSec'); if(t) t.scrollIntoView({ block: 'start' }); }, 30); }   // Setup & Admin now lives on the Business tasks page
+  if(name === 'actions' && typeof canSeeBusiness === 'function' && state && !canSeeBusiness()){ showToast('Business tasks are only visible to the people set under Settings'); return; }
   const tab = document.querySelector('.tab[data-tab="' + name + '"]'), panel = document.getElementById('panel-' + name);
   if(!tab || !panel) return;
   document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.removeAttribute('aria-current'); });
@@ -14402,13 +14463,13 @@ const menuUi = { sig: '', pop: null, hoverT: 0, sheetFrom: null, built: false };
 const menuEl = id => document.getElementById(id);
 const menuSvg = (key, cls) => `<svg${cls ? ' class="' + cls + '"' : ''} viewBox="0 0 24 24" aria-hidden="true">${MENU_ICONS[key] || MENU_ICONS.command}</svg>`;
 function menuCatalog(){
-  return [...document.querySelectorAll('#sidebar .nav-group')].map(g => ({ id: g.dataset.group, label: g.dataset.label, short: g.dataset.short, tabs: [...g.querySelectorAll('.tab')].map(t => ({ tab: t.dataset.tab, label: navTabLabel(t.dataset.tab) })) }));
+  return [...document.querySelectorAll('#sidebar .nav-group')].map(g => ({ id: g.dataset.group, label: g.dataset.label, short: g.dataset.short, tabs: [...g.querySelectorAll('.tab:not([hidden])')].map(t => ({ tab: t.dataset.tab, label: navTabLabel(t.dataset.tab) })) }));
 }
 function menuGroupOf(tab){ const t = document.querySelector('#sidebar .tab[data-tab="' + tab + '"]'), g = t && t.closest('.nav-group'); return g ? g.dataset.group : ''; }
 function menuCurrent(){ const t = document.querySelector('#sidebar .tab.active'); return t ? t.dataset.tab : ''; }
 function menuLabel(tab){ return navTabLabel(tab); }
 function menuBarLabel(tab){ return MENU_BAR_LABEL[tab] || menuLabel(tab); }
-function menuValidTabs(){ return new Set([...document.querySelectorAll('#sidebar .tab')].map(t => t.dataset.tab)); }
+function menuValidTabs(){ return new Set([...document.querySelectorAll('#sidebar .tab:not([hidden])')].map(t => t.dataset.tab)); }
 function menuCleanBottom(list){
   const ok = menuValidTabs(), out = [];
   (Array.isArray(list) ? list : []).forEach(t => { t = String(t); if(ok.has(t) && !out.includes(t)) out.push(t); });
@@ -17210,7 +17271,7 @@ function rsHeadHtml(s){
     <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rs="note">Note</button>${supPhone(s) ? `<a class="btn secondary qb-sm" href="tel:${escAttr(String(supPhone(s)).replace(/\s+/g, ''))}">Call</a>` : ''}${supEmail(s) ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(supEmail(s))}">Email</a>` : ''}</div>`;
 }
 function rsCentreBody(s){
-  if(rsUi.tab === 'activity') return `<div class="rp-card"><h4>Notes</h4><div id="spNotes">${supNotesHtml(s, state.suppliers.indexOf(s))}</div></div>`;
+  if(rsUi.tab === 'activity') return rpRefTasksHtml('supplier', s.id) + `<div class="rp-card"><h4>Notes</h4><div id="spNotes">${supNotesHtml(s, state.suppliers.indexOf(s))}</div></div>`;
   const r = supRecords(s.id), q = u => rpLrow('quote:' + u.q.id, u.ref, `${rpQPill(u.q)}${u.amount ? ' ' + escHtml(u.amount) : ''}`);
   return `<div class="rp-card"><h4>Live quotes on open projects ${r.onProj.length ? `<span class="db-count">${r.onProj.length}</span>` : ''}</h4>${r.onProj.length ? r.onProj.map(q).join('') : '<div class="pw-empty">None. A quote counts when it is Draft, Sent or Accepted, has not expired and is linked to a project that is still open.</div>'}</div>
     <div class="rp-card"><h4>Orders placed ${r.placed.length ? `<span class="db-count">${r.placed.length}</span>` : ''}</h4>${r.placed.length ? rpOrderRows(r.placed).join('') : '<div class="pw-empty">No purchase orders have been sent to this supplier yet.</div>'}</div>
@@ -17266,7 +17327,7 @@ function rcRight(sc, extraTiles){
   return (extraTiles || '') + rpTile('Projects', rcDealRows({ deals: projects }), 'No projects yet.') + rpTile('Leads and sales', rcDealRows({ deals: sc.deals.filter(d => d.pl !== 'project') }), 'None.')
     + rpTile('Quotes', rpQuoteRows(sc.quotes), 'No quotes yet.') + rpTile('Invoices', rpInvoiceRows(sc), 'No invoices yet.');
 }
-function rcBody(sc, owner, kind){ return cxPg.tab === 'activity' ? cxTimelineHtml(owner, sc, kind) : cxDealsHtml(sc, kind, owner.id) + cxQuotesHtml(sc) + cxInvoicesHtml(sc) + cxPaymentsHtml(sc); }
+function rcBody(sc, owner, kind){ return cxPg.tab === 'activity' ? rpRefTasksHtml(kind === 'company' ? 'company' : 'contact', owner.id) + cxTimelineHtml(owner, sc, kind) : cxDealsHtml(sc, kind, owner.id) + cxQuotesHtml(sc) + cxInvoicesHtml(sc) + cxPaymentsHtml(sc); }
 function rcSec(k, t, b){ return rpSec(k, t, b, '', 'cx'); }
 function rcContactPage(c){
   rcTouch('c:' + c.id);
@@ -17307,6 +17368,142 @@ document.addEventListener('click', (e) => {
   if(a === 'tab'){ cxPg.tab = b.dataset.tab; cxRender(); return; }
   if(a === 'note'){ cxPg.tab = 'activity'; cxRender(); const n = document.getElementById('cxNoteText'); if(n) n.focus(); return; }
 });
+/* ======================= TASKS: the engine around the one task form =======================
+   A task is a standalone record (state.crmTasks): title, due date, assignee (owner), status, scope ('job' or 'business'), notes, the records it attaches to
+   (linkedIds for leads, sales and projects as before; refs[] for contacts, companies, suppliers, quotes and orders) and an optional repeat.
+   The side panel is the one form, used from every page. Business tasks are only visible to the people named in Settings. */
+function canSeeBusiness(){
+  if(!state || !state.settings) return false;
+  const w = whoAmI().name; if(!w) return false;
+  return (state.settings.bizAccess || []).some(n => String(n).toLowerCase() === w.toLowerCase());
+}
+const taskVisible = t => t.scope !== 'business' || canSeeBusiness();
+const REF_LABEL = { contact: 'Contact', company: 'Company', supplier: 'Supplier', quote: 'Quote', po: 'Order' };
+function refInfo(r){
+  let name = '', missing = false;
+  if(r.kind === 'contact'){ const c = ctFind(r.id); name = c ? ctName(c) : ''; }
+  else if(r.kind === 'company'){ const c = coFind(r.id); name = c ? cxCompanyName(c) : ''; }
+  else if(r.kind === 'supplier'){ const s = supFind(Number(r.id)); name = s ? (s.name || supCode(s)) : ''; }
+  else if(r.kind === 'quote'){ const q = qFind(Number(r.id)); name = q ? qRef(q) + (q.customer ? ' · ' + q.customer : '') : ''; }
+  else if(r.kind === 'po'){ const o = poFind(Number(r.id)); name = o ? o.ref : ''; }
+  if(!name){ missing = true; name = '(record removed)'; }
+  return { kind: REF_LABEL[r.kind] || r.kind, name, missing };
+}
+function refNavSpec(r){ return r.kind + ':' + r.id; }
+function tkRefPickHtml(){
+  const q = tkUi.pickQ.trim().toLowerCase(), have = new Set((tkObj().refs || []).map(r => r.kind + ':' + r.id)), searching = !!q;
+  const groups = [
+    ['contact', 'Contacts', state.contacts.map(c => ({ id: c.id, name: ctName(c), sub: [ctPhone(c), ctEmail(c)].filter(Boolean).join(' · ') }))],
+    ['company', 'Companies', state.companies.map(c => ({ id: c.id, name: cxCompanyName(c), sub: c.type || '' }))],
+    ['supplier', 'Suppliers', state.suppliers.map(s => ({ id: s.id, name: s.name || supCode(s), sub: supCode(s) }))],
+    ['quote', 'Quotes', state.quotes.map(x => ({ id: x.id, name: qRef(x) + ' v' + x.version, sub: [x.customer, x.project].filter(Boolean).join(' · ') }))],
+    ['po', 'Orders', (state.purchaseOrders || []).map(o => ({ id: o.id, name: o.ref, sub: o.supplierName || '' }))]
+  ];
+  return groups.map(([k, label, rows]) => {
+    const hit = rows.filter(r => !q || (r.name + ' ' + r.sub).toLowerCase().includes(q) || have.has(k + ':' + r.id)), shown = searching ? hit.slice(0, 12) : hit.filter(r => have.has(k + ':' + r.id)).concat(hit.filter(r => !have.has(k + ':' + r.id)).slice(0, 6));
+    return shown.length ? `<div class="tk-pickgrp">${label}</div>` + shown.map(r => `<label class="tk-pick"><input type="checkbox" data-tk="pick-ref" data-kind="${k}" data-id="${escAttr(r.id)}"${have.has(k + ':' + r.id) ? ' checked' : ''}><span class="code">${REF_LABEL[k]}</span><span class="nm">${escHtml(r.name)}${r.sub ? `<span class="ct">${escHtml(r.sub)}</span>` : ''}</span></label>`).join('') : '';
+  }).join('');
+}
+function tkSetRefs(refs){ tkObj().refs = refs; tkAfterChange(); }
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.dataset || el.dataset.tk !== 'pick-ref' || !taskPanel) return;
+  const t = tkObj(), k = el.dataset.kind, id = String(el.dataset.id), refs = (t.refs || []).filter(r => !(r.kind === k && r.id === id));
+  if(el.checked) refs.push({ kind: k, id }); tkSetRefs(refs);
+});
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-tk="ref-open"],[data-tk="ref-x"]'); if(!b || !taskPanel) return;
+  if(b.dataset.tk === 'ref-x'){ tkSetRefs((tkObj().refs || []).filter(r => !(r.kind === b.dataset.kind && r.id === String(b.dataset.id)))); return; }
+  closeTaskPanel(); navGo(() => navOpen(b.dataset.kind + ':' + b.dataset.id));
+});
+/* task lists for a record: the same row everywhere (tick, title, repeat mark, due date, who) */
+function rpTaskRow(t){
+  const over = t.status === 'open' && t.dueDate && t.dueDate < fmt(new Date());
+  return `<div class="tkr-row${fadingTasks.has(t.id) ? ' fade-row' : ''}"><div class="cbx${t.status === 'done' ? ' checked' : ''}" data-crm="tick" data-id="${t.id}" title="Mark done">${CHECK_SVG}</div>${typeIcon(t.typeId)}
+    <button class="tkr-title" data-crm="open" data-id="${t.id}" title="${escAttr(t.title)}">${escHtml(t.title)}</button>${t.recur ? `<span class="rp-dim" title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}
+    <span class="tkr-due${over ? ' over' : ''}">${t.dueDate ? fmtDisplay(toDate(t.dueDate)) : 'No date'}</span><span class="rp-dim">${escHtml(t.owner || '')}</span></div>`;
+}
+function refTasks(kind, id){ return state.crmTasks.filter(t => (t.refs || []).some(r => r.kind === kind && r.id === String(id)) && (t.status === 'open' || fadingTasks.has(t.id)) && taskVisible(t)).sort(taskCmp('due', 'asc')); }
+function rpRefTasksHtml(kind, id){
+  const list = refTasks(kind, id);
+  return `<div class="rp-card"><div class="rp-card-h"><h4>Tasks ${list.length ? `<span class="db-count">${list.length}</span>` : ''}</h4><button type="button" class="btn secondary qb-sm" data-rp="task-add" data-kind="${kind}" data-id="${escAttr(id)}">+ Add task</button></div>
+    ${list.length ? list.map(rpTaskRow).join('') : '<div class="pw-empty">No open tasks.</div>'}</div>`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-rp="task-add"]'); if(!b || !state) return;
+  openNewTask(null, { refs: [{ kind: b.dataset.kind, id: String(b.dataset.id) }] });
+});
+/* the Tasks hub: customer filter (a task's customer is a contact or company attached directly, or on a deal it is linked to) */
+function taskCustomerKeys(t){
+  const keys = new Set((t.refs || []).filter(r => r.kind === 'contact' || r.kind === 'company').map(r => (r.kind === 'contact' ? 'c:' : 'o:') + r.id));
+  recRoots(t).forEach(root => { const d = dealRecord(root); if(!d) return; (d.rec.contactIds || []).forEach(id => keys.add('c:' + id)); if(d.rec.companyId) keys.add('o:' + d.rec.companyId); });
+  return keys;
+}
+function taskCustomerOptions(sel){
+  const keys = new Set(); state.crmTasks.forEach(t => taskVisible(t) && taskCustomerKeys(t).forEach(k => keys.add(k)));
+  return [...keys].map(k => ({ k, name: k.startsWith('c:') ? (ctFind(k.slice(2)) ? ctName(ctFind(k.slice(2))) : '') : (coFind(k.slice(2)) ? cxCompanyName(coFind(k.slice(2))) : '') })).filter(x => x.name).sort((a, b) => cmpText(a.name, b.name))
+    .map(x => `<option value="${escAttr(x.k)}"${x.k === sel ? ' selected' : ''}>${escHtml(x.name)}</option>`).join('');
+}
+function taskRefsSummary(t){
+  const refs = (t.refs || []); if(!refs.length) return '';
+  const i = refInfo(refs[0]);
+  return `<button class="link-btn crm-link${i.missing ? ' dim' : ''}" data-tk-ref="${escAttr(refNavSpec(refs[0]))}" title="${escAttr(refs.map(r => refInfo(r).kind + ' · ' + refInfo(r).name).join(', '))}">${escHtml(i.kind + ' · ' + i.name)}</button>${refs.length > 1 ? `<span class="tk-more-n">+${refs.length - 1}</span>` : ''}`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-tk-ref]'); if(!b || !state) return; e.stopPropagation();
+  navGo(() => navOpen(b.dataset.tkRef));
+}, true);
+
+/* ======================= BUSINESS TASKS: one page for running the company =======================
+   Business tasks (the task engine, scope 'business'), the weekly Actions and the Setup and Admin checklist, each kept exactly as stored. */
+const bizUi = { done: false };
+function renderBizTasks(){
+  const wrap = document.getElementById('bizTasksWrap'); if(!wrap || !state) return;
+  if(!canSeeBusiness()){ wrap.innerHTML = ''; return; }   // nothing is drawn for people who cannot see business tasks
+  const list = state.crmTasks.filter(t => t.scope === 'business' && (bizUi.done || t.status === 'open' || fadingTasks.has(t.id))).sort((a, b) => (a.status === 'done') - (b.status === 'done') || String(a.dueDate || '9999').localeCompare(String(b.dueDate || '9999')) || taskNum(a) - taskNum(b));
+  const today = fmt(new Date());
+  const rows = list.map(t => { const over = t.status === 'open' && t.dueDate && t.dueDate < today;
+    return `<tr class="crm-row${t.status === 'done' ? ' done-row' : ''}${fadingTasks.has(t.id) ? ' fade-row' : ''}" data-crm="open" data-id="${t.id}"><td style="width:44px"><div class="cbx${t.status === 'done' ? ' checked' : ''}" data-crm="tick" data-id="${t.id}" title="${t.status === 'done' ? 'Completed. Click to reopen' : 'Mark done'}">${CHECK_SVG}</div></td>
+      <td><span class="tk-title acc-action-text">${escHtml(t.title)}</span></td><td>${t.recur ? `<span class="rp-dim">↻ ${escHtml(recurLabel(t.recur))}</span>` : '<span class="tier-none">—</span>'}</td>
+      <td class="${over ? 'over' : ''}">${t.dueDate ? escHtml(fmtDisplay(toDate(t.dueDate))) : '<span class="tier-none">No date</span>'}</td><td>${t.owner ? escHtml(t.owner) : '<span class="tier-none">—</span>'}</td><td>${taskRefsSummary(t) || linkSummaryHtml(t, `data-crm="rec" data-id="${t.id}"`, 'crm-link') || '<span class="tier-none">—</span>'}</td></tr>`; }).join('');
+  wrap.innerHTML = `<div class="qb-scroll"><table class="qb-table"><thead><tr><th></th><th>Task</th><th>Repeats</th><th>Due</th><th>Assigned to</th><th>Linked record</th></tr></thead><tbody>${rows || '<tr><td colspan="6"><div class="sup-empty">No business tasks yet. Use “+ New business task”.</div></td></tr>'}</tbody></table></div>`;
+  const nd = document.getElementById('bizShowDone'); if(nd) nd.checked = bizUi.done;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-biz]'); if(!b || !state) return;
+  if(b.dataset.biz === 'new-task') openNewTask(null, { scope: 'business' });
+  else if(b.dataset.biz === 'go'){ const t = document.getElementById(b.dataset.to); if(t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+});
+document.addEventListener('change', (e) => { if(e.target.id === 'bizShowDone'){ bizUi.done = e.target.checked; renderBizTasks(); } });
+
+/* who can see business tasks and costs (Settings > CRM & tasks). An admin changes it; everyone else sees who has it. */
+function renderBizAccess(){
+  const el = document.getElementById('bizAccessCard'); if(!el || !state) return;
+  const have = state.settings.bizAccess, names = [...new Set(apTeam().concat(typeof appUsers !== 'undefined' && appUsers ? appUsers : [], have))].filter(n => n && n !== 'TBC').sort((a, b) => cmpText(a, b));
+  const adm = isAdmin();
+  el.innerHTML = `<p style="font-size:12.5px;color:var(--text-muted);margin:0 0 10px;line-height:1.55;max-width:760px;">Business tasks (and, in later stages, business costs) are visible to Lynton and Royce by default. Tick anyone else who should see them, for example Mike and Gerry once they have logins.${adm ? '' : ' Only an admin can change this.'}</p>
+    <div class="biz-people">${names.map(n => `<label class="q-check"><input type="checkbox" data-biz-access="${escAttr(n)}"${have.some(h => h.toLowerCase() === n.toLowerCase()) ? ' checked' : ''}${adm ? '' : ' disabled'}> ${escHtml(n)}</label>`).join('')}</div>`;
+}
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.dataset || el.dataset.bizAccess === undefined || !state || !isAdmin()) return;
+  const n = el.dataset.bizAccess, cur = state.settings.bizAccess.filter(h => h.toLowerCase() !== n.toLowerCase());
+  if(el.checked) cur.push(n); state.settings.bizAccess = cur; saveState(); render(); showToast(el.checked ? n + ' can now see business tasks' : n + ' can no longer see business tasks');
+});
+function renderTodayLimit(){
+  const el = document.getElementById('todayLimitCard'); if(!el || !state) return;
+  if(el.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
+  el.innerHTML = `<p style="font-size:12.5px;color:var(--text-muted);margin:0 0 10px;line-height:1.55;max-width:760px;">How many items each action tile on Today shows before a “See more” link. Everything else stays one click away.</p>
+    <div class="assumptions-grid" style="grid-template-columns:minmax(160px,220px);"><div><label for="todayLimitIn">Items per tile on Today</label><input id="todayLimitIn" type="number" min="1" max="200" step="1" inputmode="numeric" data-today-limit value="${state.settings.todayLimit}"></div></div>`;
+}
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.dataset || el.dataset.todayLimit === undefined || !state) return;
+  const n = Math.floor(Number(el.value)); state.settings.todayLimit = n >= 1 && n <= 200 ? n : state.settings.todayLimit; el.value = state.settings.todayLimit; saveState(); render();
+});
+/* hide the Business tasks page from anyone not allowed, wherever the menu is drawn */
+function bizSyncMenu(){
+  const ok = canSeeBusiness(), t = document.querySelector('#sidebar .tab[data-tab="actions"]'); if(!t) return;
+  if(t.hidden === !ok) return; t.hidden = !ok; try{ if(menuUi.built) menuBuild(); }catch(e){}
+  if(!ok && navTabName() === 'actions') activateTab('today');
+}
 /* BT:js-records end */
 
 /* ---------- init ---------- */
