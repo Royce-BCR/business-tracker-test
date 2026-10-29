@@ -2517,6 +2517,48 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 }
 
 @media (max-width: 999px), (pointer: coarse) { .rp-hint .sp-link, .rp-ro .sp-link { padding: 14px 6px; margin: -14px -6px; position: relative; } }
+/* BT:css-selling begin */
+  /* Stage 3: selling */
+  .sf-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--bt-neu-bg); color: var(--bt-neu-fg); white-space: nowrap; vertical-align: middle; }
+  .sf-chip.bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
+  .sf-chip.warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); }
+  .sf-chip.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); }
+  .sf-warn { color: var(--bt-bad-fg); font-weight: 600; }
+  .sf-calc { padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; background: var(--bt-neu-bg); }
+  .sf-calc .rp-tag { margin-left: 6px; }
+  .sf-phase { display: grid; grid-template-columns: minmax(0, 1fr) 84px 34px; gap: 6px; margin-bottom: 6px; align-items: center; }
+  .sf-box { border: 1px solid var(--line); border-radius: 10px; background: var(--bt-card); padding: 12px 14px; margin: 10px 0; max-width: 760px; }
+  .sf-box h4 { margin: 0 0 8px; font-size: 13px; }
+  .sf-box .lp-f { margin-bottom: 10px; }
+  .lp-opt { font-weight: 400; color: var(--text-muted); font-size: 11px; }
+  .lc-pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--bt-neu-bg); color: var(--bt-neu-fg); white-space: nowrap; }
+  .lc-pill.lc-lc_lead { background: var(--bt-info-bg); color: var(--bt-info-fg); border-color: var(--bt-info-bd); }
+  .lc-pill.lc-lc_opportunity { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); }
+  .lc-pill.lc-lc_customer { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); }
+  .sl-row { grid-template-columns: 58px minmax(0, 1fr) auto 34px; }
+  .sl-row .sl-nf { white-space: nowrap; font-size: 12px; }
+  .sl-row input[type=text] { min-width: 0; }
+  .lq-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 6px; }
+  .lp-q.missing > label::after { content: ' – needed'; color: var(--bt-warn-fg); font-weight: 600; font-size: 11px; }
+  .qs-head, .qs-row { grid-template-columns: 58px minmax(0, 1fr) 64px 190px 34px; }
+  .qs-row select { min-width: 0; }
+  .promote-btn.blocked { opacity: .55; cursor: pointer; filter: grayscale(.4); }
+  @media (max-width: 640px) { .qs-head { display: none; } .qs-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .qs-row select { grid-column: 2 / 3; } .lq-row { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .sl-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .sl-row .sl-nf { grid-column: 2 / 3; } .sl-row > span:empty { display: none; } #panel-settings .set-content .sl-row input[type=text] { flex: none; width: 100%; } }
+  .attn { cursor: help; }
+  .sel-chased { margin-left: 6px; padding: 2px 10px; }
+  .sc-table td, .sc-table th { vertical-align: top; }
+  .sc-best { background: var(--bt-ok-bg); }
+  .sc-total td { border-top: 2px solid var(--line); }
+  .sc-miss { font-size: 11px; color: var(--bt-warn-fg); }
+  .sc-sel { outline: 2px solid var(--slate, #3f5d7d); outline-offset: -2px; font-weight: 700; }
+  .sc-low { background: var(--bt-ok-bg); }
+  .sc-ovr { font-size: 11px; color: var(--bt-warn-fg); font-weight: 600; }
+  .sc-lines select { min-width: 150px; }
+  body.is-approver :is(.panel, #quoteBuilderView) button:is(.btn, .icon-btn):not(.apv-ok):not([data-qba^="ap-"]):not([data-qba="open"]):not([data-qba="open-quote"]):not([data-qba="list"]):not([data-qba="filter"]):not([data-qba="tab"]):not([data-nav]):not(.sp-link):not([data-qbs-step]):not([data-qbs-toggle]) { display: none !important; }
+  body.is-approver [data-qba="new"], body.is-approver [data-qba="add-line"] { display: none !important; }
+
+/* BT:css-selling end */
 </style>
 </head>
 <body>
@@ -2563,9 +2605,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-commercial" role="group" aria-labelledby="gh-commercial">
       <button type="button" class="tab g-commercial" data-tab="leads">Lead Pipeline</button>
       <button type="button" class="tab g-commercial" data-tab="salespipeline">Sales Pipeline</button>
-      <button type="button" class="tab g-commercial" data-tab="quotations">Quotes</button>
-      <button type="button" class="tab g-commercial" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></button>
-      <button type="button" class="tab g-commercial" data-tab="invoicing">Invoicing</button>
+      <button type="button" class="tab g-commercial" data-tab="quotations">Quotes <span class="tab-count" id="apBadge" hidden></span></button>
+      <button type="button" class="tab g-commercial" data-tab="invoicing">Customer invoices</button>
     </div>
   </div>
 
@@ -2742,7 +2783,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="panel" id="panel-leads">
     <div class="page-head">
       <h2>Lead Pipeline</h2>
-      <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once budget, decision-maker, timeline and competition are all filled — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
+      <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once every <em>hard-gate</em> qualification question is answered satisfactorily (the questions, weights and gate or guide mode are in Settings, Selling) — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
     </div>
     <div class="view-toggle" id="viewToggle-lead"></div>
     <div class="btn-row"><button class="btn" data-action="add-lead">+ Add lead</button></div>
@@ -2762,6 +2803,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="table-scroll" id="pipelineTableWrap"></div>
     <div class="view-pane pane-board" id="pipelineBoardWrap"></div>
     <div class="view-pane pane-gantt" id="pipelineGanttWrap"></div>
+    <div id="salesLostWrap"></div>
   </div>
 
   <!-- PROJECT PIPELINE -->
@@ -2776,6 +2818,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="table-scroll" id="projectsTableWrap"></div>
     <div class="view-pane pane-board" id="projectsBoardWrap"></div>
     <div class="view-pane pane-gantt" id="projectsGanttWrap"></div>
+    <div id="projectLostWrap"></div>
     <div class="pw" id="projectWorkspace" hidden></div>
   </div>
 
@@ -2886,7 +2929,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <!-- INVOICING -->
   <div class="panel" id="panel-invoicing">
     <div class="page-head">
-      <h2>Invoicing</h2>
+      <h2>Customer invoices</h2>
       <div class="desc">Every invoice from your projects' payment schedules and approved variations (scope additions). Edit dates and amounts in place; the same data shows in each project's Money section. A variation cannot be invoiced until it is approved.</div>
     </div>
     <div id="invoicingBody"></div>
@@ -2980,6 +3023,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 
     <div class="section-label">Units and categories</div>
     <div class="card" id="qtUnitsCard"></div>
+        </section>
+
+        <section class="set-sec" data-sec="selling">
+    <div class="section-label">Job types</div>
+    <div class="card" id="sellJobTypesCard"></div>
+
+    <div class="section-label">Customer lifecycle</div>
+    <div class="card" id="sellLifecycleCard"></div>
+    <div id="sellMoreCards"></div>
         </section>
 
         <section class="set-sec" data-sec="docs">
@@ -3080,11 +3132,6 @@ create policy "app update" on tracker_data for update using (true) with check (t
   </div>
 
   <!-- APPROVALS -->
-  <div class="panel" id="panel-approvals">
-    <div class="page-head"><h2>Approvals</h2><div class="desc">Quotes waiting for a decision. Approvals are a team process, not security: anyone with the login can choose any name. Turn lanes on in Settings &gt; Approvals.</div></div>
-    <div id="apprInbox"></div>
-  </div>
-
   <!-- QUOTES -->
   <div class="panel" id="panel-quotations">
     <div id="quoteListView">
@@ -3101,6 +3148,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
         <div class="qb-scroll" id="quoteListWrap"></div>
       </div>
       <div id="quoteAgeingView" hidden></div>
+      <div id="quoteReviewView" hidden><p class="desc" style="margin:0 0 12px;max-width:760px;">Gerry's review. Quotes waiting for a decision, with everything Approvals did before: Waiting for me, All approvals, purchase orders and the comment on each decision. Approvals are a team process, not security: anyone with the login can choose any name. Turn lanes on in Settings, Approvals.</p><div id="apprInbox"></div></div>
     </div>
     <div id="quoteBuilderView" hidden></div>
   </div>
@@ -3553,7 +3601,7 @@ function ensureQuoteModel(o, seedAction){
 
 /* ---------- default state ---------- */
 function defaultState(){
-  return crmEnsureAll(ensureQuoteDocModel(ensureQuoteModel(ensureSupplierModel(ensureTaskModel(ensureStageModel({
+  return ensureSellingModel(crmEnsureAll(ensureQuoteDocModel(ensureQuoteModel(ensureSupplierModel(ensureTaskModel(ensureStageModel({
     startingCash: 2000,
     settings: {
       tradeAccountDays: 30,
@@ -3691,7 +3739,7 @@ function defaultState(){
     branding: defaultBranding(),
     quotes: [], nextQuoteId: 1, nextJobNumber: 1,
     assets: [], assetPlan: [], purchaseOrders: [], poNextNo: 1
-  }))), true), true));
+  }))), true), true)));
 }
 
 const NAV_KEY = STORAGE_PREFIX + 'business-tracker-nav';   // linked navigation (see "linked navigation" further down)
@@ -3736,6 +3784,7 @@ function mergeDefaults(loaded){
   out.settings.quoteSampleSeeded = !!(loaded.settings && loaded.settings.quoteSampleSeeded);
   out.settings.quoteLinkSeeded = !!(loaded.settings && loaded.settings.quoteLinkSeeded);
   out.settings.quoteDocSeeded = !!(loaded.settings && loaded.settings.quoteDocSeeded);
+  ensureSellingModel(out);   // Stage 3: job types, customer lifecycle, qualification questions (defaults only)
   ensureQuoteModel(out, true);   // old backups: quote settings, units and line categories get defaults; the insurance Action is added once
   docEnsureModel(out);   // documents & email: templates, numbering, bank details (all default safely)
   ensureQuoteDocModel(out, true);   // quotes: normalise, and load the sample quote once
@@ -3945,7 +3994,7 @@ function hideLoginShowApp(){ const o = document.getElementById('loginOverlay'); 
 function renderAuthUI(){
   const lb = document.getElementById('logoutBar');
   if(lb) lb.innerHTML = session
-    ? `<div class="who">${escAttr(session.username)}<span class="role">${session.role==='admin'?'admin':'user'}</span></div><button class="logout-link" data-action="logout">Log out</button>`
+    ? `<div class="who">${escAttr(session.username)}<span class="role">${session.role==='admin'?'admin':(session.role==='approver'?'approver':'user')}</span></div><button class="logout-link" data-action="logout">Log out</button>`
     : '';
   const admin = isAdmin();
   document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = admin ? '' : 'none'; });
@@ -4047,6 +4096,7 @@ function projectRollup(p){
   return { start, end, totalCost, materialsCost, durationDays };
 }
 function effectiveProb(r){
+  if(r.lost) return 0;   // closed lost: counts for nothing in any forecast
   if(r.probOverride !== undefined && r.probOverride !== null && r.probOverride !== '') return Number(r.probOverride);
   const st = stageById('sales', r.stageId);
   return st ? clampPct(st.pct)/100 : 0;
@@ -4308,7 +4358,7 @@ function dashAttentionHtml(today, T){
   groups.push({ title: `Leads with no contact in ${dashPlural(N, 'day')}`, go: ['leads'], items: dashStaleLeads(today).map(x => ({
     attr: `data-dash="open-lead" data-id="${x.l.id}"`, title: boardTitle('lead', x.l),
     meta: `${x.fromCreated ? 'created' : 'last contact'} ${dashPlural(x.age, 'day')} ago` })) });
-  groups.push({ title: 'Sales deals with no open task', go: ['salespipeline'], items: state.pipeline.filter(r => !dashHasOpenTask(r)).map(r => ({
+  groups.push({ title: 'Sales deals with no open task', go: ['salespipeline'], items: state.pipeline.filter(r => !r.lost && !dashHasOpenTask(r)).map(r => ({
     attr: `data-dash="open-sales" data-id="${r.id}"`, title: boardTitle('sales', r), meta: `${stageName('sales', r.stageId)} · ${money(r.quoteValue)}` })) });
   groups.push({ title: 'Projects with something overdue', go: ['projectpipeline'], items: state.projects.map(p => ({ p, o: projEvents(p).filter(e => e.overdue).sort((a, b) => a.date.localeCompare(b.date)) })).filter(x => x.o.length).map(x => ({
     attr: `data-dash="open-proj" data-id="${x.p.id}"`, title: boardTitle('project', x.p), meta: `${x.o[0].title} (${PW_KIND[x.o[0].kind].toLowerCase()}) was due ${fmtDisplay(toDate(x.o[0].date))}${x.o.length > 1 ? ` · +${x.o.length - 1} more` : ''}` })) });
@@ -4328,7 +4378,7 @@ function dashCashHtml(){
   return head + `<div class="db-chart">${dashCashSVG(cf.filter(c => !c.preStart), W)}</div>`;
 }
 function dashPipeRows(mode){
-  const sales = state.pipeline, sum = (recs, f) => recs.reduce((s, r) => s + f(r), 0);
+  const sales = state.pipeline.filter(r => !r.lost), sum = (recs, f) => recs.reduce((s, r) => s + f(r), 0);
   const mk = (label, recs, extra) => Object.assign({ label, count: recs.length, val: sum(recs, r => Number(r.quoteValue) || 0), w: sum(recs, r => (Number(r.quoteValue) || 0) * effectiveProb(r)) }, extra || {});
   const out = [];
   if(mode === 'tier'){
@@ -4341,7 +4391,7 @@ function dashPipeHtml(){
   const mode = dashUi.pipeMode, W = dashWidth('dbPipe', 520);
   const toggle = `<div class="view-toggle" role="group" aria-label="Group the pipeline by"><button type="button" data-dash="pipemode" data-v="stage" aria-pressed="${mode === 'stage'}" class="${mode === 'stage' ? 'active' : ''}">By stage</button><button type="button" data-dash="pipemode" data-v="tier" aria-pressed="${mode === 'tier'}" class="${mode === 'tier' ? 'active' : ''}">By tier</button></div>`;
   const head = dashCardHead('Sales pipeline by ' + mode, 'Total quote value; hover or tap a bar for the weighted figure.', toggle);
-  if(!state.pipeline.length) return head + dashEmpty('No deals in the sales pipeline yet.', ['salespipeline', 'Open Sales Pipeline']);
+  if(!state.pipeline.filter(r => !r.lost).length) return head + dashEmpty('No deals in the sales pipeline yet.', ['salespipeline', 'Open Sales Pipeline']);
   const data = dashPipeRows(mode);
   const rows = data.map(d => ({ label: `${d.label} (${d.count})`, value: d.val, valueText: money(d.val), image: d.image, hatch: d.hatch,
     tip: `${d.label}: ${dashPlural(d.count, 'deal')}, ${money(d.val)} total, ${money(d.w)} weighted` }));
@@ -4408,7 +4458,7 @@ function renderDashboard(){
   document.getElementById('dbDate').textContent = dateLabel(now);
   document.getElementById('dbPeriod').innerHTML = DASH_PERIODS.map(([k, l]) => `<button type="button" data-dash="period" data-v="${k}" aria-pressed="${dashUi.period === k}" class="${dashUi.period === k ? 'active' : ''}">${l}</button>`).join('');
 
-  const sales = state.pipeline, T = dashTasks(today), won = dashWon(range, today), lost = dashLostInPeriod(range);
+  const sales = state.pipeline.filter(r => !r.lost), T = dashTasks(today), won = dashWon(range, today), lost = dashLostInPeriod(range);
   const weighted = sales.reduce((s, r) => s + (Number(r.quoteValue) || 0) * effectiveProb(r), 0), total = sales.reduce((s, r) => s + (Number(r.quoteValue) || 0), 0);
   const projValue = liveProjects().reduce((s, p) => s + (Number(p.agreedValue) || 0), 0);
   const totIn = state.transactions.filter(txCounted).reduce((a, t) => a + (Number(t.moneyIn) || 0), 0), totOut = state.transactions.filter(txCounted).reduce((a, t) => a + (Number(t.moneyOut) || 0), 0);
@@ -4534,6 +4584,8 @@ function salesDetailHtml(r, i){
         </div>
         ${moveStripHtml('sales', r, i)}
         ${cxCustomerHtml('sales', r)}
+        <div class="sf-box"><h4>Value and timing ${sfNotFitChip(r)}</h4>${sfEditHtml('sales', r, i)}</div>
+        <div class="sf-box"><h4>Qualification ${qualBadgeHtml(r)}</h4><p class="q-help" style="margin:0 0 8px;">Carried from the lead. The gate applied when it was promoted; here the answers only tell the story and the score.</p>${qualEditHtml('sales', r, i)}</div>
         ${recTasksHtml('sales', r)}
         ${quoteChipHtml(r.id)}
         <div class="detail-notes"><label>Notes</label><input data-tab="pipeline" data-idx="${i}" data-field="notes" value="${escAttr(r.notes||'')}"></div>
@@ -4586,6 +4638,7 @@ function renderPipelineTable(){
   const kinds = Object.keys(STAGE_KINDS);
   let html = rtTable('pipelineTableWrap', ['','Code','Project / Client','Type','Tier','Sales Stage','Prob.','Quote (£)','Start','Complete','Cost (£)','']);
   state.pipeline.forEach((r, i) => {
+    if(r.lost) return;   // closed lost: in the Closed lost bar below
     const d = derivePipelineRow(r);
     const roll = d.rollup;
     const flag = r.type === 'real' && (!r.quoteValue || r.tier === 'Needs re-scoping');
@@ -4599,7 +4652,7 @@ function renderPipelineTable(){
         <option value="real"${r.type==='real'?' selected':''}>Real</option>
         <option value="example"${r.type==='example'?' selected':''}>Example</option></select></td>
       <td><select data-tab="pipeline" data-idx="${i}" data-field="tier">${tiers.map(t=>`<option${r.tier===t?' selected':''}>${t}</option>`).join('')}</select></td>
-      <td><select class="lead-pill" data-tab="pipeline" data-idx="${i}" data-field="stageId" style="${chipStyle(SALES_CHIP[r.stageId] || 'neutral')}">${salesStages.map(s=>`<option value="${escHtml(s.id)}"${r.stageId===s.id?' selected':''}>${chipSym(SALES_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select></td>
+      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="pipeline" data-idx="${i}" data-field="stageId" style="${chipStyle(SALES_CHIP[r.stageId] || 'neutral')}">${salesStages.map(s=>`<option value="${escHtml(s.id)}"${r.stageId===s.id?' selected':''}>${chipSym(SALES_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(r)}${sfNotFitChip(r)}${attnChipHtml('sales', r)}</div></td>
       <td class="computed" title="From sales stage">${Math.round(effectiveProb(r)*100)}%${(r.probOverride!==undefined&&r.probOverride!==null&&r.probOverride!=='')?'*':''}</td>
       <td><input type="number" step="1" data-tab="pipeline" data-idx="${i}" data-field="quoteValue" value="${r.quoteValue}"></td>
       <td class="computed">${fmtDisplay(roll.start)}</td>
@@ -4655,15 +4708,16 @@ function stageColor(pl, id){
 /* Won projects stay in the active Project Pipeline until someone presses Mark completed; they then live in the Completed projects view (full record kept) and can be reopened */
 const projUi = { show: 'active', q: '', year: '' };
 function projArchived(p){ return !!(p.completed && p.completed.date); }
-function liveProjects(){ return state.projects.filter(p => !projArchived(p)); }
+function liveProjects(){ return state.projects.filter(p => !projArchived(p) && !p.lost); }
 function projShown(p){
+  if(p.lost) return false;   // closed lost: in the Closed lost bar under the board
   if(projUi.show !== 'completed') return !projArchived(p);
   if(!projArchived(p)) return false;
   if(projUi.year && String(p.completed.date).slice(0, 4) !== projUi.year) return false;
   const q = projUi.q.trim().toLowerCase(); if(q && ![p.name, p.contact, p.company, p.address, recordCode(p.id, 'project')].join(' ').toLowerCase().includes(q)) return false;
   return true;
 }
-function viewRecords(pl){ return pl === 'lead' ? activeLeads() : (pl === 'sales' ? state.pipeline : state.projects.filter(projShown)); }
+function viewRecords(pl){ return pl === 'lead' ? activeLeads() : (pl === 'sales' ? state.pipeline.filter(r => !r.lost) : state.projects.filter(projShown)); }
 function findRec(pl, id){ return (pl === 'project' ? state.projects : viewRecords(pl)).find(r => r.id === id) || null; }
 function hasProbOverride(r){ return r.probOverride !== undefined && r.probOverride !== null && r.probOverride !== ''; }
 function boardTitle(pl, r){
@@ -4708,13 +4762,17 @@ function tileHtml(pl, r, color){
   let rows = '', flag = '', edge = color;
   if(pl === 'lead'){
     edge = r.leadType === 'Commercial' ? 'var(--bt-lead-com)' : 'var(--bt-lead-res)';
-    if(Number(r.estValue) > 0) rows += `<div class="bd-t-row"><span class="k">Est. value</span><span>${money(r.estValue)}</span></div>`;
+    if(Number(r.estValue) > 0) rows += `<div class="bd-t-row"><span class="k">Ballpark</span><span>${money(r.estValue)}</span></div>`;
+    if(sfDays(r)) rows += `<div class="bd-t-row"><span class="k">Duration</span><span>${sfDays(r)} days</span></div>`;
+    if(sfIso(r.prefStart) || sfIso(r.deadline)) rows += `<div class="bd-t-row"><span class="k">${sfIso(r.deadline) ? 'Deadline' : 'Start'}</span><span>${dShow(sfIso(r.deadline) || r.prefStart)}</span></div>`;
+    flag = qualBadgeHtml(r) + sfNotFitChip(r) + attnChipHtml('lead', r) + noContactChipHtml(leadDaysSince(r));
     const last = leadLastContact(r);
     rows += `<div class="bd-t-row"><span class="k">Last contacted</span><span>${last ? fmtDisplay(toDate(last)) : '—'}</span></div>`;
   } else if(pl === 'sales'){
     const roll = projectRollup(r);
     if(hasProbOverride(r)) flag = `<span class="bd-t-flag" title="This deal has its own percentage — moving it between stages does not change it">manual %</span>`;
     rows += `<div class="bd-t-row"><span class="k">Quote · ${Math.round(effectiveProb(r)*100)}%</span><span>${money(r.quoteValue)}</span></div>`;
+    flag += qualBadgeHtml(r) + sfNotFitChip(r) + attnChipHtml('sales', r);
     if(roll.start) rows += `<div class="bd-t-row"><span class="k">Starts</span><span>${fmtDisplay(roll.start)}</span></div>`;
   } else {
     sub = '';
@@ -4750,7 +4808,7 @@ function renderBoard(pl){
   const cols = stages.map(s => colHtml(pl, s, by[s.id], false));
   if(orphans.length) cols.push(colHtml(pl, { id: '', name: 'No stage' }, orphans, true));
   const hints = {
-    lead: 'Drag a tile to another column to change its stage. Moving a lead never promotes it — Promote stays in the lead\'s detail and still needs all four qualification fields. Green edge = Residential, blue = Commercial.',
+    lead: 'Drag a tile to another column to change its stage. Moving a lead never promotes it — Promote stays in the lead\'s detail and still needs every hard-gate qualification question answered. Green edge = Residential, blue = Commercial.',
     sales: 'Drag a tile to another column to change its stage; the stage\'s percentage is applied unless the deal has a manual percentage.',
     project: 'Drag a tile to another column to change the project\'s stage. Dates and payment lines are never changed by a move.'
   };
@@ -5417,9 +5475,7 @@ function priorityChipSym(i){ return i === 0 ? '!!' : chipSym(PRIORITY_CHIP[i] ||
 /* pill colours follow the stage id (so renaming keeps the colour); stages you add get the neutral grey */
 function leadStatusStyle(stageId){ return chipStyle(LEAD_CHIP[stageId] || 'neutral'); }
 const QUAL_FIELDS = [['budget','Budget'],['decisionMaker','Decision-maker'],['timeline','Timeline'],['competition','Competition']];
-function leadQualDone(l){ return QUAL_FIELDS.filter(([k]) => l[k]).length; }
-function leadQualMissing(l){ return QUAL_FIELDS.filter(([k]) => !l[k]).map(([, n]) => n); }
-function leadQualified(l){ return leadQualDone(l) === QUAL_FIELDS.length; }
+/* leadQualDone / leadQualMissing / leadQualified now come from the qualification settings (Stage 3, step 2) */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function emailLooksOff(v){ v = String(v || '').trim(); return v !== '' && !EMAIL_RE.test(v); }   // a gentle warning only — never blocks saving
 function leadLastContact(l){
@@ -5454,7 +5510,7 @@ function leadStageName(l){ const st = stageById('lead', l.stageId); return st ? 
 /* the expanded lead: one framed card — tinted header, read-only summary blocks (each opens the editor panel), tasks + timeline, actions */
 function leadDetailHtml(l, i){
   const isCommercial = l.leadType === 'Commercial';
-  const done = leadQualDone(l), missing = leadQualMissing(l), tier = tierById(l.tierId);
+  const qe = qualEval(l), done = qe.answered, missing = leadQualMissing(l), tier = tierById(l.tierId);
   const dash = '<span class="v dim">—</span>';
   const val = (v, k) => v ? `<span class="v">${k ? `<span class="k">${k}</span>` : ''}${escHtml(v)}</span>` : (k ? `<span class="v dim"><span class="k">${k}</span>—</span>` : dash);
   const block = (sec, title, inner) => `<button type="button" class="lc-block" data-lp="open" data-id="${l.id}" data-sec="${sec}" title="Edit ${title.toLowerCase()}"><h4>${title}</h4>${inner}${PEN_SVG}</button>`;
@@ -5465,13 +5521,13 @@ function leadDetailHtml(l, i){
       <span class="lc-code">${recordCode(l.id, 'lead')}</span>${tier ? tierBadgeHtml(tier) : ''}
       <span class="lc-name${l.projectName ? '' : ' empty'}">${escHtml(l.projectName || 'No project name yet')}</span>
       <span class="lc-type">${isCommercial ? 'Commercial' : 'Residential'}</span>
-      <span class="lc-pill" style="${leadStatusStyle(l.stageId)}">${escHtml(leadStageName(l))}</span>
+      <span class="lc-pill" style="${leadStatusStyle(l.stageId)}">${escHtml(leadStageName(l))}</span>${qualBadgeHtml(l)}${sfNotFitChip(l)}${attnChipHtml('lead', l)}${noContactChipHtml(leadDaysSince(l))}
     </div>
     <div class="lc-sum">
       ${block('contact', 'Contact', `${val(l.contact || (isCommercial ? l.company : ''))}${val(l.phone)}${val(l.email)}${extra ? `<span class="v dim">+${extra} additional</span>` : ''}`)}
-      ${block('project', 'Project', `${val(l.source, 'Source')}${val(Number(l.estValue) > 0 ? money(l.estValue) : '', 'Value')}${val(tier ? tier.name : '', 'Tier')}`)}
+      ${block('project', 'Project', `${val(l.source, 'Source')}${val(Number(l.estValue) > 0 ? money(l.estValue) : '', 'Ballpark')}${sfFactsHtml(l, val)}${val(tier ? tier.name : '', 'Tier')}${sfNotFitChip(l) ? `<span class="v">${sfNotFitChip(l)}</span>` : ''}`)}
       ${block('location', 'Location', `${l.address ? `<span class="v">${escHtml(l.address).replace(/\n/g, '<br>')}</span>` : dash}${l.postcode && !String(l.address || '').toUpperCase().includes(l.postcode) ? `<span class="v"><b>${escHtml(l.postcode)}</b></span>` : ''}`)}
-      ${block('qualification', 'Qualification', `<span class="v"><b>${done} of ${QUAL_FIELDS.length} complete</b></span>${missing.length ? `<span class="miss">Missing: ${escHtml(missing.join(', '))}</span>` : '<span class="miss ok">✓ Ready to promote</span>'}`)}
+      ${block('qualification', 'Qualification', `<span class="v"><b>${done} of ${qe.total} answered</b> ${qualBadgeHtml(l)}</span>${missing.length ? `<span class="miss">Holding promotion: ${escHtml(missing.join(', '))}</span>` : '<span class="miss ok">✓ Ready to promote</span>'}`)}
     </div>
     <div class="lc-cols">
       <div class="lc-col">${recTasksHtml('lead', l, { compact: true, limit: 4 })}</div>
@@ -5481,7 +5537,7 @@ function leadDetailHtml(l, i){
     <div class="lc-foot">
       ${leadQualified(l)
         ? `<button class="promote-btn" data-action="promote-lead" data-id="${l.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Promote to sales</button>`
-        : `<button class="promote-btn" disabled title="Fill all four qualification fields to unlock promotion">Promote to sales</button><span class="gate-msg">Needs ${escHtml(missing.join(', '))} first.</span>`}
+        : `<button class="promote-btn blocked" data-action="promote-lead" data-id="${l.id}" title="${escAttr(qualGateMsg(l))}" aria-disabled="true">Promote to sales</button><span class="gate-msg">${escHtml(qualGateMsg(l))}</span>`}
       <button class="btn secondary lost-btn" style="margin-left:0;" data-action="mark-lost" data-id="${l.id}">Mark as lost</button>
       <button class="btn secondary edit-btn" data-lp="open" data-id="${l.id}" data-sec="">Edit details</button>
     </div>
@@ -5497,7 +5553,6 @@ function renderLeads(){
     const isCommercial = l.leadType === 'Commercial';
     const last = leadLastContact(l);
     const active = lp && lp.kind === 'lead' && lp.id === l.id ? ' lead-active' : '';
-    const qd = leadQualDone(l);
     html += `<tr class="lead-row ${isCommercial?'lead-com':'lead-res'}${active}">
       <td><button class="icon-btn expand${isOpen?' open':''}" data-action="toggle-lead" data-id="${l.id}" title="Detail & comms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></td>
       <td class="code-cell">${recordCode(l.id,'lead')}</td>
@@ -5509,7 +5564,7 @@ function renderLeads(){
         : `<input class="computed" disabled value="—" title="Residential — no company">`}</td>
       <td><input class="lead-pc${l.postcodeManual?' manual':''}" data-tab="leads" data-idx="${i}" data-field="postcode" value="${escAttr(l.postcode||'')}" title="${l.postcodeManual?'Set manually — clear this cell to go back to automatic':'Filled automatically from the address — type to override'}"></td>
       <td class="computed" title="Pulled from the latest communication entry">${last?fmtDisplay(toDate(last)):'—'}</td>
-      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select><span class="qual-chip${qd === QUAL_FIELDS.length ? ' q-full' : (qd ? ' q-some' : '')}" title="Qualification: ${qd} of ${QUAL_FIELDS.length} complete">${qd}/${QUAL_FIELDS.length}</span></div></td>
+      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(l)}${sfNotFitChip(l)}${attnChipHtml('lead', l)}${noContactChipHtml(leadDaysSince(l))}</div></td>
       <td><button class="icon-btn" data-action="delete-lead" data-idx="${i}" title="Delete lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
     </tr>`;
     if(isOpen){ html += `<tr class="detail-row${active}"><td colspan="10">${leadDetailHtml(l, i)}</td></tr>`; }
@@ -5518,7 +5573,6 @@ function renderLeads(){
   const wrap = document.getElementById(LEADS_TABLE_ID);
   wrap.innerHTML = html;
   rtApply(wrap);
-  renderLostLeads();
 }
 
 /* ---------- Leads editor panel ----------
@@ -5550,11 +5604,6 @@ function lpContactCardHtml(l, i, c, ci){
     ${lpEmailField(i, c.email, o)}
   </div>`;
 }
-function lpQualNoteHtml(l){
-  const done = leadQualDone(l), missing = leadQualMissing(l);
-  return { count: `${done} of ${QUAL_FIELDS.length} complete`,
-    note: missing.length ? `Promotion to the Sales Pipeline needs all four. Still needed: ${missing.join(', ')}.` : 'All four are complete — this lead can be promoted to the Sales Pipeline.' };
-}
 function lpBodyHtml(l, i){
   const isCommercial = l.leadType === 'Commercial', q = lpQualNoteHtml(l), contacts = l.contacts || [];
   const miss = f => l[f] ? '' : ' missing';
@@ -5575,20 +5624,18 @@ function lpBodyHtml(l, i){
         <button class="res${!isCommercial ? ' active' : ''}" data-action="set-lead-type" data-idx="${i}" data-val="Residential">Residential</button>
         <button class="com${isCommercial ? ' active' : ''}" data-action="set-lead-type" data-idx="${i}" data-val="Commercial">Commercial</button></div>`)}
       ${lpFieldHtml('Source', lpInput(i, 'source', l.source, { ph: 'e.g. Referral, Facebook group' }))}
-      ${lpFieldHtml('Estimated value (£)', `<input type="number" step="1" min="0" data-tab="leads" data-idx="${i}" data-field="estValue" value="${l.estValue === '' || l.estValue == null ? '' : l.estValue}" placeholder="Sets the tier automatically">`)}
+      ${lpFieldHtml('Ballpark value (£)', `<input type="number" step="1" min="0" data-tab="leads" data-idx="${i}" data-field="estValue" value="${l.estValue === '' || l.estValue == null ? '' : l.estValue}" placeholder="A rough figure, sets the tier automatically">`)}
+      ${sfEditHtml('lead', l, i, { skipValue: true })}
       ${lpFieldHtml('Tier', `<select data-tab="leads" data-idx="${i}" data-field="tierSel" id="lpTier">${lpTierOptions(l)}</select>`)}
-      ${lpFieldHtml('Lead status', `<div class="lp-statusrow"><select data-tab="leads" data-idx="${i}" data-field="stageId">${stageOpts}</select>${leadQualified(l) ? `<button type="button" class="promote-btn" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button>` : ''}</div>`)}
+      ${lpFieldHtml('Lead status', `<div class="lp-statusrow"><select data-tab="leads" data-idx="${i}" data-field="stageId">${stageOpts}</select><button type="button" class="promote-btn${leadQualified(l) ? '' : ' blocked'}" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button></div>`)}
     </section>
     <section class="lp-sec" id="lp-sec-location" data-sec="location"><h3>Location</h3>
       ${lpFieldHtml('Address', `<textarea rows="3" data-tab="leads" data-idx="${i}" data-field="address" placeholder="Site address">${escAttr(l.address || '')}</textarea>`)}
       ${lpFieldHtml('Postcode', lpInput(i, 'postcode', l.postcode, { cls: 'lp-pc' + (l.postcodeManual ? ' manual' : ''), ph: 'Filled from the address' }) + `<div class="lp-hint" id="lpPcHint">${lpPcHint(l)}</div>`)}
     </section>
     <section class="lp-sec" id="lp-sec-qualification" data-sec="qualification"><h3>Qualification</h3>
-      <div class="lp-qsum"><b id="lpQualCount">${q.count}</b><span id="lpQualNote">${q.note}</span></div>
-      <div class="lp-f${miss('budget')}" data-qf="budget"><label>Budget indication</label>${lpInput(i, 'budget', l.budget, { ph: 'e.g. £15–20k' })}</div>
-      <div class="lp-f${miss('decisionMaker')}" data-qf="decisionMaker"><label>Decision-maker</label>${lpInput(i, 'decisionMaker', l.decisionMaker, { ph: 'Who signs off?' })}</div>
-      <div class="lp-f${miss('timeline')}" data-qf="timeline"><label>Desired timeline</label>${lpInput(i, 'timeline', l.timeline, { ph: 'When?' })}</div>
-      <div class="lp-f${miss('competition')}" data-qf="competition"><label>Competition</label>${lpInput(i, 'competition', l.competition, { ph: 'Other quotes?' })}</div>
+      <div class="lp-qsum"><b id="lpQualCount">${q.count}</b> <span id="lpQualBadge">${qualBadgeHtml(l)}</span><span id="lpQualNote">${q.note}</span></div>
+      <div id="lpQualRows">${qualEditHtml('lead', l, i)}</div>
     </section>${lp && lp.timeline ? `
     <section class="lp-sec" id="lp-sec-timeline" data-sec="timeline"><h3>Timeline</h3><div id="lpTimeline">${lpTimelineHtml(l, i)}</div></section>` : ''}`;
 }
@@ -5672,11 +5719,10 @@ function lpSync(){
   lpEl('lpHeadInfo').innerHTML = lpHeadHtml(l);
   const q = lpQualNoteHtml(l);
   lpEl('lpQualCount').textContent = q.count; lpEl('lpQualNote').textContent = q.note;
-  document.querySelectorAll('#lpBody [data-qf]').forEach(w => w.classList.toggle('missing', !l[w.dataset.qf]));
+  const qb = document.getElementById('lpQualBadge'); if(qb) qb.innerHTML = qualBadgeHtml(l);
+  qualEval(l).items.forEach(x => { const w = document.querySelector(`#lpBody [data-qq="${x.q.id}"]`); if(w) w.classList.toggle('missing', x.mode === 'gate' && x.st !== 'ok'); });
   const srow = document.querySelector('#lpBody .lp-statusrow');   // “Promote to Sales” appears the moment the lead is fully qualified
-  if(srow){ const b = srow.querySelector('[data-action="promote-lead"]'), q = leadQualified(l);
-    if(q && !b) srow.insertAdjacentHTML('beforeend', `<button type="button" class="promote-btn" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button>`);
-    else if(!q && b) b.remove(); }
+  if(srow){ const b = srow.querySelector('[data-action="promote-lead"]'); if(b) b.classList.toggle('blocked', !leadQualified(l)); }
   const tl = lpEl('lpTimeline');
   if(tl && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#lpTimeline .comm-entry'))){
     const ae = document.activeElement, noteFocus = ae && ae.dataset && ae.dataset.lc === 'note' && tl.contains(ae), keep = noteFocus ? ae.value : '', top = tl.querySelector('.comms-scroll');
@@ -5688,6 +5734,7 @@ function lpSync(){
   const tier = lpEl('lpTier'); if(tier && document.activeElement !== tier) tier.innerHTML = lpTierOptions(l);
   const pc = document.querySelector('#lpBody input[data-field="postcode"]');
   if(pc){ if(document.activeElement !== pc) pc.value = l.postcode || ''; pc.classList.toggle('manual', !!l.postcodeManual); lpEl('lpPcHint').textContent = lpPcHint(l); }
+  if(typeof sfPanelSync === 'function') sfPanelSync(l);
 }
 function lpSaveStatus(msg){
   const el = lpEl('lpSaved'); if(!el || !lp) return;
@@ -5749,47 +5796,8 @@ document.addEventListener('input', (e) => {
 
 /* ---------- lost leads ---------- */
 function lostReasonName(id){ const r = (state.lostReasons||[]).find(x => x.id === id); return r ? r.name : '—'; }
-function renderLostLeads(){
-  const wrap = document.getElementById('lostLeadsWrap'); if(!wrap) return;
-  const lost = state.leads.filter(l => l.lost);
-  if(!lost.length){ wrap.innerHTML = ''; return; }
-  const open = wrap.dataset.open === '1';
-  const rows = lost.map(l => `<tr>
-      <td class="code-cell" style="width:80px">${recordCode(l.id,'lead')}</td>
-      <td>${escHtml(l.projectName||'—')}</td>
-      <td>${escHtml(l.contact || l.company || '—')}</td>
-      <td title="${escHtml(l.lostNote||'')}">${escHtml(lostReasonName(l.lostReason))}${l.lostNote ? ' <span title="'+escHtml(l.lostNote)+'">·&nbsp;note</span>' : ''}</td>
-      <td style="width:120px">${l.lostDate ? fmtDisplay(toDate(l.lostDate)) : '—'}</td>
-      <td style="width:90px;text-align:right;"><button class="btn secondary" data-action="restore-lead" data-id="${l.id}">Restore</button></td>
-    </tr>`).join('');
-  wrap.innerHTML = `<div class="archived-section lost-section">
-      <div class="archived-toggle${open?' open':''}" data-action="toggle-lost">
-        <span>Lost leads (${lost.length})</span>${CHEV_SVG}
-      </div>
-      <div class="archived-body table-scroll" ${open?'':'hidden'}>
-        <table><thead><tr><th>Code</th><th>Project name</th><th>Contact</th><th>Reason</th><th>Date lost</th><th></th></tr></thead><tbody>${rows}</tbody></table>
-      </div>
-    </div>`;
-}
-async function markLeadLost(id){
-  const l = state.leads.find(x => x.id === id && !x.lost); if(!l) return;
-  if(!state.lostReasons.length){ showToast('Add at least one lost reason in Settings first.', null, 8000); return; }
-  const extra = `<select id="lostReasonSel" required><option value="">Select a reason…</option>${state.lostReasons.map(r=>`<option value="${escHtml(r.id)}">${escHtml(r.name)}</option>`).join('')}</select>
-    <textarea id="lostNoteTxt" placeholder="Optional note"></textarea><div class="modal-err" id="modalExtraErr"></div>`;
-  const ok = await showConfirm('Mark this lead as lost?', `${recordCode(l.id,'lead')} · ${leadPrimaryName(l)} will leave the active Lead Pipeline view and all active counts. You can restore it from the Lost leads bar at the bottom of this tab.`, extra);
-  if(!ok || !_confirmExtraValue) return;
-  l.lostStageId = l.stageId;
-  l.lostReason = _confirmExtraValue; l.lostNote = (_confirmExtraNote || '').trim(); l.lostDate = fmt(new Date());
-  l.lost = true;
-  expandedLeads.delete(l.id);
-  render(); saveState();
-}
-function restoreLead(id){
-  const l = state.leads.find(x => x.id === id && x.lost); if(!l) return;
-  l.stageId = stageById('lead', l.lostStageId) ? l.lostStageId : (stageById('lead', l.stageId) ? l.stageId : firstStageId('lead'));
-  l.lost = false; l.lostReason = ''; l.lostNote = ''; l.lostDate = ''; l.lostStageId = '';
-  render(); saveState();
-}
+async function markLeadLost(id){ selCloseLost('lead', id); }   // Stage 3: one flow for all three boards (default reason Stalled, logged)
+function restoreLead(id){ selReopen('lead', id); }
 /* ---------- resizable columns ----------
    One mechanism for Leads, Sales Pipeline, Project Pipeline and their expandable detail tables (sub-stages, payment lines).
    Each table is a fixed-layout <table data-rt="key"> driven by a <colgroup>; widths are remembered per table key in
@@ -6214,7 +6222,7 @@ document.addEventListener('change', (e) => {   // leaving the name box empty put
    A record carries its customer in CARRY_FIELDS. carryFields never blanks a filled-in value with an empty one, and custBackfill fills only gaps
    (from the original lead, then from the linked quote's customer / address / project), so nothing is lost when a record moves between pipelines. */
 function isBlank(v){ return v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length); }
-function carryFields(src, dst, fields){ (fields || CARRY_FIELDS).forEach(f => { if(src[f] === undefined) return; if(isBlank(src[f]) && !isBlank(dst[f])) return; dst[f] = jclone(src[f]); }); }
+function carryFields(src, dst, fields){ const none = v => isBlank(v) || (v && typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length); (fields || CARRY_FIELDS).forEach(f => { if(src[f] === undefined) return; if(none(src[f]) && !none(dst[f])) return; dst[f] = jclone(src[f]); }); }
 function custQuote(r){ return state.quotes.filter(x => (x.linkedIds || []).some(c => linkedRoot(c) === r.id)).sort((a, b) => (b.status === 'Accepted') - (a.status === 'Accepted') || b.version - a.version)[0] || null; }
 function custBackfill(r){
   const snap = r.leadSnapshot || null, q = custQuote(r), filled = [];
@@ -6929,9 +6937,9 @@ document.addEventListener('click', (e) => {
 function whoName(){ const w = whoAmI(); return w.name || (session && session.username) || 'unknown'; }
 function chgLog(p, kind, r, changes){ p.changeLog = p.changeLog || []; p.changeLog.push({ id: qRand('ch_'), at: new Date().toISOString(), by: whoName(), kind, cause: r.cause, reason: r.reason, changes }); }
 /* ---------- edit mode: gate, draft, save (with a reason), discard, reset ---------- */
-function showConfirmLabel(title, msg, label){
+function showConfirmLabel(title, msg, label, extra){
   const btn = document.querySelector('#modalOverlay [data-modal="confirm"]'), old = btn.textContent; btn.textContent = label;
-  return showConfirm(title, msg).then(v => { btn.textContent = old; return v; });
+  return showConfirm(title, msg, extra).then(v => { btn.textContent = old; return v; });
 }
 function pwDraftInit(p, kind){
   if(kind === 'timeline') return { stages: {} };
@@ -7957,6 +7965,7 @@ function renderSettings(){
   renderDashSettings();
   renderQuoteSettings();
   renderApprovalSettings();
+  renderSellingSettings();
   renderDocSettings();
 }
 /* ---------- Settings > Pipelines: blackout dates (no-work periods: holidays, shutdowns) shown as hatched bands on the Gantt and the project timeline ---------- */
@@ -8207,7 +8216,8 @@ function qNormLine(l, supIds){
     unitId: units.some(u => u.id === l.unitId) ? l.unitId : '', unitName: str(l.unitName), qty: qNumOr(l.qty, 0),
     wastagePct: qNumOr(l.wastagePct, 0), wastageManual: !!l.wastageManual,
     prices: (Array.isArray(l.prices) ? l.prices : []).filter(p => p && typeof p === 'object' && Number(p.supplierId) > 0 && p.price !== '' && p.price != null && !isNaN(Number(p.price)))
-      .map(p => ({ supplierId: Number(p.supplierId), price: Number(p.price), date: /^\d{4}-\d{2}-\d{2}$/.test(p.date || '') ? p.date : fmt(new Date()), note: str(p.note) })),
+      .map(p => Object.assign({ supplierId: Number(p.supplierId), price: Number(p.price), date: /^\d{4}-\d{2}-\d{2}$/.test(p.date || '') ? p.date : fmt(new Date()), note: str(p.note) },
+      (p.leadTimeDays !== '' && p.leadTimeDays != null && Number(p.leadTimeDays) >= 0) ? { leadTimeDays: Math.round(Number(p.leadTimeDays)) } : {}, /^\d{4}-\d{2}-\d{2}$/.test(p.validUntil || '') ? { validUntil: p.validUntil } : {})),   // lead time and valid until: kept when typed, not added when blank
     selectedSupplierId: Number(l.selectedSupplierId) > 0 ? Number(l.selectedSupplierId) : '',
     costOverride: (l.costOverride === '' || l.costOverride == null || isNaN(Number(l.costOverride)) || Number(l.costOverride) < 0) ? '' : Number(l.costOverride),
     markupPct: qNumOr(l.markupPct, 0), vatRate: qNumOr(l.vatRate, state.settings.vatRate), customerGroup: str(l.customerGroup), showOnQuote: l.showOnQuote !== false,
@@ -8418,21 +8428,22 @@ function renderQuotes(){
   document.getElementById('quoteListView').hidden = !!qUi.openId;
   document.getElementById('quoteBuilderView').hidden = !qUi.openId;
   const vatOn = qVatOn();
-  document.getElementById('quoteTabs').innerHTML = [['quotes', 'Quotes'], ['ageing', 'Price ageing']].map(([v, n]) => `<button type="button" data-qba="tab" data-v="${v}" class="${qUi.tab === v ? 'active' : ''}">${n}</button>`).join('');
-  document.getElementById('quoteListTab').hidden = qUi.tab !== 'quotes'; document.getElementById('quoteAgeingView').hidden = qUi.tab !== 'ageing';
+  document.getElementById('quoteTabs').innerHTML = [['quotes', 'Quotes'], ['ageing', 'Price ageing'], ['review', 'Review']].map(([v, n]) => `<button type="button" data-qba="tab" data-v="${v}" class="${qUi.tab === v ? 'active' : ''}">${n}${v === 'review' && typeof apReviewCount === 'function' && apReviewCount() ? ` <span class="tab-count">${apReviewCount()}</span>` : ''}</button>`).join('');
+  document.getElementById('quoteListTab').hidden = qUi.tab !== 'quotes'; document.getElementById('quoteAgeingView').hidden = qUi.tab !== 'ageing'; document.getElementById('quoteReviewView').hidden = qUi.tab !== 'review';
+  if(qUi.tab === 'review') renderApprovals();
   if(qUi.tab === 'ageing') renderQuoteAgeing();
   const sf = document.getElementById('quoteFilters');
   sf.innerHTML = `<div class="view-toggle" role="group" aria-label="Status">${[['all', 'All']].concat(QUOTE_FILTERS.map(s => [s, s])).map(([v, n]) => `<button type="button" data-qba="filter" data-v="${v}" class="${qUi.status === v ? 'active' : ''}">${n}</button>`).join('')}</div>`;
   const s = qUi.q.trim().toLowerCase();
   const list = state.quotes.filter(q => (qUi.status === 'all' || q.status === qUi.status) && (!s || [qRef(q), q.customer, q.project, q.status, qLinkedText(q)].join(' ').toLowerCase().includes(s)))
     .sort((a, b) => b.date.localeCompare(a.date) || b.jobNumber - a.jobNumber || b.version - a.version);
-  const heads = ['Reference', 'Customer', 'Project', 'Version', 'Status', 'Total ex VAT'].concat(vatOn ? ['Total inc VAT'] : []).concat(['Date', 'Linked lead']);
+  const heads = ['Reference', 'Customer', 'Project', 'Version', 'Status', 'Days since contact', 'Next follow-up', 'Total ex VAT'].concat(vatOn ? ['Total inc VAT'] : []).concat(['Date', 'Linked record']);
   let html = `<table class="quotes-table"><thead><tr>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
   if(!list.length) html += `<tr><td colspan="${heads.length}"><div class="sup-empty">${state.quotes.length ? 'No quotes match these filters.' : 'No quotes yet — start one with “+ New quote”.'}</div></td></tr>`;
   list.forEach(q => {
-    const c = qCalc(q);
-    html += `<tr class="sup-row" data-qba="open" data-id="${q.id}" tabindex="0"><td class="code-cell">${escHtml(qRef(q))}</td><td class="q-strong">${escHtml(q.customer || '—')}</td><td>${escHtml(q.project || '—')}</td>
-      <td>${q.version}</td><td><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span>${apListChips(q)}</td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
+    const c = qCalc(q), x = qlistCells(q);
+    html += `<tr class="sup-row" data-qba="open" data-id="${q.id}" tabindex="0"><td class="code-cell">${escHtml(qRef(q))}</td><td class="q-strong">${x.cust}</td><td>${x.proj}</td>
+      <td>${q.version}</td><td><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span>${apListChips(q)}</td><td>${x.since}</td><td>${x.next}</td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
       <td>${escHtml(dShow(q.date))}</td><td>${escHtml(qLinkedText(q) || '—')}</td></tr>`;
   });
   wrap.innerHTML = html + '</tbody></table>';
@@ -8610,7 +8621,7 @@ function qbRender(){
   const ae = document.activeElement; if(ae && box.contains(ae) && ae.blur) ae.blur();   // commit a half-finished edit before the page is rebuilt
   const sc = box.querySelector('.qb-scroll'), sl = sc ? sc.scrollLeft : 0, sy = window.scrollY;
   qAutoDrops(q);
-  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbOptionalHtml(q) + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + '<div class="qb-pair">' + qAsSoldHtml(q) + '<div id="qbActual"></div></div><datalist id="qbGroupsList"></datalist><div id="qbCash"></div>' + qbTimelineHtml(q);
+  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbOptionalHtml(q) + qbMaterialsHtml(q) + qbCompareHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + '<div class="qb-pair">' + qAsSoldHtml(q) + '<div id="qbActual"></div></div><datalist id="qbGroupsList"></datalist><div id="qbCash"></div>' + qbTimelineHtml(q);
   const ns = box.querySelector('.qb-scroll'); if(ns) ns.scrollLeft = sl;
   box.querySelectorAll('[data-f="customerGroup"]').forEach(i => i.setAttribute('list', 'qbGroupsList'));
   qbRefresh(); window.scrollTo(0, sy);
@@ -8668,6 +8679,7 @@ function qbRefresh(){
   const ref = document.getElementById('qbRef'); if(ref) ref.textContent = qRef(q);
   qbSyncInputs(q, document);
   qbLiveParts(q, c); qbLock(q);
+  if(typeof selCompareRefresh === 'function') selCompareRefresh();
   apRefresh(q);
 }
 function qbSyncInputs(q, scope){
@@ -8784,7 +8796,7 @@ function qbChange(el){
       qSyncStageDrops(q); rebuild = true;
     }
     else if(f === 'deliverDate'){ l.deliverDate = isoOk(v); qSyncStageDrops(q); rebuild = true; }
-    else if(f === 'selectedSupplierId'){ l.selectedSupplierId = v === '' ? '' : Number(v); if(l.stageId){ qSyncStageDrops(q); rebuild = true; } }
+    else if(f === 'selectedSupplierId'){ selPickSupplier(q, l, v); return; }   // Stage 3: a supplier that is not the cheapest asks for a reason first
   } else if(k === 'price'){
     const l = q.lines.find(x => x.id === id); if(!l) return; const sid = Number(el.dataset.sid), at = l.prices.findIndex(p => p.supplierId === sid);
     if(f === 'price'){
@@ -8792,7 +8804,9 @@ function qbChange(el){
       else if(at >= 0){ if(l.prices[at].price !== Number(v)){ l.prices[at].price = Number(v); l.prices[at].date = fmt(new Date()); } }
       else l.prices.push({ supplierId: sid, price: Number(v), date: fmt(new Date()), note: '' });
       if(l.stageId){ qSyncStageDrops(q); rebuild = true; }
-    } else if(at >= 0){ if(f === 'note') l.prices[at].note = String(v).trim(); else if(f === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(v)) l.prices[at].date = v; }
+    } else if(at >= 0){ if(f === 'note') l.prices[at].note = String(v).trim(); else if(f === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(v)) l.prices[at].date = v;
+      else if(f === 'leadTimeDays'){ const n = Math.round(Number(v)); if(v === '' || isNaN(n) || n < 0) delete l.prices[at].leadTimeDays; else l.prices[at].leadTimeDays = n; }
+      else if(f === 'validUntil'){ if(/^\d{4}-\d{2}-\d{2}$/.test(v)) l.prices[at].validUntil = v; else delete l.prices[at].validUntil; } }
   } else if(k === 'lab'){
     const r = q.labour.find(x => x.id === id); if(!r) return;
     if(f === 'description' || f === 'customerGroup') r[f] = String(v).trim();
@@ -8915,6 +8929,7 @@ document.addEventListener('change', (e) => {
 });
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-qba]'); if(!b || !state) return;
+  if(b.dataset.qba === 'open' && e.target.closest && e.target.closest('[data-nav],[data-sel-task]')) return;   // a link inside the row, not the row
   qbAction(b.dataset.qba, b);
 });
 document.addEventListener('keydown', (e) => { if(e.key === 'Enter' && e.target.dataset && e.target.dataset.qba === 'open'){ qbAction('open', e.target); } });
@@ -8927,7 +8942,8 @@ function qlBodyHtml(q, l){
   const cats = state.lineCategories.map(c => [c.id, c.name]), units = state.quoteUnits.map(u => [u.id, u.name]), vatOn = qVatOn();
   const dropOpts = [['', '—']].concat(q.drops.map((d, i) => [d.id, d.label || ('Drop ' + (i + 1))])), f = (label, inner, help) => `<div class="lp-f"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
   const prices = q.supplierCols.map(sid => `<div class="ql-price"><b>${escHtml(qbSupName(sid))}</b><div class="ql-pr">${qbIn('price', l.id, 'price', '', { num: true, sid, ph: 'Price ex VAT each', aria: 'Price' })}
-    <input type="date" data-qb="price" data-id="${l.id}" data-sid="${sid}" data-f="date" aria-label="Date entered"></div>${qbIn('price', l.id, 'note', '', { sid, ph: 'Note (optional)', aria: 'Price note' })}</div>`).join('');
+    <input type="date" data-qb="price" data-id="${l.id}" data-sid="${sid}" data-f="date" aria-label="Date entered"></div>
+    <div class="ql-pr">${qbIn('price', l.id, 'leadTimeDays', '', { num: true, sid, ph: 'Lead time (days)', aria: 'Lead time in days' })}<input type="date" data-qb="price" data-id="${l.id}" data-sid="${sid}" data-f="validUntil" aria-label="Valid until" title="Valid until"></div>${qbIn('price', l.id, 'note', '', { sid, ph: 'Note (optional)', aria: 'Price note' })}</div>`).join('');
   return `<section class="lp-sec" id="lp-sec-line" data-sec="line"><h3>Line</h3>
       ${f('Description', `<textarea rows="3" data-qb="line" data-id="${l.id}" data-f="description">${escHtml(l.description)}</textarea>`)}
       ${f('Category', qbSel('line', l.id, 'categoryId', qbOpts(cats, l.categoryId, '—')))}
@@ -10319,10 +10335,7 @@ function qSendDone(q, email){   // "I've sent it": deliberate; sets Sent and wri
   q.timeline.push({ date: today, note: `Quote ${ref} sent to ${email}`, created: Date.now() + 3, kind: 'sent' });
   const deal = qDeal(q);
   if(deal){ deal.rec.comms = Array.isArray(deal.rec.comms) ? deal.rec.comms : []; deal.rec.comms.push({ date: today, note: `Quote ${ref} sent to ${email}`, created: Date.now(), src: 'quote', quoteId: q.id }); }   // counts as a contact: stamps Last contacted
-  const calls = typeOpt('tt_call') ? 'tt_call' : defaultTypeId();
-  const t = createTask({ title: `Follow up quote ${ref}`, dueDate: addDaysIso(today, Number(st.followUpDays) || 0), typeId: calls, owner: whoAmI().name || meName(),
-    description: `Quote ${ref} (${q.customer || ''}${q.project ? ', ' + q.project : ''}) was sent to ${email} on ${today}. Check it arrived and ask whether they have any questions.`, linkedIds: deal ? [recordCode(deal.rec.id, deal.pl)] : [] });
-  t.quoteId = q.id;
+  fuEnsure(q, wdAdd(today, st.followUpGapDays));   // Stage 3: one follow-up task per quote (autoKey), due after the gap in working days
   saveState(); return true;
 }
 function qSetPdfDone(q){ qUi.pdfDone = qUi.pdfDone || new Set(); qUi.pdfDone.add(q.id); }
@@ -10343,6 +10356,7 @@ function apBadges(){
   const n = apWaitingFor(whoAmI().name).length + (typeof poWaitingFor === 'function' ? poWaitingFor(whoAmI().name).length : 0);
   ['apBadge', 'revBadge'].forEach(id => { const el = document.getElementById(id); if(el){ el.textContent = n; el.hidden = !n; } });
 }
+function apReviewCount(){ return apWaitingFor(whoAmI().name).length + (typeof poWaitingFor === 'function' ? poWaitingFor(whoAmI().name).length : 0); }
 function apSummary(q){ const c = qCalc(q); const f = apCashFacts(q, c); return `${qm(c.totalEx)} ex VAT · margin ${qpct(c.pctBefore)} before wages · ${f.negMonth ? 'cash dips negative in ' + monthLabel(toDate(f.negMonth.key + '-01')) : 'cash stays positive'}`; }
 function renderApprovals(){
   const box = document.getElementById('apprInbox'); if(!box) return;
@@ -10389,7 +10403,7 @@ function renderApprovalSettings(){
     <div class="q-err" id="apErr-${l.id}" role="alert"></div></div>`;
   el.innerHTML = `<p class="q-help" style="margin:0 0 10px;"><b>Approvals are a team process, not security: anyone with the login can choose any name.</b> Everything is OFF until you enable a lane. Approvers come from the team list used for task owners.</p>${st.approvalLanes.map(lane).join('<hr style="border:0;border-top:1px solid var(--line);margin:18px 0;">')}`;
   document.getElementById('apSendCard').innerHTML = `<div class="assumptions-grid">
-      <div class="lp-f"><label>Follow-up after sending (days)</label><input type="number" min="0" step="1" data-ap="followUpDays" value="${st.followUpDays}"></div>
+      <div class="lp-f"><label>Follow-up after sending</label><div class="q-help" style="margin:0;">Now set in working days in Settings, Selling (Follow-up and contact).</div></div>
       <div class="lp-f"><label>Sending Gmail account</label><input type="text" data-ap="sendAccount" value="${escAttr(st.sendAccount)}" autocomplete="off"></div></div>
     <div class="q-sub">Quote email template</div>
     <p class="q-help" style="margin:0 0 8px;">Merge fields: {customerName} {project} {ref} {validUntil} {total} {businessName} {phone}. The app opens a Gmail draft for you to check, attach the PDF to and send yourself. It never sends anything.</p>
@@ -11385,7 +11399,7 @@ function poExtraHtml(po){
 }
 /* the "New order" dialog: orders for the suppliers already on the quote, or a second order for a supplier */
 const po2Ui = { pid: 0, sup: '', date: '', lines: new Set(), err: '' };
-function po2Projects(){ return state.projects.filter(p => !projArchived(p) && projAcceptedQuote(p)); }
+function po2Projects(){ return state.projects.filter(p => !projArchived(p) && !p.lost && projAcceptedQuote(p)); }
 function po2LineChoices(p){
   const wq = projWorkQuote(p); if(!wq) return []; const c = qCalc(wq);
   return wq.lines.filter(l => c.lines[l.id] && !c.lines[l.id].excluded && !(l.kind === 'labour')).map(l => { const dr = l.deliveryDropId ? wq.drops.find(d => d.id === l.deliveryDropId) : null, locked = dr ? !!poForDrop(p.id, dr.id) : false;
@@ -11782,14 +11796,15 @@ document.addEventListener('click', (e) => { const b = e.target.closest && e.targ
      leadSnapshot  the lead as it was when promoted (the read-only "Original lead info" view)
      salesSnapshot the deal's own fields when it was promoted to a project (project only)
      salesHold / projectHold  what the record held in the stage it was returned from, so promoting again puts it all back. */
-const CARRY_FIELDS = ['contact','company','leadType','phone','email','contacts','source','projectName','address','postcode','postcodeManual','estValue','tierId','tierManual','budget','decisionMaker','timeline','competition','createdAt','leadNotes','contactIds','companyId'];   // contactIds / companyId: the CRM links travel with the deal. createdAt (when the lead came in) and leadNotes (the lead's own notes) used to be dropped on the way through
+const CARRY_FIELDS = ['contact','company','leadType','phone','email','contacts','source','projectName','address','postcode','postcodeManual','estValue','tierId','tierManual','budget','decisionMaker','timeline','competition','createdAt','leadNotes','contactIds','companyId','estDays','phases','prefStart','deadline','jobTypeId','qa','qRate'];   // contactIds / companyId: the CRM links travel with the deal. createdAt (when the lead came in) and leadNotes (the lead's own notes) used to be dropped on the way through
 const jclone = o => JSON.parse(JSON.stringify(o));
 function moveLog(rec, note){ rec.comms = rec.comms || []; rec.comms.push({ date: fmt(new Date()), note, created: Date.now(), src: 'move' }); }
 function promoteLead(id){
   const idx = state.leads.findIndex(l => l.id === id);
   if(idx < 0) return;
   const l = state.leads[idx];
-  if(l.lost || !leadQualified(l)) return;   // the qualification gate holds whatever the lead stages are called
+  if(l.lost) return;
+  if(!leadQualified(l)){ qualRefuse(l); return; }   // the qualification gate holds whatever the lead stages are called; there is no override
   const snap = jclone(l); delete snap.salesHold;
   let rec;
   if(l.salesHold){   // it has been here before: bring back the deal exactly as it was, with the lead's latest details
@@ -11806,6 +11821,7 @@ function promoteLead(id){
       contact: l.contact||'', company: l.company||'', leadType: l.leadType||'Residential', phone: l.phone||'', email: l.email||'', contacts: l.contacts||[], source: l.source||'',
       projectName: l.projectName||'', address: l.address||'', postcode: l.postcode||'', postcodeManual: !!l.postcodeManual,
       estValue: l.estValue===undefined?'':l.estValue, tierId: l.tierId||'', tierManual: !!l.tierManual,
+      estDays: l.estDays===undefined?'':l.estDays, phases: jclone(l.phases||[]), prefStart: l.prefStart||'', deadline: l.deadline||'', jobTypeId: l.jobTypeId||'', qa: jclone(l.qa||{}), qRate: jclone(l.qRate||{}),
       budget: l.budget||'', decisionMaker: l.decisionMaker||'', timeline: l.timeline||'', competition: l.competition||'',
       contactIds: (l.contactIds || []).slice(), companyId: l.companyId || '',
       comms: l.comms||[], contractSigned: '', createdAt: l.createdAt || '', leadNotes: l.notes || '',
@@ -11887,7 +11903,7 @@ function returnToLead(id){
 function returnToSales(id){
   const idx = state.projects.findIndex(p => p.id === id); if(idx < 0) return;
   const p = state.projects[idx];
-  const conf = stageByName(state.pipelineStages.sales, 'Confirmed');
+  const conf = salesWonStage();
   const base = p.salesSnapshot ? jclone(p.salesSnapshot) : { type: p.type || 'real', tier: 'Needs re-scoping', stageId: conf ? conf.id : firstStageId('sales'), probability: 1, quoteValue: 0 };
   const rec = Object.assign(base, { id: p.id, name: p.name, type: p.type || base.type, quoteValue: Number(p.agreedValue) || base.quoteValue || 0, notes: p.notes || '', tierId: p.tierId || base.tierId || '',
     stages: p.stages || [], comms: p.comms || [], contractSigned: (p.milestones || {}).contractSigned || base.contractSigned || '' });
@@ -11925,11 +11941,13 @@ function moveStripHtml(pl, r, i){
     const opts = state.pipelineStages.sales.map(st => `<option value="${escHtml(st.id)}"${r.stageId === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
     return `<div class="move-strip"><label>Sales stage <select data-tab="pipeline" data-idx="${i}" data-field="stageId">${opts}</select></label>
       ${r.contractSigned ? `<button class="promote-btn" data-action="promote-project" data-id="${r.id}">Promote to Project Pipeline →</button>` : `<span class="gate-msg">Set the contract signed date to promote.</span>`}
-      <button class="btn secondary" data-action="return-record" data-pl="sales" data-id="${r.id}">← Return to Lead Pipeline</button></div>`;
+      <button class="btn secondary" data-action="return-record" data-pl="sales" data-id="${r.id}">← Return to Lead Pipeline</button>
+      <button class="btn secondary" data-sel="close-lost" data-pl="sales" data-id="${r.id}">Close as lost</button></div>`;
   }
   const opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${projStageId(r) === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
   return `<div class="move-strip"><label>Project stage <select data-tab="projects" data-idx="${i}" data-field="stageId">${opts}</select></label>
-    <button class="btn secondary" data-action="return-record" data-pl="project" data-id="${r.id}">← Return to Sales Pipeline</button></div>`;
+    <button class="btn secondary" data-action="return-record" data-pl="project" data-id="${r.id}">← Return to Sales Pipeline</button>
+    <button class="btn secondary" data-sel="close-lost" data-pl="project" data-id="${r.id}">Close as lost</button></div>`;
 }
 /* "Original lead info": the lead as it was when promoted (read-only). Older records carry only the copied fields, and say so. */
 function leadInfoHtml(r){
@@ -11941,16 +11959,16 @@ function leadInfoHtml(r){
   return `<div class="detail-box lead-info">
     <div class="gate-msg ok" style="margin-bottom:10px;">${snap ? 'The lead exactly as it was when it was promoted. Read-only.' : 'This record was promoted before original lead details were kept, so this shows the lead details carried across. Read-only.'}</div>
     <div class="stage-label-row">Contact</div><dl class="ro-grid">${row('Contact name', l.contact)}${row('Company', l.company)}${row('Phone', l.phone)}${row('Email', l.email)}${row('Additional contacts', extra)}</dl>
-    <div class="stage-label-row">Project</div><dl class="ro-grid">${row('Project name', l.projectName)}${row('Lead type', l.leadType)}${row('Source', l.source)}${row('Estimated value', Number(l.estValue) > 0 ? money(l.estValue) : '')}${row('Tier', tier ? tier.name : '')}${snap ? row('Lead status', st ? st.name : '') : ''}</dl>
+    <div class="stage-label-row">Project</div><dl class="ro-grid">${row('Project name', l.projectName)}${row('Lead type', l.leadType)}${row('Source', l.source)}${row('Ballpark value', Number(l.estValue) > 0 ? money(l.estValue) : '')}${row('Job type', (state.jobTypes.find(j => j.id === l.jobTypeId) || {}).name || '')}${row('Estimated duration', sfDays(l) ? sfDays(l) + ' days' : '')}${row('Preferred start', sfIso(l.prefStart) ? dShow(l.prefStart) : '')}${row('Deadline', sfIso(l.deadline) ? dShow(l.deadline) : '')}${row('Tier', tier ? tier.name : '')}${snap ? row('Lead status', st ? st.name : '') : ''}</dl>
     <div class="stage-label-row">Location</div><dl class="ro-grid">${row('Address', l.address)}${row('Postcode', l.postcode)}</dl>
-    <div class="stage-label-row">Qualification</div><dl class="ro-grid">${row('Budget', l.budget)}${row('Decision-maker', l.decisionMaker)}${row('Desired timeline', l.timeline)}${row('Competition', l.competition)}</dl>
+    <div class="stage-label-row">Qualification ${qualBadgeHtml(l)}</div><dl class="ro-grid">${qualEval(l).items.map(x => row(x.q.name, x.a + (x.r ? ' (' + x.r + ')' : ''))).join('')}</dl>
     <div class="stage-label-row">Lead record</div><dl class="ro-grid">${row('Lead came in', l.createdAt ? pwD(l.createdAt) : '')}${row('Lead notes', snap ? l.notes : (r.leadNotes || ''))}</dl>
     <div class="stage-label-row">Lead timeline${snap ? ' (as promoted)' : ''}</div><div class="comms-scroll">${comms || '<div class="breakdown-hint">No timeline entries.</div>'}</div>
   </div>`;
 }
 /* setting the contract signed date moves the deal to Confirmed at 100% (only when the date is first set; later manual changes are left alone) */
 function applyContractSigned(r){
-  const sales = state.pipelineStages.sales, conf = stageByName(sales, 'Confirmed') || sales.filter(x => clampPct(x.pct) >= 100).pop();
+  const conf = salesWonStage();
   if(!conf) return;
   const moved = r.stageId !== conf.id;
   r.stageId = conf.id;
@@ -12515,7 +12533,7 @@ function recTasksHtml(pl, rec, opts){
       <button class="tkr-title" data-crm="open" data-id="${t.id}" title="${escAttr(t.title)}">${escHtml(t.title)}</button>
       ${opts.compact ? '' : `<span class="tkr-code" title="${escAttr(linkedText(t))}">${escHtml(recLinks(t)[0] || '')}${recLinks(t).length > 1 ? ' +' + (recLinks(t).length - 1) : ''}</span>`}
       <span class="tkr-due${over ? ' over' : ''}">${t.dueDate ? fmtDisplay(toDate(t.dueDate)) : 'No date'}</span>
-      ${prioPill(t.priorityId)}</div>`;
+      ${prioPill(t.priorityId)}${chasedBtnHtml(t)}</div>`;
   }).join('');
   const more = opts.limit && list.length > opts.limit ? `<button class="link-btn tkr-more" data-lp="crm" data-id="${rec.id}">View all ${list.length} in CRM</button>` : '';
   const addBtn = `<button class="btn secondary" data-crm="tk-add" data-pl="${pl}" data-id="${rec.id}">${taskForms[key] ? 'Cancel' : '+ Add task'}</button>`;
@@ -12790,6 +12808,7 @@ function tkPropsHtml(){
 function tkFormHtml(){
   const o = tkObj();
   return `<div class="tk-form">
+      ${taskPanel ? chasedBtnHtml(o) : ''}
       ${tkPropsHtml()}
       <div><div class="tk-linkrow" id="tkLinks"></div><div class="tk-picker" id="tkPicker" hidden></div></div>
       <div><div class="tk-lbl"><label for="tkDesc">Description</label><span class="tk-saved" id="tkSaved" role="status" aria-live="polite"></span></div>
@@ -13141,7 +13160,7 @@ function todayTaskRow(t, over){
         ${linkSummaryHtml(t, `data-crm="rec" data-id="${t.id}"`) || taskRefsSummary(t)}
         ${t.recur ? `<span title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}
         ${todayUi.scope === 'all' ? `<span>${escHtml(t.owner || 'Unassigned')}</span>` : ''}
-        ${over && t.dueDate ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(t.dueDate)))}</span>` : ''}</span></div>`;
+        ${over && t.dueDate ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(t.dueDate)))}</span>` : ''}${chasedBtnHtml(t)}</span></div>`;
 }
 function todayActionRow(x, over){
   const r = x.r, arch = archiving.has(r);
@@ -13803,6 +13822,7 @@ const SET_SECTIONS = [
   { id: 'suppliers', label: 'Suppliers' },
   { id: 'finance',   label: 'Finance' },
   { id: 'quotes',    label: 'Quotes & pricing' },
+  { id: 'selling',   label: 'Selling' },
   { id: 'docs',      label: 'Documents & email' },
   { id: 'approvals', label: 'Approvals' },
   { id: 'dashboard', label: 'Dashboard' },
@@ -13892,7 +13912,7 @@ function pjNextAction(ctx){
 function pjBuildRow(g, shared, today, staleN){
   const recs = g.recs, pl = recs.project ? 'project' : recs.sales ? 'sales' : 'lead', rec = recs[pl], root = rec.id;
   const ctx = { tasks: shared.tasks.get(root) || [], actions: shared.actions.get(root) || [], quotes: shared.quotes.get(root) || [], inv: shared.inv.get(root) || [], pos: shared.pos.get(root) || [], txns: shared.txns.get(root) || [] };
-  const lost = pl === 'lead' && !!rec.lost, completed = cxCompleted(pl, rec), done = lost || completed, p = recs.project || null;
+  const lost = !!rec.lost, completed = cxCompleted(pl, rec), done = lost || completed, p = recs.project || null;
   const na = pjNextAction(ctx), openItems = na.items;
   // value: what applies at this stage, and which number it is
   let value = null, valueLabel = '', qpick = pjPickQuote(ctx.quotes);
@@ -14116,7 +14136,7 @@ function pjHeadlineHtml(r){
     if(f){
       S.push(pjStat('Contract value', f.ct.value > 0 ? pjMoney(f.ct.value) : 'Not set', f.ct.value > 0 ? escHtml(r.valueLabel) : ''));
       if(f.pr.n) S.push(pjStat('Stage progress', Math.max(0, f.pr.i + 1) + ' of ' + f.pr.n, escHtml(stageName('project', projStageId(p)))));
-      if(f.hasInv){ S.push(pjStat('Invoiced', pjMoney(f.invoiced), 'As on the Invoicing page')); S.push(pjStat('Paid', pjMoney(f.paid))); S.push(pjStat('Outstanding', pjMoney(f.outstanding), '', f.outstanding > 0 && r.overdue.some(o => o.kind === 'Invoice') ? 'bad' : '')); }
+      if(f.hasInv){ S.push(pjStat('Invoiced', pjMoney(f.invoiced), 'As on the Customer invoices page')); S.push(pjStat('Paid', pjMoney(f.paid))); S.push(pjStat('Outstanding', pjMoney(f.outstanding), '', f.outstanding > 0 && r.overdue.some(o => o.kind === 'Invoice') ? 'bad' : '')); }
       if(f.matBudget !== null) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'of ' + pjMoney(f.matBudget) + ' budget', f.matSpent > f.matBudget + 0.5 ? 'bad' : ''));
       else if(f.matSpent > 0) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'No budget set'));
       if(f.margin) S.push(pjStat('Estimated margin', pjMoney(f.margin.v), Math.round(f.margin.pct) + '% · ' + escHtml(f.margin.note)));
@@ -14250,6 +14270,7 @@ function render(){
   cxDirty(); cxSyncAll();   // CRM: deals and draft quotes read their customer details from the contact
   undoBadge(); projSyncValues(); navMetrics();
   renderDashboard();
+  if(typeof renderLostBars === 'function') renderLostBars();
   renderBusinessPlan();
   renderLeads();
   renderSuppliers();
@@ -14361,6 +14382,7 @@ function applyFieldChange(el){
   }
   else if(tab==='leadcontact'){ const l = state.leads[Number(el.dataset.idx)], c = l && l.contacts && l.contacts[Number(el.dataset.cidx)]; if(c) c[field] = value; }
   else if(tab==='supplier' || tab==='suppliercontact' || tab==='suppliernote') applySupplierField(el);
+  else if(tab==='sellf') sfApply(el);
   else { const idx = Number(el.dataset.idx); if(state[tab] && state[tab][idx]) state[tab][idx][field] = value; }
   render();
   saveState();
@@ -15004,6 +15026,8 @@ BTT_CARD_MQ.addEventListener('change', () => bttQueue());
 bttQueue();
 
 function activateTab(name){
+  if(name === 'approvals'){ name = 'quotations'; if(typeof qUi !== 'undefined'){ qUi.tab = 'review'; qUi.openId = 0; setTimeout(() => { try{ renderQuotes(); }catch(e){} }, 0); } }   // Approvals is now the Review tab on Quotes
+  if(typeof approverMode === 'function' && state && approverMode() && !approverPages().includes(name)) name = 'quotations';   // an approver only reaches the pages their scope allows
   if(name === 'admin'){ name = 'actions'; setTimeout(() => { const t = document.getElementById('bizAdminSec'); if(t) t.scrollIntoView({ block: 'start' }); }, 30); }   // Setup & Admin now lives on the Business tasks page
   if(name === 'actions' && typeof canSeeBusiness === 'function' && state && !canSeeBusiness()){ showToast('Business tasks are only visible to the people set under Settings'); return; }
   const tab = document.querySelector('.tab[data-tab="' + name + '"]'), panel = document.getElementById('panel-' + name);
@@ -15038,7 +15062,7 @@ document.querySelectorAll('.tab').forEach(tab => {
    The choices are PER DEVICE: they live in localStorage under STORAGE_PREFIX (so test and live never share) and never in the saved state. */
 const MENU_KEY = STORAGE_PREFIX + 'business-tracker-menu';
 const MENU_BOTTOM_DEFAULT = ['today', 'quotations', 'projectpipeline', 'crm'];
-const MENU_BADGE_IDS = { today: 'todayBadge', approvals: 'apBadge', contacts: 'dupBadge' };   // the existing badges, read as they are
+const MENU_BADGE_IDS = { today: 'todayBadge', quotations: 'apBadge', contacts: 'dupBadge' };   // the existing badges, read as they are
 const MENU_BAR_LABEL = { crm: 'CRM' };
 const MENU_ICONS = {
   command: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
@@ -15847,7 +15871,7 @@ const CX_TAGS = [['lead', 'Lead'], ['customer', 'Customer'], ['past', 'Past cust
 const CX_REL = ['partner', 'family', 'neighbour', 'colleague', 'referrer', 'other'];
 const CX_ROLES = ['director', 'site contact', 'accounts', 'other'];
 const CX_CO_TYPES = ['Residential', 'Commercial', 'Trade', 'Referrer', 'Other'];
-const cxUi = { cid: '', coid: '', view: '', q: '', type: '', status: '', live: false, past: false, sort: 'name', coq: '', cotype: '', cosort: 'name', dupFlash: '' };
+const cxUi = { cid: '', coid: '', view: '', q: '', type: '', lc: '', colc: '', status: '', live: false, past: false, sort: 'name', coq: '', cotype: '', cosort: 'name', dupFlash: '' };
 navExtra('cx', () => ({ c: cxUi.cid, o: cxUi.coid, v: cxUi.view }), o => { if(o){ cxUi.cid = o.c || ''; cxUi.coid = o.o || ''; cxUi.view = o.v || ''; } });
 
 function cxId(p){ return p + Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2, 7); }
@@ -15943,7 +15967,7 @@ function cxCompleted(pl, rec){   // same rule as the project: sign-off has an ac
   return pl === 'project' ? projIsCompleted(rec) : false;
 }
 function cxDealInfo(pl, rec){
-  const lost = pl === 'lead' && !!rec.lost, completed = cxCompleted(pl, rec);
+  const lost = !!rec.lost, completed = cxCompleted(pl, rec);
   return { pl, rec, root: rec.id, code: recordCode(rec.id, pl), name: boardTitle(pl, rec), lost, completed, live: !lost && !completed, status: lost ? 'Lost' : completed ? 'Completed' : 'Live', stage: pl === 'lead' ? stageName('lead', rec.stageId) : pl === 'sales' ? stageName('sales', rec.stageId) : stageName('project', projStageId(rec)) };
 }
 function cxIndex(){
@@ -16176,6 +16200,7 @@ function cxFilteredContacts(){
   const q = cxUi.q.toLowerCase().trim(); let list = state.contacts.map(c => ({ c, s: cxRowStats(c), st: cxContactStatus(c) }));
   if(q) list = list.filter(x => cxSearchText(x.c).includes(q));
   if(cxUi.type) list = list.filter(x => x.c.tags.includes(cxUi.type));
+  if(cxUi.lc) list = list.filter(x => lcOf('contact', x.c) === cxUi.lc);
   if(cxUi.status) list = list.filter(x => x.st === cxUi.status);
   if(cxUi.live) list = list.filter(x => x.st === 'live');
   if(cxUi.past) list = list.filter(x => x.c.tags.includes('past') || x.st === 'past');
@@ -16193,8 +16218,9 @@ function cxListRowsHtml(){
     <td class="cx-hide-s">${escHtml(ctPhone(c))}</td><td class="cx-hide-s">${escHtml(ctEmail(c))}</td>
     <td class="cx-hide-m">${escHtml(cxCompanyNamesOf(c))}</td>
     <td>${cxStatusPill(st)} ${c.tags.filter(t => !(t === 'past' && st === 'past')).map(cxTagHtml).join(' ')}</td>
+    <td class="cx-hide-s">${lcPillHtml(lcOf('contact', c))}</td>
     <td class="qb-calc cx-hide-m">${s.live}/${s.deals.length}</td><td class="cx-hide-m">${s.last ? escHtml(dShow(s.last)) : '<span class="qb-dim">—</span>'}</td><td class="qb-calc cx-hide-s">${s.won ? qm(s.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
-  return { count: list.length, html: `<div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Name</th><th class="cx-hide-s">Phone</th><th class="cx-hide-s">Email</th><th class="cx-hide-m">Company</th><th>Status</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-m">Last contact</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="8"><div class="sup-empty">${state.contacts.length ? 'No contacts match these filters.' : 'No contacts yet. Add one above, or build them from your existing leads and projects.'}</div></td></tr>`}</tbody></table></div>` };
+  return { count: list.length, html: `<div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Name</th><th class="cx-hide-s">Phone</th><th class="cx-hide-s">Email</th><th class="cx-hide-m">Company</th><th>Status</th><th class="cx-hide-s">Lifecycle</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-m">Last contact</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="9"><div class="sup-empty">${state.contacts.length ? 'No contacts match these filters.' : 'No contacts yet. Add one above, or build them from your existing leads and projects.'}</div></td></tr>`}</tbody></table></div>` };
 }
 function cxDupCount(){ try{ return cxDupPairs().length; }catch(e){ return 0; } }
 function cxContactsListHtml(){
@@ -16207,7 +16233,7 @@ function cxContactsListHtml(){
     ${m.report ? (m.reportHidden ? `<div class="cx-showrep"><button type="button" class="link-btn" data-cx="show-report">Show the summary of the last build (${escHtml(dShow(m.migratedAt))})</button></div>` : cxReportHtml(m.report)) : ''}
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quick"><input data-cxqa="first" placeholder="First name" aria-label="First name" autocomplete="off"><input data-cxqa="last" placeholder="Last name" aria-label="Last name" autocomplete="off"><input data-cxqa="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"><input data-cxqa="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
     <div class="crm-filters cx-filters"><input type="search" id="cxSearch" class="crm-search" data-cxq="q" value="${escAttr(cxUi.q)}" placeholder="Search name, phone, email, postcode…" aria-label="Search contacts" autocomplete="off">
-      ${sel('cxType', CX_TAGS, cxUi.type, 'Any type')}${sel('cxStatus', [['live', 'Live deal'], ['past', 'Past customer'], ['lost', 'Lost only'], ['none', 'No deals']], cxUi.status, 'Any status')}
+      ${sel('cxType', CX_TAGS, cxUi.type, 'Any type')}${sel('cxLc', state.lifecycle.map(l => [l.id, l.name]), cxUi.lc, 'Any lifecycle')}${sel('cxStatus', [['live', 'Live deal'], ['past', 'Past customer'], ['lost', 'Lost only'], ['none', 'No deals']], cxUi.status, 'Any status')}
       <label class="q-check"><input type="checkbox" data-cxq="live"${cxUi.live ? ' checked' : ''}> Has live deal</label><label class="q-check"><input type="checkbox" data-cxq="past"${cxUi.past ? ' checked' : ''}> Past customer</label>
       <label class="inv-filter">Sort <select data-cxq="sort" aria-label="Sort"><option value="name"${cxUi.sort === 'name' ? ' selected' : ''}>Name</option><option value="recent"${cxUi.sort === 'recent' ? ' selected' : ''}>Last contact</option><option value="created"${cxUi.sort === 'created' ? ' selected' : ''}>Newest</option><option value="won"${cxUi.sort === 'won' ? ' selected' : ''}>Total won</option></select></label>
       <span class="sup-count" id="cxCount">${r.count} of ${state.contacts.length}</span></div>
@@ -16246,7 +16272,7 @@ function cxAssocHtml(c){
 function cxKpiHtml(st){
   const k = (l, v, s) => `<div class="kpi" style="--accent:var(--slate)"><div class="label">${l}</div><div class="value">${v}</div>${s ? `<div class="fin-sub">${s}</div>` : ''}</div>`;
   const vat = qVatOn() ? 'inc VAT' : '';
-  return `<div class="kpi-row cx-kpis">${k('Total quoted', qm(st.quoted), 'ex VAT, latest version of each job sent')}${k('Total won', qm(st.won), 'ex VAT, contracts and variations')}${k('Total invoiced', qm(st.invoiced), 'as in Invoicing' + (vat ? ', ' + vat : ''))}${k('Outstanding', qm(st.outstanding), 'invoiced, not yet paid')}${k('Last contact', st.last ? escHtml(dShow(st.last)) : '—', st.last ? cxAgo(st.last) : 'nothing logged yet')}</div>`;
+  return `<div class="kpi-row cx-kpis">${k('Total quoted', qm(st.quoted), 'ex VAT, latest version of each job sent')}${k('Total won', qm(st.won), 'ex VAT, contracts and variations')}${k('Total invoiced', qm(st.invoiced), 'as on Customer invoices' + (vat ? ', ' + vat : ''))}${k('Outstanding', qm(st.outstanding), 'invoiced, not yet paid')}${k('Last contact', st.last ? escHtml(dShow(st.last)) : '—', st.last ? cxAgo(st.last) : 'nothing logged yet')}</div>`;
 }
 function cxAgo(iso){ const n = dashDays(iso, fmt(new Date())); return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago'; }
 function cxDealsHtml(sc, ownerKind, ownerId){
@@ -16265,7 +16291,7 @@ function cxQuotesHtml(sc){
 function cxInvoicesHtml(sc){
   const docs = sc.docs.slice().sort((a, b) => b.seq - a.seq).map(i => { const st = ivDisplayStatus(i); return `<tr><td><button type="button" class="sp-link" data-iv="open" data-id="${escAttr(i.id)}">${escHtml(i.number)}</button></td><td>${escHtml(i.desc || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(Math.abs(i.total))}</td><td>${invPill(st)}</td></tr>`; }).join('');
   const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : r.uid))).map(r => `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${r.vid ? 'v' + r.vid : r.idx}">${escHtml(r.code)}</button></td><td>${escHtml(r.desc)}</td><td>${r.invoicedDate ? escHtml(dShow(r.invoicedDate)) : '—'}</td><td>${r.dueDate ? escHtml(dShow(r.dueDate)) : '—'}</td><td class="qb-calc">${qm(r.amount)}</td><td>${invPill(r.status)}</td></tr>`).join('');
-  return `<div class="card"><div class="qb-sec-h"><h4>Invoices <span class="qb-dim">(status colours as on the Invoicing page${qVatOn() ? '; amounts inc VAT' : ''})</span></h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Invoice</th><th>For</th><th>Issued / sent</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${docs}${rest || ''}${docs || rest ? '' : '<tr><td colspan="6"><div class="sup-empty">No invoices yet.</div></td></tr>'}</tbody></table></div></div>`;
+  return `<div class="card"><div class="qb-sec-h"><h4>Invoices <span class="qb-dim">(status colours as on the Customer invoices page${qVatOn() ? '; amounts inc VAT' : ''})</span></h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Invoice</th><th>For</th><th>Issued / sent</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${docs}${rest || ''}${docs || rest ? '' : '<tr><td colspan="6"><div class="sup-empty">No invoices yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function cxPaymentsHtml(sc){
   const rows = sc.payments.map(({ t, ix }) => `<tr><td>${escHtml(dShow(t.date))}</td><td>${escHtml(t.description || '')}</td><td class="qb-calc">${qm(t.moneyIn)}</td><td><button type="button" class="sp-link" data-nav="txn:${escAttr(t.uid || ix)}">Open →</button></td></tr>`).join('');
@@ -16296,19 +16322,21 @@ function cxFilteredCompanies(){
   const q = cxUi.coq.toLowerCase().trim(); let list = state.companies.map(co => ({ co, deals: cxDealsOfCompany(co.id), people: cxContactsOfCompany(co.id) }));
   if(q) list = list.filter(x => (x.co.name + ' ' + x.co.postcode + ' ' + x.co.type + ' ' + x.people.map(p => ctName(p.contact)).join(' ')).toLowerCase().includes(q));
   if(cxUi.cotype) list = list.filter(x => x.co.type === cxUi.cotype);
+  if(cxUi.colc) list = list.filter(x => lcOf('company', x.co) === cxUi.colc);
   const won = x => x.deals.filter(d => d.pl === 'project').reduce((a, d) => a + projContract(d.rec).value, 0);
   const by = { name: (a, b) => a.co.name.toLowerCase().localeCompare(b.co.name.toLowerCase()), won: (a, b) => won(b) - won(a) || a.co.name.localeCompare(b.co.name), created: (a, b) => b.co.created.localeCompare(a.co.created) };
   return list.sort(by[cxUi.cosort] || by.name).map(x => Object.assign(x, { won: won(x) }));
 }
 function cxCompaniesListHtml(){
   const list = cxFilteredCompanies();
-  const rows = list.map(x => `<tr class="cx-row"><td><button type="button" class="sp-link cx-name" data-nav="company:${escAttr(x.co.id)}">${escHtml(cxCompanyName(x.co))}</button></td><td>${escHtml(x.co.type || '')}</td><td class="cx-hide-s">${escHtml(x.co.postcode)}</td><td>${x.people.length}</td><td class="cx-hide-m">${x.deals.filter(d => d.live).length}/${x.deals.length}</td><td class="qb-calc cx-hide-s">${x.won ? qm(x.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
+  const rows = list.map(x => `<tr class="cx-row"><td><button type="button" class="sp-link cx-name" data-nav="company:${escAttr(x.co.id)}">${escHtml(cxCompanyName(x.co))}</button></td><td>${escHtml(x.co.type || '')}</td><td class="cx-hide-s">${lcPillHtml(lcOf('company', x.co))}</td><td class="cx-hide-s">${escHtml(x.co.postcode)}</td><td>${x.people.length}</td><td class="cx-hide-m">${x.deals.filter(d => d.live).length}/${x.deals.length}</td><td class="qb-calc cx-hide-s">${x.won ? qm(x.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
   return `<div class="page-head crm-head"><div><h2>Companies</h2><div class="desc">Businesses and organisations your customers belong to. A company can have several contacts, and its deals, quotes and invoices roll up here.</div></div><button type="button" class="btn" data-cx="new-company">+ New company</button></div>
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quickco"><input data-cxqa="name" placeholder="Company name" aria-label="Company name" autocomplete="off"><select data-cxqa="type" aria-label="Type">${CX_CO_TYPES.map(t => `<option>${t}</option>`).join('')}</select><input data-cxqa="postcode" placeholder="Postcode" aria-label="Postcode" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
     <div class="crm-filters cx-filters"><input type="search" class="crm-search" data-cxq="coq" value="${escAttr(cxUi.coq)}" placeholder="Search companies…" aria-label="Search companies" autocomplete="off">
       <select data-cxq="cotype" aria-label="Type"><option value="">Any type</option>${CX_CO_TYPES.map(t => `<option${cxUi.cotype === t ? ' selected' : ''}>${t}</option>`).join('')}</select>
+      <select data-cxq="colc" aria-label="Lifecycle"><option value="">Any lifecycle</option>${state.lifecycle.map(l => `<option value="${escAttr(l.id)}"${cxUi.colc === l.id ? ' selected' : ''}>${escHtml(l.name)}</option>`).join('')}</select>
       <label class="inv-filter">Sort <select data-cxq="cosort" aria-label="Sort"><option value="name"${cxUi.cosort === 'name' ? ' selected' : ''}>Name</option><option value="won"${cxUi.cosort === 'won' ? ' selected' : ''}>Total won</option><option value="created"${cxUi.cosort === 'created' ? ' selected' : ''}>Newest</option></select></label><span class="sup-count">${list.length} of ${state.companies.length}</span></div>
-    <div id="cxCoRes" class="card"><div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Company</th><th>Type</th><th class="cx-hide-s">Postcode</th><th>Contacts</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="6"><div class="sup-empty">${state.companies.length ? 'No companies match.' : 'No companies yet.'}</div></td></tr>`}</tbody></table></div></div>`;
+    <div id="cxCoRes" class="card"><div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Company</th><th>Type</th><th class="cx-hide-s">Lifecycle</th><th class="cx-hide-s">Postcode</th><th>Contacts</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="7"><div class="sup-empty">${state.companies.length ? 'No companies match.' : 'No companies yet.'}</div></td></tr>`}</tbody></table></div></div>`;
 }
 function cxCompanyProfileHtml(co){ return rcCompanyPage(co); }
 
@@ -16582,7 +16610,7 @@ document.addEventListener('input', (e) => {
 });
 document.addEventListener('change', (e) => {
   const el = e.target, d = el.dataset; if(!d || !state) return;
-  if(d.cxq){ const k = d.cxq; if(k === 'cxType') cxUi.type = el.value; else if(k === 'cxStatus') cxUi.status = el.value; else if(k === 'live' || k === 'past') cxUi[k] = el.checked; else if(k === 'sort' || k === 'cotype' || k === 'cosort') cxUi[k] = el.value; else if(k === 'q') cxUi.q = el.value; else if(k === 'coq') cxUi.coq = el.value; cxRender(); return; }
+  if(d.cxq){ const k = d.cxq; if(k === 'cxType') cxUi.type = el.value; else if(k === 'cxLc') cxUi.lc = el.value; else if(k === 'colc') cxUi.colc = el.value; else if(k === 'cxStatus') cxUi.status = el.value; else if(k === 'live' || k === 'past') cxUi[k] = el.checked; else if(k === 'sort' || k === 'cotype' || k === 'cosort') cxUi[k] = el.value; else if(k === 'q') cxUi.q = el.value; else if(k === 'coq') cxUi.coq = el.value; cxRender(); return; }
   if(d.cx === 'tag'){ const c = ctFind(d.cid); if(!c) return; const t = d.tag; c.tags = el.checked ? [...new Set(c.tags.concat(t))] : c.tags.filter(x => x !== t); saveState(); render(); return; }
   if(d.cxf){ const c = ctFind(d.cid); if(!c) return; c[d.cxf] = d.cxf === 'notes' ? el.value : el.value.trim(); saveState(); render(); return; }
   if(d.cxl){ const c = ctFind(d.cid); if(!c) return; const it = c[d.cxl][Number(d.i)]; if(!it) return; it[d.k] = d.k === 'label' ? el.value.trim() : el.value.trim(); if(d.cxl === 'addresses' && d.k === 'v' && !it.postcode){ const pc = extractPostcode(it.v); if(pc){ it.postcode = pc; const pe = document.querySelector(`[data-cxl="addresses"][data-cid="${d.cid}"][data-i="${d.i}"][data-k="postcode"]`); if(pe) pe.value = pc; } } saveState(); render(); return; }
@@ -16803,7 +16831,7 @@ function qbsClassify(el){
   if(el.id === 'qbCustomer') return { key: 'customer', step: 3, title: 'Customer view' };
   if(el.classList.contains('qbs-kpi')) return { key: 'kpi', step: 2, title: 'Key figures' };
   const h = el.querySelector(':scope > .qb-sec-h h3'), t = h ? h.textContent.trim() : '';
-  const map = { 'Optional groups': ['optional', 1], 'Materials': ['materials', 1], 'Supplier quote requests': ['rfq', 1], 'Labour': ['labour', 1], 'Delivery': ['delivery', 1],
+  const map = { 'Optional groups': ['optional', 1], 'Materials': ['materials', 1], 'Compare suppliers': ['compare', 1], 'Supplier quote requests': ['rfq', 1], 'Labour': ['labour', 1], 'Delivery': ['delivery', 1],
     'Customer payment schedule': ['payments', 2], 'Summary': ['summary', 2], 'Cash by month (this project)': ['cash', 2], 'Timeline': ['timeline', 2], 'Approvals': ['approvals', 2] };
   if(map[t]) return { key: map[t][0], step: map[t][1], title: t };
   return { key: 'x-' + (el.id || t || 'other'), step: 2, title: t };
@@ -17514,7 +17542,7 @@ const rpUi = { pid: 0, tab: 'overview', sec: {}, secs: {}, draft: null, edit: ''
 navExtra('rp', () => ({ pid: rpUi.pid, tab: rpUi.tab, sec: Object.assign({}, rpUi.sec) }), v => { if(v){ rpUi.pid = v.pid || 0; rpUi.tab = v.tab || 'overview'; rpUi.sec = v.sec || {}; } });
 const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan'], ['materials', 'Materials and deliveries']];
 const RP_DATE_KEYS = ['start', 'complete', 'dur'];
-const RP_LABELS = { stageId: 'Stage', jobType: 'Job type', owner: 'Owner', source: 'Source', start: 'Start date', complete: 'Complete date', dur: 'Duration', address: 'Site address', postcode: 'Postcode', access: 'Access', services: 'Services', lastVisited: 'Last visited', contact: 'Contact', company: 'Company', phone: 'Phone', email: 'Email' };
+const RP_LABELS = { stageId: 'Stage', jobType: 'Job detail', jobTypeId: 'Job type', estValue: 'Ballpark value', estDays: 'Estimated duration', prefStart: 'Preferred start', deadline: 'Deadline', owner: 'Owner', source: 'Source', start: 'Start date', complete: 'Complete date', dur: 'Duration', address: 'Site address', postcode: 'Postcode', access: 'Access', services: 'Services', lastVisited: 'Last visited', contact: 'Contact', company: 'Company', phone: 'Phone', email: 'Email' };
 const RP_CHEV = '<svg class="rp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
 const rpFind = id => state.projects.find(x => x.id === id) || null;
 const rpDraft = p => (rpUi.draft && rpUi.draft.pid === p.id) ? rpUi.draft : null;
@@ -17534,7 +17562,7 @@ function rpDates(p){
 }
 function rpOrig(p){
   const cu = projCustomer(p), s = p.site || {}, d = rpDates(p);
-  return { stageId: projStageId(p), jobType: p.jobType || '', owner: p.owner || '', source: p.source || cu.source || '', start: d.start, complete: d.complete, dur: d.dur ? String(d.dur) : '',
+  return { stageId: projStageId(p), jobType: p.jobType || '', jobTypeId: p.jobTypeId || '', estValue: p.estValue === undefined || p.estValue === '' || p.estValue === null ? '' : String(p.estValue), estDays: p.estDays === undefined || p.estDays === '' || p.estDays === null ? '' : String(p.estDays), prefStart: sfIso(p.prefStart), deadline: sfIso(p.deadline), owner: p.owner || '', source: p.source || cu.source || '', start: d.start, complete: d.complete, dur: d.dur ? String(d.dur) : '',
     address: cu.address || '', postcode: cu.postcode || '', access: s.access || '', services: s.services || '', lastVisited: s.lastVisited || '',
     contact: cu.name || '', company: cu.company || '', phone: cu.phone || '', email: cu.email || '' };
 }
@@ -17588,13 +17616,17 @@ function rpLeftHtml(p){
     ${rpEdit(p, 'stageId', { select: stageOpts, hint: 'Moves when a milestone is confirmed. Choose here to set it by hand.' })}
     ${rpRO('Pipeline stage', proj6Pill(p), 'Worked out from confirmed milestone dates: it moves when you confirm one', 'calc')}
     ${rpRO('Reference', escHtml(code), 'Never changes', 'locked')}
-    ${rpEdit(p, 'jobType', { label: 'Job type', ph: 'e.g. Oak pergola' })}
+    ${rpEdit(p, 'jobTypeId', { select: [['', 'Not set']].concat(state.jobTypes.map(j => [j.id, j.name + (j.notFit ? ' (not a fit)' : '')])), hint: jobNotFit(Object.assign({}, p, { jobTypeId: rpVal(p, 'jobTypeId') })) ? 'Marked as not a fit in Settings.' : 'The kind of job. The list is in Settings, Selling.' })}
+    ${rpEdit(p, 'jobType', { label: 'Job detail', ph: 'e.g. Oak pergola' })}
     ${rpRO('Value (ex VAT)', ct.live ? `<b>${qm(ct.value)}</b>` : (ct.value ? `<b>${qm(ct.value)}</b>` : ''), ct.live ? `Edit the value in Quote ${quoteLink}` : 'No accepted quote yet: the value is typed in the full workspace')}
     <div class="rp-f rp-calc"><div class="rp-lab"><span>Margin</span><span class="rp-tag">Calculated</span></div><div class="rp-two"><div class="rp-ro"><small>Sold</small>${mg && mg.hasSold ? `<b>${qm(mg.soldAfter)}</b> <span class="rp-dim">${qpct(mg.soldPct)}</span>` : '<span class="rp-dash">—</span>'}</div><div class="rp-ro"><small>Now</small>${mg ? `<b>${qm(mg.now)}</b> <span class="rp-dim">${qpct(mg.nowPct)}</span>` : '<span class="rp-dash">—</span>'}</div></div><div class="rp-hint">${mg ? 'Calculated from the quote and the costs' : 'Needs an accepted quote'}</div></div>
     ${rpRO('Agreed', sold ? escHtml(pwD(sold)) : '', 'Set when the contract is marked agreed')}
     ${rpEdit(p, 'owner', { select: ownerOpts })}
     <datalist id="rpSources">${sources.map(s => `<option value="${escAttr(s)}">`).join('')}</datalist>
     ${rpEdit(p, 'source', { list: 'rpSources', ph: 'e.g. Referral' })}
+    ${rpEdit(p, 'estValue', { type: 'number', label: 'Ballpark value (£)', hint: 'The rough figure from the lead. The agreed value is above.' })}
+    ${sfPhases(p).length ? rpRO('Estimated duration', `<b>${sfDays(p)}</b> days`, 'Adds up the phases carried from the lead: ' + sfPhases(p).map(x => escHtml((x.name || 'Phase') + ' ' + (x.days || 0) + 'd')).join(', ')) : rpEdit(p, 'estDays', { type: 'number', label: 'Estimated duration (days)', hint: 'The estimate made at the lead stage. The planned dates are under Dates and workload.' })}
+    ${rpEdit(p, 'prefStart', { type: 'date', label: 'Customer\'s preferred start' })}${rpEdit(p, 'deadline', { type: 'date', label: 'Deadline' })}
     ${nm ? rpRO('Next', `${escHtml(nm.name)}${nm.date ? ' <span class="rp-dim">' + escHtml(pwD(nm.date)) + '</span>' : ''}`, 'The next stage') : ''}`;
   const dd = rpDraft(p) && rpDraft(p).sched;
   const dates = `
@@ -17624,7 +17656,7 @@ function rpLeftHtml(p){
       <div class="rp-head-top"><button type="button" class="rp-back" data-pw="back">← All projects</button><button type="button" class="rp-legacy" data-rp="legacy" title="The earlier project page, with every section">Open full workspace</button></div>
       <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(p.name))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(p.name)}</h2><div class="rp-sub">${escHtml(sub)}</div></div></div>
       <div class="rp-pills"><span class="rp-pill ${st.k}">${escHtml(st.t)}</span>${proj6Pill(p)}<span class="rp-pill neu" title="Stored stage">${escHtml(stageName_)}</span>${p.tentative ? '<span class="rp-pill warn">Tentative</span>' : ''}</div>
-      <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rp="q-note">Note</button><button type="button" class="btn secondary qb-sm" data-rp="q-task">Task</button><button type="button" class="btn secondary qb-sm" data-rp="q-time">Log time</button><button type="button" class="btn secondary qb-sm" data-rp="q-call">Call</button></div>
+      <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rp="q-note">Note</button><button type="button" class="btn secondary qb-sm" data-rp="q-task">Task</button><button type="button" class="btn secondary qb-sm" data-rp="q-time">Log time</button><button type="button" class="btn secondary qb-sm" data-rp="q-call">Call</button><button type="button" class="btn secondary qb-sm" data-sel="close-lost" data-pl="project" data-id="${p.id}">Close as lost</button></div>
     </div>
     <div class="rp-lbody">${rpSec('about', 'About this project', about)}${rpSec('dates', 'Dates and workload', dates)}${rpSec('money', 'Money', moneySec)}${rpSec('cust', 'Customer and contact', cust)}${rpSec('site', 'Site', site)}</div>
     <div class="rp-bar" id="rpBar" role="region" aria-label="Unsaved changes"${d && Object.keys(d.f).length ? '' : ' hidden'}>${rpBarInner(p)}</div>`;
@@ -17689,9 +17721,8 @@ function rpInvoicesTile(p){
   return `<div class="rp-card"><h4>Invoices</h4>${rows.length ? rows.map(row).join('') : '<div class="pw-empty">No invoice schedule yet.</div>'}</div>`;
 }
 function rpQualTile(p){
-  const snap = p.leadSnapshot || {}, done = QUAL_FIELDS.filter(([k]) => snap[k] || p[k]).length, score = done === QUAL_FIELDS.length ? 'Strong' : done >= 2 ? 'Fair' : 'Weak';
-  const rows = QUAL_FIELDS.map(([k, n]) => `<div class="rp-row"><span class="rp-dim">${n}</span><span>${escHtml(snap[k] || p[k] || '—')}</span></div>`).join('');
-  return `<div class="rp-card"><h4>Qualification ${snap && Object.keys(snap).length ? `<span class="rp-pill ${done === 4 ? 'ok' : done >= 2 ? 'warn' : 'neu'}">${score} · ${done} of ${QUAL_FIELDS.length}</span>` : ''}</h4>${rows}<div class="rp-hint">Carried from the lead stage.</div></div>`;
+  const snap = p.leadSnapshot || {}, has = Object.keys(snap).length || QUAL_FIELDS.some(([k]) => p[k]);
+  return `<div class="rp-card"><h4>Qualification ${has ? qualBadgeHtml(p) : ''}</h4>${qualRowsHtml(p)}<div class="rp-hint">Carried from the lead stage. The questions and their weights are in Settings, Selling.</div></div>`;
 }
 function rpOverviewHtml(p){
   return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${varProjectCard(p)}${rpQualTile(p)}</div>`;
@@ -17749,7 +17780,7 @@ function rpSyncDraftUi(p){
   const bar = root.querySelector('#rpBar'); if(!bar) return; const has = !!(rpDraft(p) && Object.keys(rpDraft(p).f).length);
   bar.hidden = !has; bar.innerHTML = has ? rpBarInner(p) : '';
 }
-const RP_PLAIN = ['jobType', 'owner', 'source', 'contact', 'company', 'phone', 'email', 'address', 'postcode'];
+const RP_PLAIN = ['jobType', 'jobTypeId', 'prefStart', 'deadline', 'owner', 'source', 'contact', 'company', 'phone', 'email', 'address', 'postcode'];
 /* write the non-date fields onto the project (called when the bar is saved, or when a schedule is confirmed or kept as tentative) */
 function rpApplyPlain(p, f){
   const done = [];
@@ -17757,6 +17788,7 @@ function rpApplyPlain(p, f){
     const v = f[k];
     if(k === 'stageId'){ p.stageId = v; p.actualsMode = true; }
     else if(RP_PLAIN.includes(k)) p[k] = v;
+    else if(k === 'estValue' || k === 'estDays'){ const n = parseFloat(v); p[k] = (v === '' || isNaN(n)) ? '' : Math.max(0, k === 'estDays' ? Math.round(n) : n); }
     else if(k === 'access' || k === 'services' || k === 'lastVisited'){ p.site = Object.assign({ access: '', services: '', lastVisited: '' }, p.site || {}); p.site[k] = v; }
     else return;
     done.push(RP_LABELS[k] || k);
@@ -17960,10 +17992,10 @@ function rcContactPage(c){
   const sc = cxScopeContact(c), st = cxStats(sc), s = cxContactStatus(c), dupWith = cxDupPairs().filter(p => p.a.id === c.id || p.b.id === c.id).length, L = cxLinksOfContact(c.id);
   const head = `<div class="rp-head-top">${nav.stack.length ? '<span></span>' : '<button type="button" class="rp-back" data-cx="close-profile">← All contacts</button>'}</div>
     <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(ctName(c)))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(ctName(c))}</h2><div class="rp-sub">${[ctPhone(c), ctEmail(c)].filter(Boolean).map(escHtml).join(' · ')}</div></div></div>
-    <div class="rp-pills">${cxStatusPill(s)}${c.tags.map(cxTagHtml).join('')}${L.companies.length ? `<span class="rp-pill neu">${escHtml(L.companies[0].company.name)}</span>` : ''}</div>
+    <div class="rp-pills">${cxStatusPill(s)}${lcPillHtml(lcOf('contact', c))}${c.tags.map(cxTagHtml).join('')}${L.companies.length ? `<span class="rp-pill neu">${escHtml(L.companies[0].company.name)}</span>` : ''}</div>
     ${dupWith ? `<div class="cx-dupwarn">⚠ ${dupWith} possible duplicate${dupWith > 1 ? 's' : ''}. <button type="button" class="sp-link" data-cx="dups">Review</button></div>` : ''}
     <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rc="note">Note</button>${ctPhone(c) ? `<a class="btn secondary qb-sm" href="tel:${escAttr(ctPhone(c).replace(/\s+/g, ''))}">Call</a>` : ''}${ctEmail(c) ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(ctEmail(c))}">Email</a>` : ''}</div>`;
-  const about = rpRO('Status', cxStatusPill(s), 'Worked out from this person\'s deals');
+  const about = rpRO('Status', cxStatusPill(s), 'Worked out from this person\'s deals') + lcFieldHtml('contact', c);
   const manage = `<div class="btn-row" style="margin:0"><button type="button" class="btn secondary qb-sm" data-cx="export" data-cid="${escAttr(c.id)}">Export this contact's data</button><button type="button" class="btn secondary qb-sm" data-cx="merge-into" data-cid="${escAttr(c.id)}">Merge into another…</button><button type="button" class="btn secondary qb-sm cx-danger" data-cx="delete-contact" data-cid="${escAttr(c.id)}">Delete contact</button></div>`;
   const left = rcSec('about', 'About this contact', about) + `<section class="rp-sec open" data-sec="details"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="details" aria-expanded="true">${RP_CHEV}<span>Details</span></button></div><div class="rp-sec-b card-less" id="cxDetails">${cxContactDetailsHtml(c)}</div></section>`
     + `<section class="rp-sec open" data-sec="assoc"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="assoc" aria-expanded="true">${RP_CHEV}<span>People and company</span></button></div><div class="rp-sec-b" id="cxAssoc">${cxAssocHtml(c)}</div></section>` + rcSec('manage', 'Manage', manage);
@@ -17975,9 +18007,9 @@ function rcCompanyPage(co){
   const sc = cxScopeCompany(co), st = cxStats(sc), people = cxContactsOfCompany(co.id), f = (label, field, val, o) => `<div class="lp-f"><label>${label}</label><input data-cxco="${field}" data-oid="${escAttr(co.id)}" value="${escAttr(val)}" autocomplete="off"${o && o.type ? ` type="${o.type}"` : ''}></div>`;
   const head = `<div class="rp-head-top">${nav.stack.length ? '<span></span>' : '<button type="button" class="rp-back" data-cx="close-profile">← All companies</button>'}</div>
     <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(cxCompanyName(co)))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(cxCompanyName(co))}</h2><div class="rp-sub">${escHtml(co.type || 'Company')}${co.postcode ? ' · ' + escHtml(co.postcode) : ''}</div></div></div>
-    <div class="rp-pills"><span class="rp-pill neu">${people.length} contact${people.length === 1 ? '' : 's'}</span><span class="rp-pill neu">${sc.deals.filter(d => d.live).length} live deal${sc.deals.filter(d => d.live).length === 1 ? '' : 's'}</span></div>
+    <div class="rp-pills">${lcPillHtml(lcOf('company', co))}<span class="rp-pill neu">${people.length} contact${people.length === 1 ? '' : 's'}</span><span class="rp-pill neu">${sc.deals.filter(d => d.live).length} live deal${sc.deals.filter(d => d.live).length === 1 ? '' : 's'}</span></div>
     <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rc="note">Note</button>${co.phone ? `<a class="btn secondary qb-sm" href="tel:${escAttr(String(co.phone).replace(/\s+/g, ''))}">Call</a>` : ''}${co.email ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(co.email)}">Email</a>` : ''}</div>`;
-  const about = `${rpRO('Created', escHtml(dShow(co.created)), 'Never changes', 'locked')}${rpRO('People', String(people.length), 'Listed under People below')}`;
+  const about = `${rpRO('Created', escHtml(dShow(co.created)), 'Never changes', 'locked')}${rpRO('People', String(people.length), 'Listed under People below')}${lcFieldHtml('company', co)}`;
   const details = `<div class="assumptions-grid">${f('Name', 'name', co.name)}<div class="lp-f"><label>Type</label><select data-cxco="type" data-oid="${escAttr(co.id)}"><option value="">—</option>${CX_CO_TYPES.map(t => `<option${co.type === t ? ' selected' : ''}>${t}</option>`).join('')}</select></div></div>
     ${f('Phone', 'phone', co.phone, { type: 'tel' })}${f('Email', 'email', co.email, { type: 'email' })}${f('Website', 'website', co.website)}
     <div class="lp-f"><label>Address</label><textarea rows="2" data-cxco="address" data-oid="${escAttr(co.id)}">${escHtml(co.address)}</textarea></div>${f('Postcode', 'postcode', co.postcode)}
@@ -18413,6 +18445,608 @@ document.addEventListener('click', (e) => {
   else if(a === 'tent-revert') rpRevertTentative(p);
 });
 /* BT:js-records end */
+
+/* BT:js-selling begin */
+/* =====================================================================
+   STAGE 3: SELLING (leads, qualification, quotes)
+   Everything here is additive. New stored fields all default empty/safe, so existing leads, sales, projects, quotes and tags load unchanged:
+     state.jobTypes [{ id, name, notFit }]                    Settings > Selling
+     state.lifecycle [{ id, name }]                           Settings > Selling (names and order editable)
+     lead / sale / project:  estDays, phases[{ id, name, days }], prefStart, deadline, jobTypeId   (the ballpark value is the existing estValue)
+     contact / company:      lifecycle ('' = worked out from tags and deals, never a stored conversion)
+   ===================================================================== */
+const SEL_JOB_TYPES = [['jt_build', 'New build'], ['jt_repair', 'Repair'], ['jt_maintenance', 'Maintenance', true], ['jt_other', 'Other'], ['jt_notfit', 'Not a fit', true]];
+const SEL_LIFECYCLE = [['lc_lead', 'Lead'], ['lc_opportunity', 'Opportunity'], ['lc_customer', 'Customer'], ['lc_referrer', 'Referrer'], ['lc_evangelist', 'Evangelist']];
+function selId(p){ return p + Math.random().toString(36).slice(2, 8); }
+function ensureSellingModel(o){
+  const str = v => v == null ? '' : String(v);
+  const tidy = (list, seed, mk) => {
+    let l = Array.isArray(list) ? list.filter(x => x && typeof x === 'object' && x.id) : [];
+    if(!l.length) l = seed.map(mk);
+    l = sortByOrder(l).map(x => Object.assign({}, x, { id: String(x.id), name: str(x.name).trim() || 'Item' })); renumberStages(l); return l;
+  };
+  o.jobTypes = tidy(o.jobTypes, SEL_JOB_TYPES, ([id, name, nf]) => ({ id, name, notFit: !!nf })).map(x => ({ id: x.id, name: x.name, notFit: x.notFit === true, order: x.order }));
+  o.lifecycle = tidy(o.lifecycle, SEL_LIFECYCLE, ([id, name]) => ({ id, name })).map(x => ({ id: x.id, name: x.name, order: x.order }));
+  if(typeof ensureSellingModel2 === 'function') ensureSellingModel2(o);
+  return o;
+}
+
+/* ---------- fields every lead, sale and project carries ---------- */
+function sfRec(kind, id){ id = Number(id); return (kind === 'lead' ? state.leads : kind === 'sales' ? state.pipeline : state.projects).find(r => r.id === id) || null; }
+function sfPhases(r){ return (Array.isArray(r.phases) ? r.phases : []).filter(p => p && typeof p === 'object'); }
+function sfDays(r){ const ph = sfPhases(r); if(ph.length) return ph.reduce((a, p) => a + (Number(p.days) || 0), 0); const n = Number(r.estDays); return n > 0 ? n : 0; }
+function jobTypeOf(r){ return state.jobTypes.find(j => j.id === r.jobTypeId) || null; }
+function jobNotFit(r){ const j = jobTypeOf(r); return !!(j && j.notFit); }
+function sfIso(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : ''; }
+function sfNotFitChip(r){ return jobNotFit(r) ? `<span class="sf-chip bad" title="This job type is marked as not a fit in Settings">Not a fit</span>` : ''; }
+function sfDeadlineWarn(r){ return sfIso(r.prefStart) && sfIso(r.deadline) && r.deadline < r.prefStart ? 'The deadline is before the preferred start.' : ''; }
+/* the editable group: ballpark value (the existing estValue), job type, duration (or phases), preferred start, deadline */
+const SF_NF_HINT = 'Not a fit (set in Settings, Selling): flagged on the lead, the sales card and the project.';
+function sfEditHtml(kind, r, i, o){
+  o = o || {}; const id = r.id, base = `data-tab="sellf" data-kind="${kind}" data-id="${id}"`;
+  const ph = sfPhases(r), f = (label, inner, hint) => `<div class="lp-f"><label>${label}</label>${inner}${hint ? `<div class="lp-hint">${hint}</div>` : ''}</div>`;
+  const jt = `<select ${base} data-field="jobTypeId"><option value=""${r.jobTypeId ? '' : ' selected'}>Not set</option>${state.jobTypes.map(j => `<option value="${escAttr(j.id)}"${r.jobTypeId === j.id ? ' selected' : ''}>${escHtml(j.name)}${j.notFit ? ' (not a fit)' : ''}</option>`).join('')}</select>`;
+  const val = o.skipValue ? '' : f('Ballpark value (£)', `<input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="estValue" value="${r.estValue === '' || r.estValue == null ? '' : r.estValue}" placeholder="A rough figure, not a quote">`);
+  const dur = ph.length
+    ? f('Estimated duration (days)', `<div class="sf-calc" aria-readonly="true"><b>${sfDays(r)}</b> days <span class="rp-tag">Calculated</span></div>`, 'Adds up the phases below. Remove the phases to type one figure instead.')
+    : f('Estimated duration (days)', `<input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="estDays" value="${r.estDays === '' || r.estDays == null ? '' : escAttr(r.estDays)}" placeholder="Working days on site">`, 'How long the job is likely to take. You can split it into phases.');
+  const phases = `<div class="lp-f"><label>Phases <span class="lp-opt">optional</span></label>${ph.map((p, pi) => `<div class="sf-phase"><input type="text" ${base} data-field="phaseName" data-pi="${pi}" value="${escAttr(p.name || '')}" placeholder="Phase name" aria-label="Phase name"><input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${p.days === '' || p.days == null ? '' : escAttr(p.days)}" placeholder="Days" aria-label="Days"><button type="button" class="icon-btn" data-sf="phase-del" data-kind="${kind}" data-id="${id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button></div>`).join('')}<button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="${kind}" data-id="${id}">+ Add a phase</button></div>`;
+  const warn = sfDeadlineWarn(r);
+  return `${val}${f('Job type', jt, SF_NF_HINT, 'sf-jt-hint')}${dur}${phases}${f('Customer\'s preferred start', `<input type="date" ${base} data-field="prefStart" value="${escAttr(sfIso(r.prefStart))}">`)}${f('Deadline', `<input type="date" ${base} data-field="deadline" value="${escAttr(sfIso(r.deadline))}">`, warn ? `<span class="sf-warn">${warn}</span>` : 'Optional: a date the job must be finished by.')}`;
+}
+/* one line of the facts, for cards and tiles */
+function sfFactsHtml(r, val){
+  val = val || ((v, k) => v ? `<span class="v">${k ? `<span class="k">${k}</span>` : ''}${escHtml(v)}</span>` : '');
+  const j = jobTypeOf(r), d = sfDays(r);
+  return `${val(j ? j.name : '', 'Type')}${val(d ? d + ' days' : '', 'Duration')}${val(sfIso(r.prefStart) ? dShow(r.prefStart) : '', 'Start')}${val(sfIso(r.deadline) ? dShow(r.deadline) : '', 'Deadline')}`;
+}
+function sfApply(el){
+  const d = el.dataset, r = sfRec(d.kind, d.id); if(!r) return; const f = d.field, v = el.value;
+  if(f === 'qa'){ r.qa = r.qa && typeof r.qa === 'object' ? r.qa : {}; r.qa[d.qid] = v.trim(); }
+  else if(f === 'qrate'){ r.qRate = r.qRate && typeof r.qRate === 'object' ? r.qRate : {}; r.qRate[d.qid] = ['good', 'unclear', 'poor'].includes(v) ? v : ''; }
+  else if(f === 'estValue'){ const n = parseFloat(v); r.estValue = (v === '' || isNaN(n)) ? '' : Math.max(0, n); if(d.kind === 'lead' && typeof applyAutoTier === 'function') applyAutoTier(r); }
+  else if(f === 'estDays'){ const n = Math.round(Number(v)); r.estDays = (v === '' || isNaN(n)) ? '' : Math.max(0, n); }
+  else if(f === 'jobTypeId'){ r.jobTypeId = state.jobTypes.some(j => j.id === v) ? v : ''; }
+  else if(f === 'prefStart' || f === 'deadline'){ r[f] = sfIso(v); }
+  else if(f === 'phaseName' || f === 'phaseDays'){ const p = sfPhases(r)[Number(d.pi)]; if(p){ if(f === 'phaseName') p.name = v.trim(); else { const n = Math.round(Number(v)); p.days = (v === '' || isNaN(n)) ? '' : Math.max(0, n); } } }
+}
+const sfUi = { rebuild: false };
+/* the lead panel is not rebuilt on every change (that would drop the focus), so the calculated bits are refreshed in place */
+function sfPanelSync(l){
+  if(sfUi.rebuild){ sfUi.rebuild = false; lpRenderBody(true); return; }
+  const c = document.querySelector('#lpBody .sf-calc b'); if(c) c.textContent = sfDays(l);
+  const j = document.querySelector('#lpBody [data-field="jobTypeId"]'); if(j && j.value !== (l.jobTypeId || '')) j.value = l.jobTypeId || '';
+  const h = document.querySelector('#lpBody .sf-jt-hint'); if(h) h.style.display = jobNotFit(l) ? '' : 'none';
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-sf]'); if(!b || !state) return;
+  const r = sfRec(b.dataset.kind, b.dataset.id); if(!r) return;
+  if(b.dataset.sf === 'phase-add'){ r.phases = sfPhases(r).concat([{ id: selId('ph_'), name: '', days: '' }]); }
+  else if(b.dataset.sf === 'phase-del'){ const ph = sfPhases(r); ph.splice(Number(b.dataset.pi), 1); r.phases = ph; }
+  else return;
+  sfUi.rebuild = true; render(); saveState();
+});
+
+/* ---------- customer lifecycle (contacts and companies) ----------
+   '' on the record means "worked out": from the old tags and the deals (Customer if there is a project, a past customer or a Customer tag;
+   Opportunity if a deal is in sales; Lead if a lead is open or tagged; Referrer if tagged), never stored. Evangelist is always set by hand. */
+function lcName(id){ const x = state.lifecycle.find(l => l.id === id); return x ? x.name : ''; }
+function lcValid(id){ return state.lifecycle.some(l => l.id === id) ? id : ''; }
+function lcPick(id){ return lcValid(id) || state.lifecycle[0].id; }
+function lcFromSignals(deals, tags, status){
+  const has = pl => deals.some(d => d.pl === pl && d.live);
+  if(deals.some(d => d.pl === 'project') || tags.includes('customer') || tags.includes('past') || status === 'past') return lcPick('lc_customer');
+  if(has('sales')) return lcPick('lc_opportunity');
+  if(has('lead') || tags.includes('lead')) return lcPick('lc_lead');
+  if(tags.includes('referrer')) return lcPick('lc_referrer');
+  return lcPick('lc_lead');
+}
+function lcDerived(kind, rec){
+  if(kind === 'contact') return lcFromSignals(cxDealsOfContact(rec.id), rec.tags || [], cxContactStatus(rec));
+  const deals = cxDealsOfCompany(rec.id), people = cxContactsOfCompany(rec.id), rank = ['lc_customer', 'lc_opportunity', 'lc_lead', 'lc_referrer'];
+  const ids = people.map(x => lcOf('contact', x.contact)).concat([lcFromSignals(deals, rec.type === 'Referrer' ? ['referrer'] : [], '')]);
+  for(const k of rank){ if(ids.includes(k)) return lcPick(k); }
+  return lcPick(ids[0]);
+}
+function lcOf(kind, rec){ return lcValid(rec.lifecycle) || lcDerived(kind, rec); }
+function lcPillHtml(id){ return id ? `<span class="lc-pill lc-${escAttr(id)}" title="Customer lifecycle">${escHtml(lcName(id))}</span>` : ''; }
+function lcFieldHtml(kind, rec){
+  const d = lcDerived(kind, rec), cur = lcValid(rec.lifecycle), attr = kind === 'contact' ? `data-cxf="lifecycle" data-cid="${escAttr(rec.id)}"` : `data-cxco="lifecycle" data-oid="${escAttr(rec.id)}"`;
+  return `<div class="rp-f rp-edit"><label for="lcf_${escAttr(rec.id)}">Customer lifecycle</label><select id="lcf_${escAttr(rec.id)}" ${attr}><option value=""${cur ? '' : ' selected'}>Automatic: ${escHtml(lcName(d))}</option>${state.lifecycle.map(l => `<option value="${escAttr(l.id)}"${cur === l.id ? ' selected' : ''}>${escHtml(l.name)}</option>`).join('')}</select><div class="rp-hint">${cur ? 'Set by hand. Choose Automatic to go back to what the tags and deals say.' : 'Worked out from the tags and deals. Choose a stage to set it by hand.'}</div></div>`;
+}
+
+/* ---------- Settings > Selling: small editors for the lists ---------- */
+const SL_LISTS = { jobtypes: { get: () => state.jobTypes, noun: 'job type', uses: id => state.leads.concat(state.pipeline, state.projects).filter(r => r.jobTypeId === id).length },
+  lifecycle: { get: () => state.lifecycle, noun: 'lifecycle stage', uses: id => state.contacts.concat(state.companies).filter(c => c.lifecycle === id).length } };
+function slRowsHtml(k){
+  const L = SL_LISTS[k], list = L.get();
+  return `<div class="stage-list">${list.map((it, i) => `<div class="stage-row sl-row" data-slrow="${escAttr(it.id)}">
+      <div class="tier-move"><button type="button" class="icon-btn" data-sl="up" data-k="${k}" data-id="${escAttr(it.id)}" title="Move up" aria-label="Move up"${i === 0 ? ' disabled style="opacity:.3"' : ''}>${UP_SVG}</button><button type="button" class="icon-btn" data-sl="down" data-k="${k}" data-id="${escAttr(it.id)}" title="Move down" aria-label="Move down"${i === list.length - 1 ? ' disabled style="opacity:.3"' : ''}>${DOWN_SVG}</button></div>
+      <input type="text" data-sl="name" data-k="${k}" data-id="${escAttr(it.id)}" value="${escAttr(it.name)}" aria-label="Name">
+      ${k === 'jobtypes' ? `<label class="q-check sl-nf"><input type="checkbox" data-sl="notfit" data-k="${k}" data-id="${escAttr(it.id)}"${it.notFit ? ' checked' : ''}> Not a fit</label>` : '<span></span>'}
+      <button type="button" class="icon-btn" data-sl="del" data-k="${k}" data-id="${escAttr(it.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('')}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-sl="add" data-k="${k}">+ Add ${L.noun}</button>`;
+}
+function renderSellingSettings(){
+  const a = document.getElementById('sellJobTypesCard'), b = document.getElementById('sellLifecycleCard');
+  if(a) a.innerHTML = `<p class="q-help" style="margin:0 0 8px;">The kinds of job. A type marked <b>Not a fit</b> is flagged on the lead, the sales card and the project as soon as it is chosen (maintenance, for example). Records follow a type's hidden id, so renaming it is safe.</p><div style="max-width:520px;">${slRowsHtml('jobtypes')}</div>`;
+  if(b) b.innerHTML = `<p class="q-help" style="margin:0 0 8px;">Where each contact and company is in the relationship with you. The names and the order are yours to change. Each one starts from the old tags and the deals (it is not stored until someone sets it by hand), and can be changed on the contact or company page.</p><div style="max-width:520px;">${slRowsHtml('lifecycle')}</div>`;
+  if(typeof renderSellingSettings2 === 'function') renderSellingSettings2();
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-sl]'); if(!b || !state || !b.dataset.k || !SL_LISTS[b.dataset.k]) return;
+  const k = b.dataset.k, L = SL_LISTS[k], list = L.get(), a = b.dataset.sl, i = list.findIndex(x => x.id === b.dataset.id);
+  if(a === 'add'){ const it = { id: selId(k === 'jobtypes' ? 'jt_' : 'lc_'), name: 'New ' + L.noun }; if(k === 'jobtypes') it.notFit = false; list.push(it); renumberStages(list); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-sl="name"][data-id="${it.id}"]`); if(el){ el.focus(); el.select(); } }, 30); return; }
+  if(i < 0) return;
+  if(a === 'up' || a === 'down'){ const j = i + (a === 'up' ? -1 : 1); if(j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; renumberStages(list); saveState(); render(); return; }
+  if(a === 'del'){
+    if(list.length <= 1){ showToast('A list needs at least one ' + L.noun + '. Add another before deleting this one.', null, 7000); return; }
+    const n = L.uses(list[i].id);
+    if(n){ showToast(`${n} record${n === 1 ? ' uses' : 's use'} “${list[i].name}”. Change ${n === 1 ? 'it' : 'them'} first, then delete it. Nothing was changed.`, null, 9000); return; }
+    const gone = list.splice(i, 1)[0]; renumberStages(list); undoDeleted(L.noun[0].toUpperCase() + L.noun.slice(1) + ' deleted: ' + String(gone.name).slice(0, 40), k === 'jobtypes' ? ['jobTypes'] : ['lifecycle'], i, gone); saveState(); render(); return; }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.sl || !d.k || !SL_LISTS[d.k] || !state) return;
+  const it = SL_LISTS[d.k].get().find(x => x.id === d.id); if(!it) return;
+  if(d.sl === 'name') it.name = el.value.trim() || it.name; else if(d.sl === 'notfit') it.notFit = el.checked; else return;
+  saveState(); render();
+});
+
+/* =====================================================================
+   STEP 2: QUALIFICATION GATES
+   Questions, weights and gate/guide mode live in Settings, Selling (state.qualQuestions, settings.qualGateDefault).
+   The four starting questions keep their answers in the lead's existing fields (decisionMaker, budget, competition, timeline), so every
+   existing answer is still there; any question you add stores its answer in rec.qa[id]. A rating (rec.qRate[id]: good / unclear / poor) sits
+   beside an answer. An answer with no rating counts as good, so leads that were already fully answered stay promotable.
+   Score: Weak if a hard-gate answer is rated Poor or the weighted score is under 40%; Strong if it is 75% or more and every hard gate is
+   satisfied; otherwise Unclear. A lead with nothing answered yet is Unclear.
+   ===================================================================== */
+const SEL_QUALS = [['qq_decision', 'Decision maker', 'decisionMaker', 3, 'Who signs off?'], ['qq_budget', 'Budget', 'budget', 3, 'e.g. £15–20k'], ['qq_competition', 'Competition', 'competition', 2, 'Other quotes?'], ['qq_timeline', 'Timeline', 'timeline', 2, 'When?']];
+function ensureSellingModel2(o){
+  const str = v => v == null ? '' : String(v);
+  let q = Array.isArray(o.qualQuestions) ? o.qualQuestions.filter(x => x && typeof x === 'object' && x.id) : [];
+  if(!q.length) q = SEL_QUALS.map(([id, name, field, weight, ph]) => ({ id, name, field, weight, mode: 'default', ph }));
+  q = sortByOrder(q).map(x => { const w = Math.round(Number(x.weight)); return { id: String(x.id), name: str(x.name).trim() || 'Question', field: str(x.field), weight: (w >= 1 && w <= 5) ? w : 2, mode: x.mode === 'gate' || x.mode === 'guide' ? x.mode : 'default', ph: str(x.ph), order: x.order }; });
+  renumberStages(q); o.qualQuestions = q;
+  const st = o.settings = o.settings || {}; st.qualGateDefault = st.qualGateDefault === 'guide' ? 'guide' : 'gate';
+  if(typeof ensureSellingModel3 === 'function') ensureSellingModel3(o);
+}
+function qaGet(rec, q){ const f = r => q.field ? r[q.field] : (r.qa || {})[q.id]; let v = f(rec); if(isBlank(v) && rec.leadSnapshot) v = f(rec.leadSnapshot); return v == null ? '' : String(v).trim(); }
+function qrGet(rec, q){ const r = (rec.qRate || {})[q.id] || (rec.leadSnapshot && (rec.leadSnapshot.qRate || {})[q.id]) || ''; return ['good', 'unclear', 'poor'].includes(r) ? r : ''; }
+function qqMode(q){ return q.mode === 'gate' || q.mode === 'guide' ? q.mode : state.settings.qualGateDefault; }
+const QQ_WHY = { open: 'not answered yet', poor: 'answered, but rated Poor', unclear: 'answered, but rated Unclear' };
+function qualEval(rec){
+  const items = state.qualQuestions.map(q => { const a = qaGet(rec, q), r = qrGet(rec, q), st = !a ? 'open' : r === 'poor' ? 'poor' : r === 'unclear' ? 'unclear' : 'ok'; return { q, a, r, st, mode: qqMode(q) }; });
+  const blocking = items.filter(x => x.mode === 'gate' && x.st !== 'ok'), answered = items.filter(x => x.a).length;
+  let tw = 0, sw = 0; items.forEach(x => { const w = x.q.weight || 1; tw += w; sw += w * (x.st === 'ok' ? 1 : x.st === 'unclear' ? 0.5 : 0); });
+  const pct = tw ? sw / tw : 0, poorGate = items.some(x => x.mode === 'gate' && x.st === 'poor');
+  const key = !answered ? 'unclear' : (poorGate || pct < 0.4) ? 'weak' : (pct >= 0.75 && !blocking.length) ? 'strong' : 'unclear';
+  return { items, blocking, answered, total: items.length, pct, key };
+}
+const QUAL_LABEL = { strong: 'Strong', unclear: 'Unclear', weak: 'Weak' }, QUAL_CLS = { strong: 'ok', unclear: 'warn', weak: 'bad' }, QUAL_SYM = { strong: '✓', unclear: '▲', weak: '!' };
+function qualBadgeHtml(rec){
+  if(!state.qualQuestions.length) return '';
+  const e = qualEval(rec);
+  return `<span class="sf-chip ${QUAL_CLS[e.key]} qual-score" title="Qualification: ${e.answered} of ${e.total} answered, scored ${Math.round(e.pct * 100)}%${e.blocking.length ? '. Holding promotion: ' + escAttr(e.blocking.map(x => x.q.name).join(', ')) : ''}">${QUAL_SYM[e.key]} ${QUAL_LABEL[e.key]}</span>`;
+}
+function qualGateMsg(rec){
+  const e = qualEval(rec); if(!e.blocking.length) return '';
+  return 'Held by: ' + e.blocking.map(x => `${x.q.name} (${QQ_WHY[x.st]})`).join('; ') + '. Answer it, or change it to a guide in Settings, Selling.';
+}
+/* the old helpers, now driven by the settings (every other part of the app keeps calling these) */
+function leadQualDone(l){ return qualEval(l).answered; }
+function leadQualMissing(l){ return qualEval(l).blocking.map(x => x.q.name); }
+function leadQualified(l){ return !qualEval(l).blocking.length; }
+/* the questions as editable rows. kind 'lead' saves through the lead's own fields; 'sales' through the deal's */
+function qualEditHtml(kind, rec, idx){
+  const tab = kind === 'lead' ? 'leads' : 'pipeline', e = qualEval(rec), base = `data-tab="sellf" data-kind="${kind}" data-id="${rec.id}"`;
+  return e.items.map(x => {
+    const q = x.q, ans = q.field
+      ? `<input type="text" autocomplete="off" data-tab="${tab}" data-idx="${idx}" data-field="${q.field}" value="${escAttr(rec[q.field] || '')}" placeholder="${escAttr(q.ph || '')}" aria-label="${escAttr(q.name)}">`
+      : `<input type="text" autocomplete="off" ${base} data-field="qa" data-qid="${escAttr(q.id)}" value="${escAttr((rec.qa || {})[q.id] || '')}" placeholder="${escAttr(q.ph || '')}" aria-label="${escAttr(q.name)}">`;
+    const rate = `<select ${base} data-field="qrate" data-qid="${escAttr(q.id)}" aria-label="${escAttr(q.name)} rating"><option value=""${!x.r ? ' selected' : ''}>Rating</option><option value="good"${x.r === 'good' ? ' selected' : ''}>Good</option><option value="unclear"${x.r === 'unclear' ? ' selected' : ''}>Unclear</option><option value="poor"${x.r === 'poor' ? ' selected' : ''}>Poor</option></select>`;
+    return `<div class="lp-f lp-q${x.mode === 'gate' && x.st !== 'ok' ? ' missing' : ''}" data-qq="${escAttr(q.id)}"><label>${escHtml(q.name)} <span class="sf-chip ${x.mode === 'gate' ? 'bad' : ''}" title="${x.mode === 'gate' ? 'A hard gate: this must be answered, and not rated Unclear or Poor, before the lead can be promoted' : 'A guide: it counts towards the score but never blocks promotion'}">${x.mode === 'gate' ? 'Gate' : 'Guide'}</span></label><div class="lq-row">${ans}${rate}</div></div>`;
+  }).join('');
+}
+function lpQualNoteHtml(l){
+  const e = qualEval(l), msg = qualGateMsg(l);
+  return { count: `${e.answered} of ${e.total} answered`, note: msg || (e.total ? 'Every hard gate is satisfied: this lead can be promoted to the Sales Pipeline.' : 'There are no qualification questions set up in Settings, Selling.') };
+}
+/* answers carried across: the rows for a read-only view (sales card shows them editable, the project tile reads them) */
+function qualRowsHtml(rec){
+  return qualEval(rec).items.map(x => `<div class="rp-row"><span class="rp-dim">${escHtml(x.q.name)}${x.mode === 'gate' ? '' : ' <span class="rp-dim">(guide)</span>'}</span><span>${escHtml(x.a || '—')}${x.r ? ` <span class="sf-chip ${x.r === 'good' ? 'ok' : x.r === 'poor' ? 'bad' : 'warn'}">${x.r[0].toUpperCase() + x.r.slice(1)}</span>` : ''}</span></div>`).join('');
+}
+/* a blocked promotion says what is holding it and takes you to the question */
+function qualRefuse(l){
+  const msg = qualGateMsg(l);
+  showToast(msg, null, 14000);
+  if(typeof openLeadPanel === 'function') openLeadPanel(l.id, 'qualification');
+}
+
+/* ---------- Settings > Selling: the qualification card ---------- */
+const SEL_SET_CARDS = [];
+SEL_SET_CARDS.push(['Qualification gates', () => {
+  const list = state.qualQuestions, d = state.settings.qualGateDefault;
+  return `<p class="q-help" style="margin:0 0 8px;">The questions asked of every lead. A <b>hard gate</b> must be answered, and not rated Unclear or Poor, before the lead can be promoted to the Sales Pipeline. A <b>guide</b> counts towards the score but never blocks. There is no override: the way through is to answer the question, or switch it to a guide here. The weight (1 to 5) is how much an answer counts towards the score: Strong, Unclear or Weak.</p>
+    <div class="lp-f" style="max-width:360px;"><label>Default for every question</label><select data-qs="default" aria-label="Default gate mode"><option value="gate"${d === 'gate' ? ' selected' : ''}>Hard gate</option><option value="guide"${d === 'guide' ? ' selected' : ''}>Guide</option></select></div>
+    <div class="stage-head qs-head"><span>Order</span><span>Question</span><span>Weight</span><span>Gate mode</span><span></span></div>
+    <div class="stage-list">${list.map((q, i) => `<div class="stage-row qs-row">
+      <div class="tier-move"><button type="button" class="icon-btn" data-qs="up" data-id="${escAttr(q.id)}" title="Move up" aria-label="Move up"${i === 0 ? ' disabled style="opacity:.3"' : ''}>${UP_SVG}</button><button type="button" class="icon-btn" data-qs="down" data-id="${escAttr(q.id)}" title="Move down" aria-label="Move down"${i === list.length - 1 ? ' disabled style="opacity:.3"' : ''}>${DOWN_SVG}</button></div>
+      <input type="text" data-qs="name" data-id="${escAttr(q.id)}" value="${escAttr(q.name)}" aria-label="Question">
+      <select data-qs="weight" data-id="${escAttr(q.id)}" aria-label="Weight">${[1, 2, 3, 4, 5].map(n => `<option${q.weight === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
+      <select data-qs="mode" data-id="${escAttr(q.id)}" aria-label="Gate mode"><option value="default"${q.mode === 'default' ? ' selected' : ''}>Use default (${d === 'gate' ? 'hard gate' : 'guide'})</option><option value="gate"${q.mode === 'gate' ? ' selected' : ''}>Hard gate</option><option value="guide"${q.mode === 'guide' ? ' selected' : ''}>Guide</option></select>
+      <button type="button" class="icon-btn" data-qs="del" data-id="${escAttr(q.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('')}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-qs="add">+ Add a question</button>
+    <p class="q-help" style="margin:10px 0 0;">Deleting a question hides it. The answers already typed stay on the leads.</p>`;
+}]);
+function renderSellingSettings2(){
+  const el = document.getElementById('sellMoreCards'); if(!el) return;
+  el.innerHTML = SEL_SET_CARDS.map(([label, fn], i) => `<div class="section-label">${label}</div><div class="card" data-selcard="${i}">${fn()}</div>`).join('');
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-qs]'); if(!b || !state || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+  const list = state.qualQuestions, a = b.dataset.qs, i = list.findIndex(x => x.id === b.dataset.id);
+  if(a === 'add'){ const q = { id: selId('qq_'), name: 'New question', field: '', weight: 2, mode: 'default', ph: '' }; list.push(q); renumberStages(list); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-qs="name"][data-id="${q.id}"]`); if(el){ el.focus(); el.select(); } }, 30); return; }
+  if(i < 0) return;
+  if(a === 'up' || a === 'down'){ const j = i + (a === 'up' ? -1 : 1); if(j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; renumberStages(list); saveState(); render(); return; }
+  if(a === 'del'){ const gone = list.splice(i, 1)[0]; renumberStages(list); undoDeleted('Question deleted: ' + String(gone.name).slice(0, 40), ['qualQuestions'], i, gone); saveState(); render(); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.qs || !state) return;
+  if(d.qs === 'default'){ state.settings.qualGateDefault = el.value === 'guide' ? 'guide' : 'gate'; saveState(); render(); return; }
+  const q = state.qualQuestions.find(x => x.id === d.id); if(!q) return;
+  if(d.qs === 'name') q.name = el.value.trim() || q.name; else if(d.qs === 'weight') q.weight = Math.max(1, Math.min(5, Math.round(Number(el.value)) || 2)); else if(d.qs === 'mode') q.mode = ['gate', 'guide'].includes(el.value) ? el.value : 'default'; else return;
+  saveState(); render();
+});
+
+/* =====================================================================
+   STEP 3: PIPELINES AND END STAGES
+   Sales stages: the stored stages (and every card's stage id) are never touched. Settings, Selling shows the proposed list next to the stored
+   one with a button that you press yourself: it renames the stages that already exist and adds the two that are missing; no card moves.
+   Closed lost (all three boards): rec.lost, lostReason (a Lost reasons id, default Stalled), lostNote, lostDate, lostStageId. The record stays where
+   it is, keeps its stage, data and history, and leaves the live board for the Closed lost archive bar, from where Reopen puts it back.
+   ===================================================================== */
+const SEL_SALES_PLAN = [   // the proposed sales pipeline: [id, name, win %, existing stored stage it takes over]
+  ['stg_sales_inquiry', 'Site visit', 10], ['stg_sales_tabled', 'Scoping', 25], ['stg_sales_quoted', 'Quoted', 50],
+  ['stg_sales_negotiation', 'Negotiation', 65], ['stg_sales_commitment', 'Commitment', 85], ['stg_sales_confirmed', 'Won', 100]];
+function ensureSellingModel3(o){
+  const rs = Array.isArray(o.lostReasons) ? o.lostReasons : (o.lostReasons = []);
+  if(!rs.some(r => r.id === 'lr_stalled' || String(r.name).trim().toLowerCase() === 'stalled')){ rs.push({ id: 'lr_stalled', name: 'Stalled' }); renumberStages(rs); }
+  if(typeof ensureSellingModel4 === 'function') ensureSellingModel4(o);
+}
+function stalledReasonId(){ const r = state.lostReasons.find(x => x.id === 'lr_stalled') || stageByName(state.lostReasons, 'Stalled'); return r ? r.id : (state.lostReasons[0] || {}).id || ''; }
+function salesWonStage(){ const l = state.pipelineStages.sales; return stageByName(l, 'Won') || stageByName(l, 'Confirmed') || l.filter(x => clampPct(x.pct) >= 100).pop() || null; }
+function salesPlanState(){   // what the button would do, in words, and whether it is already done
+  const l = state.pipelineStages.sales, ren = [], add = [];
+  SEL_SALES_PLAN.forEach(([id, name]) => { const have = l.find(s => s.id === id); if(!have) add.push(name); else if(have.name !== name) ren.push(`${have.name} → ${name}`); });
+  return { ren, add, done: !ren.length && !add.length };
+}
+function salesPlanApply(){
+  const l = state.pipelineStages.sales;
+  SEL_SALES_PLAN.forEach(([id, name, pct]) => { const have = l.find(s => s.id === id); if(have) have.name = name; });
+  const at = id => l.findIndex(s => s.id === id);
+  [['stg_sales_negotiation', 'Negotiation', 65, 'stg_sales_quoted'], ['stg_sales_commitment', 'Commitment', 85, 'stg_sales_negotiation']].forEach(([id, name, pct, after]) => {
+    if(at(id) >= 0) return; const i = at(after); l.splice(i >= 0 ? i + 1 : l.length, 0, { id, name, pct });
+  });
+  renumberStages(l);
+}
+SEL_SET_CARDS.push(['Sales pipeline stages', () => {
+  const p = salesPlanState(), cur = state.pipelineStages.sales.map(s => `${escHtml(s.name)} <span class="rp-dim">${Math.round(clampPct(s.pct))}%</span>`).join(' → ');
+  return `<p class="q-help" style="margin:0 0 8px;">The proposed stages are <b>${SEL_SALES_PLAN.map(x => x[1]).join(', ')}</b>, then <b>Closed lost</b> (which is the archive, not a stage). Your cards keep their stage: they follow a stage's hidden id, so nothing is remapped or moved.</p>
+    <div class="lp-f"><label>Stored today</label><div class="sf-calc">${cur}</div></div>
+    ${p.done ? '<div class="gate-msg ok">✓ The sales stages already match.</div>' : `<div class="lp-f"><label>What the button does</label><div class="sf-calc">${[p.ren.length ? 'Rename: ' + p.ren.map(escHtml).join(', ') : '', p.add.length ? 'Add: ' + p.add.map(escHtml).join(', ') : ''].filter(Boolean).join('<br>')}</div></div>
+    <button type="button" class="btn" data-sel="plan-apply">Set up the proposed sales stages</button>`}
+    <p class="q-help" style="margin:8px 0 0;">You can also rename, reorder and set percentages yourself in Pipelines, above.</p>`;
+}]);
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-sel]'); if(!b || !state) return; const a = b.dataset.sel;
+  if(a === 'plan-apply'){
+    const p = salesPlanState(); if(!await showConfirmLabel('Set up the proposed sales stages?', `${[p.ren.length ? 'Renames: ' + p.ren.join(', ') + '.' : '', p.add.length ? 'Adds: ' + p.add.join(', ') + '.' : ''].filter(Boolean).join(' ')} Every sales card keeps the stage it is in; no card is moved.`, 'Set up')) return;
+    salesPlanApply(); saveState(); render(); showToast('Sales stages set up. No card was moved.'); return;
+  }
+  if(a === 'close-lost'){ selCloseLost(b.dataset.pl, Number(b.dataset.id)); return; }
+  if(a === 'reopen'){ selReopen(b.dataset.pl, Number(b.dataset.id)); return; }
+  if(a === 'toggle-bar'){ const w = b.closest('[data-lostbar]'); if(w){ w.dataset.open = w.dataset.open === '1' ? '0' : '1'; renderLostBars(); } return; }
+});
+
+/* ---------- the log: an entry on the record's timeline (it shows in the Activity feed) that is not a customer contact ---------- */
+function selLog(rec, note, extra){ rec.comms = Array.isArray(rec.comms) ? rec.comms : []; rec.comms.push(Object.assign({ date: fmt(new Date()), note, created: Date.now(), src: 'move', noContact: true }, extra || {})); }
+function selRecs(pl){ return pl === 'lead' ? state.leads : pl === 'sales' ? state.pipeline : state.projects; }
+function selFind(pl, id){ return selRecs(pl).find(r => r.id === id) || null; }
+const SEL_PL_NAME = { lead: 'Lead Pipeline', sales: 'Sales Pipeline', project: 'Project Pipeline' };
+/* ask for a reason (default Stalled) and close the card as lost */
+async function selCloseLost(pl, id){
+  const r = selFind(pl, id); if(!r || r.lost) return;
+  if(!state.lostReasons.length){ showToast('Add at least one lost reason in Settings first.', null, 8000); return; }
+  const dflt = stalledReasonId();
+  const extra = `<select id="lostReasonSel">${state.lostReasons.map(x => `<option value="${escHtml(x.id)}"${x.id === dflt ? ' selected' : ''}>${escHtml(x.name)}</option>`).join('')}</select><textarea id="lostNoteTxt" placeholder="Optional note (if nobody knows why, leave Stalled)"></textarea><div class="modal-err" id="modalExtraErr"></div>`;
+  return selCloseLostDo(pl, r, extra);
+}
+async function selCloseLostDo(pl, r, extra){
+  const code = recordCode(r.id, pl), what = pl === 'lead' ? leadPrimaryName(r) : (r.name || r.projectName || r.contact || '');
+  const hasMoney = pl === 'project' && ((r.paymentLines || []).some(l => l.invoicedDate || l.paidDate));
+  const ok = await (async () => {
+    const btn = document.querySelector('#modalOverlay [data-modal="confirm"]'), old = btn.textContent; btn.textContent = 'Close as lost';
+    const v = await showConfirm(`Close ${code} as lost?`, `${code} · ${what} leaves the live ${SEL_PL_NAME[pl]} and goes to the Closed lost archive under it. Nothing is deleted: the stage, data and history stay, and Reopen puts it back where it was.${hasMoney ? ' It already has invoices or payments; those records are not touched.' : ''}`, extra);
+    btn.textContent = old; return v;
+  })();
+  if(!ok) return;
+  const reason = _confirmExtraValue || stalledReasonId(), note = (_confirmExtraNote || '').trim();
+  r.lostStageId = pl === 'lead' ? r.stageId : (pl === 'project' ? projStageId(r) : r.stageId);
+  r.lostReason = reason; r.lostNote = note; r.lostDate = fmt(new Date()); r.lost = true;
+  selLog(r, `Closed lost: ${lostReasonName(reason)}${note ? ' (' + note + ')' : ''}. Was in ${pl === 'lead' ? stageName('lead', r.lostStageId) : pl === 'sales' ? stageName('sales', r.lostStageId) : stageName('project', r.lostStageId)}.`);
+  if(pl === 'lead') expandedLeads.delete(r.id); else if(pl === 'sales') expandedProjects.delete(r.id);
+  if(typeof closeDetail === 'function') closeDetail(); if(typeof closeLeadPanel === 'function' && lp) closeLeadPanel();
+  if(pl === 'project' && typeof pwUi !== 'undefined' && pwUi.id === r.id){ pwUi.id = 0; }
+  render(); saveState(); showToast(`${code} closed as lost (${lostReasonName(reason)}). Find it in the Closed lost archive; Reopen puts it back.`, null, 9000);
+}
+function selReopen(pl, id){
+  const r = selFind(pl, id); if(!r || !r.lost) return;
+  const was = lostReasonName(r.lostReason), code = recordCode(r.id, pl);
+  if(pl === 'lead'){ r.stageId = stageById('lead', r.lostStageId) ? r.lostStageId : (stageById('lead', r.stageId) ? r.stageId : firstStageId('lead')); }
+  else if(pl === 'sales'){ if(!stageById('sales', r.stageId)) r.stageId = stageById('sales', r.lostStageId) ? r.lostStageId : firstStageId('sales'); }
+  r.lost = false; r.lostReason = ''; r.lostNote = ''; r.lostDate = ''; r.lostStageId = '';
+  selLog(r, `Reopened from Closed lost (the reason was ${was}). Back in ${pl === 'project' ? stageName('project', projStageId(r)) : stageName(pl, r.stageId)}.`, { reopened: true });
+  render(); saveState(); showToast(`${code} reopened: back in the ${SEL_PL_NAME[pl]}, at ${pl === 'project' ? stageName('project', projStageId(r)) : stageName(pl, r.stageId)}.`);
+}
+/* the archive bar under each board */
+const SEL_BAR = { lead: 'lostLeadsWrap', sales: 'salesLostWrap', project: 'projectLostWrap' };
+function renderLostBars(){
+  Object.keys(SEL_BAR).forEach(pl => {
+    const wrap = document.getElementById(SEL_BAR[pl]); if(!wrap) return;
+    const lost = selRecs(pl).filter(r => r.lost);
+    if(!lost.length){ wrap.innerHTML = ''; return; }
+    const open = wrap.dataset.open === '1';
+    const rows = lost.map(r => `<tr><td class="code-cell" style="width:80px">${recordCode(r.id, pl)}</td><td>${escHtml(pl === 'lead' ? (r.projectName || '—') : (r.name || r.projectName || '—'))}</td><td>${escHtml(r.contact || r.company || '—')}</td>
+      <td title="${escAttr(r.lostNote || '')}">${escHtml(lostReasonName(r.lostReason))}${r.lostNote ? ' <span title="' + escAttr(r.lostNote) + '">· note</span>' : ''}</td><td>${r.lostDate ? dShow(r.lostDate) : '—'}</td><td class="rp-dim">${escHtml(stageName(pl, r.lostStageId || r.stageId))}</td>
+      <td style="width:110px;text-align:right;"><button type="button" class="btn secondary" data-sel="reopen" data-pl="${pl}" data-id="${r.id}">Reopen</button></td></tr>`).join('');
+    wrap.dataset.lostbar = pl;
+    wrap.innerHTML = `<div class="archived-section lost-section"><div class="archived-toggle${open ? ' open' : ''}" data-sel="toggle-bar"><span>Closed lost (${lost.length})</span>${CHEV_SVG}</div>
+      <div class="archived-body table-scroll" ${open ? '' : 'hidden'}><table><thead><tr><th>Code</th><th>Name</th><th>Contact</th><th>Reason</th><th>Closed</th><th>Was in</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  });
+}
+
+/* ---------- needs-attention markers on cards ---------- */
+function quotesOfRec(r){ return state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === r.id)); }
+function quoteHasFollowUp(q){ return state.crmTasks.some(t => t.status === 'open' && Number(t.quoteId) === q.id); }
+function attnReasons(pl, r){
+  if(r.lost || pl === 'project') return [];
+  const out = [], today = fmt(new Date());
+  quotesOfRec(r).forEach(q => { if(q.status === 'Sent' && !quoteHasFollowUp(q)) out.push(`Quote ${qRef(q)} was sent with no follow-up planned`); });
+  if(pl === 'lead'){
+    const i = state.pipelineStages.lead.findIndex(s => s.id === r.stageId), blocked = leadQualMissing(r);
+    if(i >= 1 && blocked.length) out.push(`Qualification gate not answered: ${blocked.join(', ')}`);
+  }
+  const ref = leadLastContact(r) || (typeof leadCreatedDate === 'function' ? leadCreatedDate(r) : '');
+  if(ref){ const n = dashDays(ref, today); if(n >= dashStaleDays()) out.push(`No activity for ${n} days`); }
+  return out;
+}
+function attnChipHtml(pl, r){ const x = attnReasons(pl, r); return x.length ? `<span class="sf-chip warn attn" title="${escAttr(x.join('. '))}">⚠ Needs attention</span>` : ''; }
+
+/* =====================================================================
+   STEP 4: QUOTES HUB AND FOLLOW-UP
+   Settings, Selling: follow-up gap (working days, default 3), the follow-up task name ({quote} stands for the reference), and the no-contact
+   flag (working days, default 5). Working days are Monday to Friday; bank holidays are ignored for now.
+   The older "follow-up days" setting (calendar days, default 7, in Approvals) is left stored as it is but no longer used: it counted calendar days.
+   ===================================================================== */
+function ensureSellingModel4(o){
+  const st = o.settings = o.settings || {}, int = (v, d, min) => { const n = Math.round(Number(v)); return (v === '' || v == null || isNaN(n) || n < min) ? d : n; };
+  st.followUpGapDays = int(st.followUpGapDays, 3, 1);
+  st.noContactDays = int(st.noContactDays, 5, 1);
+  st.followUpTaskName = typeof st.followUpTaskName === 'string' && st.followUpTaskName.trim() ? st.followUpTaskName : 'Follow up quote {quote}';
+  if(typeof ensureSellingModel5 === 'function') ensureSellingModel5(o);
+}
+const isWork = d => d.getDay() !== 0 && d.getDay() !== 6;
+function wdAdd(iso, n){ const d = toDate(iso); let k = Math.max(0, Math.round(n)); while(k > 0){ d.setDate(d.getDate() + 1); if(isWork(d)) k--; } return fmt(d); }
+function wdSince(from, to){   // working days after `from` up to and including `to`
+  if(!from || !to || to <= from) return 0; const d = toDate(from), e = toDate(to); let n = 0;
+  while(d < e){ d.setDate(d.getDate() + 1); if(isWork(d)) n++; } return n;
+}
+const SEL_CHANNELS = [['call', 'Call'], ['email', 'Email'], ['text', 'Text'], ['visit', 'Visit'], ['other', 'Other']];
+function fuKey(q){ return 'fu:' + q.id; }
+function fuTaskOf(q){ return state.crmTasks.find(t => t.status === 'open' && t.autoKey === fuKey(q)) || null; }
+function fuTitle(q){ return String(state.settings.followUpTaskName || 'Follow up quote {quote}').replace(/\{quote\}/gi, qRef(q)).replace(/\{customer\}/gi, q.customer || '').trim(); }
+/* the one follow-up task for a sent quote: autoKey stops it being created twice */
+function fuEnsure(q, due, text){
+  const ex = fuTaskOf(q); if(ex) return ex;
+  const today = fmt(new Date()), deal = qDeal(q), calls = typeOpt('tt_call') ? 'tt_call' : defaultTypeId();
+  const t = createTask({ title: fuTitle(q), dueDate: due || wdAdd(today, state.settings.followUpGapDays), typeId: calls, owner: whoAmI().name || meName(), quoteId: q.id,
+    description: text || `Quote ${qRef(q)} (${q.customer || ''}${q.project ? ', ' + q.project : ''}) was sent${q.sentTo ? ' to ' + q.sentTo : ''}${q.sentAt ? ' on ' + q.sentAt : ''}. Check it arrived and ask whether they have any questions. Press Chased when you have been in touch.`,
+    linkedIds: deal ? [recordCode(deal.rec.id, deal.pl)] : [] });
+  t.autoKey = fuKey(q); return t;
+}
+function chasedBtnHtml(t){ return t && t.status === 'open' && String(t.autoKey || '').startsWith('fu:') ? `<button type="button" class="btn qb-sm sel-chased" data-chased="${escAttr(t.id)}" title="Log that you chased this and set the next follow-up">Chased</button>` : ''; }
+async function selChase(taskId){
+  const t = findTask(taskId); if(!t || t.status !== 'open') return;
+  const q = qFind(t.quoteId), today = fmt(new Date()), live = !!q && q.status === 'Sent', sugg = wdAdd(today, state.settings.followUpGapDays);
+  const extra = `<select id="chaseChannel" aria-label="How did you chase it?">${SEL_CHANNELS.map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select><textarea id="chaseNote" placeholder="Optional note: what was said"></textarea>${live ? `<label class="lp-f" style="display:block;margin-top:8px;"><span style="display:block;font-size:12px;">Next follow-up (suggested: ${state.settings.followUpGapDays} working days)</span><input type="date" id="chaseNext" value="${sugg}"></label>` : '<p class="q-help">The quote is no longer waiting for an answer, so no further follow-up is suggested.</p>'}`;
+  const pr = showConfirmLabel(`Chased: ${t.title}`, 'How did you chase it?', 'Save chase', extra);
+  const ni = document.getElementById('chaseNext'); let next = sugg; if(ni) ni.addEventListener('input', () => { next = sfIso(ni.value) || sugg; });
+  const ok = await pr; if(!ok) return;
+  const ch = SEL_CHANNELS.find(c => c[0] === _confirmExtraValue) || SEL_CHANNELS[4], note = (_confirmExtraNote || '').trim(), text = `Chased by ${ch[1].toLowerCase()}${note ? ': ' + note : ''}`;
+  if(q){
+    const deal = qDeal(q); q.timeline.push({ date: today, note: text, created: Date.now(), kind: 'chase', channel: ch[0] });
+    if(deal){ deal.rec.comms = Array.isArray(deal.rec.comms) ? deal.rec.comms : []; deal.rec.comms.push({ date: today, note: `Quote ${qRef(q)}: ${text}`, created: Date.now(), src: 'chase', channel: ch[0], quoteId: q.id }); }   // a customer contact: resets days since contact
+  }
+  t.notes.push({ id: 'n' + Date.now().toString(36), text, created: Date.now(), author: meName(), date: today });
+  t.status = 'done'; t.completedAt = new Date().toISOString(); t.completedBy = meName();
+  let nx = null; if(live) nx = fuEnsure(q, next, `Chased on ${today} (${ch[1].toLowerCase()}). Next follow-up on quote ${qRef(q)}.`);
+  render(); saveState();
+  showToast(nx ? `Chase logged (${ch[1].toLowerCase()}). Next follow-up ${fmtDisplay(toDate(nx.dueDate))}.` : 'Chase logged.');
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-chased]'); if(b && state){ e.stopPropagation(); e.preventDefault(); selChase(b.dataset.chased); return; }
+  const k = e.target.closest && e.target.closest('[data-sel-task]'); if(k && state){ e.stopPropagation(); e.preventDefault(); openTaskPanel(k.dataset.selTask); }
+}, true);
+/* days since contact (working days), on quotes that are waiting for an answer and on open leads */
+function quoteLastContact(q){
+  const ds = [q.sentAt]; (q.timeline || []).forEach(x => { if(x.kind === 'chase' || x.kind === 'sent') ds.push(x.date); });
+  const d = qDeal(q); if(d) ds.push(leadLastContact(d.rec));
+  return ds.filter(Boolean).sort().pop() || '';
+}
+function quoteDaysSince(q){ if(q.status !== 'Sent') return null; const l = quoteLastContact(q); return l ? wdSince(l, fmt(new Date())) : null; }
+function leadDaysSince(r){ const ref = leadLastContact(r) || (typeof leadCreatedDate === 'function' ? leadCreatedDate(r) : ''); return ref ? wdSince(ref, fmt(new Date())) : null; }
+function noContactChipHtml(n){ return n !== null && n >= state.settings.noContactDays ? `<span class="sf-chip warn" title="No contact for ${n} working days (the flag is set in Settings, Selling)">${n} days since contact</span>` : ''; }
+SEL_SET_CARDS.push(['Follow-up and contact', () => {
+  const st = state.settings;
+  return `<p class="q-help" style="margin:0 0 8px;">When a quote is marked as sent, a follow-up task is made automatically (once per quote) and shows on Today. Press <b>Chased</b> on the task, pick the channel, and the next one is suggested. Gaps count Monday to Friday; bank holidays are ignored for now.</p>
+    <div class="assumptions-grid" style="max-width:760px;">
+      <div><label>Follow-up gap (working days)</label><input type="number" min="1" step="1" data-fu="followUpGapDays" value="${st.followUpGapDays}"></div>
+      <div><label>No-contact flag after (working days)</label><input type="number" min="1" step="1" data-fu="noContactDays" value="${st.noContactDays}"></div>
+      <div style="grid-column:1/-1;"><label>Follow-up task name</label><input type="text" data-fu="followUpTaskName" value="${escAttr(st.followUpTaskName)}"><div class="q-help">{quote} becomes the quote reference, {customer} the customer name.</div></div>
+    </div>
+    <p class="q-help" style="margin:8px 0 0;">The earlier setting “follow-up after sending (days)” was in calendar days (${st.followUpDays}). It is kept as stored but no longer used.</p>`;
+}]);
+document.addEventListener('change', (e) => {
+  const el = e.target, k = el.dataset && el.dataset.fu; if(!k || !state) return;
+  if(k === 'followUpTaskName'){ if(el.value.trim()) state.settings.followUpTaskName = el.value.trim(); }
+  else { const n = Math.round(Number(el.value)); if(!isNaN(n) && n >= 1) state.settings[k] = n; }
+  saveState(); render();
+});
+/* ---------- the quotes list columns ---------- */
+function qlistCells(q){
+  const d = qDeal(q), ds = quoteDaysSince(q), t = fuTaskOf(q), cid = (q.contactIds || [])[0];
+  const cust = q.customer ? (cid && ctFind(cid) ? `<button type="button" class="sp-link" data-nav="contact:${escAttr(cid)}">${escHtml(q.customer)}</button>` : escHtml(q.customer)) : '—';
+  const proj = q.project ? (d ? `<button type="button" class="sp-link" data-nav="deal2:${d.rec.id}">${escHtml(q.project)}</button>` : escHtml(q.project)) : (d ? `<button type="button" class="sp-link" data-nav="deal2:${d.rec.id}">${escHtml(recordCode(d.rec.id, d.pl))}</button>` : '—');
+  const since = ds === null ? '<span class="qb-dim">—</span>' : (noContactChipHtml(ds) || `${ds} working day${ds === 1 ? '' : 's'}`);
+  const next = t ? `<button type="button" class="sp-link" data-sel-task="${escAttr(t.id)}" title="Open the follow-up task">${escHtml(dShow(t.dueDate))}</button>${t.dueDate < fmt(new Date()) ? ' <span class="sf-chip bad">overdue</span>' : ''}` : (q.status === 'Sent' ? '<span class="sf-chip warn">none planned</span>' : '<span class="qb-dim">—</span>');
+  return { cust, proj, since, next };
+}
+
+/* =====================================================================
+   STEP 5: SEVERAL PRICES PER LINE AND THE WHOLE-BASKET COMPARISON
+   Each quote line already holds one price per supplier column (supplier, price, date entered, note) and one chosen supplier. Each price now also
+   holds lead time (days) and valid until (both optional, left out of the stored price until typed). The comparison card on a quote shows,
+   per supplier, the landed cost of the whole basket (materials plus the supplier's delivery charge) with the cheapest complete basket
+   highlighted, and the basket each supplier would get from the choices made now: moving a line re-totals both. Choosing a supplier whose
+   price is not the line's cheapest asks for a short reason, saved on the quote (q.overrides: lineId, supplierId, cheapestId, reason, by, date).
+   The chosen supplier flows to the Working plan and orders exactly as before; accepted quotes stay locked.
+   ===================================================================== */
+function ensureSellingModel5(o){
+  const str = v => v == null ? '' : String(v);
+  (o.quotes || []).forEach(q => {
+    if(!Array.isArray(q.overrides)) return;   // nothing stored: nothing added
+    q.overrides = q.overrides.filter(x => x && typeof x === 'object' && x.lineId).map(x => ({ id: str(x.id) || selId('ov_'), lineId: str(x.lineId), supplierId: Number(x.supplierId) || 0, cheapestId: Number(x.cheapestId) || 0, reason: str(x.reason), by: str(x.by), date: str(x.date) }));
+  });
+}
+function selDelivery(q, sup, cost){
+  if(!sup || !(cost > 0)) return 0;
+  const drop = q.drops.find(d => d.supplierId === sup.id); if(drop && drop.method === 'collect') return 0;
+  let ch = sup.deliveryCharge !== '' && sup.deliveryCharge != null ? qNetAmt(sup, sup.deliveryCharge) : 0;
+  const free = qNetAmt(sup, sup.freeDeliveryOver); if(free !== '' && free > 0 && cost >= free) ch = 0;
+  return Number(ch) || 0;
+}
+function selCompare(q){
+  const c = qCalc(q), live = q.lines.filter(l => !qExcluded(q, l) && l.costOverride === ''), typed = q.lines.filter(l => !qExcluded(q, l) && l.costOverride !== '').length;
+  const sups = q.supplierCols.map(id => supFind(id) || { id, name: qbSupName(id), deliveryCharge: '' });
+  const priceOf = (l, sid) => l.prices.find(p => p.supplierId === sid && Number(p.price) > 0);
+  const rows = sups.map(s => {
+    let all = 0, have = 0, lead = 0, until = '';
+    live.forEach(l => { const p = priceOf(l, s.id); if(p){ have++; all += qQtyOrder(q, l) * qNetPrice(p); if(Number(p.leadTimeDays) > lead) lead = Number(p.leadTimeDays); if(p.validUntil && (!until || p.validUntil < until)) until = p.validUntil; } });
+    const allDel = selDelivery(q, s, all);
+    let mine = 0, n = 0; live.forEach(l => { const x = c.lines[l.id]; if(x.selSupplierId === s.id){ mine += x.lineCost; n++; } });
+    const myDel = selDelivery(q, s, mine);
+    return { s, all, allDel, allTotal: r2(all + allDel), have, missing: live.length - have, complete: live.length > 0 && have === live.length, lead, until, mine, n, myDel, myTotal: r2(mine + myDel) };
+  });
+  const complete = rows.filter(r => r.complete), best = complete.length ? complete.reduce((a, b) => b.allTotal < a.allTotal ? b : a) : null;
+  return { c, live, typed, rows, best, chosenTotal: r2(rows.reduce((a, r) => a + r.myTotal, 0)), unassigned: live.filter(l => !c.lines[l.id].selSupplierId).length };
+}
+function qbCompareHtml(q){
+  if(!q.supplierCols.length || !q.lines.length) return `<div class="card" id="qbCompareCard"><div class="qb-sec-h"><h3>Compare suppliers</h3></div><p class="q-help">Add supplier columns and prices to the materials above to compare the whole basket.</p></div>`;
+  const d = selCompare(q), locked = qLocked(q) || q.mode === 'template', today = fmt(new Date());
+  const sorted = d.rows.slice().sort((a, b) => (b.complete - a.complete) || (a.allTotal - b.allTotal));
+  const head = `<table class="qb-table qb-narrow sc-table"><thead><tr><th>Supplier</th><th>If every line came from them</th><th>Delivery</th><th>Landed total</th><th>Lead time</th><th>Prices valid until</th><th>Chosen now (lines · total with delivery)</th></tr></thead><tbody>${sorted.map(r => {
+    const best = d.best && d.best.s.id === r.s.id;
+    return `<tr class="${best ? 'sc-best' : ''}"><td><b>${escHtml(r.s.name)}</b> ${best ? '<span class="sf-chip ok">Cheapest</span>' : ''}</td>
+      <td class="q-num">${qm(r.all)}${r.missing ? `<div class="sc-miss">${r.missing} line${r.missing === 1 ? '' : 's'} have no price from them</div>` : ''}</td><td class="q-num">${qm(r.allDel)}</td><td class="q-num"><b>${qm(r.allTotal)}</b>${r.complete ? '' : '<div class="sc-miss">incomplete</div>'}</td>
+      <td>${r.lead ? r.lead + ' days' : '<span class="qb-dim">—</span>'}</td><td>${r.until ? (r.until < today ? `<span class="sf-chip bad">${escHtml(dShow(r.until))} (past)</span>` : escHtml(dShow(r.until))) : '<span class="qb-dim">—</span>'}</td>
+      <td class="q-num" data-sc="mine">${r.n ? `${r.n} line${r.n === 1 ? '' : 's'} · <b>${qm(r.myTotal)}</b>${r.myDel ? ` <span class="qb-dim">(incl. ${qm(r.myDel)} delivery)</span>` : ''}` : '<span class="qb-dim">none</span>'}</td></tr>`; }).join('')}
+    <tr class="sc-total"><td colspan="6">Total of the chosen baskets${d.unassigned ? ` <span class="sf-chip warn">${d.unassigned} line${d.unassigned === 1 ? '' : 's'} with no supplier</span>` : ''}${d.typed ? ` <span class="qb-dim">(${d.typed} typed-cost line${d.typed === 1 ? '' : 's'} not included)</span>` : ''}</td><td class="q-num"><b>${qm(d.chosenTotal)}</b></td></tr></tbody></table>`;
+  const ovr = id => (q.overrides || []).find(o => o.lineId === id);
+  const lineRows = d.live.map(l => {
+    const x = d.c.lines[l.id], qo = qQtyOrder(q, l), low = qCheapest(l), o = ovr(l.id), nonCheap = x.selSupplierId && x.cheapestId && x.selSupplierId !== x.cheapestId;
+    const cells = d.rows.map(r => { const p = l.prices.find(z => z.supplierId === r.s.id && Number(z.price) > 0); if(!p) return `<td class="qb-dim">—</td>`; const isSel = x.selSupplierId === r.s.id, isLow = low && low.supplierId === r.s.id;
+      return `<td class="q-num${isSel ? ' sc-sel' : ''}${isLow ? ' sc-low' : ''}" title="${isSel ? 'Chosen' : ''}${isLow ? ' · lowest' : ''}${p.leadTimeDays ? ' · ' + p.leadTimeDays + ' days lead' : ''}">${qm(qo * qNetPrice(p))}${isLow ? ' ▾' : ''}</td>`; }).join('');
+    const opts = [['', q.mode === 'template' ? 'Cheapest' : 'Cheapest (automatic)']].concat(d.rows.filter(r => l.prices.some(z => z.supplierId === r.s.id && Number(z.price) > 0)).map(r => [r.s.id, r.s.name]));
+    return `<tr><td>${escHtml(l.description || 'Item')}${l.hire ? ' <span class="dc-ptc">hire</span>' : ''}${nonCheap && o ? `<div class="sc-ovr">Not the cheapest: ${escHtml(o.reason)}</div>` : (nonCheap ? '<div class="sc-ovr">Not the cheapest (no reason saved)</div>' : '')}</td><td class="q-num">${qo}</td>${cells}
+      <td>${qbSel('line', l.id, 'selectedSupplierId', qbOpts(opts, l.selectedSupplierId), { aria: 'Supplier for ' + (l.description || 'this line') }).replace('<select', locked ? '<select disabled' : '<select')}</td></tr>`;
+  }).join('');
+  const lines = `<div class="qb-scroll"><table class="qb-table qb-narrow sc-lines"><thead><tr><th>Line</th><th>Qty</th>${d.rows.map(r => `<th>${escHtml(r.s.name)}</th>`).join('')}<th>Supplier for this line</th></tr></thead><tbody>${lineRows}</tbody></table></div>`;
+  return `<div class="card" id="qbCompareCard"><div class="qb-sec-h"><h3>Compare suppliers</h3></div>
+    <p class="q-help">Landed cost is materials plus the supplier's delivery charge (free above its threshold, nothing when collecting), ex VAT. The cheapest basket is highlighted among suppliers that price every line. Change a line's supplier below and both baskets re-total straight away.${locked ? ' This quote is locked, so the choices are read-only.' : ''}</p>
+    <div class="qb-scroll">${head}</div><div class="qb-sec-h" style="margin-top:14px;"><h4>Line by line</h4></div>${lines}</div>`;
+}
+function selCompareRefresh(){
+  const q = qFind(qUi.openId), el = document.getElementById('qbCompareCard'); if(!q || !el) return;
+  const ae = document.activeElement; if(ae && el.contains(ae)) return;
+  const tmp = document.createElement('div'); tmp.innerHTML = qbCompareHtml(q); el.replaceWith(tmp.firstElementChild);
+}
+/* choosing a supplier that is not the cheapest for the line asks for a reason */
+async function selPickSupplier(q, l, sid){
+  const x = qCalc(q).lines[l.id]; sid = sid === '' ? '' : Number(sid);
+  const cheap = qCheapest(l), notCheap = sid !== '' && cheap && sid !== cheap.supplierId && qNetPrice(l.prices.find(p => p.supplierId === sid) || cheap) > qNetPrice(cheap);
+  if(notCheap){
+    const has = (q.overrides || []).find(o => o.lineId === l.id && o.supplierId === sid);
+    let reason = has ? has.reason : '';
+    if(!reason){
+      const sp = l.prices.find(p => p.supplierId === sid);
+      const ok = await showConfirmLabel('Not the cheapest: why?', `${l.description || 'This line'}: ${qbSupName(sid)} is ${qm(qQtyOrder(q, l) * (qNetPrice(sp) - qNetPrice(cheap)))} dearer than ${qbSupName(cheap.supplierId)}, the cheapest. A short reason is saved with the quote.`, 'Use this supplier', '<input type="text" id="ovrReason" maxlength="160" placeholder="e.g. in stock this week, or a trade account discount">');
+      if(!ok){ qbRender(); return; }
+      reason = (_confirmExtraNote || '').trim(); if(!reason){ showToast('A reason is needed to choose a supplier that is not the cheapest. Nothing was changed.', null, 7000); qbRender(); return; }
+    }
+    q.overrides = (q.overrides || []).filter(o => o.lineId !== l.id); q.overrides.push({ id: selId('ov_'), lineId: l.id, supplierId: sid, cheapestId: cheap.supplierId, reason, by: whoName(), date: fmt(new Date()) });
+    q.timeline.push({ date: fmt(new Date()), note: `${l.description || 'Line'}: ${qbSupName(sid)} chosen, not the cheapest (${qbSupName(cheap.supplierId)}). Reason: ${reason}`, created: Date.now(), kind: 'override' });
+  } else if(q.overrides) q.overrides = q.overrides.filter(o => o.lineId !== l.id);
+  l.selectedSupplierId = sid;
+  if(l.stageId){ qSyncStageDrops(q); }
+  qbTouch(q, true);
+}
+SEL_SET_CARDS.length;   // (no settings for step 5)
+
+/* =====================================================================
+   STEP 6: APPROVER ACCESS TYPE (built, not switched on)
+   Settings, Selling holds the scope (commercial, finance or both). The view itself keys off a login role of "approver" (session.role) or, for an
+   admin testing it, a per-browser preview that is never stored in the saved data. NO user or login is created by any of this; the login system,
+   its role list and the Supabase users are untouched. An approver sees the quotes (and the finance pages when the scope allows) read-only,
+   and can decide through the existing Approvals flow, which carries the comment. Anything else cannot be saved from an approver's browser.
+   ===================================================================== */
+const APV_PREVIEW_KEY = STORAGE_PREFIX + 'business-tracker-approver-preview';
+const APV_SCOPES = [['commercial', 'Commercial: quotes and approvals'], ['finance', 'Finance: quotes, approvals and the finance figures'], ['both', 'Both: commercial and finance']];
+const APV_PAGES = { commercial: ['quotations', 'approvals'], finance: ['quotations', 'approvals', 'cashflow', 'transactions', 'reconciliation', 'pricing', 'revenue', 'invoicing', 'supplierinvoices', 'dashboard'] };
+function ensureSellingModel6(o){ const st = o.settings = o.settings || {}; st.approverScope = ['commercial', 'finance', 'both'].includes(st.approverScope) ? st.approverScope : 'commercial'; }
+(function(){ const o = ensureSellingModel5; ensureSellingModel5 = function(x){ o(x); ensureSellingModel6(x); if(typeof ensureSellingModel7 === 'function') ensureSellingModel7(x); }; })();
+function approverMode(){ if(session && session.role === 'approver') return true; try{ return isAdmin() && sessionStorage.getItem(APV_PREVIEW_KEY) === '1'; }catch(e){ return false; } }
+function approverPages(){ const sc = state.settings.approverScope; return sc === 'commercial' ? APV_PAGES.commercial : APV_PAGES.finance.filter(p => sc === 'both' || ['quotations', 'approvals', 'cashflow', 'transactions', 'reconciliation', 'pricing', 'revenue', 'invoicing', 'supplierinvoices', 'dashboard'].includes(p)); }
+let apvWrite = false;   // true only while an approval decision is being recorded
+function apvApply(){
+  const on = !!state && approverMode(); document.body.classList.toggle('is-approver', on);
+  let st = document.getElementById('apvStyle'); if(!on){ if(st) st.remove(); return; }
+  const ok = approverPages(), all = [...document.querySelectorAll('.tab[data-tab]')].map(t => t.dataset.tab).filter(t => !ok.includes(t));
+  const sel = all.map(t => `#sidebar .tab[data-tab="${t}"],[data-go="${t}"]`).join(',');
+  if(!st){ st = document.createElement('style'); st.id = 'apvStyle'; document.head.appendChild(st); }
+  st.textContent = `${sel}{display:none!important}`;
+  document.querySelectorAll('#main :is(input,select,textarea):not(.apv-ok)').forEach(el => { if(!el.closest('#decOverlay') && !el.matches('[type=search],.crm-search')){ el.disabled = true; } });
+  const cur = (typeof menuCurrent === 'function') ? menuCurrent() : ''; if(cur && !ok.includes(cur)) activateTab('quotations');
+}
+(function(){   // nothing an approver does is saved, except recording a decision through Approvals
+  const save = saveState; saveState = function(){ if(approverMode() && !apvWrite) return; return save.apply(this, arguments); };
+  const dec = apDecide; apDecide = function(){ apvWrite = true; try{ return dec.apply(this, arguments); } finally { setTimeout(() => { apvWrite = false; }, 50); } };
+  const m = new MutationObserver(() => { if(document.body.classList.contains('is-approver') || approverMode()) apvApply(); }); m.observe(document.body, { childList: true, subtree: true });
+})();
+SEL_SET_CARDS.push(['Approver access', () => {
+  const sc = state.settings.approverScope, pv = (() => { try{ return sessionStorage.getItem(APV_PREVIEW_KEY) === '1'; }catch(e){ return false; } })();
+  return `<p class="q-help" style="margin:0 0 8px;">An <b>Approver</b> sees the quotes in a read-only view (and the finance figures if the scope allows), and can approve or comment through Approvals. They cannot change anything else. This is built but <b>not switched on</b>: no user or login has been created for Gerry or Mike.</p>
+    <div class="lp-f" style="max-width:420px;"><label>Approver scope</label><select data-apv="scope" aria-label="Approver scope">${APV_SCOPES.map(([k, n]) => `<option value="${k}"${sc === k ? ' selected' : ''}>${n}</option>`).join('')}</select></div>
+    <details style="margin-top:10px;"><summary style="cursor:pointer;font-weight:600;">What it takes to switch it on</summary><ol class="q-help" style="margin:8px 0 0 18px;"><li>Allow the role <b>approver</b> in the users setup in Supabase (the user table and its add-user function currently accept admin and user only). This is a login change, so it needs your go-ahead.</li><li>Create a login for Gerry and one for Mike with that role. A username must match the approver's name in Settings, Approvals (for example Gerry) so their decisions carry their name.</li><li>Add Approver to the Role list in Settings, Admin, Add a new user.</li><li>Pick the scope here (one scope applies to every approver; say if Gerry and Mike need different ones).</li></ol></details>
+    ${isAdmin() ? `<label class="q-check" style="margin-top:10px;"><input type="checkbox" data-apv="preview"${pv ? ' checked' : ''}> Preview the approver view in this browser <span class="q-help">(admin only, not saved, no user created; untick to go back)</span></label>` : ''}`;
+}]);
+document.addEventListener('change', (e) => {
+  const el = e.target, k = el.dataset && el.dataset.apv; if(!k || !state) return;
+  if(k === 'scope'){ state.settings.approverScope = ['commercial', 'finance', 'both'].includes(el.value) ? el.value : 'commercial'; saveState(); render(); }
+  else if(k === 'preview' && isAdmin()){ try{ if(el.checked) sessionStorage.setItem(APV_PREVIEW_KEY, '1'); else sessionStorage.removeItem(APV_PREVIEW_KEY); }catch(err){} location.reload(); }
+});
+
+/* BT:js-selling end */
 
 /* ---------- init ---------- */
 (async () => {
