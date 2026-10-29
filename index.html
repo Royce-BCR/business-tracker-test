@@ -2538,6 +2538,13 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .sl-row { grid-template-columns: 58px minmax(0, 1fr) auto 34px; }
   .sl-row .sl-nf { white-space: nowrap; font-size: 12px; }
   .sl-row input[type=text] { min-width: 0; }
+  .lq-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 6px; }
+  .lp-q.missing > label::after { content: ' – needed'; color: var(--bt-warn-fg); font-weight: 600; font-size: 11px; }
+  .qs-head, .qs-row { grid-template-columns: 58px minmax(0, 1fr) 64px 190px 34px; }
+  .qs-row select { min-width: 0; }
+  .promote-btn.blocked { opacity: .55; cursor: pointer; filter: grayscale(.4); }
+  @media (max-width: 640px) { .qs-head { display: none; } .qs-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .qs-row select { grid-column: 2 / 3; } .lq-row { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .sl-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .sl-row .sl-nf { grid-column: 2 / 3; } .sl-row > span:empty { display: none; } #panel-settings .set-content .sl-row input[type=text] { flex: none; width: 100%; } }
 
 /* BT:css-selling end */
 </style>
@@ -2765,7 +2772,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="panel" id="panel-leads">
     <div class="page-head">
       <h2>Lead Pipeline</h2>
-      <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once budget, decision-maker, timeline and competition are all filled — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
+      <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once every <em>hard-gate</em> qualification question is answered satisfactorily (the questions, weights and gate or guide mode are in Settings, Selling) — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
     </div>
     <div class="view-toggle" id="viewToggle-lead"></div>
     <div class="btn-row"><button class="btn" data-action="add-lead">+ Add lead</button></div>
@@ -4568,6 +4575,7 @@ function salesDetailHtml(r, i){
         ${moveStripHtml('sales', r, i)}
         ${cxCustomerHtml('sales', r)}
         <div class="sf-box"><h4>Value and timing ${sfNotFitChip(r)}</h4>${sfEditHtml('sales', r, i)}</div>
+        <div class="sf-box"><h4>Qualification ${qualBadgeHtml(r)}</h4><p class="q-help" style="margin:0 0 8px;">Carried from the lead. The gate applied when it was promoted; here the answers only tell the story and the score.</p>${qualEditHtml('sales', r, i)}</div>
         ${recTasksHtml('sales', r)}
         ${quoteChipHtml(r.id)}
         <div class="detail-notes"><label>Notes</label><input data-tab="pipeline" data-idx="${i}" data-field="notes" value="${escAttr(r.notes||'')}"></div>
@@ -4633,7 +4641,7 @@ function renderPipelineTable(){
         <option value="real"${r.type==='real'?' selected':''}>Real</option>
         <option value="example"${r.type==='example'?' selected':''}>Example</option></select></td>
       <td><select data-tab="pipeline" data-idx="${i}" data-field="tier">${tiers.map(t=>`<option${r.tier===t?' selected':''}>${t}</option>`).join('')}</select></td>
-      <td><select class="lead-pill" data-tab="pipeline" data-idx="${i}" data-field="stageId" style="${chipStyle(SALES_CHIP[r.stageId] || 'neutral')}">${salesStages.map(s=>`<option value="${escHtml(s.id)}"${r.stageId===s.id?' selected':''}>${chipSym(SALES_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select></td>
+      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="pipeline" data-idx="${i}" data-field="stageId" style="${chipStyle(SALES_CHIP[r.stageId] || 'neutral')}">${salesStages.map(s=>`<option value="${escHtml(s.id)}"${r.stageId===s.id?' selected':''}>${chipSym(SALES_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(r)}${sfNotFitChip(r)}</div></td>
       <td class="computed" title="From sales stage">${Math.round(effectiveProb(r)*100)}%${(r.probOverride!==undefined&&r.probOverride!==null&&r.probOverride!=='')?'*':''}</td>
       <td><input type="number" step="1" data-tab="pipeline" data-idx="${i}" data-field="quoteValue" value="${r.quoteValue}"></td>
       <td class="computed">${fmtDisplay(roll.start)}</td>
@@ -4745,14 +4753,14 @@ function tileHtml(pl, r, color){
     if(Number(r.estValue) > 0) rows += `<div class="bd-t-row"><span class="k">Ballpark</span><span>${money(r.estValue)}</span></div>`;
     if(sfDays(r)) rows += `<div class="bd-t-row"><span class="k">Duration</span><span>${sfDays(r)} days</span></div>`;
     if(sfIso(r.prefStart) || sfIso(r.deadline)) rows += `<div class="bd-t-row"><span class="k">${sfIso(r.deadline) ? 'Deadline' : 'Start'}</span><span>${dShow(sfIso(r.deadline) || r.prefStart)}</span></div>`;
-    if(jobNotFit(r)) flag = sfNotFitChip(r);
+    flag = qualBadgeHtml(r) + sfNotFitChip(r);
     const last = leadLastContact(r);
     rows += `<div class="bd-t-row"><span class="k">Last contacted</span><span>${last ? fmtDisplay(toDate(last)) : '—'}</span></div>`;
   } else if(pl === 'sales'){
     const roll = projectRollup(r);
     if(hasProbOverride(r)) flag = `<span class="bd-t-flag" title="This deal has its own percentage — moving it between stages does not change it">manual %</span>`;
     rows += `<div class="bd-t-row"><span class="k">Quote · ${Math.round(effectiveProb(r)*100)}%</span><span>${money(r.quoteValue)}</span></div>`;
-    if(jobNotFit(r)) flag += sfNotFitChip(r);
+    flag += qualBadgeHtml(r) + sfNotFitChip(r);
     if(roll.start) rows += `<div class="bd-t-row"><span class="k">Starts</span><span>${fmtDisplay(roll.start)}</span></div>`;
   } else {
     sub = '';
@@ -4788,7 +4796,7 @@ function renderBoard(pl){
   const cols = stages.map(s => colHtml(pl, s, by[s.id], false));
   if(orphans.length) cols.push(colHtml(pl, { id: '', name: 'No stage' }, orphans, true));
   const hints = {
-    lead: 'Drag a tile to another column to change its stage. Moving a lead never promotes it — Promote stays in the lead\'s detail and still needs all four qualification fields. Green edge = Residential, blue = Commercial.',
+    lead: 'Drag a tile to another column to change its stage. Moving a lead never promotes it — Promote stays in the lead\'s detail and still needs every hard-gate qualification question answered. Green edge = Residential, blue = Commercial.',
     sales: 'Drag a tile to another column to change its stage; the stage\'s percentage is applied unless the deal has a manual percentage.',
     project: 'Drag a tile to another column to change the project\'s stage. Dates and payment lines are never changed by a move.'
   };
@@ -5455,9 +5463,7 @@ function priorityChipSym(i){ return i === 0 ? '!!' : chipSym(PRIORITY_CHIP[i] ||
 /* pill colours follow the stage id (so renaming keeps the colour); stages you add get the neutral grey */
 function leadStatusStyle(stageId){ return chipStyle(LEAD_CHIP[stageId] || 'neutral'); }
 const QUAL_FIELDS = [['budget','Budget'],['decisionMaker','Decision-maker'],['timeline','Timeline'],['competition','Competition']];
-function leadQualDone(l){ return QUAL_FIELDS.filter(([k]) => l[k]).length; }
-function leadQualMissing(l){ return QUAL_FIELDS.filter(([k]) => !l[k]).map(([, n]) => n); }
-function leadQualified(l){ return leadQualDone(l) === QUAL_FIELDS.length; }
+/* leadQualDone / leadQualMissing / leadQualified now come from the qualification settings (Stage 3, step 2) */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function emailLooksOff(v){ v = String(v || '').trim(); return v !== '' && !EMAIL_RE.test(v); }   // a gentle warning only — never blocks saving
 function leadLastContact(l){
@@ -5492,7 +5498,7 @@ function leadStageName(l){ const st = stageById('lead', l.stageId); return st ? 
 /* the expanded lead: one framed card — tinted header, read-only summary blocks (each opens the editor panel), tasks + timeline, actions */
 function leadDetailHtml(l, i){
   const isCommercial = l.leadType === 'Commercial';
-  const done = leadQualDone(l), missing = leadQualMissing(l), tier = tierById(l.tierId);
+  const qe = qualEval(l), done = qe.answered, missing = leadQualMissing(l), tier = tierById(l.tierId);
   const dash = '<span class="v dim">—</span>';
   const val = (v, k) => v ? `<span class="v">${k ? `<span class="k">${k}</span>` : ''}${escHtml(v)}</span>` : (k ? `<span class="v dim"><span class="k">${k}</span>—</span>` : dash);
   const block = (sec, title, inner) => `<button type="button" class="lc-block" data-lp="open" data-id="${l.id}" data-sec="${sec}" title="Edit ${title.toLowerCase()}"><h4>${title}</h4>${inner}${PEN_SVG}</button>`;
@@ -5503,13 +5509,13 @@ function leadDetailHtml(l, i){
       <span class="lc-code">${recordCode(l.id, 'lead')}</span>${tier ? tierBadgeHtml(tier) : ''}
       <span class="lc-name${l.projectName ? '' : ' empty'}">${escHtml(l.projectName || 'No project name yet')}</span>
       <span class="lc-type">${isCommercial ? 'Commercial' : 'Residential'}</span>
-      <span class="lc-pill" style="${leadStatusStyle(l.stageId)}">${escHtml(leadStageName(l))}</span>
+      <span class="lc-pill" style="${leadStatusStyle(l.stageId)}">${escHtml(leadStageName(l))}</span>${qualBadgeHtml(l)}${sfNotFitChip(l)}
     </div>
     <div class="lc-sum">
       ${block('contact', 'Contact', `${val(l.contact || (isCommercial ? l.company : ''))}${val(l.phone)}${val(l.email)}${extra ? `<span class="v dim">+${extra} additional</span>` : ''}`)}
       ${block('project', 'Project', `${val(l.source, 'Source')}${val(Number(l.estValue) > 0 ? money(l.estValue) : '', 'Ballpark')}${sfFactsHtml(l, val)}${val(tier ? tier.name : '', 'Tier')}${sfNotFitChip(l) ? `<span class="v">${sfNotFitChip(l)}</span>` : ''}`)}
       ${block('location', 'Location', `${l.address ? `<span class="v">${escHtml(l.address).replace(/\n/g, '<br>')}</span>` : dash}${l.postcode && !String(l.address || '').toUpperCase().includes(l.postcode) ? `<span class="v"><b>${escHtml(l.postcode)}</b></span>` : ''}`)}
-      ${block('qualification', 'Qualification', `<span class="v"><b>${done} of ${QUAL_FIELDS.length} complete</b></span>${missing.length ? `<span class="miss">Missing: ${escHtml(missing.join(', '))}</span>` : '<span class="miss ok">✓ Ready to promote</span>'}`)}
+      ${block('qualification', 'Qualification', `<span class="v"><b>${done} of ${qe.total} answered</b> ${qualBadgeHtml(l)}</span>${missing.length ? `<span class="miss">Holding promotion: ${escHtml(missing.join(', '))}</span>` : '<span class="miss ok">✓ Ready to promote</span>'}`)}
     </div>
     <div class="lc-cols">
       <div class="lc-col">${recTasksHtml('lead', l, { compact: true, limit: 4 })}</div>
@@ -5519,7 +5525,7 @@ function leadDetailHtml(l, i){
     <div class="lc-foot">
       ${leadQualified(l)
         ? `<button class="promote-btn" data-action="promote-lead" data-id="${l.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Promote to sales</button>`
-        : `<button class="promote-btn" disabled title="Fill all four qualification fields to unlock promotion">Promote to sales</button><span class="gate-msg">Needs ${escHtml(missing.join(', '))} first.</span>`}
+        : `<button class="promote-btn blocked" data-action="promote-lead" data-id="${l.id}" title="${escAttr(qualGateMsg(l))}" aria-disabled="true">Promote to sales</button><span class="gate-msg">${escHtml(qualGateMsg(l))}</span>`}
       <button class="btn secondary lost-btn" style="margin-left:0;" data-action="mark-lost" data-id="${l.id}">Mark as lost</button>
       <button class="btn secondary edit-btn" data-lp="open" data-id="${l.id}" data-sec="">Edit details</button>
     </div>
@@ -5535,7 +5541,6 @@ function renderLeads(){
     const isCommercial = l.leadType === 'Commercial';
     const last = leadLastContact(l);
     const active = lp && lp.kind === 'lead' && lp.id === l.id ? ' lead-active' : '';
-    const qd = leadQualDone(l);
     html += `<tr class="lead-row ${isCommercial?'lead-com':'lead-res'}${active}">
       <td><button class="icon-btn expand${isOpen?' open':''}" data-action="toggle-lead" data-id="${l.id}" title="Detail & comms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></td>
       <td class="code-cell">${recordCode(l.id,'lead')}</td>
@@ -5547,7 +5552,7 @@ function renderLeads(){
         : `<input class="computed" disabled value="—" title="Residential — no company">`}</td>
       <td><input class="lead-pc${l.postcodeManual?' manual':''}" data-tab="leads" data-idx="${i}" data-field="postcode" value="${escAttr(l.postcode||'')}" title="${l.postcodeManual?'Set manually — clear this cell to go back to automatic':'Filled automatically from the address — type to override'}"></td>
       <td class="computed" title="Pulled from the latest communication entry">${last?fmtDisplay(toDate(last)):'—'}</td>
-      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select><span class="qual-chip${qd === QUAL_FIELDS.length ? ' q-full' : (qd ? ' q-some' : '')}" title="Qualification: ${qd} of ${QUAL_FIELDS.length} complete">${qd}/${QUAL_FIELDS.length}</span></div></td>
+      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(l)}${sfNotFitChip(l)}</div></td>
       <td><button class="icon-btn" data-action="delete-lead" data-idx="${i}" title="Delete lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
     </tr>`;
     if(isOpen){ html += `<tr class="detail-row${active}"><td colspan="10">${leadDetailHtml(l, i)}</td></tr>`; }
@@ -5588,11 +5593,6 @@ function lpContactCardHtml(l, i, c, ci){
     ${lpEmailField(i, c.email, o)}
   </div>`;
 }
-function lpQualNoteHtml(l){
-  const done = leadQualDone(l), missing = leadQualMissing(l);
-  return { count: `${done} of ${QUAL_FIELDS.length} complete`,
-    note: missing.length ? `Promotion to the Sales Pipeline needs all four. Still needed: ${missing.join(', ')}.` : 'All four are complete — this lead can be promoted to the Sales Pipeline.' };
-}
 function lpBodyHtml(l, i){
   const isCommercial = l.leadType === 'Commercial', q = lpQualNoteHtml(l), contacts = l.contacts || [];
   const miss = f => l[f] ? '' : ' missing';
@@ -5616,18 +5616,15 @@ function lpBodyHtml(l, i){
       ${lpFieldHtml('Ballpark value (£)', `<input type="number" step="1" min="0" data-tab="leads" data-idx="${i}" data-field="estValue" value="${l.estValue === '' || l.estValue == null ? '' : l.estValue}" placeholder="A rough figure, sets the tier automatically">`)}
       ${sfEditHtml('lead', l, i, { skipValue: true })}
       ${lpFieldHtml('Tier', `<select data-tab="leads" data-idx="${i}" data-field="tierSel" id="lpTier">${lpTierOptions(l)}</select>`)}
-      ${lpFieldHtml('Lead status', `<div class="lp-statusrow"><select data-tab="leads" data-idx="${i}" data-field="stageId">${stageOpts}</select>${leadQualified(l) ? `<button type="button" class="promote-btn" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button>` : ''}</div>`)}
+      ${lpFieldHtml('Lead status', `<div class="lp-statusrow"><select data-tab="leads" data-idx="${i}" data-field="stageId">${stageOpts}</select><button type="button" class="promote-btn${leadQualified(l) ? '' : ' blocked'}" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button></div>`)}
     </section>
     <section class="lp-sec" id="lp-sec-location" data-sec="location"><h3>Location</h3>
       ${lpFieldHtml('Address', `<textarea rows="3" data-tab="leads" data-idx="${i}" data-field="address" placeholder="Site address">${escAttr(l.address || '')}</textarea>`)}
       ${lpFieldHtml('Postcode', lpInput(i, 'postcode', l.postcode, { cls: 'lp-pc' + (l.postcodeManual ? ' manual' : ''), ph: 'Filled from the address' }) + `<div class="lp-hint" id="lpPcHint">${lpPcHint(l)}</div>`)}
     </section>
     <section class="lp-sec" id="lp-sec-qualification" data-sec="qualification"><h3>Qualification</h3>
-      <div class="lp-qsum"><b id="lpQualCount">${q.count}</b><span id="lpQualNote">${q.note}</span></div>
-      <div class="lp-f${miss('budget')}" data-qf="budget"><label>Budget indication</label>${lpInput(i, 'budget', l.budget, { ph: 'e.g. £15–20k' })}</div>
-      <div class="lp-f${miss('decisionMaker')}" data-qf="decisionMaker"><label>Decision-maker</label>${lpInput(i, 'decisionMaker', l.decisionMaker, { ph: 'Who signs off?' })}</div>
-      <div class="lp-f${miss('timeline')}" data-qf="timeline"><label>Desired timeline</label>${lpInput(i, 'timeline', l.timeline, { ph: 'When?' })}</div>
-      <div class="lp-f${miss('competition')}" data-qf="competition"><label>Competition</label>${lpInput(i, 'competition', l.competition, { ph: 'Other quotes?' })}</div>
+      <div class="lp-qsum"><b id="lpQualCount">${q.count}</b> <span id="lpQualBadge">${qualBadgeHtml(l)}</span><span id="lpQualNote">${q.note}</span></div>
+      <div id="lpQualRows">${qualEditHtml('lead', l, i)}</div>
     </section>${lp && lp.timeline ? `
     <section class="lp-sec" id="lp-sec-timeline" data-sec="timeline"><h3>Timeline</h3><div id="lpTimeline">${lpTimelineHtml(l, i)}</div></section>` : ''}`;
 }
@@ -5711,11 +5708,10 @@ function lpSync(){
   lpEl('lpHeadInfo').innerHTML = lpHeadHtml(l);
   const q = lpQualNoteHtml(l);
   lpEl('lpQualCount').textContent = q.count; lpEl('lpQualNote').textContent = q.note;
-  document.querySelectorAll('#lpBody [data-qf]').forEach(w => w.classList.toggle('missing', !l[w.dataset.qf]));
+  const qb = document.getElementById('lpQualBadge'); if(qb) qb.innerHTML = qualBadgeHtml(l);
+  qualEval(l).items.forEach(x => { const w = document.querySelector(`#lpBody [data-qq="${x.q.id}"]`); if(w) w.classList.toggle('missing', x.mode === 'gate' && x.st !== 'ok'); });
   const srow = document.querySelector('#lpBody .lp-statusrow');   // “Promote to Sales” appears the moment the lead is fully qualified
-  if(srow){ const b = srow.querySelector('[data-action="promote-lead"]'), q = leadQualified(l);
-    if(q && !b) srow.insertAdjacentHTML('beforeend', `<button type="button" class="promote-btn" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button>`);
-    else if(!q && b) b.remove(); }
+  if(srow){ const b = srow.querySelector('[data-action="promote-lead"]'); if(b) b.classList.toggle('blocked', !leadQualified(l)); }
   const tl = lpEl('lpTimeline');
   if(tl && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#lpTimeline .comm-entry'))){
     const ae = document.activeElement, noteFocus = ae && ae.dataset && ae.dataset.lc === 'note' && tl.contains(ae), keep = noteFocus ? ae.value : '', top = tl.querySelector('.comms-scroll');
@@ -11830,7 +11826,8 @@ function promoteLead(id){
   const idx = state.leads.findIndex(l => l.id === id);
   if(idx < 0) return;
   const l = state.leads[idx];
-  if(l.lost || !leadQualified(l)) return;   // the qualification gate holds whatever the lead stages are called
+  if(l.lost) return;
+  if(!leadQualified(l)){ qualRefuse(l); return; }   // the qualification gate holds whatever the lead stages are called; there is no override
   const snap = jclone(l); delete snap.salesHold;
   let rec;
   if(l.salesHold){   // it has been here before: bring back the deal exactly as it was, with the lead's latest details
@@ -11985,7 +11982,7 @@ function leadInfoHtml(r){
     <div class="stage-label-row">Contact</div><dl class="ro-grid">${row('Contact name', l.contact)}${row('Company', l.company)}${row('Phone', l.phone)}${row('Email', l.email)}${row('Additional contacts', extra)}</dl>
     <div class="stage-label-row">Project</div><dl class="ro-grid">${row('Project name', l.projectName)}${row('Lead type', l.leadType)}${row('Source', l.source)}${row('Ballpark value', Number(l.estValue) > 0 ? money(l.estValue) : '')}${row('Job type', (state.jobTypes.find(j => j.id === l.jobTypeId) || {}).name || '')}${row('Estimated duration', sfDays(l) ? sfDays(l) + ' days' : '')}${row('Preferred start', sfIso(l.prefStart) ? dShow(l.prefStart) : '')}${row('Deadline', sfIso(l.deadline) ? dShow(l.deadline) : '')}${row('Tier', tier ? tier.name : '')}${snap ? row('Lead status', st ? st.name : '') : ''}</dl>
     <div class="stage-label-row">Location</div><dl class="ro-grid">${row('Address', l.address)}${row('Postcode', l.postcode)}</dl>
-    <div class="stage-label-row">Qualification</div><dl class="ro-grid">${row('Budget', l.budget)}${row('Decision-maker', l.decisionMaker)}${row('Desired timeline', l.timeline)}${row('Competition', l.competition)}</dl>
+    <div class="stage-label-row">Qualification ${qualBadgeHtml(l)}</div><dl class="ro-grid">${qualEval(l).items.map(x => row(x.q.name, x.a + (x.r ? ' (' + x.r + ')' : ''))).join('')}</dl>
     <div class="stage-label-row">Lead record</div><dl class="ro-grid">${row('Lead came in', l.createdAt ? pwD(l.createdAt) : '')}${row('Lead notes', snap ? l.notes : (r.leadNotes || ''))}</dl>
     <div class="stage-label-row">Lead timeline${snap ? ' (as promoted)' : ''}</div><div class="comms-scroll">${comms || '<div class="breakdown-hint">No timeline entries.</div>'}</div>
   </div>`;
@@ -17741,9 +17738,8 @@ function rpInvoicesTile(p){
   return `<div class="rp-card"><h4>Invoices</h4>${rows.length ? rows.map(row).join('') : '<div class="pw-empty">No invoice schedule yet.</div>'}</div>`;
 }
 function rpQualTile(p){
-  const snap = p.leadSnapshot || {}, done = QUAL_FIELDS.filter(([k]) => snap[k] || p[k]).length, score = done === QUAL_FIELDS.length ? 'Strong' : done >= 2 ? 'Fair' : 'Weak';
-  const rows = QUAL_FIELDS.map(([k, n]) => `<div class="rp-row"><span class="rp-dim">${n}</span><span>${escHtml(snap[k] || p[k] || '—')}</span></div>`).join('');
-  return `<div class="rp-card"><h4>Qualification ${snap && Object.keys(snap).length ? `<span class="rp-pill ${done === 4 ? 'ok' : done >= 2 ? 'warn' : 'neu'}">${score} · ${done} of ${QUAL_FIELDS.length}</span>` : ''}</h4>${rows}<div class="rp-hint">Carried from the lead stage.</div></div>`;
+  const snap = p.leadSnapshot || {}, has = Object.keys(snap).length || QUAL_FIELDS.some(([k]) => p[k]);
+  return `<div class="rp-card"><h4>Qualification ${has ? qualBadgeHtml(p) : ''}</h4>${qualRowsHtml(p)}<div class="rp-hint">Carried from the lead stage. The questions and their weights are in Settings, Selling.</div></div>`;
 }
 function rpOverviewHtml(p){
   return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${varProjectCard(p)}${rpQualTile(p)}</div>`;
@@ -18523,7 +18519,9 @@ function sfFactsHtml(r, val){
 }
 function sfApply(el){
   const d = el.dataset, r = sfRec(d.kind, d.id); if(!r) return; const f = d.field, v = el.value;
-  if(f === 'estValue'){ const n = parseFloat(v); r.estValue = (v === '' || isNaN(n)) ? '' : Math.max(0, n); if(d.kind === 'lead' && typeof applyAutoTier === 'function') applyAutoTier(r); }
+  if(f === 'qa'){ r.qa = r.qa && typeof r.qa === 'object' ? r.qa : {}; r.qa[d.qid] = v.trim(); }
+  else if(f === 'qrate'){ r.qRate = r.qRate && typeof r.qRate === 'object' ? r.qRate : {}; r.qRate[d.qid] = ['good', 'unclear', 'poor'].includes(v) ? v : ''; }
+  else if(f === 'estValue'){ const n = parseFloat(v); r.estValue = (v === '' || isNaN(n)) ? '' : Math.max(0, n); if(d.kind === 'lead' && typeof applyAutoTier === 'function') applyAutoTier(r); }
   else if(f === 'estDays'){ const n = Math.round(Number(v)); r.estDays = (v === '' || isNaN(n)) ? '' : Math.max(0, n); }
   else if(f === 'jobTypeId'){ r.jobTypeId = state.jobTypes.some(j => j.id === v) ? v : ''; }
   else if(f === 'prefStart' || f === 'deadline'){ r[f] = sfIso(v); }
@@ -18608,6 +18606,113 @@ document.addEventListener('change', (e) => {
   const el = e.target, d = el.dataset; if(!d || !d.sl || !d.k || !SL_LISTS[d.k] || !state) return;
   const it = SL_LISTS[d.k].get().find(x => x.id === d.id); if(!it) return;
   if(d.sl === 'name') it.name = el.value.trim() || it.name; else if(d.sl === 'notfit') it.notFit = el.checked; else return;
+  saveState(); render();
+});
+
+/* =====================================================================
+   STEP 2: QUALIFICATION GATES
+   Questions, weights and gate/guide mode live in Settings, Selling (state.qualQuestions, settings.qualGateDefault).
+   The four starting questions keep their answers in the lead's existing fields (decisionMaker, budget, competition, timeline), so every
+   existing answer is still there; any question you add stores its answer in rec.qa[id]. A rating (rec.qRate[id]: good / unclear / poor) sits
+   beside an answer. An answer with no rating counts as good, so leads that were already fully answered stay promotable.
+   Score: Weak if a hard-gate answer is rated Poor or the weighted score is under 40%; Strong if it is 75% or more and every hard gate is
+   satisfied; otherwise Unclear. A lead with nothing answered yet is Unclear.
+   ===================================================================== */
+const SEL_QUALS = [['qq_decision', 'Decision maker', 'decisionMaker', 3, 'Who signs off?'], ['qq_budget', 'Budget', 'budget', 3, 'e.g. £15–20k'], ['qq_competition', 'Competition', 'competition', 2, 'Other quotes?'], ['qq_timeline', 'Timeline', 'timeline', 2, 'When?']];
+function ensureSellingModel2(o){
+  const str = v => v == null ? '' : String(v);
+  let q = Array.isArray(o.qualQuestions) ? o.qualQuestions.filter(x => x && typeof x === 'object' && x.id) : [];
+  if(!q.length) q = SEL_QUALS.map(([id, name, field, weight, ph]) => ({ id, name, field, weight, mode: 'default', ph }));
+  q = sortByOrder(q).map(x => { const w = Math.round(Number(x.weight)); return { id: String(x.id), name: str(x.name).trim() || 'Question', field: str(x.field), weight: (w >= 1 && w <= 5) ? w : 2, mode: x.mode === 'gate' || x.mode === 'guide' ? x.mode : 'default', ph: str(x.ph), order: x.order }; });
+  renumberStages(q); o.qualQuestions = q;
+  const st = o.settings = o.settings || {}; st.qualGateDefault = st.qualGateDefault === 'guide' ? 'guide' : 'gate';
+  if(typeof ensureSellingModel3 === 'function') ensureSellingModel3(o);
+}
+function qaGet(rec, q){ const f = r => q.field ? r[q.field] : (r.qa || {})[q.id]; let v = f(rec); if(isBlank(v) && rec.leadSnapshot) v = f(rec.leadSnapshot); return v == null ? '' : String(v).trim(); }
+function qrGet(rec, q){ const r = (rec.qRate || {})[q.id] || (rec.leadSnapshot && (rec.leadSnapshot.qRate || {})[q.id]) || ''; return ['good', 'unclear', 'poor'].includes(r) ? r : ''; }
+function qqMode(q){ return q.mode === 'gate' || q.mode === 'guide' ? q.mode : state.settings.qualGateDefault; }
+const QQ_WHY = { open: 'not answered yet', poor: 'answered, but rated Poor', unclear: 'answered, but rated Unclear' };
+function qualEval(rec){
+  const items = state.qualQuestions.map(q => { const a = qaGet(rec, q), r = qrGet(rec, q), st = !a ? 'open' : r === 'poor' ? 'poor' : r === 'unclear' ? 'unclear' : 'ok'; return { q, a, r, st, mode: qqMode(q) }; });
+  const blocking = items.filter(x => x.mode === 'gate' && x.st !== 'ok'), answered = items.filter(x => x.a).length;
+  let tw = 0, sw = 0; items.forEach(x => { const w = x.q.weight || 1; tw += w; sw += w * (x.st === 'ok' ? 1 : x.st === 'unclear' ? 0.5 : 0); });
+  const pct = tw ? sw / tw : 0, poorGate = items.some(x => x.mode === 'gate' && x.st === 'poor');
+  const key = !answered ? 'unclear' : (poorGate || pct < 0.4) ? 'weak' : (pct >= 0.75 && !blocking.length) ? 'strong' : 'unclear';
+  return { items, blocking, answered, total: items.length, pct, key };
+}
+const QUAL_LABEL = { strong: 'Strong', unclear: 'Unclear', weak: 'Weak' }, QUAL_CLS = { strong: 'ok', unclear: 'warn', weak: 'bad' }, QUAL_SYM = { strong: '✓', unclear: '▲', weak: '!' };
+function qualBadgeHtml(rec){
+  if(!state.qualQuestions.length) return '';
+  const e = qualEval(rec);
+  return `<span class="sf-chip ${QUAL_CLS[e.key]} qual-score" title="Qualification: ${e.answered} of ${e.total} answered, scored ${Math.round(e.pct * 100)}%${e.blocking.length ? '. Holding promotion: ' + escAttr(e.blocking.map(x => x.q.name).join(', ')) : ''}">${QUAL_SYM[e.key]} ${QUAL_LABEL[e.key]}</span>`;
+}
+function qualGateMsg(rec){
+  const e = qualEval(rec); if(!e.blocking.length) return '';
+  return 'Held by: ' + e.blocking.map(x => `${x.q.name} (${QQ_WHY[x.st]})`).join('; ') + '. Answer it, or change it to a guide in Settings, Selling.';
+}
+/* the old helpers, now driven by the settings (every other part of the app keeps calling these) */
+function leadQualDone(l){ return qualEval(l).answered; }
+function leadQualMissing(l){ return qualEval(l).blocking.map(x => x.q.name); }
+function leadQualified(l){ return !qualEval(l).blocking.length; }
+/* the questions as editable rows. kind 'lead' saves through the lead's own fields; 'sales' through the deal's */
+function qualEditHtml(kind, rec, idx){
+  const tab = kind === 'lead' ? 'leads' : 'pipeline', e = qualEval(rec), base = `data-tab="sellf" data-kind="${kind}" data-id="${rec.id}"`;
+  return e.items.map(x => {
+    const q = x.q, ans = q.field
+      ? `<input type="text" autocomplete="off" data-tab="${tab}" data-idx="${idx}" data-field="${q.field}" value="${escAttr(rec[q.field] || '')}" placeholder="${escAttr(q.ph || '')}" aria-label="${escAttr(q.name)}">`
+      : `<input type="text" autocomplete="off" ${base} data-field="qa" data-qid="${escAttr(q.id)}" value="${escAttr((rec.qa || {})[q.id] || '')}" placeholder="${escAttr(q.ph || '')}" aria-label="${escAttr(q.name)}">`;
+    const rate = `<select ${base} data-field="qrate" data-qid="${escAttr(q.id)}" aria-label="${escAttr(q.name)} rating"><option value=""${!x.r ? ' selected' : ''}>Rating</option><option value="good"${x.r === 'good' ? ' selected' : ''}>Good</option><option value="unclear"${x.r === 'unclear' ? ' selected' : ''}>Unclear</option><option value="poor"${x.r === 'poor' ? ' selected' : ''}>Poor</option></select>`;
+    return `<div class="lp-f lp-q${x.mode === 'gate' && x.st !== 'ok' ? ' missing' : ''}" data-qq="${escAttr(q.id)}"><label>${escHtml(q.name)} <span class="sf-chip ${x.mode === 'gate' ? 'bad' : ''}" title="${x.mode === 'gate' ? 'A hard gate: this must be answered, and not rated Unclear or Poor, before the lead can be promoted' : 'A guide: it counts towards the score but never blocks promotion'}">${x.mode === 'gate' ? 'Gate' : 'Guide'}</span></label><div class="lq-row">${ans}${rate}</div></div>`;
+  }).join('');
+}
+function lpQualNoteHtml(l){
+  const e = qualEval(l), msg = qualGateMsg(l);
+  return { count: `${e.answered} of ${e.total} answered`, note: msg || (e.total ? 'Every hard gate is satisfied: this lead can be promoted to the Sales Pipeline.' : 'There are no qualification questions set up in Settings, Selling.') };
+}
+/* answers carried across: the rows for a read-only view (sales card shows them editable, the project tile reads them) */
+function qualRowsHtml(rec){
+  return qualEval(rec).items.map(x => `<div class="rp-row"><span class="rp-dim">${escHtml(x.q.name)}${x.mode === 'gate' ? '' : ' <span class="rp-dim">(guide)</span>'}</span><span>${escHtml(x.a || '—')}${x.r ? ` <span class="sf-chip ${x.r === 'good' ? 'ok' : x.r === 'poor' ? 'bad' : 'warn'}">${x.r[0].toUpperCase() + x.r.slice(1)}</span>` : ''}</span></div>`).join('');
+}
+/* a blocked promotion says what is holding it and takes you to the question */
+function qualRefuse(l){
+  const msg = qualGateMsg(l);
+  showToast(msg, null, 14000);
+  if(typeof openLeadPanel === 'function') openLeadPanel(l.id, 'qualification');
+}
+
+/* ---------- Settings > Selling: the qualification card ---------- */
+const SEL_SET_CARDS = [];
+SEL_SET_CARDS.push(['Qualification gates', () => {
+  const list = state.qualQuestions, d = state.settings.qualGateDefault;
+  return `<p class="q-help" style="margin:0 0 8px;">The questions asked of every lead. A <b>hard gate</b> must be answered, and not rated Unclear or Poor, before the lead can be promoted to the Sales Pipeline. A <b>guide</b> counts towards the score but never blocks. There is no override: the way through is to answer the question, or switch it to a guide here. The weight (1 to 5) is how much an answer counts towards the score: Strong, Unclear or Weak.</p>
+    <div class="lp-f" style="max-width:360px;"><label>Default for every question</label><select data-qs="default" aria-label="Default gate mode"><option value="gate"${d === 'gate' ? ' selected' : ''}>Hard gate</option><option value="guide"${d === 'guide' ? ' selected' : ''}>Guide</option></select></div>
+    <div class="stage-head qs-head"><span>Order</span><span>Question</span><span>Weight</span><span>Gate mode</span><span></span></div>
+    <div class="stage-list">${list.map((q, i) => `<div class="stage-row qs-row">
+      <div class="tier-move"><button type="button" class="icon-btn" data-qs="up" data-id="${escAttr(q.id)}" title="Move up" aria-label="Move up"${i === 0 ? ' disabled style="opacity:.3"' : ''}>${UP_SVG}</button><button type="button" class="icon-btn" data-qs="down" data-id="${escAttr(q.id)}" title="Move down" aria-label="Move down"${i === list.length - 1 ? ' disabled style="opacity:.3"' : ''}>${DOWN_SVG}</button></div>
+      <input type="text" data-qs="name" data-id="${escAttr(q.id)}" value="${escAttr(q.name)}" aria-label="Question">
+      <select data-qs="weight" data-id="${escAttr(q.id)}" aria-label="Weight">${[1, 2, 3, 4, 5].map(n => `<option${q.weight === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
+      <select data-qs="mode" data-id="${escAttr(q.id)}" aria-label="Gate mode"><option value="default"${q.mode === 'default' ? ' selected' : ''}>Use default (${d === 'gate' ? 'hard gate' : 'guide'})</option><option value="gate"${q.mode === 'gate' ? ' selected' : ''}>Hard gate</option><option value="guide"${q.mode === 'guide' ? ' selected' : ''}>Guide</option></select>
+      <button type="button" class="icon-btn" data-qs="del" data-id="${escAttr(q.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('')}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-qs="add">+ Add a question</button>
+    <p class="q-help" style="margin:10px 0 0;">Deleting a question hides it. The answers already typed stay on the leads.</p>`;
+}]);
+function renderSellingSettings2(){
+  const el = document.getElementById('sellMoreCards'); if(!el) return;
+  el.innerHTML = SEL_SET_CARDS.map(([label, fn], i) => `<div class="section-label">${label}</div><div class="card" data-selcard="${i}">${fn()}</div>`).join('');
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-qs]'); if(!b || !state || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+  const list = state.qualQuestions, a = b.dataset.qs, i = list.findIndex(x => x.id === b.dataset.id);
+  if(a === 'add'){ const q = { id: selId('qq_'), name: 'New question', field: '', weight: 2, mode: 'default', ph: '' }; list.push(q); renumberStages(list); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-qs="name"][data-id="${q.id}"]`); if(el){ el.focus(); el.select(); } }, 30); return; }
+  if(i < 0) return;
+  if(a === 'up' || a === 'down'){ const j = i + (a === 'up' ? -1 : 1); if(j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; renumberStages(list); saveState(); render(); return; }
+  if(a === 'del'){ const gone = list.splice(i, 1)[0]; renumberStages(list); undoDeleted('Question deleted: ' + String(gone.name).slice(0, 40), ['qualQuestions'], i, gone); saveState(); render(); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.qs || !state) return;
+  if(d.qs === 'default'){ state.settings.qualGateDefault = el.value === 'guide' ? 'guide' : 'gate'; saveState(); render(); return; }
+  const q = state.qualQuestions.find(x => x.id === d.id); if(!q) return;
+  if(d.qs === 'name') q.name = el.value.trim() || q.name; else if(d.qs === 'weight') q.weight = Math.max(1, Math.min(5, Math.round(Number(el.value)) || 2)); else if(d.qs === 'mode') q.mode = ['gate', 'guide'].includes(el.value) ? el.value : 'default'; else return;
   saveState(); render();
 });
 
