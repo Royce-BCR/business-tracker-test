@@ -2517,6 +2517,29 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 }
 
 @media (max-width: 999px), (pointer: coarse) { .rp-hint .sp-link, .rp-ro .sp-link { padding: 14px 6px; margin: -14px -6px; position: relative; } }
+/* BT:css-selling begin */
+  /* Stage 3: selling */
+  .sf-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--bt-neu-bg); color: var(--bt-neu-fg); white-space: nowrap; vertical-align: middle; }
+  .sf-chip.bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
+  .sf-chip.warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); }
+  .sf-chip.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); }
+  .sf-warn { color: var(--bt-bad-fg); font-weight: 600; }
+  .sf-calc { padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; background: var(--bt-neu-bg); }
+  .sf-calc .rp-tag { margin-left: 6px; }
+  .sf-phase { display: grid; grid-template-columns: minmax(0, 1fr) 84px 34px; gap: 6px; margin-bottom: 6px; align-items: center; }
+  .sf-box { border: 1px solid var(--line); border-radius: 10px; background: var(--bt-card); padding: 12px 14px; margin: 10px 0; max-width: 760px; }
+  .sf-box h4 { margin: 0 0 8px; font-size: 13px; }
+  .sf-box .lp-f { margin-bottom: 10px; }
+  .lp-opt { font-weight: 400; color: var(--text-muted); font-size: 11px; }
+  .lc-pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--bt-neu-bg); color: var(--bt-neu-fg); white-space: nowrap; }
+  .lc-pill.lc-lc_lead { background: var(--bt-info-bg); color: var(--bt-info-fg); border-color: var(--bt-info-bd); }
+  .lc-pill.lc-lc_opportunity { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); }
+  .lc-pill.lc-lc_customer { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); }
+  .sl-row { grid-template-columns: 58px minmax(0, 1fr) auto 34px; }
+  .sl-row .sl-nf { white-space: nowrap; font-size: 12px; }
+  .sl-row input[type=text] { min-width: 0; }
+
+/* BT:css-selling end */
 </style>
 </head>
 <body>
@@ -2980,6 +3003,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 
     <div class="section-label">Units and categories</div>
     <div class="card" id="qtUnitsCard"></div>
+        </section>
+
+        <section class="set-sec" data-sec="selling">
+    <div class="section-label">Job types</div>
+    <div class="card" id="sellJobTypesCard"></div>
+
+    <div class="section-label">Customer lifecycle</div>
+    <div class="card" id="sellLifecycleCard"></div>
+    <div id="sellMoreCards"></div>
         </section>
 
         <section class="set-sec" data-sec="docs">
@@ -3553,7 +3585,7 @@ function ensureQuoteModel(o, seedAction){
 
 /* ---------- default state ---------- */
 function defaultState(){
-  return crmEnsureAll(ensureQuoteDocModel(ensureQuoteModel(ensureSupplierModel(ensureTaskModel(ensureStageModel({
+  return ensureSellingModel(crmEnsureAll(ensureQuoteDocModel(ensureQuoteModel(ensureSupplierModel(ensureTaskModel(ensureStageModel({
     startingCash: 2000,
     settings: {
       tradeAccountDays: 30,
@@ -3691,7 +3723,7 @@ function defaultState(){
     branding: defaultBranding(),
     quotes: [], nextQuoteId: 1, nextJobNumber: 1,
     assets: [], assetPlan: [], purchaseOrders: [], poNextNo: 1
-  }))), true), true));
+  }))), true), true)));
 }
 
 const NAV_KEY = STORAGE_PREFIX + 'business-tracker-nav';   // linked navigation (see "linked navigation" further down)
@@ -3736,6 +3768,7 @@ function mergeDefaults(loaded){
   out.settings.quoteSampleSeeded = !!(loaded.settings && loaded.settings.quoteSampleSeeded);
   out.settings.quoteLinkSeeded = !!(loaded.settings && loaded.settings.quoteLinkSeeded);
   out.settings.quoteDocSeeded = !!(loaded.settings && loaded.settings.quoteDocSeeded);
+  ensureSellingModel(out);   // Stage 3: job types, customer lifecycle, qualification questions (defaults only)
   ensureQuoteModel(out, true);   // old backups: quote settings, units and line categories get defaults; the insurance Action is added once
   docEnsureModel(out);   // documents & email: templates, numbering, bank details (all default safely)
   ensureQuoteDocModel(out, true);   // quotes: normalise, and load the sample quote once
@@ -4534,6 +4567,7 @@ function salesDetailHtml(r, i){
         </div>
         ${moveStripHtml('sales', r, i)}
         ${cxCustomerHtml('sales', r)}
+        <div class="sf-box"><h4>Value and timing ${sfNotFitChip(r)}</h4>${sfEditHtml('sales', r, i)}</div>
         ${recTasksHtml('sales', r)}
         ${quoteChipHtml(r.id)}
         <div class="detail-notes"><label>Notes</label><input data-tab="pipeline" data-idx="${i}" data-field="notes" value="${escAttr(r.notes||'')}"></div>
@@ -4708,13 +4742,17 @@ function tileHtml(pl, r, color){
   let rows = '', flag = '', edge = color;
   if(pl === 'lead'){
     edge = r.leadType === 'Commercial' ? 'var(--bt-lead-com)' : 'var(--bt-lead-res)';
-    if(Number(r.estValue) > 0) rows += `<div class="bd-t-row"><span class="k">Est. value</span><span>${money(r.estValue)}</span></div>`;
+    if(Number(r.estValue) > 0) rows += `<div class="bd-t-row"><span class="k">Ballpark</span><span>${money(r.estValue)}</span></div>`;
+    if(sfDays(r)) rows += `<div class="bd-t-row"><span class="k">Duration</span><span>${sfDays(r)} days</span></div>`;
+    if(sfIso(r.prefStart) || sfIso(r.deadline)) rows += `<div class="bd-t-row"><span class="k">${sfIso(r.deadline) ? 'Deadline' : 'Start'}</span><span>${dShow(sfIso(r.deadline) || r.prefStart)}</span></div>`;
+    if(jobNotFit(r)) flag = sfNotFitChip(r);
     const last = leadLastContact(r);
     rows += `<div class="bd-t-row"><span class="k">Last contacted</span><span>${last ? fmtDisplay(toDate(last)) : '—'}</span></div>`;
   } else if(pl === 'sales'){
     const roll = projectRollup(r);
     if(hasProbOverride(r)) flag = `<span class="bd-t-flag" title="This deal has its own percentage — moving it between stages does not change it">manual %</span>`;
     rows += `<div class="bd-t-row"><span class="k">Quote · ${Math.round(effectiveProb(r)*100)}%</span><span>${money(r.quoteValue)}</span></div>`;
+    if(jobNotFit(r)) flag += sfNotFitChip(r);
     if(roll.start) rows += `<div class="bd-t-row"><span class="k">Starts</span><span>${fmtDisplay(roll.start)}</span></div>`;
   } else {
     sub = '';
@@ -5469,7 +5507,7 @@ function leadDetailHtml(l, i){
     </div>
     <div class="lc-sum">
       ${block('contact', 'Contact', `${val(l.contact || (isCommercial ? l.company : ''))}${val(l.phone)}${val(l.email)}${extra ? `<span class="v dim">+${extra} additional</span>` : ''}`)}
-      ${block('project', 'Project', `${val(l.source, 'Source')}${val(Number(l.estValue) > 0 ? money(l.estValue) : '', 'Value')}${val(tier ? tier.name : '', 'Tier')}`)}
+      ${block('project', 'Project', `${val(l.source, 'Source')}${val(Number(l.estValue) > 0 ? money(l.estValue) : '', 'Ballpark')}${sfFactsHtml(l, val)}${val(tier ? tier.name : '', 'Tier')}${sfNotFitChip(l) ? `<span class="v">${sfNotFitChip(l)}</span>` : ''}`)}
       ${block('location', 'Location', `${l.address ? `<span class="v">${escHtml(l.address).replace(/\n/g, '<br>')}</span>` : dash}${l.postcode && !String(l.address || '').toUpperCase().includes(l.postcode) ? `<span class="v"><b>${escHtml(l.postcode)}</b></span>` : ''}`)}
       ${block('qualification', 'Qualification', `<span class="v"><b>${done} of ${QUAL_FIELDS.length} complete</b></span>${missing.length ? `<span class="miss">Missing: ${escHtml(missing.join(', '))}</span>` : '<span class="miss ok">✓ Ready to promote</span>'}`)}
     </div>
@@ -5575,7 +5613,8 @@ function lpBodyHtml(l, i){
         <button class="res${!isCommercial ? ' active' : ''}" data-action="set-lead-type" data-idx="${i}" data-val="Residential">Residential</button>
         <button class="com${isCommercial ? ' active' : ''}" data-action="set-lead-type" data-idx="${i}" data-val="Commercial">Commercial</button></div>`)}
       ${lpFieldHtml('Source', lpInput(i, 'source', l.source, { ph: 'e.g. Referral, Facebook group' }))}
-      ${lpFieldHtml('Estimated value (£)', `<input type="number" step="1" min="0" data-tab="leads" data-idx="${i}" data-field="estValue" value="${l.estValue === '' || l.estValue == null ? '' : l.estValue}" placeholder="Sets the tier automatically">`)}
+      ${lpFieldHtml('Ballpark value (£)', `<input type="number" step="1" min="0" data-tab="leads" data-idx="${i}" data-field="estValue" value="${l.estValue === '' || l.estValue == null ? '' : l.estValue}" placeholder="A rough figure, sets the tier automatically">`)}
+      ${sfEditHtml('lead', l, i, { skipValue: true })}
       ${lpFieldHtml('Tier', `<select data-tab="leads" data-idx="${i}" data-field="tierSel" id="lpTier">${lpTierOptions(l)}</select>`)}
       ${lpFieldHtml('Lead status', `<div class="lp-statusrow"><select data-tab="leads" data-idx="${i}" data-field="stageId">${stageOpts}</select>${leadQualified(l) ? `<button type="button" class="promote-btn" data-action="promote-lead" data-id="${l.id}">Promote to Sales →</button>` : ''}</div>`)}
     </section>
@@ -5688,6 +5727,7 @@ function lpSync(){
   const tier = lpEl('lpTier'); if(tier && document.activeElement !== tier) tier.innerHTML = lpTierOptions(l);
   const pc = document.querySelector('#lpBody input[data-field="postcode"]');
   if(pc){ if(document.activeElement !== pc) pc.value = l.postcode || ''; pc.classList.toggle('manual', !!l.postcodeManual); lpEl('lpPcHint').textContent = lpPcHint(l); }
+  if(typeof sfPanelSync === 'function') sfPanelSync(l);
 }
 function lpSaveStatus(msg){
   const el = lpEl('lpSaved'); if(!el || !lp) return;
@@ -6214,7 +6254,7 @@ document.addEventListener('change', (e) => {   // leaving the name box empty put
    A record carries its customer in CARRY_FIELDS. carryFields never blanks a filled-in value with an empty one, and custBackfill fills only gaps
    (from the original lead, then from the linked quote's customer / address / project), so nothing is lost when a record moves between pipelines. */
 function isBlank(v){ return v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length); }
-function carryFields(src, dst, fields){ (fields || CARRY_FIELDS).forEach(f => { if(src[f] === undefined) return; if(isBlank(src[f]) && !isBlank(dst[f])) return; dst[f] = jclone(src[f]); }); }
+function carryFields(src, dst, fields){ const none = v => isBlank(v) || (v && typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length); (fields || CARRY_FIELDS).forEach(f => { if(src[f] === undefined) return; if(none(src[f]) && !none(dst[f])) return; dst[f] = jclone(src[f]); }); }
 function custQuote(r){ return state.quotes.filter(x => (x.linkedIds || []).some(c => linkedRoot(c) === r.id)).sort((a, b) => (b.status === 'Accepted') - (a.status === 'Accepted') || b.version - a.version)[0] || null; }
 function custBackfill(r){
   const snap = r.leadSnapshot || null, q = custQuote(r), filled = [];
@@ -7957,6 +7997,7 @@ function renderSettings(){
   renderDashSettings();
   renderQuoteSettings();
   renderApprovalSettings();
+  renderSellingSettings();
   renderDocSettings();
 }
 /* ---------- Settings > Pipelines: blackout dates (no-work periods: holidays, shutdowns) shown as hatched bands on the Gantt and the project timeline ---------- */
@@ -11782,7 +11823,7 @@ document.addEventListener('click', (e) => { const b = e.target.closest && e.targ
      leadSnapshot  the lead as it was when promoted (the read-only "Original lead info" view)
      salesSnapshot the deal's own fields when it was promoted to a project (project only)
      salesHold / projectHold  what the record held in the stage it was returned from, so promoting again puts it all back. */
-const CARRY_FIELDS = ['contact','company','leadType','phone','email','contacts','source','projectName','address','postcode','postcodeManual','estValue','tierId','tierManual','budget','decisionMaker','timeline','competition','createdAt','leadNotes','contactIds','companyId'];   // contactIds / companyId: the CRM links travel with the deal. createdAt (when the lead came in) and leadNotes (the lead's own notes) used to be dropped on the way through
+const CARRY_FIELDS = ['contact','company','leadType','phone','email','contacts','source','projectName','address','postcode','postcodeManual','estValue','tierId','tierManual','budget','decisionMaker','timeline','competition','createdAt','leadNotes','contactIds','companyId','estDays','phases','prefStart','deadline','jobTypeId','qa','qRate'];   // contactIds / companyId: the CRM links travel with the deal. createdAt (when the lead came in) and leadNotes (the lead's own notes) used to be dropped on the way through
 const jclone = o => JSON.parse(JSON.stringify(o));
 function moveLog(rec, note){ rec.comms = rec.comms || []; rec.comms.push({ date: fmt(new Date()), note, created: Date.now(), src: 'move' }); }
 function promoteLead(id){
@@ -11806,6 +11847,7 @@ function promoteLead(id){
       contact: l.contact||'', company: l.company||'', leadType: l.leadType||'Residential', phone: l.phone||'', email: l.email||'', contacts: l.contacts||[], source: l.source||'',
       projectName: l.projectName||'', address: l.address||'', postcode: l.postcode||'', postcodeManual: !!l.postcodeManual,
       estValue: l.estValue===undefined?'':l.estValue, tierId: l.tierId||'', tierManual: !!l.tierManual,
+      estDays: l.estDays===undefined?'':l.estDays, phases: jclone(l.phases||[]), prefStart: l.prefStart||'', deadline: l.deadline||'', jobTypeId: l.jobTypeId||'', qa: jclone(l.qa||{}), qRate: jclone(l.qRate||{}),
       budget: l.budget||'', decisionMaker: l.decisionMaker||'', timeline: l.timeline||'', competition: l.competition||'',
       contactIds: (l.contactIds || []).slice(), companyId: l.companyId || '',
       comms: l.comms||[], contractSigned: '', createdAt: l.createdAt || '', leadNotes: l.notes || '',
@@ -11941,7 +11983,7 @@ function leadInfoHtml(r){
   return `<div class="detail-box lead-info">
     <div class="gate-msg ok" style="margin-bottom:10px;">${snap ? 'The lead exactly as it was when it was promoted. Read-only.' : 'This record was promoted before original lead details were kept, so this shows the lead details carried across. Read-only.'}</div>
     <div class="stage-label-row">Contact</div><dl class="ro-grid">${row('Contact name', l.contact)}${row('Company', l.company)}${row('Phone', l.phone)}${row('Email', l.email)}${row('Additional contacts', extra)}</dl>
-    <div class="stage-label-row">Project</div><dl class="ro-grid">${row('Project name', l.projectName)}${row('Lead type', l.leadType)}${row('Source', l.source)}${row('Estimated value', Number(l.estValue) > 0 ? money(l.estValue) : '')}${row('Tier', tier ? tier.name : '')}${snap ? row('Lead status', st ? st.name : '') : ''}</dl>
+    <div class="stage-label-row">Project</div><dl class="ro-grid">${row('Project name', l.projectName)}${row('Lead type', l.leadType)}${row('Source', l.source)}${row('Ballpark value', Number(l.estValue) > 0 ? money(l.estValue) : '')}${row('Job type', (state.jobTypes.find(j => j.id === l.jobTypeId) || {}).name || '')}${row('Estimated duration', sfDays(l) ? sfDays(l) + ' days' : '')}${row('Preferred start', sfIso(l.prefStart) ? dShow(l.prefStart) : '')}${row('Deadline', sfIso(l.deadline) ? dShow(l.deadline) : '')}${row('Tier', tier ? tier.name : '')}${snap ? row('Lead status', st ? st.name : '') : ''}</dl>
     <div class="stage-label-row">Location</div><dl class="ro-grid">${row('Address', l.address)}${row('Postcode', l.postcode)}</dl>
     <div class="stage-label-row">Qualification</div><dl class="ro-grid">${row('Budget', l.budget)}${row('Decision-maker', l.decisionMaker)}${row('Desired timeline', l.timeline)}${row('Competition', l.competition)}</dl>
     <div class="stage-label-row">Lead record</div><dl class="ro-grid">${row('Lead came in', l.createdAt ? pwD(l.createdAt) : '')}${row('Lead notes', snap ? l.notes : (r.leadNotes || ''))}</dl>
@@ -13803,6 +13845,7 @@ const SET_SECTIONS = [
   { id: 'suppliers', label: 'Suppliers' },
   { id: 'finance',   label: 'Finance' },
   { id: 'quotes',    label: 'Quotes & pricing' },
+  { id: 'selling',   label: 'Selling' },
   { id: 'docs',      label: 'Documents & email' },
   { id: 'approvals', label: 'Approvals' },
   { id: 'dashboard', label: 'Dashboard' },
@@ -14361,6 +14404,7 @@ function applyFieldChange(el){
   }
   else if(tab==='leadcontact'){ const l = state.leads[Number(el.dataset.idx)], c = l && l.contacts && l.contacts[Number(el.dataset.cidx)]; if(c) c[field] = value; }
   else if(tab==='supplier' || tab==='suppliercontact' || tab==='suppliernote') applySupplierField(el);
+  else if(tab==='sellf') sfApply(el);
   else { const idx = Number(el.dataset.idx); if(state[tab] && state[tab][idx]) state[tab][idx][field] = value; }
   render();
   saveState();
@@ -15847,7 +15891,7 @@ const CX_TAGS = [['lead', 'Lead'], ['customer', 'Customer'], ['past', 'Past cust
 const CX_REL = ['partner', 'family', 'neighbour', 'colleague', 'referrer', 'other'];
 const CX_ROLES = ['director', 'site contact', 'accounts', 'other'];
 const CX_CO_TYPES = ['Residential', 'Commercial', 'Trade', 'Referrer', 'Other'];
-const cxUi = { cid: '', coid: '', view: '', q: '', type: '', status: '', live: false, past: false, sort: 'name', coq: '', cotype: '', cosort: 'name', dupFlash: '' };
+const cxUi = { cid: '', coid: '', view: '', q: '', type: '', lc: '', colc: '', status: '', live: false, past: false, sort: 'name', coq: '', cotype: '', cosort: 'name', dupFlash: '' };
 navExtra('cx', () => ({ c: cxUi.cid, o: cxUi.coid, v: cxUi.view }), o => { if(o){ cxUi.cid = o.c || ''; cxUi.coid = o.o || ''; cxUi.view = o.v || ''; } });
 
 function cxId(p){ return p + Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2, 7); }
@@ -16176,6 +16220,7 @@ function cxFilteredContacts(){
   const q = cxUi.q.toLowerCase().trim(); let list = state.contacts.map(c => ({ c, s: cxRowStats(c), st: cxContactStatus(c) }));
   if(q) list = list.filter(x => cxSearchText(x.c).includes(q));
   if(cxUi.type) list = list.filter(x => x.c.tags.includes(cxUi.type));
+  if(cxUi.lc) list = list.filter(x => lcOf('contact', x.c) === cxUi.lc);
   if(cxUi.status) list = list.filter(x => x.st === cxUi.status);
   if(cxUi.live) list = list.filter(x => x.st === 'live');
   if(cxUi.past) list = list.filter(x => x.c.tags.includes('past') || x.st === 'past');
@@ -16193,8 +16238,9 @@ function cxListRowsHtml(){
     <td class="cx-hide-s">${escHtml(ctPhone(c))}</td><td class="cx-hide-s">${escHtml(ctEmail(c))}</td>
     <td class="cx-hide-m">${escHtml(cxCompanyNamesOf(c))}</td>
     <td>${cxStatusPill(st)} ${c.tags.filter(t => !(t === 'past' && st === 'past')).map(cxTagHtml).join(' ')}</td>
+    <td class="cx-hide-s">${lcPillHtml(lcOf('contact', c))}</td>
     <td class="qb-calc cx-hide-m">${s.live}/${s.deals.length}</td><td class="cx-hide-m">${s.last ? escHtml(dShow(s.last)) : '<span class="qb-dim">—</span>'}</td><td class="qb-calc cx-hide-s">${s.won ? qm(s.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
-  return { count: list.length, html: `<div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Name</th><th class="cx-hide-s">Phone</th><th class="cx-hide-s">Email</th><th class="cx-hide-m">Company</th><th>Status</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-m">Last contact</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="8"><div class="sup-empty">${state.contacts.length ? 'No contacts match these filters.' : 'No contacts yet. Add one above, or build them from your existing leads and projects.'}</div></td></tr>`}</tbody></table></div>` };
+  return { count: list.length, html: `<div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Name</th><th class="cx-hide-s">Phone</th><th class="cx-hide-s">Email</th><th class="cx-hide-m">Company</th><th>Status</th><th class="cx-hide-s">Lifecycle</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-m">Last contact</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="9"><div class="sup-empty">${state.contacts.length ? 'No contacts match these filters.' : 'No contacts yet. Add one above, or build them from your existing leads and projects.'}</div></td></tr>`}</tbody></table></div>` };
 }
 function cxDupCount(){ try{ return cxDupPairs().length; }catch(e){ return 0; } }
 function cxContactsListHtml(){
@@ -16207,7 +16253,7 @@ function cxContactsListHtml(){
     ${m.report ? (m.reportHidden ? `<div class="cx-showrep"><button type="button" class="link-btn" data-cx="show-report">Show the summary of the last build (${escHtml(dShow(m.migratedAt))})</button></div>` : cxReportHtml(m.report)) : ''}
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quick"><input data-cxqa="first" placeholder="First name" aria-label="First name" autocomplete="off"><input data-cxqa="last" placeholder="Last name" aria-label="Last name" autocomplete="off"><input data-cxqa="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"><input data-cxqa="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
     <div class="crm-filters cx-filters"><input type="search" id="cxSearch" class="crm-search" data-cxq="q" value="${escAttr(cxUi.q)}" placeholder="Search name, phone, email, postcode…" aria-label="Search contacts" autocomplete="off">
-      ${sel('cxType', CX_TAGS, cxUi.type, 'Any type')}${sel('cxStatus', [['live', 'Live deal'], ['past', 'Past customer'], ['lost', 'Lost only'], ['none', 'No deals']], cxUi.status, 'Any status')}
+      ${sel('cxType', CX_TAGS, cxUi.type, 'Any type')}${sel('cxLc', state.lifecycle.map(l => [l.id, l.name]), cxUi.lc, 'Any lifecycle')}${sel('cxStatus', [['live', 'Live deal'], ['past', 'Past customer'], ['lost', 'Lost only'], ['none', 'No deals']], cxUi.status, 'Any status')}
       <label class="q-check"><input type="checkbox" data-cxq="live"${cxUi.live ? ' checked' : ''}> Has live deal</label><label class="q-check"><input type="checkbox" data-cxq="past"${cxUi.past ? ' checked' : ''}> Past customer</label>
       <label class="inv-filter">Sort <select data-cxq="sort" aria-label="Sort"><option value="name"${cxUi.sort === 'name' ? ' selected' : ''}>Name</option><option value="recent"${cxUi.sort === 'recent' ? ' selected' : ''}>Last contact</option><option value="created"${cxUi.sort === 'created' ? ' selected' : ''}>Newest</option><option value="won"${cxUi.sort === 'won' ? ' selected' : ''}>Total won</option></select></label>
       <span class="sup-count" id="cxCount">${r.count} of ${state.contacts.length}</span></div>
@@ -16296,19 +16342,21 @@ function cxFilteredCompanies(){
   const q = cxUi.coq.toLowerCase().trim(); let list = state.companies.map(co => ({ co, deals: cxDealsOfCompany(co.id), people: cxContactsOfCompany(co.id) }));
   if(q) list = list.filter(x => (x.co.name + ' ' + x.co.postcode + ' ' + x.co.type + ' ' + x.people.map(p => ctName(p.contact)).join(' ')).toLowerCase().includes(q));
   if(cxUi.cotype) list = list.filter(x => x.co.type === cxUi.cotype);
+  if(cxUi.colc) list = list.filter(x => lcOf('company', x.co) === cxUi.colc);
   const won = x => x.deals.filter(d => d.pl === 'project').reduce((a, d) => a + projContract(d.rec).value, 0);
   const by = { name: (a, b) => a.co.name.toLowerCase().localeCompare(b.co.name.toLowerCase()), won: (a, b) => won(b) - won(a) || a.co.name.localeCompare(b.co.name), created: (a, b) => b.co.created.localeCompare(a.co.created) };
   return list.sort(by[cxUi.cosort] || by.name).map(x => Object.assign(x, { won: won(x) }));
 }
 function cxCompaniesListHtml(){
   const list = cxFilteredCompanies();
-  const rows = list.map(x => `<tr class="cx-row"><td><button type="button" class="sp-link cx-name" data-nav="company:${escAttr(x.co.id)}">${escHtml(cxCompanyName(x.co))}</button></td><td>${escHtml(x.co.type || '')}</td><td class="cx-hide-s">${escHtml(x.co.postcode)}</td><td>${x.people.length}</td><td class="cx-hide-m">${x.deals.filter(d => d.live).length}/${x.deals.length}</td><td class="qb-calc cx-hide-s">${x.won ? qm(x.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
+  const rows = list.map(x => `<tr class="cx-row"><td><button type="button" class="sp-link cx-name" data-nav="company:${escAttr(x.co.id)}">${escHtml(cxCompanyName(x.co))}</button></td><td>${escHtml(x.co.type || '')}</td><td class="cx-hide-s">${lcPillHtml(lcOf('company', x.co))}</td><td class="cx-hide-s">${escHtml(x.co.postcode)}</td><td>${x.people.length}</td><td class="cx-hide-m">${x.deals.filter(d => d.live).length}/${x.deals.length}</td><td class="qb-calc cx-hide-s">${x.won ? qm(x.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
   return `<div class="page-head crm-head"><div><h2>Companies</h2><div class="desc">Businesses and organisations your customers belong to. A company can have several contacts, and its deals, quotes and invoices roll up here.</div></div><button type="button" class="btn" data-cx="new-company">+ New company</button></div>
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quickco"><input data-cxqa="name" placeholder="Company name" aria-label="Company name" autocomplete="off"><select data-cxqa="type" aria-label="Type">${CX_CO_TYPES.map(t => `<option>${t}</option>`).join('')}</select><input data-cxqa="postcode" placeholder="Postcode" aria-label="Postcode" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
     <div class="crm-filters cx-filters"><input type="search" class="crm-search" data-cxq="coq" value="${escAttr(cxUi.coq)}" placeholder="Search companies…" aria-label="Search companies" autocomplete="off">
       <select data-cxq="cotype" aria-label="Type"><option value="">Any type</option>${CX_CO_TYPES.map(t => `<option${cxUi.cotype === t ? ' selected' : ''}>${t}</option>`).join('')}</select>
+      <select data-cxq="colc" aria-label="Lifecycle"><option value="">Any lifecycle</option>${state.lifecycle.map(l => `<option value="${escAttr(l.id)}"${cxUi.colc === l.id ? ' selected' : ''}>${escHtml(l.name)}</option>`).join('')}</select>
       <label class="inv-filter">Sort <select data-cxq="cosort" aria-label="Sort"><option value="name"${cxUi.cosort === 'name' ? ' selected' : ''}>Name</option><option value="won"${cxUi.cosort === 'won' ? ' selected' : ''}>Total won</option><option value="created"${cxUi.cosort === 'created' ? ' selected' : ''}>Newest</option></select></label><span class="sup-count">${list.length} of ${state.companies.length}</span></div>
-    <div id="cxCoRes" class="card"><div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Company</th><th>Type</th><th class="cx-hide-s">Postcode</th><th>Contacts</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="6"><div class="sup-empty">${state.companies.length ? 'No companies match.' : 'No companies yet.'}</div></td></tr>`}</tbody></table></div></div>`;
+    <div id="cxCoRes" class="card"><div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Company</th><th>Type</th><th class="cx-hide-s">Lifecycle</th><th class="cx-hide-s">Postcode</th><th>Contacts</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="7"><div class="sup-empty">${state.companies.length ? 'No companies match.' : 'No companies yet.'}</div></td></tr>`}</tbody></table></div></div>`;
 }
 function cxCompanyProfileHtml(co){ return rcCompanyPage(co); }
 
@@ -16582,7 +16630,7 @@ document.addEventListener('input', (e) => {
 });
 document.addEventListener('change', (e) => {
   const el = e.target, d = el.dataset; if(!d || !state) return;
-  if(d.cxq){ const k = d.cxq; if(k === 'cxType') cxUi.type = el.value; else if(k === 'cxStatus') cxUi.status = el.value; else if(k === 'live' || k === 'past') cxUi[k] = el.checked; else if(k === 'sort' || k === 'cotype' || k === 'cosort') cxUi[k] = el.value; else if(k === 'q') cxUi.q = el.value; else if(k === 'coq') cxUi.coq = el.value; cxRender(); return; }
+  if(d.cxq){ const k = d.cxq; if(k === 'cxType') cxUi.type = el.value; else if(k === 'cxLc') cxUi.lc = el.value; else if(k === 'colc') cxUi.colc = el.value; else if(k === 'cxStatus') cxUi.status = el.value; else if(k === 'live' || k === 'past') cxUi[k] = el.checked; else if(k === 'sort' || k === 'cotype' || k === 'cosort') cxUi[k] = el.value; else if(k === 'q') cxUi.q = el.value; else if(k === 'coq') cxUi.coq = el.value; cxRender(); return; }
   if(d.cx === 'tag'){ const c = ctFind(d.cid); if(!c) return; const t = d.tag; c.tags = el.checked ? [...new Set(c.tags.concat(t))] : c.tags.filter(x => x !== t); saveState(); render(); return; }
   if(d.cxf){ const c = ctFind(d.cid); if(!c) return; c[d.cxf] = d.cxf === 'notes' ? el.value : el.value.trim(); saveState(); render(); return; }
   if(d.cxl){ const c = ctFind(d.cid); if(!c) return; const it = c[d.cxl][Number(d.i)]; if(!it) return; it[d.k] = d.k === 'label' ? el.value.trim() : el.value.trim(); if(d.cxl === 'addresses' && d.k === 'v' && !it.postcode){ const pc = extractPostcode(it.v); if(pc){ it.postcode = pc; const pe = document.querySelector(`[data-cxl="addresses"][data-cid="${d.cid}"][data-i="${d.i}"][data-k="postcode"]`); if(pe) pe.value = pc; } } saveState(); render(); return; }
@@ -17514,7 +17562,7 @@ const rpUi = { pid: 0, tab: 'overview', sec: {}, secs: {}, draft: null, edit: ''
 navExtra('rp', () => ({ pid: rpUi.pid, tab: rpUi.tab, sec: Object.assign({}, rpUi.sec) }), v => { if(v){ rpUi.pid = v.pid || 0; rpUi.tab = v.tab || 'overview'; rpUi.sec = v.sec || {}; } });
 const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan'], ['materials', 'Materials and deliveries']];
 const RP_DATE_KEYS = ['start', 'complete', 'dur'];
-const RP_LABELS = { stageId: 'Stage', jobType: 'Job type', owner: 'Owner', source: 'Source', start: 'Start date', complete: 'Complete date', dur: 'Duration', address: 'Site address', postcode: 'Postcode', access: 'Access', services: 'Services', lastVisited: 'Last visited', contact: 'Contact', company: 'Company', phone: 'Phone', email: 'Email' };
+const RP_LABELS = { stageId: 'Stage', jobType: 'Job detail', jobTypeId: 'Job type', estValue: 'Ballpark value', estDays: 'Estimated duration', prefStart: 'Preferred start', deadline: 'Deadline', owner: 'Owner', source: 'Source', start: 'Start date', complete: 'Complete date', dur: 'Duration', address: 'Site address', postcode: 'Postcode', access: 'Access', services: 'Services', lastVisited: 'Last visited', contact: 'Contact', company: 'Company', phone: 'Phone', email: 'Email' };
 const RP_CHEV = '<svg class="rp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
 const rpFind = id => state.projects.find(x => x.id === id) || null;
 const rpDraft = p => (rpUi.draft && rpUi.draft.pid === p.id) ? rpUi.draft : null;
@@ -17534,7 +17582,7 @@ function rpDates(p){
 }
 function rpOrig(p){
   const cu = projCustomer(p), s = p.site || {}, d = rpDates(p);
-  return { stageId: projStageId(p), jobType: p.jobType || '', owner: p.owner || '', source: p.source || cu.source || '', start: d.start, complete: d.complete, dur: d.dur ? String(d.dur) : '',
+  return { stageId: projStageId(p), jobType: p.jobType || '', jobTypeId: p.jobTypeId || '', estValue: p.estValue === undefined || p.estValue === '' || p.estValue === null ? '' : String(p.estValue), estDays: p.estDays === undefined || p.estDays === '' || p.estDays === null ? '' : String(p.estDays), prefStart: sfIso(p.prefStart), deadline: sfIso(p.deadline), owner: p.owner || '', source: p.source || cu.source || '', start: d.start, complete: d.complete, dur: d.dur ? String(d.dur) : '',
     address: cu.address || '', postcode: cu.postcode || '', access: s.access || '', services: s.services || '', lastVisited: s.lastVisited || '',
     contact: cu.name || '', company: cu.company || '', phone: cu.phone || '', email: cu.email || '' };
 }
@@ -17588,13 +17636,17 @@ function rpLeftHtml(p){
     ${rpEdit(p, 'stageId', { select: stageOpts, hint: 'Moves when a milestone is confirmed. Choose here to set it by hand.' })}
     ${rpRO('Pipeline stage', proj6Pill(p), 'Worked out from confirmed milestone dates: it moves when you confirm one', 'calc')}
     ${rpRO('Reference', escHtml(code), 'Never changes', 'locked')}
-    ${rpEdit(p, 'jobType', { label: 'Job type', ph: 'e.g. Oak pergola' })}
+    ${rpEdit(p, 'jobTypeId', { select: [['', 'Not set']].concat(state.jobTypes.map(j => [j.id, j.name + (j.notFit ? ' (not a fit)' : '')])), hint: jobNotFit(Object.assign({}, p, { jobTypeId: rpVal(p, 'jobTypeId') })) ? 'Marked as not a fit in Settings.' : 'The kind of job. The list is in Settings, Selling.' })}
+    ${rpEdit(p, 'jobType', { label: 'Job detail', ph: 'e.g. Oak pergola' })}
     ${rpRO('Value (ex VAT)', ct.live ? `<b>${qm(ct.value)}</b>` : (ct.value ? `<b>${qm(ct.value)}</b>` : ''), ct.live ? `Edit the value in Quote ${quoteLink}` : 'No accepted quote yet: the value is typed in the full workspace')}
     <div class="rp-f rp-calc"><div class="rp-lab"><span>Margin</span><span class="rp-tag">Calculated</span></div><div class="rp-two"><div class="rp-ro"><small>Sold</small>${mg && mg.hasSold ? `<b>${qm(mg.soldAfter)}</b> <span class="rp-dim">${qpct(mg.soldPct)}</span>` : '<span class="rp-dash">—</span>'}</div><div class="rp-ro"><small>Now</small>${mg ? `<b>${qm(mg.now)}</b> <span class="rp-dim">${qpct(mg.nowPct)}</span>` : '<span class="rp-dash">—</span>'}</div></div><div class="rp-hint">${mg ? 'Calculated from the quote and the costs' : 'Needs an accepted quote'}</div></div>
     ${rpRO('Agreed', sold ? escHtml(pwD(sold)) : '', 'Set when the contract is marked agreed')}
     ${rpEdit(p, 'owner', { select: ownerOpts })}
     <datalist id="rpSources">${sources.map(s => `<option value="${escAttr(s)}">`).join('')}</datalist>
     ${rpEdit(p, 'source', { list: 'rpSources', ph: 'e.g. Referral' })}
+    ${rpEdit(p, 'estValue', { type: 'number', label: 'Ballpark value (£)', hint: 'The rough figure from the lead. The agreed value is above.' })}
+    ${sfPhases(p).length ? rpRO('Estimated duration', `<b>${sfDays(p)}</b> days`, 'Adds up the phases carried from the lead: ' + sfPhases(p).map(x => escHtml((x.name || 'Phase') + ' ' + (x.days || 0) + 'd')).join(', ')) : rpEdit(p, 'estDays', { type: 'number', label: 'Estimated duration (days)', hint: 'The estimate made at the lead stage. The planned dates are under Dates and workload.' })}
+    ${rpEdit(p, 'prefStart', { type: 'date', label: 'Customer\'s preferred start' })}${rpEdit(p, 'deadline', { type: 'date', label: 'Deadline' })}
     ${nm ? rpRO('Next', `${escHtml(nm.name)}${nm.date ? ' <span class="rp-dim">' + escHtml(pwD(nm.date)) + '</span>' : ''}`, 'The next stage') : ''}`;
   const dd = rpDraft(p) && rpDraft(p).sched;
   const dates = `
@@ -17749,7 +17801,7 @@ function rpSyncDraftUi(p){
   const bar = root.querySelector('#rpBar'); if(!bar) return; const has = !!(rpDraft(p) && Object.keys(rpDraft(p).f).length);
   bar.hidden = !has; bar.innerHTML = has ? rpBarInner(p) : '';
 }
-const RP_PLAIN = ['jobType', 'owner', 'source', 'contact', 'company', 'phone', 'email', 'address', 'postcode'];
+const RP_PLAIN = ['jobType', 'jobTypeId', 'prefStart', 'deadline', 'owner', 'source', 'contact', 'company', 'phone', 'email', 'address', 'postcode'];
 /* write the non-date fields onto the project (called when the bar is saved, or when a schedule is confirmed or kept as tentative) */
 function rpApplyPlain(p, f){
   const done = [];
@@ -17757,6 +17809,7 @@ function rpApplyPlain(p, f){
     const v = f[k];
     if(k === 'stageId'){ p.stageId = v; p.actualsMode = true; }
     else if(RP_PLAIN.includes(k)) p[k] = v;
+    else if(k === 'estValue' || k === 'estDays'){ const n = parseFloat(v); p[k] = (v === '' || isNaN(n)) ? '' : Math.max(0, k === 'estDays' ? Math.round(n) : n); }
     else if(k === 'access' || k === 'services' || k === 'lastVisited'){ p.site = Object.assign({ access: '', services: '', lastVisited: '' }, p.site || {}); p.site[k] = v; }
     else return;
     done.push(RP_LABELS[k] || k);
@@ -17960,10 +18013,10 @@ function rcContactPage(c){
   const sc = cxScopeContact(c), st = cxStats(sc), s = cxContactStatus(c), dupWith = cxDupPairs().filter(p => p.a.id === c.id || p.b.id === c.id).length, L = cxLinksOfContact(c.id);
   const head = `<div class="rp-head-top">${nav.stack.length ? '<span></span>' : '<button type="button" class="rp-back" data-cx="close-profile">← All contacts</button>'}</div>
     <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(ctName(c)))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(ctName(c))}</h2><div class="rp-sub">${[ctPhone(c), ctEmail(c)].filter(Boolean).map(escHtml).join(' · ')}</div></div></div>
-    <div class="rp-pills">${cxStatusPill(s)}${c.tags.map(cxTagHtml).join('')}${L.companies.length ? `<span class="rp-pill neu">${escHtml(L.companies[0].company.name)}</span>` : ''}</div>
+    <div class="rp-pills">${cxStatusPill(s)}${lcPillHtml(lcOf('contact', c))}${c.tags.map(cxTagHtml).join('')}${L.companies.length ? `<span class="rp-pill neu">${escHtml(L.companies[0].company.name)}</span>` : ''}</div>
     ${dupWith ? `<div class="cx-dupwarn">⚠ ${dupWith} possible duplicate${dupWith > 1 ? 's' : ''}. <button type="button" class="sp-link" data-cx="dups">Review</button></div>` : ''}
     <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rc="note">Note</button>${ctPhone(c) ? `<a class="btn secondary qb-sm" href="tel:${escAttr(ctPhone(c).replace(/\s+/g, ''))}">Call</a>` : ''}${ctEmail(c) ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(ctEmail(c))}">Email</a>` : ''}</div>`;
-  const about = rpRO('Status', cxStatusPill(s), 'Worked out from this person\'s deals');
+  const about = rpRO('Status', cxStatusPill(s), 'Worked out from this person\'s deals') + lcFieldHtml('contact', c);
   const manage = `<div class="btn-row" style="margin:0"><button type="button" class="btn secondary qb-sm" data-cx="export" data-cid="${escAttr(c.id)}">Export this contact's data</button><button type="button" class="btn secondary qb-sm" data-cx="merge-into" data-cid="${escAttr(c.id)}">Merge into another…</button><button type="button" class="btn secondary qb-sm cx-danger" data-cx="delete-contact" data-cid="${escAttr(c.id)}">Delete contact</button></div>`;
   const left = rcSec('about', 'About this contact', about) + `<section class="rp-sec open" data-sec="details"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="details" aria-expanded="true">${RP_CHEV}<span>Details</span></button></div><div class="rp-sec-b card-less" id="cxDetails">${cxContactDetailsHtml(c)}</div></section>`
     + `<section class="rp-sec open" data-sec="assoc"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="assoc" aria-expanded="true">${RP_CHEV}<span>People and company</span></button></div><div class="rp-sec-b" id="cxAssoc">${cxAssocHtml(c)}</div></section>` + rcSec('manage', 'Manage', manage);
@@ -17975,9 +18028,9 @@ function rcCompanyPage(co){
   const sc = cxScopeCompany(co), st = cxStats(sc), people = cxContactsOfCompany(co.id), f = (label, field, val, o) => `<div class="lp-f"><label>${label}</label><input data-cxco="${field}" data-oid="${escAttr(co.id)}" value="${escAttr(val)}" autocomplete="off"${o && o.type ? ` type="${o.type}"` : ''}></div>`;
   const head = `<div class="rp-head-top">${nav.stack.length ? '<span></span>' : '<button type="button" class="rp-back" data-cx="close-profile">← All companies</button>'}</div>
     <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(cxCompanyName(co)))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(cxCompanyName(co))}</h2><div class="rp-sub">${escHtml(co.type || 'Company')}${co.postcode ? ' · ' + escHtml(co.postcode) : ''}</div></div></div>
-    <div class="rp-pills"><span class="rp-pill neu">${people.length} contact${people.length === 1 ? '' : 's'}</span><span class="rp-pill neu">${sc.deals.filter(d => d.live).length} live deal${sc.deals.filter(d => d.live).length === 1 ? '' : 's'}</span></div>
+    <div class="rp-pills">${lcPillHtml(lcOf('company', co))}<span class="rp-pill neu">${people.length} contact${people.length === 1 ? '' : 's'}</span><span class="rp-pill neu">${sc.deals.filter(d => d.live).length} live deal${sc.deals.filter(d => d.live).length === 1 ? '' : 's'}</span></div>
     <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rc="note">Note</button>${co.phone ? `<a class="btn secondary qb-sm" href="tel:${escAttr(String(co.phone).replace(/\s+/g, ''))}">Call</a>` : ''}${co.email ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(co.email)}">Email</a>` : ''}</div>`;
-  const about = `${rpRO('Created', escHtml(dShow(co.created)), 'Never changes', 'locked')}${rpRO('People', String(people.length), 'Listed under People below')}`;
+  const about = `${rpRO('Created', escHtml(dShow(co.created)), 'Never changes', 'locked')}${rpRO('People', String(people.length), 'Listed under People below')}${lcFieldHtml('company', co)}`;
   const details = `<div class="assumptions-grid">${f('Name', 'name', co.name)}<div class="lp-f"><label>Type</label><select data-cxco="type" data-oid="${escAttr(co.id)}"><option value="">—</option>${CX_CO_TYPES.map(t => `<option${co.type === t ? ' selected' : ''}>${t}</option>`).join('')}</select></div></div>
     ${f('Phone', 'phone', co.phone, { type: 'tel' })}${f('Email', 'email', co.email, { type: 'email' })}${f('Website', 'website', co.website)}
     <div class="lp-f"><label>Address</label><textarea rows="2" data-cxco="address" data-oid="${escAttr(co.id)}">${escHtml(co.address)}</textarea></div>${f('Postcode', 'postcode', co.postcode)}
@@ -18413,6 +18466,152 @@ document.addEventListener('click', (e) => {
   else if(a === 'tent-revert') rpRevertTentative(p);
 });
 /* BT:js-records end */
+
+/* BT:js-selling begin */
+/* =====================================================================
+   STAGE 3: SELLING (leads, qualification, quotes)
+   Everything here is additive. New stored fields all default empty/safe, so existing leads, sales, projects, quotes and tags load unchanged:
+     state.jobTypes [{ id, name, notFit }]                    Settings > Selling
+     state.lifecycle [{ id, name }]                           Settings > Selling (names and order editable)
+     lead / sale / project:  estDays, phases[{ id, name, days }], prefStart, deadline, jobTypeId   (the ballpark value is the existing estValue)
+     contact / company:      lifecycle ('' = worked out from tags and deals, never a stored conversion)
+   ===================================================================== */
+const SEL_JOB_TYPES = [['jt_build', 'New build'], ['jt_repair', 'Repair'], ['jt_maintenance', 'Maintenance', true], ['jt_other', 'Other'], ['jt_notfit', 'Not a fit', true]];
+const SEL_LIFECYCLE = [['lc_lead', 'Lead'], ['lc_opportunity', 'Opportunity'], ['lc_customer', 'Customer'], ['lc_referrer', 'Referrer'], ['lc_evangelist', 'Evangelist']];
+function selId(p){ return p + Math.random().toString(36).slice(2, 8); }
+function ensureSellingModel(o){
+  const str = v => v == null ? '' : String(v);
+  const tidy = (list, seed, mk) => {
+    let l = Array.isArray(list) ? list.filter(x => x && typeof x === 'object' && x.id) : [];
+    if(!l.length) l = seed.map(mk);
+    l = sortByOrder(l).map(x => Object.assign({}, x, { id: String(x.id), name: str(x.name).trim() || 'Item' })); renumberStages(l); return l;
+  };
+  o.jobTypes = tidy(o.jobTypes, SEL_JOB_TYPES, ([id, name, nf]) => ({ id, name, notFit: !!nf })).map(x => ({ id: x.id, name: x.name, notFit: x.notFit === true, order: x.order }));
+  o.lifecycle = tidy(o.lifecycle, SEL_LIFECYCLE, ([id, name]) => ({ id, name })).map(x => ({ id: x.id, name: x.name, order: x.order }));
+  if(typeof ensureSellingModel2 === 'function') ensureSellingModel2(o);
+  return o;
+}
+
+/* ---------- fields every lead, sale and project carries ---------- */
+function sfRec(kind, id){ id = Number(id); return (kind === 'lead' ? state.leads : kind === 'sales' ? state.pipeline : state.projects).find(r => r.id === id) || null; }
+function sfPhases(r){ return (Array.isArray(r.phases) ? r.phases : []).filter(p => p && typeof p === 'object'); }
+function sfDays(r){ const ph = sfPhases(r); if(ph.length) return ph.reduce((a, p) => a + (Number(p.days) || 0), 0); const n = Number(r.estDays); return n > 0 ? n : 0; }
+function jobTypeOf(r){ return state.jobTypes.find(j => j.id === r.jobTypeId) || null; }
+function jobNotFit(r){ const j = jobTypeOf(r); return !!(j && j.notFit); }
+function sfIso(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : ''; }
+function sfNotFitChip(r){ return jobNotFit(r) ? `<span class="sf-chip bad" title="This job type is marked as not a fit in Settings">Not a fit</span>` : ''; }
+function sfDeadlineWarn(r){ return sfIso(r.prefStart) && sfIso(r.deadline) && r.deadline < r.prefStart ? 'The deadline is before the preferred start.' : ''; }
+/* the editable group: ballpark value (the existing estValue), job type, duration (or phases), preferred start, deadline */
+const SF_NF_HINT = 'Not a fit (set in Settings, Selling): flagged on the lead, the sales card and the project.';
+function sfEditHtml(kind, r, i, o){
+  o = o || {}; const id = r.id, base = `data-tab="sellf" data-kind="${kind}" data-id="${id}"`;
+  const ph = sfPhases(r), f = (label, inner, hint) => `<div class="lp-f"><label>${label}</label>${inner}${hint ? `<div class="lp-hint">${hint}</div>` : ''}</div>`;
+  const jt = `<select ${base} data-field="jobTypeId"><option value=""${r.jobTypeId ? '' : ' selected'}>Not set</option>${state.jobTypes.map(j => `<option value="${escAttr(j.id)}"${r.jobTypeId === j.id ? ' selected' : ''}>${escHtml(j.name)}${j.notFit ? ' (not a fit)' : ''}</option>`).join('')}</select>`;
+  const val = o.skipValue ? '' : f('Ballpark value (£)', `<input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="estValue" value="${r.estValue === '' || r.estValue == null ? '' : r.estValue}" placeholder="A rough figure, not a quote">`);
+  const dur = ph.length
+    ? f('Estimated duration (days)', `<div class="sf-calc" aria-readonly="true"><b>${sfDays(r)}</b> days <span class="rp-tag">Calculated</span></div>`, 'Adds up the phases below. Remove the phases to type one figure instead.')
+    : f('Estimated duration (days)', `<input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="estDays" value="${r.estDays === '' || r.estDays == null ? '' : escAttr(r.estDays)}" placeholder="Working days on site">`, 'How long the job is likely to take. You can split it into phases.');
+  const phases = `<div class="lp-f"><label>Phases <span class="lp-opt">optional</span></label>${ph.map((p, pi) => `<div class="sf-phase"><input type="text" ${base} data-field="phaseName" data-pi="${pi}" value="${escAttr(p.name || '')}" placeholder="Phase name" aria-label="Phase name"><input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${p.days === '' || p.days == null ? '' : escAttr(p.days)}" placeholder="Days" aria-label="Days"><button type="button" class="icon-btn" data-sf="phase-del" data-kind="${kind}" data-id="${id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button></div>`).join('')}<button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="${kind}" data-id="${id}">+ Add a phase</button></div>`;
+  const warn = sfDeadlineWarn(r);
+  return `${val}${f('Job type', jt, SF_NF_HINT, 'sf-jt-hint')}${dur}${phases}${f('Customer\'s preferred start', `<input type="date" ${base} data-field="prefStart" value="${escAttr(sfIso(r.prefStart))}">`)}${f('Deadline', `<input type="date" ${base} data-field="deadline" value="${escAttr(sfIso(r.deadline))}">`, warn ? `<span class="sf-warn">${warn}</span>` : 'Optional: a date the job must be finished by.')}`;
+}
+/* one line of the facts, for cards and tiles */
+function sfFactsHtml(r, val){
+  val = val || ((v, k) => v ? `<span class="v">${k ? `<span class="k">${k}</span>` : ''}${escHtml(v)}</span>` : '');
+  const j = jobTypeOf(r), d = sfDays(r);
+  return `${val(j ? j.name : '', 'Type')}${val(d ? d + ' days' : '', 'Duration')}${val(sfIso(r.prefStart) ? dShow(r.prefStart) : '', 'Start')}${val(sfIso(r.deadline) ? dShow(r.deadline) : '', 'Deadline')}`;
+}
+function sfApply(el){
+  const d = el.dataset, r = sfRec(d.kind, d.id); if(!r) return; const f = d.field, v = el.value;
+  if(f === 'estValue'){ const n = parseFloat(v); r.estValue = (v === '' || isNaN(n)) ? '' : Math.max(0, n); if(d.kind === 'lead' && typeof applyAutoTier === 'function') applyAutoTier(r); }
+  else if(f === 'estDays'){ const n = Math.round(Number(v)); r.estDays = (v === '' || isNaN(n)) ? '' : Math.max(0, n); }
+  else if(f === 'jobTypeId'){ r.jobTypeId = state.jobTypes.some(j => j.id === v) ? v : ''; }
+  else if(f === 'prefStart' || f === 'deadline'){ r[f] = sfIso(v); }
+  else if(f === 'phaseName' || f === 'phaseDays'){ const p = sfPhases(r)[Number(d.pi)]; if(p){ if(f === 'phaseName') p.name = v.trim(); else { const n = Math.round(Number(v)); p.days = (v === '' || isNaN(n)) ? '' : Math.max(0, n); } } }
+}
+const sfUi = { rebuild: false };
+/* the lead panel is not rebuilt on every change (that would drop the focus), so the calculated bits are refreshed in place */
+function sfPanelSync(l){
+  if(sfUi.rebuild){ sfUi.rebuild = false; lpRenderBody(true); return; }
+  const c = document.querySelector('#lpBody .sf-calc b'); if(c) c.textContent = sfDays(l);
+  const j = document.querySelector('#lpBody [data-field="jobTypeId"]'); if(j && j.value !== (l.jobTypeId || '')) j.value = l.jobTypeId || '';
+  const h = document.querySelector('#lpBody .sf-jt-hint'); if(h) h.style.display = jobNotFit(l) ? '' : 'none';
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-sf]'); if(!b || !state) return;
+  const r = sfRec(b.dataset.kind, b.dataset.id); if(!r) return;
+  if(b.dataset.sf === 'phase-add'){ r.phases = sfPhases(r).concat([{ id: selId('ph_'), name: '', days: '' }]); }
+  else if(b.dataset.sf === 'phase-del'){ const ph = sfPhases(r); ph.splice(Number(b.dataset.pi), 1); r.phases = ph; }
+  else return;
+  sfUi.rebuild = true; render(); saveState();
+});
+
+/* ---------- customer lifecycle (contacts and companies) ----------
+   '' on the record means "worked out": from the old tags and the deals (Customer if there is a project, a past customer or a Customer tag;
+   Opportunity if a deal is in sales; Lead if a lead is open or tagged; Referrer if tagged), never stored. Evangelist is always set by hand. */
+function lcName(id){ const x = state.lifecycle.find(l => l.id === id); return x ? x.name : ''; }
+function lcValid(id){ return state.lifecycle.some(l => l.id === id) ? id : ''; }
+function lcPick(id){ return lcValid(id) || state.lifecycle[0].id; }
+function lcFromSignals(deals, tags, status){
+  const has = pl => deals.some(d => d.pl === pl && d.live);
+  if(deals.some(d => d.pl === 'project') || tags.includes('customer') || tags.includes('past') || status === 'past') return lcPick('lc_customer');
+  if(has('sales')) return lcPick('lc_opportunity');
+  if(has('lead') || tags.includes('lead')) return lcPick('lc_lead');
+  if(tags.includes('referrer')) return lcPick('lc_referrer');
+  return lcPick('lc_lead');
+}
+function lcDerived(kind, rec){
+  if(kind === 'contact') return lcFromSignals(cxDealsOfContact(rec.id), rec.tags || [], cxContactStatus(rec));
+  const deals = cxDealsOfCompany(rec.id), people = cxContactsOfCompany(rec.id), rank = ['lc_customer', 'lc_opportunity', 'lc_lead', 'lc_referrer'];
+  const ids = people.map(x => lcOf('contact', x.contact)).concat([lcFromSignals(deals, rec.type === 'Referrer' ? ['referrer'] : [], '')]);
+  for(const k of rank){ if(ids.includes(k)) return lcPick(k); }
+  return lcPick(ids[0]);
+}
+function lcOf(kind, rec){ return lcValid(rec.lifecycle) || lcDerived(kind, rec); }
+function lcPillHtml(id){ return id ? `<span class="lc-pill lc-${escAttr(id)}" title="Customer lifecycle">${escHtml(lcName(id))}</span>` : ''; }
+function lcFieldHtml(kind, rec){
+  const d = lcDerived(kind, rec), cur = lcValid(rec.lifecycle), attr = kind === 'contact' ? `data-cxf="lifecycle" data-cid="${escAttr(rec.id)}"` : `data-cxco="lifecycle" data-oid="${escAttr(rec.id)}"`;
+  return `<div class="rp-f rp-edit"><label for="lcf_${escAttr(rec.id)}">Customer lifecycle</label><select id="lcf_${escAttr(rec.id)}" ${attr}><option value=""${cur ? '' : ' selected'}>Automatic: ${escHtml(lcName(d))}</option>${state.lifecycle.map(l => `<option value="${escAttr(l.id)}"${cur === l.id ? ' selected' : ''}>${escHtml(l.name)}</option>`).join('')}</select><div class="rp-hint">${cur ? 'Set by hand. Choose Automatic to go back to what the tags and deals say.' : 'Worked out from the tags and deals. Choose a stage to set it by hand.'}</div></div>`;
+}
+
+/* ---------- Settings > Selling: small editors for the lists ---------- */
+const SL_LISTS = { jobtypes: { get: () => state.jobTypes, noun: 'job type', uses: id => state.leads.concat(state.pipeline, state.projects).filter(r => r.jobTypeId === id).length },
+  lifecycle: { get: () => state.lifecycle, noun: 'lifecycle stage', uses: id => state.contacts.concat(state.companies).filter(c => c.lifecycle === id).length } };
+function slRowsHtml(k){
+  const L = SL_LISTS[k], list = L.get();
+  return `<div class="stage-list">${list.map((it, i) => `<div class="stage-row sl-row" data-slrow="${escAttr(it.id)}">
+      <div class="tier-move"><button type="button" class="icon-btn" data-sl="up" data-k="${k}" data-id="${escAttr(it.id)}" title="Move up" aria-label="Move up"${i === 0 ? ' disabled style="opacity:.3"' : ''}>${UP_SVG}</button><button type="button" class="icon-btn" data-sl="down" data-k="${k}" data-id="${escAttr(it.id)}" title="Move down" aria-label="Move down"${i === list.length - 1 ? ' disabled style="opacity:.3"' : ''}>${DOWN_SVG}</button></div>
+      <input type="text" data-sl="name" data-k="${k}" data-id="${escAttr(it.id)}" value="${escAttr(it.name)}" aria-label="Name">
+      ${k === 'jobtypes' ? `<label class="q-check sl-nf"><input type="checkbox" data-sl="notfit" data-k="${k}" data-id="${escAttr(it.id)}"${it.notFit ? ' checked' : ''}> Not a fit</label>` : '<span></span>'}
+      <button type="button" class="icon-btn" data-sl="del" data-k="${k}" data-id="${escAttr(it.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('')}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-sl="add" data-k="${k}">+ Add ${L.noun}</button>`;
+}
+function renderSellingSettings(){
+  const a = document.getElementById('sellJobTypesCard'), b = document.getElementById('sellLifecycleCard');
+  if(a) a.innerHTML = `<p class="q-help" style="margin:0 0 8px;">The kinds of job. A type marked <b>Not a fit</b> is flagged on the lead, the sales card and the project as soon as it is chosen (maintenance, for example). Records follow a type's hidden id, so renaming it is safe.</p><div style="max-width:520px;">${slRowsHtml('jobtypes')}</div>`;
+  if(b) b.innerHTML = `<p class="q-help" style="margin:0 0 8px;">Where each contact and company is in the relationship with you. The names and the order are yours to change. Each one starts from the old tags and the deals (it is not stored until someone sets it by hand), and can be changed on the contact or company page.</p><div style="max-width:520px;">${slRowsHtml('lifecycle')}</div>`;
+  if(typeof renderSellingSettings2 === 'function') renderSellingSettings2();
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-sl]'); if(!b || !state || !b.dataset.k || !SL_LISTS[b.dataset.k]) return;
+  const k = b.dataset.k, L = SL_LISTS[k], list = L.get(), a = b.dataset.sl, i = list.findIndex(x => x.id === b.dataset.id);
+  if(a === 'add'){ const it = { id: selId(k === 'jobtypes' ? 'jt_' : 'lc_'), name: 'New ' + L.noun }; if(k === 'jobtypes') it.notFit = false; list.push(it); renumberStages(list); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-sl="name"][data-id="${it.id}"]`); if(el){ el.focus(); el.select(); } }, 30); return; }
+  if(i < 0) return;
+  if(a === 'up' || a === 'down'){ const j = i + (a === 'up' ? -1 : 1); if(j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; renumberStages(list); saveState(); render(); return; }
+  if(a === 'del'){
+    if(list.length <= 1){ showToast('A list needs at least one ' + L.noun + '. Add another before deleting this one.', null, 7000); return; }
+    const n = L.uses(list[i].id);
+    if(n){ showToast(`${n} record${n === 1 ? ' uses' : 's use'} “${list[i].name}”. Change ${n === 1 ? 'it' : 'them'} first, then delete it. Nothing was changed.`, null, 9000); return; }
+    const gone = list.splice(i, 1)[0]; renumberStages(list); undoDeleted(L.noun[0].toUpperCase() + L.noun.slice(1) + ' deleted: ' + String(gone.name).slice(0, 40), k === 'jobtypes' ? ['jobTypes'] : ['lifecycle'], i, gone); saveState(); render(); return; }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.sl || !d.k || !SL_LISTS[d.k] || !state) return;
+  const it = SL_LISTS[d.k].get().find(x => x.id === d.id); if(!it) return;
+  if(d.sl === 'name') it.name = el.value.trim() || it.name; else if(d.sl === 'notfit') it.notFit = el.checked; else return;
+  saveState(); render();
+});
+
+/* BT:js-selling end */
 
 /* ---------- init ---------- */
 (async () => {
