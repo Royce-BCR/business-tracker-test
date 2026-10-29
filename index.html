@@ -1738,6 +1738,12 @@
   /* ---------------- Purchase orders ---------------- */
   .po-st { display: inline-block; padding: 2px 10px; border-radius: var(--bt-r-pill); font-size: 11.5px; font-weight: 700; } .po-st-Draft { background: var(--bt-neu-bg); color: var(--bt-neu-fg); } .po-st-Approved { background: var(--bt-info-bg); color: var(--bt-info-fg); } .po-st-Sent { background: var(--bt-info-bg); color: var(--bt-info-fg); } .po-st-Delivered { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .po-st-Matched { background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
   .po-needs td { background: var(--bt-bad-bg); } .po-needs td:first-child { box-shadow: inset 4px 0 0 var(--bt-bad-fg); } .po-flag { display: inline-block; background: var(--bt-bad-fg); color: var(--bt-on-dark); border-radius: var(--bt-r-pill); padding: 2px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .dc-line { border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3); margin-bottom: var(--bt-s2); background: var(--bt-card); } .dc-top { display: flex; justify-content: space-between; gap: 8px; margin-bottom: var(--bt-s2); flex-wrap: wrap; }
+  .dc-seg { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: var(--bt-s2); } .dc-b { flex: 1 1 22%; min-height: 44px; border: 1px solid var(--bt-border-strong); background: var(--bt-card); border-radius: var(--bt-r-btn); font: inherit; font-weight: 600; cursor: pointer; padding: 6px 8px; }
+  .dc-b.on.dc-b-received { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); } .dc-b.on.dc-b-short, .dc-b.on.dc-b-substituted { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); } .dc-b.on.dc-b-damaged { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
+  .dc-ph { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; } .dc-thumb { position: relative; display: inline-block; } .dc-thumb img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); display: block; } .dc-x { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; min-width: 24px; min-height: 24px; border-radius: 50%; border: 0; background: var(--bt-bad-fg); color: #fff; cursor: pointer; line-height: 1; }
+  .dc-mini img { width: 28px; height: 28px; object-fit: cover; border-radius: 4px; margin-left: 6px; vertical-align: middle; border: 1px solid var(--line); }
+  .dc-ptc { display: inline-block; background: var(--bt-warn-bg); color: var(--bt-warn-fg); border: 1px solid var(--bt-warn-bd); border-radius: var(--bt-r-pill); padding: 1px 8px; font-size: 11px; font-weight: 700; } .dc-st { font-weight: 700; } .dc-st-short, .dc-st-substituted { color: var(--bt-warn-fg); } .dc-st-damaged { color: var(--bt-bad-fg); } .dc-st-received { color: var(--bt-ok-fg); } .td-allrec { white-space: nowrap; }
   .po-tools { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; margin-bottom: var(--bt-s3); } .po-hero { margin: var(--bt-s2) 0 var(--bt-s3); } .po-trace { display: flex; flex-wrap: wrap; gap: var(--bt-s2) var(--bt-s4); align-items: baseline; margin-bottom: var(--bt-s2); } .po-trace small { display: block; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; } .po-bigref { font-size: 20px; letter-spacing: .01em; } .po-extra { margin-top: var(--bt-s3); }
   .po-note { font-size: 12.5px; color: var(--slate); margin-bottom: var(--bt-s3); } .po-steps { display: flex; gap: var(--bt-s2); align-items: center; margin: var(--bt-s1) 0 var(--bt-s3); font-size: 12.5px; color: var(--text-muted); } .po-steps span.done { color: var(--bt-ok-fg); font-weight: 600; } .po-steps span.cur { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--ink); } .po-steps i { font-style: normal; }
   /* ---------------- Q4: thumb-sized controls on phones and touch screens (desktop with a mouse is unchanged) ---------------- */
@@ -7144,7 +7150,8 @@ function pwClick(b){
   if(a === 'ms-undo'){ pwUndoActual(p, 'ms', b.dataset.key); return; }
   if(a === 'st-undo'){ pwUndoActual(p, 'st', b.dataset.sid); return; }
   if(a === 'inv-sent' || a === 'pay-paid'){ const l = p.paymentLines[idx]; if(!l) return; const f = a === 'inv-sent' ? 'invoicedDate' : 'paidDate'; if(f === 'paidDate' && !l.invoicedDate) l.invoicedDate = today; pwSetDate((a === 'inv-sent' ? 'Invoice sent' : 'Paid') + ': ' + (l.desc || 'payment'), () => l[f] || '', v => { l[f] = v; }, today); return; }
-  if(a === 'del-done' || a === 'del-undo'){ const id = b.dataset.did; const st = p.dropState[id] = p.dropState[id] || {}; pwSetDate('Delivered', () => st.delivered || '', v => { st.delivered = v; }, a === 'del-done' ? today : ''); return; }
+  if(a === 'del-done'){ dcOpen(p.id, b.dataset.did); return; }
+  if(a === 'del-undo'){ const id = b.dataset.did; const st = p.dropState[id] = p.dropState[id] || {}; pwSetDate('Delivered', () => st.delivered || '', v => { st.delivered = v; }, a === 'del-done' ? today : ''); return; }
   if(a === 'ord-done' || a === 'ord-undo'){ const id = b.dataset.did; const st = p.dropState[id] = p.dropState[id] || {}; pwSetDate('Ordered', () => st.ordered || '', v => { st.ordered = v; if(v && !projMsActual(p, 'materialsOrdered')) projAdvance(p); }, a === 'ord-done' ? today : ''); return; }
   if(a === 'sync-pay'){ const q = projAcceptedQuote(p); if(q) projSyncPayments(p, q, { verbose: true }); return; }
   if(a === 'add-stage'){ p.stages = p.stages || []; p.stages.push({ label: 'New stage', kind: 'other', start: '', end: '', cost: 0 }); render(); saveState(); return; }
@@ -7754,7 +7761,7 @@ function pwNextStep(p){
   else if(n.act === 'po-open') navGo(() => poOpen(n.po));
   else if(n.act === 'po-create') poCreate(p.id, n.did);
   else if(n.act === 'ord'){ const st = p.dropState[n.did] = p.dropState[n.did] || {}; st.ordered = today; saveState(); render(); showToast('Marked ordered', () => { st.ordered = ''; saveState(); render(); }); }
-  else if(n.act === 'del'){ const st = p.dropState[n.did] = p.dropState[n.did] || {}; st.delivered = today; saveState(); render(); showToast('Marked delivered', () => { st.delivered = ''; saveState(); render(); }); }
+  else if(n.act === 'del'){ dcOpen(p.id, n.did); }
 }
 function renderProjects(){
   clearTimeout(pwLazyT);
@@ -11217,7 +11224,7 @@ function renderPOs(){
   el.innerHTML = `<div class="po-note">${state.settings.poApprovalOn ? `Approval is <b>on</b>: POs of <b>${qm(state.settings.poApprovalThreshold)}</b> or more are flagged and cannot be sent until approved${poViaApprovals() ? ' (through the Approvals process)' : ''}.` : 'PO approval is off (Settings &gt; Quotes &gt; Purchase orders).'} Create a PO from a delivery drop in a project's Materials and deliveries section.</div>
     <div class="po-tools"><button type="button" class="btn qb-sm" data-po2="open">+ New order</button><span class="qb-dim">Create the orders for a project's suppliers, or add a second order for the same supplier.</span></div>
     <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>PO</th><th>Project</th><th>Supplier</th><th>Delivery</th><th>Value</th><th>Status</th><th>Approval</th><th></th></tr></thead><tbody>${list.map(x => { const need = poNeedsApproval(x), act = poActualDelivery(x), aq = poQuoteOf(x);
-      return `<tr class="${need && !poApproved(x) ? 'po-needs' : ''}"><td><b>${escHtml(x.ref)}</b>${aq ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(qRef(aq))}</div>` : ''}</td><td>${finSrcLink({ t: 'project', id: x.pid, sec: 'materials' }, recordCode(x.pid, 'project'))}</td><td>${escHtml(x.supplierName)}</td><td>${x.deliveryDate ? pwD(x.deliveryDate) : '—'}${act ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">delivered ${escHtml(pwD(act))}</div>` : ''}</td><td class="qb-calc">${qm(poTotals(x).payable)}</td><td>${poPill(x)}</td>
+      return `<tr class="${need && !poApproved(x) ? 'po-needs' : ''}"><td><b>${escHtml(x.ref)}</b>${aq ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(qRef(aq))}</div>` : ''}</td><td>${finSrcLink({ t: 'project', id: x.pid, sec: 'materials' }, recordCode(x.pid, 'project'))}</td><td>${escHtml(x.supplierName)}</td><td>${x.deliveryDate ? pwD(x.deliveryDate) : '—'}${act ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">delivered ${escHtml(pwD(act))}</div>` : ''}</td><td class="qb-calc">${qm(poTotals(x).payable)}</td><td>${poPill(x)}${poProject(x) ? dcPtcMark(poProject(x), x.did) : ''}</td>
       <td>${need ? (poApproved(x) ? `<span class="pw-ok">✓ ${escHtml(x.approval.by)}</span>` : '<span class="po-flag">Requires approval</span>') : '<span class="qb-dim">not needed</span>'}</td><td><button type="button" class="btn secondary qb-sm" data-po="open" data-id="${x.id}">Open</button></td></tr>`; }).join('') || '<tr><td colspan="8"><div class="sup-empty">No purchase orders yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function poDetailHtml(po){
@@ -11286,7 +11293,7 @@ document.addEventListener('click', (e) => {
   if(!po) return;
   if(a === 'approve'){ const c = poCanApprove(po); if(!c.ok){ showToast(c.why); return; } po.approval = { by: whoName(), at: fmt(new Date()) }; po.status = 'Approved'; }
   else if(a === 'sent'){ if(poNeedsApproval(po) && !poApproved(po)){ showToast('This PO requires approval before it can be sent'); return; } po.status = 'Sent'; po.sentAt = fmt(new Date()); const pp = state.projects.find(x => x.id === po.pid); if(pp){ projEnsure(pp); const ds = pp.dropState[po.did] = pp.dropState[po.did] || {}; if(!ds.ordered) ds.ordered = po.sentAt; } }
-  else if(a === 'delivered'){ po.status = 'Delivered'; po.deliveredAt = fmt(new Date()); const p = state.projects.find(x => x.id === po.pid); if(p){ p.dropState[po.did] = p.dropState[po.did] || {}; if(!p.dropState[po.did].delivered) p.dropState[po.did].delivered = fmt(new Date()); } }
+  else if(a === 'delivered'){ dcOpen(po.pid, po.did); return; }   // marking a delivery complete opens the checklist
   else if(a === 'del'){ const ix = state.purchaseOrders.indexOf(po); state.purchaseOrders.splice(ix, 1); undoDeleted('Purchase order deleted: ' + po.ref, ['purchaseOrders'], ix, po); poUi.open = 0; }
   else if(a === 'refresh'){ const p = state.projects.find(x => x.id === po.pid), snap = p && poSnapshot(p, po.did); if(snap) Object.assign(po, snap); }
   else if(a === 'item-add'){ po.items.push({ lineId: qRand('x_'), desc: 'New item', qty: 1, unit: '', price: 0, vatRate: Number(state.settings.vatRate) || 0 }); }
@@ -11320,10 +11327,10 @@ function poHeroHtml(po){
       <span><small>Project</small> ${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}">${escHtml(recordCode(p.id, 'project'))} · ${escHtml(p.name)}</button>` : '—'}</span>
       <span><small>Quote</small> ${aq ? `<button type="button" class="sp-link" data-nav="quote:${aq.id}">${escHtml(qRef(aq))} v${aq.version}</button>` : '<span class="qb-dim">no accepted quote</span>'}</span>
       <span><small>Supplier</small> ${sup ? `<button type="button" class="sp-link" data-nav="supplier:${sup.id}">${escHtml(sup.name)}</button>` : escHtml(po.supplierName || '—')}</span></div>
-    <div class="rp-strip">${cell('Planned delivery', pl ? escHtml(pwD(pl)) : '—', moved ? 'the plan now says ' + escHtml(pwD(drop.date)) : (pl ? escHtml(pwRel(pl)) : 'no date'))}${cell('Actual delivery', ac ? escHtml(pwD(ac)) : '—', ac ? (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' late</b>' : 'on time') : (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' overdue</b>' : 'not yet'), late ? 'bad' : '')}${cell('Ordered', ds.ordered || po.sentAt ? escHtml(pwD(ds.ordered || po.sentAt)) : '—', ds.ordered || po.sentAt ? '' : 'not yet')}${cell('Status', escHtml(po.status), '')}${cell('Value', qm(poTotals(po).payable), qVatOn() ? 'inc VAT' : '')}</div></div>`;
+    <div class="rp-strip">${cell('Planned delivery', pl ? escHtml(pwD(pl)) : '—', moved ? 'the plan now says ' + escHtml(pwD(drop.date)) : (pl ? escHtml(pwRel(pl)) : 'no date'))}${cell('Actual delivery', ac ? escHtml(pwD(ac)) : '—', ac ? (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' late</b>' : 'on time') : (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' overdue</b>' : 'not yet'), late ? 'bad' : '')}${cell('Ordered', ds.ordered || po.sentAt ? escHtml(pwD(ds.ordered || po.sentAt)) : '—', ds.ordered || po.sentAt ? '' : 'not yet')}${cell('Status', escHtml(po.status), p && dcPtcMark(p, po.did) ? dcPtcMark(p, po.did) : '')}${cell('Value', qm(poTotals(po).payable), qVatOn() ? 'inc VAT' : '')}</div></div>`;
 }
 function poExtraHtml(po){
-  return `<div class="po-extra">${rpRefTasksHtml('po', po.id)}</div>`;
+  return `<div class="po-extra">${dcRecordHtml(po)}${rpRefTasksHtml('po', po.id)}</div>`;
 }
 /* the "New order" dialog: orders for the suppliers already on the quote, or a second order for a supplier */
 const po2Ui = { pid: 0, sup: '', date: '', lines: new Set(), err: '' };
@@ -11374,6 +11381,93 @@ document.addEventListener('change', (e) => {
   else if(t.id === 'po2Sup') po2Ui.sup = t.value; else if(t.id === 'po2Date') po2Ui.date = isoOk(t.value) || '';
   else if(t.dataset && t.dataset.po2l){ if(t.checked) po2Ui.lines.add(t.dataset.po2l); else po2Ui.lines.delete(t.dataset.po2l); }
 });
+
+/* ---------- Stage 2: delivery checklist ----------
+   Marking a delivery complete (from Today, the order, the project) opens the order's lines. Each line is received, short, substituted or damaged, with a note and photos.
+   Stored on the project's drop state, which the order shares (one order per drop), so it works with or without an order: p.dropState[dropId].check = { at, by, signed, lines[{ k, desc, unit, qty, s, got, note, photos[{ name, data }] }] }
+   and .ptc = { at, lines[] } (the "price to confirm" flag: set when a line is short or substituted, cleared when prices are confirmed). All fields are optional and default empty. */
+const DC_STATUS = [['received', 'Received'], ['short', 'Short'], ['substituted', 'Substituted'], ['damaged', 'Damaged']];
+const dcUi = { pid: 0, did: '', date: '', lines: [], err: '' };
+function dcState(p, did){ projEnsure(p); return p.dropState[did] = p.dropState[did] || {}; }
+function dcSource(p, did){
+  const po = poForDrop(p.id, did), items = po ? po.items : ((poSnapshot(p, did) || {}).items || []);
+  return items.filter(i => i.lineId !== '' && !/^Delivery charge$/i.test(i.desc)).map(i => ({ k: String(i.lineId), desc: i.desc, unit: i.unit || '', qty: Number(i.qty) || 0 }));
+}
+function dcLinesFor(p, did){
+  const st = dcState(p, did), saved = st.check && Array.isArray(st.check.lines) ? st.check.lines : [], src = dcSource(p, did);
+  return src.map(i => { const o = saved.find(x => x.k === i.k) || {}; return { k: i.k, desc: i.desc, unit: i.unit, qty: i.qty, s: o.s || 'received', got: o.got === undefined || o.got === '' ? i.qty : Number(o.got) || 0, note: o.note || '', photos: Array.isArray(o.photos) ? o.photos.slice() : [] }; });
+}
+function dcPtcMark(p, did){ const ds = (p.dropState || {})[did]; return ds && ds.ptc ? ' <span class="dc-ptc" title="Short or substituted: the final price needs checking">price to confirm</span>' : ''; }
+function dcOpen(pid, did){
+  const p = state.projects.find(x => x.id === pid); if(!p) return; projEnsure(p);
+  const x = projDeliveries(p).drops.find(d => d.d.id === did); if(!x){ showToast('That delivery is not on the project any more'); return; }
+  dcUi.pid = pid; dcUi.did = did; dcUi.date = fmt(new Date()); dcUi.lines = dcLinesFor(p, did); dcUi.err = ''; finUi.mode = 'dc'; dcDraw(true);
+}
+function dcRead(){
+  document.querySelectorAll('#dcBody [data-dcf]').forEach(el => { const l = dcUi.lines[Number(el.dataset.i)]; if(!l) return; const f = el.dataset.dcf; if(f === 'got') l.got = Math.max(0, Number(el.value) || 0); else if(f === 'note') l.note = el.value; });
+  const d = document.getElementById('dcDate'); if(d) dcUi.date = isoOk(d.value) || dcUi.date;
+}
+function dcDraw(open){
+  const p = state.projects.find(x => x.id === dcUi.pid); if(!p) return finClose(); const x = projDeliveries(p).drops.find(d => d.d.id === dcUi.did), po = poForDrop(p.id, dcUi.did), collect = x && x.method === 'collect';
+  const L = dcUi.lines, exc = L.filter(l => l.s !== 'received').length, rows = L.map((l, i) => `<div class="dc-line dc-${l.s}" data-dcl="${i}"><div class="dc-top"><b>${escHtml(l.desc)}</b><span class="qb-dim">ordered ${l.qty} ${escHtml(l.unit)}</span></div>
+      <div class="dc-seg" role="group" aria-label="Status of ${escAttr(l.desc)}">${DC_STATUS.map(([k, n]) => `<button type="button" class="dc-b dc-b-${k}${l.s === k ? ' on' : ''}" aria-pressed="${l.s === k}" data-dc="s" data-i="${i}" data-v="${k}">${n}</button>`).join('')}</div>
+      ${l.s === 'short' ? `<div class="lp-f"><label>Quantity received</label><input type="number" step="any" min="0" class="qb-n" data-dcf="got" data-i="${i}" value="${l.got}"></div>` : ''}
+      ${l.s !== 'received' ? `<div class="lp-f"><label>${l.s === 'substituted' ? 'What came instead' : 'Note'}</label><input data-dcf="note" data-i="${i}" maxlength="200" value="${escAttr(l.note)}" placeholder="${l.s === 'substituted' ? 'e.g. 47x100 instead of 50x100' : 'e.g. two boards cracked'}"></div>` : ''}
+      <div class="dc-ph">${l.photos.map((ph, k) => `<span class="dc-thumb"><img src="${escAttr(ph.data)}" alt="Photo ${k + 1} of ${escAttr(l.desc)}"><button type="button" class="dc-x" data-dc="ph-del" data-i="${i}" data-k="${k}" aria-label="Remove photo">×</button></span>`).join('')}${l.photos.length < 3 ? `<label class="btn secondary qb-sm">Photo<input type="file" accept="image/*" capture="environment" hidden data-dcphoto="${i}"></label>` : ''}</div></div>`).join('');
+  const body = `<p class="q-help" style="margin:0 0 8px;">${escHtml(p.name)} · ${escHtml(x ? x.supplier : '')}${po ? ' · ' + escHtml(po.ref) : ''} · ${collect ? 'collection' : 'delivery'}${x && x.date ? ' planned ' + escHtml(pwD(x.date)) : ''}</p>
+    <div id="dcBody">${rows || '<div class="qb-dim" style="padding:8px 0;">No item lines on this delivery. You can still sign it off.</div>'}</div>
+    <div class="lp-f"><label>${collect ? 'Collected' : 'Delivered'} on</label><input type="date" id="dcDate" value="${escAttr(dcUi.date)}" max="${fmt(new Date())}"></div>
+    ${exc ? `<div class="fin-var">${exc} item${exc === 1 ? '' : 's'} not received as ordered.${L.some(l => l.s === 'short' || l.s === 'substituted') ? ' This delivery will be marked <b>price to confirm</b>.' : ''}</div>` : ''}
+    <div class="chg-err" id="finErr">${escHtml(dcUi.err)}</div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn dc-sign" type="button" data-dc="sign">${exc ? 'Sign off with these exceptions' : 'All received: sign off'}</button></div>`;
+  if(open) finOpen((collect ? 'Collection' : 'Delivery') + ' checklist', body, true); else document.getElementById('finBody').innerHTML = body;
+}
+/* write the checklist to the drop (and the order) */
+function dcCommit(p, did, lines, date, dt){
+  const st = dcState(p, did), po = poForDrop(p.id, did), was = { delivered: st.delivered, check: st.check, ptc: st.ptc, poStatus: po ? po.status : null, poDel: po ? po.deliveredAt : null };
+  st.check = { at: new Date().toISOString(), by: whoName(), signed: date, lines: lines.map(l => ({ k: l.k, desc: l.desc, unit: l.unit, qty: l.qty, s: l.s, got: l.s === 'short' ? l.got : l.qty, note: l.note || '', photos: l.photos || [] })) };
+  const flagged = lines.filter(l => l.s === 'short' || l.s === 'substituted');
+  if(flagged.length) st.ptc = { at: date, lines: flagged.map(l => l.desc) }; else if(st.ptc && !st.ptc.done) st.ptc = null;
+  st.delivered = date; if(!st.ordered) st.ordered = date;
+  if(po && po.status !== 'Matched'){ po.status = 'Delivered'; po.deliveredAt = date; }
+  saveState(); render();
+  return () => { st.delivered = was.delivered || ''; st.check = was.check; st.ptc = was.ptc; if(po && was.poStatus){ po.status = was.poStatus; po.deliveredAt = was.poDel; } saveState(); render(); };
+}
+function dcSign(){
+  dcRead(); const p = state.projects.find(x => x.id === dcUi.pid); if(!p) return finClose();
+  const bad = dcUi.lines.find(l => l.s === 'short' && !(l.got < l.qty)); if(bad){ dcUi.err = `“${bad.desc}” is marked short: enter the quantity that came (less than ${bad.qty}).`; return dcDraw(); }
+  const bad2 = dcUi.lines.find(l => l.s === 'substituted' && String(l.note).trim().length < 2); if(bad2){ dcUi.err = `Say what came instead of “${bad2.desc}”.`; return dcDraw(); }
+  if(dcUi.date > fmt(new Date())){ dcUi.err = 'A delivery cannot be dated in the future.'; return dcDraw(); }
+  const pid = p.id, did = dcUi.did, lines = dcUi.lines, date = dcUi.date, flagged = lines.some(l => l.s === 'short' || l.s === 'substituted');
+  const undo = dcCommit(p, did, lines, date); finClose();
+  showToast('Delivery signed off' + (flagged ? ': marked price to confirm' : ''), undo);
+  dcAfter(pid, did, flagged);
+}
+/* one tap from Today: everything came as ordered */
+function dcQuick(pid, did){
+  const p = state.projects.find(x => x.id === pid); if(!p) return; const lines = dcLinesFor(p, did).map(l => Object.assign(l, { s: 'received', got: l.qty }));
+  const undo = dcCommit(p, did, lines, fmt(new Date())); showToast('Delivery signed off: all received', undo); dcAfter(pid, did, false);
+}
+function dcAfter(pid, did, flagged){ /* the "check prices now or later" question is added with the price check */ }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-dc]'); if(!b || finUi.mode !== 'dc') return; const a = b.dataset.dc;
+  if(a === 's'){ dcRead(); const l = dcUi.lines[Number(b.dataset.i)]; if(l){ l.s = b.dataset.v; if(l.s !== 'short') l.got = l.qty; dcDraw(); } }
+  else if(a === 'ph-del'){ dcRead(); const l = dcUi.lines[Number(b.dataset.i)]; if(l){ l.photos.splice(Number(b.dataset.k), 1); dcDraw(); } }
+  else if(a === 'sign') dcSign();
+});
+document.addEventListener('change', async (e) => {
+  const el = e.target; if(finUi.mode !== 'dc' || !el.dataset || el.dataset.dcphoto === undefined) return;
+  const l = dcUi.lines[Number(el.dataset.dcphoto)], f = el.files && el.files[0]; if(!l || !f) return; dcRead();
+  try{ const r = await finReadFile(f); l.photos.push({ name: r.name, data: r.data }); dcUi.err = ''; }catch(err){ dcUi.err = err.message || 'Could not read that photo.'; }
+  dcDraw();
+});
+/* the delivery check, as recorded, on the order */
+function dcRecordHtml(po){
+  const p = poProject(po), st = p && p.dropState ? p.dropState[po.did] : null, c = st && st.check; if(!c) return '';
+  const exc = c.lines.filter(l => l.s !== 'received').length;
+  return `<div class="rp-card"><div class="rp-card-h"><h4>Delivery check ${st.ptc ? '<span class="dc-ptc">price to confirm</span>' : ''}</h4><span class="rp-dim">${escHtml(pwD(c.signed))} · ${escHtml(c.by || '')}</span></div>
+    ${c.lines.map(l => `<div class="rp-row"><span>${escHtml(l.desc)}${l.note ? `<span class="rp-dim"> · ${escHtml(l.note)}</span>` : ''}${(l.photos || []).map(ph => `<a href="${escAttr(ph.data)}" target="_blank" rel="noopener" class="dc-mini"><img src="${escAttr(ph.data)}" alt="Photo of ${escAttr(l.desc)}"></a>`).join('')}</span><span class="dc-st dc-st-${l.s}">${escHtml((DC_STATUS.find(x => x[0] === l.s) || ['', l.s])[1])}${l.s === 'short' ? ' ' + l.got + ' of ' + l.qty : ''}</span></div>`).join('') || '<div class="pw-empty">No item lines were checked.</div>'}
+    ${exc ? '' : '<div class="rp-hint">Everything came as ordered.</div>'}</div>`;
+}
 
 /* ---------- moving a record between the three pipelines ----------
    Promotion and return keep everything. The record keeps its id (so its code, quotes and tasks stay linked) and carries:
@@ -12830,7 +12924,7 @@ function todayDeliveryRow(y, over){
   const x = y.x, collect = x.method === 'collect';
   return `<div class="td-row" data-today="nav" data-spec="project:${y.p.id}:materials">${todayTick(`data-today="tick-del" data-pid="${y.p.id}" data-did="${escAttr(x.d.id)}"`, 'Mark ' + (collect ? 'collected' : 'delivered') + ': ' + y.p.name + ' · ' + x.supplier)}
       <span class="td-title">${escHtml(y.p.name)} · ${collect ? 'Collection' : 'Delivery'}: ${escHtml(x.supplier)}${x.items.length ? `<span class="td-sub">${escHtml(x.items.join(', '))}</span>` : ''}</span>
-      <span class="td-meta"><span>${collect ? 'Collection' : 'Delivery'}</span>${todayDue(y.d, over)}</span></div>`;
+      <span class="td-meta"><span>${collect ? 'Collection' : 'Delivery'}${dcPtcMark(y.p, x.d.id)}</span>${todayDue(y.d, over)}<button type="button" class="btn qb-sm td-allrec" data-today="all-del" data-pid="${y.p.id}" data-did="${escAttr(x.d.id)}" title="Everything came as ordered: sign off now">All received</button></span></div>`;
 }
 function todayOrderRow(y, over){
   const po = y.po, need = poNeedsApproval(po) && !poApproved(po);
@@ -13001,11 +13095,8 @@ document.addEventListener('click', (e) => {
   else if(a === 'add-action') openNewAction();
   else if(a === 'proj-open'){ openProjectWorkspace(Number(b.dataset.id)); }
   else if(a === 'nav'){ const inner = e.target.closest('input,select,textarea,button,.cbx,a'); if(inner && inner !== b) return; navGo(() => navOpen(b.dataset.spec)); }
-  else if(a === 'tick-del'){
-    const p = state.projects.find(x => x.id === Number(b.dataset.pid)), id = b.dataset.did; if(!p) return;
-    projEnsure(p); const st = p.dropState[id] = p.dropState[id] || {};
-    pwSetDate('Delivered', () => st.delivered || '', v => { st.delivered = v; }, fmt(new Date()));
-  }
+  else if(a === 'tick-del') dcOpen(Number(b.dataset.pid), b.dataset.did);
+  else if(a === 'all-del') dcQuick(Number(b.dataset.pid), b.dataset.did);
   else if(a === 'act-open'){ const inner = e.target.closest('input,select,textarea,button,.cbx,a'); if(inner && inner !== b) return; openActionPanel(state.actions[Number(b.dataset.idx)]); }
   else if(a === 'act-rec' || a === 'act-rec-panel'){
     const r = a === 'act-rec' ? state.actions[Number(b.dataset.idx)] : (actionPanel && actionPanel.ref);
