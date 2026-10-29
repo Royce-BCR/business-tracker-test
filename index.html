@@ -2362,6 +2362,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-id-t { min-width: 0; }
 .rp-name { margin: 0; font-family: var(--bt-font-brand); font-size: var(--bt-fs-lg); line-height: 1.2; overflow-wrap: anywhere; }
 .rp-sub { color: var(--text-muted); font-size: var(--bt-fs-xs); overflow-wrap: anywhere; }
+.pj-badge { display: inline-block; min-width: 18px; padding: 0 6px; border-radius: var(--bt-r-pill); background: var(--bt-warn-bg); color: var(--bt-warn-fg); border: 1px solid var(--bt-warn-bd); font-size: var(--bt-fs-2xs); font-weight: 700; text-align: center; line-height: 16px; }
+#panel-projectpipeline[data-pjshow="check"] :is(#viewToggle-project, #projectsTableWrap, .view-pane, #projectLostWrap) { display: none !important; }
 .rp-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--bt-s2); }
 .rp-pill { display: inline-block; padding: 2px 9px; border-radius: var(--bt-r-pill); font-size: var(--bt-fs-2xs); font-weight: 700; letter-spacing: .02em; border: 1px solid transparent; vertical-align: middle; }
 .rp-pill.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); } .rp-pill.bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
@@ -3024,11 +3026,10 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="page-head crm-head">
       <div>
         <h2>Project Pipeline</h2>
-        <div class="desc">Delivery, from signed contract to sign-off and testimonial. A won deal is promoted here from the Sales Pipeline (once its contract is marked signed) and becomes a live project — code <strong>P-</strong>. Expand a project to track its delivery milestones, budgeted vs actual cost, and testimonial. Payment lines &amp; margin variance come in the finance pass.</div>
+        <div class="desc">Live jobs from signed contract to sign-off. A won deal is promoted here from the Sales Pipeline.</div>
       </div>
       
     </div>
-    <div class="pj-strip pg-strip" data-pgs="projects"></div>
     <div class="view-toggle" id="viewToggle-project"></div>
     <div id="projectsMode" class="pj-mode"></div>
     <div id="projectsPvd"></div>
@@ -8082,9 +8083,9 @@ function pvdCheckRows(){   // existing projects: every typed date that used to s
 function renderProjectsPvd(){
   const el = document.getElementById('projectsPvd'); if(!el) return;
   if(pwUi.id){ el.innerHTML = ''; return; }
-  const chk = pvdCheckRows(), roll = pvdRollup(!pvdUi.all);
+  const chk = pvdCheckRows(), roll = pvdRollup(!pvdUi.all), onCheck = projUi.show === 'check' && chk.length > 0;
   let html = '';
-  if(chk.length){
+  if(chk.length && onCheck){
     html += `<details class="pvd-card" open><summary><b>Check existing projects</b> <span class="qb-dim">Planned and actual dates now work differently: ${chk.length} project${chk.length > 1 ? 's have' : ' has'} dates that used to count as done</span></summary>
       <p class="q-help">Dates already typed are now read as <b>planned</b> dates. Nothing stored has changed. A milestone shows as done only where the records prove it (a paid or invoiced payment line, a delivery marked delivered, the quote's accepted date) or where it has been confirmed. Check each line, then confirm what really happened.</p>
       ${chk.map(c => `<div class="pvd-proj"><div class="pvd-h"><b>${escHtml(c.p.name)}</b> <span class="qb-dim">${recordCode(c.p.id, 'project')} · stage stored as “${escHtml(c.stored)}”, shown now as “${escHtml(c.now)}”</span></div>
@@ -8093,7 +8094,7 @@ function renderProjectsPvd(){
           <div class="pvd-btn">${r.kept ? '' : `<button type="button" class="btn secondary qb-sm" data-pvd="confirm" data-id="${c.p.id}" data-key="${r.key}">Confirm done ${escHtml(dShow(r.typed))}</button>`}</div></div>`).join('')}
         <div class="pvd-acts"><button type="button" class="btn secondary qb-sm" data-pvd="confirm-all" data-id="${c.p.id}">Confirm all as done on their typed dates</button><button type="button" class="btn secondary qb-sm" data-pvd="dismiss" data-id="${c.p.id}">Leave as planned, hide this check</button></div></div>`).join('')}</details>`;
   }
-  html += `<details class="pvd-card"><summary><b>Plan vs delivery roll-up</b> <span class="qb-dim">where plans miss, from confirmed dates</span></summary>
+  if(!onCheck) html += `<details class="pvd-card"><summary><b>Plan vs delivery roll-up</b> <span class="qb-dim">where plans miss, from confirmed dates</span></summary>
     <div class="pvd-tools"><label class="q-check"><input type="checkbox" data-pvd="all"${pvdUi.all ? ' checked' : ''}> Include projects that are not completed yet</label></div>
     ${roll.length ? `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Milestone</th><th>Projects</th><th>Average</th><th>Worst</th><th>On time or early</th></tr></thead><tbody>${roll.map(r => { const avg = Math.round(r.sum / r.n * 10) / 10; return `<tr><td>${escHtml(r.name)}</td><td>${r.n}</td><td><b class="pw-slip ${avg > 0 ? 'late' : 'early'}">${avg === 0 ? 'on time' : Math.abs(avg) + ' day' + (Math.abs(avg) === 1 ? '' : 's') + (avg > 0 ? ' late' : ' early')}</b></td><td>${r.worst > 0 ? r.worst + ' days late' : 'none late'}</td><td>${r.onTime} of ${r.n}</td></tr>`; }).join('')}</tbody></table></div>` : `<p class="q-help">${pvdUi.all ? 'No milestone has both a planned and an actual date yet.' : 'No completed project has milestones with both a planned and an actual date yet. Tick the box above to include live projects.'}</p>`}</details>`;
   el.innerHTML = html;
@@ -8112,8 +8113,10 @@ document.addEventListener('click', async (e) => {
 document.addEventListener('change', (e) => { const el = e.target; if(el.dataset && el.dataset.pvd === 'all'){ pvdUi.all = el.checked; renderProjectsPvd(); } });
 function renderProjectsMode(){
   const el = document.getElementById('projectsMode'); if(!el) return; if(pwUi.id){ el.innerHTML = ''; return; }
+  const chkN = pvdCheckRows().length; if(projUi.show === 'check' && !chkN) projUi.show = 'active';
+  el.closest('.panel').dataset.pjshow = projUi.show;
   const act = liveProjects().length, done = state.projects.length - act, years = [...new Set(state.projects.filter(projArchived).map(p => String(p.completed.date).slice(0, 4)))].sort().reverse();
-  el.innerHTML = `<div class="view-toggle" role="group" aria-label="Active or completed projects"><button type="button" data-pj="show" data-v="active" class="${projUi.show === 'active' ? 'active' : ''}">Active (${act})</button><button type="button" data-pj="show" data-v="completed" class="${projUi.show === 'completed' ? 'active' : ''}">Completed (${done})</button></div>
+  el.innerHTML = `<div class="view-toggle" role="group" aria-label="Project views"><button type="button" data-pj="show" data-v="active" class="${projUi.show === 'active' ? 'active' : ''}">Active (${act})</button><button type="button" data-pj="show" data-v="completed" class="${projUi.show === 'completed' ? 'active' : ''}">Completed (${done})</button>${chkN ? `<button type="button" data-pj="show" data-v="check" class="${projUi.show === 'check' ? 'active' : ''}" title="Existing projects with typed dates that need checking">Date check <span class="pj-badge">${chkN}</span></button>` : ''}</div>
     ${projUi.show === 'completed' ? `<div class="pj-filters"><input type="search" data-pj="q" value="${escAttr(projUi.q)}" placeholder="Search completed projects" aria-label="Search completed projects"><select data-pj="year" aria-label="Year completed"><option value="">All years</option>${years.map(y => `<option${y === projUi.year ? ' selected' : ''}>${y}</option>`).join('')}</select><span class="qb-dim">${state.projects.filter(projShown).length} shown · full records are kept; open one to see it, or Reopen it</span></div>` : ''}`;
 }
 document.addEventListener('click', (e) => {
@@ -18070,7 +18073,6 @@ const PG_STRIPS = {
   suppliers: () => { const a = state.suppliers.filter(x => x.status !== 'Inactive').length; return pgTile('Active suppliers', a) + pgTile('Inactive', state.suppliers.length - a, 'kept for their history'); },
   orders: () => { if(poUi.open) return ''; const L = state.purchaseOrders || [], n = st => L.filter(x => x.status === st).length; return pgTile('Orders', L.length) + pgTile('Draft or approved', n('Draft') + n('Approved'), 'not sent yet') + pgTile('Sent', n('Sent'), 'awaiting delivery') + pgTile('Delivered', n('Delivered') + n('Matched')); },
   tasks: () => { const t = fmt(new Date()), c = {}; crmFiltered().forEach(x => { const k = taskBucket(x, t); c[k] = (c[k] || 0) + 1; }); return pgTile('Overdue', c.overdue || 0) + pgTile('Due today', c.today || 0) + pgTile('Upcoming', c.upcoming || 0) + pgTile('No date', c.nodate || 0); },
-  projects: () => { if(pwUi.id) return ''; const a = liveProjects().length; return pgTile('Active projects', a) + pgTile('Completed', state.projects.length - a); },
   supinv: () => { const all = siRows(); return pgTile('Documents', all.length, 'invoices and receipts') + pgTile('Total', qm(all.reduce((a, x) => a + (Number(x.total) || 0), 0)), 'as entered'); }
 };
 function pgStripsRender(){
