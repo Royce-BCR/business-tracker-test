@@ -1951,6 +1951,9 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
 .nav-gbtn #revBadge { display: none; }
 .nav-group.open .grp-count { display: none; }
 .nav-items { display: none; padding: 2px 0 6px; }
+.td-greet-link, .db-date-link { margin-top: var(--bt-s1); font-size: var(--bt-fs-sm); }
+.nav-sep { height: 1px; margin: var(--bt-s2) var(--bt-s3); background: color-mix(in srgb, var(--bt-on-dark) 14%, transparent); }
+.ms-sep { grid-column: 1 / -1; height: 1px; margin: var(--bt-s1) 0; background: var(--bt-line); }
 .nav-group.open .nav-items { display: block; }
 .nav-group.has-current .nav-gbtn { color: var(--bt-on-dark); }
 /* icon rail (laptop / tablet, collapsed) */
@@ -2729,6 +2732,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-command" role="group" aria-labelledby="gh-command">
       <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
       <button type="button" class="tab g-command" data-tab="capacity">Calendar and capacity</button>
+      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
       <button type="button" class="tab g-command" data-tab="reports">Reports</button>
     </div>
@@ -2739,6 +2743,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-crm" role="group" aria-labelledby="gh-crm">
       <button type="button" class="tab g-crm" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
       <button type="button" class="tab g-crm" data-tab="companies">Companies</button>
+      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-crm" data-tab="crmprojects">Projects</button>
       <button type="button" class="tab g-crm" data-tab="crm">Tasks</button>
     </div>
@@ -2758,9 +2763,11 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <button type="button" class="nav-label nav-gbtn" id="gh-operations" aria-expanded="false" aria-controls="gp-operations"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Operations</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-operations" role="group" aria-labelledby="gh-operations">
       <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
+      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
       <button type="button" class="tab g-operations" data-tab="purchaseorders">Orders and deliveries</button>
       <button type="button" class="tab g-operations" data-tab="supplierinvoices">Supplier invoices</button>
+      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-operations" data-tab="assets">Assets</button>
     </div>
   </div>
@@ -2770,12 +2777,14 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-finance" role="group" aria-labelledby="gh-finance">
       <button type="button" class="tab g-finance" data-tab="cashflow">Cash flow</button>
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
-      <button type="button" class="tab g-finance" data-tab="pnl">Profit and loss</button>
-      <button type="button" class="tab g-finance" data-tab="revenue">Budget and forecast</button>
-      <button type="button" class="tab g-finance" data-tab="balance">Balance sheet</button>
-      <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
-      <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
+      <div class="nav-sep" role="separator"></div>
+      <button type="button" class="tab g-finance" data-tab="pnl">Profit and loss</button>
+      <button type="button" class="tab g-finance" data-tab="balance">Balance sheet</button>
+      <button type="button" class="tab g-finance" data-tab="revenue">Budget and forecast</button>
+      <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
+      <div class="nav-sep" role="separator"></div>
+      <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
     </div>
   </div>
@@ -2783,9 +2792,9 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="nav-group g-business" data-group="business" data-label="Business" data-short="Business">
     <button type="button" class="nav-label nav-gbtn" id="gh-business" aria-expanded="false" aria-controls="gp-business"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Business</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-business" role="group" aria-labelledby="gh-business">
-      <button type="button" class="tab g-business" data-tab="businessplan">Business Plan</button>
-      <button type="button" class="tab g-business" data-tab="businesscosts">Business costs</button>
       <button type="button" class="tab g-business" data-tab="actions">Business tasks</button>
+      <button type="button" class="tab g-business" data-tab="businesscosts">Business costs</button>
+      <button type="button" class="tab g-business" data-tab="businessplan">Business Plan</button>
     </div>
   </div>
 
@@ -2843,6 +2852,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <section class="td-greet" id="todayGreet" aria-label="Greeting">
       <h2 class="td-greeting" id="todayGreeting">Hello</h2>
       <div class="td-greet-sum" id="todaySummary"></div>
+      <div class="td-greet-link"><button type="button" class="sp-link" data-f6="rep-open-nav" data-k="biz:monthly">Monthly summary →</button></div>
     </section>
     <div class="page-head crm-head">
       <div>
@@ -2867,6 +2877,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <div>
         <h2 id="dbGreeting">Dashboard</h2>
         <div class="db-date" id="dbDate"></div>
+        <div class="db-date-link"><button type="button" class="sp-link" data-f6="rep-open-nav" data-k="biz:monthly">Monthly summary →</button></div>
       </div>
       <div class="view-toggle" id="dbPeriod" role="group" aria-label="Period for the period-based widgets"></div>
     </div>
@@ -15385,7 +15396,7 @@ const menuUi = { sig: '', pop: null, hoverT: 0, sheetFrom: null, built: false };
 const menuEl = id => document.getElementById(id);
 const menuSvg = (key, cls) => `<svg${cls ? ' class="' + cls + '"' : ''} viewBox="0 0 24 24" aria-hidden="true">${MENU_ICONS[key] || MENU_ICONS.command}</svg>`;
 function menuCatalog(){
-  return [...document.querySelectorAll('#sidebar .nav-group')].map(g => ({ id: g.dataset.group, label: g.dataset.label, short: g.dataset.short, tabs: [...g.querySelectorAll('.tab:not([hidden])')].map(t => ({ tab: t.dataset.tab, label: navTabLabel(t.dataset.tab) })) }));
+  return [...document.querySelectorAll('#sidebar .nav-group')].map(g => ({ id: g.dataset.group, label: g.dataset.label, short: g.dataset.short, tabs: [...g.querySelectorAll('.tab:not([hidden])')].map(t => ({ tab: t.dataset.tab, label: navTabLabel(t.dataset.tab), sep: !!(t.previousElementSibling && t.previousElementSibling.classList.contains('nav-sep')) })) }));
 }
 function menuGroupOf(tab){ const t = document.querySelector('#sidebar .tab[data-tab="' + tab + '"]'), g = t && t.closest('.nav-group'); return g ? g.dataset.group : ''; }
 function menuCurrent(){ const t = document.querySelector('#sidebar .tab.active'); return t ? t.dataset.tab : ''; }
@@ -15532,7 +15543,7 @@ function menuPopOpen(gid, btn, o){
   if(menuUi.pop && menuUi.pop.btn !== btn) menuPopClose(false);
   clearTimeout(menuUi.hoverT);
   const cur = menuCurrent(), top = !!o.top;
-  let html = `<div class="mp-head">${escHtml(g.label)}</div>` + g.tabs.map(t => { const c = menuBadge(t.tab); return `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('');
+  let html = `<div class="mp-head">${escHtml(g.label)}</div>` + g.tabs.map(t => { const c = menuBadge(t.tab); return (t.sep ? '<div class="mp-sep" role="separator"></div>' : '') + `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('');
   if(top && gid === 'settings'){
     const ue = menuEl('undoBadge'), un = ue && !ue.hidden ? (parseInt(ue.textContent, 10) || 0) : 0;
     html += '<div class="mp-sep"></div>' + `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="undo"><span>Undo history</span>${un ? `<span class="tab-count">${un}</span>` : ''}</button>`;
@@ -15557,7 +15568,7 @@ function menuFocusMove(list, from, step){ const i = list.indexOf(from), n = list
 function menuSheetOpen(){
   const cat = menuCatalog(), cur = menuCurrent(), u = menuEl('undoBadge'), un = u && !u.hidden ? (parseInt(u.textContent, 10) || 0) : 0;
   menuEl('moreSheet').innerHTML = `<div class="ms-head"><h2>All pages</h2><button type="button" class="btn secondary" data-mact="sheetclose" aria-label="Close the page list">Close</button></div><div class="ms-grid ms-favs" id="msFavs" role="group" aria-label="Favourite pages" hidden></div>`
-    + cat.map(g => `<div class="ms-group g-${g.id}"><h3>${escHtml(g.label)}</h3><div class="ms-grid">${g.tabs.map(t => { const c = menuBadge(t.tab); return `<button type="button" class="ms-item g-${g.id}" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('')}</div></div>`).join('')
+    + cat.map(g => `<div class="ms-group g-${g.id}"><h3>${escHtml(g.label)}</h3><div class="ms-grid">${g.tabs.map(t => { const c = menuBadge(t.tab); return (t.sep ? '<span class="ms-sep" role="separator"></span>' : '') + `<button type="button" class="ms-item g-${g.id}" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('')}</div></div>`).join('')
     + `<div class="ms-foot"><button type="button" class="btn secondary" data-mact="editbar">Edit bottom bar</button><button type="button" class="btn secondary" data-mact="undo">Undo history${un ? ' (' + un + ')' : ''}</button>${document.querySelector('#logoutBar .logout-link') ? '<button type="button" class="btn secondary" data-mact="logout">Log out</button>' : ''}</div>`;
   menuFavRender();
   menuUi.sheetFrom = document.activeElement;
