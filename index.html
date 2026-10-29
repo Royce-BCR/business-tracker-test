@@ -2519,6 +2519,112 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 @media (max-width: 999px), (pointer: coarse) { .rp-hint .sp-link, .rp-ro .sp-link { padding: 14px 6px; margin: -14px -6px; position: relative; } }
 /* BT:css-selling begin */
   /* Stage 3: selling */
+  .ph-head, .pt-head { display: grid; gap: 6px; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+  .ph-head { grid-template-columns: minmax(0, 1fr) 64px 64px 34px; }
+  .ph-row { display: grid; grid-template-columns: minmax(0, 1fr) 64px 64px 34px; gap: 6px; margin-bottom: 8px; align-items: center; padding-bottom: 8px; border-bottom: 1px dashed var(--line); }
+  .ph-row .ph-sub { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .ph-row .ph-sub input[type=date] { width: 138px; }
+  .ph-row .ph-sub .q-check { min-height: 0; font-size: var(--bt-fs-xs); }
+  .cap-row input:not([type=checkbox]), .hd-row input:not([type=checkbox]), .hd-row select, .ph-row input:not([type=checkbox]), .pt-row input[type=text], .pt-row input[type=number] { border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); min-width: 0; width: 100%; }
+  .ph-row input[type=checkbox], .pt-row input[type=checkbox] { width: auto; }
+  .ph-row.ph-stack { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px; }
+  .ph-row.ph-stack .ph-nm { grid-column: 1 / -1; font-weight: 600; }
+  .ph-row.ph-stack .pt-f > span { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+  .ph-row.ph-stack .ph-sub { grid-column: 1 / -1; font-size: var(--bt-fs-xs); }
+  .ph-ask-n { margin: 0 0 6px; } .ph-q { margin: 0 0 10px; font-size: 15px; }
+  .ph-pick { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; } .ph-pick select { flex: 1; min-width: 0; font-size: 16px; } .ph-pick .btn { min-width: 44px; font-size: 20px; line-height: 1; }
+  .ph-note { font-size: var(--bt-fs-xs); color: var(--text-muted); margin-bottom: 4px; }
+  .db-minis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--bt-s3); margin: 0 0 var(--bt-s3); }
+  .db-mini { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; background: var(--bt-surface-2); display: flex; flex-direction: column; gap: 2px; } .db-mini .k { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; } .db-mini b { font-size: 18px; font-variant-numeric: tabular-nums; } .db-mini .s { font-size: var(--bt-fs-xs); color: var(--text-muted); }
+  .db-tbl { width: 100%; border-collapse: collapse; font-size: 13px; } .db-tbl th, .db-tbl td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); } .db-tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .ph-sell { margin-top: 4px; }
+  .cap-list { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+  .cap-row { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; background: var(--bt-card); }
+  .cap-main { display: grid; grid-template-columns: minmax(0, 1fr) 200px 34px; gap: var(--bt-s2); align-items: end; }
+  .cap-main input { width: 100%; min-width: 0; } .cap-h { display: block; margin: 0; } .cap-h > span { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+  .cap-leave { margin-top: 8px; } .cap-leave summary { cursor: pointer; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--slate); }
+  .cap-lv { display: grid; grid-template-columns: 138px 138px minmax(0, 1fr) 34px; gap: 6px; margin: 6px 0; align-items: center; } .cap-lv input { min-width: 0; width: 100%; }
+  @media (max-width: 700px) { .cap-main { grid-template-columns: minmax(0, 1fr) 34px; } .cap-main .cap-h { grid-column: 1 / -1; grid-row: 2; } .cap-lv { grid-template-columns: 1fr 1fr 34px; } .cap-lv input[type=text] { grid-column: 1 / 3; } .cap-lv .icon-btn { grid-row: 1; grid-column: 3; } }
+  .gt-card .gt-head { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; margin-bottom: 8px; } .gt-card h4 { margin: 0; } .gt-sub { font-size: var(--bt-fs-xs); color: var(--text-muted); }
+  .gt-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bt-card); -webkit-overflow-scrolling: touch; }
+  .gt { --lw: 124px; width: calc(var(--lw) + var(--gw)); position: relative; }
+  .gt-axis, .gt-row { display: flex; }
+  .gt-l { width: var(--lw); flex: 0 0 var(--lw); position: sticky; left: 0; z-index: 5; background: var(--bt-card); border-right: 1px solid var(--line); padding: 3px 8px; font-size: 12px; display: flex; flex-direction: column; justify-content: center; min-height: 30px; overflow: hidden; box-sizing: border-box; }
+  .gt-l span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; } .gt-l small { color: var(--text-muted); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gt-t { position: relative; width: var(--gw); flex: 0 0 var(--gw); height: 30px; }
+  .gt-axis { border-bottom: 1.5px solid var(--stone-deep); background: var(--bt-surface-2); } .gt-axis .gt-l { background: var(--bt-surface-2); } .gt-axis .gt-t { height: 38px; }
+  .gt-mo { position: absolute; top: 2px; height: 16px; line-height: 16px; font-size: 11px; font-weight: 600; padding-left: 4px; border-left: 1px solid var(--line); white-space: nowrap; }
+  .gt-wkt { position: absolute; top: 20px; height: 16px; line-height: 16px; font-size: 10px; color: var(--text-muted); padding-left: 3px; border-left: 1px solid var(--line); }
+  .gt-body { position: relative; }
+  .gt-over { position: absolute; top: 0; bottom: 0; left: var(--lw); width: var(--gw); pointer-events: none; z-index: 0; } .gt-bgl { position: absolute; inset: 0; }
+  .gt-off { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--bt-ink) 5%, transparent); }
+  .gt-off.hol { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--bt-warn-fg) 22%, transparent) 0 3px, color-mix(in srgb, var(--bt-warn-fg) 6%, transparent) 3px 6px); }
+  .gt-wl { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--bt-chalk); }
+  .gt-bo { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--bt-ink) 14%, transparent) 0 5px, color-mix(in srgb, var(--bt-ink) 5%, transparent) 5px 10px); }
+  .gt-today { position: absolute; top: 0; bottom: 0; border-left: 2px solid var(--bt-bad-fg); z-index: 3; } .gt-today-t { position: absolute; top: 0; transform: translateX(-50%); background: var(--bt-bad-fg); color: var(--bt-on-dark); font-size: 10px; font-weight: 600; padding: 0 5px; border-radius: var(--bt-r-btn); z-index: 3; }
+  .gt-row { border-bottom: 1px solid var(--line); position: relative; z-index: 1; } .gt-row:last-child { border-bottom: 0; }
+  .gt-bar { position: absolute; top: 6px; height: 18px; border-radius: 4px; background: var(--bt-oak-600); box-shadow: 0 1px 2px color-mix(in srgb, var(--bt-ink) 15%, transparent); min-width: 5px; display: block; }
+  .gt-bar.sell { background: var(--slate); } .gt-bar.gt-st { background: var(--muted); opacity: .75; } .gt-bar.done { background: var(--bt-ok-fg); } .gt-bar.done.ass { background: var(--bt-warn-fg); }
+  .gt-bar.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.5) 0 4px, transparent 4px 8px); outline: 1px dashed var(--bt-warn-fg); }
+  .gt-txt { position: absolute; top: 7px; font-size: 11px; white-space: nowrap; color: var(--ink); }
+  .gt-mk { font-weight: 600; } .gt-mk.ok { color: var(--bt-ok-fg); } .gt-mk.warn { color: var(--bt-warn-fg); }
+  .gt-ms { position: absolute; top: 9px; width: 11px; height: 11px; margin-left: -6px; transform: rotate(45deg); background: var(--bt-card); border: 2px solid var(--muted); box-sizing: border-box; display: block; }
+  .gt-ms.ms-done { background: var(--bt-ok-fg); border-color: var(--bt-ok-fg); } .gt-ms.ms-overdue { background: var(--bt-bad-fg); border-color: var(--bt-bad-fg); } .gt-ms.ms-soon { border-color: var(--bt-warn-fg); background: var(--bt-warn-bg); }
+  .gt-dl { position: absolute; top: 6px; width: 18px; height: 18px; margin-left: -9px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--bt-oak-500); border-radius: var(--bt-r-chip); background: var(--bt-card); color: var(--bt-oak-700); } .gt-dl svg { width: 12px; height: 12px; } .gt-dl.done { opacity: .5; }
+  .gt-caprow .gt-t, .gt-captrack { height: 112px; } .gt-caprow { background: var(--bt-surface-2); }
+  .gt-wk { position: absolute; top: 6px; bottom: 16px; cursor: pointer; } .gt-wk:hover { background: color-mix(in srgb, var(--bt-oak-500) 12%, transparent); } .gt-wk.over { background: color-mix(in srgb, var(--bt-bad-fg) 12%, transparent); }
+  .gt-stack { position: absolute; left: 2px; right: 2px; top: 0; bottom: 0; display: flex; flex-direction: column-reverse; } .gt-stack i { display: block; flex: none; } .gt-stack .oth { background: color-mix(in srgb, var(--muted) 55%, transparent); } .gt-stack .mine { background: var(--bt-oak-600); } .gt-stack .mine.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.5) 0 4px, transparent 4px 8px); }
+  .gt-wk.over .gt-stack .oth, .gt-wk.over .gt-stack .mine { filter: saturate(1.2); } .gt-wk.over .gt-wv { color: var(--bt-bad-fg); font-weight: 700; }
+  .gt-capl { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--bt-ink); opacity: .7; height: 0; } .gt-wv { position: absolute; left: 0; right: 0; bottom: -15px; text-align: center; font-size: 10px; color: var(--text-muted); white-space: nowrap; }
+  .gt-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 8px; } .gt-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .gt-legend .gt-bar { position: static; width: 18px; height: 10px; min-width: 0; } .gt-legend .gt-ms, .gt-legend .gt-dl { position: static; margin: 0; } .gt-legend .gt-off { position: static; display: inline-block; width: 14px; height: 10px; } .gt-capsw { display: inline-block; width: 16px; border-top: 2px dashed var(--bt-ink); }
+  #phSched .rp-s-f { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; } #phSched .rp-s-f input[type=date] { width: 138px; } #phSched .rp-s-d { flex: 1 1 100%; }
+  @media (max-width: 700px) { #phSched .rp-s-f .rp-s-was { flex: 1 1 100%; } #phSched .rp-s-f input[type=date] { flex: 1 1 0; width: auto; min-width: 0; } }
+  .cv-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 0 0 var(--bt-s3); }
+  .cv-layers { display: flex; flex-wrap: wrap; gap: 6px; } .cv-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--bt-card); color: var(--text-muted); border-radius: 999px; padding: 5px 12px; font-size: var(--bt-fs-xs); font-weight: 600; cursor: pointer; min-height: 32px; } .cv-chip.on { background: var(--bt-ink); color: var(--bt-on-dark); border-color: var(--bt-ink); }
+  .cv-sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--muted); } .cv-sw.oak { background: var(--bt-oak-600); } .cv-sw.slate { background: var(--slate); } .cv-sw.green { background: var(--bt-green-600); } .cv-sw.bad { background: var(--bt-bad-fg); } .cv-sw.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 3px, transparent 3px 6px); } .cv-sw.deliveries { background: var(--bt-card); border: 1.5px solid var(--bt-oak-500); } .cv-sw.tasks { background: var(--bt-info-fg); border-radius: 50%; }
+  .cv-nav { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; } .cv-go { display: inline-flex; align-items: center; gap: 6px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin: 0; } .cv-go input, .cv-go select { width: auto; }
+  .cv-leg { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin: 0 0 8px; } .cv-leg span { display: inline-flex; align-items: center; gap: 5px; } .cv-capsw { display: inline-block; width: 16px; border-top: 2px dashed var(--bt-ink); }
+  .cv-wk { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bt-card); padding: 8px 10px; margin-bottom: 8px; } .cv-wk.cur { border-color: var(--bt-oak-500); } .cv-wk.over { background: color-mix(in srgb, var(--bt-bad-fg) 7%, var(--bt-card)); border-color: var(--bt-bad-bd); }
+  .cv-wh { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 10px 14px; align-items: center; }
+  .cv-wl { text-align: left; background: none; border: 0; padding: 4px 0; cursor: pointer; font: inherit; display: flex; flex-direction: column; min-height: 36px; justify-content: center; } .cv-wl b { font-size: 13px; text-decoration: underline; text-decoration-color: var(--line); } .cv-wl span { font-size: var(--bt-fs-2xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+  .cv-bar { min-width: 0; } .cv-track { position: relative; height: 18px; background: var(--bt-surface-2); border-radius: 4px; overflow: visible; display: flex; } .cv-seg { display: block; height: 100%; flex: none; } .cv-seg:first-child { border-radius: 4px 0 0 4px; } .cv-seg.project { background: var(--bt-oak-600); } .cv-seg.sales { background: var(--slate); } .cv-seg.lead { background: var(--bt-green-600); } .cv-seg.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 4px, transparent 4px 8px); }
+  .cv-cap { position: absolute; top: -3px; bottom: -3px; border-left: 2px dashed var(--bt-ink); } .cv-num { font-size: 12px; font-variant-numeric: tabular-nums; display: inline-block; margin-top: 3px; } .cv-num.bad { color: var(--bt-bad-fg); font-weight: 700; }
+  .cv-days { display: grid; grid-template-columns: repeat(7, 40px); gap: 3px; }
+  .cv-d { display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 4px; background: var(--bt-card); padding: 2px 0; min-height: 46px; cursor: pointer; font: inherit; color: var(--ink); } .cv-d:hover { border-color: var(--bt-oak-500); }
+  .cv-d.off { background: var(--bt-surface-2); color: var(--text-muted); } .cv-d.hol { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--bt-warn-fg) 18%, transparent) 0 3px, transparent 3px 6px); } .cv-d.hot { border-color: var(--bt-bad-fg); background: var(--bt-bad-bg); } .cv-d.today { outline: 2px solid var(--bt-bad-fg); outline-offset: -1px; }
+  .cv-dn { font-size: 9.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--text-muted); } .cv-dh { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 14px; } .cv-de { display: flex; gap: 2px; min-height: 12px; align-items: center; }
+  .cv-ic { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; } .cv-ic.del svg { width: 12px; height: 12px; color: var(--bt-oak-700); } .cv-ic.tsk { background: var(--bt-info-fg); color: var(--bt-on-dark); border-radius: 50%; font-size: 8px; font-style: normal; }
+  .cv-more { margin-top: 6px; } .cv-list { margin-top: 6px; border-top: 1px dashed var(--line); padding-top: 6px; }
+  .cv-c { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; padding: 3px 0; font-size: 13px; } .cv-c b { margin-left: auto; font-variant-numeric: tabular-nums; } .cv-cw { color: var(--text-muted); font-size: var(--bt-fs-xs); }
+  .cv-ck { width: 10px; height: 10px; border-radius: 2px; background: var(--muted); flex: none; } .cv-ck.project { background: var(--bt-oak-600); } .cv-ck.sales { background: var(--slate); } .cv-ck.lead { background: var(--bt-green-600); } .cv-ck.del { background: var(--bt-card); border: 1.5px solid var(--bt-oak-500); }
+  .cv-unp { margin-top: var(--bt-s4); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; background: var(--bt-card); } .cv-unp h4 { margin: 0 0 4px; }
+  .db-mini.bad b { color: var(--bt-bad-fg); }
+  @media (max-width: 860px) { .cv-wh { grid-template-columns: minmax(0, 1fr); } .cv-days { grid-template-columns: repeat(7, minmax(0, 1fr)); } .cv-wl { flex-direction: row; gap: 8px; align-items: baseline; justify-content: flex-start; } }
+  .ph-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .ph-tbl input { width: 100%; min-width: 0; } .ph-tbl td:nth-child(2) input, .ph-tbl td:nth-child(3) input { width: 72px; }
+  .ph-card .ph-btns { margin-top: 10px; }
+  .pt-head, .pt-row { grid-template-columns: 58px minmax(0, 1fr) 80px 70px 80px 34px; }
+  .pt-row { display: grid; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .pt-f > span { display: none; } .pt-f { display: block; margin: 0; }
+  .pt-list, .pt-head { max-width: 720px; }
+  @media (max-width: 700px) {
+    .pt-head { display: none; }
+    .pt-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto; grid-template-areas: "nm nm nm nm" "hr dy sl dl" "mv mv mv mv"; padding: 8px 0 10px; border-bottom: 1px dashed var(--line); gap: 6px 8px; margin-bottom: 4px; }
+    .pt-nm { grid-area: nm; } .pt-hr { grid-area: hr; } .pt-dy { grid-area: dy; } .pt-sl { grid-area: sl; } .pt-dl { grid-area: dl; } .pt-mv { grid-area: mv; }
+    .pt-f > span { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; }
+  }
+  .hd-wk { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; margin: 0 0 10px; }
+  .hd-wk-l { font-weight: 600; font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
+  #panel-settings .set-content .hd-wk { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, max-content)); gap: 2px 16px; }
+  #panel-settings .set-content .hd-wk .hd-wk-l { grid-column: 1 / -1; }
+  #panel-settings .set-content .hd-wk label { display: flex; flex-direction: row; align-items: center; gap: 8px; margin: 0; width: auto; }
+  #panel-settings .set-content .hd-wk input { margin-top: 0; }
+  .hd-wk input[type=checkbox] { width: auto; margin: 0; }
+  .hd-list { display: flex; flex-direction: column; gap: 6px; max-width: 900px; }
+  .hd-row { display: grid; grid-template-columns: 136px 136px minmax(0, 1fr) 160px 34px; gap: var(--bt-s2); align-items: center; }
+  .hd-row input, .hd-row select { min-width: 0; }
+  @media (max-width: 700px) { .hd-row { grid-template-columns: 1fr 1fr 34px; } .hd-row input[type=text], .hd-row select { grid-column: 1 / 3; } .hd-row .icon-btn { grid-row: 1; grid-column: 3; } }
   .sf-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--bt-neu-bg); color: var(--bt-neu-fg); white-space: nowrap; vertical-align: middle; }
   .sf-chip.bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
   .sf-chip.warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); }
@@ -2586,6 +2692,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <button type="button" class="nav-label nav-gbtn" id="gh-command" aria-expanded="false" aria-controls="gp-command"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Command</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-command" role="group" aria-labelledby="gh-command">
       <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
+      <button type="button" class="tab g-command" data-tab="capacity">Calendar and capacity</button>
       <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
     </div>
   </div>
@@ -2707,6 +2814,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <section class="td-card" id="todayJob"></section>
       <section class="td-card" id="todayBiz"></section>
       <section class="td-card" id="todayProjects" style="grid-column:1 / -1;"></section>
+      <section class="td-card" id="todayPhases" style="grid-column:1 / -1;"></section>
       <section class="td-card" id="todayReady" style="grid-column:1 / -1;"></section>
     </div>
   </div>
@@ -2731,10 +2839,22 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <section class="db-card" id="dbFunnel" aria-label="Lead funnel"></section>
       <section class="db-card" id="dbLost" aria-label="Lost leads by reason"></section>
     </div>
+    <section class="db-card" id="dbSelling" aria-label="Cost of selling"></section>
     <section class="db-card" id="dbSoon" aria-label="Coming up"></section>
     <section class="db-card" id="dbForecast" aria-label="Forecast and actuals"></section>
   </div>
   <div class="db-tip" id="dbTip" role="tooltip" hidden></div>
+
+  <!-- CALENDAR AND CAPACITY -->
+  <div class="panel" id="panel-capacity">
+    <div class="page-head">
+      <h2>Calendar and capacity</h2>
+      <div class="desc">What is planned in each week against the hours the team has. Switch layers on and off to see confirmed work on its own, or with the weighted sales deals and leads on top. Click a week or a day to open it on Today.</div>
+    </div>
+    <div id="cvSum"></div>
+    <div class="cv-controls" id="cvControls"></div>
+    <div id="cvBody"></div>
+  </div>
 
   <!-- BUSINESS PLAN -->
   <div class="panel" id="panel-businessplan">
@@ -3034,6 +3154,10 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div id="sellMoreCards"></div>
         </section>
 
+        <section class="set-sec" data-sec="planning">
+    <div id="planCards"></div>
+        </section>
+
         <section class="set-sec" data-sec="docs">
     <div class="section-label">Business and bank details for documents</div>
     <div class="card" id="docsBizCard"></div>
@@ -3233,6 +3357,12 @@ create policy "app update" on tracker_data for update using (true) with check (t
   </div>
 </div>
 
+<div class="modal-overlay" id="phOverlay" hidden>
+  <div class="modal undo-modal" style="max-width:440px;" role="dialog" aria-label="Hours for this phase">
+    <div class="terms-top"><span class="terms-tag" id="phTitle">Hours</span></div>
+    <div id="phBody"></div>
+  </div>
+</div>
 <div class="modal-overlay" id="chgOverlay" hidden>
   <div class="modal undo-modal" style="max-width:480px;" role="dialog" aria-label="Save changes">
     <div class="terms-top"><span class="terms-tag" id="chgTitle">Save changes</span></div>
@@ -3391,8 +3521,7 @@ function completionDate(start, buildDays){
   if(!start || !buildDays) return null;
   let d = new Date(start), count = 0, guard = 0;
   while(guard < 400){
-    const dow = d.getDay();
-    if(dow!==0 && dow!==6){ count++; if(count >= buildDays) return new Date(d); }
+    if(wdIsWork(d)){ count++; if(count >= buildDays) return new Date(d); }
     d.setDate(d.getDate()+1); guard++;
   }
   return d;
@@ -4476,6 +4605,7 @@ function renderDashboard(){
   document.getElementById('dbPipe').innerHTML = dashPipeHtml();
   document.getElementById('dbFunnel').innerHTML = dashFunnelHtml(range, won, lost.length);
   document.getElementById('dbLost').innerHTML = dashLostHtml(range, lost);
+  if(typeof dashSellingHtml === 'function' && document.getElementById('dbSelling')) document.getElementById('dbSelling').innerHTML = dashSellingHtml();
   document.getElementById('dbSoon').innerHTML = dashSoonHtml(today);
   document.getElementById('dbForecast').innerHTML = dashForecastHtml(months, totIn, totOut);
   dashUi.sig = DASH_CHARTS.map(id => dashInnerW(document.getElementById(id))).join('|');
@@ -6800,7 +6930,7 @@ function pwMiniGantt(p){
   /* faint calendar grid behind the bars: a line per day on short spans, per Monday and per month always, weekends shaded */
   const dow0 = toDate(lo).getDay(); let we = '', run = -1, wl = '';
   for(let k = 0; k <= span; k++){
-    const wk = k < span && ((dow0 + k) % 7 === 0 || (dow0 + k) % 7 === 6);
+    const wk = k < span && ((dow0 + k) % 7 === 0 || (dow0 + k) % 7 === 6 || wdIsOffDay(addDaysIso(lo, k)));
     if(wk && run < 0) run = k; else if(!wk && run >= 0){ we += `<i class="pw-we" style="left:${run / span * 100}%;width:${(k - run) / span * 100}%"></i>`; run = -1; }
     if(k < span && (dow0 + k) % 7 === 1) wl += `<i class="pw-wl" style="left:${k / span * 100}%"></i>`;
   }
@@ -6838,7 +6968,7 @@ function pwTimelineHtml(p, i){
   const sw = (state.blackouts || []).length;
   const bar = ed ? pwEditBar(p, 'timeline', `<button type="button" class="btn secondary qb-sm" data-pw="edit-baseline" title="Put every stage back to its original (baseline) dates in the draft">Reset to original dates</button>`) : '';
   return `<section class="pw-sec" id="pw-timeline" data-sec="timeline"><h3>Timeline</h3>
-    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan</h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div>
+    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan</h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${rpPlanCtx.on && !ed ? '<div class="pw-note">The Gantt for this project is at the top of the Plan tab. Press Edit timeline to drag the stage lines here.</div>' : pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div>
       <div class="pw-note pw-foot">The faint bar behind each stage is its original date. Weekends are shaded; rest the cursor on the chart for a moment to see the date.</div></div>
     ${pwFold('t-stages', 'Stages', 'Stage lines: dates, planned and logged hours', '<button class="btn secondary" data-pw="add-stage">+ Add stage</button>', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Planned start</th><th>Planned end</th><th>Actual start → end</th><th>Status</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
       <tbody>${stageRows || '<tr><td colspan="12"><div class="sup-empty">No stage lines on this project yet. Add one, or promote a deal that has stage lines.</div></td></tr>'}</tbody></table></div>
@@ -7966,6 +8096,7 @@ function renderSettings(){
   renderQuoteSettings();
   renderApprovalSettings();
   renderSellingSettings();
+  if(typeof renderPlanningSettings === 'function') renderPlanningSettings();
   renderDocSettings();
 }
 /* ---------- Settings > Pipelines: blackout dates (no-work periods: holidays, shutdowns) shown as hatched bands on the Gantt and the project timeline ---------- */
@@ -11021,7 +11152,7 @@ function psWordsGeneric(method, value){
     : `Profit share = labour hours × ${qm(value)}. For example 40 labour hours gives ${qm(40 * value)}. Retained profit = project profit − profit share.`;
 }
 function projHours(p){
-  const aq = projAcceptedQuote(p), logged = (p.stages || []).reduce((a, s) => a + slLogged(s), 0);
+  const aq = projAcceptedQuote(p), logged = (p.stages || []).reduce((a, s) => a + slLogged(s), 0) + (typeof phDoneHours === 'function' ? phDoneHours(p) : 0);   // Stage 4: plus the hours confirmed or assumed when a phase was ticked done
   if(!aq) return { sold: 0, plan: 0, logged };
   const sold = aq.asSold ? aq.asSold.labourHours : aq.labour.filter(r => !qExcluded(aq, r)).reduce((a, r) => a + qLabourDays(r) * hpd(), 0);
   const pq = projWorkQuote(p), plan = pq.labour.filter(r => !qExcluded(pq, r)).reduce((a, r) => a + qLabourDays(r) * hpd(), 0);
@@ -13366,6 +13497,7 @@ function renderToday(){
     pr.innerHTML = `<div class="td-head"><h3>${isToday ? 'Projects today' : 'Projects on ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${pe.today.length}</span></div>
       ${pe.over.length ? `<button class="td-od${open ? ' open' : ''}" data-today="od" data-k="proj">Overdue (${pe.over.length})${CHEV_SVG}</button><div class="td-od-list"${open ? '' : ' hidden'}>${pe.over.map(x => todayProjectRow(x, true)).join('')}</div>` : ''}
       ${pe.today.length ? pe.today.map(x => todayProjectRow(x, false)).join('') : '<div class="td-empty">No project stages, deliveries or payments dated ' + (isToday ? 'today' : 'that day') + '.</div>'}`; }
+  if(typeof renderTodayPhases === 'function') renderTodayPhases(sel, real);
   refreshActionPanel();
 }
 /* roll over at midnight and when the tab or window regains focus, so the lists never show yesterday's "today" */
@@ -13823,6 +13955,7 @@ const SET_SECTIONS = [
   { id: 'finance',   label: 'Finance' },
   { id: 'quotes',    label: 'Quotes & pricing' },
   { id: 'selling',   label: 'Selling' },
+  { id: 'planning',  label: 'Planning & capacity' },
   { id: 'docs',      label: 'Documents & email' },
   { id: 'approvals', label: 'Approvals' },
   { id: 'dashboard', label: 'Dashboard' },
@@ -14270,6 +14403,7 @@ function render(){
   cxDirty(); cxSyncAll();   // CRM: deals and draft quotes read their customer details from the contact
   undoBadge(); projSyncValues(); navMetrics();
   renderDashboard();
+  if(typeof renderCapacity === 'function' && document.getElementById('panel-capacity').classList.contains('active')) renderCapacity();
   if(typeof renderLostBars === 'function') renderLostBars();
   renderBusinessPlan();
   renderLeads();
@@ -14406,7 +14540,7 @@ document.addEventListener('click', (e) => {
   if(action === 'add-row'){
     const tab = btn.dataset.tab;
     const row = newRowFor(tab);
-    if(tab === 'pipeline'){ row.id = allocRecordId(); expandedProjects.add(row.id); }
+    if(tab === 'pipeline'){ row.id = allocRecordId(); phPrefill(row); expandedProjects.add(row.id); }
     state[tab].push(row); render(); saveState();
   }
   else if(action === 'delete-row'){
@@ -14438,7 +14572,7 @@ document.addEventListener('click', (e) => {
     if(gone) undoDeleted('Stage line deleted: ' + String(gone.label || 'Stage').slice(0, 40), ['pipeline', { id: rec.id }, 'stages'], s, gone);
     render(); saveState();
   }
-  else if(action === 'add-lead'){ const l = newRowFor('leads'); l.id = allocRecordId(); expandedLeads.add(l.id); state.leads.push(l); render(); saveState(); }
+  else if(action === 'add-lead'){ const l = newRowFor('leads'); l.id = allocRecordId(); phPrefill(l); expandedLeads.add(l.id); state.leads.push(l); render(); saveState(); }
   else if(action === 'delete-lead'){
     const at = Number(btn.dataset.idx), gone = state.leads.splice(at, 1)[0];
     if(gone) undoDeleted('Lead deleted: ' + String(gone.projectName || gone.contact || gone.company || recordCode(gone.id, 'lead')).slice(0, 40), ['leads'], at, gone);
@@ -15038,6 +15172,7 @@ function activateTab(name){
   tab.setAttribute('aria-current', 'page');
   panel.classList.add('active');
   if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
+  if(name === 'capacity') try{ renderCapacity(); }catch(e){ console.error(e); }
   try{ pjOnTab(name); }catch(e){}   // the Projects overview draws when shown and closes its panel when left
   updateScrollCues();
   try{ bttTouch(); }catch(e){}   // tables on the page just shown are measured
@@ -15071,6 +15206,7 @@ const MENU_ICONS = {
   finance: '<path d="M3 10l9-6 9 6"/><line x1="5" y1="10" x2="5" y2="18"/><line x1="10" y1="10" x2="10" y2="18"/><line x1="14" y1="10" x2="14" y2="18"/><line x1="19" y1="10" x2="19" y2="18"/><line x1="3" y1="21" x2="21" y2="21"/>',
   operations: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><line x1="12" y1="13" x2="12" y2="21"/>',
   organisation: '<path d="M4 21V4h10v17"/><path d="M14 9h6v12"/><line x1="2" y1="21" x2="22" y2="21"/><line x1="8" y1="8" x2="10" y2="8"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="8" y1="16" x2="10" y2="16"/>',
+  capacity: '<rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="7" y1="17" x2="7" y2="14"/><line x1="12" y1="17" x2="12" y2="13"/><line x1="17" y1="17" x2="17" y2="15"/>',
   today: '<rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/><polyline points="9 15 11 17 15 13"/>',
   contacts: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
   companies: '<path d="M4 21V4h10v17"/><path d="M14 9h6v12"/><line x1="2" y1="21" x2="22" y2="21"/><line x1="8" y1="8" x2="10" y2="8"/><line x1="8" y1="12" x2="10" y2="12"/>',
@@ -17550,10 +17686,10 @@ const rpM = n => (Number(n) < 0 ? '-£' : '£') + Math.round(Math.abs(Number(n) 
 function rpInitials(name){ const w = String(name || '').replace(/[—–-]/g, ' ').split(/\s+/).filter(Boolean); return ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(); }
 
 /* ---- working days (Monday to Friday; start and end both count) ---- */
-const rpIsWork = d => d.getDay() !== 0 && d.getDay() !== 6;
-function rpWD(a, b){ if(!a || !b) return 0; let d = toDate(a), n = 0; const e = toDate(b); while(d <= e){ if(rpIsWork(d)) n++; d.setDate(d.getDate() + 1); } return n; }
-function rpAddWD(start, n){ if(!start) return ''; const d = toDate(start); while(!rpIsWork(d)) d.setDate(d.getDate() + 1); let k = Math.max(1, Math.round(n)) - 1; while(k > 0){ d.setDate(d.getDate() + 1); if(rpIsWork(d)) k--; } return fmt(d); }
-function rpSubWD(end, n){ if(!end) return ''; const d = toDate(end); while(!rpIsWork(d)) d.setDate(d.getDate() - 1); let k = Math.max(1, Math.round(n)) - 1; while(k > 0){ d.setDate(d.getDate() - 1); if(rpIsWork(d)) k--; } return fmt(d); }
+const rpIsWork = d => wdIsWork(d);   // Stage 4: the working week minus bank holidays and unavailable days (Settings, Planning and capacity)
+function rpWD(a, b){ return wdCount(a, b); }
+function rpAddWD(start, n){ return wdEnd(start, n); }
+function rpSubWD(end, n){ return wdBegin(end, n); }
 
 /* ---- what the record holds now (the "original" the draft is compared with) ---- */
 function rpDates(p){
@@ -17633,8 +17769,8 @@ function rpLeftHtml(p){
     ${p.tentative ? `<div class="rp-note tent">Tentative since ${escHtml(dShow(p.tentative.since))}. The dates below are not confirmed yet.</div>` : ''}
     ${rpEdit(p, 'start', { type: 'date' })}${rpEdit(p, 'complete', { type: 'date' })}${rpEdit(p, 'dur', { type: 'number', label: 'Duration (working days)' })}
     <div class="rp-hint rp-dateh">Start, complete and duration are linked: change start or duration and complete moves, change complete and duration follows.</div>
-    ${rpRO('Hours planned', h.plan ? `<b>${hrs(h.plan)}</b>` : '', `From the plan, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>`)}
-    ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>` : '', 'From time logs')}`;
+    ${phHasHours(p) ? rpRO('Hours planned', `<b>${hrs(phHours(p))}</b>`, `Adds up the phase hours, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>${h.plan && Math.abs(h.plan - phHours(p)) > 0.01 ? ` · the Working plan holds ${hrs(h.plan)}` : ''}`) : rpRO('Hours planned', h.plan ? `<b>${hrs(h.plan)}</b>` : '', `From the plan, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>`)}
+    ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>${phLoggedChips(p)}` : '', 'From time logs and the phases ticked done')}`;
   const moneySec = `
     <div class="rp-three"><div class="rp-ro"><small>Billed</small><b>${qm(money.billed)}</b></div><div class="rp-ro"><small>Paid</small><b>${qm(money.paid)}</b></div><div class="rp-ro${money.overdue ? ' rp-bad' : ''}"><small>Overdue</small><b>${qm(money.overdue)}</b></div></div>
     <div class="rp-hint">Read-only, from the invoice schedule. <button type="button" class="sp-link" data-rp="legacy" data-sec="money">Open the schedule</button></div>`;
@@ -17727,8 +17863,10 @@ function rpQualTile(p){
 function rpOverviewHtml(p){
   return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${varProjectCard(p)}${rpQualTile(p)}</div>`;
 }
+const rpPlanCtx = { on: false };   // true while the Plan tab builds the old timeline: the new Gantt above replaces its chart
 function rpPlanHtml(p){
-  return `${rpSchedPanel(p)}<div class="rp-plan" id="rpPlan">${pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p)))}</div>`;
+  rpPlanCtx.on = true; let tl; try{ tl = pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p))); } finally { rpPlanCtx.on = false; }
+  return `${rpSchedPanel(p)}${phSchedPanel(p)}${phGanttHtml(p)}${phPlanCardHtml(p)}<div class="rp-plan" id="rpPlan">${tl}</div>`;
 }
 function pwSecWrapFlat(html){ const m = html.match(/^<section class="pw-sec" id="pw-(\w+)" data-sec="(\w+)"><h3>([\s\S]*?)<\/h3>([\s\S]*)<\/section>\s*$/); return m ? `<section class="pw-sec open rp-flat" id="pw-${m[1]}" data-sec="${m[2]}"><div class="pw-sec-b">${m[4]}</div></section>` : html; }
 
@@ -17744,8 +17882,10 @@ function rpRenderProject(p){
   el.innerHTML = `<div class="rp" data-kind="project"><aside class="rp-left" aria-label="Profile">${rpLeftHtml(p)}</aside><main class="rp-centre">${rpCentreHtml(p)}</main><aside class="rp-right" aria-label="Linked records">${rpRightHtml(p)}</aside></div>`;
   Object.keys(prev).forEach(s => { const n = el.querySelector(s); if(n) n.scrollTop = prev[s]; });
   try{ pwStick(); }catch(e){}
-  rpFit();
+  rpFit(); try{ gtFocus(); }catch(e){}
 }
+/* the chart opens on today (or the first phase if that is earlier), not at the far left */
+function gtFocus(){ document.querySelectorAll('.gt[data-focus]').forEach(g => { const sc = g.parentNode; if(sc && !sc.dataset.set){ sc.scrollLeft = Math.max(0, Number(g.dataset.focus) / 100 * Number(g.dataset.w) - 40); sc.dataset.set = '1'; } }); }
 /* the three columns scroll on their own: the frame is as tall as the space under the brand bar and the Back bar */
 function rpFit(){ rpFitEl(document.querySelector('#projectWorkspace .rp')); }
 function rpFitEl(rp){
@@ -17768,7 +17908,7 @@ function rpSetField(p, k, raw){
     const set = (key, val) => { if(String(val) === String(o[key])) delete f[key]; else f[key] = String(val); };
     set('start', s || ''); set('complete', c || ''); set('dur', n ? String(n) : '');
   } else if(v === String(o[k] == null ? '' : o[k])) delete f[k]; else f[k] = v;
-  if(!Object.keys(f).length) rpUi.draft = null;
+  if(!Object.keys(f).length && !(rpUi.draft && rpUi.draft.ph)) rpUi.draft = null;
   if(rpUi.draft && rpUi.draft.sched && RP_DATE_KEYS.includes(k)){ rpSchedRefresh(p); rpSyncDraftUi(p); rpRenderProject(p); return; }   // the review follows the profile dates
   rpSyncDraftUi(p);
 }
@@ -18330,7 +18470,7 @@ function rpShiftDate(d, b){
 }
 /* every linked date, oldest first. A row: { id, kind, label, tag, fields:[{ k, old, new }], locked, note, ref } */
 function rpSchedRows(p, b){
-  const rows = [], sh = d => rpShiftDate(d, b), tagOf = { ms: 'Milestone', stage: 'Phase', drop: 'Delivery', pay: 'Supplier payment', line: 'Invoice' };
+  const rows = [], sh = d => rpShiftDate(d, b), tagOf = { ms: 'Milestone', stage: 'Stage', phase: 'Phase', drop: 'Delivery', pay: 'Supplier payment', line: 'Invoice' };
   const add = r => { r.tag = tagOf[r.kind]; r.fields.forEach(f => { if(f.new === undefined) f.new = r.locked ? f.old : sh(f.old); }); rows.push(r); };
   projEnsure(p);
   [['onSiteStart', 'On-site start', b.ns], ['buildComplete', 'Build complete', b.nc]].forEach(([k, n, nv]) => { const i = projMsInfo(p, k); if(i.actual) add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: i.actual.date }], locked: true, note: 'Confirmed ' + pwD(i.actual.date) + ', stays', ref: k }); else add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: i.planned || '', new: nv || '' }], ref: k, project: true }); });
@@ -18339,6 +18479,8 @@ function rpSchedRows(p, b){
     else if((p.milestones || {})[k]) add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: p.milestones[k] }], ref: k }); });
   (p.stages || []).forEach(s => { slEnsure(s); if(!(s.start || s.end)) return; const done = !!(s.actEnd && s.actEnd.date);
     add({ id: 'st:' + s.id, kind: 'stage', label: s.label || 'Stage', fields: [{ k: 'start', old: s.start || '' }, { k: 'end', old: s.end || '' }], locked: done, note: done ? 'Finished, stays' : '', ref: s.id }); });
+  sfPhases(p).forEach(q => { if(!(sfIso(q.start) || sfIso(q.end))) return; const done = phIsDone(q);
+    add({ id: 'ph:' + q.id, kind: 'phase', label: q.name || 'Phase', fields: [{ k: 'start', old: sfIso(q.start) }, { k: 'end', old: sfIso(q.end) }], locked: done, note: done ? 'Done, stays' : '', ref: q.id }); });
   const aq = projAcceptedQuote(p);
   projDeliveries(p).drops.forEach(x => {
     const name = (x.method === 'collect' ? 'Collection: ' : 'Delivery: ') + x.supplier, po = poForDrop(p.id, x.d.id);
@@ -18348,10 +18490,6 @@ function rpSchedRows(p, b){
   (p.paymentLines || []).forEach((l, i) => { if(!l.dueDate) return; const done = !!(l.invoicedDate || l.paidDate);
     add({ id: 'pl:' + (l.uid || i), kind: 'line', label: (l.desc || 'Payment') + ' · ' + qm(l.amount), fields: [{ k: 'date', old: l.dueDate }], locked: done, note: l.paidDate ? 'Paid, stays' : l.invoicedDate ? 'Invoiced ' + pwD(l.invoicedDate) + ', stays' : '', ref: l.uid || i }); });
   return rows.sort((a, b) => String(a.fields[0].old || '9999').localeCompare(String(b.fields[0].old || '9999')) || a.label.localeCompare(b.label));
-}
-function rpOverlaps(p, s, c){
-  if(!s || !c) return [];
-  return state.projects.filter(o => o.id !== p.id && !projIsCompleted(o)).map(o => ({ o, d: rpDates(o) })).filter(x => x.d.start && x.d.complete && x.d.start <= c && x.d.complete >= s);
 }
 /* open the review for the pending change (or, from the tentative banner, for the dates that are waiting to be confirmed) */
 function rpBeginSchedule(p, mode, fromTentative){
@@ -18369,11 +18507,11 @@ function rpBeginSchedule(p, mode, fromTentative){
 function rpSchedRefresh(p){ const d = rpDraft(p); if(!d || !d.sched || d.sched.tent) return; const o = rpDates(p); d.sched.base = { os: o.start, oc: o.complete, ns: rpVal(p, 'start'), nc: rpVal(p, 'complete') }; d.sched.rows = rpSchedRows(p, d.sched.base); }
 function rpSchedPanel(p){
   const d = rpDraft(p), t = p.tentative;
-  const banner = t && !(d && d.sched) ? `<div class="rp-tent"><b>Tentative since ${escHtml(dShow(t.since))}</b>${t.by ? ' (' + escHtml(t.by) + ')' : ''}. The project's start and complete dates are flagged tentative. Phases, deliveries and invoices still follow the previous dates (${escHtml(pwD(t.prev.start))} to ${escHtml(pwD(t.prev.complete))}) until you confirm.
+  const banner = t && !(d && d.sched) ? `<div class="rp-tent"><b>Tentative since ${escHtml(dShow(t.since))}</b>${t.by ? ' (' + escHtml(t.by) + ')' : ''}. ${t.prev && t.prev.phases && Object.keys(t.prev.phases).length ? 'Some phase dates are' : "The project's start and complete dates are"} flagged tentative. ${t.prev && t.prev.phases && Object.keys(t.prev.phases).length ? 'The previous phase dates are kept for going back. Deliveries and invoices have not moved' : 'Phases, deliveries and invoices still follow the previous dates'} (${escHtml(pwD(t.prev.start))} to ${escHtml(pwD(t.prev.complete))}) until you confirm.
     <div class="rp-tent-b"><button type="button" class="btn qb-sm" data-rp="tent-review">Review and confirm the schedule</button><button type="button" class="btn secondary qb-sm" data-rp="tent-revert">Go back to the previous dates</button></div></div>` : '';
   if(!d || !d.sched) return banner;
-  const sc = d.sched, b = sc.base, ov = rpOverlaps(p, b.ns, b.nc), n = sc.rows.reduce((a, r) => a + (r.locked ? 0 : r.fields.filter(f => f.new !== f.old).length), 0);
-  const warn = ov.length ? `<div class="rp-warn" role="alert"><b>⚠ These dates overlap ${ov.length === 1 ? 'another project' : ov.length + ' other projects'}.</b> ${ov.map(x => `<div>${rpLink('project:' + x.o.id, recordCode(x.o.id, 'project') + ' ' + x.o.name)}: ${escHtml(pwD(x.d.start))} to ${escHtml(pwD(x.d.complete))}${x.o.owner ? ' · owner ' + escHtml(x.o.owner) : ''}${projCustomer(x.o).name ? ' · customer ' + escHtml(projCustomer(x.o).name) : ''}</div>`).join('')}<div>Speak to them first. <b>Keep as tentative</b> is the safer choice until you have.</div></div>` : '';
+  const sc = d.sched, b = sc.base, cw = sc.tent ? [] : capCheck(p, capProposalFromSched(p, sc)), ov = cw, n = sc.rows.reduce((a, r) => a + (r.locked ? 0 : r.fields.filter(f => f.new !== f.old).length), 0);
+  const warn = capWarnWeeks(p, cw);   // Stage 4: the capacity check replaces the simple date overlap
   const dateIn = (r, f, i) => r.locked || !f.old && !f.new ? `<span class="rp-dim">stays</span>` : `<input type="date" class="${f.new !== f.old ? 'rp-chg' : ''}" data-rps="${escAttr(r.id)}" data-f="${f.k}" value="${escAttr(f.new)}" aria-label="New date for ${escAttr(r.label)}">`;
   const body = sc.rows.map(r => `<div class="rp-s-row${r.locked ? ' locked' : ''}${r.fields.some(f => f.new !== f.old) ? ' moved' : ''}"><div class="rp-s-i"><span class="rp-s-tag">${escHtml(r.tag)}</span>${escHtml(r.label)}${r.note ? `<div class="rp-dim">${escHtml(r.note)}</div>` : ''}</div>
       <div class="rp-s-d">${r.fields.map((f, i) => `<div class="rp-s-f"><span class="rp-s-was">${r.fields.length > 1 ? (f.k === 'start' ? 'start ' : 'end ') : ''}was ${f.old ? escHtml(pwD(f.old)) : '—'}</span>${dateIn(r, f, i)}</div>`).join('')}</div></div>`).join('');
@@ -18399,6 +18537,12 @@ function rpApplyRows(p, sc, why){
       if(ns === (s.start || '') && ne === (s.end || '')) return;
       (s.planLog = s.planLog || []).push({ id: qRand('pl_'), kind: 'planned', fromTxt: pwD(s.start) + ' → ' + pwD(s.end), toTxt: pwD(ns) + ' → ' + pwD(ne), at: now, by, reason: why });
       lines.push(`${r.label}: ${pwD(s.start)} → ${pwD(s.end)} to ${pwD(ns)} → ${pwD(ne)}`); s.start = ns; s.end = ne; return;
+    }
+    if(r.kind === 'phase'){
+      const q = sfPhases(p).find(x => x.id === r.ref); if(!q) return; let ns = r.fields.find(x => x.k === 'start').new || '', ne = r.fields.find(x => x.k === 'end').new || ''; if(ns && ne && ne < ns) ne = ns;
+      if(ns === sfIso(q.start) && ne === sfIso(q.end)) return; const t = (a, b) => (a ? pwD(a) : '—') + ' → ' + (b ? pwD(b) : '—');
+      (q.planLog = q.planLog || []).push({ id: qRand('pl_'), kind: 'planned', fromTxt: t(sfIso(q.start), sfIso(q.end)), toTxt: t(ns, ne), at: now, by, reason: why });
+      lines.push(`${r.label}: ${t(sfIso(q.start), sfIso(q.end))} to ${t(ns, ne)}`); q.start = ns; q.end = ne; return;
     }
     r.fields.forEach(f => {
       if(f.new === f.old || !f.new) return;
@@ -18433,6 +18577,7 @@ function rpKeepTentative(p){
 }
 function rpRevertTentative(p){
   const t = p.tentative; if(!t) return;
+  Object.keys(t.prev.phases || {}).forEach(id => { const q = sfPhases(p).find(x => x.id === id); if(q){ q.start = t.prev.phases[id].start || ''; q.end = t.prev.phases[id].end || ''; } });
   projSetPlanned(p, 'onSiteStart', t.prev.start || '', 'Tentative change reverted'); projSetPlanned(p, 'buildComplete', t.prev.complete || '', 'Tentative change reverted');
   chgLog(p, 'reschedule', { cause: '', reason: 'Tentative change reverted' }, [`Back to ${pwD(t.prev.start)} to ${pwD(t.prev.complete)}`]); p.tentative = null; rpUi.draft = null; saveState(); render(); showToast('Back to the previous dates');
 }
@@ -18474,7 +18619,7 @@ function ensureSellingModel(o){
 /* ---------- fields every lead, sale and project carries ---------- */
 function sfRec(kind, id){ id = Number(id); return (kind === 'lead' ? state.leads : kind === 'sales' ? state.pipeline : state.projects).find(r => r.id === id) || null; }
 function sfPhases(r){ return (Array.isArray(r.phases) ? r.phases : []).filter(p => p && typeof p === 'object'); }
-function sfDays(r){ const ph = sfPhases(r); if(ph.length) return ph.reduce((a, p) => a + (Number(p.days) || 0), 0); const n = Number(r.estDays); return n > 0 ? n : 0; }
+function sfDays(r){ const ph = sfPhases(r); if(ph.length) return ph.filter(p => !p.selling).reduce((a, p) => a + (Number(p.days) || 0), 0); const n = Number(r.estDays); return n > 0 ? n : 0; }   // Stage 4: a phase marked selling time (site visit, scope, quote) is not time on site
 function jobTypeOf(r){ return state.jobTypes.find(j => j.id === r.jobTypeId) || null; }
 function jobNotFit(r){ const j = jobTypeOf(r); return !!(j && j.notFit); }
 function sfIso(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : ''; }
@@ -18490,7 +18635,7 @@ function sfEditHtml(kind, r, i, o){
   const dur = ph.length
     ? f('Estimated duration (days)', `<div class="sf-calc" aria-readonly="true"><b>${sfDays(r)}</b> days <span class="rp-tag">Calculated</span></div>`, 'Adds up the phases below. Remove the phases to type one figure instead.')
     : f('Estimated duration (days)', `<input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="estDays" value="${r.estDays === '' || r.estDays == null ? '' : escAttr(r.estDays)}" placeholder="Working days on site">`, 'How long the job is likely to take. You can split it into phases.');
-  const phases = `<div class="lp-f"><label>Phases <span class="lp-opt">optional</span></label>${ph.map((p, pi) => `<div class="sf-phase"><input type="text" ${base} data-field="phaseName" data-pi="${pi}" value="${escAttr(p.name || '')}" placeholder="Phase name" aria-label="Phase name"><input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${p.days === '' || p.days == null ? '' : escAttr(p.days)}" placeholder="Days" aria-label="Days"><button type="button" class="icon-btn" data-sf="phase-del" data-kind="${kind}" data-id="${id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button></div>`).join('')}<button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="${kind}" data-id="${id}">+ Add a phase</button></div>`;
+  const phases = phEditorHtml(kind, r, base);
   const warn = sfDeadlineWarn(r);
   return `${val}${f('Job type', jt, SF_NF_HINT, 'sf-jt-hint')}${dur}${phases}${f('Customer\'s preferred start', `<input type="date" ${base} data-field="prefStart" value="${escAttr(sfIso(r.prefStart))}">`)}${f('Deadline', `<input type="date" ${base} data-field="deadline" value="${escAttr(sfIso(r.deadline))}">`, warn ? `<span class="sf-warn">${warn}</span>` : 'Optional: a date the job must be finished by.')}`;
 }
@@ -18509,6 +18654,7 @@ function sfApply(el){
   else if(f === 'jobTypeId'){ r.jobTypeId = state.jobTypes.some(j => j.id === v) ? v : ''; }
   else if(f === 'prefStart' || f === 'deadline'){ r[f] = sfIso(v); }
   else if(f === 'phaseName' || f === 'phaseDays'){ const p = sfPhases(r)[Number(d.pi)]; if(p){ if(f === 'phaseName') p.name = v.trim(); else { const n = Math.round(Number(v)); p.days = (v === '' || isNaN(n)) ? '' : Math.max(0, n); } } }
+  else if(f.startsWith('phase')){ const p = sfPhases(r)[Number(d.pi)]; if(p) phApply(p, f, v, el); }
 }
 const sfUi = { rebuild: false };
 /* the lead panel is not rebuilt on every change (that would drop the focus), so the calculated bits are refreshed in place */
@@ -18523,6 +18669,7 @@ document.addEventListener('click', (e) => {
   const r = sfRec(b.dataset.kind, b.dataset.id); if(!r) return;
   if(b.dataset.sf === 'phase-add'){ r.phases = sfPhases(r).concat([{ id: selId('ph_'), name: '', days: '' }]); }
   else if(b.dataset.sf === 'phase-del'){ const ph = sfPhases(r); ph.splice(Number(b.dataset.pi), 1); r.phases = ph; }
+  else if(b.dataset.sf === 'phase-tpl'){ if(!phApplyTemplate(r)) return; }
   else return;
   sfUi.rebuild = true; render(); saveState();
 });
@@ -18627,6 +18774,7 @@ const QUAL_LABEL = { strong: 'Strong', unclear: 'Unclear', weak: 'Weak' }, QUAL_
 function qualBadgeHtml(rec){
   if(!state.qualQuestions.length) return '';
   const e = qualEval(rec);
+  if(!e.answered) return `<span class="sf-chip qual-score" title="Qualification: nothing has been answered, so this has not been assessed (display only; nothing is stored)">Not assessed</span>`;   // no answers at all: neutral, not "Unclear"
   return `<span class="sf-chip ${QUAL_CLS[e.key]} qual-score" title="Qualification: ${e.answered} of ${e.total} answered, scored ${Math.round(e.pct * 100)}%${e.blocking.length ? '. Holding promotion: ' + escAttr(e.blocking.map(x => x.q.name).join(', ')) : ''}">${QUAL_SYM[e.key]} ${QUAL_LABEL[e.key]}</span>`;
 }
 function qualGateMsg(rec){
@@ -18826,7 +18974,7 @@ function attnChipHtml(pl, r){ const x = attnReasons(pl, r); return x.length ? `<
 /* =====================================================================
    STEP 4: QUOTES HUB AND FOLLOW-UP
    Settings, Selling: follow-up gap (working days, default 3), the follow-up task name ({quote} stands for the reference), and the no-contact
-   flag (working days, default 5). Working days are Monday to Friday; bank holidays are ignored for now.
+   flag (working days, default 5). Working days are the working week minus the bank holidays and unavailable days in Settings, Planning and capacity (Stage 4).
    The older "follow-up days" setting (calendar days, default 7, in Approvals) is left stored as it is but no longer used: it counted calendar days.
    ===================================================================== */
 function ensureSellingModel4(o){
@@ -18836,7 +18984,7 @@ function ensureSellingModel4(o){
   st.followUpTaskName = typeof st.followUpTaskName === 'string' && st.followUpTaskName.trim() ? st.followUpTaskName : 'Follow up quote {quote}';
   if(typeof ensureSellingModel5 === 'function') ensureSellingModel5(o);
 }
-const isWork = d => d.getDay() !== 0 && d.getDay() !== 6;
+const isWork = d => wdIsWork(d);
 function wdAdd(iso, n){ const d = toDate(iso); let k = Math.max(0, Math.round(n)); while(k > 0){ d.setDate(d.getDate() + 1); if(isWork(d)) k--; } return fmt(d); }
 function wdSince(from, to){   // working days after `from` up to and including `to`
   if(!from || !to || to <= from) return 0; const d = toDate(from), e = toDate(to); let n = 0;
@@ -18889,7 +19037,7 @@ function leadDaysSince(r){ const ref = leadLastContact(r) || (typeof leadCreated
 function noContactChipHtml(n){ return n !== null && n >= state.settings.noContactDays ? `<span class="sf-chip warn" title="No contact for ${n} working days (the flag is set in Settings, Selling)">${n} days since contact</span>` : ''; }
 SEL_SET_CARDS.push(['Follow-up and contact', () => {
   const st = state.settings;
-  return `<p class="q-help" style="margin:0 0 8px;">When a quote is marked as sent, a follow-up task is made automatically (once per quote) and shows on Today. Press <b>Chased</b> on the task, pick the channel, and the next one is suggested. Gaps count Monday to Friday; bank holidays are ignored for now.</p>
+  return `<p class="q-help" style="margin:0 0 8px;">When a quote is marked as sent, a follow-up task is made automatically (once per quote) and shows on Today. Press <b>Chased</b> on the task, pick the channel, and the next one is suggested. Gaps count the working week and skip the bank holidays and unavailable days listed in Settings, Planning and capacity.</p>
     <div class="assumptions-grid" style="max-width:760px;">
       <div><label>Follow-up gap (working days)</label><input type="number" min="1" step="1" data-fu="followUpGapDays" value="${st.followUpGapDays}"></div>
       <div><label>No-contact flag after (working days)</label><input type="number" min="1" step="1" data-fu="noContactDays" value="${st.noContactDays}"></div>
@@ -19047,6 +19195,702 @@ document.addEventListener('change', (e) => {
 });
 
 /* BT:js-selling end */
+
+
+/* BT:js-planning begin */
+/* =====================================================================
+   STAGE 4: PLANNING, TIME AND CAPACITY
+   STEP 1: WORKING DAYS THAT KNOW ABOUT HOLIDAYS
+   One place decides whether a day is a working day: it is one of the days in the working week (Monday to Friday unless settings.workingWeek says otherwise)
+   and it is not on the list of bank holidays and unavailable days (state.holidays: { id, date, end (optional, for a run of days), name, kind: 'bank' | 'off' }).
+   Duration and complete date on the project profile, the quote follow-up gap, days since contact and the reschedule review all count through it.
+   No stored date is ever changed: only the counting changes.
+   ===================================================================== */
+const PLAN_HOLIDAYS = [
+  ['2026-01-01', 'New Year\'s Day'], ['2026-04-03', 'Good Friday'], ['2026-04-06', 'Easter Monday'], ['2026-05-04', 'Early May bank holiday'], ['2026-05-25', 'Spring bank holiday'],
+  ['2026-08-31', 'Summer bank holiday'], ['2026-12-25', 'Christmas Day'], ['2026-12-28', 'Boxing Day (substitute day)'],
+  ['2027-01-01', 'New Year\'s Day'], ['2027-03-26', 'Good Friday'], ['2027-03-29', 'Easter Monday'], ['2027-05-03', 'Early May bank holiday'], ['2027-05-31', 'Spring bank holiday'],
+  ['2027-08-30', 'Summer bank holiday'], ['2027-12-27', 'Christmas Day (substitute day)'], ['2027-12-28', 'Boxing Day (substitute day)']
+];
+const PLAN_KINDS = [['bank', 'Bank holiday'], ['off', 'Unavailable (business)']];
+function ensurePlanModel(o){
+  const st = o.settings = o.settings || {}, str = v => v == null ? '' : String(v), ok = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '');
+  if(!Array.isArray(o.holidays)) o.holidays = PLAN_HOLIDAYS.map(([date, name]) => ({ id: 'hd_' + date, date, end: '', name, kind: 'bank' }));   // never stored before: seed the England and Wales list
+  else o.holidays = o.holidays.filter(h => h && typeof h === 'object' && ok(h.date)).map(h => ({ id: str(h.id) || 'hd_' + h.date, date: h.date, end: ok(h.end) && h.end > h.date ? h.end : '', name: str(h.name), kind: h.kind === 'off' ? 'off' : 'bank' }));
+  const w = Array.isArray(st.workingWeek) ? st.workingWeek.map(Number).filter(n => n >= 0 && n <= 6 && Math.floor(n) === n) : [];
+  st.workingWeek = w.length ? [...new Set(w)].sort((a, b) => a - b) : [1, 2, 3, 4, 5];
+  if(typeof ensurePlanModel2 === 'function') ensurePlanModel2(o);
+}
+(function(){ const o = ensureSellingModel6; ensureSellingModel6 = function(x){ o(x); ensurePlanModel(x); }; })();
+let _holCache = { sig: null, set: null, names: null };
+function holCache(){
+  const l = (typeof state !== 'undefined' && state && Array.isArray(state.holidays)) ? state.holidays : [], sig = l.map(h => h.date + '~' + (h.end || '') + '~' + (h.name || '')).join('|');
+  if(sig !== _holCache.sig){
+    const set = new Set(), names = {};
+    l.forEach(h => { let d = h.date, g = 0; const e = h.end && h.end > h.date ? h.end : h.date; while(d <= e && g < 400){ set.add(d); if(!names[d]) names[d] = h.name || (h.kind === 'off' ? 'Unavailable' : 'Bank holiday'); d = addDaysIso(d, 1); g++; } });
+    _holCache = { sig, set, names };
+  }
+  return _holCache;
+}
+const holidaySet = () => holCache().set;
+function holidayName(iso){ return holCache().names[iso] || ''; }
+function workingWeek(){ const w = (typeof state !== 'undefined' && state && state.settings && state.settings.workingWeek); return Array.isArray(w) && w.length ? w : [1, 2, 3, 4, 5]; }
+/* a Date or an ISO string */
+function wdIsWork(d){ if(typeof d === 'string') d = toDate(d); return workingWeek().includes(d.getDay()) && !holidaySet().has(fmt(d)); }
+function wdIsOffDay(iso){ return holidaySet().has(iso); }
+/* working days from a to b, both counted */
+function wdCount(a, b){ if(!a || !b) return 0; let d = toDate(a), n = 0, g = 0; const e = toDate(b); while(d <= e && g < 4000){ if(wdIsWork(d)) n++; d.setDate(d.getDate() + 1); g++; } return n; }
+/* the working day on or after the date (dir 1) or on or before it (dir -1) */
+function wdSnap(iso, dir){ let d = toDate(iso), g = 0; while(!wdIsWork(d) && g < 400){ d.setDate(d.getDate() + (dir || 1)); g++; } return fmt(d); }
+/* the date n working days after the start, the start itself counting as day 1 (n = 1 gives the first working day on or after start) */
+function wdEnd(start, n){ if(!start) return ''; const d = toDate(wdSnap(start, 1)); let k = Math.max(1, Math.round(n)) - 1, g = 0; while(k > 0 && g < 4000){ d.setDate(d.getDate() + 1); if(wdIsWork(d)) k--; g++; } return fmt(d); }
+function wdBegin(end, n){ if(!end) return ''; const d = toDate(wdSnap(end, -1)); let k = Math.max(1, Math.round(n)) - 1, g = 0; while(k > 0 && g < 4000){ d.setDate(d.getDate() - 1); if(wdIsWork(d)) k--; g++; } return fmt(d); }
+
+/* ---------- Settings > Planning and capacity ---------- */
+const PLAN_SET_CARDS = [];
+function renderPlanningSettings(){
+  const el = document.getElementById('planCards'); if(!el) return;
+  el.innerHTML = PLAN_SET_CARDS.map(([label, fn], i) => `<div class="section-label">${label}</div><div class="card" data-plancard="${i}">${fn()}</div>`).join('');
+}
+PLAN_SET_CARDS.push(['Bank holidays and unavailable days', () => {
+  const l = state.holidays.slice().sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)), wk = workingWeek(), dn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return `<p class="q-help" style="margin:0 0 8px;">Everywhere the tracker counts working days it skips these dates as well as the weekend: duration and complete date on a project, the quote follow-up gap, days since contact and the reschedule review. Dates already saved are never moved. The England and Wales bank holidays for 2026 and 2027 are listed to start with: please check them. Use <b>Unavailable</b> for a day the whole business is shut; a person's own leave is set under People and capacity.</p>
+    <div class="hd-wk" role="group" aria-label="Working week"><span class="hd-wk-l">Working week</span>${[1, 2, 3, 4, 5, 6, 0].map(n => `<label class="q-check"><input type="checkbox" data-hd="wk" data-d="${n}"${wk.includes(n) ? ' checked' : ''}> ${dn[n]}</label>`).join('')}</div>
+    <div class="hd-list">${l.map(h => `<div class="hd-row">
+      <input type="date" data-hd="date" data-id="${escAttr(h.id)}" value="${escAttr(h.date)}" aria-label="Date">
+      <input type="date" data-hd="end" data-id="${escAttr(h.id)}" value="${escAttr(h.end || '')}" aria-label="Last day, if it runs over several days" title="Last day (leave empty for one day)">
+      <input type="text" data-hd="name" data-id="${escAttr(h.id)}" value="${escAttr(h.name)}" placeholder="Name" aria-label="Name">
+      <select data-hd="kind" data-id="${escAttr(h.id)}" aria-label="Kind">${PLAN_KINDS.map(([k, n]) => `<option value="${k}"${h.kind === k ? ' selected' : ''}>${n}</option>`).join('')}</select>
+      <button type="button" class="icon-btn" data-hd="del" data-id="${escAttr(h.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('') || '<div class="q-help">No days listed: only the weekend is skipped.</div>'}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-hd="add">+ Add a day</button>
+    <p class="q-help" style="margin:10px 0 0;">The “Blackout dates” under Pipelines only shade the Gantt; they do not change any counting.</p>`;
+}]);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-hd]'); if(!b || !state || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+  const a = b.dataset.hd, list = state.holidays;
+  if(a === 'add'){
+    const last = list.map(h => h.end || h.date).sort().pop() || fmt(new Date()), h = { id: selId('hd_'), date: addDaysIso(last, 1), end: '', name: '', kind: 'bank' }; list.push(h);
+    saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-hd="name"][data-id="${h.id}"]`); if(el) el.focus(); }, 30); return; }
+  if(a === 'del'){ const i = list.findIndex(x => x.id === b.dataset.id); if(i < 0) return; const gone = list.splice(i, 1)[0]; undoDeleted('Day deleted: ' + String(gone.name || gone.date).slice(0, 40), ['holidays'], i, gone); saveState(); render(); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.hd || !state) return;
+  if(d.hd === 'wk'){ const w = new Set(workingWeek()), n = Number(d.d); if(el.checked) w.add(n); else w.delete(n); if(!w.size){ showToast('At least one day has to be a working day'); render(); return; } state.settings.workingWeek = [...w].sort((a, b) => a - b); saveState(); render(); return; }
+  const h = state.holidays.find(x => x.id === d.id); if(!h) return;
+  if(d.hd === 'date'){ if(!isoOk(el.value)){ render(); return; } h.date = el.value; if(h.end && h.end <= h.date) h.end = ''; }
+  else if(d.hd === 'end'){ h.end = isoOk(el.value) && el.value > h.date ? el.value : ''; }
+  else if(d.hd === 'name') h.name = el.value.trim();
+  else if(d.hd === 'kind') h.kind = el.value === 'off' ? 'off' : 'bank';
+  else return;
+  saveState(); render();
+});
+
+/* =====================================================================
+   STEP 2: PHASE TEMPLATE AND BUDGETED HOURS
+   state.phaseTemplate: [{ id, name, hours, days, selling }]  (Settings, Planning and capacity). A new lead or sales deal is pre-filled from it.
+   A phase (lead / sale / project .phases[]) now optionally also holds: hours (budget), start, end (ISO), selling (true for site visit, scope, quote),
+   and, from step 3, done: { date, hours, mode: 'assumed' | 'confirmed', by, at }. A phase marked selling is not counted in the days on site.
+   Existing records are never touched: the template is applied to a record only when it is new or when "Apply the template" is pressed.
+   ===================================================================== */
+const PLAN_TPL = [['Site visit', 3, 1, true], ['Scope', 2, 1, true], ['Quote', 3, 1, true], ['Order', 1, 1, false], ['Delivery', 2, 1, false], ['Install: groundwork', 16, 2, false], ['Install: build', 24, 3, false], ['Sign-off', 1, 1, false]];
+function ensurePlanModel2(o){
+  const str = v => v == null ? '' : String(v), num = v => { const n = Number(v); return v === '' || v == null || isNaN(n) || n < 0 ? '' : n; };
+  let t = Array.isArray(o.phaseTemplate) ? o.phaseTemplate.filter(x => x && typeof x === 'object') : null;
+  if(!t) t = PLAN_TPL.map(([name, hours, days, selling], i) => ({ id: 'pt_' + (i + 1), name, hours, days, selling }));
+  o.phaseTemplate = t.map((x, i) => ({ id: str(x.id) || selId('pt_'), name: str(x.name).trim() || 'Phase', hours: num(x.hours), days: num(x.days), selling: x.selling === true }));
+  if(typeof ensurePlanModel3 === 'function') ensurePlanModel3(o);
+}
+const phNum = v => { const n = Number(v); return v === '' || v == null || isNaN(n) || n < 0 ? 0 : n; };
+const phNew = t => ({ id: selId('ph_'), name: t.name, days: t.days, hours: t.hours, start: '', end: '', selling: !!t.selling });
+function phPrefill(r){ if(!sfPhases(r).length && state.phaseTemplate.length) r.phases = state.phaseTemplate.map(phNew); }
+/* by hand: adds the template phases the record does not already have (matched by name); an existing phase is never changed */
+function phApplyTemplate(r){
+  const have = new Set(sfPhases(r).map(p => String(p.name || '').trim().toLowerCase())), add = state.phaseTemplate.filter(t => !have.has(t.name.trim().toLowerCase())).map(phNew);
+  if(!add.length){ showToast('Every phase in the template is already there'); return false; }
+  r.phases = sfPhases(r).concat(add); return true;
+}
+const phHours = r => sfPhases(r).reduce((a, p) => a + phNum(p.hours), 0);
+const phHasHours = r => sfPhases(r).some(p => phNum(p.hours) > 0);
+function phApply(p, f, v, el){
+  if(f === 'phaseHours'){ const n = parseFloat(v); p.hours = (v === '' || isNaN(n)) ? '' : Math.max(0, Math.round(n * 4) / 4); }
+  else if(f === 'phaseStart' || f === 'phaseEnd'){
+    const k = f === 'phaseStart' ? 'start' : 'end', ps = sfIso(p.start), pe = sfIso(p.end); p[k] = isoOk(v);
+    if(k === 'start' && p.start){ if(ps && pe) p.end = wdEnd(p.start, wdCount(ps, pe) || 1); else if(!p.end && phNum(p.days) > 0) p.end = wdEnd(p.start, phNum(p.days)); }   // moving the start keeps the length; with no end, the days give one (working days)
+    if(p.start && p.end && p.end < p.start){ if(k === 'start') p.end = p.start; else p.start = p.end; }
+  }
+  else if(f === 'phaseSelling') p.selling = !!(el && el.checked);
+}
+function phStatusHtml(p){
+  const d = p.done; if(!d || typeof d !== 'object') return '';
+  return `<span class="sf-chip ${d.mode === 'confirmed' ? 'ok' : 'warn'}" title="${d.mode === 'confirmed' ? 'The hours were adjusted and confirmed' : 'The budget was accepted as it stood: not confirmed'}">✓ ${hrs(phNum(d.hours))} ${d.mode === 'confirmed' ? 'confirmed' : 'assumed'}</span>`;
+}
+function phRowHtml(kind, r, p, pi, base){
+  const v = x => x === '' || x == null ? '' : escAttr(x), id = r.id;
+  return `<div class="ph-row${p.selling ? ' selling' : ''}"><input type="text" ${base} data-field="phaseName" data-pi="${pi}" value="${escAttr(p.name || '')}" placeholder="Phase name" aria-label="Phase name">
+    <input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${v(p.days)}" placeholder="Days" aria-label="Days">
+    <input type="number" min="0" step="0.25" inputmode="decimal" ${base} data-field="phaseHours" data-pi="${pi}" value="${v(p.hours)}" placeholder="Hrs" aria-label="Budgeted hours">
+    <button type="button" class="icon-btn" data-sf="phase-del" data-kind="${kind}" data-id="${id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button>
+    <div class="ph-sub"><input type="date" ${base} data-field="phaseStart" data-pi="${pi}" value="${v(sfIso(p.start))}" aria-label="Start"><input type="date" ${base} data-field="phaseEnd" data-pi="${pi}" value="${v(sfIso(p.end))}" aria-label="End">
+      <label class="q-check"><input type="checkbox" ${base} data-field="phaseSelling" data-pi="${pi}"${p.selling ? ' checked' : ''}> Selling time</label>${phStatusHtml(p)}${phTickBtn(kind, r, p)}</div></div>`;
+}
+function phEditorHtml(kind, r, base){
+  const ph = sfPhases(r), id = r.id;
+  return `<div class="lp-f"><label>Phases <span class="lp-opt">optional</span></label>${ph.length ? '<div class="ph-head"><span>Phase</span><span>Days</span><span>Hours</span><span></span></div>' : ''}${ph.map((p, pi) => phRowHtml(kind, r, p, pi, base)).join('')}
+    ${phHasHours(r) ? `<div class="lp-hint ph-sum">Budgeted time: <b>${hrs(phHours(r))}</b> in all${sfPhases(r).some(p => p.selling && phNum(p.hours) > 0) ? ` (${hrs(sfPhases(r).filter(p => p.selling).reduce((a, p) => a + phNum(p.hours), 0))} of it selling time)` : ''}</div>` : ''}
+    ${phSellLineHtml(r)}
+    <div class="ph-btns"><button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="${kind}" data-id="${id}">+ Add a phase</button><button type="button" class="btn secondary qb-sm" data-sf="phase-tpl" data-kind="${kind}" data-id="${id}" title="Adds the phases from the template (Settings, Planning and capacity) that are not here yet">Apply the template</button></div></div>`;
+}
+/* the project's Plan tab: the same phases (name, days and hours are editable here; their dates move through the review above) */
+function phPlanCardHtml(p){
+  const ph = sfPhases(p), base = `data-tab="sellf" data-kind="project" data-id="${p.id}"`, v = x => x === '' || x == null ? '' : escAttr(x);
+  const rows = ph.map((x, pi) => `<div class="ph-row ph-stack${x.selling ? ' selling' : ''}"><input class="ph-nm" type="text" ${base} data-field="phaseName" data-pi="${pi}" value="${escAttr(x.name || '')}" aria-label="Phase name">
+    <label class="pt-f"><span>Days</span><input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${v(x.days)}" aria-label="Days"></label>
+    <label class="pt-f"><span>Budget (h)</span><input type="number" min="0" step="0.25" inputmode="decimal" ${base} data-field="phaseHours" data-pi="${pi}" value="${v(x.hours)}" aria-label="Budgeted hours"></label>
+    <button type="button" class="icon-btn" data-sf="phase-del" data-kind="project" data-id="${p.id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button>
+    <div class="ph-sub">${phIsDone(x) ? `<span class="ph-dt">${sfIso(x.start) || sfIso(x.end) ? escHtml((sfIso(x.start) ? pwD(x.start) : '—') + ' → ' + (sfIso(x.end) ? pwD(x.end) : '—')) : ''}</span>` : `<input type="date" data-rpph="start" data-pid="${escAttr(x.id)}" value="${escAttr(phDraftOf(p, x).start)}" aria-label="Start"><input type="date" data-rpph="end" data-pid="${escAttr(x.id)}" value="${escAttr(phDraftOf(p, x).end)}" aria-label="End">`}${x.selling ? '<span class="sf-chip">Selling time</span>' : ''}${phStatusHtml(x)}${phTickBtn('project', p, x)}</div></div>`).join('');
+  return `<section class="rp-card ph-card" id="phPlan"><h4>Phases</h4>
+    ${ph.length ? `${rows}
+      <div class="rp-hint">${phHasHours(p) ? `Budgeted time ${hrs(phHours(p))}: this is the Hours planned on the profile. ` : ''}Dates are changed through the review above, so nothing linked moves until you confirm.</div>${phSellLineHtml(p)}` : '<div class="pw-empty">No phases yet. Add them, or apply the template.</div>'}
+    <div class="ph-btns"><button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="project" data-id="${p.id}">+ Add a phase</button><button type="button" class="btn secondary qb-sm" data-sf="phase-tpl" data-kind="project" data-id="${p.id}" title="Adds the phases from the template that are not here yet; nothing already here changes">Apply the template</button></div></section>`;
+}
+PLAN_SET_CARDS.push(['Phase template', () => {
+  const l = state.phaseTemplate;
+  return `<p class="q-help" style="margin:0 0 8px;">The phases every new lead and sales deal starts with, each with a budgeted time in hours and a duration in working days. Tick <b>Selling time</b> for the phases that are part of winning the job (site visit, scope, quote): their hours are costed at the labour rate even when the deal is lost, and their days are not counted as days on site. Jobs that already exist are never changed; press <b>Apply the template</b> on a job to add what it is missing.</p>
+    <div class="pt-head"><span>Order</span><span>Phase</span><span>Hours</span><span>Days</span><span>Selling</span><span></span></div>
+    <div class="pt-list">${l.map((t, i) => `<div class="pt-row"><div class="tier-move pt-mv"><button type="button" class="icon-btn" data-pt="up" data-id="${escAttr(t.id)}" title="Move up" aria-label="Move up"${i === 0 ? ' disabled style="opacity:.3"' : ''}>${UP_SVG}</button><button type="button" class="icon-btn" data-pt="down" data-id="${escAttr(t.id)}" title="Move down" aria-label="Move down"${i === l.length - 1 ? ' disabled style="opacity:.3"' : ''}>${DOWN_SVG}</button></div>
+      <input class="pt-nm" type="text" data-pt="name" data-id="${escAttr(t.id)}" value="${escAttr(t.name)}" aria-label="Phase">
+      <label class="pt-f pt-hr"><span>Hours</span><input type="number" min="0" step="0.25" inputmode="decimal" data-pt="hours" data-id="${escAttr(t.id)}" value="${t.hours === '' ? '' : t.hours}" aria-label="Budgeted hours"></label>
+      <label class="pt-f pt-dy"><span>Days</span><input type="number" min="0" step="1" inputmode="numeric" data-pt="days" data-id="${escAttr(t.id)}" value="${t.days === '' ? '' : t.days}" aria-label="Duration in days"></label>
+      <label class="q-check pt-sl"><input type="checkbox" data-pt="selling" data-id="${escAttr(t.id)}"${t.selling ? ' checked' : ''}><span class="pt-sl-t">Selling</span></label>
+      <button type="button" class="icon-btn pt-dl" data-pt="del" data-id="${escAttr(t.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('') || '<div class="q-help">No phases: new jobs start without any.</div>'}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-pt="add">+ Add a phase</button>
+    <p class="q-help" style="margin:10px 0 0;">Total <b>${hrs(l.reduce((a, t) => a + phNum(t.hours), 0))}</b> over ${l.length} phase${l.length === 1 ? '' : 's'}. Hours move in quarter-hour steps.</p>`;
+}]);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-pt]'); if(!b || !state || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+  const list = state.phaseTemplate, a = b.dataset.pt, i = list.findIndex(x => x.id === b.dataset.id);
+  if(a === 'add'){ const t = { id: selId('pt_'), name: 'New phase', hours: '', days: '', selling: false }; list.push(t); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-pt="name"][data-id="${t.id}"]`); if(el){ el.focus(); el.select(); } }, 30); return; }
+  if(i < 0) return;
+  if(a === 'up' || a === 'down'){ const j = i + (a === 'up' ? -1 : 1); if(j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; saveState(); render(); return; }
+  if(a === 'del'){ const gone = list.splice(i, 1)[0]; undoDeleted('Template phase deleted: ' + String(gone.name).slice(0, 40), ['phaseTemplate'], i, gone); saveState(); render(); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.pt || !state) return;
+  const t = state.phaseTemplate.find(x => x.id === d.id); if(!t) return;
+  if(d.pt === 'name') t.name = el.value.trim() || t.name;
+  else if(d.pt === 'hours'){ const n = parseFloat(el.value); t.hours = (el.value === '' || isNaN(n)) ? '' : Math.max(0, Math.round(n * 4) / 4); }
+  else if(d.pt === 'days'){ const n = Math.round(Number(el.value)); t.days = (el.value === '' || isNaN(n)) ? '' : Math.max(0, n); }
+  else if(d.pt === 'selling') t.selling = el.checked;
+  else return;
+  saveState(); render();
+});
+
+
+/* =====================================================================
+   STEP 3: TICK THEN CONFIRM, AND THE COST OF SELLING
+   A phase with a date shows on Today once it is due. Ticking it done marks it done at once with its budgeted hours, saved as ASSUMED ("budget, not confirmed"),
+   and asks "Was that 3 h?". Yes keeps it assumed; adjusting in 15-minute steps and confirming saves it as CONFIRMED. phase.done = { date, hours, mode, by, at }.
+   Hours logged on a project = the time logged on its stage lines (the existing time logging, unchanged) + the hours on its done phases.
+   Selling time (phases marked selling: site visit, scope, quote) is costed at the labour rate on every deal, including deals that are lost.
+   ===================================================================== */
+const PH_KIND = { lead: 'Lead', sales: 'Sales', project: 'Project' };
+function phRecords(){ return state.leads.map(r => ({ kind: 'lead', r })).concat(state.pipeline.map(r => ({ kind: 'sales', r })), state.projects.map(r => ({ kind: 'project', r }))); }
+function phFind(kind, rid, pid){ const r = sfRec(kind, rid), p = r ? sfPhases(r).find(x => x.id === pid) || null : null; return { r, p }; }
+function phFmtH(h){ h = Math.round(phNum(h) * 4) / 4; const w = Math.floor(h), m = Math.round((h - w) * 60); return !m ? w + ' h' : (w ? w + ' h ' + m + ' min' : m + ' min'); }
+const phIsDone = p => !!(p && p.done && typeof p.done === 'object');
+const phDoneHours = r => sfPhases(r).filter(phIsDone).reduce((a, p) => a + phNum(p.done.hours), 0);
+function phLoggedSplit(p){
+  const stage = (p.stages || []).reduce((a, s) => a + slLogged(s), 0), done = sfPhases(p).filter(phIsDone);
+  return { confirmed: stage + done.filter(x => x.done.mode === 'confirmed').reduce((a, x) => a + phNum(x.done.hours), 0), assumed: done.filter(x => x.done.mode !== 'confirmed').reduce((a, x) => a + phNum(x.done.hours), 0) };
+}
+function phMarkHtml(conf, ass){
+  return (ass > 0 ? `<span class="sf-chip warn" title="Budget accepted as it stood: not confirmed">${hrs(ass)} assumed</span>` : '') + (conf > 0 && ass > 0 ? ` <span class="sf-chip ok" title="Hours that were logged or adjusted and confirmed">${hrs(conf)} confirmed</span>` : (conf > 0 ? ` <span class="sf-chip ok" title="Hours that were logged or adjusted and confirmed">confirmed</span>` : ''));
+}
+function phLoggedChips(p){ const x = phLoggedSplit(p); return ' ' + phMarkHtml(x.confirmed, x.assumed); }
+function phTickBtn(kind, r, p){
+  const at = `data-kind="${kind}" data-rid="${r.id}" data-pid="${escAttr(p.id)}"`;
+  return phIsDone(p) ? `<button type="button" class="sp-link" data-ph="reopen" ${at} title="Put it back as not done">Reopen</button>` : `<button type="button" class="btn secondary qb-sm" data-ph="tick" ${at}>Mark done</button>`;
+}
+function phTimeline(kind, r, text){ try{ tlDeal(r.id, text, { src: 'phase' }); }catch(e){} }
+function phTick(kind, rid, pid){
+  const { r, p } = phFind(kind, rid, pid); if(!p || phIsDone(p)) return;
+  p.done = { date: fmt(new Date()), hours: phNum(p.hours), mode: 'assumed', by: whoName(), at: Date.now() };
+  phTimeline(kind, r, `Phase done: ${p.name || 'Phase'}, ${phFmtH(p.done.hours)} (budget, not confirmed) · by ${whoName()}`);
+  saveState(); render(); phDialog(kind, rid, pid);
+}
+function phReopen(kind, rid, pid){
+  const { r, p } = phFind(kind, rid, pid); if(!p || !phIsDone(p)) return;
+  phTimeline(kind, r, `Phase put back as not done: ${p.name || 'Phase'} · by ${whoName()}`);
+  delete p.done; saveState(); render(); showToast('Back as not done');
+}
+/* the "Was that 3 h?" step */
+const phUi = { kind: '', rid: 0, pid: '', val: 0 };
+function phOptions(budget, val){
+  const max = Math.max(24, Math.ceil(Math.max(budget, val) * 2)), out = [];
+  for(let q = 0; q <= max * 4; q++) out.push(`<option value="${q / 4}"${q / 4 === val ? ' selected' : ''}>${escHtml(phFmtH(q / 4))}</option>`);
+  return out.join('');
+}
+function phDialog(kind, rid, pid){
+  const { r, p } = phFind(kind, rid, pid); if(!p || !phIsDone(p)) return;
+  Object.assign(phUi, { kind, rid, pid, val: phNum(p.done.hours) }); const budget = phNum(p.hours);
+  document.getElementById('phTitle').textContent = 'Phase done';
+  document.getElementById('phBody').innerHTML = `<p class="ph-ask-n"><b>${escHtml(p.name || 'Phase')}</b> <span class="qb-dim">· ${escHtml(boardTitle(kind === 'lead' ? 'lead' : kind, r))}</span></p>
+    <p id="phQ" class="ph-q">${budget > 0 ? `Was that <b>${escHtml(phFmtH(budget))}</b>?` : 'How long did it take? No budget was set for this phase.'}</p>
+    <div class="ph-pick"><button type="button" class="btn secondary" data-ph="minus" aria-label="15 minutes less">−</button><select id="phPick" aria-label="Hours spent, in 15-minute steps">${phOptions(budget, phUi.val)}</select><button type="button" class="btn secondary" data-ph="plus" aria-label="15 minutes more">+</button></div>
+    <div class="ph-note" id="phNote"></div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-ph="undo">Not done after all</button><button type="button" class="btn" id="phOk" data-ph="ok"></button></div>`;
+  phDialogSync(); document.getElementById('phOverlay').hidden = false; const ok = document.getElementById('phOk'); if(ok) ok.focus();
+}
+function phDialogSync(){
+  const { p } = phFind(phUi.kind, phUi.rid, phUi.pid); if(!p) return; const budget = phNum(p.hours), same = phUi.val === budget;
+  const pick = document.getElementById('phPick'); if(pick && Number(pick.value) !== phUi.val) pick.value = String(phUi.val);
+  document.getElementById('phOk').textContent = same ? (budget > 0 ? 'Yes, ' + phFmtH(budget) : 'Leave at 0 h') : 'Confirm ' + phFmtH(phUi.val);
+  document.getElementById('phNote').innerHTML = same ? 'Saved as <b>assumed</b>: the budget stands and is marked “not confirmed”.' : 'Saved as <b>confirmed</b>: the time you chose.';
+}
+function phDialogClose(){ document.getElementById('phOverlay').hidden = true; }
+document.addEventListener('change', (e) => { if(e.target.id === 'phPick'){ phUi.val = Math.max(0, Number(e.target.value) || 0); phDialogSync(); } });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && !document.getElementById('phOverlay').hidden) phDialogClose(); });
+document.addEventListener('click', (e) => {
+  if(e.target.id === 'phOverlay'){ phDialogClose(); return; }   // clicking outside keeps what is saved: the budget stands, assumed
+  const b = e.target.closest && e.target.closest('[data-ph]'); if(!b || !state) return; const a = b.dataset.ph;
+  if(a === 'tick' || a === 'reopen'){ e.stopPropagation(); return a === 'tick' ? phTick(b.dataset.kind, Number(b.dataset.rid), b.dataset.pid) : phReopen(b.dataset.kind, Number(b.dataset.rid), b.dataset.pid); }
+  if(a === 'minus' || a === 'plus'){ phUi.val = Math.max(0, Math.round((phUi.val + (a === 'plus' ? 0.25 : -0.25)) * 4) / 4); phDialogSync(); return; }
+  if(a === 'undo'){ phDialogClose(); phReopen(phUi.kind, phUi.rid, phUi.pid); return; }
+  if(a === 'ok'){
+    const { r, p } = phFind(phUi.kind, phUi.rid, phUi.pid); if(!p || !phIsDone(p)){ phDialogClose(); return; }
+    if(phUi.val !== phNum(p.hours)){   // the figure was changed: confirmed. Yes on the budget leaves it assumed, as ticking already saved it
+      p.done.hours = phUi.val; p.done.mode = 'confirmed'; p.done.by = whoName(); p.done.at = Date.now();
+      phTimeline(phUi.kind, r, `Phase hours confirmed: ${p.name || 'Phase'}, ${phFmtH(phUi.val)} (budget ${phFmtH(p.hours)}) · by ${whoName()}`);
+    }
+    phDialogClose(); saveState(); render();
+  }
+});
+/* Today: the phases that are due (their end date, or start date when there is no end, is today or earlier) */
+function phDue(sel){
+  const me = meName(), mine = todayUi.scope === 'mine' && !!me, live = new Set(liveProjects()), out = [];
+  phRecords().forEach(({ kind, r }) => {
+    if(r.lost || (kind === 'project' && !live.has(r)) || (mine && r.owner && r.owner !== me)) return;
+    sfPhases(r).forEach(p => { if(phIsDone(p)) return; const d = sfIso(p.end) || sfIso(p.start); if(d && d <= sel) out.push({ kind, r, p, d }); });
+  });
+  return out.sort((a, b) => a.d.localeCompare(b.d) || String(a.p.name).localeCompare(String(b.p.name)));
+}
+function phTodayRow(x, over){
+  const at = `data-kind="${x.kind}" data-rid="${x.r.id}" data-pid="${escAttr(x.p.id)}"`, b = phNum(x.p.hours);
+  return `<div class="td-row"><div class="cbx" data-ph="tick" ${at} title="Mark done: you can confirm the hours next">${CHECK_SVG}</div>
+    <span class="td-title">${escHtml(x.p.name || 'Phase')} · <button type="button" class="sp-link" data-nav="deal2:${x.r.id}">${escHtml(boardTitle(x.kind, x.r))}</button></span>
+    <span class="td-meta"><span>${PH_KIND[x.kind]}</span>${x.p.selling ? '<span class="sf-chip">Selling time</span>' : ''}<span>${b > 0 ? escHtml(phFmtH(b)) + ' budget' : 'no budget'}</span>${over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(x.d)))}</span>` : ''}</span></div>`;
+}
+function renderTodayPhases(sel){
+  const el = document.getElementById('todayPhases'); if(!el) return;
+  const rows = phDue(sel), real = fmt(new Date()), isToday = sel === real, lim = (state.settings && state.settings.todayLimit) || 10, more = !!todayUi.more.ph;
+  const over = rows.filter(x => x.d < sel), main = rows.filter(x => x.d === sel), all = over.map(x => ({ x, o: true })).concat(main.map(x => ({ x, o: false }))), shown = more ? all : all.slice(0, lim), hid = all.length - shown.length;
+  el.innerHTML = `<div class="td-head"><h3>${isToday ? 'Phases due' : 'Phases due by ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${rows.length}</span></div>
+    ${shown.length ? shown.map(r => phTodayRow(r.x, r.o)).join('') : '<div class="td-empty">No dated phases are due. Phases with a start or end date show here when they come up.</div>'}
+    ${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="ph">See more (${hid})</button>` : (more && all.length > lim ? `<button type="button" class="link-btn td-more" data-today="more" data-k="ph">Show fewer</button>` : '')}`;
+}
+/* the labour rate used for selling time: the hourly rate in Settings, else the day rate over the hours in a day */
+function sellRate(){
+  const st = state.settings, h = Number(st.labourRateHour), d = Number(st.labourRateDay);
+  if(h > 0) return { rate: h, basis: 'the hourly labour rate in Settings, Quotes and pricing' };
+  if(d > 0) return { rate: d / hpd(), basis: 'the day labour rate divided by ' + hpd() + ' hours' };
+  return { rate: 0, basis: '' };
+}
+function sellOf(r){
+  const ph = sfPhases(r).filter(p => p.selling), done = ph.filter(phIsDone), sum = f => done.filter(f).reduce((a, p) => a + phNum(p.done.hours), 0), rate = sellRate().rate;
+  const conf = sum(p => p.done.mode === 'confirmed'), ass = sum(p => p.done.mode !== 'confirmed'), hours = conf + ass;
+  return { hours, conf, ass, cost: hours * rate, budget: ph.reduce((a, p) => a + phNum(p.hours), 0), any: ph.length > 0 };
+}
+function phSellLineHtml(r){
+  const x = sellOf(r); if(!x.hours && !x.budget) return '';
+  const rate = sellRate().rate;
+  return `<div class="lp-hint ph-sell">Selling time so far: <b>${hrs(x.hours)}</b> ${phMarkHtml(x.conf, x.ass)}${rate > 0 ? ` · cost <b>${qm(x.cost)}</b>` : ' · set the labour rate in Settings to see its cost'}${x.budget > x.hours ? ` · budget ${hrs(x.budget)}` : ''}</div>`;
+}
+function sellRows(){
+  return phRecords().map(({ kind, r }) => Object.assign({ kind, r, lost: !!r.lost, name: boardTitle(kind, r) }, sellOf(r))).filter(x => x.hours > 0).sort((a, b) => b.cost - a.cost || b.hours - a.hours);
+}
+function dashSellingHtml(){
+  const rows = sellRows(), { rate, basis } = sellRate(), head = dashCardHead('Cost of selling', 'Site visits, scoping and quoting at the labour rate, on every deal, including the ones that were lost.');
+  if(!rows.length) return head + dashEmpty('No selling time has been ticked off yet. Tick a site visit, scope or quote phase done on Today and its hours are counted here.');
+  const tot = f => rows.reduce((a, x) => a + f(x), 0), hours = tot(x => x.hours), cost = tot(x => x.cost), lostH = rows.filter(x => x.lost).reduce((a, x) => a + x.hours, 0), lostC = rows.filter(x => x.lost).reduce((a, x) => a + x.cost, 0);
+  const won = state.projects.filter(p => !p.lost).reduce((a, p) => a + (Number(p.agreedValue) || 0), 0), ass = tot(x => x.ass), conf = tot(x => x.conf);
+  const tile = (k, v, sub) => `<div class="db-mini"><span class="k">${k}</span><b>${v}</b>${sub ? `<span class="s">${sub}</span>` : ''}</div>`;
+  const money = v => rate > 0 ? qm(v) : '—';
+  return head + `<div class="db-minis">${tile('Selling time', hrs(hours), `${phMarkHtml(conf, ass)}`)}${tile('Cost of selling', money(cost), rate > 0 ? 'at ' + qm(rate) + ' an hour' : 'set the labour rate')}${tile('On lost deals', money(lostC), hrs(lostH))}${tile('Won value', qm(won), rate > 0 && won > 0 ? (Math.round(cost / won * 1000) / 10) + '% spent on selling' : '')}${tile('Per deal', money(cost / rows.length), 'across ' + rows.length + ' deal' + (rows.length === 1 ? '' : 's'))}</div>
+    <div class="table-scroll"><table class="db-tbl sell-tbl"><thead><tr><th>Deal</th><th class="num">Selling time</th><th class="num">Cost</th></tr></thead><tbody>${rows.map(x => `<tr><td><button type="button" class="sp-link" data-nav="deal2:${x.r.id}">${escHtml(x.name)}</button> ${x.lost ? '<span class="sf-chip bad">Lost</span>' : '<span class="qb-dim">' + escHtml(PH_KIND[x.kind]) + '</span>'}</td><td class="num">${hrs(x.hours)} ${phMarkHtml(x.conf, x.ass)}</td><td class="num">${money(x.cost)}</td></tr>`).join('')}</tbody></table></div>
+    <p class="q-help" style="margin:8px 0 0;">${rate > 0 ? 'Costed at ' + basis + '.' : 'No labour rate is set, so only the hours are shown.'} The same hours count towards Hours logged on a project once it exists.</p>`;
+}
+
+
+/* =====================================================================
+   STEP 4: TEAM CAPACITY
+   state.people: [{ id, name, weeklyHours ('' until filled in), leave: [{ id, start, end, note }] }]. Lynton starts at 40 hours a week; Gerry, Mike and Peter are blank.
+   The hours in a working day are the existing settings.hoursPerDay (default 8), the same figure as Settings, Quotes and pricing: nothing is typed twice.
+   A person's hours in a week are spread over the days of the working week; a bank holiday, an unavailable day or that person's own leave takes that day's share away.
+   No login or access is created or changed by any of this.
+   ===================================================================== */
+const PLAN_PEOPLE = [['Lynton', 40], ['Gerry', ''], ['Mike', ''], ['Peter', '']];
+function ensurePlanModel3(o){
+  const str = v => v == null ? '' : String(v), ok = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '');
+  let l = Array.isArray(o.people) ? o.people.filter(x => x && typeof x === 'object') : null;
+  if(!l) l = PLAN_PEOPLE.map(([name, h]) => ({ id: 'pe_' + name.toLowerCase(), name, weeklyHours: h, leave: [] }));
+  { const st = o.settings = o.settings || {}, n = Number(st.leadWeightPct); st.leadWeightPct = (st.leadWeightPct === '' || st.leadWeightPct == null || isNaN(n) || n < 0 || n > 100) ? 20 : Math.round(n); }   // the share of a lead's hours counted on the capacity view
+  o.people = l.map(x => { const w = Number(x.weeklyHours);
+    return { id: str(x.id) || selId('pe_'), name: str(x.name).trim() || 'Person', weeklyHours: (x.weeklyHours === '' || x.weeklyHours == null || isNaN(w) || w < 0) ? '' : Math.min(168, w),
+      leave: (Array.isArray(x.leave) ? x.leave : []).filter(v => v && typeof v === 'object' && ok(v.start)).map(v => ({ id: str(v.id) || selId('lv_'), start: v.start, end: ok(v.end) && v.end >= v.start ? v.end : v.start, note: str(v.note) })) }; });
+}
+/* hours one person has on one day (0 on a non-working day, a holiday, an unavailable day or their own leave) */
+function capPersonDay(person, iso){
+  const w = Number(person.weeklyHours); if(!(w > 0) || !wdIsWork(iso)) return 0;
+  if((person.leave || []).some(v => v.start <= iso && iso <= (v.end || v.start))) return 0;
+  return w / Math.max(1, workingWeek().length);
+}
+const capPeople = () => state.people.filter(x => Number(x.weeklyHours) > 0);
+function capDay(iso){ return capPeople().reduce((a, x) => a + capPersonDay(x, iso), 0); }
+/* the hours the business has between two dates, both counted (people with no weekly hours filled in have none) */
+function capRange(a, b){ let t = 0, d = a, g = 0; while(d <= b && g < 4000){ t += capDay(d); d = addDaysIso(d, 1); g++; } return t; }
+const capWeekStart = iso => { const d = toDate(iso); return fmt(addCalendarDays(d, -((d.getDay() + 6) % 7))); };
+const capWeek = monday => capRange(monday, addDaysIso(monday, 6));
+const capFull = () => capPeople().reduce((a, x) => a + Number(x.weeklyHours), 0);
+PLAN_SET_CARDS.push(['People and capacity', () => {
+  const l = state.people, hp = hpd();
+  return `<p class="q-help" style="margin:0 0 8px;">The people who do the work and the hours each has in a week. Everything on the capacity view is measured against these hours, so a person with no hours filled in adds nothing to capacity. A week with a bank holiday or someone's leave has fewer hours. Adding a person here does not give them a login.</p>
+    <div class="assumptions-grid two" style="max-width:560px;margin-bottom:12px;"><div><label for="capHpd">Hours in a working day</label><input id="capHpd" type="number" min="1" max="24" step="1" inputmode="numeric" data-cap="hpd" value="${hp}"><div class="q-help">The same figure as Hours per day in Quotes and pricing. It turns a duration in days into hours.</div></div></div>
+    <div class="cap-list">${l.map(x => `<div class="cap-row"><div class="cap-main"><input type="text" data-cap="name" data-id="${escAttr(x.id)}" value="${escAttr(x.name)}" aria-label="Name">
+      <label class="cap-h"><span>Hours a week</span><input type="number" min="0" max="168" step="0.5" inputmode="decimal" data-cap="hours" data-id="${escAttr(x.id)}" value="${x.weeklyHours === '' ? '' : x.weeklyHours}" placeholder="Not filled in" aria-label="Available hours a week"></label>
+      <button type="button" class="icon-btn" data-cap="del" data-id="${escAttr(x.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>
+      <details class="cap-leave"${x.leave.length ? ' open' : ''}><summary>Unavailable days${x.leave.length ? ' (' + x.leave.length + ')' : ''}</summary>
+        ${x.leave.slice().sort((a, b) => a.start.localeCompare(b.start)).map(v => `<div class="cap-lv"><input type="date" data-cap="lstart" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.start)}" aria-label="First day"><input type="date" data-cap="lend" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.end)}" aria-label="Last day"><input type="text" data-cap="lnote" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.note)}" placeholder="Leave, training…" aria-label="Note"><button type="button" class="icon-btn" data-cap="ldel" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('')}
+        <button type="button" class="btn secondary qb-sm" data-cap="ladd" data-id="${escAttr(x.id)}">+ Add unavailable days</button></details></div>`).join('') || '<div class="q-help">Nobody listed.</div>'}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-cap="add">+ Add a person</button>
+    <p class="q-help" style="margin:10px 0 0;">Business capacity: <b>${capFull()} hours a week</b> (${capPeople().map(x => escHtml(x.name)).join(', ') || 'nobody has hours filled in yet'}). Bank holidays and unavailable days for the whole business are in the list above.</p>`;
+}]);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-cap]'); if(!b || !state || b.tagName === 'INPUT' || b.tagName === 'SELECT') return;
+  const a = b.dataset.cap, list = state.people, x = list.find(q => q.id === b.dataset.id);
+  if(a === 'add'){ const n = { id: selId('pe_'), name: 'New person', weeklyHours: '', leave: [] }; list.push(n); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-cap="name"][data-id="${n.id}"]`); if(el){ el.focus(); el.select(); } }, 30); return; }
+  if(!x) return;
+  if(a === 'del'){ const i = list.indexOf(x); list.splice(i, 1); undoDeleted('Person deleted: ' + String(x.name).slice(0, 40), ['people'], i, x); saveState(); render(); }
+  else if(a === 'ladd'){ const d = fmt(new Date()); x.leave.push({ id: selId('lv_'), start: d, end: d, note: '' }); saveState(); render(); }
+  else if(a === 'ldel'){ const i = x.leave.findIndex(v => v.id === b.dataset.lid); if(i >= 0){ x.leave.splice(i, 1); saveState(); render(); } }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.cap || !state) return;
+  if(d.cap === 'hpd'){ const n = Math.round(Number(el.value)); if(n >= 1 && n <= 24) state.settings.hoursPerDay = n; saveState(); render(); return; }
+  const x = state.people.find(q => q.id === d.id); if(!x) return;
+  if(d.cap === 'name') x.name = el.value.trim() || x.name;
+  else if(d.cap === 'hours'){ const n = parseFloat(el.value); x.weeklyHours = (el.value === '' || isNaN(n) || n < 0) ? '' : Math.min(168, Math.round(n * 4) / 4); }
+  else { const v = x.leave.find(q => q.id === d.lid); if(!v) return;
+    if(d.cap === 'lstart'){ if(isoOk(el.value)){ v.start = el.value; if(v.end < v.start) v.end = v.start; } }
+    else if(d.cap === 'lend'){ if(isoOk(el.value)) v.end = el.value < v.start ? v.start : el.value; }
+    else if(d.cap === 'lnote') v.note = el.value.trim(); else return; }
+  saveState(); render();
+});
+
+
+/* =====================================================================
+   STEP 5 (and the engine STEP 6 uses): DEMAND AGAINST CAPACITY, AND THE GANTT ON EVERY PROJECT PAGE
+   Demand, in hours, is worked out from what the records already hold; nothing is stored.
+   Project:      the hours on its dated phases, spread over the working days between the phase's dates (a done phase counts the hours that were ticked, assumed or confirmed).
+                 No dated phase hours: the stage lines with dates and planned time; then the on-site start to build complete with the Working plan hours.
+   Sale / lead:  its dated phases the same way; otherwise its phase hours (or its estimated days times the hours in a working day) spread from the preferred
+                 start (or back from the deadline) over the estimated days. Multiplied by the probability: a sales stage's percentage, or the lead weighting in Settings.
+   Hours that cannot be placed (no dates, no start) are counted separately, never guessed.
+   ===================================================================== */
+const capLeadWeight = () => { const n = Number(state.settings.leadWeightPct); return state.settings.leadWeightPct === '' || state.settings.leadWeightPct == null || isNaN(n) || n < 0 || n > 100 ? 0.2 : n / 100; };
+function capSpread(start, end, hours){
+  if(!(hours > 0) || !sfIso(start)) return [];
+  end = sfIso(end) && end >= start ? end : start; if(daysBetween(start, end) > 800) end = addDaysIso(start, 800);
+  const days = []; let d = start, g = 0; while(d <= end && g < 900){ if(wdIsWork(d)) days.push(d); d = addDaysIso(d, 1); g++; }
+  if(!days.length) days.push(wdSnap(start, 1));   // a span that is all weekend or holiday goes on the next working day
+  return days.map(x => [x, hours / days.length]);
+}
+const capPhaseHours = p => phIsDone(p) ? phNum(p.done.hours) : phNum(p.hours);
+function capSpans(kind, r){
+  const spans = [], un = { hours: 0, what: '' }, ph = sfPhases(r), dated = p => sfIso(p.start) || sfIso(p.end);
+  ph.filter(p => capPhaseHours(p) > 0 && dated(p)).forEach(p => spans.push({ start: sfIso(p.start) || sfIso(p.end), end: sfIso(p.end) || sfIso(p.start), hours: capPhaseHours(p), label: p.name || 'Phase', phaseId: p.id, done: phIsDone(p), selling: !!p.selling }));
+  const loose = ph.filter(p => capPhaseHours(p) > 0 && !dated(p)), looseH = loose.reduce((a, p) => a + capPhaseHours(p), 0);
+  if(kind === 'project'){
+    if(!spans.length){
+      (r.stages || []).forEach(s => { const h = slPlannedHours(s); if(h > 0 && (s.start || s.end)) spans.push({ start: s.start || s.end, end: s.end || s.start, hours: h, label: s.label || 'Stage', stage: true }); });
+      if(!spans.length){ const d = rpDates(r), h = projHours(r).plan; if(d.start && d.complete && h > 0) spans.push({ start: d.start, end: d.complete, hours: h, label: 'Working plan' }); }
+    }
+    if(looseH > 0){ un.hours = looseH; un.what = 'phases with hours but no dates'; }
+  } else {
+    const days = sfDays(r), hrsNeed = looseH > 0 ? looseH : (spans.length ? 0 : days * hpd()), win = Math.max(1, days || Math.ceil(looseH / hpd()) || 1);
+    if(hrsNeed > 0){
+      const first = spans.length ? spans.map(x => x.start).sort()[0] : '', start = sfIso(r.prefStart) || (sfIso(r.deadline) ? wdBegin(r.deadline, win) : '') || first;
+      if(start) spans.push({ start, end: wdEnd(start, win), hours: hrsNeed, label: looseH > 0 ? 'Phases' : 'Estimated duration', estimate: true });
+      else { un.hours = hrsNeed; un.what = 'no preferred start or deadline'; }
+    }
+  }
+  return { spans, unplaced: un };
+}
+function capItem(kind, r){
+  const sp = capSpans(kind, r), w = kind === 'project' ? 1 : kind === 'sales' ? effectiveProb(r) : capLeadWeight(), days = {};
+  sp.spans.forEach(s => capSpread(s.start, s.end, s.hours).forEach(([d, h]) => { days[d] = (days[d] || 0) + h * (s.done ? 1 : w); }));
+  return { kind, r, id: r.id, name: boardTitle(kind, r), code: recordCode(r.id, kind), weight: w, tentative: kind === 'project' && !!r.tentative, days, spans: sp.spans, unplaced: sp.unplaced, total: Object.values(days).reduce((a, b) => a + b, 0) };
+}
+/* which records, by layer. A project counts while it is live; a sale or lead while it is open */
+function capItems(layers){
+  layers = layers || { projects: true, sales: true, leads: true }; const out = [];
+  if(layers.projects) liveProjects().forEach(p => { const it = capItem('project', capTentativeView(p)); it.r = p; out.push(it); });
+  if(layers.sales) state.pipeline.filter(r => !r.lost).forEach(r => out.push(capItem('sales', r)));
+  if(layers.leads) activeLeads().forEach(r => out.push(capItem('lead', r)));
+  return out;
+}
+/* weeks (Monday dates) from a to b: { mon, cap, total, parts: [{ item, hours }] } */
+function capWeekRows(items, a, b){
+  const rows = []; let m = capWeekStart(a), g = 0;
+  while(m <= b && g < 300){ const end = addDaysIso(m, 6), parts = [];
+    items.forEach(it => { let h = 0; for(let i = 0; i < 7; i++){ h += it.days[addDaysIso(m, i)] || 0; } if(h > 0.001) parts.push({ item: it, hours: h }); });
+    rows.push({ mon: m, end, cap: capWeek(m), total: parts.reduce((s, x) => s + x.hours, 0), parts }); m = addDaysIso(m, 7); g++; }
+  return rows;
+}
+const capH = n => (Math.round(n * 10) / 10) + ' h';
+
+/* ---------- the Gantt ---------- */
+const GT_MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function gtRange(p, ph, st, ev){
+  const ds = [fmt(new Date())]; ph.forEach(x => { if(sfIso(x.start)) ds.push(x.start); if(sfIso(x.end)) ds.push(x.end); }); st.forEach(s => { if(s.start) ds.push(s.start); if(s.end) ds.push(s.end); }); ev.forEach(e => { if(e.date) ds.push(e.date); });
+  ds.sort(); let lo = capWeekStart(ds[0]), hi = addDaysIso(capWeekStart(ds[ds.length - 1]), 6);
+  const min = 28; if(daysBetween(lo, hi) + 1 < min) hi = addDaysIso(lo, min - 1);
+  return { lo: addDaysIso(lo, -7), hi: addDaysIso(hi, 7) };
+}
+function phGanttHtml(p){
+  const ph = sfPhases(p), dated = x => sfIso(x.start) || sfIso(x.end), phd = ph.filter(dated), undated = ph.filter(x => !dated(x));
+  const st = (p.stages || []).filter(s => s.start || s.end), ev = projEvents(p).filter(e => e.kind === 'milestone' || e.kind === 'delivery'), tent = !!p.tentative;
+  if(!phd.length && !st.length && !ev.length) return `<section class="rp-card gt-card" id="phGantt"><h4>Gantt</h4><div class="pw-empty">Nothing is dated yet. Give the phases start and end dates below and they appear here, with the hours against capacity.</div></section>`;
+  const { lo, hi } = gtRange(p, phd, st, ev), span = daysBetween(lo, hi) + 1, dw = span <= 70 ? 16 : span <= 150 ? 11 : 7, W = span * dw, today = fmt(new Date());
+  const x = d => (daysBetween(lo, d) / span * 100), pct = (a, b) => Math.max(0.6, (daysBetween(a, b) + 1) / span * 100);
+  /* axis: months, then a tick per week */
+  let months = '', weeks = '', bg = '';
+  for(let d = lo, i = 0; d <= hi; d = addDaysIso(d, 1), i++){
+    const dt = toDate(d), dow = dt.getDay();
+    if(dt.getDate() === 1 || i === 0) months += `<span class="gt-mo" style="left:${i / span * 100}%">${GT_MON[dt.getMonth()]} ${String(dt.getFullYear()).slice(2)}</span>`;
+    if(dow === 1) weeks += `<span class="gt-wkt" style="left:${i / span * 100}%">${dt.getDate()}</span>`;
+    const off = !wdIsWork(d); if(off) bg += `<i class="gt-off${holidayName(d) ? ' hol' : ''}" style="left:${i / span * 100}%;width:${100 / span}%" title="${escAttr(holidayName(d) || 'Weekend')}"></i>`;
+    if(dow === 1) bg += `<i class="gt-wl" style="left:${i / span * 100}%"></i>`;
+  }
+  (state.blackouts || []).filter(b => b.end >= lo && b.start <= hi).forEach(b => { bg += `<i class="gt-bo" style="left:${Math.max(0, x(b.start))}%;width:${pct(b.start < lo ? lo : b.start, b.end > hi ? hi : b.end)}%" title="Blackout: ${escAttr(b.label || 'no work')}"></i>`; });
+  const todayX = today >= lo && today <= hi ? `<i class="gt-today" style="left:${x(today)}%" title="Today"></i><span class="gt-today-t" style="left:${x(today)}%">Today</span>` : '';
+  const row = (label, sub, inner, cls) => `<div class="gt-row${cls ? ' ' + cls : ''}"><div class="gt-l" title="${escAttr(label)}"><span>${escHtml(label)}</span>${sub ? `<small>${sub}</small>` : ''}</div><div class="gt-t">${inner}</div></div>`;
+  const bar = (a, b, cls, txt, tip, extra) => `<i class="gt-bar ${cls}" style="left:${x(a)}%;width:${pct(a, b)}%" title="${escAttr(tip)}"></i><span class="gt-txt" style="left:calc(${x(a) + pct(a, b)}% + 4px)">${txt}</span>${extra || ''}`;
+  const phRows = phd.map(q => {
+    const a = sfIso(q.start) || sfIso(q.end), b = sfIso(q.end) || sfIso(q.start), done = phIsDone(q), hh = done ? phNum(q.done.hours) : phNum(q.hours);
+    const mark = done ? `<span class="gt-mk ${q.done.mode === 'confirmed' ? 'ok' : 'warn'}">✓ ${escHtml(phFmtH(hh))} ${q.done.mode === 'confirmed' ? 'confirmed' : 'assumed'}</span>` : (hh > 0 ? `<span class="gt-mk">${escHtml(phFmtH(hh))} budget</span>` : '');
+    const tip = `${q.name || 'Phase'} · ${pwD(a)} → ${pwD(b)}${hh > 0 ? ' · ' + phFmtH(hh) + (done ? (q.done.mode === 'confirmed' ? ' confirmed' : ' assumed (budget not confirmed)') : ' budget') : ''}${tent ? ' · tentative' : ''}`;
+    return row(q.name || 'Phase', q.selling ? 'selling time' : '', bar(a, b, `gt-ph${q.selling ? ' sell' : ''}${done ? ' done' : ''}${done && q.done.mode !== 'confirmed' ? ' ass' : ''}${tent ? ' tent' : ''}`, mark, tip));
+  }).join('');
+  const stRows = st.map(s => { const a = s.start || s.end, b = s.end || s.start, h = slPlannedHours(s), lg = slLogged(s); return row(s.label || 'Stage', 'working plan', bar(a, b, 'gt-st', `<span class="gt-mk">${h ? escHtml(phFmtH(h)) + ' planned' : ''}${lg ? ' · ' + escHtml(phFmtH(lg)) + ' logged' : ''}</span>`, `${s.label || 'Stage'} · ${pwD(a)} → ${pwD(b)}`)); }).join('');
+  const ms = ev.filter(e => e.kind === 'milestone'), dl = ev.filter(e => e.kind === 'delivery');
+  const msRow = ms.length ? row('Milestones', '', ms.map(e => `<i class="gt-ms ms-${e.ms || 'future'}${e.planned ? ' planned' : ''}" style="left:${x(e.date)}%" title="${escAttr('Milestone: ' + e.title + ' · ' + pwD(e.date) + (e.done ? ' · done' : e.planned || e.isPlan ? ' · planned' : ''))}"></i>`).join('')) : '';
+  const dlRow = dl.length ? row('Deliveries', '', dl.map(e => `<i class="gt-dl${e.done ? ' done' : ''}" style="left:${x(e.date)}%" title="${escAttr(e.title + ' · ' + pwD(e.date) + (e.done ? ' · delivered' : ''))}">${DROP_SVG}</i>`).join('')) : '';
+  /* hours against capacity, week by week, on the same axis */
+  const me = capItem('project', capTentativeView(p)), others = capItems({ projects: true }).filter(it => it.id !== p.id), rows = capWeekRows([me].concat(others), lo, hi), scale = Math.max(8, ...rows.map(r => Math.max(r.cap, r.total))) * 1.12;
+  const cap = rows.map(r => { const mine = r.parts.filter(q => q.item === me).reduce((a, q) => a + q.hours, 0), oth = r.total - mine, over = r.cap > 0 ? r.total > r.cap + 0.05 : r.total > 0.05, ix = daysBetween(lo, r.mon);
+    return `<div class="gt-wk${over ? ' over' : ''}" data-cv="go" data-mon="${r.mon}" role="button" tabindex="0" style="left:${ix / span * 100}%;width:${7 / span * 100}%" title="${escAttr('Week of ' + pwD(r.mon) + ': ' + capH(r.total) + ' of ' + capH(r.cap) + ' capacity (this project ' + capH(mine) + ', other projects ' + capH(oth) + '). Open this week in Calendar and capacity')}"><div class="gt-stack"><i class="oth" style="height:${oth / scale * 100}%"></i><i class="mine${tent ? ' tent' : ''}" style="height:${mine / scale * 100}%"></i></div><i class="gt-capl" style="bottom:${r.cap / scale * 100}%"></i><span class="gt-wv">${r.total > 0.05 || r.cap > 0 ? Math.round(r.total) + '/' + Math.round(r.cap) : ''}</span></div>`; }).join('');
+  const overWeeks = rows.filter(r => r.total > r.cap + 0.05 && r.parts.some(q => q.item === me));
+  const unp = me.unplaced.hours > 0 ? `<div class="rp-hint">${escHtml(phFmtH(me.unplaced.hours))} of phase hours have no dates yet, so they are not in the chart.</div>` : '';
+  return `<section class="rp-card gt-card" id="phGantt"><div class="gt-head"><h4>Gantt</h4><span class="gt-sub">Phases with their hours, milestones, deliveries and today${tent ? ' · <b>tentative</b>' : ''}</span></div>
+    <div class="gt-scroll"><div class="gt" style="--gw:${W}px" data-focus="${x(phd.length ? [today].concat(phd.map(q => sfIso(q.start) || sfIso(q.end))).sort()[0] : today)}" data-w="${W}">
+      <div class="gt-axis"><div class="gt-l"></div><div class="gt-t"><div class="gt-mos">${months}</div><div class="gt-wks">${weeks}</div></div></div>
+      <div class="gt-body"><div class="gt-over"><div class="gt-bgl">${bg}${todayX}</div></div>${phRows}${stRows}${msRow}${dlRow}
+        <div class="gt-row gt-caprow"><div class="gt-l"><span>Hours against capacity</span><small>this project and other projects, per week</small></div><div class="gt-t gt-captrack">${cap}</div></div></div>
+    </div></div>
+    <div class="gt-legend"><span><i class="gt-bar gt-ph"></i>Phase</span><span><i class="gt-bar gt-ph sell"></i>Selling time</span><span><i class="gt-bar gt-ph done"></i>Done, confirmed</span><span><i class="gt-bar gt-ph done ass"></i>Done, assumed</span><span><i class="gt-bar gt-ph tent"></i>Tentative</span><span><i class="gt-ms ms-future"></i>Milestone</span><span><i class="gt-dl">${DROP_SVG}</i>Delivery</span><span><i class="gt-off hol"></i>Weekend or holiday</span><span><i class="gt-capsw"></i>Capacity</span></div>
+    ${overWeeks.length ? `<div class="rp-warn" role="status"><b>Over capacity:</b> ${overWeeks.length === 1 ? 'one week' : overWeeks.length + ' weeks'} with this project in it ${overWeeks.length === 1 ? 'is' : 'are'} above the hours the team has (${overWeeks.slice(0, 4).map(r => escHtml(pwD(r.mon)) + ' ' + Math.round(r.total) + '/' + Math.round(r.cap) + ' h').join(', ')}${overWeeks.length > 4 ? '…' : ''}).</div>` : ''}
+    ${undated.length ? `<div class="rp-hint">No dates yet: ${undated.map(q => escHtml(q.name || 'Phase')).join(', ')}.</div>` : ''}${unp}
+    <div class="rp-hint">Dates are changed in the Phases list below and go through a review: nothing linked moves until you confirm. <button type="button" class="sp-link" data-cv="go" data-mon="">Open Calendar and capacity</button> to see every project, deal and lead against capacity.</div></section>`;
+}
+
+/* ---------- editing a phase date: the same flow as the project dates (Confirm, Tentative or Cancel) ----------
+   A date typed in the Phases list on the Plan tab waits in the draft (rpUi.draft.ph). Nothing is saved, and nothing linked moves, until Confirm schedule
+   (with a cause and a reason, logged on the project) or Keep as tentative (the new dates are saved and the project is flagged tentative, the previous ones kept). */
+function phDraftOf(p, q){ const d = rpDraft(p), c = d && d.ph && d.ph[q.id]; return c || { start: sfIso(q.start), end: sfIso(q.end) }; }
+function phDraftSet(p, pid, field, value){
+  const q = sfPhases(p).find(x => x.id === pid); if(!q || phIsDone(q)) return;
+  let d = rpDraft(p); if(!d) d = rpUi.draft = { pid: p.id, f: {}, sched: null };
+  d.ph = d.ph || {}; const cur = Object.assign({}, phDraftOf(p, q)); cur[field] = sfIso(value);
+  if(field === 'start' && cur.start){ const prev = phDraftOf(p, q); if(prev.start && prev.end) cur.end = wdEnd(cur.start, wdCount(prev.start, prev.end) || 1); else if(!cur.end && phNum(q.days) > 0) cur.end = wdEnd(cur.start, phNum(q.days)); }   // moving the start keeps the length; with no end, the days give one (working days)
+  if(cur.start && cur.end && cur.end < cur.start){ if(field === 'start') cur.end = cur.start; else cur.start = cur.end; }
+  if(cur.start === sfIso(q.start) && cur.end === sfIso(q.end)) delete d.ph[pid]; else d.ph[pid] = cur;
+  if(!Object.keys(d.ph).length){ delete d.ph; if(!Object.keys(d.f).length && !d.sched) rpUi.draft = null; }
+  rpUi.tab = 'plan'; rpRenderProject(p);
+}
+function phDraftLines(p){
+  const d = rpDraft(p); if(!d || !d.ph) return [];
+  return Object.keys(d.ph).map(id => { const q = sfPhases(p).find(x => x.id === id); if(!q) return null; const n = d.ph[id], t = (a, b) => (a ? pwD(a) : '—') + ' → ' + (b ? pwD(b) : '—');
+    return `${q.name || 'Phase'}: ${t(sfIso(q.start), sfIso(q.end))} to ${t(n.start, n.end)}`; }).filter(Boolean);
+}
+function phSchedPanel(p){
+  const d = rpDraft(p); if(!d || !d.ph || !Object.keys(d.ph).length) return '';
+  const rows = Object.keys(d.ph).map(id => { const q = sfPhases(p).find(x => x.id === id); if(!q) return ''; const n = d.ph[id], o = (a, b) => (a ? escHtml(pwD(a)) : '—') + ' → ' + (b ? escHtml(pwD(b)) : '—');
+    return `<div class="rp-s-row moved"><div class="rp-s-i"><span class="rp-s-tag">Phase</span>${escHtml(q.name || 'Phase')}</div><div class="rp-s-d"><div class="rp-s-f"><span class="rp-s-was">was ${o(sfIso(q.start), sfIso(q.end))}</span>
+      <input type="date" class="rp-chg" data-rpph="start" data-pid="${escAttr(id)}" value="${escAttr(n.start || '')}" aria-label="New start for ${escAttr(q.name || 'phase')}"><input type="date" class="rp-chg" data-rpph="end" data-pid="${escAttr(id)}" value="${escAttr(n.end || '')}" aria-label="New end for ${escAttr(q.name || 'phase')}"></div></div></div>`; }).join('');
+  const warn = typeof capWarnHtml === 'function' ? capWarnHtml(p) : '';
+  return `<section class="rp-sched" id="phSched" aria-label="Review the new phase dates"><div class="rp-sched-h"><h3>Review the new phase dates</h3><p>${Object.keys(d.ph).length} phase${Object.keys(d.ph).length === 1 ? '' : 's'} will move. Nothing is saved, and nothing linked changes, until you confirm.</p></div>${warn}
+    <div class="rp-s-list">${rows}</div><div class="rp-sched-f"><button type="button" class="btn" data-phs="confirm">Confirm schedule</button><button type="button" class="btn secondary" data-phs="tentative">Keep as tentative</button><button type="button" class="btn secondary" data-phs="cancel">Cancel changes</button></div></section>`;
+}
+function phApplyDraft(p, why){
+  const d = rpDraft(p), now = new Date().toISOString(), by = whoName(), lines = [];
+  Object.keys(d.ph).forEach(id => { const q = sfPhases(p).find(x => x.id === id); if(!q) return; const n = d.ph[id], t = (a, b) => (a ? pwD(a) : '—') + ' → ' + (b ? pwD(b) : '—');
+    (q.planLog = q.planLog || []).push({ id: qRand('pl_'), kind: 'planned', fromTxt: t(sfIso(q.start), sfIso(q.end)), toTxt: t(n.start, n.end), at: now, by, reason: why });
+    lines.push(`${q.name || 'Phase'}: ${t(sfIso(q.start), sfIso(q.end))} to ${t(n.start, n.end)}`); q.start = n.start || ''; q.end = n.end || ''; });
+  return lines;
+}
+async function phConfirmDates(p){
+  const d = rpDraft(p); if(!d || !d.ph) return; const lines = phDraftLines(p); if(!lines.length) return;
+  const r = await chgAsk('Confirm these phase dates?', lines, { causes: SCHEDULE_CAUSES, save: 'Confirm schedule' }); if(!r) return;
+  const why = (r.cause ? ((SCHEDULE_CAUSES.find(c => c[0] === r.cause) || [0, r.cause])[1]) + ': ' : '') + r.reason, out = phApplyDraft(p, why);
+  delete d.ph; if(!Object.keys(d.f).length && !d.sched) rpUi.draft = null;
+  chgLog(p, 'reschedule', r, out); saveState(); render(); showToast('Phase dates confirmed: ' + out.length + ' updated');
+}
+function phKeepTentative(p){
+  const d = rpDraft(p); if(!d || !d.ph) return; const old = {}; Object.keys(d.ph).forEach(id => { const q = sfPhases(p).find(x => x.id === id); if(q) old[id] = { start: sfIso(q.start), end: sfIso(q.end) }; });
+  const out = phApplyDraft(p, 'Tentative'), cur = rpDates(p), t = p.tentative;
+  p.tentative = { since: t ? t.since : fmt(new Date()), by: whoName(), prev: Object.assign({}, t ? t.prev : { start: cur.start, complete: cur.complete }) };
+  p.tentative.prev.phases = Object.assign({}, old, (t && t.prev && t.prev.phases) || {});   // the earliest dates win, so Go back returns to what was confirmed
+  delete d.ph; if(!Object.keys(d.f).length && !d.sched) rpUi.draft = null;
+  chgLog(p, 'reschedule', { cause: '', reason: 'Kept as tentative' }, out.map(l => l + ' (tentative)')); saveState(); render(); showToast('Kept as tentative. Linked dates have not moved.');
+}
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.rpph || !state) return; const p = rpFind(pwUi.id); if(p) phDraftSet(p, d.pid, d.rpph, el.value);
+});
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-phs]'); if(!b || !state) return; const p = rpFind(pwUi.id); if(!p) return;
+  if(b.dataset.phs === 'confirm') phConfirmDates(p); else if(b.dataset.phs === 'tentative') phKeepTentative(p);
+  else if(b.dataset.phs === 'cancel'){ const d = rpDraft(p); if(d){ delete d.ph; if(!Object.keys(d.f).length && !d.sched) rpUi.draft = null; } rpRenderProject(p); showToast('Phase date changes cancelled'); }
+});
+
+
+/* =====================================================================
+   STEP 6: CALENDAR AND CAPACITY (Command menu)
+   A weekly view of demand against capacity across the business, from the engine above (the same hours as the Gantt on each project).
+   Layers you switch on and off: confirmed projects, sales opportunities (weighted by probability), leads (weighted), deliveries, business tasks.
+   Choices are kept per browser. Clicking a week or a day opens that day on Today; every name opens its own record, and Back returns here.
+   ===================================================================== */
+const CV_KEY = STORAGE_PREFIX + 'business-tracker-capacity-view';
+const CV_LAYERS = [['projects', 'Confirmed projects', 'oak'], ['sales', 'Sales opportunities (weighted)', 'slate'], ['leads', 'Leads (weighted)', 'green'], ['deliveries', 'Deliveries', ''], ['tasks', 'Business tasks', '']];
+const capUi = { layers: { projects: true, sales: true, leads: true, deliveries: true, tasks: false }, start: '', weeks: 12, open: {} };
+(function(){ try{ const o = JSON.parse(localStorage.getItem(CV_KEY) || 'null'); if(o && typeof o === 'object'){ CV_LAYERS.forEach(([k]) => { if(typeof (o.layers || {})[k] === 'boolean') capUi.layers[k] = o.layers[k]; }); if([8, 12, 26].includes(o.weeks)) capUi.weeks = o.weeks; } }catch(e){} })();
+function capSave(){ try{ localStorage.setItem(CV_KEY, JSON.stringify({ layers: capUi.layers, weeks: capUi.weeks })); }catch(e){} }
+navExtra('cap', () => ({ s: capUi.start, o: Object.keys(capUi.open) }), v => { capUi.start = (v && v.s) || ''; capUi.open = {}; ((v && v.o) || []).forEach(k => { capUi.open[k] = true; }); });
+const capLayerName = { project: 'Project', sales: 'Sales', lead: 'Lead' };
+const capShortDay = iso => toDate(iso).toLocaleDateString('en-GB', { weekday: 'short' });
+function capDayEvents(from, to){
+  const del = {}, tasks = {};
+  if(capUi.layers.deliveries) liveProjects().forEach(p => projDeliveries(p).drops.forEach(x => { if(x.date && x.date >= from && x.date <= to && !x.delivered) (del[x.date] = del[x.date] || []).push({ p, x }); }));
+  if(capUi.layers.tasks && canSeeBusiness()) state.crmTasks.filter(t => t.status === 'open' && t.scope === 'business' && t.dueDate && t.dueDate >= from && t.dueDate <= to && taskVisible(t)).forEach(t => (tasks[t.dueDate] = tasks[t.dueDate] || []).push(t));
+  return { del, tasks };
+}
+/* the hours a record puts on a week, for the list under it */
+function capWhy(it){
+  if(it.kind === 'project') return it.tentative ? 'tentative, full hours' : 'confirmed';
+  return Math.round(it.weight * 100) + '% ' + (it.kind === 'sales' ? 'probability' : 'lead weighting');
+}
+function capOverNames(row){ return row.parts.slice().sort((a, b) => b.hours - a.hours).map(q => q.item); }
+function renderCapacity(){
+  const panel = document.getElementById('panel-capacity'); if(!panel || !state) return;
+  const real = fmt(new Date()), start = capUi.start ? capWeekStart(capUi.start) : capWeekStart(real), n = capUi.weeks, end = addDaysIso(start, 7 * n - 1), L = capUi.layers;
+  const items = capItems({ projects: L.projects, sales: L.sales, leads: L.leads }), rows = capWeekRows(items, start, end), full = capFull(), noCap = full <= 0;
+  const ev = capDayEvents(start, end), scale = Math.max(8, ...rows.map(r => Math.max(r.cap, r.total))) * 1.1, over = r => !noCap && r.total > r.cap + 0.05;
+  const overRows = rows.filter(over), peak = rows.slice().sort((a, b) => (b.total - b.cap) - (a.total - a.cap))[0];
+  const unp = capItems({ projects: true, sales: true, leads: true }).filter(it => it.unplaced.hours > 0 || (it.kind !== 'project' && !it.spans.length && sfDays(it.r) > 0));
+  const unpHours = unp.reduce((a, it) => a + it.unplaced.hours, 0);
+  const tile = (k, v, sub, cls) => `<div class="db-mini${cls ? ' ' + cls : ''}"><span class="k">${k}</span><b>${v}</b>${sub ? `<span class="s">${sub}</span>` : ''}</div>`;
+  document.getElementById('cvSum').innerHTML = (noCap ? `<div class="rp-warn" role="status"><b>No capacity is set.</b> Fill in the weekly hours for at least one person in Settings, Planning and capacity, or every week would look over capacity.</div>` : '')
+    + `<div class="db-minis">${tile('Team capacity', capH(full) + ' a week', capPeople().map(x => escHtml(x.name)).join(', ') || 'nobody yet')}${tile('Weeks over capacity', String(overRows.length), overRows.length ? 'first: week of ' + escHtml(pwD(overRows[0].mon)) : 'in the next ' + n + ' weeks', overRows.length ? 'bad' : '')}${tile('Busiest week', peak && peak.total > 0 ? Math.round(peak.total) + ' / ' + Math.round(peak.cap) + ' h' : '—', peak && peak.total > 0 ? 'week of ' + escHtml(pwD(peak.mon)) : '')}${tile('Not placed yet', capH(unpHours), unp.length ? unp.length + ' record' + (unp.length === 1 ? '' : 's') + ' without dates' : 'everything has dates')}</div>`;
+  document.getElementById('cvControls').innerHTML = `<div class="cv-layers" role="group" aria-label="Layers">${CV_LAYERS.map(([k, name, c]) => `<button type="button" class="cv-chip${L[k] ? ' on' : ''}" data-cv="layer" data-k="${k}" aria-pressed="${!!L[k]}">${c ? `<i class="cv-sw ${c}"></i>` : `<i class="cv-sw ${k}"></i>`}${escHtml(name)}</button>`).join('')}</div>
+    <div class="cv-nav"><button type="button" class="btn secondary qb-sm" data-cv="prev" aria-label="Four weeks earlier">← 4 weeks</button><button type="button" class="btn secondary qb-sm" data-cv="this">This week</button><button type="button" class="btn secondary qb-sm" data-cv="next" aria-label="Four weeks later">4 weeks →</button>
+      <label class="cv-go">Go to <input type="date" data-cv="goto" value="${escAttr(start)}" aria-label="Show the week containing"></label>
+      <label class="cv-go">Show <select data-cv="weeks" aria-label="Number of weeks">${[8, 12, 26].map(x => `<option value="${x}"${x === n ? ' selected' : ''}>${x} weeks</option>`).join('')}</select></label></div>`;
+  const dayCell = (d, r) => { let h = 0; items.forEach(it => { h += it.days[d] || 0; }); const off = !wdIsWork(d), dayCap = capDay(d), de = (ev.del[d] || []).length, te = (ev.tasks[d] || []).length, dn = toDate(d).getDate(), hot = !noCap && dayCap > 0 && h > dayCap + 0.05, name = holidayName(d);
+    const tip = `${capShortDay(d)} ${pwD(d)}${name ? ' · ' + name : off ? ' · weekend' : ''} · ${capH(h)} of ${capH(dayCap)}${de ? ' · ' + de + ' deliver' + (de === 1 ? 'y' : 'ies') : ''}${te ? ' · ' + te + ' task' + (te === 1 ? '' : 's') : ''}. Open this day on Today`;
+    return `<button type="button" class="cv-d${off ? ' off' : ''}${name ? ' hol' : ''}${hot ? ' hot' : ''}${d === real ? ' today' : ''}" data-cv="day" data-d="${d}" title="${escAttr(tip)}" aria-label="${escAttr(tip)}"><span class="cv-dn">${capShortDay(d).slice(0, 2)} ${dn}</span><span class="cv-dh">${h > 0.05 ? Math.round(h * 10) / 10 : ''}</span><span class="cv-de">${de ? `<i class="cv-ic del">${DROP_SVG}</i>` : ''}${te ? `<i class="cv-ic tsk">${te}</i>` : ''}</span></button>`; };
+  const seg = (h, cls) => h > 0.001 ? `<i class="cv-seg ${cls}" style="width:${h / scale * 100}%"></i>` : '';
+  const body = rows.map(r => {
+    const parts = { project: 0, sales: 0, lead: 0 }, tent = r.parts.filter(q => q.item.tentative).reduce((a, q) => a + q.hours, 0); r.parts.forEach(q => { parts[q.item.kind] += q.hours; }); parts.project -= tent;
+    const isOver = over(r), open = isOver || capUi.open[r.mon], days = [0, 1, 2, 3, 4, 5, 6].map(i => addDaysIso(r.mon, i)), dels = days.reduce((a, d) => a + (ev.del[d] || []).length, 0), tks = days.reduce((a, d) => a + (ev.tasks[d] || []).length, 0), cur = r.mon === capWeekStart(real);
+    const list = r.parts.length ? capOverNames(r).map(it => { const h = r.parts.find(q => q.item === it).hours; return `<div class="cv-c"><span class="cv-ck ${it.kind}"></span><button type="button" class="sp-link" data-nav="deal2:${it.id}">${escHtml(it.name)}</button><span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span>${it.tentative ? '<span class="sf-chip warn">Tentative</span>' : ''}<span class="cv-cw">${escHtml(capWhy(it))}</span><b>${capH(h)}</b></div>`; }).join('') : '<div class="qb-dim">Nothing is planned in this week.</div>';
+    const dl = days.flatMap(d => (ev.del[d] || []).map(x => `<div class="cv-c"><span class="cv-ck del"></span><span>Delivery · ${escHtml(x.x.supplier)}</span><button type="button" class="sp-link" data-nav="deal2:${x.p.id}">${escHtml(boardTitle('project', x.p))}</button><span class="cv-cw">${escHtml(pwD(d))}</span></div>`)).join('');
+    return `<div class="cv-wk${isOver ? ' over' : ''}${cur ? ' cur' : ''}"><div class="cv-wh"><button type="button" class="cv-wl" data-cv="day" data-d="${r.mon}" title="Open Monday ${escAttr(pwD(r.mon))} on Today"><b>${escHtml(pwD(r.mon))}</b><span>${r.cap < full - 0.01 ? 'reduced week' : 'week'}</span></button>
+        <div class="cv-bar" title="${escAttr(capH(r.total) + ' planned of ' + capH(r.cap) + ' available')}"><div class="cv-track">${seg(parts.project, 'project')}${seg(tent, 'project tent')}${seg(parts.sales, 'sales')}${seg(parts.lead, 'lead')}<i class="cv-cap" style="left:${r.cap / scale * 100}%"></i></div><span class="cv-num${isOver ? ' bad' : ''}">${Math.round(r.total * 10) / 10} / ${Math.round(r.cap * 10) / 10} h${isOver ? ' · over by ' + (Math.round((r.total - r.cap) * 10) / 10) : ''}${tent > 0.05 ? ` <span class="sf-chip warn" title="Tentative project hours, counted in full">${capH(tent)} tentative</span>` : ''}</span></div>
+        <div class="cv-days">${days.map(d => dayCell(d, r)).join('')}</div></div>
+      ${(r.parts.length || dels) ? `<div class="cv-more"><button type="button" class="link-btn" data-cv="open" data-mon="${r.mon}" aria-expanded="${!!open}">${open ? 'Hide' : 'Show'} what makes up this week (${r.parts.length}${dels ? ' · ' + dels + ' deliver' + (dels === 1 ? 'y' : 'ies') : ''}${tks ? ' · ' + tks + ' task' + (tks === 1 ? '' : 's') : ''})</button>${open ? `<div class="cv-list">${list}${dl}</div>` : ''}</div>` : ''}</div>`;
+  }).join('');
+  document.getElementById('cvBody').innerHTML = `<div class="cv-leg"><span><i class="cv-sw oak"></i>Projects</span><span><i class="cv-sw slate"></i>Sales (weighted)</span><span><i class="cv-sw green"></i>Leads (weighted)</span><span><i class="cv-sw oak tent"></i>Tentative project</span><span><i class="cv-capsw"></i>Capacity that week</span><span><i class="cv-sw bad"></i>Over capacity</span></div>${body}
+    ${unp.length ? `<div class="cv-unp"><h4>Not placed on the calendar</h4><p class="q-help" style="margin:0 0 6px;">These have hours or a duration but nothing to place them by: give them a preferred start, a deadline or phase dates.</p>${unp.map(it => `<div class="cv-c"><span class="cv-ck ${it.kind}"></span><button type="button" class="sp-link" data-nav="deal2:${it.id}">${escHtml(it.name)}</button><span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span><span class="cv-cw">${escHtml(it.unplaced.what || 'no preferred start or deadline')}</span><b>${capH(it.unplaced.hours || sfDays(it.r) * hpd())}</b></div>`).join('')}</div>` : ''}`;
+}
+function capOpenDay(iso){
+  navGo(() => { todayUi.date = iso === fmt(new Date()) ? '' : iso; todayUi.more = {}; activateTab('today'); render(); window.scrollTo(0, 0); });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-cv]'); if(!b || !state || b.tagName === 'INPUT' || b.tagName === 'SELECT') return; const a = b.dataset.cv;
+  if(a === 'day') return capOpenDay(b.dataset.d);
+  if(a === 'go'){ navGo(() => { capUi.start = b.dataset.mon || ''; activateTab('capacity'); window.scrollTo(0, 0); }); return; }
+  if(a === 'layer'){ capUi.layers[b.dataset.k] = !capUi.layers[b.dataset.k]; capSave(); }
+  else if(a === 'prev' || a === 'next'){ capUi.start = addDaysIso(capUi.start ? capWeekStart(capUi.start) : capWeekStart(fmt(new Date())), a === 'prev' ? -28 : 28); }
+  else if(a === 'this') capUi.start = '';
+  else if(a === 'open'){ capUi.open[b.dataset.mon] = !capUi.open[b.dataset.mon]; }
+  else return;
+  renderCapacity();
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, a = el.dataset && el.dataset.cv; if(!a || !state) return;
+  if(a === 'goto'){ if(isoOk(el.value)) capUi.start = capWeekStart(el.value); }
+  else if(a === 'weeks'){ capUi.weeks = [8, 12, 26].includes(Number(el.value)) ? Number(el.value) : 12; capSave(); }
+  else return;
+  renderCapacity();
+});
+
+
+/* =====================================================================
+   STEP 7: OVERLAP WARNINGS USE CAPACITY
+   The reschedule review no longer compares dates with other projects. It works out the hours the project would put on each week with the NEW dates,
+   adds the other projects (confirmed and tentative, at their full hours), and warns about every week the change pushes over the team's capacity, naming the
+   projects in it, and suggests Keep as tentative. A tentative project stays in the capacity view in full, striped, until it is confirmed or put back.
+   ===================================================================== */
+const capClone = o => JSON.parse(JSON.stringify(o));
+/* a project that is tentative is shown where the tentative dates put it: its project-level move is applied to the phases and stages that have not happened */
+function capTentativeView(p){
+  const t = p.tentative; if(!t || !t.prev) return p; const cur = rpDates(p), b = { os: t.prev.start, oc: t.prev.complete, ns: cur.start, nc: cur.complete };
+  if(!(b.os && b.oc && b.ns && b.nc) || (b.os === b.ns && b.oc === b.nc)) return p;
+  const c = capClone(p), moved = t.prev.phases || {};
+  (c.phases || []).forEach(q => { if(!q || typeof q !== 'object' || phIsDone(q) || moved[q.id]) return; if(sfIso(q.start)) q.start = rpShiftDate(q.start, b); if(sfIso(q.end)) q.end = rpShiftDate(q.end, b); });
+  (c.stages || []).forEach(s => { if(s.actEnd && s.actEnd.date) return; if(s.start) s.start = rpShiftDate(s.start, b); if(s.end) s.end = rpShiftDate(s.end, b); });
+  return c;
+}
+/* the project as it would be if the pending review were confirmed */
+function capProposalFromSched(p, sc){
+  const c = capClone(p), b = sc.base;
+  c.milestones = c.milestones || {}; if(b.ns) c.milestones.onSiteStart = b.ns; if(b.nc) c.milestones.buildComplete = b.nc;
+  sc.rows.forEach(r => { if(r.locked) return; const f = k => (r.fields.find(x => x.k === k) || {}).new || '';
+    if(r.kind === 'phase'){ const q = (c.phases || []).find(x => x.id === r.ref); if(q){ q.start = f('start'); q.end = f('end'); } }
+    else if(r.kind === 'stage'){ const s = (c.stages || []).find(x => x.id === r.ref); if(s){ s.start = f('start'); s.end = f('end'); } } });
+  c.tentative = null; return c;
+}
+function capProposalFromDraft(p){
+  const d = rpDraft(p), c = capClone(p); if(!d || !d.ph) return c;
+  Object.keys(d.ph).forEach(id => { const q = (c.phases || []).find(x => x.id === id); if(q){ q.start = d.ph[id].start || ''; q.end = d.ph[id].end || ''; } }); c.tentative = null; return c;
+}
+/* the weeks the proposal pushes over capacity: { mon, total, cap, mine, others: [{ item, hours }] } */
+function capCheck(p, prop){
+  if(capFull() <= 0) return [];
+  const others = liveProjects().filter(o => o.id !== p.id).map(o => capItem('project', capTentativeView(o))), before = capItem('project', capTentativeView(p)), after = capItem('project', prop);
+  const ds = Object.keys(before.days).concat(Object.keys(after.days)).sort(); if(!ds.length) return [];
+  return capWeekRows(others.concat([after]), ds[0], ds[ds.length - 1]).map(w => {
+    const mine = w.parts.filter(q => q.item === after).reduce((a, q) => a + q.hours, 0); let was = 0; for(let i = 0; i < 7; i++) was += before.days[addDaysIso(w.mon, i)] || 0;
+    return { mon: w.mon, total: w.total, cap: w.cap, mine, was, others: w.parts.filter(q => q.item !== after).sort((a, b) => b.hours - a.hours) };
+  }).filter(w => w.total > w.cap + 0.05 && w.mine > w.was + 0.05);
+}
+function capWarnWeeks(p, weeks){
+  if(!weeks.length) return '';
+  const names = w => w.others.length ? w.others.map(q => `${rpLink('project:' + q.item.id, q.item.code + ' ' + q.item.name)} (${capH(q.hours)}${q.item.tentative ? ', tentative' : ''})`).join(', ') : 'no other project';
+  return `<div class="rp-warn" role="alert"><b>⚠ These dates push ${weeks.length === 1 ? 'a week' : weeks.length + ' weeks'} over capacity.</b>${weeks.slice(0, 4).map(w => `<div>Week of ${escHtml(pwD(w.mon))}: <b>${capH(w.total)}</b> planned against ${capH(w.cap)} available (this project ${capH(w.mine)}). Shared with ${names(w)}.</div>`).join('')}${weeks.length > 4 ? `<div>and ${weeks.length - 4} more week${weeks.length - 4 === 1 ? '' : 's'}.</div>` : ''}<div>Speak to them first. <b>Keep as tentative</b> is the safer choice until you have: it stays on the calendar in full, striped, until you confirm or go back. <button type="button" class="sp-link" data-cv="go" data-mon="${escAttr(weeks[0].mon)}">See it in Calendar and capacity</button></div></div>`;
+}
+const capWarnHtml = p => capWarnWeeks(p, capCheck(p, capProposalFromDraft(p)));
+
+/* BT:js-planning end */
 
 /* ---------- init ---------- */
 (async () => {

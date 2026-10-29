@@ -91,3 +91,16 @@ New stored fields, all optional and empty by default: `project.dropState[drop].c
 - **Menu**: Invoicing is now **Customer invoices**.
 
 New stored fields, all optional and defaulting empty or to the values above: lead, sale and project `estDays`, `phases`, `prefStart`, `deadline`, `jobTypeId`, `qa`, `qRate`, `lost*`; contact and company `lifecycle`; quote `overrides` and price `leadTimeDays`, `validUntil`; `state.jobTypes`, `state.lifecycle`, `state.qualQuestions`; settings `qualGateDefault`, `followUpGapDays`, `followUpTaskName`, `noContactDays`, `approverScope`; a Stalled lost reason. The old `settings.followUpDays` (calendar days) is kept but no longer used.
+
+## Planning, time and capacity (Stage 4, test site)
+
+- **Settings > Planning & capacity** (new): bank holidays and unavailable days (England and Wales 2026 and 2027 listed to start with; the working week is Monday to Friday and can be changed), the **phase template**, and **people and capacity** (weekly hours each, their own unavailable days, and the hours in a working day, which is the existing Hours per day setting).
+- **Working days** are counted in one place that knows about the list above: duration and complete date on a project, the quote follow-up gap, days since contact and the reschedule review. No stored date is changed.
+- **Phases** (leads, sales and projects) gain optional hours, start, end and a selling-time tick. A new lead or sales deal is pre-filled from the template; existing jobs are only changed by pressing **Apply the template** on them. Phase hours add up to Hours planned on the project profile (the Working plan figure is used when no phase has hours).
+- **Tick then confirm**: dated phases that are due show on Today. Ticking one saves its budget as **assumed**; the dialog that follows lets you adjust in 15-minute steps and save as **confirmed**. Hours logged on a project add these to the stage-line time logs, with the assumed or confirmed marker beside them.
+- **Cost of selling** (Dashboard): hours on selling phases at the labour rate (hourly rate, or day rate over hours in a day), including lost deals.
+- **Gantt** at the top of every project's Plan tab: phases with hours and markers, stage lines, milestones, deliveries, today, and the project's hours against capacity by week. Phase dates changed there go through Confirm schedule, Keep as tentative or Cancel.
+- **Calendar and capacity** (Command): weekly demand against capacity with layers (projects, sales and leads weighted by probability, deliveries, business tasks). Over-capacity weeks list their projects and leads; a week or a day opens that day on Today.
+- **Reschedule review** warns by capacity instead of by overlapping dates, and suggests Tentative. A tentative project stays on the calendar in full, striped.
+
+New stored fields, all optional and defaulting safely: `state.holidays`, `state.phaseTemplate`, `state.people`; `settings.workingWeek`, `settings.leadWeightPct` (default 20); phase `hours`, `start`, `end`, `selling`, `done`; `project.tentative.prev.phases`. Nothing existing is renamed, removed or converted.
