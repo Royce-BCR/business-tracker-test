@@ -2525,7 +2525,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .ph-row .ph-sub { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
   .ph-row .ph-sub input[type=date] { width: 138px; }
   .ph-row .ph-sub .q-check { min-height: 0; font-size: var(--bt-fs-xs); }
-  .ph-row input, .pt-row input[type=text], .pt-row input[type=number] { border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); min-width: 0; width: 100%; }
+  .cap-row input:not([type=checkbox]), .hd-row input:not([type=checkbox]), .hd-row select, .ph-row input:not([type=checkbox]), .pt-row input[type=text], .pt-row input[type=number] { border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); min-width: 0; width: 100%; }
   .ph-row input[type=checkbox], .pt-row input[type=checkbox] { width: auto; }
   .ph-row.ph-stack { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px; }
   .ph-row.ph-stack .ph-nm { grid-column: 1 / -1; font-weight: 600; }
@@ -2538,6 +2538,13 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .db-mini { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; background: var(--bt-surface-2); display: flex; flex-direction: column; gap: 2px; } .db-mini .k { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; } .db-mini b { font-size: 18px; font-variant-numeric: tabular-nums; } .db-mini .s { font-size: var(--bt-fs-xs); color: var(--text-muted); }
   .db-tbl { width: 100%; border-collapse: collapse; font-size: 13px; } .db-tbl th, .db-tbl td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); } .db-tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
   .ph-sell { margin-top: 4px; }
+  .cap-list { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+  .cap-row { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; background: var(--bt-card); }
+  .cap-main { display: grid; grid-template-columns: minmax(0, 1fr) 200px 34px; gap: var(--bt-s2); align-items: end; }
+  .cap-main input { width: 100%; min-width: 0; } .cap-h { display: block; margin: 0; } .cap-h > span { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+  .cap-leave { margin-top: 8px; } .cap-leave summary { cursor: pointer; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--slate); }
+  .cap-lv { display: grid; grid-template-columns: 138px 138px minmax(0, 1fr) 34px; gap: 6px; margin: 6px 0; align-items: center; } .cap-lv input { min-width: 0; width: 100%; }
+  @media (max-width: 700px) { .cap-main { grid-template-columns: minmax(0, 1fr) 34px; } .cap-main .cap-h { grid-column: 1 / -1; grid-row: 2; } .cap-lv { grid-template-columns: 1fr 1fr 34px; } .cap-lv input[type=text] { grid-column: 1 / 3; } .cap-lv .icon-btn { grid-row: 1; grid-column: 3; } }
   .ph-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .ph-tbl input { width: 100%; min-width: 0; } .ph-tbl td:nth-child(2) input, .ph-tbl td:nth-child(3) input { width: 72px; }
   .ph-card .ph-btns { margin-top: 10px; }
@@ -19432,6 +19439,71 @@ function dashSellingHtml(){
     <div class="table-scroll"><table class="db-tbl sell-tbl"><thead><tr><th>Deal</th><th class="num">Selling time</th><th class="num">Cost</th></tr></thead><tbody>${rows.map(x => `<tr><td><button type="button" class="sp-link" data-nav="deal2:${x.r.id}">${escHtml(x.name)}</button> ${x.lost ? '<span class="sf-chip bad">Lost</span>' : '<span class="qb-dim">' + escHtml(PH_KIND[x.kind]) + '</span>'}</td><td class="num">${hrs(x.hours)} ${phMarkHtml(x.conf, x.ass)}</td><td class="num">${money(x.cost)}</td></tr>`).join('')}</tbody></table></div>
     <p class="q-help" style="margin:8px 0 0;">${rate > 0 ? 'Costed at ' + basis + '.' : 'No labour rate is set, so only the hours are shown.'} The same hours count towards Hours logged on a project once it exists.</p>`;
 }
+
+
+/* =====================================================================
+   STEP 4: TEAM CAPACITY
+   state.people: [{ id, name, weeklyHours ('' until filled in), leave: [{ id, start, end, note }] }]. Lynton starts at 40 hours a week; Gerry, Mike and Peter are blank.
+   The hours in a working day are the existing settings.hoursPerDay (default 8), the same figure as Settings, Quotes and pricing: nothing is typed twice.
+   A person's hours in a week are spread over the days of the working week; a bank holiday, an unavailable day or that person's own leave takes that day's share away.
+   No login or access is created or changed by any of this.
+   ===================================================================== */
+const PLAN_PEOPLE = [['Lynton', 40], ['Gerry', ''], ['Mike', ''], ['Peter', '']];
+function ensurePlanModel3(o){
+  const str = v => v == null ? '' : String(v), ok = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '');
+  let l = Array.isArray(o.people) ? o.people.filter(x => x && typeof x === 'object') : null;
+  if(!l) l = PLAN_PEOPLE.map(([name, h]) => ({ id: 'pe_' + name.toLowerCase(), name, weeklyHours: h, leave: [] }));
+  o.people = l.map(x => { const w = Number(x.weeklyHours);
+    return { id: str(x.id) || selId('pe_'), name: str(x.name).trim() || 'Person', weeklyHours: (x.weeklyHours === '' || x.weeklyHours == null || isNaN(w) || w < 0) ? '' : Math.min(168, w),
+      leave: (Array.isArray(x.leave) ? x.leave : []).filter(v => v && typeof v === 'object' && ok(v.start)).map(v => ({ id: str(v.id) || selId('lv_'), start: v.start, end: ok(v.end) && v.end >= v.start ? v.end : v.start, note: str(v.note) })) }; });
+}
+/* hours one person has on one day (0 on a non-working day, a holiday, an unavailable day or their own leave) */
+function capPersonDay(person, iso){
+  const w = Number(person.weeklyHours); if(!(w > 0) || !wdIsWork(iso)) return 0;
+  if((person.leave || []).some(v => v.start <= iso && iso <= (v.end || v.start))) return 0;
+  return w / Math.max(1, workingWeek().length);
+}
+const capPeople = () => state.people.filter(x => Number(x.weeklyHours) > 0);
+function capDay(iso){ return capPeople().reduce((a, x) => a + capPersonDay(x, iso), 0); }
+/* the hours the business has between two dates, both counted (people with no weekly hours filled in have none) */
+function capRange(a, b){ let t = 0, d = a, g = 0; while(d <= b && g < 4000){ t += capDay(d); d = addDaysIso(d, 1); g++; } return t; }
+const capWeekStart = iso => { const d = toDate(iso); return fmt(addCalendarDays(d, -((d.getDay() + 6) % 7))); };
+const capWeek = monday => capRange(monday, addDaysIso(monday, 6));
+const capFull = () => capPeople().reduce((a, x) => a + Number(x.weeklyHours), 0);
+PLAN_SET_CARDS.push(['People and capacity', () => {
+  const l = state.people, hp = hpd();
+  return `<p class="q-help" style="margin:0 0 8px;">The people who do the work and the hours each has in a week. Everything on the capacity view is measured against these hours, so a person with no hours filled in adds nothing to capacity. A week with a bank holiday or someone's leave has fewer hours. Adding a person here does not give them a login.</p>
+    <div class="assumptions-grid two" style="max-width:560px;margin-bottom:12px;"><div><label for="capHpd">Hours in a working day</label><input id="capHpd" type="number" min="1" max="24" step="1" inputmode="numeric" data-cap="hpd" value="${hp}"><div class="q-help">The same figure as Hours per day in Quotes and pricing. It turns a duration in days into hours.</div></div></div>
+    <div class="cap-list">${l.map(x => `<div class="cap-row"><div class="cap-main"><input type="text" data-cap="name" data-id="${escAttr(x.id)}" value="${escAttr(x.name)}" aria-label="Name">
+      <label class="cap-h"><span>Hours a week</span><input type="number" min="0" max="168" step="0.5" inputmode="decimal" data-cap="hours" data-id="${escAttr(x.id)}" value="${x.weeklyHours === '' ? '' : x.weeklyHours}" placeholder="Not filled in" aria-label="Available hours a week"></label>
+      <button type="button" class="icon-btn" data-cap="del" data-id="${escAttr(x.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>
+      <details class="cap-leave"${x.leave.length ? ' open' : ''}><summary>Unavailable days${x.leave.length ? ' (' + x.leave.length + ')' : ''}</summary>
+        ${x.leave.slice().sort((a, b) => a.start.localeCompare(b.start)).map(v => `<div class="cap-lv"><input type="date" data-cap="lstart" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.start)}" aria-label="First day"><input type="date" data-cap="lend" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.end)}" aria-label="Last day"><input type="text" data-cap="lnote" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.note)}" placeholder="Leave, training…" aria-label="Note"><button type="button" class="icon-btn" data-cap="ldel" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('')}
+        <button type="button" class="btn secondary qb-sm" data-cap="ladd" data-id="${escAttr(x.id)}">+ Add unavailable days</button></details></div>`).join('') || '<div class="q-help">Nobody listed.</div>'}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-cap="add">+ Add a person</button>
+    <p class="q-help" style="margin:10px 0 0;">Business capacity: <b>${capFull()} hours a week</b> (${capPeople().map(x => escHtml(x.name)).join(', ') || 'nobody has hours filled in yet'}). Bank holidays and unavailable days for the whole business are in the list above.</p>`;
+}]);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-cap]'); if(!b || !state || b.tagName === 'INPUT' || b.tagName === 'SELECT') return;
+  const a = b.dataset.cap, list = state.people, x = list.find(q => q.id === b.dataset.id);
+  if(a === 'add'){ const n = { id: selId('pe_'), name: 'New person', weeklyHours: '', leave: [] }; list.push(n); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-cap="name"][data-id="${n.id}"]`); if(el){ el.focus(); el.select(); } }, 30); return; }
+  if(!x) return;
+  if(a === 'del'){ const i = list.indexOf(x); list.splice(i, 1); undoDeleted('Person deleted: ' + String(x.name).slice(0, 40), ['people'], i, x); saveState(); render(); }
+  else if(a === 'ladd'){ const d = fmt(new Date()); x.leave.push({ id: selId('lv_'), start: d, end: d, note: '' }); saveState(); render(); }
+  else if(a === 'ldel'){ const i = x.leave.findIndex(v => v.id === b.dataset.lid); if(i >= 0){ x.leave.splice(i, 1); saveState(); render(); } }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.cap || !state) return;
+  if(d.cap === 'hpd'){ const n = Math.round(Number(el.value)); if(n >= 1 && n <= 24) state.settings.hoursPerDay = n; saveState(); render(); return; }
+  const x = state.people.find(q => q.id === d.id); if(!x) return;
+  if(d.cap === 'name') x.name = el.value.trim() || x.name;
+  else if(d.cap === 'hours'){ const n = parseFloat(el.value); x.weeklyHours = (el.value === '' || isNaN(n) || n < 0) ? '' : Math.min(168, Math.round(n * 4) / 4); }
+  else { const v = x.leave.find(q => q.id === d.lid); if(!v) return;
+    if(d.cap === 'lstart'){ if(isoOk(el.value)){ v.start = el.value; if(v.end < v.start) v.end = v.start; } }
+    else if(d.cap === 'lend'){ if(isoOk(el.value)) v.end = el.value < v.start ? v.start : el.value; }
+    else if(d.cap === 'lnote') v.note = el.value.trim(); else return; }
+  saveState(); render();
+});
 
 /* BT:js-planning end */
 
