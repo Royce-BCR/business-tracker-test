@@ -2519,6 +2519,17 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 @media (max-width: 999px), (pointer: coarse) { .rp-hint .sp-link, .rp-ro .sp-link { padding: 14px 6px; margin: -14px -6px; position: relative; } }
 /* BT:css-selling begin */
   /* Stage 3: selling */
+  .hd-wk { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; margin: 0 0 10px; }
+  .hd-wk-l { font-weight: 600; font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
+  #panel-settings .set-content .hd-wk { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, max-content)); gap: 2px 16px; }
+  #panel-settings .set-content .hd-wk .hd-wk-l { grid-column: 1 / -1; }
+  #panel-settings .set-content .hd-wk label { display: flex; flex-direction: row; align-items: center; gap: 8px; margin: 0; width: auto; }
+  #panel-settings .set-content .hd-wk input { margin-top: 0; }
+  .hd-wk input[type=checkbox] { width: auto; margin: 0; }
+  .hd-list { display: flex; flex-direction: column; gap: 6px; max-width: 900px; }
+  .hd-row { display: grid; grid-template-columns: 136px 136px minmax(0, 1fr) 160px 34px; gap: var(--bt-s2); align-items: center; }
+  .hd-row input, .hd-row select { min-width: 0; }
+  @media (max-width: 700px) { .hd-row { grid-template-columns: 1fr 1fr 34px; } .hd-row input[type=text], .hd-row select { grid-column: 1 / 3; } .hd-row .icon-btn { grid-row: 1; grid-column: 3; } }
   .sf-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--bt-neu-bg); color: var(--bt-neu-fg); white-space: nowrap; vertical-align: middle; }
   .sf-chip.bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
   .sf-chip.warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); }
@@ -3034,6 +3045,10 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div id="sellMoreCards"></div>
         </section>
 
+        <section class="set-sec" data-sec="planning">
+    <div id="planCards"></div>
+        </section>
+
         <section class="set-sec" data-sec="docs">
     <div class="section-label">Business and bank details for documents</div>
     <div class="card" id="docsBizCard"></div>
@@ -3391,8 +3406,7 @@ function completionDate(start, buildDays){
   if(!start || !buildDays) return null;
   let d = new Date(start), count = 0, guard = 0;
   while(guard < 400){
-    const dow = d.getDay();
-    if(dow!==0 && dow!==6){ count++; if(count >= buildDays) return new Date(d); }
+    if(wdIsWork(d)){ count++; if(count >= buildDays) return new Date(d); }
     d.setDate(d.getDate()+1); guard++;
   }
   return d;
@@ -6800,7 +6814,7 @@ function pwMiniGantt(p){
   /* faint calendar grid behind the bars: a line per day on short spans, per Monday and per month always, weekends shaded */
   const dow0 = toDate(lo).getDay(); let we = '', run = -1, wl = '';
   for(let k = 0; k <= span; k++){
-    const wk = k < span && ((dow0 + k) % 7 === 0 || (dow0 + k) % 7 === 6);
+    const wk = k < span && ((dow0 + k) % 7 === 0 || (dow0 + k) % 7 === 6 || wdIsOffDay(addDaysIso(lo, k)));
     if(wk && run < 0) run = k; else if(!wk && run >= 0){ we += `<i class="pw-we" style="left:${run / span * 100}%;width:${(k - run) / span * 100}%"></i>`; run = -1; }
     if(k < span && (dow0 + k) % 7 === 1) wl += `<i class="pw-wl" style="left:${k / span * 100}%"></i>`;
   }
@@ -7966,6 +7980,7 @@ function renderSettings(){
   renderQuoteSettings();
   renderApprovalSettings();
   renderSellingSettings();
+  if(typeof renderPlanningSettings === 'function') renderPlanningSettings();
   renderDocSettings();
 }
 /* ---------- Settings > Pipelines: blackout dates (no-work periods: holidays, shutdowns) shown as hatched bands on the Gantt and the project timeline ---------- */
@@ -13823,6 +13838,7 @@ const SET_SECTIONS = [
   { id: 'finance',   label: 'Finance' },
   { id: 'quotes',    label: 'Quotes & pricing' },
   { id: 'selling',   label: 'Selling' },
+  { id: 'planning',  label: 'Planning & capacity' },
   { id: 'docs',      label: 'Documents & email' },
   { id: 'approvals', label: 'Approvals' },
   { id: 'dashboard', label: 'Dashboard' },
@@ -17550,10 +17566,10 @@ const rpM = n => (Number(n) < 0 ? '-£' : '£') + Math.round(Math.abs(Number(n) 
 function rpInitials(name){ const w = String(name || '').replace(/[—–-]/g, ' ').split(/\s+/).filter(Boolean); return ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(); }
 
 /* ---- working days (Monday to Friday; start and end both count) ---- */
-const rpIsWork = d => d.getDay() !== 0 && d.getDay() !== 6;
-function rpWD(a, b){ if(!a || !b) return 0; let d = toDate(a), n = 0; const e = toDate(b); while(d <= e){ if(rpIsWork(d)) n++; d.setDate(d.getDate() + 1); } return n; }
-function rpAddWD(start, n){ if(!start) return ''; const d = toDate(start); while(!rpIsWork(d)) d.setDate(d.getDate() + 1); let k = Math.max(1, Math.round(n)) - 1; while(k > 0){ d.setDate(d.getDate() + 1); if(rpIsWork(d)) k--; } return fmt(d); }
-function rpSubWD(end, n){ if(!end) return ''; const d = toDate(end); while(!rpIsWork(d)) d.setDate(d.getDate() - 1); let k = Math.max(1, Math.round(n)) - 1; while(k > 0){ d.setDate(d.getDate() - 1); if(rpIsWork(d)) k--; } return fmt(d); }
+const rpIsWork = d => wdIsWork(d);   // Stage 4: the working week minus bank holidays and unavailable days (Settings, Planning and capacity)
+function rpWD(a, b){ return wdCount(a, b); }
+function rpAddWD(start, n){ return wdEnd(start, n); }
+function rpSubWD(end, n){ return wdBegin(end, n); }
 
 /* ---- what the record holds now (the "original" the draft is compared with) ---- */
 function rpDates(p){
@@ -18827,7 +18843,7 @@ function attnChipHtml(pl, r){ const x = attnReasons(pl, r); return x.length ? `<
 /* =====================================================================
    STEP 4: QUOTES HUB AND FOLLOW-UP
    Settings, Selling: follow-up gap (working days, default 3), the follow-up task name ({quote} stands for the reference), and the no-contact
-   flag (working days, default 5). Working days are Monday to Friday; bank holidays are ignored for now.
+   flag (working days, default 5). Working days are the working week minus the bank holidays and unavailable days in Settings, Planning and capacity (Stage 4).
    The older "follow-up days" setting (calendar days, default 7, in Approvals) is left stored as it is but no longer used: it counted calendar days.
    ===================================================================== */
 function ensureSellingModel4(o){
@@ -18837,7 +18853,7 @@ function ensureSellingModel4(o){
   st.followUpTaskName = typeof st.followUpTaskName === 'string' && st.followUpTaskName.trim() ? st.followUpTaskName : 'Follow up quote {quote}';
   if(typeof ensureSellingModel5 === 'function') ensureSellingModel5(o);
 }
-const isWork = d => d.getDay() !== 0 && d.getDay() !== 6;
+const isWork = d => wdIsWork(d);
 function wdAdd(iso, n){ const d = toDate(iso); let k = Math.max(0, Math.round(n)); while(k > 0){ d.setDate(d.getDate() + 1); if(isWork(d)) k--; } return fmt(d); }
 function wdSince(from, to){   // working days after `from` up to and including `to`
   if(!from || !to || to <= from) return 0; const d = toDate(from), e = toDate(to); let n = 0;
@@ -18890,7 +18906,7 @@ function leadDaysSince(r){ const ref = leadLastContact(r) || (typeof leadCreated
 function noContactChipHtml(n){ return n !== null && n >= state.settings.noContactDays ? `<span class="sf-chip warn" title="No contact for ${n} working days (the flag is set in Settings, Selling)">${n} days since contact</span>` : ''; }
 SEL_SET_CARDS.push(['Follow-up and contact', () => {
   const st = state.settings;
-  return `<p class="q-help" style="margin:0 0 8px;">When a quote is marked as sent, a follow-up task is made automatically (once per quote) and shows on Today. Press <b>Chased</b> on the task, pick the channel, and the next one is suggested. Gaps count Monday to Friday; bank holidays are ignored for now.</p>
+  return `<p class="q-help" style="margin:0 0 8px;">When a quote is marked as sent, a follow-up task is made automatically (once per quote) and shows on Today. Press <b>Chased</b> on the task, pick the channel, and the next one is suggested. Gaps count the working week and skip the bank holidays and unavailable days listed in Settings, Planning and capacity.</p>
     <div class="assumptions-grid" style="max-width:760px;">
       <div><label>Follow-up gap (working days)</label><input type="number" min="1" step="1" data-fu="followUpGapDays" value="${st.followUpGapDays}"></div>
       <div><label>No-contact flag after (working days)</label><input type="number" min="1" step="1" data-fu="noContactDays" value="${st.noContactDays}"></div>
@@ -19048,6 +19064,96 @@ document.addEventListener('change', (e) => {
 });
 
 /* BT:js-selling end */
+
+
+/* BT:js-planning begin */
+/* =====================================================================
+   STAGE 4: PLANNING, TIME AND CAPACITY
+   STEP 1: WORKING DAYS THAT KNOW ABOUT HOLIDAYS
+   One place decides whether a day is a working day: it is one of the days in the working week (Monday to Friday unless settings.workingWeek says otherwise)
+   and it is not on the list of bank holidays and unavailable days (state.holidays: { id, date, end (optional, for a run of days), name, kind: 'bank' | 'off' }).
+   Duration and complete date on the project profile, the quote follow-up gap, days since contact and the reschedule review all count through it.
+   No stored date is ever changed: only the counting changes.
+   ===================================================================== */
+const PLAN_HOLIDAYS = [
+  ['2026-01-01', 'New Year\'s Day'], ['2026-04-03', 'Good Friday'], ['2026-04-06', 'Easter Monday'], ['2026-05-04', 'Early May bank holiday'], ['2026-05-25', 'Spring bank holiday'],
+  ['2026-08-31', 'Summer bank holiday'], ['2026-12-25', 'Christmas Day'], ['2026-12-28', 'Boxing Day (substitute day)'],
+  ['2027-01-01', 'New Year\'s Day'], ['2027-03-26', 'Good Friday'], ['2027-03-29', 'Easter Monday'], ['2027-05-03', 'Early May bank holiday'], ['2027-05-31', 'Spring bank holiday'],
+  ['2027-08-30', 'Summer bank holiday'], ['2027-12-27', 'Christmas Day (substitute day)'], ['2027-12-28', 'Boxing Day (substitute day)']
+];
+const PLAN_KINDS = [['bank', 'Bank holiday'], ['off', 'Unavailable (business)']];
+function ensurePlanModel(o){
+  const st = o.settings = o.settings || {}, str = v => v == null ? '' : String(v), ok = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '');
+  if(!Array.isArray(o.holidays)) o.holidays = PLAN_HOLIDAYS.map(([date, name]) => ({ id: 'hd_' + date, date, end: '', name, kind: 'bank' }));   // never stored before: seed the England and Wales list
+  else o.holidays = o.holidays.filter(h => h && typeof h === 'object' && ok(h.date)).map(h => ({ id: str(h.id) || 'hd_' + h.date, date: h.date, end: ok(h.end) && h.end > h.date ? h.end : '', name: str(h.name), kind: h.kind === 'off' ? 'off' : 'bank' }));
+  const w = Array.isArray(st.workingWeek) ? st.workingWeek.map(Number).filter(n => n >= 0 && n <= 6 && Math.floor(n) === n) : [];
+  st.workingWeek = w.length ? [...new Set(w)].sort((a, b) => a - b) : [1, 2, 3, 4, 5];
+  if(typeof ensurePlanModel2 === 'function') ensurePlanModel2(o);
+}
+(function(){ const o = ensureSellingModel6; ensureSellingModel6 = function(x){ o(x); ensurePlanModel(x); }; })();
+let _holCache = { sig: null, set: null, names: null };
+function holCache(){
+  const l = (typeof state !== 'undefined' && state && Array.isArray(state.holidays)) ? state.holidays : [], sig = l.map(h => h.date + '~' + (h.end || '') + '~' + (h.name || '')).join('|');
+  if(sig !== _holCache.sig){
+    const set = new Set(), names = {};
+    l.forEach(h => { let d = h.date, g = 0; const e = h.end && h.end > h.date ? h.end : h.date; while(d <= e && g < 400){ set.add(d); if(!names[d]) names[d] = h.name || (h.kind === 'off' ? 'Unavailable' : 'Bank holiday'); d = addDaysIso(d, 1); g++; } });
+    _holCache = { sig, set, names };
+  }
+  return _holCache;
+}
+const holidaySet = () => holCache().set;
+function holidayName(iso){ return holCache().names[iso] || ''; }
+function workingWeek(){ const w = (typeof state !== 'undefined' && state && state.settings && state.settings.workingWeek); return Array.isArray(w) && w.length ? w : [1, 2, 3, 4, 5]; }
+/* a Date or an ISO string */
+function wdIsWork(d){ if(typeof d === 'string') d = toDate(d); return workingWeek().includes(d.getDay()) && !holidaySet().has(fmt(d)); }
+function wdIsOffDay(iso){ return holidaySet().has(iso); }
+/* working days from a to b, both counted */
+function wdCount(a, b){ if(!a || !b) return 0; let d = toDate(a), n = 0, g = 0; const e = toDate(b); while(d <= e && g < 4000){ if(wdIsWork(d)) n++; d.setDate(d.getDate() + 1); g++; } return n; }
+/* the working day on or after the date (dir 1) or on or before it (dir -1) */
+function wdSnap(iso, dir){ let d = toDate(iso), g = 0; while(!wdIsWork(d) && g < 400){ d.setDate(d.getDate() + (dir || 1)); g++; } return fmt(d); }
+/* the date n working days after the start, the start itself counting as day 1 (n = 1 gives the first working day on or after start) */
+function wdEnd(start, n){ if(!start) return ''; const d = toDate(wdSnap(start, 1)); let k = Math.max(1, Math.round(n)) - 1, g = 0; while(k > 0 && g < 4000){ d.setDate(d.getDate() + 1); if(wdIsWork(d)) k--; g++; } return fmt(d); }
+function wdBegin(end, n){ if(!end) return ''; const d = toDate(wdSnap(end, -1)); let k = Math.max(1, Math.round(n)) - 1, g = 0; while(k > 0 && g < 4000){ d.setDate(d.getDate() - 1); if(wdIsWork(d)) k--; g++; } return fmt(d); }
+
+/* ---------- Settings > Planning and capacity ---------- */
+const PLAN_SET_CARDS = [];
+function renderPlanningSettings(){
+  const el = document.getElementById('planCards'); if(!el) return;
+  el.innerHTML = PLAN_SET_CARDS.map(([label, fn], i) => `<div class="section-label">${label}</div><div class="card" data-plancard="${i}">${fn()}</div>`).join('');
+}
+PLAN_SET_CARDS.push(['Bank holidays and unavailable days', () => {
+  const l = state.holidays.slice().sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)), wk = workingWeek(), dn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return `<p class="q-help" style="margin:0 0 8px;">Everywhere the tracker counts working days it skips these dates as well as the weekend: duration and complete date on a project, the quote follow-up gap, days since contact and the reschedule review. Dates already saved are never moved. The England and Wales bank holidays for 2026 and 2027 are listed to start with: please check them. Use <b>Unavailable</b> for a day the whole business is shut; a person's own leave is set under People and capacity.</p>
+    <div class="hd-wk" role="group" aria-label="Working week"><span class="hd-wk-l">Working week</span>${[1, 2, 3, 4, 5, 6, 0].map(n => `<label class="q-check"><input type="checkbox" data-hd="wk" data-d="${n}"${wk.includes(n) ? ' checked' : ''}> ${dn[n]}</label>`).join('')}</div>
+    <div class="hd-list">${l.map(h => `<div class="hd-row">
+      <input type="date" data-hd="date" data-id="${escAttr(h.id)}" value="${escAttr(h.date)}" aria-label="Date">
+      <input type="date" data-hd="end" data-id="${escAttr(h.id)}" value="${escAttr(h.end || '')}" aria-label="Last day, if it runs over several days" title="Last day (leave empty for one day)">
+      <input type="text" data-hd="name" data-id="${escAttr(h.id)}" value="${escAttr(h.name)}" placeholder="Name" aria-label="Name">
+      <select data-hd="kind" data-id="${escAttr(h.id)}" aria-label="Kind">${PLAN_KINDS.map(([k, n]) => `<option value="${k}"${h.kind === k ? ' selected' : ''}>${n}</option>`).join('')}</select>
+      <button type="button" class="icon-btn" data-hd="del" data-id="${escAttr(h.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('') || '<div class="q-help">No days listed: only the weekend is skipped.</div>'}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-hd="add">+ Add a day</button>
+    <p class="q-help" style="margin:10px 0 0;">The “Blackout dates” under Pipelines only shade the Gantt; they do not change any counting.</p>`;
+}]);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-hd]'); if(!b || !state || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+  const a = b.dataset.hd, list = state.holidays;
+  if(a === 'add'){
+    const last = list.map(h => h.end || h.date).sort().pop() || fmt(new Date()), h = { id: selId('hd_'), date: addDaysIso(last, 1), end: '', name: '', kind: 'bank' }; list.push(h);
+    saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-hd="name"][data-id="${h.id}"]`); if(el) el.focus(); }, 30); return; }
+  if(a === 'del'){ const i = list.findIndex(x => x.id === b.dataset.id); if(i < 0) return; const gone = list.splice(i, 1)[0]; undoDeleted('Day deleted: ' + String(gone.name || gone.date).slice(0, 40), ['holidays'], i, gone); saveState(); render(); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.hd || !state) return;
+  if(d.hd === 'wk'){ const w = new Set(workingWeek()), n = Number(d.d); if(el.checked) w.add(n); else w.delete(n); if(!w.size){ showToast('At least one day has to be a working day'); render(); return; } state.settings.workingWeek = [...w].sort((a, b) => a - b); saveState(); render(); return; }
+  const h = state.holidays.find(x => x.id === d.id); if(!h) return;
+  if(d.hd === 'date'){ if(!isoOk(el.value)){ render(); return; } h.date = el.value; if(h.end && h.end <= h.date) h.end = ''; }
+  else if(d.hd === 'end'){ h.end = isoOk(el.value) && el.value > h.date ? el.value : ''; }
+  else if(d.hd === 'name') h.name = el.value.trim();
+  else if(d.hd === 'kind') h.kind = el.value === 'off' ? 'off' : 'bank';
+  else return;
+  saveState(); render();
+});
+/* BT:js-planning end */
 
 /* ---------- init ---------- */
 (async () => {
