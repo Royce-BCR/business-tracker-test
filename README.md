@@ -129,3 +129,15 @@ New stored fields, all optional: `transaction.costClass`, `.costProjectId`, `.cl
 - **Menu**: Finance is Cash flow, Transactions, Profit and loss, Budget and forecast (was Revenue Forecast), Balance sheet, Ageing, Classify, Bank Reconciliation, Pricing Model. Command gains Reports. No page was removed or given a new route.
 
 New stored fields, all optional: payment line and variation `writtenOff`, `landedTxn`; `drop state paidTxn`; `state.reviewMarks`. Nothing existing is converted, renamed or removed.
+
+## The seven stages at a glance (rebuild, test site)
+
+1. **Menu, record pages, tasks, Today and the reschedule review**: the seven-group menu, three-column record pages, one task engine, the activity feed, Today as a day view.
+2. **Buying, orders, deliveries and the invoice check**: six derived project stages, Orders and deliveries, the delivery checklist, confirm prices, variance by cause, hire, Materials and deliveries tab, Supplier invoices.
+3. **Selling**: lead fields carried through, qualification gates, Closed lost, follow-up tasks and Chased, several prices per line with a whole-basket comparison, approver access (built, not switched on).
+4. **Planning, time and capacity**: working days with bank holidays, phase template with hours, tick-then-confirm on Today, team capacity, the Gantt on every project, Calendar and capacity.
+5. **Money foundations**: Classify, Business costs, set-aside method per pot, assets and tool cost, the project Money tab.
+6. **Finance pages and reports**: weekly review (Landed, Late, Moved), Ageing, Profit and loss, Balance sheet, Reports library and the monthly summary.
+7. **Polish and the tablet and phone pass**: final menu order with dividers, one tab bar with a More menu on every record page, one page template across the list and board areas, the Reports library tidied, a warning on the old Mark paid when a bank transaction already matches, touch targets and one-handed delivery sign-off on a phone.
+
+Stage 7 adds no stored fields and no Settings keys. See `docs/whats-new.md` (what changed, for the team) and `docs/go-live-notes.md` (new fields, data-dependent behaviour, backups and the order of a push to live).

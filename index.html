@@ -1951,6 +1951,9 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
 .nav-gbtn #revBadge { display: none; }
 .nav-group.open .grp-count { display: none; }
 .nav-items { display: none; padding: 2px 0 6px; }
+.td-greet-link, .db-date-link { margin-top: var(--bt-s1); font-size: var(--bt-fs-sm); }
+.nav-sep { height: 1px; margin: var(--bt-s2) var(--bt-s3); background: color-mix(in srgb, var(--bt-on-dark) 14%, transparent); }
+.ms-sep { grid-column: 1 / -1; height: 1px; margin: var(--bt-s1) 0; background: var(--bt-line); }
 .nav-group.open .nav-items { display: block; }
 .nav-group.has-current .nav-gbtn { color: var(--bt-on-dark); }
 /* icon rail (laptop / tablet, collapsed) */
@@ -2394,6 +2397,16 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-bar-t { font-size: var(--bt-fs-xs); } .rp-bar-b { display: flex; flex-wrap: wrap; gap: 6px; }
 .rp-tabs { flex: none; display: flex; gap: var(--bt-s5); overflow-x: auto; padding: 0 var(--bt-s4); border-bottom: 1px solid var(--line); scrollbar-width: thin; background: var(--bt-card); } .rp-tabs::-webkit-scrollbar { height: 6px; } .rp-tabs::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
 .rp-tabs button { flex: none; min-height: var(--bt-control); padding: 0 2px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; font: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+.rp-tabs-fit { display: flex; align-items: stretch; gap: var(--bt-s3); overflow: visible; position: relative; }
+.rp-tabs-fit .rp-tablist { display: flex; gap: var(--bt-s5); min-width: 0; flex: 0 1 auto; overflow: hidden; }
+.rp-tabs-fit [hidden] { display: none !important; }
+.rp-tabs-fit .rp-more { position: relative; flex: none; margin-left: auto; display: flex; }
+.rp-more-btn { display: inline-flex; align-items: center; gap: 4px; }
+.rp-more-menu { position: absolute; right: 0; top: 100%; z-index: 40; min-width: 200px; max-width: min(86vw, 320px); margin-top: 2px; padding: var(--bt-s1); background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-ctl, 8px); box-shadow: 0 10px 30px color-mix(in srgb, var(--bt-ink) 22%, transparent); display: flex; flex-direction: column; }
+.rp-more-menu[hidden] { display: none; }
+.rp-tabs .rp-more-menu .rp-more-item { flex: none; width: 100%; min-height: var(--bt-control); padding: 0 var(--bt-s3); border: 0; border-radius: var(--bt-r-ctl, 8px); margin: 0; background: none; text-align: left; font: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-ink); cursor: pointer; white-space: nowrap; }
+.rp-tabs .rp-more-menu .rp-more-item:hover, .rp-tabs .rp-more-menu .rp-more-item:focus-visible { background: var(--bt-brand-soft); outline: 2px solid transparent; }
+.rp-tabs .rp-more-menu .rp-more-item:focus-visible { outline-color: var(--bt-focus); }
 .rp-tabs button:hover { color: var(--bt-ink); } .rp-tabs button.active { color: var(--bt-ink); border-bottom-color: var(--bt-brand-2); }
 .rp-cbody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .rp-strip { flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
@@ -2641,9 +2654,9 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   #panel-settings .set-content .hd-wk input { margin-top: 0; }
   .hd-wk input[type=checkbox] { width: auto; margin: 0; }
   .hd-list { display: flex; flex-direction: column; gap: 6px; max-width: 900px; }
-  .hd-row { display: grid; grid-template-columns: 136px 136px minmax(0, 1fr) 160px 34px; gap: var(--bt-s2); align-items: center; }
+  .hd-row { display: grid; grid-template-columns: 136px 136px minmax(0, 1fr) 160px 48px; gap: var(--bt-s2); align-items: center; }
   .hd-row input, .hd-row select { min-width: 0; }
-  @media (max-width: 700px) { .hd-row { grid-template-columns: 1fr 1fr 34px; } .hd-row input[type=text], .hd-row select { grid-column: 1 / 3; } .hd-row .icon-btn { grid-row: 1; grid-column: 3; } }
+  @media (max-width: 1000px) { .hd-row { grid-template-columns: 1fr 1fr 48px; } .hd-row input[type=text], .hd-row select { grid-column: 1 / 3; } .hd-row .icon-btn { grid-row: 1; grid-column: 3; } }
   .sf-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--bt-neu-bg); color: var(--bt-neu-fg); white-space: nowrap; vertical-align: middle; }
   .sf-chip.bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
   .sf-chip.warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); }
@@ -2696,11 +2709,36 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .f6-wf { display: grid; grid-template-columns: minmax(130px, 220px) 1fr minmax(90px, auto); gap: 10px; align-items: center; padding: 5px 0; } .f6-wfb { background: var(--bt-surface-2); border-radius: 4px; height: 18px; } .f6-wfb i { display: block; height: 100%; border-radius: 4px; background: var(--oak); }
   .f6-wf.in .f6-wfb i { background: var(--green); } .f6-wf.out .f6-wfb i { background: var(--bt-bad-fg); opacity: .75; } .f6-wf.sub .f6-wfb i { background: var(--slate); } .f6-wf.sub .f6-wfl, .f6-wf.sub .f6-wfv { font-weight: 700; } .f6-wfv { text-align: right; font-variant-numeric: tabular-nums; } .f6-sect2 { margin: 10px 0 2px; font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
   @media (max-width: 560px) { .f6-wf { grid-template-columns: 1fr auto; } .f6-wfb { grid-column: 1 / -1; order: 3; height: 10px; } }
-  .f6-repgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--bt-s3); } .f6-repcard { text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 6px; font: inherit; } .f6-repcard:hover { border-color: var(--bt-oak-500, #a0794a); }
+  .f6-rephead { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; margin: 0 0 var(--bt-s3); } .f6-rephead h3 { margin: 0; font-size: var(--bt-fs-lg, 18px); } .f6-tomonthly { margin-left: auto; }
+.f6-gh { margin: var(--bt-s5) 0 var(--bt-s2); font-size: var(--bt-fs-md, 16px); } .f6-repcard .f6-kind { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; } .f6-repcard .f6-meta { margin-top: auto; padding-top: var(--bt-s2); font-size: var(--bt-fs-xs); color: var(--slate); } .f6-repcard { min-height: 124px; }
+.f6-repgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--bt-s3); } .f6-repcard { text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 6px; font: inherit; } .f6-repcard:hover { border-color: var(--bt-oak-500, #a0794a); }
   #reportsBody .view-toggle, #pnlBody .view-toggle, #ageingBody .view-toggle, #cfViewToggle .view-toggle { flex-wrap: wrap; max-width: 100%; }
   .f6-acts { display: flex; gap: 4px; flex-wrap: wrap; } .f6-in { color: var(--bt-ok-fg); } .f6-weeks td, .f6-weeks th { white-space: nowrap; } .f6-low { background: var(--bt-warn-bg); } .f6-wklist { margin-top: var(--bt-s3); }
   .f6-ul { margin: 4px 0 10px 16px; padding: 0; font-size: var(--bt-fs-sm); } .f6-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s4); margin-top: var(--bt-s3); } .f6-cand { display: block; margin: 6px 0; }
 /* BT:css-finance end */
+/* BT:css-template begin (Stage 7: one page template across the list and board areas) */
+.pg > .page-head, .pg #quoteListView > .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--bt-s3) var(--bt-s5); flex-wrap: wrap; margin-bottom: var(--bt-s4); }
+.pg .page-head > div:first-child { flex: 1 1 360px; min-width: 0; }
+.pg .page-head .desc { max-width: 68ch; }
+.pg-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--bt-s2); flex-wrap: wrap; flex: 0 0 auto; margin: 0; }
+.pg-actions:empty { display: none; }
+.pg .page-head .btn { margin-top: var(--bt-s1); }
+.pg-strip { margin: 0 0 var(--bt-s4); grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.pg-strip:empty { display: none; }
+.pg-strip .pj-tile { min-height: 0; padding: var(--bt-s2) var(--bt-s4); }
+.pg-strip .pj-tile .v { font-size: var(--bt-fs-lg, 20px); }
+.pg > .crm-filters, .pg > .pj-controls, .pg #quoteListTab > .crm-filters, .pg .cx-filters { margin: 0 0 var(--bt-s3); }
+.pg > .view-toggle, .pg > .pj-mode, .pg #quoteTabs { margin-top: 0; margin-bottom: var(--bt-s3); }
+@media (max-width: 700px){ .pg .page-head > div:first-child { flex-basis: 100%; } .pg-actions { width: 100%; justify-content: flex-start; } .pg-actions .btn { min-height: 44px; } .pg-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lead-status-cell { flex-wrap: wrap; min-width: 0; } .lead-status-cell .sf-chip { white-space: normal; max-width: 100%; }
+/* Stage 7: on a phone the dialog buttons stay at the foot of the window, in thumb reach, however long the checklist is */
+@media (max-width: 700px){
+  #finOverlay .modal-actions, #pwqOverlay .modal-actions { position: sticky; bottom: -22px; z-index: 2; margin: var(--bt-s3) -22px -22px; padding: var(--bt-s3) 22px 22px; background: var(--bt-card); border-top: 1px solid var(--line); }
+  #finOverlay .modal-actions .btn, #pwqOverlay .modal-actions .btn { flex: 1 1 0; min-height: 52px; }
+  #finOverlay .modal-actions .btn.dc-sign { flex: 2 1 0; }
+}
+@media (max-width: 1100px){ .rp-tabs button { min-width: 44px; padding: 0 var(--bt-s2); } }
+/* BT:css-template end */
 </style>
 </head>
 <body>
@@ -2729,6 +2767,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-command" role="group" aria-labelledby="gh-command">
       <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
       <button type="button" class="tab g-command" data-tab="capacity">Calendar and capacity</button>
+      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
       <button type="button" class="tab g-command" data-tab="reports">Reports</button>
     </div>
@@ -2739,6 +2778,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-crm" role="group" aria-labelledby="gh-crm">
       <button type="button" class="tab g-crm" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
       <button type="button" class="tab g-crm" data-tab="companies">Companies</button>
+      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-crm" data-tab="crmprojects">Projects</button>
       <button type="button" class="tab g-crm" data-tab="crm">Tasks</button>
     </div>
@@ -2758,9 +2798,11 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <button type="button" class="nav-label nav-gbtn" id="gh-operations" aria-expanded="false" aria-controls="gp-operations"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Operations</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-operations" role="group" aria-labelledby="gh-operations">
       <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
+      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
       <button type="button" class="tab g-operations" data-tab="purchaseorders">Orders and deliveries</button>
       <button type="button" class="tab g-operations" data-tab="supplierinvoices">Supplier invoices</button>
+      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-operations" data-tab="assets">Assets</button>
     </div>
   </div>
@@ -2770,12 +2812,14 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-finance" role="group" aria-labelledby="gh-finance">
       <button type="button" class="tab g-finance" data-tab="cashflow">Cash flow</button>
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
-      <button type="button" class="tab g-finance" data-tab="pnl">Profit and loss</button>
-      <button type="button" class="tab g-finance" data-tab="revenue">Budget and forecast</button>
-      <button type="button" class="tab g-finance" data-tab="balance">Balance sheet</button>
-      <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
-      <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
+      <div class="nav-sep" role="separator"></div>
+      <button type="button" class="tab g-finance" data-tab="pnl">Profit and loss</button>
+      <button type="button" class="tab g-finance" data-tab="balance">Balance sheet</button>
+      <button type="button" class="tab g-finance" data-tab="revenue">Budget and forecast</button>
+      <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
+      <div class="nav-sep" role="separator"></div>
+      <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
     </div>
   </div>
@@ -2783,9 +2827,9 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="nav-group g-business" data-group="business" data-label="Business" data-short="Business">
     <button type="button" class="nav-label nav-gbtn" id="gh-business" aria-expanded="false" aria-controls="gp-business"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Business</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-business" role="group" aria-labelledby="gh-business">
-      <button type="button" class="tab g-business" data-tab="businessplan">Business Plan</button>
-      <button type="button" class="tab g-business" data-tab="businesscosts">Business costs</button>
       <button type="button" class="tab g-business" data-tab="actions">Business tasks</button>
+      <button type="button" class="tab g-business" data-tab="businesscosts">Business costs</button>
+      <button type="button" class="tab g-business" data-tab="businessplan">Business Plan</button>
     </div>
   </div>
 
@@ -2843,6 +2887,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <section class="td-greet" id="todayGreet" aria-label="Greeting">
       <h2 class="td-greeting" id="todayGreeting">Hello</h2>
       <div class="td-greet-sum" id="todaySummary"></div>
+      <div class="td-greet-link"><button type="button" class="sp-link" data-f6="rep-open-nav" data-k="biz:monthly">Monthly summary →</button></div>
     </section>
     <div class="page-head crm-head">
       <div>
@@ -2867,6 +2912,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <div>
         <h2 id="dbGreeting">Dashboard</h2>
         <div class="db-date" id="dbDate"></div>
+        <div class="db-date-link"><button type="button" class="sp-link" data-f6="rep-open-nav" data-k="biz:monthly">Monthly summary →</button></div>
       </div>
       <div class="view-toggle" id="dbPeriod" role="group" aria-label="Period for the period-based widgets"></div>
     </div>
@@ -2942,26 +2988,32 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- LEADS -->
-  <div class="panel" id="panel-leads">
-    <div class="page-head">
-      <h2>Lead Pipeline</h2>
-      <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once every <em>hard-gate</em> qualification question is answered satisfactorily (the questions, weights and gate or guide mode are in Settings, Selling) — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
+  <div class="panel pg" id="panel-leads">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Lead Pipeline</h2>
+        <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once every <em>hard-gate</em> qualification question is answered satisfactorily (the questions, weights and gate or guide mode are in Settings, Selling) — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
+      </div>
+      <div class="pg-actions"><button class="btn" data-action="add-lead">+ Add lead</button></div>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="leads"></div>
     <div class="view-toggle" id="viewToggle-lead"></div>
-    <div class="btn-row"><button class="btn" data-action="add-lead">+ Add lead</button></div>
     <div class="table-scroll" id="leadsTableWrap"></div>
     <div class="view-pane pane-board" id="leadsBoardWrap"></div>
     <div id="lostLeadsWrap"></div>
   </div>
 
   <!-- SALES PIPELINE -->
-  <div class="panel" id="panel-salespipeline">
-    <div class="page-head">
-      <h2>Sales Pipeline</h2>
-      <div class="desc">Live inquiry → quotable → quote sent → closed-won &amp; signed. Click the chevron on any project to expand its stages — each stage carries its own dates and cost, and the project timeline &amp; cost roll up from them. Use the Table / Board / Gantt switcher to see it as a stage board or a timeline. Only rows marked <strong>Real</strong> feed the forecast.</div>
+  <div class="panel pg" id="panel-salespipeline">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Sales Pipeline</h2>
+        <div class="desc">Live inquiry → quotable → quote sent → closed-won &amp; signed. Click the chevron on any project to expand its stages — each stage carries its own dates and cost, and the project timeline &amp; cost roll up from them. Use the Table / Board / Gantt switcher to see it as a stage board or a timeline. Only rows marked <strong>Real</strong> feed the forecast.</div>
+      </div>
+      <div class="pg-actions"><button class="btn" data-action="add-row" data-tab="pipeline">+ Add project</button></div>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="sales"></div>
     <div class="view-toggle" id="viewToggle-sales"></div>
-    <div class="btn-row"><button class="btn" data-action="add-row" data-tab="pipeline">+ Add project</button></div>
     <div class="table-scroll" id="pipelineTableWrap"></div>
     <div class="view-pane pane-board" id="pipelineBoardWrap"></div>
     <div class="view-pane pane-gantt" id="pipelineGanttWrap"></div>
@@ -2969,11 +3021,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- PROJECT PIPELINE -->
-  <div class="panel" id="panel-projectpipeline">
-    <div class="page-head">
-      <h2>Project Pipeline</h2>
-      <div class="desc">Delivery, from signed contract to sign-off and testimonial. A won deal is promoted here from the Sales Pipeline (once its contract is marked signed) and becomes a live project — code <strong>P-</strong>. Expand a project to track its delivery milestones, budgeted vs actual cost, and testimonial. Payment lines &amp; margin variance come in the finance pass.</div>
+  <div class="panel pg" id="panel-projectpipeline">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Project Pipeline</h2>
+        <div class="desc">Delivery, from signed contract to sign-off and testimonial. A won deal is promoted here from the Sales Pipeline (once its contract is marked signed) and becomes a live project — code <strong>P-</strong>. Expand a project to track its delivery milestones, budgeted vs actual cost, and testimonial. Payment lines &amp; margin variance come in the finance pass.</div>
+      </div>
+      
     </div>
+    <div class="pj-strip pg-strip" data-pgs="projects"></div>
     <div class="view-toggle" id="viewToggle-project"></div>
     <div id="projectsMode" class="pj-mode"></div>
     <div id="projectsPvd"></div>
@@ -2985,7 +3041,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- CRM -->
-  <div class="panel" id="panel-crm">
+  <div class="panel pg" id="panel-crm">
     <div class="page-head crm-head">
       <div>
         <h2>Tasks</h2>
@@ -2993,6 +3049,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       </div>
       <button class="btn" data-crm="new">+ New task</button>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="tasks"></div>
     <div class="crm-tabs" id="crmTabs"></div>
     <div class="crm-filters"><span id="crmFilters" class="crm-filters-dyn"></span><input type="search" id="crmSearch" class="crm-search" placeholder="Search tasks…" autocomplete="off"></div>
     <div class="table-scroll" id="crmTableWrap"></div>
@@ -3000,7 +3057,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- CRM > PROJECTS OVERVIEW (read-only) -->
-  <div class="panel" id="panel-crmprojects">
+  <div class="panel pg" id="panel-crmprojects">
     <div class="page-head">
       <h2>Projects</h2>
       <div class="desc">Every lead, sales deal and project in one read-only list. A job that moved from lead to deal to project shows once, at its furthest stage. Click a job for the detail, or use “Open in pipeline” to work on it.</div>
@@ -3020,10 +3077,10 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 
 <!-- BT:panels begin -->
   <!-- CONTACTS -->
-  <div class="panel" id="panel-contacts"><div id="contactsBody"></div></div>
+  <div class="panel pg" id="panel-contacts"><div id="contactsBody"></div></div>
 
   <!-- COMPANIES -->
-  <div class="panel" id="panel-companies"><div id="companiesBody"></div></div>
+  <div class="panel pg" id="panel-companies"><div id="companiesBody"></div></div>
 <!-- BT:panels end -->
   <!-- PRICING -->
   <div class="panel" id="panel-pricing">
@@ -3067,20 +3124,28 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- PURCHASE ORDERS -->
-  <div class="panel" id="panel-purchaseorders">
-    <div class="page-head">
-      <h2>Orders and deliveries</h2>
-      <div class="desc">One order per supplier, raised from a project's delivery drops (and a second order for the same supplier when a job needs one): supplier, items, agreed prices, planned and actual delivery. Draft, Approved, Sent, Delivered, Matched (to the supplier's invoice in Transactions).</div>
+  <div class="panel pg" id="panel-purchaseorders">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Orders and deliveries</h2>
+        <div class="desc">One order per supplier, raised from a project's delivery drops (and a second order for the same supplier when a job needs one): supplier, items, agreed prices, planned and actual delivery. Draft, Approved, Sent, Delivered, Matched (to the supplier's invoice in Transactions).</div>
+      </div>
+      <div class="pg-actions" id="pgAct-po"></div>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="orders"></div>
     <div id="poBody"></div>
   </div>
 
   <!-- SUPPLIER INVOICES -->
-  <div class="panel" id="panel-supplierinvoices">
-    <div class="page-head">
-      <h2>Supplier invoices</h2>
-      <div class="desc">The invoices and receipts entered when prices were confirmed, each linked to its order and project. Quote prices never change: differences sit beside them as variances.</div>
+  <div class="panel pg" id="panel-supplierinvoices">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Supplier invoices</h2>
+        <div class="desc">The invoices and receipts entered when prices were confirmed, each linked to its order and project. Quote prices never change: differences sit beside them as variances.</div>
+      </div>
+      
     </div>
+    <div class="pj-strip pg-strip" data-pgs="supinv"></div>
     <div id="siBody"></div>
   </div>
 
@@ -3094,24 +3159,29 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- INVOICING -->
-  <div class="panel" id="panel-invoicing">
-    <div class="page-head">
-      <h2>Customer invoices</h2>
-      <div class="desc">Every invoice from your projects' payment schedules and approved variations (scope additions). Edit dates and amounts in place; the same data shows in each project's Money section. A variation cannot be invoiced until it is approved.</div>
+  <div class="panel pg" id="panel-invoicing">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Customer invoices</h2>
+        <div class="desc">Every invoice from your projects' payment schedules and approved variations (scope additions). Edit dates and amounts in place; the same data shows in each project's Money section. A variation cannot be invoiced until it is approved.</div>
+      </div>
+      
     </div>
     <div id="invoicingBody"></div>
   </div>
 
   <!-- TRANSACTIONS -->
-  <div class="panel" id="panel-transactions">
-    <div class="page-head">
-      <h2>Transactions</h2>
-      <div class="desc">The actual line — real money in and out, logged and reconciled. Link a transaction to a project or invoice code (e.g. P-103-INV1) so it ties back to the forecast. This is the source of month-end actuals; full forecast-vs-actual variance builds on top of it next.</div>
+  <div class="panel pg" id="panel-transactions">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Transactions</h2>
+        <div class="desc">The actual line — real money in and out, logged and reconciled. Link a transaction to a project or invoice code (e.g. P-103-INV1) so it ties back to the forecast. This is the source of month-end actuals; full forecast-vs-actual variance builds on top of it next.</div>
+      </div>
+      <div class="pg-actions"><button class="btn" data-fin="txn-add">+ Add transaction</button></div>
     </div>
     <div id="txnTotals"></div>
     <div class="kpi-row" id="txnKpis"></div>
     <div id="txnPending"></div>
-    <div class="btn-row"><button class="btn" data-fin="txn-add">+ Add transaction</button></div>
     <div class="table-scroll" id="transactionsTableWrap"></div>
   </div>
 
@@ -3134,10 +3204,13 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- REPORTS -->
-  <div class="panel" id="panel-reports">
-    <div class="page-head">
-      <h2>Reports</h2>
-      <div class="desc">The questions you ask on a schedule. Each report reads the same records as the finance pages, holds no numbers of its own, and every figure opens the line behind it.</div>
+  <div class="panel pg" id="panel-reports">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Reports</h2>
+        <div class="desc">The questions you ask on a schedule. Each report reads the same records as the finance pages, holds no numbers of its own, and every figure opens the line behind it.</div>
+      </div>
+      <div class="pg-actions"><button type="button" class="btn" data-f6="rep-open-nav" data-k="biz:monthly">Monthly summary</button></div>
     </div>
     <div id="reportsBody"></div>
   </div>
@@ -3358,7 +3431,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
 
   <!-- APPROVALS -->
   <!-- QUOTES -->
-  <div class="panel" id="panel-quotations">
+  <div class="panel pg" id="panel-quotations">
     <div id="quoteListView">
       <div class="page-head crm-head">
         <div>
@@ -3367,6 +3440,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
         </div>
         <button class="btn" data-qba="new">+ New quote</button>
       </div>
+    <div class="pj-strip pg-strip" data-pgs="quotes"></div>
       <div class="view-toggle" id="quoteTabs" role="group" aria-label="Quotes view" style="margin-bottom:12px;"></div>
       <div id="quoteListTab">
         <div class="crm-filters"><input type="search" id="quoteSearch" class="crm-search" placeholder="Search quotes…" autocomplete="off" aria-label="Search quotes"><span id="quoteFilters" class="crm-filters-dyn"></span><span class="sup-count" id="quoteCount"></span></div>
@@ -3379,7 +3453,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
   </div>
 
   <!-- SUPPLIERS -->
-  <div class="panel" id="panel-suppliers">
+  <div class="panel pg" id="panel-suppliers">
     <div class="page-head crm-head">
       <div>
         <h2>Suppliers</h2>
@@ -3387,6 +3461,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
       </div>
       <button class="btn" data-sp="new">+ New supplier</button>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="suppliers"></div>
     <div class="crm-filters"><input type="search" id="supSearch" class="crm-search" placeholder="Search suppliers…" autocomplete="off" aria-label="Search suppliers"><span id="supFilters" class="crm-filters-dyn"></span><span class="sup-count" id="supCount"></span></div>
     <div class="table-scroll" id="suppliersTableWrap"></div>
     <div class="pw" id="supplierRecord" hidden></div>
@@ -4102,6 +4177,7 @@ async function loadState(){
 
 let saveTimer = null;
 function saveState(){
+  try{ pgStripsRender(); }catch(e){}
   try{ finEnsureReceipts(); }catch(e){}
   try{ clsSyncTask(); }catch(e){}   // Stage 5: the one rolling task for costs with no class
   if(typeof cxDirty === 'function') cxDirty();
@@ -6074,7 +6150,7 @@ function rtApplyTable(table, widths, fit){
   [...table.querySelector(':scope > colgroup').children].forEach((col,i) => { col.style.width = fit ? (widths[i]/sum*100).toFixed(3)+'%' : widths[i]+'px'; });
   table.style.minWidth = fit ? '0' : sum+'px';
 }
-function rtApply(root){ (root || document).querySelectorAll('table[data-rt]').forEach(t => rtApplyTable(t, rtWidths(t.dataset.rt), rtFit(t))); }
+function rtApply(root){ (root || document).querySelectorAll('table[data-rt]').forEach(t => { if(t.dataset.rt !== CRM_TABLE_ID && !RT_SPECS[t.dataset.rt]) return; rtApplyTable(t, rtWidths(t.dataset.rt), rtFit(t)); }); }   // Stage 7: a table with no width spec (Business costs, Classify) is skipped instead of stopping the rest
 function rtReset(id){   // a page table and its detail tables back to default widths
   const spec = RT_SPECS[id]; if(!spec) return;
   [id, ...(spec.nested||[])].forEach(k => { if(state.colWidths) delete state.colWidths[k]; });
@@ -7874,6 +7950,19 @@ document.addEventListener('change', (e) => {
   l[el.dataset.pwLink] = el.value.trim(); saveState(); render();
 });
 /* quick actions: a small form (log time, milestone done, invoice sent, paid, note) */
+/* Stage 7: marking a line paid the older way (no transaction) double counts when a real bank transaction already matches it. Reads only; nothing is changed. */
+function pwPaidMatches(p, ix){ try{ const l = p.paymentLines[Number(ix)]; if(!l || l.paidDate || l.landedTxn) return []; const amt = Number(l.amount) || 0; return amt > 0 ? rvCandidates('in', amt, l.dueDate || l.invoicedDate || '') : []; }catch(e){ return []; } }
+function pwPaidWarnHtml(p, ix){
+  const m = pwPaidMatches(p, ix); if(!m.length) return '';
+  const c = m[0].t;
+  return `<div class="pw-qbar pw-alert-bar pw-paidwarn" role="alert" style="display:block;margin:0 0 var(--bt-s3);"><b>This payment already has a bank transaction. Use Landed so it is not counted twice.</b><div class="qb-dim" style="margin:4px 0 var(--bt-s2);">${escHtml(dShow(c.date))} · ${escHtml(c.description || 'transaction')} · ${qm(c.moneyIn)}${m.length > 1 ? ' (and ' + (m.length - 1) + ' more)' : ''}</div><button type="button" class="btn qb-sm" data-pwq-landed="${escAttr(String(ix))}">Go to Landed</button></div>`;
+}
+function pwPaidGoLanded(ix){
+  const p = state.projects.find(x => x.id === pwUi.id); if(!p) return; const key = 'cp:' + p.id + ':' + ix; pwQuickClose();
+  navGo(() => { cfUi.view = 'review'; activateTab('cashflow'); render(); window.scrollTo(0, 0); const b = document.querySelector('[data-f6="rv-landed"][data-key="' + key + '"]'); if(b) b.click(); else showToast('Find this payment on the Cash flow weekly review and press Landed.', null, 7000); });
+}
+document.addEventListener('change', (e) => { if(e.target && e.target.id === 'pwqPay' && pwUi.quick && pwUi.quick.kind === 'paid'){ const p = state.projects.find(x => x.id === pwUi.id), w = document.getElementById('pwqWarn'); if(p && w) w.innerHTML = pwPaidWarnHtml(p, e.target.value); } });
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-pwq-landed]'); if(b) pwPaidGoLanded(b.dataset.pwqLanded); });
 function pwQuickOpen(kind, sid){
   const p = state.projects.find(x => x.id === pwUi.id); if(!p) return; projEnsure(p); pwUi.quick = { kind, sid };
   const today = fmt(new Date()), o = (arr, sel) => arr.map(([v, n]) => `<option value="${escAttr(v)}"${v === sel ? ' selected' : ''}>${escHtml(n)}</option>`).join('');
@@ -7881,7 +7970,7 @@ function pwQuickOpen(kind, sid){
   if(kind === 'time'){ title = 'Log time'; body = `<div class="lp-f"><label>Stage</label><select id="pwqStage">${o((p.stages || []).map(s => [slEnsure(s).id, s.label || 'Stage']), sid)}</select></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>Hours</label><input type="number" step="any" min="0" id="pwqHours" placeholder="e.g. 4"></div></div><div class="lp-f"><label>Note (optional)</label><input id="pwqNote"></div>`; }
   else if(kind === 'milestone'){ const open = state.pipelineStages.project.filter(s => s.key && !projMsActual(p, s.key)); title = 'Mark milestone done'; body = open.length ? `<div class="lp-f"><label>Milestone</label><select id="pwqMs">${o(open.map(s => [s.key, s.name + (projMsPlanned(p, s.key).date ? ' (planned ' + pwD(projMsPlanned(p, s.key).date) + ')' : '')]), (sid && open.some(s => s.key === sid)) ? sid : open[0].key)}</select></div><div class="lp-f"><label>Date it actually happened</label><input type="date" id="pwqDate" value="${today}" max="${today}"></div><p class="q-help" style="margin:0;">This confirms it happened. The planned date is not changed, and the difference is shown as days early or late.</p>` : '<div class="pw-empty">Every milestone already has an actual date.</div>'; }
   else if(kind === 'stact'){ const parts = String(sid).split('|'), s = (p.stages || []).find(x => slEnsure(x).id === parts[0]), which = parts[1] === 'start' ? 'start' : 'end'; pwUi.quick.sid = parts[0]; pwUi.quick.which = which; title = which === 'start' ? 'Mark stage started' : 'Mark stage done'; body = `<p class="q-help" style="margin:0 0 8px;">${escHtml(s ? (s.label || 'Stage') : 'Stage')} · planned ${s ? pwD(s.start || s.end) + ' → ' + pwD(s.end || s.start) : ''}</p><div class="lp-f"><label>Date it actually ${which === 'start' ? 'started' : 'finished'}</label><input type="date" id="pwqDate" value="${today}" max="${today}"></div>`; }
-  else if(kind === 'invoice' || kind === 'paid'){ const f = kind === 'invoice' ? 'invoicedDate' : 'paidDate', open = p.paymentLines.map((l, ix) => [String(ix), `${l.desc || 'Payment'} · ${qm(l.amount)}${l.dueDate ? ' · due ' + l.dueDate : ''}`, l]).filter(x => !x[2][f]); title = kind === 'invoice' ? 'Mark invoice sent' : 'Mark paid'; body = open.length ? `<div class="lp-f"><label>Payment line</label><select id="pwqPay">${o(open.map(x => [x[0], x[1]]), open[0][0])}</select></div><div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>` : '<div class="pw-empty">Every payment line already has this date.</div>'; }
+  else if(kind === 'invoice' || kind === 'paid'){ const f = kind === 'invoice' ? 'invoicedDate' : 'paidDate', open = p.paymentLines.map((l, ix) => [String(ix), `${l.desc || 'Payment'} · ${qm(l.amount)}${l.dueDate ? ' · due ' + l.dueDate : ''}`, l]).filter(x => !x[2][f]); title = kind === 'invoice' ? 'Mark invoice sent' : 'Mark paid'; body = open.length ? `<div class="lp-f"><label>Payment line</label><select id="pwqPay">${o(open.map(x => [x[0], x[1]]), open[0][0])}</select></div>${kind === 'paid' ? `<div id="pwqWarn">${pwPaidWarnHtml(p, open[0][0])}</div>` : ''}<div class="lp-f"><label>Date</label><input type="date" id="pwqDate" value="${today}"></div>` : '<div class="pw-empty">Every payment line already has this date.</div>'; }
   else if(kind === 'varapprove'){ const v = (p.variations || []).find(x => x.id === sid); title = 'Approve ' + (v ? v.ref : 'variation'); body = `<p class="q-help" style="margin:0 0 8px;">${v ? escHtml(v.desc) + ' · ' + qm(v.price) + ' ex VAT' : ''}</p><label class="q-check"><input type="checkbox" id="pwqTick"> The customer has approved this variation</label><div class="lp-f"><label>Who approved it</label><input id="pwqWho" value="${escAttr(projCustomer(p).name)}"></div><div class="q-inline" style="gap:10px;"><div class="lp-f"><label>When</label><input type="date" id="pwqDate" value="${today}"></div><div class="lp-f"><label>How</label><select id="pwqHow">${VAR_HOW.map(h => `<option value="${h[0]}">${h[1]}</option>`).join('')}</select></div></div><div class="lp-f"><label>Attachment (optional, up to 1.2 MB)</label><input type="file" id="pwqFile" accept="image/*,application/pdf,.eml,.msg"></div><div class="chg-err" id="pwqErr"></div>`; }
   else if(kind === 'customer'){ const cu = projCustomer(p), f = (label, field, val, ph) => `<div class="lp-f"><label>${label}</label><input id="pwqc_${field}" value="${escAttr(val || '')}" placeholder="${escAttr(ph || '')}"></div>`; title = 'Customer and site';
     body = `<div id="pwqCx">${cxCustomerHtml('project', p)}</div><p class="q-help" style="margin:8px 0;">First recorded in the Lead Pipeline and carried across. Change it here only if it has changed since.</p><div class="pw-cform">${f('Contact', 'contact', p.contact, cu.name)}${f('Company', 'company', p.company, '')}${f('Phone', 'phone', p.phone, cu.phone)}${f('Email', 'email', p.email, cu.email)}${f('Address', 'address', p.address, cu.address)}${f('Postcode', 'postcode', p.postcode, cu.postcode)}${f('Source', 'source', p.source, '')}${f('Project name', 'projectName', p.projectName, cu.projectName)}</div>`; }
@@ -7896,7 +7985,9 @@ function pwQuickSave(){
     slEnsure(s); s.log.push({ id: qRand('lg_'), date, hours: h, note: v('pwqNote').trim() }); showToast(`Logged ${hrs(h)} on ${s.label || 'the stage'}`);
   } else if(qk.kind === 'milestone'){ const key = v('pwqMs'); if(!key) return; if(date > fmt(new Date())){ showToast('An actual date cannot be in the future. A future date belongs in the planned date.'); return; } projMsConfirm(p, key, date); const mi = projMsInfo(p, key); showToast(msName(key) + ' done ' + pwD(date) + (mi.diff !== null ? ' (' + diffText(mi.diff) + ')' : '')); }
   else if(qk.kind === 'stact'){ const s = (p.stages || []).find(x => x.id === qk.sid); if(!s){ pwQuickClose(); return; } if(date > fmt(new Date())){ showToast('An actual date cannot be in the future.'); return; } if(qk.which === 'start') s.actStart = stampNow(date, 'Marked started'); else s.actEnd = stampNow(date, 'Marked done'); showToast((s.label || 'Stage') + (qk.which === 'start' ? ' started ' : ' done ') + pwD(date)); }
-  else if(qk.kind === 'invoice' || qk.kind === 'paid'){ const l = p.paymentLines[Number(v('pwqPay'))]; if(!l){ pwQuickClose(); return; } if(qk.kind === 'invoice') l.invoicedDate = date; else { l.paidDate = date; if(!l.invoicedDate) l.invoicedDate = date; } showToast(qk.kind === 'invoice' ? 'Invoice marked sent' : 'Marked paid'); }
+  else if(qk.kind === 'invoice' || qk.kind === 'paid'){ const l = p.paymentLines[Number(v('pwqPay'))]; if(!l){ pwQuickClose(); return; }
+    if(qk.kind === 'paid' && !qk.paidOk && pwPaidMatches(p, v('pwqPay')).length){ showConfirm('Mark paid anyway?', 'This payment already has a bank transaction. Marking it paid this way can count the money twice. Use Landed so it is not counted twice. Mark it paid anyway?').then(ok => { if(ok && pwUi.quick === qk){ qk.paidOk = true; pwQuickSave(); } }); return; }
+    if(qk.kind === 'invoice') l.invoicedDate = date; else { l.paidDate = date; if(!l.invoicedDate) l.invoicedDate = date; } showToast(qk.kind === 'invoice' ? 'Invoice marked sent' : 'Marked paid'); }
   else if(qk.kind === 'customer'){ ['contact', 'company', 'phone', 'email', 'address', 'postcode', 'source', 'projectName'].forEach(k => { p[k] = v('pwqc_' + k).trim(); }); showToast('Customer and site details saved'); }
   else if(qk.kind === 'note'){ const n = v('pwqNote').trim(); if(!n) return; p.comms = p.comms || []; p.comms.push({ date, note: n, created: Date.now() }); showToast('Note added'); }
   pwQuickClose(); render(); saveState();
@@ -11535,10 +11626,11 @@ function renderPOs(){
   const el = document.getElementById('poBody'); if(!el) return;
   (state.purchaseOrders || []).forEach(po => { if(po.status === 'Sent' && poDelivered(po)){ po.status = 'Delivered'; po.deliveredAt = po.deliveredAt || fmt(new Date()); } });
   const po = poUi.open ? poFind(poUi.open) : null; if(poUi.open && !po) poUi.open = 0;
+  { const sl = document.getElementById('pgAct-po'); if(sl) sl.innerHTML = po ? '' : '<button type="button" class="btn" data-po2="open">+ New order</button>'; }   // Stage 7: the primary action sits in the page head like every other area
   if(po) { el.innerHTML = poDetailHtml(po); return; }
   const list = (state.purchaseOrders || []).slice().sort((a, b) => b.no - a.no), me = whoAmI().name;
   el.innerHTML = varHubHtml() + `<div class="po-note">${state.settings.poApprovalOn ? `Approval is <b>on</b>: POs of <b>${qm(state.settings.poApprovalThreshold)}</b> or more are flagged and cannot be sent until approved${poViaApprovals() ? ' (through the Approvals process)' : ''}.` : 'PO approval is off (Settings &gt; Quotes &gt; Purchase orders).'} Create a PO from a delivery drop in a project's Materials and deliveries section.</div>
-    <div class="po-tools"><button type="button" class="btn qb-sm" data-po2="open">+ New order</button><span class="qb-dim">Create the orders for a project's suppliers, or add a second order for the same supplier.</span></div>
+    <div class="po-tools"><span class="qb-dim">Create the orders for a project's suppliers, or add a second order for the same supplier.</span></div>
     <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>PO</th><th>Project</th><th>Supplier</th><th>Delivery</th><th>Value</th><th>Status</th><th>Approval</th><th></th></tr></thead><tbody>${list.map(x => { const need = poNeedsApproval(x), act = poActualDelivery(x), aq = poQuoteOf(x);
       return `<tr class="${need && !poApproved(x) ? 'po-needs' : ''}"><td><b>${escHtml(x.ref)}</b>${aq ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(qRef(aq))}</div>` : ''}</td><td>${finSrcLink({ t: 'project', id: x.pid, sec: 'materials' }, recordCode(x.pid, 'project'))}</td><td>${escHtml(x.supplierName)}</td><td>${x.deliveryDate ? pwD(x.deliveryDate) : '—'}${act ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">delivered ${escHtml(pwD(act))}</div>` : ''}</td><td class="qb-calc">${qm(poTotals(x).payable)}</td><td>${poPill(x)}${poProject(x) ? dcPtcMark(poProject(x), x.did) : ''}</td>
       <td>${need ? (poApproved(x) ? `<span class="pw-ok">✓ ${escHtml(x.approval.by)}</span>` : '<span class="po-flag">Requires approval</span>') : '<span class="qb-dim">not needed</span>'}</td><td><button type="button" class="btn secondary qb-sm" data-po="open" data-id="${x.id}">Open</button></td></tr>`; }).join('') || '<tr><td colspan="8"><div class="sup-empty">No purchase orders yet.</div></td></tr>'}</tbody></table></div></div>`;
@@ -14548,6 +14640,7 @@ function render(){
   renderAssets();
   try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); renderAgeing(); renderPnl(); renderBalance(); renderReports(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
+  try{ pgStripsRender(); }catch(e){}
   renderSettings();
   renderBranding();
   settingsMenuSync();
@@ -15302,6 +15395,7 @@ function activateTab(name){
   updateScrollCues();
   try{ bttTouch(); }catch(e){}   // tables on the page just shown are measured
   try{ menuSync(); }catch(e){}   // the menus (folding group, rail, bottom bar) follow the current page
+  try{ pgStripsRender(); }catch(e){}   // Stage 7: the headline strips count what is listed now
 }
 document.querySelector('.skip-link').addEventListener('click', (e) => {
   e.preventDefault();
@@ -15370,7 +15464,7 @@ const menuUi = { sig: '', pop: null, hoverT: 0, sheetFrom: null, built: false };
 const menuEl = id => document.getElementById(id);
 const menuSvg = (key, cls) => `<svg${cls ? ' class="' + cls + '"' : ''} viewBox="0 0 24 24" aria-hidden="true">${MENU_ICONS[key] || MENU_ICONS.command}</svg>`;
 function menuCatalog(){
-  return [...document.querySelectorAll('#sidebar .nav-group')].map(g => ({ id: g.dataset.group, label: g.dataset.label, short: g.dataset.short, tabs: [...g.querySelectorAll('.tab:not([hidden])')].map(t => ({ tab: t.dataset.tab, label: navTabLabel(t.dataset.tab) })) }));
+  return [...document.querySelectorAll('#sidebar .nav-group')].map(g => ({ id: g.dataset.group, label: g.dataset.label, short: g.dataset.short, tabs: [...g.querySelectorAll('.tab:not([hidden])')].map(t => ({ tab: t.dataset.tab, label: navTabLabel(t.dataset.tab), sep: !!(t.previousElementSibling && t.previousElementSibling.classList.contains('nav-sep')) })) }));
 }
 function menuGroupOf(tab){ const t = document.querySelector('#sidebar .tab[data-tab="' + tab + '"]'), g = t && t.closest('.nav-group'); return g ? g.dataset.group : ''; }
 function menuCurrent(){ const t = document.querySelector('#sidebar .tab.active'); return t ? t.dataset.tab : ''; }
@@ -15517,7 +15611,7 @@ function menuPopOpen(gid, btn, o){
   if(menuUi.pop && menuUi.pop.btn !== btn) menuPopClose(false);
   clearTimeout(menuUi.hoverT);
   const cur = menuCurrent(), top = !!o.top;
-  let html = `<div class="mp-head">${escHtml(g.label)}</div>` + g.tabs.map(t => { const c = menuBadge(t.tab); return `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('');
+  let html = `<div class="mp-head">${escHtml(g.label)}</div>` + g.tabs.map(t => { const c = menuBadge(t.tab); return (t.sep ? '<div class="mp-sep" role="separator"></div>' : '') + `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('');
   if(top && gid === 'settings'){
     const ue = menuEl('undoBadge'), un = ue && !ue.hidden ? (parseInt(ue.textContent, 10) || 0) : 0;
     html += '<div class="mp-sep"></div>' + `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="undo"><span>Undo history</span>${un ? `<span class="tab-count">${un}</span>` : ''}</button>`;
@@ -15542,7 +15636,7 @@ function menuFocusMove(list, from, step){ const i = list.indexOf(from), n = list
 function menuSheetOpen(){
   const cat = menuCatalog(), cur = menuCurrent(), u = menuEl('undoBadge'), un = u && !u.hidden ? (parseInt(u.textContent, 10) || 0) : 0;
   menuEl('moreSheet').innerHTML = `<div class="ms-head"><h2>All pages</h2><button type="button" class="btn secondary" data-mact="sheetclose" aria-label="Close the page list">Close</button></div><div class="ms-grid ms-favs" id="msFavs" role="group" aria-label="Favourite pages" hidden></div>`
-    + cat.map(g => `<div class="ms-group g-${g.id}"><h3>${escHtml(g.label)}</h3><div class="ms-grid">${g.tabs.map(t => { const c = menuBadge(t.tab); return `<button type="button" class="ms-item g-${g.id}" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('')}</div></div>`).join('')
+    + cat.map(g => `<div class="ms-group g-${g.id}"><h3>${escHtml(g.label)}</h3><div class="ms-grid">${g.tabs.map(t => { const c = menuBadge(t.tab); return (t.sep ? '<span class="ms-sep" role="separator"></span>' : '') + `<button type="button" class="ms-item g-${g.id}" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('')}</div></div>`).join('')
     + `<div class="ms-foot"><button type="button" class="btn secondary" data-mact="editbar">Edit bottom bar</button><button type="button" class="btn secondary" data-mact="undo">Undo history${un ? ' (' + un + ')' : ''}</button>${document.querySelector('#logoutBar .logout-link') ? '<button type="button" class="btn secondary" data-mact="logout">Log out</button>' : ''}</div>`;
   menuFavRender();
   menuUi.sheetFrom = document.activeElement;
@@ -16491,7 +16585,8 @@ function cxContactsListHtml(){
   const needMig = cxUnmigratedCount() > 0;   // shows again whenever records exist that have a customer name but no contact
   const sel = (id, opts, v, ph) => `<select id="${id}" data-cxq="${id}" aria-label="${escAttr(ph)}"><option value="">${escHtml(ph)}</option>${opts.map(([k, n]) => `<option value="${k}"${v === k ? ' selected' : ''}>${escHtml(n)}</option>`).join('')}</select>`;
   return `<div class="page-head crm-head"><div><h2>Contacts</h2><div class="desc">Everyone you quote, build for or take referrals from: leads, customers and past customers. Every lead, sale, project, quote and invoice links to its contact, so you can see the whole history in one place. Suppliers stay in their own area.</div></div>
-      <div class="btn-row" style="margin:0"><button type="button" class="btn secondary" data-cx="dups">Review duplicates${dups ? ` <span class="tab-count">${dups}</span>` : ''}</button><button type="button" class="btn" data-cx="new-contact">+ New contact</button></div></div>
+      <div class="pg-actions"><button type="button" class="btn secondary" data-cx="dups">Review duplicates${dups ? ` <span class="tab-count">${dups}</span>` : ''}</button><button type="button" class="btn" data-cx="new-contact">+ New contact</button></div></div>
+    <div class="pj-strip pg-strip" data-pgs="contacts"></div>
     ${needMig ? `<div class="card cx-mig"><b>${m.migratedAt ? 'Some records are not linked to a contact yet' : 'Build contacts from your existing records'}</b><p class="q-help" style="margin:4px 0 8px;">${cxUnmigratedCount()} lead, sale, project and quote records have a customer name but no contact yet. This creates a contact (and a company where there is one) for each, links it, and flags likely duplicates for you to review. <b>Nothing is merged automatically</b> and nothing existing is changed or removed.</p><button type="button" class="btn" data-cx="migrate">Build contacts now</button></div>` : ''}
     ${m.report ? (m.reportHidden ? `<div class="cx-showrep"><button type="button" class="link-btn" data-cx="show-report">Show the summary of the last build (${escHtml(dShow(m.migratedAt))})</button></div>` : cxReportHtml(m.report)) : ''}
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quick"><input data-cxqa="first" placeholder="First name" aria-label="First name" autocomplete="off"><input data-cxqa="last" placeholder="Last name" aria-label="Last name" autocomplete="off"><input data-cxqa="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"><input data-cxqa="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
@@ -16593,7 +16688,8 @@ function cxFilteredCompanies(){
 function cxCompaniesListHtml(){
   const list = cxFilteredCompanies();
   const rows = list.map(x => `<tr class="cx-row"><td><button type="button" class="sp-link cx-name" data-nav="company:${escAttr(x.co.id)}">${escHtml(cxCompanyName(x.co))}</button></td><td>${escHtml(x.co.type || '')}</td><td class="cx-hide-s">${lcPillHtml(lcOf('company', x.co))}</td><td class="cx-hide-s">${escHtml(x.co.postcode)}</td><td>${x.people.length}</td><td class="cx-hide-m">${x.deals.filter(d => d.live).length}/${x.deals.length}</td><td class="qb-calc cx-hide-s">${x.won ? qm(x.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
-  return `<div class="page-head crm-head"><div><h2>Companies</h2><div class="desc">Businesses and organisations your customers belong to. A company can have several contacts, and its deals, quotes and invoices roll up here.</div></div><button type="button" class="btn" data-cx="new-company">+ New company</button></div>
+  return `<div class="page-head crm-head"><div><h2>Companies</h2><div class="desc">Businesses and organisations your customers belong to. A company can have several contacts, and its deals, quotes and invoices roll up here.</div></div><div class="pg-actions"><button type="button" class="btn" data-cx="new-company">+ New company</button></div></div>
+    <div class="pj-strip pg-strip" data-pgs="companies"></div>
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quickco"><input data-cxqa="name" placeholder="Company name" aria-label="Company name" autocomplete="off"><select data-cxqa="type" aria-label="Type">${CX_CO_TYPES.map(t => `<option>${t}</option>`).join('')}</select><input data-cxqa="postcode" placeholder="Postcode" aria-label="Postcode" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
     <div class="crm-filters cx-filters"><input type="search" class="crm-search" data-cxq="coq" value="${escAttr(cxUi.coq)}" placeholder="Search companies…" aria-label="Search companies" autocomplete="off">
       <select data-cxq="cotype" aria-label="Type"><option value="">Any type</option>${CX_CO_TYPES.map(t => `<option${cxUi.cotype === t ? ' selected' : ''}>${t}</option>`).join('')}</select>
@@ -16633,6 +16729,7 @@ function cxRender(){
     if(!typing || !kb.querySelector('#cxCoRes')) kb.innerHTML = cxCompaniesListHtml();
     else { const tmp = document.createElement('div'); tmp.innerHTML = cxCompaniesListHtml(); document.getElementById('cxCoRes').innerHTML = tmp.querySelector('#cxCoRes').innerHTML; }
   }
+  try{ rpTabsFitAll(); pgStripsRender(); }catch(e){}
 }
 /* BT:js-crm2 end */
 /* BT:js-crm3 begin */
@@ -17935,7 +18032,80 @@ function rpBarInner(p){
 }
 
 /* ---- centre column ---- */
-function rpTabsHtml(){ return `<nav class="rp-tabs" role="tablist" aria-label="Project">${RP_TABS.map(([k, n]) => `<button type="button" role="tab" class="${rpUi.tab === k ? 'active' : ''}" aria-selected="${rpUi.tab === k}" data-rp="tab" data-tab="${k}">${n}</button>`).join('')}</nav>`; }
+/* ---- Stage 7: the page template. Every list and board area has the same frame: a head (title, one line of help, the single primary action on the right), a headline strip,
+   filters, the list or board, and the side panel where there is one. The strips below only count records the page already lists (nothing is calculated, nothing is stored). ---- */
+const pgTile = (k, v, sub) => `<div class="pj-tile"><span class="k">${escHtml(k)}</span><span class="v">${v}</span>${sub ? `<span class="s">${sub}</span>` : ''}</div>`;
+const PG_STRIPS = {
+  contacts: () => pgTile('Contacts', state.contacts.length) + pgTile('Companies', state.companies.length) + pgTile('Possible duplicates', cxDupCount(), 'to review'),
+  companies: () => pgTile('Companies', state.companies.length) + pgTile('Contacts', state.contacts.length) + pgTile('Possible duplicates', cxDupCount(), 'contacts to review'),
+  leads: () => { const l = state.leads.filter(x => !x.lost).length; return pgTile('Leads', l, 'in the pipeline') + pgTile('Closed lost', state.leads.length - l, 'archived below'); },
+  sales: () => { const l = state.pipeline.filter(x => !x.lost).length; return pgTile('Sales deals', l, 'in the pipeline') + pgTile('Closed lost', state.pipeline.length - l, 'archived below'); },
+  quotes: () => { const n = st => state.quotes.filter(q => q.status === st).length; return pgTile('Draft', n('Draft')) + pgTile('Sent', n('Sent')) + pgTile('Accepted', n('Accepted')) + pgTile('All quotes', state.quotes.length); },
+  suppliers: () => { const a = state.suppliers.filter(x => x.status !== 'Inactive').length; return pgTile('Active suppliers', a) + pgTile('Inactive', state.suppliers.length - a, 'kept for their history'); },
+  orders: () => { if(poUi.open) return ''; const L = state.purchaseOrders || [], n = st => L.filter(x => x.status === st).length; return pgTile('Orders', L.length) + pgTile('Draft or approved', n('Draft') + n('Approved'), 'not sent yet') + pgTile('Sent', n('Sent'), 'awaiting delivery') + pgTile('Delivered', n('Delivered') + n('Matched')); },
+  tasks: () => { const t = fmt(new Date()), c = {}; crmFiltered().forEach(x => { const k = taskBucket(x, t); c[k] = (c[k] || 0) + 1; }); return pgTile('Overdue', c.overdue || 0) + pgTile('Due today', c.today || 0) + pgTile('Upcoming', c.upcoming || 0) + pgTile('No date', c.nodate || 0); },
+  projects: () => { if(pwUi.id) return ''; const a = liveProjects().length; return pgTile('Active projects', a) + pgTile('Completed', state.projects.length - a); },
+  supinv: () => { const all = siRows(); return pgTile('Documents', all.length, 'invoices and receipts') + pgTile('Total', qm(all.reduce((a, x) => a + (Number(x.total) || 0), 0)), 'as entered'); }
+};
+function pgStripsRender(){
+  if(!state) return;
+  document.querySelectorAll('[data-pgs]').forEach(el => { let h = ''; try{ h = PG_STRIPS[el.dataset.pgs] ? PG_STRIPS[el.dataset.pgs]() : ''; }catch(e){ h = ''; } if(el.dataset.h !== h){ el.innerHTML = h; el.dataset.h = h; } });
+}
+/* ---- Stage 7: one tab bar for the project, customer, supplier, contact and company pages.
+   As many tabs as fit on one line, the rest in a "More" menu (keyboard: Enter, Space or Down opens it; Up, Down, Home, End move; Escape closes; Tab leaves).
+   The active tab is always one of the visible ones. Nothing is stored; the tabs and what they show are unchanged. ---- */
+function rpBarHtml(label, tabs, active, attr){
+  const btn = ([k, n]) => `<button type="button" role="tab" class="${active === k ? 'active' : ''}" aria-selected="${active === k}" data-${attr}="tab" data-tab="${k}">${n}</button>`;
+  return `<nav class="rp-tabs rp-tabs-fit" aria-label="${label} pages"><div class="rp-tablist" role="tablist" aria-label="${label}">${tabs.map(btn).join('')}</div><div class="rp-more" hidden><button type="button" class="rp-more-btn" aria-haspopup="menu" aria-expanded="false">More<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="rp-more-menu" role="menu" aria-label="More ${label.toLowerCase()} tabs" hidden></div></div></nav>`;
+}
+const rpTabsRO = (typeof ResizeObserver === 'function') ? new ResizeObserver(es => es.forEach(e => rpTabsFit(e.target))) : null, rpTabsSeen = new WeakSet();
+function rpTabsFit(nav){
+  const list = nav && nav.querySelector('.rp-tablist'), more = nav && nav.querySelector('.rp-more'), menu = nav && nav.querySelector('.rp-more-menu'); if(!list || !more || !menu || !nav.offsetWidth) return;
+  const tabs = [...list.querySelectorAll('[role="tab"]')], cs = getComputedStyle(nav), gap = parseFloat(getComputedStyle(list).columnGap) || 0, avail = nav.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+  tabs.forEach(t => { t.hidden = false; }); more.hidden = true;
+  const w = tabs.map(t => t.offsetWidth), total = w.reduce((a, b) => a + b, 0) + gap * Math.max(0, tabs.length - 1);
+  const was = menu.hidden === false; let keep = new Set(tabs.map((t, i) => i));
+  if(total > avail){
+    more.hidden = false; let room = avail - more.offsetWidth - (parseFloat(getComputedStyle(nav).columnGap) || gap); keep = new Set();
+    const act = tabs.findIndex(t => t.classList.contains('active')); if(act >= 0){ keep.add(act); room -= w[act] + gap; }
+    for(let i = 0; i < tabs.length; i++){ if(keep.has(i)) continue; if(w[i] + gap <= room){ keep.add(i); room -= w[i] + gap; } else break; }
+  }
+  tabs.forEach((t, i) => { t.hidden = !keep.has(i); });
+  const rest = tabs.filter((t, i) => !keep.has(i));
+  const sig = rest.map(t => t.dataset.tab).join(',');
+  if(menu.dataset.sig !== sig){
+    menu.dataset.sig = sig;
+    menu.innerHTML = rest.map(t => { const b = t.cloneNode(true); b.removeAttribute('aria-selected'); b.removeAttribute('hidden'); b.className = 'rp-more-item'; b.setAttribute('role', 'menuitem'); b.setAttribute('tabindex', '-1'); return b.outerHTML; }).join('');
+  }
+  if(!rest.length || !was) rpMoreClose(nav, false);
+}
+function rpTabsFitAll(){
+  document.querySelectorAll('.rp-tabs-fit').forEach(n => { if(rpTabsRO && !rpTabsSeen.has(n)){ rpTabsSeen.add(n); rpTabsRO.observe(n); } rpTabsFit(n); });
+  if(rpMoreFocus){ rpMoreFocus = false; const a = document.querySelector('.rp-tablist [role="tab"][aria-selected="true"]:not([hidden])'); if(a) a.focus(); }
+}
+let rpMoreFocus = false;
+function rpMoreClose(nav, ret){ const m = nav && nav.querySelector('.rp-more-menu'), b = nav && nav.querySelector('.rp-more-btn'); if(!m || m.hidden) return; m.hidden = true; if(b){ b.setAttribute('aria-expanded', 'false'); if(ret) b.focus(); } }
+function rpMoreOpen(nav, focusFirst){ const m = nav.querySelector('.rp-more-menu'), b = nav.querySelector('.rp-more-btn'); if(!m || !b) return; document.querySelectorAll('.rp-tabs-fit').forEach(n => { if(n !== nav) rpMoreClose(n, false); }); m.hidden = false; b.setAttribute('aria-expanded', 'true'); if(focusFirst){ const f = m.querySelector('[role="menuitem"]'); if(f) f.focus(); } }
+document.addEventListener('click', (e) => {
+  const t = e.target; if(!t || !t.closest) return;
+  const btn = t.closest('.rp-more-btn'); if(btn){ const nav = btn.closest('.rp-tabs-fit'), m = nav.querySelector('.rp-more-menu'); if(m.hidden) rpMoreOpen(nav, false); else rpMoreClose(nav, false); return; }
+  const it = t.closest('.rp-more-item'); if(it){ rpMoreFocus = true; setTimeout(() => { rpMoreFocus = false; }, 400); const nav = it.closest('.rp-tabs-fit'); if(nav) rpMoreClose(nav, false); return; }
+  document.querySelectorAll('.rp-tabs-fit').forEach(n => rpMoreClose(n, false));
+}, true);
+document.addEventListener('keydown', (e) => {
+  const t = e.target; if(!t || !t.closest) return; const nav = t.closest('.rp-tabs-fit'); if(!nav) return;
+  const btn = nav.querySelector('.rp-more-btn'), m = nav.querySelector('.rp-more-menu'), items = [...m.querySelectorAll('[role="menuitem"]')];
+  if(t === btn){ if(e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){ e.preventDefault(); rpMoreOpen(nav, true); } else if(e.key === 'Escape' && !m.hidden){ e.preventDefault(); rpMoreClose(nav, true); } return; }
+  if(!t.closest('.rp-more-menu')) return;
+  const i = items.indexOf(t);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); items[(i + 1) % items.length].focus(); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+  else if(e.key === 'Home'){ e.preventDefault(); items[0].focus(); }
+  else if(e.key === 'End'){ e.preventDefault(); items[items.length - 1].focus(); }
+  else if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); rpMoreClose(nav, true); }
+  else if(e.key === 'Tab'){ rpMoreClose(nav, false); }
+}, true);
+function rpTabsHtml(){ return rpBarHtml('Project', RP_TABS, rpUi.tab, 'rp'); }
 function rpNextInvoice(p){
   const ls = (p.paymentLines || []).filter(l => !l.invoicedDate && l.dueDate && (Number(l.amount) || 0) > 0).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   return ls[0] || null;
@@ -18008,7 +18178,7 @@ function rpRenderProject(p){
   ['.rp-left .rp-lbody', '.rp-centre .rp-cscroll', '.rp-right .rp-rbody'].forEach(s => { const n = el.querySelector(s); if(n) prev[s] = n.scrollTop; });
   el.innerHTML = `<div class="rp" data-kind="project"><aside class="rp-left" aria-label="Profile">${rpLeftHtml(p)}</aside><main class="rp-centre">${rpCentreHtml(p)}</main><aside class="rp-right" aria-label="Linked records">${rpRightHtml(p)}</aside></div>`;
   Object.keys(prev).forEach(s => { const n = el.querySelector(s); if(n) n.scrollTop = prev[s]; });
-  try{ const at = el.querySelector('.rp-tabs button.active'), bar = at && at.parentNode; if(bar && at.offsetLeft + at.offsetWidth > bar.clientWidth + bar.scrollLeft) bar.scrollLeft = at.offsetLeft + at.offsetWidth - bar.clientWidth + 16; }catch(e){}   // a tab that is off the edge (Money) is brought into view
+  try{ rpTabsFitAll(); }catch(e){}   // Stage 7: tabs that do not fit go into More; the active tab stays visible
   try{ pwStick(); }catch(e){}
   rpFit(); try{ gtFocus(); }catch(e){}
 }
@@ -18204,7 +18374,7 @@ function rsCentreBody(s){
     ${r.drafts.length ? `<div class="rp-card"><h4>Purchase orders not placed yet <span class="db-count">${r.drafts.length}</span></h4>${rpOrderRows(r.drafts).join('')}</div>` : ''}
     ${r.other.length ? `<div class="rp-card"><h4>Other live quotes (leads and sales deals) <span class="db-count">${r.other.length}</span></h4>${r.other.map(q).join('')}</div>` : ''}`;
 }
-function rsTabsHtml(){ return `<nav class="rp-tabs" role="tablist" aria-label="Supplier">${RS_TABS.map(([k, n]) => `<button type="button" role="tab" class="${rsUi.tab === k ? 'active' : ''}" aria-selected="${rsUi.tab === k}" data-rs="tab" data-tab="${k}">${n}</button>`).join('')}</nav>`; }
+function rsTabsHtml(){ return rpBarHtml('Supplier', RS_TABS, rsUi.tab, 'rs'); }
 /* draw: the whole page the first time; while a field on the left is being typed in only the parts that read from it are redrawn */
 function rsRender(s){
   const host = document.getElementById('supplierRecord'); if(!host) return;
@@ -18222,6 +18392,7 @@ function rsRender(s){
     if(!typing) { const l = host.querySelector('#rsLeftBody'), t = l ? l.scrollTop : 0; put('rsLeftBody', rsLeftBody(s)); if(l) l.scrollTop = t; }
   }
   rpFitEl(host.querySelector('.rp'));
+  try{ rpTabsFitAll(); }catch(e){}
 }
 function rsRenderLeft(keep){ const s = supFind(rsUi.id), l = document.getElementById('rsLeftBody'); if(!s || !l) return; const t = l.scrollTop; l.innerHTML = rsLeftBody(s); if(keep) l.scrollTop = t; }
 document.addEventListener('click', (e) => {
@@ -18238,7 +18409,7 @@ navExtra('rssec', () => rsUi.sec, v => { if(v) rsUi.sec = v; });
 const cxPg = { key: '', tab: 'overview' };
 navExtra('cxpg', () => ({ k: cxPg.key, t: cxPg.tab }), v => { if(v){ cxPg.key = v.k || ''; cxPg.tab = v.t || 'overview'; } });
 const RC_TABS = [['overview', 'Overview'], ['activity', 'Activity']];
-function rcTabsHtml(){ return `<nav class="rp-tabs" role="tablist" aria-label="Customer">${RC_TABS.map(([k, n]) => `<button type="button" role="tab" class="${cxPg.tab === k ? 'active' : ''}" aria-selected="${cxPg.tab === k}" data-rc="tab" data-tab="${k}">${n}</button>`).join('')}</nav>`; }
+function rcTabsHtml(){ return rpBarHtml('Customer', RC_TABS, cxPg.tab, 'rc'); }
 function rcTouch(key){ if(cxPg.key !== key){ cxPg.key = key; cxPg.tab = 'overview'; } }
 function rcFrame(kind, o){
   return `<div class="rp cx-prof" data-kind="${kind}"><aside class="rp-left" aria-label="Profile"><div class="rp-head" id="cxHead">${o.head}</div><div class="rp-lbody" id="cxLeft">${o.left}</div></aside>
@@ -20994,16 +21165,22 @@ function repBody(k){
   if(k === 'selling') return `<div class="db-card">${dashSellingHtml()}</div>`;
   return '';
 }
+const REP_JOB_D = { summary: 'Price, invoiced, paid, margin and hours on one job.', margin: 'Margin as sold against margin now, line by line.', cost: 'What was paid on the job, by category.', variance: 'Supplier price differences, by cause.', hours: 'Hours sold, planned and logged.', selling: 'Time spent selling the job and what it cost.', money: 'Money in and out on the job.' };
 function repHtml(){
   repDefaults();
-  if(!repUi.open) return `<p class="q-help">Reports are the questions you ask on a schedule. They read the same records as the finance pages, hold no numbers of their own, and every figure opens the line behind it. Each has a date range and a data-quality strip.</p>
-    <div class="card"><div class="qb-sec-h"><h4>Job reports</h4></div><p class="q-help">One project at a time: a summary, sold against now, cost by category, variance by cause, hours, cost of selling, and money in and out.</p><div class="btn-row">${REP_JOB.map(([k, n]) => `<button type="button" class="btn secondary" data-f6="rep-open" data-k="job:${k}">${escHtml(n)}</button>`).join('')}</div></div>
-    <div class="f6-repgrid">${REP_BIZ.map(([k, n, d]) => `<button type="button" class="card f6-repcard" data-f6="rep-open" data-k="biz:${k}"><b>${escHtml(n)}</b><span class="qb-dim">${escHtml(d)}</span></button>`).join('')}</div>`;
+  /* the same order on every report and on the library: title, date range (or month, or project), data-quality strip, then the report */
+  const range = (job, p, monthly) => `<div class="q-inline f6-range" style="gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:var(--bt-s3);">${job ? `<div class="lp-f"><label>Project</label><select data-f6="rep-pid">${state.projects.map(x => `<option value="${x.id}"${p && x.id === p.id ? ' selected' : ''}>${escHtml(recordCode(x.id, 'project') + ' ' + x.name)}${projStageId(x) === 'stg_proj_completed' ? ' (completed)' : ''}</option>`).join('')}</select></div>` : ''}
+    ${monthly ? `<div class="lp-f"><label>Month</label><input type="month" data-f6="rep-month" value="${repUi.to.slice(0, 7)}"></div>` : `<div class="lp-f"><label>From</label><input type="date" data-f6="rep-from" value="${repUi.from}"></div><div class="lp-f"><label>To</label><input type="date" data-f6="rep-to" value="${repUi.to}"></div>`}</div>`;
+  const dq = monthly => dqStripHtml(monthly ? repUi.to.slice(0, 7) : repUi.from.slice(0, 7), repUi.to.slice(0, 7));
+  if(!repUi.open){
+    const card = (kind, k, n, d, meta) => `<button type="button" class="card f6-repcard" data-f6="rep-open" data-k="${kind}:${k}"><span class="f6-kind">${kind === 'job' ? 'Job report' : 'Business report'}</span><b>${escHtml(n)}</b><span class="qb-dim">${escHtml(d)}</span><span class="f6-meta">${meta}</span></button>`;
+    return `<h3 class="f6-gh" style="margin-top:0;">Date range</h3><p class="q-help" style="margin:0 0 var(--bt-s2);">The range and the data-quality strip apply to whichever report you open.</p>${range(false, null, false)}${dq(false)}
+      <h3 class="f6-gh">Business reports</h3><div class="f6-repgrid">${REP_BIZ.map(([k, n, d]) => card('biz', k, n, d, k === 'monthly' ? 'One month' : 'Date range')).join('')}</div>
+      <h3 class="f6-gh">Job reports</h3><p class="q-help">One project at a time. Pick the project once you open one.</p><div class="f6-repgrid">${REP_JOB.map(([k, n]) => card('job', k, n, REP_JOB_D[k] || '', 'One project')).join('')}</div>`;
+  }
   const [kind, key] = repUi.open.split(':'), job = kind === 'job', p = job ? jrProject() : null, title = job ? 'Job report' : (REP_BIZ.find(x => x[0] === key) || [0, key])[1];
   const monthly = !job && key === 'monthly';
-  const ctl = `<div class="q-inline" style="gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:var(--bt-s3);">${job ? `<div class="lp-f"><label>Project</label><select data-f6="rep-pid">${state.projects.map(x => `<option value="${x.id}"${p && x.id === p.id ? ' selected' : ''}>${escHtml(recordCode(x.id, 'project') + ' ' + x.name)}${projStageId(x) === 'stg_proj_completed' ? ' (completed)' : ''}</option>`).join('')}</select></div>` : ''}
-    ${monthly ? `<div class="lp-f"><label>Month</label><input type="month" data-f6="rep-month" value="${repUi.to.slice(0, 7)}"></div>` : `<div class="lp-f"><label>From</label><input type="date" data-f6="rep-from" value="${repUi.from}"></div><div class="lp-f"><label>To</label><input type="date" data-f6="rep-to" value="${repUi.to}"></div>`}</div>`;
-  return `<div class="btn-row"><button type="button" class="btn secondary qb-sm" data-f6="rep-open" data-k="">← All reports</button></div><h3 style="margin:8px 0;">${escHtml(title)}</h3>${ctl}${dqStripHtml(monthly ? repUi.to.slice(0, 7) : repUi.from.slice(0, 7), monthly ? repUi.to.slice(0, 7) : repUi.to.slice(0, 7))}
+  return `<div class="f6-rephead"><button type="button" class="btn secondary qb-sm" data-f6="rep-open" data-k="">← All reports</button><h3>${escHtml(title)}</h3>${monthly ? '' : '<button type="button" class="sp-link f6-tomonthly" data-f6="rep-open" data-k="biz:monthly">Monthly summary →</button>'}</div>${range(job, p, monthly)}${dq(monthly)}
     ${job ? `<div class="view-toggle" role="group" aria-label="Job report sections">${REP_JOB.map(([k, n]) => `<button type="button" data-f6="rep-sec" data-v="${k}" class="${repUi.sec === k ? 'active' : ''}">${escHtml(n)}</button>`).join('')}</div>${jrHtml(p, repUi.sec)}` : repBody(key)}`;
 }
 function renderReports(){ const el = document.getElementById('reportsBody'); if(el && state) el.innerHTML = repHtml(); }
