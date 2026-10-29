@@ -2531,6 +2531,13 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .ph-row.ph-stack .ph-nm { grid-column: 1 / -1; font-weight: 600; }
   .ph-row.ph-stack .pt-f > span { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
   .ph-row.ph-stack .ph-sub { grid-column: 1 / -1; font-size: var(--bt-fs-xs); }
+  .ph-ask-n { margin: 0 0 6px; } .ph-q { margin: 0 0 10px; font-size: 15px; }
+  .ph-pick { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; } .ph-pick select { flex: 1; min-width: 0; font-size: 16px; } .ph-pick .btn { min-width: 44px; font-size: 20px; line-height: 1; }
+  .ph-note { font-size: var(--bt-fs-xs); color: var(--text-muted); margin-bottom: 4px; }
+  .db-minis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--bt-s3); margin: 0 0 var(--bt-s3); }
+  .db-mini { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; background: var(--bt-surface-2); display: flex; flex-direction: column; gap: 2px; } .db-mini .k { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; } .db-mini b { font-size: 18px; font-variant-numeric: tabular-nums; } .db-mini .s { font-size: var(--bt-fs-xs); color: var(--text-muted); }
+  .db-tbl { width: 100%; border-collapse: collapse; font-size: 13px; } .db-tbl th, .db-tbl td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); } .db-tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .ph-sell { margin-top: 4px; }
   .ph-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .ph-tbl input { width: 100%; min-width: 0; } .ph-tbl td:nth-child(2) input, .ph-tbl td:nth-child(3) input { width: 72px; }
   .ph-card .ph-btns { margin-top: 10px; }
@@ -2743,6 +2750,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <section class="td-card" id="todayJob"></section>
       <section class="td-card" id="todayBiz"></section>
       <section class="td-card" id="todayProjects" style="grid-column:1 / -1;"></section>
+      <section class="td-card" id="todayPhases" style="grid-column:1 / -1;"></section>
       <section class="td-card" id="todayReady" style="grid-column:1 / -1;"></section>
     </div>
   </div>
@@ -2767,6 +2775,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <section class="db-card" id="dbFunnel" aria-label="Lead funnel"></section>
       <section class="db-card" id="dbLost" aria-label="Lost leads by reason"></section>
     </div>
+    <section class="db-card" id="dbSelling" aria-label="Cost of selling"></section>
     <section class="db-card" id="dbSoon" aria-label="Coming up"></section>
     <section class="db-card" id="dbForecast" aria-label="Forecast and actuals"></section>
   </div>
@@ -3273,6 +3282,12 @@ create policy "app update" on tracker_data for update using (true) with check (t
   </div>
 </div>
 
+<div class="modal-overlay" id="phOverlay" hidden>
+  <div class="modal undo-modal" style="max-width:440px;" role="dialog" aria-label="Hours for this phase">
+    <div class="terms-top"><span class="terms-tag" id="phTitle">Hours</span></div>
+    <div id="phBody"></div>
+  </div>
+</div>
 <div class="modal-overlay" id="chgOverlay" hidden>
   <div class="modal undo-modal" style="max-width:480px;" role="dialog" aria-label="Save changes">
     <div class="terms-top"><span class="terms-tag" id="chgTitle">Save changes</span></div>
@@ -4515,6 +4530,7 @@ function renderDashboard(){
   document.getElementById('dbPipe').innerHTML = dashPipeHtml();
   document.getElementById('dbFunnel').innerHTML = dashFunnelHtml(range, won, lost.length);
   document.getElementById('dbLost').innerHTML = dashLostHtml(range, lost);
+  if(typeof dashSellingHtml === 'function' && document.getElementById('dbSelling')) document.getElementById('dbSelling').innerHTML = dashSellingHtml();
   document.getElementById('dbSoon').innerHTML = dashSoonHtml(today);
   document.getElementById('dbForecast').innerHTML = dashForecastHtml(months, totIn, totOut);
   dashUi.sig = DASH_CHARTS.map(id => dashInnerW(document.getElementById(id))).join('|');
@@ -11061,7 +11077,7 @@ function psWordsGeneric(method, value){
     : `Profit share = labour hours × ${qm(value)}. For example 40 labour hours gives ${qm(40 * value)}. Retained profit = project profit − profit share.`;
 }
 function projHours(p){
-  const aq = projAcceptedQuote(p), logged = (p.stages || []).reduce((a, s) => a + slLogged(s), 0);
+  const aq = projAcceptedQuote(p), logged = (p.stages || []).reduce((a, s) => a + slLogged(s), 0) + (typeof phDoneHours === 'function' ? phDoneHours(p) : 0);   // Stage 4: plus the hours confirmed or assumed when a phase was ticked done
   if(!aq) return { sold: 0, plan: 0, logged };
   const sold = aq.asSold ? aq.asSold.labourHours : aq.labour.filter(r => !qExcluded(aq, r)).reduce((a, r) => a + qLabourDays(r) * hpd(), 0);
   const pq = projWorkQuote(p), plan = pq.labour.filter(r => !qExcluded(pq, r)).reduce((a, r) => a + qLabourDays(r) * hpd(), 0);
@@ -13406,6 +13422,7 @@ function renderToday(){
     pr.innerHTML = `<div class="td-head"><h3>${isToday ? 'Projects today' : 'Projects on ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${pe.today.length}</span></div>
       ${pe.over.length ? `<button class="td-od${open ? ' open' : ''}" data-today="od" data-k="proj">Overdue (${pe.over.length})${CHEV_SVG}</button><div class="td-od-list"${open ? '' : ' hidden'}>${pe.over.map(x => todayProjectRow(x, true)).join('')}</div>` : ''}
       ${pe.today.length ? pe.today.map(x => todayProjectRow(x, false)).join('') : '<div class="td-empty">No project stages, deliveries or payments dated ' + (isToday ? 'today' : 'that day') + '.</div>'}`; }
+  if(typeof renderTodayPhases === 'function') renderTodayPhases(sel, real);
   refreshActionPanel();
 }
 /* roll over at midnight and when the tab or window regains focus, so the lists never show yesterday's "today" */
@@ -17675,7 +17692,7 @@ function rpLeftHtml(p){
     ${rpEdit(p, 'start', { type: 'date' })}${rpEdit(p, 'complete', { type: 'date' })}${rpEdit(p, 'dur', { type: 'number', label: 'Duration (working days)' })}
     <div class="rp-hint rp-dateh">Start, complete and duration are linked: change start or duration and complete moves, change complete and duration follows.</div>
     ${phHasHours(p) ? rpRO('Hours planned', `<b>${hrs(phHours(p))}</b>`, `Adds up the phase hours, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>${h.plan && Math.abs(h.plan - phHours(p)) > 0.01 ? ` · the Working plan holds ${hrs(h.plan)}` : ''}`) : rpRO('Hours planned', h.plan ? `<b>${hrs(h.plan)}</b>` : '', `From the plan, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>`)}
-    ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>` : '', 'From time logs')}`;
+    ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>${phLoggedChips(p)}` : '', 'From time logs and the phases ticked done')}`;
   const moneySec = `
     <div class="rp-three"><div class="rp-ro"><small>Billed</small><b>${qm(money.billed)}</b></div><div class="rp-ro"><small>Paid</small><b>${qm(money.paid)}</b></div><div class="rp-ro${money.overdue ? ' rp-bad' : ''}"><small>Overdue</small><b>${qm(money.overdue)}</b></div></div>
     <div class="rp-hint">Read-only, from the invoice schedule. <button type="button" class="sp-link" data-rp="legacy" data-sec="money">Open the schedule</button></div>`;
@@ -19227,12 +19244,13 @@ function phRowHtml(kind, r, p, pi, base){
     <input type="number" min="0" step="0.25" inputmode="decimal" ${base} data-field="phaseHours" data-pi="${pi}" value="${v(p.hours)}" placeholder="Hrs" aria-label="Budgeted hours">
     <button type="button" class="icon-btn" data-sf="phase-del" data-kind="${kind}" data-id="${id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button>
     <div class="ph-sub"><input type="date" ${base} data-field="phaseStart" data-pi="${pi}" value="${v(sfIso(p.start))}" aria-label="Start"><input type="date" ${base} data-field="phaseEnd" data-pi="${pi}" value="${v(sfIso(p.end))}" aria-label="End">
-      <label class="q-check"><input type="checkbox" ${base} data-field="phaseSelling" data-pi="${pi}"${p.selling ? ' checked' : ''}> Selling time</label>${phStatusHtml(p)}</div></div>`;
+      <label class="q-check"><input type="checkbox" ${base} data-field="phaseSelling" data-pi="${pi}"${p.selling ? ' checked' : ''}> Selling time</label>${phStatusHtml(p)}${phTickBtn(kind, r, p)}</div></div>`;
 }
 function phEditorHtml(kind, r, base){
   const ph = sfPhases(r), id = r.id;
   return `<div class="lp-f"><label>Phases <span class="lp-opt">optional</span></label>${ph.length ? '<div class="ph-head"><span>Phase</span><span>Days</span><span>Hours</span><span></span></div>' : ''}${ph.map((p, pi) => phRowHtml(kind, r, p, pi, base)).join('')}
     ${phHasHours(r) ? `<div class="lp-hint ph-sum">Budgeted time: <b>${hrs(phHours(r))}</b> in all${sfPhases(r).some(p => p.selling && phNum(p.hours) > 0) ? ` (${hrs(sfPhases(r).filter(p => p.selling).reduce((a, p) => a + phNum(p.hours), 0))} of it selling time)` : ''}</div>` : ''}
+    ${phSellLineHtml(r)}
     <div class="ph-btns"><button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="${kind}" data-id="${id}">+ Add a phase</button><button type="button" class="btn secondary qb-sm" data-sf="phase-tpl" data-kind="${kind}" data-id="${id}" title="Adds the phases from the template (Settings, Planning and capacity) that are not here yet">Apply the template</button></div></div>`;
 }
 /* the project's Plan tab: the same phases (name, days and hours are editable here; their dates move through the review above) */
@@ -19242,10 +19260,10 @@ function phPlanCardHtml(p){
     <label class="pt-f"><span>Days</span><input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${v(x.days)}" aria-label="Days"></label>
     <label class="pt-f"><span>Budget (h)</span><input type="number" min="0" step="0.25" inputmode="decimal" ${base} data-field="phaseHours" data-pi="${pi}" value="${v(x.hours)}" aria-label="Budgeted hours"></label>
     <button type="button" class="icon-btn" data-sf="phase-del" data-kind="project" data-id="${p.id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button>
-    <div class="ph-sub"><span class="ph-dt">${sfIso(x.start) || sfIso(x.end) ? escHtml((sfIso(x.start) ? pwD(x.start) : '—') + ' → ' + (sfIso(x.end) ? pwD(x.end) : '—')) : '<span class="qb-dim">No dates yet</span>'}</span>${x.selling ? '<span class="sf-chip">Selling time</span>' : ''}${phStatusHtml(x)}</div></div>`).join('');
+    <div class="ph-sub"><span class="ph-dt">${sfIso(x.start) || sfIso(x.end) ? escHtml((sfIso(x.start) ? pwD(x.start) : '—') + ' → ' + (sfIso(x.end) ? pwD(x.end) : '—')) : '<span class="qb-dim">No dates yet</span>'}</span>${x.selling ? '<span class="sf-chip">Selling time</span>' : ''}${phStatusHtml(x)}${phTickBtn('project', p, x)}</div></div>`).join('');
   return `<section class="rp-card ph-card" id="phPlan"><h4>Phases</h4>
     ${ph.length ? `${rows}
-      <div class="rp-hint">${phHasHours(p) ? `Budgeted time ${hrs(phHours(p))}: this is the Hours planned on the profile. ` : ''}Dates are changed through the review above, so nothing linked moves until you confirm.</div>` : '<div class="pw-empty">No phases yet. Add them, or apply the template.</div>'}
+      <div class="rp-hint">${phHasHours(p) ? `Budgeted time ${hrs(phHours(p))}: this is the Hours planned on the profile. ` : ''}Dates are changed through the review above, so nothing linked moves until you confirm.</div>${phSellLineHtml(p)}` : '<div class="pw-empty">No phases yet. Add them, or apply the template.</div>'}
     <div class="ph-btns"><button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="project" data-id="${p.id}">+ Add a phase</button><button type="button" class="btn secondary qb-sm" data-sf="phase-tpl" data-kind="project" data-id="${p.id}" title="Adds the phases from the template that are not here yet; nothing already here changes">Apply the template</button></div></section>`;
 }
 PLAN_SET_CARDS.push(['Phase template', () => {
@@ -19279,6 +19297,141 @@ document.addEventListener('change', (e) => {
   else return;
   saveState(); render();
 });
+
+
+/* =====================================================================
+   STEP 3: TICK THEN CONFIRM, AND THE COST OF SELLING
+   A phase with a date shows on Today once it is due. Ticking it done marks it done at once with its budgeted hours, saved as ASSUMED ("budget, not confirmed"),
+   and asks "Was that 3 h?". Yes keeps it assumed; adjusting in 15-minute steps and confirming saves it as CONFIRMED. phase.done = { date, hours, mode, by, at }.
+   Hours logged on a project = the time logged on its stage lines (the existing time logging, unchanged) + the hours on its done phases.
+   Selling time (phases marked selling: site visit, scope, quote) is costed at the labour rate on every deal, including deals that are lost.
+   ===================================================================== */
+const PH_KIND = { lead: 'Lead', sales: 'Sales', project: 'Project' };
+function phRecords(){ return state.leads.map(r => ({ kind: 'lead', r })).concat(state.pipeline.map(r => ({ kind: 'sales', r })), state.projects.map(r => ({ kind: 'project', r }))); }
+function phFind(kind, rid, pid){ const r = sfRec(kind, rid), p = r ? sfPhases(r).find(x => x.id === pid) || null : null; return { r, p }; }
+function phFmtH(h){ h = Math.round(phNum(h) * 4) / 4; const w = Math.floor(h), m = Math.round((h - w) * 60); return !m ? w + ' h' : (w ? w + ' h ' + m + ' min' : m + ' min'); }
+const phIsDone = p => !!(p && p.done && typeof p.done === 'object');
+const phDoneHours = r => sfPhases(r).filter(phIsDone).reduce((a, p) => a + phNum(p.done.hours), 0);
+function phLoggedSplit(p){
+  const stage = (p.stages || []).reduce((a, s) => a + slLogged(s), 0), done = sfPhases(p).filter(phIsDone);
+  return { confirmed: stage + done.filter(x => x.done.mode === 'confirmed').reduce((a, x) => a + phNum(x.done.hours), 0), assumed: done.filter(x => x.done.mode !== 'confirmed').reduce((a, x) => a + phNum(x.done.hours), 0) };
+}
+function phMarkHtml(conf, ass){
+  return (ass > 0 ? `<span class="sf-chip warn" title="Budget accepted as it stood: not confirmed">${hrs(ass)} assumed</span>` : '') + (conf > 0 && ass > 0 ? ` <span class="sf-chip ok" title="Hours that were logged or adjusted and confirmed">${hrs(conf)} confirmed</span>` : (conf > 0 ? ` <span class="sf-chip ok" title="Hours that were logged or adjusted and confirmed">confirmed</span>` : ''));
+}
+function phLoggedChips(p){ const x = phLoggedSplit(p); return ' ' + phMarkHtml(x.confirmed, x.assumed); }
+function phTickBtn(kind, r, p){
+  const at = `data-kind="${kind}" data-rid="${r.id}" data-pid="${escAttr(p.id)}"`;
+  return phIsDone(p) ? `<button type="button" class="sp-link" data-ph="reopen" ${at} title="Put it back as not done">Reopen</button>` : `<button type="button" class="btn secondary qb-sm" data-ph="tick" ${at}>Mark done</button>`;
+}
+function phTimeline(kind, r, text){ try{ tlDeal(r.id, text, { src: 'phase' }); }catch(e){} }
+function phTick(kind, rid, pid){
+  const { r, p } = phFind(kind, rid, pid); if(!p || phIsDone(p)) return;
+  p.done = { date: fmt(new Date()), hours: phNum(p.hours), mode: 'assumed', by: whoName(), at: Date.now() };
+  phTimeline(kind, r, `Phase done: ${p.name || 'Phase'}, ${phFmtH(p.done.hours)} (budget, not confirmed) · by ${whoName()}`);
+  saveState(); render(); phDialog(kind, rid, pid);
+}
+function phReopen(kind, rid, pid){
+  const { r, p } = phFind(kind, rid, pid); if(!p || !phIsDone(p)) return;
+  phTimeline(kind, r, `Phase put back as not done: ${p.name || 'Phase'} · by ${whoName()}`);
+  delete p.done; saveState(); render(); showToast('Back as not done');
+}
+/* the "Was that 3 h?" step */
+const phUi = { kind: '', rid: 0, pid: '', val: 0 };
+function phOptions(budget, val){
+  const max = Math.max(24, Math.ceil(Math.max(budget, val) * 2)), out = [];
+  for(let q = 0; q <= max * 4; q++) out.push(`<option value="${q / 4}"${q / 4 === val ? ' selected' : ''}>${escHtml(phFmtH(q / 4))}</option>`);
+  return out.join('');
+}
+function phDialog(kind, rid, pid){
+  const { r, p } = phFind(kind, rid, pid); if(!p || !phIsDone(p)) return;
+  Object.assign(phUi, { kind, rid, pid, val: phNum(p.done.hours) }); const budget = phNum(p.hours);
+  document.getElementById('phTitle').textContent = 'Phase done';
+  document.getElementById('phBody').innerHTML = `<p class="ph-ask-n"><b>${escHtml(p.name || 'Phase')}</b> <span class="qb-dim">· ${escHtml(boardTitle(kind === 'lead' ? 'lead' : kind, r))}</span></p>
+    <p id="phQ" class="ph-q">${budget > 0 ? `Was that <b>${escHtml(phFmtH(budget))}</b>?` : 'How long did it take? No budget was set for this phase.'}</p>
+    <div class="ph-pick"><button type="button" class="btn secondary" data-ph="minus" aria-label="15 minutes less">−</button><select id="phPick" aria-label="Hours spent, in 15-minute steps">${phOptions(budget, phUi.val)}</select><button type="button" class="btn secondary" data-ph="plus" aria-label="15 minutes more">+</button></div>
+    <div class="ph-note" id="phNote"></div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-ph="undo">Not done after all</button><button type="button" class="btn" id="phOk" data-ph="ok"></button></div>`;
+  phDialogSync(); document.getElementById('phOverlay').hidden = false; const ok = document.getElementById('phOk'); if(ok) ok.focus();
+}
+function phDialogSync(){
+  const { p } = phFind(phUi.kind, phUi.rid, phUi.pid); if(!p) return; const budget = phNum(p.hours), same = phUi.val === budget;
+  const pick = document.getElementById('phPick'); if(pick && Number(pick.value) !== phUi.val) pick.value = String(phUi.val);
+  document.getElementById('phOk').textContent = same ? (budget > 0 ? 'Yes, ' + phFmtH(budget) : 'Leave at 0 h') : 'Confirm ' + phFmtH(phUi.val);
+  document.getElementById('phNote').innerHTML = same ? 'Saved as <b>assumed</b>: the budget stands and is marked “not confirmed”.' : 'Saved as <b>confirmed</b>: the time you chose.';
+}
+function phDialogClose(){ document.getElementById('phOverlay').hidden = true; }
+document.addEventListener('change', (e) => { if(e.target.id === 'phPick'){ phUi.val = Math.max(0, Number(e.target.value) || 0); phDialogSync(); } });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && !document.getElementById('phOverlay').hidden) phDialogClose(); });
+document.addEventListener('click', (e) => {
+  if(e.target.id === 'phOverlay'){ phDialogClose(); return; }   // clicking outside keeps what is saved: the budget stands, assumed
+  const b = e.target.closest && e.target.closest('[data-ph]'); if(!b || !state) return; const a = b.dataset.ph;
+  if(a === 'tick' || a === 'reopen'){ e.stopPropagation(); return a === 'tick' ? phTick(b.dataset.kind, Number(b.dataset.rid), b.dataset.pid) : phReopen(b.dataset.kind, Number(b.dataset.rid), b.dataset.pid); }
+  if(a === 'minus' || a === 'plus'){ phUi.val = Math.max(0, Math.round((phUi.val + (a === 'plus' ? 0.25 : -0.25)) * 4) / 4); phDialogSync(); return; }
+  if(a === 'undo'){ phDialogClose(); phReopen(phUi.kind, phUi.rid, phUi.pid); return; }
+  if(a === 'ok'){
+    const { r, p } = phFind(phUi.kind, phUi.rid, phUi.pid); if(!p || !phIsDone(p)){ phDialogClose(); return; }
+    if(phUi.val !== phNum(p.hours)){   // the figure was changed: confirmed. Yes on the budget leaves it assumed, as ticking already saved it
+      p.done.hours = phUi.val; p.done.mode = 'confirmed'; p.done.by = whoName(); p.done.at = Date.now();
+      phTimeline(phUi.kind, r, `Phase hours confirmed: ${p.name || 'Phase'}, ${phFmtH(phUi.val)} (budget ${phFmtH(p.hours)}) · by ${whoName()}`);
+    }
+    phDialogClose(); saveState(); render();
+  }
+});
+/* Today: the phases that are due (their end date, or start date when there is no end, is today or earlier) */
+function phDue(sel){
+  const me = meName(), mine = todayUi.scope === 'mine' && !!me, live = new Set(liveProjects()), out = [];
+  phRecords().forEach(({ kind, r }) => {
+    if(r.lost || (kind === 'project' && !live.has(r)) || (mine && r.owner && r.owner !== me)) return;
+    sfPhases(r).forEach(p => { if(phIsDone(p)) return; const d = sfIso(p.end) || sfIso(p.start); if(d && d <= sel) out.push({ kind, r, p, d }); });
+  });
+  return out.sort((a, b) => a.d.localeCompare(b.d) || String(a.p.name).localeCompare(String(b.p.name)));
+}
+function phTodayRow(x, over){
+  const at = `data-kind="${x.kind}" data-rid="${x.r.id}" data-pid="${escAttr(x.p.id)}"`, b = phNum(x.p.hours);
+  return `<div class="td-row"><div class="cbx" data-ph="tick" ${at} title="Mark done: you can confirm the hours next">${CHECK_SVG}</div>
+    <span class="td-title">${escHtml(x.p.name || 'Phase')} · <button type="button" class="sp-link" data-nav="deal2:${x.r.id}">${escHtml(boardTitle(x.kind, x.r))}</button></span>
+    <span class="td-meta"><span>${PH_KIND[x.kind]}</span>${x.p.selling ? '<span class="sf-chip">Selling time</span>' : ''}<span>${b > 0 ? escHtml(phFmtH(b)) + ' budget' : 'no budget'}</span>${over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(x.d)))}</span>` : ''}</span></div>`;
+}
+function renderTodayPhases(sel){
+  const el = document.getElementById('todayPhases'); if(!el) return;
+  const rows = phDue(sel), real = fmt(new Date()), isToday = sel === real, lim = (state.settings && state.settings.todayLimit) || 10, more = !!todayUi.more.ph;
+  const over = rows.filter(x => x.d < sel), main = rows.filter(x => x.d === sel), all = over.map(x => ({ x, o: true })).concat(main.map(x => ({ x, o: false }))), shown = more ? all : all.slice(0, lim), hid = all.length - shown.length;
+  el.innerHTML = `<div class="td-head"><h3>${isToday ? 'Phases due' : 'Phases due by ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${rows.length}</span></div>
+    ${shown.length ? shown.map(r => phTodayRow(r.x, r.o)).join('') : '<div class="td-empty">No dated phases are due. Phases with a start or end date show here when they come up.</div>'}
+    ${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="ph">See more (${hid})</button>` : (more && all.length > lim ? `<button type="button" class="link-btn td-more" data-today="more" data-k="ph">Show fewer</button>` : '')}`;
+}
+/* the labour rate used for selling time: the hourly rate in Settings, else the day rate over the hours in a day */
+function sellRate(){
+  const st = state.settings, h = Number(st.labourRateHour), d = Number(st.labourRateDay);
+  if(h > 0) return { rate: h, basis: 'the hourly labour rate in Settings, Quotes and pricing' };
+  if(d > 0) return { rate: d / hpd(), basis: 'the day labour rate divided by ' + hpd() + ' hours' };
+  return { rate: 0, basis: '' };
+}
+function sellOf(r){
+  const ph = sfPhases(r).filter(p => p.selling), done = ph.filter(phIsDone), sum = f => done.filter(f).reduce((a, p) => a + phNum(p.done.hours), 0), rate = sellRate().rate;
+  const conf = sum(p => p.done.mode === 'confirmed'), ass = sum(p => p.done.mode !== 'confirmed'), hours = conf + ass;
+  return { hours, conf, ass, cost: hours * rate, budget: ph.reduce((a, p) => a + phNum(p.hours), 0), any: ph.length > 0 };
+}
+function phSellLineHtml(r){
+  const x = sellOf(r); if(!x.hours && !x.budget) return '';
+  const rate = sellRate().rate;
+  return `<div class="lp-hint ph-sell">Selling time so far: <b>${hrs(x.hours)}</b> ${phMarkHtml(x.conf, x.ass)}${rate > 0 ? ` · cost <b>${qm(x.cost)}</b>` : ' · set the labour rate in Settings to see its cost'}${x.budget > x.hours ? ` · budget ${hrs(x.budget)}` : ''}</div>`;
+}
+function sellRows(){
+  return phRecords().map(({ kind, r }) => Object.assign({ kind, r, lost: !!r.lost, name: boardTitle(kind, r) }, sellOf(r))).filter(x => x.hours > 0).sort((a, b) => b.cost - a.cost || b.hours - a.hours);
+}
+function dashSellingHtml(){
+  const rows = sellRows(), { rate, basis } = sellRate(), head = dashCardHead('Cost of selling', 'Site visits, scoping and quoting at the labour rate, on every deal, including the ones that were lost.');
+  if(!rows.length) return head + dashEmpty('No selling time has been ticked off yet. Tick a site visit, scope or quote phase done on Today and its hours are counted here.');
+  const tot = f => rows.reduce((a, x) => a + f(x), 0), hours = tot(x => x.hours), cost = tot(x => x.cost), lostH = rows.filter(x => x.lost).reduce((a, x) => a + x.hours, 0), lostC = rows.filter(x => x.lost).reduce((a, x) => a + x.cost, 0);
+  const won = state.projects.filter(p => !p.lost).reduce((a, p) => a + (Number(p.agreedValue) || 0), 0), ass = tot(x => x.ass), conf = tot(x => x.conf);
+  const tile = (k, v, sub) => `<div class="db-mini"><span class="k">${k}</span><b>${v}</b>${sub ? `<span class="s">${sub}</span>` : ''}</div>`;
+  const money = v => rate > 0 ? qm(v) : '—';
+  return head + `<div class="db-minis">${tile('Selling time', hrs(hours), `${phMarkHtml(conf, ass)}`)}${tile('Cost of selling', money(cost), rate > 0 ? 'at ' + qm(rate) + ' an hour' : 'set the labour rate')}${tile('On lost deals', money(lostC), hrs(lostH))}${tile('Won value', qm(won), rate > 0 && won > 0 ? (Math.round(cost / won * 1000) / 10) + '% spent on selling' : '')}${tile('Per deal', money(cost / rows.length), 'across ' + rows.length + ' deal' + (rows.length === 1 ? '' : 's'))}</div>
+    <div class="table-scroll"><table class="db-tbl sell-tbl"><thead><tr><th>Deal</th><th class="num">Selling time</th><th class="num">Cost</th></tr></thead><tbody>${rows.map(x => `<tr><td><button type="button" class="sp-link" data-nav="deal2:${x.r.id}">${escHtml(x.name)}</button> ${x.lost ? '<span class="sf-chip bad">Lost</span>' : '<span class="qb-dim">' + escHtml(PH_KIND[x.kind]) + '</span>'}</td><td class="num">${hrs(x.hours)} ${phMarkHtml(x.conf, x.ass)}</td><td class="num">${money(x.cost)}</td></tr>`).join('')}</tbody></table></div>
+    <p class="q-help" style="margin:8px 0 0;">${rate > 0 ? 'Costed at ' + basis + '.' : 'No labour rate is set, so only the hours are shown.'} The same hours count towards Hours logged on a project once it exists.</p>`;
+}
 
 /* BT:js-planning end */
 
