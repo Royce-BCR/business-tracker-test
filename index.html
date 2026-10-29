@@ -2578,7 +2578,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .gt-capl { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--bt-ink); opacity: .7; height: 0; } .gt-wv { position: absolute; left: 0; right: 0; bottom: -15px; text-align: center; font-size: 10px; color: var(--text-muted); white-space: nowrap; }
   .gt-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 8px; } .gt-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .gt-legend .gt-bar { position: static; width: 18px; height: 10px; min-width: 0; } .gt-legend .gt-ms, .gt-legend .gt-dl { position: static; margin: 0; } .gt-legend .gt-off { position: static; display: inline-block; width: 14px; height: 10px; } .gt-capsw { display: inline-block; width: 16px; border-top: 2px dashed var(--bt-ink); }
-  #phSched .rp-s-f input[type=date] { width: 138px; }
+  #phSched .rp-s-f { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; } #phSched .rp-s-f input[type=date] { width: 138px; } #phSched .rp-s-d { flex: 1 1 100%; }
+  @media (max-width: 700px) { #phSched .rp-s-f .rp-s-was { flex: 1 1 100%; } #phSched .rp-s-f input[type=date] { flex: 1 1 0; width: auto; min-width: 0; } }
   .cv-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 0 0 var(--bt-s3); }
   .cv-layers { display: flex; flex-wrap: wrap; gap: 6px; } .cv-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--bt-card); color: var(--text-muted); border-radius: 999px; padding: 5px 12px; font-size: var(--bt-fs-xs); font-weight: 600; cursor: pointer; min-height: 32px; } .cv-chip.on { background: var(--bt-ink); color: var(--bt-on-dark); border-color: var(--bt-ink); }
   .cv-sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--muted); } .cv-sw.oak { background: var(--bt-oak-600); } .cv-sw.slate { background: var(--slate); } .cv-sw.green { background: var(--bt-green-600); } .cv-sw.bad { background: var(--bt-bad-fg); } .cv-sw.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 3px, transparent 3px 6px); } .cv-sw.deliveries { background: var(--bt-card); border: 1.5px solid var(--bt-oak-500); } .cv-sw.tasks { background: var(--bt-info-fg); border-radius: 50%; }
@@ -18490,10 +18491,6 @@ function rpSchedRows(p, b){
     add({ id: 'pl:' + (l.uid || i), kind: 'line', label: (l.desc || 'Payment') + ' · ' + qm(l.amount), fields: [{ k: 'date', old: l.dueDate }], locked: done, note: l.paidDate ? 'Paid, stays' : l.invoicedDate ? 'Invoiced ' + pwD(l.invoicedDate) + ', stays' : '', ref: l.uid || i }); });
   return rows.sort((a, b) => String(a.fields[0].old || '9999').localeCompare(String(b.fields[0].old || '9999')) || a.label.localeCompare(b.label));
 }
-function rpOverlaps(p, s, c){
-  if(!s || !c) return [];
-  return state.projects.filter(o => o.id !== p.id && !projIsCompleted(o)).map(o => ({ o, d: rpDates(o) })).filter(x => x.d.start && x.d.complete && x.d.start <= c && x.d.complete >= s);
-}
 /* open the review for the pending change (or, from the tentative banner, for the dates that are waiting to be confirmed) */
 function rpBeginSchedule(p, mode, fromTentative){
   let d = rpDraft(p);
@@ -18513,8 +18510,8 @@ function rpSchedPanel(p){
   const banner = t && !(d && d.sched) ? `<div class="rp-tent"><b>Tentative since ${escHtml(dShow(t.since))}</b>${t.by ? ' (' + escHtml(t.by) + ')' : ''}. ${t.prev && t.prev.phases && Object.keys(t.prev.phases).length ? 'Some phase dates are' : "The project's start and complete dates are"} flagged tentative. ${t.prev && t.prev.phases && Object.keys(t.prev.phases).length ? 'The previous phase dates are kept for going back. Deliveries and invoices have not moved' : 'Phases, deliveries and invoices still follow the previous dates'} (${escHtml(pwD(t.prev.start))} to ${escHtml(pwD(t.prev.complete))}) until you confirm.
     <div class="rp-tent-b"><button type="button" class="btn qb-sm" data-rp="tent-review">Review and confirm the schedule</button><button type="button" class="btn secondary qb-sm" data-rp="tent-revert">Go back to the previous dates</button></div></div>` : '';
   if(!d || !d.sched) return banner;
-  const sc = d.sched, b = sc.base, ov = rpOverlaps(p, b.ns, b.nc), n = sc.rows.reduce((a, r) => a + (r.locked ? 0 : r.fields.filter(f => f.new !== f.old).length), 0);
-  const warn = ov.length ? `<div class="rp-warn" role="alert"><b>⚠ These dates overlap ${ov.length === 1 ? 'another project' : ov.length + ' other projects'}.</b> ${ov.map(x => `<div>${rpLink('project:' + x.o.id, recordCode(x.o.id, 'project') + ' ' + x.o.name)}: ${escHtml(pwD(x.d.start))} to ${escHtml(pwD(x.d.complete))}${x.o.owner ? ' · owner ' + escHtml(x.o.owner) : ''}${projCustomer(x.o).name ? ' · customer ' + escHtml(projCustomer(x.o).name) : ''}</div>`).join('')}<div>Speak to them first. <b>Keep as tentative</b> is the safer choice until you have.</div></div>` : '';
+  const sc = d.sched, b = sc.base, cw = sc.tent ? [] : capCheck(p, capProposalFromSched(p, sc)), ov = cw, n = sc.rows.reduce((a, r) => a + (r.locked ? 0 : r.fields.filter(f => f.new !== f.old).length), 0);
+  const warn = capWarnWeeks(p, cw);   // Stage 4: the capacity check replaces the simple date overlap
   const dateIn = (r, f, i) => r.locked || !f.old && !f.new ? `<span class="rp-dim">stays</span>` : `<input type="date" class="${f.new !== f.old ? 'rp-chg' : ''}" data-rps="${escAttr(r.id)}" data-f="${f.k}" value="${escAttr(f.new)}" aria-label="New date for ${escAttr(r.label)}">`;
   const body = sc.rows.map(r => `<div class="rp-s-row${r.locked ? ' locked' : ''}${r.fields.some(f => f.new !== f.old) ? ' moved' : ''}"><div class="rp-s-i"><span class="rp-s-tag">${escHtml(r.tag)}</span>${escHtml(r.label)}${r.note ? `<div class="rp-dim">${escHtml(r.note)}</div>` : ''}</div>
       <div class="rp-s-d">${r.fields.map((f, i) => `<div class="rp-s-f"><span class="rp-s-was">${r.fields.length > 1 ? (f.k === 'start' ? 'start ' : 'end ') : ''}was ${f.old ? escHtml(pwD(f.old)) : '—'}</span>${dateIn(r, f, i)}</div>`).join('')}</div></div>`).join('');
@@ -19636,7 +19633,7 @@ function capItem(kind, r){
 /* which records, by layer. A project counts while it is live; a sale or lead while it is open */
 function capItems(layers){
   layers = layers || { projects: true, sales: true, leads: true }; const out = [];
-  if(layers.projects) liveProjects().forEach(p => out.push(capItem('project', p)));
+  if(layers.projects) liveProjects().forEach(p => { const it = capItem('project', capTentativeView(p)); it.r = p; out.push(it); });
   if(layers.sales) state.pipeline.filter(r => !r.lost).forEach(r => out.push(capItem('sales', r)));
   if(layers.leads) activeLeads().forEach(r => out.push(capItem('lead', r)));
   return out;
@@ -19689,7 +19686,7 @@ function phGanttHtml(p){
   const msRow = ms.length ? row('Milestones', '', ms.map(e => `<i class="gt-ms ms-${e.ms || 'future'}${e.planned ? ' planned' : ''}" style="left:${x(e.date)}%" title="${escAttr('Milestone: ' + e.title + ' · ' + pwD(e.date) + (e.done ? ' · done' : e.planned || e.isPlan ? ' · planned' : ''))}"></i>`).join('')) : '';
   const dlRow = dl.length ? row('Deliveries', '', dl.map(e => `<i class="gt-dl${e.done ? ' done' : ''}" style="left:${x(e.date)}%" title="${escAttr(e.title + ' · ' + pwD(e.date) + (e.done ? ' · delivered' : ''))}">${DROP_SVG}</i>`).join('')) : '';
   /* hours against capacity, week by week, on the same axis */
-  const me = capItem('project', p), others = capItems({ projects: true }).filter(it => it.id !== p.id), rows = capWeekRows([me].concat(others), lo, hi), scale = Math.max(8, ...rows.map(r => Math.max(r.cap, r.total))) * 1.12;
+  const me = capItem('project', capTentativeView(p)), others = capItems({ projects: true }).filter(it => it.id !== p.id), rows = capWeekRows([me].concat(others), lo, hi), scale = Math.max(8, ...rows.map(r => Math.max(r.cap, r.total))) * 1.12;
   const cap = rows.map(r => { const mine = r.parts.filter(q => q.item === me).reduce((a, q) => a + q.hours, 0), oth = r.total - mine, over = r.cap > 0 ? r.total > r.cap + 0.05 : r.total > 0.05, ix = daysBetween(lo, r.mon);
     return `<div class="gt-wk${over ? ' over' : ''}" data-cv="go" data-mon="${r.mon}" role="button" tabindex="0" style="left:${ix / span * 100}%;width:${7 / span * 100}%" title="${escAttr('Week of ' + pwD(r.mon) + ': ' + capH(r.total) + ' of ' + capH(r.cap) + ' capacity (this project ' + capH(mine) + ', other projects ' + capH(oth) + '). Open this week in Calendar and capacity')}"><div class="gt-stack"><i class="oth" style="height:${oth / scale * 100}%"></i><i class="mine${tent ? ' tent' : ''}" style="height:${mine / scale * 100}%"></i></div><i class="gt-capl" style="bottom:${r.cap / scale * 100}%"></i><span class="gt-wv">${r.total > 0.05 || r.cap > 0 ? Math.round(r.total) + '/' + Math.round(r.cap) : ''}</span></div>`; }).join('');
   const overWeeks = rows.filter(r => r.total > r.cap + 0.05 && r.parts.some(q => q.item === me));
@@ -19845,6 +19842,53 @@ document.addEventListener('change', (e) => {
   else return;
   renderCapacity();
 });
+
+
+/* =====================================================================
+   STEP 7: OVERLAP WARNINGS USE CAPACITY
+   The reschedule review no longer compares dates with other projects. It works out the hours the project would put on each week with the NEW dates,
+   adds the other projects (confirmed and tentative, at their full hours), and warns about every week the change pushes over the team's capacity, naming the
+   projects in it, and suggests Keep as tentative. A tentative project stays in the capacity view in full, striped, until it is confirmed or put back.
+   ===================================================================== */
+const capClone = o => JSON.parse(JSON.stringify(o));
+/* a project that is tentative is shown where the tentative dates put it: its project-level move is applied to the phases and stages that have not happened */
+function capTentativeView(p){
+  const t = p.tentative; if(!t || !t.prev) return p; const cur = rpDates(p), b = { os: t.prev.start, oc: t.prev.complete, ns: cur.start, nc: cur.complete };
+  if(!(b.os && b.oc && b.ns && b.nc) || (b.os === b.ns && b.oc === b.nc)) return p;
+  const c = capClone(p), moved = t.prev.phases || {};
+  (c.phases || []).forEach(q => { if(!q || typeof q !== 'object' || phIsDone(q) || moved[q.id]) return; if(sfIso(q.start)) q.start = rpShiftDate(q.start, b); if(sfIso(q.end)) q.end = rpShiftDate(q.end, b); });
+  (c.stages || []).forEach(s => { if(s.actEnd && s.actEnd.date) return; if(s.start) s.start = rpShiftDate(s.start, b); if(s.end) s.end = rpShiftDate(s.end, b); });
+  return c;
+}
+/* the project as it would be if the pending review were confirmed */
+function capProposalFromSched(p, sc){
+  const c = capClone(p), b = sc.base;
+  c.milestones = c.milestones || {}; if(b.ns) c.milestones.onSiteStart = b.ns; if(b.nc) c.milestones.buildComplete = b.nc;
+  sc.rows.forEach(r => { if(r.locked) return; const f = k => (r.fields.find(x => x.k === k) || {}).new || '';
+    if(r.kind === 'phase'){ const q = (c.phases || []).find(x => x.id === r.ref); if(q){ q.start = f('start'); q.end = f('end'); } }
+    else if(r.kind === 'stage'){ const s = (c.stages || []).find(x => x.id === r.ref); if(s){ s.start = f('start'); s.end = f('end'); } } });
+  c.tentative = null; return c;
+}
+function capProposalFromDraft(p){
+  const d = rpDraft(p), c = capClone(p); if(!d || !d.ph) return c;
+  Object.keys(d.ph).forEach(id => { const q = (c.phases || []).find(x => x.id === id); if(q){ q.start = d.ph[id].start || ''; q.end = d.ph[id].end || ''; } }); c.tentative = null; return c;
+}
+/* the weeks the proposal pushes over capacity: { mon, total, cap, mine, others: [{ item, hours }] } */
+function capCheck(p, prop){
+  if(capFull() <= 0) return [];
+  const others = liveProjects().filter(o => o.id !== p.id).map(o => capItem('project', capTentativeView(o))), before = capItem('project', capTentativeView(p)), after = capItem('project', prop);
+  const ds = Object.keys(before.days).concat(Object.keys(after.days)).sort(); if(!ds.length) return [];
+  return capWeekRows(others.concat([after]), ds[0], ds[ds.length - 1]).map(w => {
+    const mine = w.parts.filter(q => q.item === after).reduce((a, q) => a + q.hours, 0); let was = 0; for(let i = 0; i < 7; i++) was += before.days[addDaysIso(w.mon, i)] || 0;
+    return { mon: w.mon, total: w.total, cap: w.cap, mine, was, others: w.parts.filter(q => q.item !== after).sort((a, b) => b.hours - a.hours) };
+  }).filter(w => w.total > w.cap + 0.05 && w.mine > w.was + 0.05);
+}
+function capWarnWeeks(p, weeks){
+  if(!weeks.length) return '';
+  const names = w => w.others.length ? w.others.map(q => `${rpLink('project:' + q.item.id, q.item.code + ' ' + q.item.name)} (${capH(q.hours)}${q.item.tentative ? ', tentative' : ''})`).join(', ') : 'no other project';
+  return `<div class="rp-warn" role="alert"><b>⚠ These dates push ${weeks.length === 1 ? 'a week' : weeks.length + ' weeks'} over capacity.</b>${weeks.slice(0, 4).map(w => `<div>Week of ${escHtml(pwD(w.mon))}: <b>${capH(w.total)}</b> planned against ${capH(w.cap)} available (this project ${capH(w.mine)}). Shared with ${names(w)}.</div>`).join('')}${weeks.length > 4 ? `<div>and ${weeks.length - 4} more week${weeks.length - 4 === 1 ? '' : 's'}.</div>` : ''}<div>Speak to them first. <b>Keep as tentative</b> is the safer choice until you have: it stays on the calendar in full, striped, until you confirm or go back. <button type="button" class="sp-link" data-cv="go" data-mon="${escAttr(weeks[0].mon)}">See it in Calendar and capacity</button></div></div>`;
+}
+const capWarnHtml = p => capWarnWeeks(p, capCheck(p, capProposalFromDraft(p)));
 
 /* BT:js-planning end */
 
