@@ -2062,8 +2062,6 @@ body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, bod
 .menu-mode-btn { width: 32px; height: 32px; min-height: 32px; }
 .menu-mode-btn svg { width: 18px; height: 18px; }
 .brand h1 { padding-right: 0; }
-.nav-gbtn[aria-disabled="true"] { cursor: default; }
-.nav-group.has-current .nav-gbtn .chev { opacity: 0.35; }
 .g-crm .nav-label, .g-crm { --accent: var(--g-growth); }
 .rail-btn.g-commercial, .bb-btn.g-commercial, .ms-item.g-commercial, .menu-pop.g-commercial, .ms-group.g-commercial, .fav-item.g-commercial, .rail-fav.g-commercial { --accent: var(--g-revenue); }
 .rail-btn.g-business, .bb-btn.g-business, .ms-item.g-business, .menu-pop.g-business, .ms-group.g-business, .fav-item.g-business, .rail-fav.g-business, .rail-btn.g-settings, .bb-btn.g-settings, .ms-item.g-settings, .menu-pop.g-settings, .ms-group.g-settings, .fav-item.g-settings, .rail-fav.g-settings { --accent: var(--g-organisation); }
@@ -15519,17 +15517,15 @@ function menuBadgesSync(){
 }
 function menuQueueBadges(){ if(menuBadgeQueued) return; menuBadgeQueued = true; requestAnimationFrame(menuBadgesSync); }
 /* ---- sidebar: folding groups ---- */
-/* several groups can be open at once; the group holding the current page is always open */
+/* several groups can be open at once; any group, including the one holding the current page, can be folded by hand */
 function menuRenderOpen(){
-  const cg = menuGroupOf(menuCurrent());
   document.querySelectorAll('#sidebar .nav-group').forEach(g => {
-    const id = g.dataset.group, forced = id === cg, on = forced || menuPrefs.open.includes(id), b = g.querySelector('.nav-gbtn');
+    const on = menuPrefs.open.includes(g.dataset.group), b = g.querySelector('.nav-gbtn');
     g.classList.toggle('open', on);
-    if(b){ b.setAttribute('aria-expanded', String(on)); if(forced) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled'); b.title = forced ? 'Stays open while you are on a page in this group' : ''; }
+    if(b) b.setAttribute('aria-expanded', String(on));
   });
 }
 function menuToggleGroup(id){
-  if(id === menuGroupOf(menuCurrent())) return;   // the current page's group stays open
   const i = menuPrefs.open.indexOf(id); if(i >= 0) menuPrefs.open.splice(i, 1); else menuPrefs.open.push(id);
   menuSave(); menuRenderOpen();
 }
@@ -15578,6 +15574,7 @@ function menuSync(){
   if(!menuUi.built) return;
   const cur = menuCurrent(), grp = menuGroupOf(cur), inBar = menuPrefs.bottom.includes(cur);
   document.querySelectorAll('#sidebar .nav-group').forEach(g => g.classList.toggle('has-current', g.dataset.group === grp));
+  if(menuUi.synced !== cur && grp && !menuPrefs.open.includes(grp)){ menuPrefs.open.push(grp); menuSave(); }   // arriving on a new page opens its group once; it can then be folded
   menuUi.synced = cur; menuRenderOpen(); menuFavStar();
   document.querySelectorAll('.fav-item[data-go], .rail-fav[data-go]').forEach(b => { if(b.dataset.go === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   document.querySelectorAll('.rail-btn[data-mgroup]').forEach(b => b.classList.toggle('has-current', b.dataset.mgroup === grp));
@@ -15803,6 +15800,7 @@ function menuInit(){
   const bn = menuEl('envBanner'); if(bn) document.documentElement.style.setProperty('--bt-banner-h', bn.offsetHeight + 'px');
   menuLoad(); menuBuild(); menuUi.built = true;
   const cur = menuCurrent();
+  const g0 = menuGroupOf(cur); if(g0 && !menuPrefs.open.includes(g0)) menuPrefs.open.push(g0);   // first load: show the group holding the page
   menuRenderOpen(); menuUi.synced = cur;
   menuApply(true); menuSettingsRender();
   const mo = new MutationObserver(menuQueueBadges);
