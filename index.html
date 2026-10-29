@@ -2768,15 +2768,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="nav-group g-finance" data-group="finance" data-label="Finance" data-short="Finance">
     <button type="button" class="nav-label nav-gbtn" id="gh-finance" aria-expanded="false" aria-controls="gp-finance"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Finance</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-finance" role="group" aria-labelledby="gh-finance">
-      <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
+      <button type="button" class="tab g-finance" data-tab="cashflow">Cash flow</button>
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
-      <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
-      <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
       <button type="button" class="tab g-finance" data-tab="pnl">Profit and loss</button>
+      <button type="button" class="tab g-finance" data-tab="revenue">Budget and forecast</button>
       <button type="button" class="tab g-finance" data-tab="balance">Balance sheet</button>
+      <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
+      <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
-      <button type="button" class="tab g-finance" data-tab="revenue">Revenue Forecast</button>
     </div>
   </div>
 
@@ -3041,7 +3041,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <!-- REVENUE -->
   <div class="panel" id="panel-revenue">
     <div class="page-head">
-      <h2>Revenue Forecast</h2>
+      <h2>Budget and forecast</h2>
       <div class="desc">Two layers: <strong>Committed</strong> is real dated money from live projects' payment lines (100%). <strong>Weighted pipeline</strong> is sales deals at quote × their stage probability. Tap any figure to see exactly which records make it up.</div>
     </div>
     <div class="table-scroll" id="revenueTableWrap"></div>
@@ -3051,8 +3051,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <!-- CASH FLOW -->
   <div class="panel" id="panel-cashflow">
     <div class="page-head">
-      <h2>Cash Flow Forecast</h2>
-      <div class="desc">Money in from committed project payment lines (real due dates) plus weighted pipeline (sales × probability), less materials and fixed overhead, giving a running closing balance. Terms are set in Settings.</div>
+      <h2>Cash flow</h2>
+      <div class="desc">The weekly review (what is in the bank, what is owed, what is expected this week) and the forecast: money in from committed project payment lines (real due dates) plus weighted pipeline (sales × probability), less materials and fixed overhead, giving a running closing balance. Terms are set in Settings.</div>
     </div>
     <div id="cfViewToggle"></div>
     <div id="cfReview"></div>
@@ -20592,8 +20592,8 @@ function rvProjection(weeks){
   const low = out.reduce((m, x) => x.close < m.close ? x : m, out[0]);
   return { start: bal0, weeks: out, low };
 }
-const rvMarks = () => (state.reviewMarks = state.reviewMarks && typeof state.reviewMarks === 'object' ? state.reviewMarks : {});
-function rvMark(key, o){ rvMarks()[key] = Object.assign({ at: new Date().toISOString(), by: meName() }, o); }
+const rvMarks = () => (state.reviewMarks && typeof state.reviewMarks === 'object' ? state.reviewMarks : {});   // reading never creates the field
+function rvMark(key, o){ if(!state.reviewMarks || typeof state.reviewMarks !== 'object') state.reviewMarks = {}; state.reviewMarks[key] = Object.assign({ at: new Date().toISOString(), by: meName() }, o); }
 function rvCandidates(dir, amount, date){
   const used = new Set(); state.projects.forEach(p => { (p.paymentLines || []).concat(p.variations || []).forEach(l => { if(l.landedTxn) used.add(l.landedTxn); }); Object.values(p.dropState || {}).forEach(s => { if(s && s.paidTxn) used.add(s.paidTxn); }); });
   const bc = bcMatchedKeys(), f = dir === 'in' ? 'moneyIn' : 'moneyOut', today = finToday();

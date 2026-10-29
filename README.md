@@ -116,3 +116,16 @@ New stored fields, all optional and defaulting safely: `state.holidays`, `state.
 - `stage5-profit-note.md` explains the order in which money is taken today.
 
 New stored fields, all optional: `transaction.costClass`, `.costProjectId`, `.classHow`, `.classAt`, `.classBy`; `state.businessCosts`; `settings.bizCostsForOverheads`, `settings.pot*Method`, `.pot*Fixed`, `.pot*From`, `settings.toolCostOnJobs`; `asset.usageCharge`, `.usageAfter`; plan item `.hireCost`, `.uses`; `project.toolUse`. Tasks now keep their `autoKey` when a saved document is loaded.
+
+## Finance pages and reports (Stage 6, test site)
+
+- **Lost projects**: a project closed as lost leaves the forecast: planned lines never invoiced are not counted (and are marked "Lost project: not in the forecast"). A raised, unpaid invoice stays as money owed until you press **Write off** (asks first, records a dated reason; Reverse is available). Unpaid supplier payments stay unless the order is cancelled. Paid lines stay as actuals. Cash flow shows the effect on the forecast.
+- **Duplicate automatic tasks** (Business tasks page): lists open tasks made twice by the same rule; tick and confirm to delete (goes to Undo history). Nothing is deleted automatically.
+- **Cash flow** has two views. **Weekly review**: cash in the bank, lowest point over eight weeks, money owed to you and by you, this week's expected items with Landed / Late / Moved, expected against actual, quotes out. **Forecast** is the earlier page.
+- **Ageing** (Finance): money owed to me and money I owe, current / 1 to 30 / 31 to 60 / over 60 days, by customer or by project. Same lists as the weekly review.
+- **Profit and loss** (Finance): by month. Revenue as invoiced; job costs, project profit, profit share and retained profit are the figures the tracker already calculates, taken at the same share, so they add up to Retained profit to date. Business costs sit beside, not inside. An Unclassified line links to Classify. A check against the bank explains the difference line by line. The **Monthly waterfall** view shows the pots by each pot's method and the overhead recovered by pricing beside the business costs.
+- **Balance sheet** (Finance): a simple view (cash by account, owed to me, owed by me, equipment at cost, loans, retained position). To be checked against the accounts.
+- **Reports** (Command): job reports per project (summary, sold against now, cost by category, variance by cause, hours, cost of selling, money in and out) and business reports (monthly summary, ageing, profit and loss, cash flow, pipeline against break-even, capacity, cost of selling). Each has a date range and a data-quality strip. The Dashboard Cost of selling card moved here.
+- **Menu**: Finance is Cash flow, Transactions, Profit and loss, Budget and forecast (was Revenue Forecast), Balance sheet, Ageing, Classify, Bank Reconciliation, Pricing Model. Command gains Reports. No page was removed or given a new route.
+
+New stored fields, all optional: payment line and variation `writtenOff`, `landedTxn`; `drop state paidTxn`; `state.reviewMarks`. Nothing existing is converted, renamed or removed.
