@@ -2693,6 +2693,9 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .f6-dq { font: inherit; font-size: var(--bt-fs-xs); border: 1px solid var(--line); border-radius: var(--bt-r-pill); padding: 2px 10px; background: var(--bt-paper, #fff); cursor: pointer; } .f6-dq.warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .f6-dq.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); } .f6-dql { flex-basis: 100%; }
   .f6-pl th, .f6-pl td { white-space: nowrap; } .f6-fc { background: var(--bt-surface-2); } .f6-sub td { font-weight: 600; border-top: 1px solid var(--line); } .f6-sect td { background: var(--bt-chalk); font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); } .f6-memo td { color: var(--text-muted); font-style: italic; } .f6-bridge h5 { margin: 0 0 6px; }
   .f6-ul .sp-link { display: inline; text-align: left; }
+  .f6-wf { display: grid; grid-template-columns: minmax(130px, 220px) 1fr minmax(90px, auto); gap: 10px; align-items: center; padding: 5px 0; } .f6-wfb { background: var(--bt-surface-2); border-radius: 4px; height: 18px; } .f6-wfb i { display: block; height: 100%; border-radius: 4px; background: var(--oak); }
+  .f6-wf.in .f6-wfb i { background: var(--green); } .f6-wf.out .f6-wfb i { background: var(--bt-bad-fg); opacity: .75; } .f6-wf.sub .f6-wfb i { background: var(--slate); } .f6-wf.sub .f6-wfl, .f6-wf.sub .f6-wfv { font-weight: 700; } .f6-wfv { text-align: right; font-variant-numeric: tabular-nums; } .f6-sect2 { margin: 10px 0 2px; font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+  @media (max-width: 560px) { .f6-wf { grid-template-columns: 1fr auto; } .f6-wfb { grid-column: 1 / -1; order: 3; height: 10px; } }
   .f6-acts { display: flex; gap: 4px; flex-wrap: wrap; } .f6-in { color: var(--bt-ok-fg); } .f6-weeks td, .f6-weeks th { white-space: nowrap; } .f6-low { background: var(--bt-warn-bg); } .f6-wklist { margin-top: var(--bt-s3); }
   .f6-ul { margin: 4px 0 10px 16px; padding: 0; font-size: var(--bt-fs-sm); } .f6-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s4); margin-top: var(--bt-s3); } .f6-cand { display: block; margin: 6px 0; }
 /* BT:css-finance end */
@@ -20738,8 +20741,8 @@ document.addEventListener('click', (e) => { const b = e.target.closest && e.targ
 /* ---- step 3: profit and loss by month ----
    Revenue, job costs, project profit, profit share and retained profit are exactly the code's figures (projRetained), recognised in proportion to the invoices dated in the month
    (the recognition rule projInvoicedShare uses), so the actual months add up to retainedTotals().toDate. Business costs sit beside, never inside, the retained profit. */
-const plUi = { from: '', to: '', sel: null, rec: '' };
-navExtra('pl', () => ({ f: plUi.from, t: plUi.to, s: plUi.sel, r: plUi.rec }), o => { if(o){ plUi.from = o.f; plUi.to = o.t; plUi.sel = o.s; plUi.rec = o.r; } });
+const plUi = { from: '', to: '', sel: null, rec: '', view: 'pl', wf: '' };
+navExtra('pl', () => ({ f: plUi.from, t: plUi.to, s: plUi.sel, r: plUi.rec, v: plUi.view, w: plUi.wf }), o => { if(o){ plUi.from = o.f; plUi.to = o.t; plUi.sel = o.s; plUi.rec = o.r; plUi.view = o.v || 'pl'; plUi.wf = o.w || ''; } });
 const monthAdd = (key, n) => { const [y, m] = key.split('-').map(Number); return monthKey(new Date(y, m - 1 + n, 1)); };
 const monthsBetween = (a, b) => { const out = []; let k = a, g = 0; while(k <= b && g++ < 120){ out.push(k); k = monthAdd(k, 1); } return out; };
 function plBase(p){
@@ -20791,6 +20794,8 @@ function plRecon(m){
 }
 function plHtml(){
   const cur = finToday().slice(0, 7); if(!plUi.from) plUi.from = monthAdd(cur, -5); if(!plUi.to) plUi.to = monthAdd(cur, 3);
+  const tg = `<div class="view-toggle" role="group" aria-label="Views">${[['pl', 'Profit and loss'], ['wf', 'Monthly waterfall']].map(([k, n]) => `<button type="button" data-f6="pl-view" data-v="${k}" class="${plUi.view === k ? 'active' : ''}">${n}</button>`).join('')}</div>`;
+  if(plUi.view === 'wf'){ const mk = plUi.wf || cur; return tg + `<div class="q-inline" style="gap:12px;align-items:flex-end;margin-bottom:var(--bt-s3);"><div class="lp-f"><label>Month</label><input type="month" data-f6="wf-month" value="${mk}"></div></div>` + dqStripHtml(mk, mk) + wfHtml(mk); }
   const keys = monthsBetween(plUi.from, plUi.to), M = plCompute(keys), tot = f => M.reduce((s, m) => s + f(m), 0), money2 = v => (v < 0 ? '-' : '') + qm(Math.abs(v));
   const cell = (row, m, v, neg) => { const n = plLinesFor(row, m).length, sel = plUi.sel && plUi.sel.row === row && plUi.sel.key === m.key; return `<td class="qb-calc${m.forecast ? ' f6-fc' : ''}">${n ? `<button type="button" class="cf-n${sel ? ' sel' : ''}" data-f6="pl-sel" data-row="${row}" data-key="${m.key}" title="Show the ${n} line${n === 1 ? '' : 's'} behind this number">${neg && Math.abs(v) > 0.004 ? '−' : ''}${money2(Math.abs(v))}</button>` : (neg && Math.abs(v) > 0.004 ? '−' : '') + money2(Math.abs(v))}</td>`; };
   const R = (row, label, f, neg, cls) => `<tr${cls ? ` class="${cls}"` : ''}><td>${label}</td>${M.map(m => cell(row, m, f(m), neg)).join('')}<td class="qb-calc"><b>${neg ? '−' : ''}${money2(Math.abs(tot(f)))}</b></td></tr>`;
@@ -20825,7 +20830,9 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('change', (e) => { const el = e.target; if(!el || !el.dataset || !state) return; const f = el.dataset.f6;
   if(f === 'pl-from' || f === 'pl-to'){ if(/^\d{4}-\d{2}$/.test(el.value)){ plUi[f === 'pl-from' ? 'from' : 'to'] = el.value; if(plUi.from > plUi.to){ if(f === 'pl-from') plUi.to = plUi.from; else plUi.from = plUi.to; } } renderPnl(); }
-  else if(f === 'pl-rec'){ plUi.rec = el.value; renderPnl(); } });
+  else if(f === 'pl-rec'){ plUi.rec = el.value; renderPnl(); }
+  else if(f === 'wf-month' && /^\d{4}-\d{2}$/.test(el.value)){ plUi.wf = el.value; plUi.sel = null; renderPnl(); } });
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-f6="pl-view"]'); if(!b || !state) return; plUi.view = b.dataset.v; plUi.sel = null; renderPnl(); });
 /* ---- step 4: simplified balance sheet (every line reads a record list and opens it) ---- */
 function bsData(){
   const cur = finToday().slice(0, 7), R = recon(), cash = R.accounts.map(a => ({ a, v: bankBalance(undefined, a.id) })), owedMe = owedToMe(), owe = iOwe();
@@ -20854,6 +20861,39 @@ function bsHtml(){
       <p class="q-help">Retained profit is earned on the jobs; cash is what is in the bank. The pots: <button type="button" class="sp-link" data-nav-tab="dashboard">Dashboard →</button></p></div>`;
 }
 function renderBalance(){ const el = document.getElementById('balanceBody'); if(el && state) el.innerHTML = bsHtml() + dqStripHtml('', ''); }
+/* ---- step 5: the monthly waterfall ----
+   Money in (as invoiced), less job costs, project profit, less profit share, retained profit, shared into the four pots by each pot's method: the order the code uses today.
+   Business costs are NOT taken off inside it. They are shown beside it, next to the overhead the prices recover (the Pricing Model's overhead per day times the project days in the month). */
+function wdProjectDays(key){
+  let hours = 0, unplaced = 0, n = 0;
+  state.projects.forEach(p => { if(p.lost) return; let sp; try{ sp = capSpans('project', p); }catch(e){ return; } const s = (sp && sp.spans) || [];
+    s.filter(x => !x.selling).forEach(x => { capSpread(x.start, x.end, x.hours).forEach(([d, h]) => { if(d.slice(0, 7) === key) hours += h; }); }); if(sp && sp.un) unplaced += Number(sp.un.hours) || 0; if(s.length) n++; });
+  return { days: r2(hours / hpd()), hours: r2(hours), unplaced: r2(unplaced), projects: n };
+}
+function wfCompute(key){
+  const first = invRows().filter(r => r.invoicedDate).map(r => r.invoicedDate.slice(0, 7)).concat([bankStartDate().slice(0, 7), key]).sort()[0], keys = monthsBetween(first, key), M = plCompute(keys), m = M[M.length - 1];
+  const cum = M.reduce((s, x) => s + x.retained, 0), prev = cum - m.retained, pa = potPositions(cum, monthEnd(key)), pb = key === first ? null : potPositions(prev, monthEnd(monthAdd(key, -1)));
+  const pots = pa.rows.map((r, i) => ({ b: r.b, method: r.method, pct: r.pct, perMonth: r.perMonth, amt: r2(r.amt - (pb ? pb.rows[i].amt : 0)) }));
+  return { m, pots, potSum: r2(pots.reduce((s, x) => s + x.amt, 0)), short: pa.short, days: wdProjectDays(key), perDay: overheadPerDay() };
+}
+function wfHtml(key){
+  const w = wfCompute(key), m = w.m, max = Math.max(1, Math.abs(m.rev), Math.abs(m.job), ...w.pots.map(x => Math.abs(x.amt))), money2 = v => (v < 0 ? '-' : '') + qm(Math.abs(v));
+  const bar = (label, v, kind, row, sub) => `<div class="f6-wf ${kind}"><div class="f6-wfl">${escHtml(label)}${sub ? `<div class="qb-dim">${sub}</div>` : ''}</div><div class="f6-wfb"><i style="width:${Math.max(0.5, Math.abs(v) / max * 100)}%"></i></div><div class="f6-wfv">${row && plLinesFor(row, m).length ? `<button type="button" class="cf-n" data-f6="pl-sel" data-row="${row}" data-key="${m.key}">${money2(v)}</button>` : money2(v)}</div></div>`;
+  const rec = r2(w.perDay * w.days.days), used = m.biz.used, cover = r2(rec - used);
+  const selL = plUi.sel && plUi.sel.key === m.key ? plLinesFor(plUi.sel.row, m) : [];
+  return `<div class="card"><div class="qb-sec-h"><h4>${escHtml(monthLabel(new Date(key + '-01T00:00:00')))}${m.forecast ? ' <span class="qb-dim">forecast</span>' : m.cur ? ' <span class="qb-dim">this month, part forecast</span>' : ''}</h4></div>
+    ${bar('Money in, as invoiced (ex VAT)', m.rev, 'in', 'rev')}${bar('Less job costs', -m.job, 'out', 'job', 'Working plan and unplanned costs, as invoiced')}${bar('Project profit', m.profit, 'sub', 'profit')}${bar('Less profit share', -m.share, 'out', 'share')}${bar('Retained profit', m.retained, 'sub', 'retained', 'then shared into the pots')}
+    <div class="f6-sect2">Shared into the pots</div>
+    ${w.pots.map(x => bar(x.b[1], x.amt, 'pot', '', x.method === 'fixed' ? 'fixed ' + qm(x.perMonth) + ' a month' : Math.round(x.pct) + '% of the pot (Settings)')).join('')}
+    <div class="qb-dim" style="margin-top:6px;">The four pots add up to ${money2(w.potSum)}${w.short ? ': retained profit to date does not yet cover the fixed amounts' : ''}. Change the method per pot in <button type="button" class="sp-link" data-nav-tab="settings">Settings, Finance</button>. This is the order the tracker uses today: nothing but job costs and the profit share comes off before the pots.</div></div>
+    ${selL.length ? `<div class="card cf-lines"><div class="qb-sec-h"><h4>${escHtml((plRows().find(r => r[0] === plUi.sel.row) || [0, plUi.sel.row])[1])} <span class="qb-dim">(${selL.length} lines)</span></h4><button type="button" class="btn secondary qb-sm" data-f6="pl-sel-close">Close</button></div><table class="qb-table qb-narrow"><tbody>${selL.map(x => `<tr><td>${x.date ? pwD(x.date) : '—'}</td><td>${escHtml(x.label)} <span class="qb-dim">${escHtml(x.note || '')}</span></td><td class="qb-calc">${qm(x.amount)}</td><td>${finSrcLink(x.src, 'Open')}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    <div class="card"><div class="qb-sec-h"><h4>Beside the waterfall: business costs and what prices recover</h4></div>
+      ${w.days.days > 0 ? `<div class="kpi-row"><div class="kpi" style="--accent:var(--green)"><div class="label">Overhead recovered by pricing</div><div class="value">${qm(rec)}</div><div class="fin-sub">${qm(w.perDay)} a day (<button type="button" class="sp-link" data-nav-tab="pricing">Pricing Model</button>) × ${w.days.days} project day${w.days.days === 1 ? '' : 's'}</div></div>
+        <div class="kpi" style="--accent:var(--oak)"><div class="label">Business costs ${m.biz.basis}</div><div class="value">${qm(used)}</div><div class="fin-sub"><button type="button" class="sp-link" data-f6="pl-sel" data-row="biz" data-key="${m.key}">the lines</button> · <button type="button" class="sp-link" data-nav-tab="businesscosts">Business costs</button></div></div>
+        <div class="kpi" style="--accent:var(--plum)"><div class="label">${cover >= 0 ? 'Pricing covers them' : 'Pricing falls short by'}</div><div class="value ${cover < 0 ? 'over' : ''}">${qm(Math.abs(cover))}</div><div class="fin-sub">${used > 0 ? Math.round(rec / used * 100) + '% of business costs recovered' : 'no business costs'}</div></div></div>`
+      : `<p class="q-help">The project days in this month could not be read (no dated phases or stage lines), so the overhead recovered through pricing is not shown. Business costs ${m.biz.basis}: <b>${qm(used)}</b>.</p>`}
+      ${w.days.unplaced > 0 ? `<p class="q-help">${w.days.unplaced} hours on phases with no dates could not be placed in a month, so they are not counted.</p>` : ''}</div>`;
+}
 /* BT:js-finance end */
 
 /* ---------- init ---------- */
