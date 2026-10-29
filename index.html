@@ -147,6 +147,9 @@
   .g-operations .nav-label, .tab.g-operations { --accent: var(--g-operations); }
   .g-revenue .nav-label, .tab.g-revenue { --accent: var(--g-revenue); }
   .g-organisation .nav-label, .tab.g-organisation { --accent: var(--g-organisation); }
+  .g-commercial .nav-label, .tab.g-commercial { --accent: var(--g-revenue); }
+  .g-business .nav-label, .tab.g-business, .g-settings .nav-label, .tab.g-settings { --accent: var(--g-organisation); }
+  .g-crm .nav-label, .tab.g-crm { --accent: var(--g-growth); }
   .nav-label { color: var(--bt-nav-label, var(--accent)); }
 
   .tab {
@@ -2038,6 +2041,8 @@ body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, bod
 .nav-gbtn[aria-disabled="true"] { cursor: default; }
 .nav-group.has-current .nav-gbtn .chev { opacity: 0.35; }
 .g-crm .nav-label, .g-crm { --accent: var(--g-growth); }
+.rail-btn.g-commercial, .bb-btn.g-commercial, .ms-item.g-commercial, .menu-pop.g-commercial, .ms-group.g-commercial, .fav-item.g-commercial, .rail-fav.g-commercial { --accent: var(--g-revenue); }
+.rail-btn.g-business, .bb-btn.g-business, .ms-item.g-business, .menu-pop.g-business, .ms-group.g-business, .fav-item.g-business, .rail-fav.g-business, .rail-btn.g-settings, .bb-btn.g-settings, .ms-item.g-settings, .menu-pop.g-settings, .ms-group.g-settings, .fav-item.g-settings, .rail-fav.g-settings { --accent: var(--g-organisation); }
 .rail-btn.g-crm, .bb-btn.g-crm, .ms-item.g-crm, .menu-pop.g-crm, .ms-group.g-crm { --accent: var(--g-growth); }
 .nav-favs { margin: 2px 0 6px; padding-bottom: 8px; border-bottom: 1px solid color-mix(in srgb, var(--bt-on-dark) 12%, transparent); }
 .nav-favs[hidden] { display: none; }
@@ -2355,38 +2360,21 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="nav-group g-crm" data-group="crm" data-label="CRM" data-short="CRM">
     <button type="button" class="nav-label nav-gbtn" id="gh-crm" aria-expanded="false" aria-controls="gp-crm"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">CRM</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-crm" role="group" aria-labelledby="gh-crm">
-      <button type="button" class="tab g-growth" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
-      <button type="button" class="tab g-growth" data-tab="companies">Companies</button>
-      <button type="button" class="tab g-growth" data-tab="crm">Tasks</button>
-      <button type="button" class="tab g-growth" data-tab="crmprojects">Projects</button>
+      <button type="button" class="tab g-crm" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
+      <button type="button" class="tab g-crm" data-tab="companies">Companies</button>
+      <button type="button" class="tab g-crm" data-tab="crmprojects">Projects</button>
+      <button type="button" class="tab g-crm" data-tab="crm">Tasks</button>
     </div>
   </div>
 
-  <div class="nav-group g-growth" data-group="growth" data-label="Growth" data-short="Growth">
-    <button type="button" class="nav-label nav-gbtn" id="gh-growth" aria-expanded="false" aria-controls="gp-growth"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Growth</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
-    <div class="nav-items" id="gp-growth" role="group" aria-labelledby="gh-growth">
-      <button type="button" class="tab g-growth" data-tab="leads">Lead Pipeline</button>
-      <button type="button" class="tab g-growth" data-tab="salespipeline">Sales Pipeline</button>
-    </div>
-  </div>
-
-  <div class="nav-group g-revenue" data-group="revenue" data-label="Revenue" data-short="Revenue">
-    <button type="button" class="nav-label nav-gbtn" id="gh-revenue" aria-expanded="false" aria-controls="gp-revenue"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Revenue</span><span class="tab-count" id="revBadge" hidden></span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
-    <div class="nav-items" id="gp-revenue" role="group" aria-labelledby="gh-revenue">
-      <button type="button" class="tab g-revenue" data-tab="quotations">Quotes</button>
-      <button type="button" class="tab g-revenue" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></button>
-      <button type="button" class="tab g-revenue" data-tab="revenue">Revenue Forecast</button>
-    </div>
-  </div>
-
-  <div class="nav-group g-finance" data-group="finance" data-label="Finance" data-short="Finance">
-    <button type="button" class="nav-label nav-gbtn" id="gh-finance" aria-expanded="false" aria-controls="gp-finance"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Finance</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
-    <div class="nav-items" id="gp-finance" role="group" aria-labelledby="gh-finance">
-      <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
-      <button type="button" class="tab g-finance" data-tab="invoicing">Invoicing</button>
-      <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
-      <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
-      <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
+  <div class="nav-group g-commercial" data-group="commercial" data-label="Commercial" data-short="Selling">
+    <button type="button" class="nav-label nav-gbtn" id="gh-commercial" aria-expanded="false" aria-controls="gp-commercial"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Commercial</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-commercial" role="group" aria-labelledby="gh-commercial">
+      <button type="button" class="tab g-commercial" data-tab="leads">Lead Pipeline</button>
+      <button type="button" class="tab g-commercial" data-tab="salespipeline">Sales Pipeline</button>
+      <button type="button" class="tab g-commercial" data-tab="quotations">Quotes</button>
+      <button type="button" class="tab g-commercial" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></button>
+      <button type="button" class="tab g-commercial" data-tab="invoicing">Invoicing</button>
     </div>
   </div>
 
@@ -2396,17 +2384,34 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
       <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
       <button type="button" class="tab g-operations" data-tab="purchaseorders">Purchase Orders</button>
+      <button type="button" class="tab g-operations" data-tab="assets">Assets</button>
     </div>
   </div>
 
-  <div class="nav-group g-organisation" data-group="organisation" data-label="Organisation" data-short="Admin">
-    <button type="button" class="nav-label nav-gbtn" id="gh-organisation" aria-expanded="false" aria-controls="gp-organisation"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Organisation</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
-    <div class="nav-items" id="gp-organisation" role="group" aria-labelledby="gh-organisation">
-      <button type="button" class="tab g-organisation" data-tab="admin">Setup &amp; Admin</button>
-      <button type="button" class="tab g-organisation" data-tab="businessplan">Business Plan</button>
-      <button type="button" class="tab g-organisation" data-tab="actions">Actions</button>
-      <button type="button" class="tab g-organisation" data-tab="assets">Assets</button>
-      <button type="button" class="tab g-organisation" data-tab="settings">Settings</button>
+  <div class="nav-group g-finance" data-group="finance" data-label="Finance" data-short="Finance">
+    <button type="button" class="nav-label nav-gbtn" id="gh-finance" aria-expanded="false" aria-controls="gp-finance"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Finance</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-finance" role="group" aria-labelledby="gh-finance">
+      <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
+      <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
+      <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
+      <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
+      <button type="button" class="tab g-finance" data-tab="revenue">Revenue Forecast</button>
+    </div>
+  </div>
+
+  <div class="nav-group g-business" data-group="business" data-label="Business" data-short="Business">
+    <button type="button" class="nav-label nav-gbtn" id="gh-business" aria-expanded="false" aria-controls="gp-business"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Business</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-business" role="group" aria-labelledby="gh-business">
+      <button type="button" class="tab g-business" data-tab="businessplan">Business Plan</button>
+      <button type="button" class="tab g-business" data-tab="actions">Actions</button>
+      <button type="button" class="tab g-business" data-tab="admin">Setup &amp; Admin</button>
+    </div>
+  </div>
+
+  <div class="nav-group g-settings" data-group="settings" data-label="Settings" data-short="Settings">
+    <button type="button" class="nav-label nav-gbtn" id="gh-settings" aria-expanded="false" aria-controls="gp-settings"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Settings</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="nav-items" id="gp-settings" role="group" aria-labelledby="gh-settings">
+      <button type="button" class="tab g-settings" data-tab="settings">Settings</button>
     </div>
   </div>
 
@@ -14292,7 +14297,7 @@ const MENU_ICONS = {
   close: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>'
 };
 const MENU_FAV_MAX = 5;
-const MENU_GROUP_ICON = { crm: 'contacts' };
+const MENU_GROUP_ICON = { crm: 'contacts', commercial: 'revenue', business: 'organisation', settings: 'settings' };
 const menuPrefs = { mode: '', open: [], phone: 'bottom', bottom: MENU_BOTTOM_DEFAULT.slice(), fav: [] };
 const menuMQ = window.matchMedia('(max-width: 700px)');
 const menuUi = { sig: '', pop: null, hoverT: 0, sheetFrom: null, built: false };
@@ -14447,7 +14452,7 @@ function menuPopOpen(gid, btn, o){
   clearTimeout(menuUi.hoverT);
   const cur = menuCurrent(), top = !!o.top;
   let html = `<div class="mp-head">${escHtml(g.label)}</div>` + g.tabs.map(t => { const c = menuBadge(t.tab); return `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('');
-  if(top && gid === 'organisation'){
+  if(top && gid === 'settings'){
     const ue = menuEl('undoBadge'), un = ue && !ue.hidden ? (parseInt(ue.textContent, 10) || 0) : 0;
     html += '<div class="mp-sep"></div>' + `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="undo"><span>Undo history</span>${un ? `<span class="tab-count">${un}</span>` : ''}</button>`;
     if(document.querySelector('#logoutBar .logout-link')) html += '<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="logout"><span>Log out</span></button>';
