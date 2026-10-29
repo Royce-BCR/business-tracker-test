@@ -54,3 +54,14 @@ Added on the test site, all optional and defaulting safely so existing data load
 - **Cash.** Starting balance has an "as at" date (default 1 Oct 2026). The forecast shows only unsettled items; settled items are actuals in the month they happened. Finance > Bank Reconciliation reconciles a month per account, tracks loans and locks reconciled months.
 - **Profit share** can be £ per labour hour or % of labour cost, with a per-project override.
 - **Projects** show a journey strip and a Next step; completed projects move to a Completed view and can be reopened.
+
+## Record pages, tasks and Today (Stage 1, test site)
+
+- **Menu**: Command, CRM, Commercial, Operations, Finance, Business and Settings. Every page keeps its route; Actions and Setup & Admin now sit together on **Business tasks**.
+- **Record pages**: a project, supplier, contact or company opens in three columns (profile, tabs, linked records). The project profile marks each value as locked, calculated (with where to change it) or editable; edits wait in a bar at the foot of the profile. The earlier project page is still there under **Open full workspace**.
+- **Tasks**: one task form (job or business, assignee, repeat, links to projects, customers, suppliers, quotes and orders). Business tasks are only visible to the people ticked under Settings > CRM & tasks (Lynton and Royce by default).
+- **Activity feed**: on every record, a view over real records: open tasks first, history below, existing timeline notes shown as they are stored.
+- **Today**: a day view with arrows and a date picker; list length is a setting (default 10).
+- **Plan tab**: a date change in the profile opens a review of every linked date; Confirm schedule, Keep as tentative, or Cancel changes.
+
+New stored fields, all optional: `project.jobType`, `project.owner`, `project.site`, `project.tentative`; `task.scope`, `task.refs`, `task.recur`, `task.spawnedId`; `settings.bizAccess`, `settings.todayLimit`. Existing data loads unchanged.
