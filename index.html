@@ -2408,6 +2408,23 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-note-row { display: grid; grid-template-columns: 96px 1fr; gap: var(--bt-s2); padding: 6px 0; border-bottom: 1px solid var(--bt-chalk); font-size: var(--bt-fs-sm); }
 .rp-rhead { flex: none; padding: var(--bt-s3) var(--bt-s4); border-bottom: 1px solid var(--line); } .rp-rhead h3 { margin: 0; font-size: var(--bt-fs-sm); }
 .rp-rbody { flex: 1; min-height: 0; overflow-y: auto; padding: var(--bt-s3) var(--bt-s4) var(--bt-s4); overscroll-behavior: contain; }
+
+/* collapsible side panels on every record page (a per-browser choice, kept outside the saved document) */
+.rp-cbtn { position: absolute; top: 8px; right: 8px; z-index: 5; width: 32px; height: 32px; min-width: 32px; min-height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: var(--bt-r-btn); background: var(--bt-card); color: var(--bt-ink); cursor: pointer; }
+.rp-cbtn:hover { background: var(--bt-surface-2); } .rp-cbtn:focus-visible { outline: 2px solid var(--bt-brand-2); outline-offset: 2px; } .rp-cbtn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.rp-left, .rp-right { position: relative; } .rp-head-top, .rp-rhead { padding-right: 40px; } .rp-left > .rp-head { padding-right: calc(var(--bt-s4) + 28px); }
+.rp-left > .rp-head .rp-head-top { padding-right: 0; }
+@media (max-width: 700px) { .rp-cbtn { display: none; } }
+@media (min-width: 701px) {
+  .rp.rp-lc { grid-template-columns: 44px minmax(0, 1fr) minmax(236px, 296px); } .rp.rp-rc { grid-template-columns: minmax(268px, 320px) minmax(0, 1fr) 44px; } .rp.rp-lc.rp-rc { grid-template-columns: 44px minmax(0, 1fr) 44px; }
+  .rp.rp-lc .rp-left > *:not(.rp-cbtn):not(.rp-bar), .rp.rp-rc .rp-right > *:not(.rp-cbtn) { display: none; }
+  .rp.rp-lc .rp-cbtn[data-rpc="l"], .rp.rp-rc .rp-cbtn[data-rpc="r"] { right: auto; left: 50%; transform: translateX(-50%); }
+  .rp.rp-lc .rp-left { overflow: visible; } .rp.rp-lc .rp-left > .rp-bar:not([hidden]) { display: flex; position: absolute; left: 0; bottom: 0; width: 300px; z-index: 8; border-radius: 0 var(--bt-r-card) var(--bt-r-card) 0; border: 1px solid var(--line); border-top: 2px solid var(--bt-brand-2); }   /* unsaved changes stay in view, over the centre, while the panel is a strip */
+}
+@media (min-width: 701px) and (max-width: 999px) {
+  .rp.rp-lc { grid-template-columns: 44px minmax(0, 1fr); } .rp.rp-rc, .rp.rp-lc.rp-rc { grid-template-columns: minmax(250px, 300px) minmax(0, 1fr); } .rp.rp-lc.rp-rc { grid-template-columns: 44px minmax(0, 1fr); }
+  .rp.rp-rc .rp-right { min-height: 44px; flex-direction: row; } .rp.rp-rc .rp-cbtn[data-rpc="r"] { left: auto; right: 8px; transform: none; }
+}
 .rp-legacy-bar { margin-bottom: var(--bt-s3); }
 .rp-flat > .pw-sec-b { padding: 0; } .rp-plan .pw-sec { border: 0; margin: 0; }
 @media (max-width: 999px) {
@@ -11736,6 +11753,30 @@ function renderSupInvoices(){
 }
 document.addEventListener('input', (e) => { if(e.target.id === 'siQ'){ siUi.q = e.target.value; const pos = e.target.selectionStart; renderSupInvoices(); const n = document.getElementById('siQ'); if(n){ n.focus(); try{ n.setSelectionRange(pos, pos); }catch(x){} } } });
 document.addEventListener('change', (e) => { if(e.target.id === 'siSup'){ siUi.sup = e.target.value; renderSupInvoices(); } });
+
+/* ---------- collapsible side panels (record pages) ----------
+   Each record page (project, customer, contact, company, supplier) is an .rp frame. A small button at the top of the left and right panels collapses that panel to a thin strip.
+   The choice is kept per browser in localStorage (never in the saved document); every storage call is wrapped, so it all works with storage blocked. Default: both open. */
+const RPC_KEY = STORAGE_PREFIX + 'business-tracker-record-panels';
+const rpcState = { l: false, r: false };   // true = collapsed
+(function(){ try{ const v = JSON.parse(localStorage.getItem(RPC_KEY) || 'null'); if(v && typeof v === 'object'){ rpcState.l = v.l === true; rpcState.r = v.r === true; } }catch(e){} })();
+function rpcSave(){ try{ localStorage.setItem(RPC_KEY, JSON.stringify(rpcState)); }catch(e){} }
+const RPC_NAME = { l: 'profile panel', r: 'linked records panel' };
+function rpcApply(){
+  document.querySelectorAll('.rp').forEach(rp => {
+    rp.classList.toggle('rp-lc', rpcState.l); rp.classList.toggle('rp-rc', rpcState.r);
+    [['l', '.rp-left'], ['r', '.rp-right']].forEach(([k, sel]) => {
+      const panel = rp.querySelector(':scope > ' + sel); if(!panel) return; let b = panel.querySelector(':scope > .rp-cbtn');
+      if(!b){ b = document.createElement('button'); b.type = 'button'; b.className = 'rp-cbtn'; b.dataset.rpc = k; b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>'; panel.insertBefore(b, panel.firstChild); }
+      const col = rpcState[k], label = (col ? 'Expand ' : 'Collapse ') + RPC_NAME[k];
+      b.setAttribute('aria-expanded', String(!col)); b.setAttribute('aria-label', label); b.title = label;
+      b.querySelector('svg').style.transform = (k === 'l') === col ? 'rotate(180deg)' : '';   // the arrow points the way the panel will move
+    });
+  });
+}
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('.rp-cbtn'); if(!b) return; rpcState[b.dataset.rpc] = !rpcState[b.dataset.rpc]; rpcSave(); rpcApply(); });
+(function(){ let q = false; const run = () => { q = false; try{ rpcApply(); }catch(e){} }; new MutationObserver(() => { if(!q){ q = true; requestAnimationFrame(run); } }).observe(document.body, { childList: true, subtree: true }); })();
+
 /* ---------- moving a record between the three pipelines ----------
    Promotion and return keep everything. The record keeps its id (so its code, quotes and tasks stay linked) and carries:
      leadSnapshot  the lead as it was when promoted (the read-only "Original lead info" view)
