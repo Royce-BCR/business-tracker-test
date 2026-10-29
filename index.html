@@ -2547,6 +2547,14 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   @media (max-width: 640px) { .sl-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .sl-row .sl-nf { grid-column: 2 / 3; } .sl-row > span:empty { display: none; } #panel-settings .set-content .sl-row input[type=text] { flex: none; width: 100%; } }
   .attn { cursor: help; }
   .sel-chased { margin-left: 6px; padding: 2px 10px; }
+  .sc-table td, .sc-table th { vertical-align: top; }
+  .sc-best { background: var(--bt-ok-bg); }
+  .sc-total td { border-top: 2px solid var(--line); }
+  .sc-miss { font-size: 11px; color: var(--bt-warn-fg); }
+  .sc-sel { outline: 2px solid var(--slate, #3f5d7d); outline-offset: -2px; font-weight: 700; }
+  .sc-low { background: var(--bt-ok-bg); }
+  .sc-ovr { font-size: 11px; color: var(--bt-warn-fg); font-weight: 600; }
+  .sc-lines select { min-width: 150px; }
 
 /* BT:css-selling end */
 </style>
@@ -8211,7 +8219,8 @@ function qNormLine(l, supIds){
     unitId: units.some(u => u.id === l.unitId) ? l.unitId : '', unitName: str(l.unitName), qty: qNumOr(l.qty, 0),
     wastagePct: qNumOr(l.wastagePct, 0), wastageManual: !!l.wastageManual,
     prices: (Array.isArray(l.prices) ? l.prices : []).filter(p => p && typeof p === 'object' && Number(p.supplierId) > 0 && p.price !== '' && p.price != null && !isNaN(Number(p.price)))
-      .map(p => ({ supplierId: Number(p.supplierId), price: Number(p.price), date: /^\d{4}-\d{2}-\d{2}$/.test(p.date || '') ? p.date : fmt(new Date()), note: str(p.note) })),
+      .map(p => Object.assign({ supplierId: Number(p.supplierId), price: Number(p.price), date: /^\d{4}-\d{2}-\d{2}$/.test(p.date || '') ? p.date : fmt(new Date()), note: str(p.note) },
+      (p.leadTimeDays !== '' && p.leadTimeDays != null && Number(p.leadTimeDays) >= 0) ? { leadTimeDays: Math.round(Number(p.leadTimeDays)) } : {}, /^\d{4}-\d{2}-\d{2}$/.test(p.validUntil || '') ? { validUntil: p.validUntil } : {})),   // lead time and valid until: kept when typed, not added when blank
     selectedSupplierId: Number(l.selectedSupplierId) > 0 ? Number(l.selectedSupplierId) : '',
     costOverride: (l.costOverride === '' || l.costOverride == null || isNaN(Number(l.costOverride)) || Number(l.costOverride) < 0) ? '' : Number(l.costOverride),
     markupPct: qNumOr(l.markupPct, 0), vatRate: qNumOr(l.vatRate, state.settings.vatRate), customerGroup: str(l.customerGroup), showOnQuote: l.showOnQuote !== false,
@@ -8614,7 +8623,7 @@ function qbRender(){
   const ae = document.activeElement; if(ae && box.contains(ae) && ae.blur) ae.blur();   // commit a half-finished edit before the page is rebuilt
   const sc = box.querySelector('.qb-scroll'), sl = sc ? sc.scrollLeft : 0, sy = window.scrollY;
   qAutoDrops(q);
-  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbOptionalHtml(q) + qbMaterialsHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + '<div class="qb-pair">' + qAsSoldHtml(q) + '<div id="qbActual"></div></div><datalist id="qbGroupsList"></datalist><div id="qbCash"></div>' + qbTimelineHtml(q);
+  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbOptionalHtml(q) + qbMaterialsHtml(q) + qbCompareHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + '<div class="qb-pair">' + qAsSoldHtml(q) + '<div id="qbActual"></div></div><datalist id="qbGroupsList"></datalist><div id="qbCash"></div>' + qbTimelineHtml(q);
   const ns = box.querySelector('.qb-scroll'); if(ns) ns.scrollLeft = sl;
   box.querySelectorAll('[data-f="customerGroup"]').forEach(i => i.setAttribute('list', 'qbGroupsList'));
   qbRefresh(); window.scrollTo(0, sy);
@@ -8672,6 +8681,7 @@ function qbRefresh(){
   const ref = document.getElementById('qbRef'); if(ref) ref.textContent = qRef(q);
   qbSyncInputs(q, document);
   qbLiveParts(q, c); qbLock(q);
+  if(typeof selCompareRefresh === 'function') selCompareRefresh();
   apRefresh(q);
 }
 function qbSyncInputs(q, scope){
@@ -8788,7 +8798,7 @@ function qbChange(el){
       qSyncStageDrops(q); rebuild = true;
     }
     else if(f === 'deliverDate'){ l.deliverDate = isoOk(v); qSyncStageDrops(q); rebuild = true; }
-    else if(f === 'selectedSupplierId'){ l.selectedSupplierId = v === '' ? '' : Number(v); if(l.stageId){ qSyncStageDrops(q); rebuild = true; } }
+    else if(f === 'selectedSupplierId'){ selPickSupplier(q, l, v); return; }   // Stage 3: a supplier that is not the cheapest asks for a reason first
   } else if(k === 'price'){
     const l = q.lines.find(x => x.id === id); if(!l) return; const sid = Number(el.dataset.sid), at = l.prices.findIndex(p => p.supplierId === sid);
     if(f === 'price'){
@@ -8796,7 +8806,9 @@ function qbChange(el){
       else if(at >= 0){ if(l.prices[at].price !== Number(v)){ l.prices[at].price = Number(v); l.prices[at].date = fmt(new Date()); } }
       else l.prices.push({ supplierId: sid, price: Number(v), date: fmt(new Date()), note: '' });
       if(l.stageId){ qSyncStageDrops(q); rebuild = true; }
-    } else if(at >= 0){ if(f === 'note') l.prices[at].note = String(v).trim(); else if(f === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(v)) l.prices[at].date = v; }
+    } else if(at >= 0){ if(f === 'note') l.prices[at].note = String(v).trim(); else if(f === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(v)) l.prices[at].date = v;
+      else if(f === 'leadTimeDays'){ const n = Math.round(Number(v)); if(v === '' || isNaN(n) || n < 0) delete l.prices[at].leadTimeDays; else l.prices[at].leadTimeDays = n; }
+      else if(f === 'validUntil'){ if(/^\d{4}-\d{2}-\d{2}$/.test(v)) l.prices[at].validUntil = v; else delete l.prices[at].validUntil; } }
   } else if(k === 'lab'){
     const r = q.labour.find(x => x.id === id); if(!r) return;
     if(f === 'description' || f === 'customerGroup') r[f] = String(v).trim();
@@ -8932,7 +8944,8 @@ function qlBodyHtml(q, l){
   const cats = state.lineCategories.map(c => [c.id, c.name]), units = state.quoteUnits.map(u => [u.id, u.name]), vatOn = qVatOn();
   const dropOpts = [['', '—']].concat(q.drops.map((d, i) => [d.id, d.label || ('Drop ' + (i + 1))])), f = (label, inner, help) => `<div class="lp-f"><label>${label}</label>${inner}${help ? `<p class="q-help">${help}</p>` : ''}</div>`;
   const prices = q.supplierCols.map(sid => `<div class="ql-price"><b>${escHtml(qbSupName(sid))}</b><div class="ql-pr">${qbIn('price', l.id, 'price', '', { num: true, sid, ph: 'Price ex VAT each', aria: 'Price' })}
-    <input type="date" data-qb="price" data-id="${l.id}" data-sid="${sid}" data-f="date" aria-label="Date entered"></div>${qbIn('price', l.id, 'note', '', { sid, ph: 'Note (optional)', aria: 'Price note' })}</div>`).join('');
+    <input type="date" data-qb="price" data-id="${l.id}" data-sid="${sid}" data-f="date" aria-label="Date entered"></div>
+    <div class="ql-pr">${qbIn('price', l.id, 'leadTimeDays', '', { num: true, sid, ph: 'Lead time (days)', aria: 'Lead time in days' })}<input type="date" data-qb="price" data-id="${l.id}" data-sid="${sid}" data-f="validUntil" aria-label="Valid until" title="Valid until"></div>${qbIn('price', l.id, 'note', '', { sid, ph: 'Note (optional)', aria: 'Price note' })}</div>`).join('');
   return `<section class="lp-sec" id="lp-sec-line" data-sec="line"><h3>Line</h3>
       ${f('Description', `<textarea rows="3" data-qb="line" data-id="${l.id}" data-f="description">${escHtml(l.description)}</textarea>`)}
       ${f('Category', qbSel('line', l.id, 'categoryId', qbOpts(cats, l.categoryId, '—')))}
@@ -16817,7 +16830,7 @@ function qbsClassify(el){
   if(el.id === 'qbCustomer') return { key: 'customer', step: 3, title: 'Customer view' };
   if(el.classList.contains('qbs-kpi')) return { key: 'kpi', step: 2, title: 'Key figures' };
   const h = el.querySelector(':scope > .qb-sec-h h3'), t = h ? h.textContent.trim() : '';
-  const map = { 'Optional groups': ['optional', 1], 'Materials': ['materials', 1], 'Supplier quote requests': ['rfq', 1], 'Labour': ['labour', 1], 'Delivery': ['delivery', 1],
+  const map = { 'Optional groups': ['optional', 1], 'Materials': ['materials', 1], 'Compare suppliers': ['compare', 1], 'Supplier quote requests': ['rfq', 1], 'Labour': ['labour', 1], 'Delivery': ['delivery', 1],
     'Customer payment schedule': ['payments', 2], 'Summary': ['summary', 2], 'Cash by month (this project)': ['cash', 2], 'Timeline': ['timeline', 2], 'Approvals': ['approvals', 2] };
   if(map[t]) return { key: map[t][0], step: map[t][1], title: t };
   return { key: 'x-' + (el.id || t || 'other'), step: 2, title: t };
@@ -18898,6 +18911,96 @@ function qlistCells(q){
   const next = t ? `<button type="button" class="sp-link" data-sel-task="${escAttr(t.id)}" title="Open the follow-up task">${escHtml(dShow(t.dueDate))}</button>${t.dueDate < fmt(new Date()) ? ' <span class="sf-chip bad">overdue</span>' : ''}` : (q.status === 'Sent' ? '<span class="sf-chip warn">none planned</span>' : '<span class="qb-dim">—</span>');
   return { cust, proj, since, next };
 }
+
+/* =====================================================================
+   STEP 5: SEVERAL PRICES PER LINE AND THE WHOLE-BASKET COMPARISON
+   Each quote line already holds one price per supplier column (supplier, price, date entered, note) and one chosen supplier. Each price now also
+   holds lead time (days) and valid until (both optional, left out of the stored price until typed). The comparison card on a quote shows,
+   per supplier, the landed cost of the whole basket (materials plus the supplier's delivery charge) with the cheapest complete basket
+   highlighted, and the basket each supplier would get from the choices made now: moving a line re-totals both. Choosing a supplier whose
+   price is not the line's cheapest asks for a short reason, saved on the quote (q.overrides: lineId, supplierId, cheapestId, reason, by, date).
+   The chosen supplier flows to the Working plan and orders exactly as before; accepted quotes stay locked.
+   ===================================================================== */
+function ensureSellingModel5(o){
+  const str = v => v == null ? '' : String(v);
+  (o.quotes || []).forEach(q => {
+    if(!Array.isArray(q.overrides)) return;   // nothing stored: nothing added
+    q.overrides = q.overrides.filter(x => x && typeof x === 'object' && x.lineId).map(x => ({ id: str(x.id) || selId('ov_'), lineId: str(x.lineId), supplierId: Number(x.supplierId) || 0, cheapestId: Number(x.cheapestId) || 0, reason: str(x.reason), by: str(x.by), date: str(x.date) }));
+  });
+}
+function selDelivery(q, sup, cost){
+  if(!sup || !(cost > 0)) return 0;
+  const drop = q.drops.find(d => d.supplierId === sup.id); if(drop && drop.method === 'collect') return 0;
+  let ch = sup.deliveryCharge !== '' && sup.deliveryCharge != null ? qNetAmt(sup, sup.deliveryCharge) : 0;
+  const free = qNetAmt(sup, sup.freeDeliveryOver); if(free !== '' && free > 0 && cost >= free) ch = 0;
+  return Number(ch) || 0;
+}
+function selCompare(q){
+  const c = qCalc(q), live = q.lines.filter(l => !qExcluded(q, l) && l.costOverride === ''), typed = q.lines.filter(l => !qExcluded(q, l) && l.costOverride !== '').length;
+  const sups = q.supplierCols.map(id => supFind(id) || { id, name: qbSupName(id), deliveryCharge: '' });
+  const priceOf = (l, sid) => l.prices.find(p => p.supplierId === sid && Number(p.price) > 0);
+  const rows = sups.map(s => {
+    let all = 0, have = 0, lead = 0, until = '';
+    live.forEach(l => { const p = priceOf(l, s.id); if(p){ have++; all += qQtyOrder(q, l) * qNetPrice(p); if(Number(p.leadTimeDays) > lead) lead = Number(p.leadTimeDays); if(p.validUntil && (!until || p.validUntil < until)) until = p.validUntil; } });
+    const allDel = selDelivery(q, s, all);
+    let mine = 0, n = 0; live.forEach(l => { const x = c.lines[l.id]; if(x.selSupplierId === s.id){ mine += x.lineCost; n++; } });
+    const myDel = selDelivery(q, s, mine);
+    return { s, all, allDel, allTotal: r2(all + allDel), have, missing: live.length - have, complete: live.length > 0 && have === live.length, lead, until, mine, n, myDel, myTotal: r2(mine + myDel) };
+  });
+  const complete = rows.filter(r => r.complete), best = complete.length ? complete.reduce((a, b) => b.allTotal < a.allTotal ? b : a) : null;
+  return { c, live, typed, rows, best, chosenTotal: r2(rows.reduce((a, r) => a + r.myTotal, 0)), unassigned: live.filter(l => !c.lines[l.id].selSupplierId).length };
+}
+function qbCompareHtml(q){
+  if(!q.supplierCols.length || !q.lines.length) return `<div class="card" id="qbCompareCard"><div class="qb-sec-h"><h3>Compare suppliers</h3></div><p class="q-help">Add supplier columns and prices to the materials above to compare the whole basket.</p></div>`;
+  const d = selCompare(q), locked = qLocked(q) || q.mode === 'template', today = fmt(new Date());
+  const sorted = d.rows.slice().sort((a, b) => (b.complete - a.complete) || (a.allTotal - b.allTotal));
+  const head = `<table class="qb-table qb-narrow sc-table"><thead><tr><th>Supplier</th><th>If every line came from them</th><th>Delivery</th><th>Landed total</th><th>Lead time</th><th>Prices valid until</th><th>Chosen now (lines · total with delivery)</th></tr></thead><tbody>${sorted.map(r => {
+    const best = d.best && d.best.s.id === r.s.id;
+    return `<tr class="${best ? 'sc-best' : ''}"><td><b>${escHtml(r.s.name)}</b> ${best ? '<span class="sf-chip ok">Cheapest</span>' : ''}</td>
+      <td class="q-num">${qm(r.all)}${r.missing ? `<div class="sc-miss">${r.missing} line${r.missing === 1 ? '' : 's'} have no price from them</div>` : ''}</td><td class="q-num">${qm(r.allDel)}</td><td class="q-num"><b>${qm(r.allTotal)}</b>${r.complete ? '' : '<div class="sc-miss">incomplete</div>'}</td>
+      <td>${r.lead ? r.lead + ' days' : '<span class="qb-dim">—</span>'}</td><td>${r.until ? (r.until < today ? `<span class="sf-chip bad">${escHtml(dShow(r.until))} (past)</span>` : escHtml(dShow(r.until))) : '<span class="qb-dim">—</span>'}</td>
+      <td class="q-num" data-sc="mine">${r.n ? `${r.n} line${r.n === 1 ? '' : 's'} · <b>${qm(r.myTotal)}</b>${r.myDel ? ` <span class="qb-dim">(incl. ${qm(r.myDel)} delivery)</span>` : ''}` : '<span class="qb-dim">none</span>'}</td></tr>`; }).join('')}
+    <tr class="sc-total"><td colspan="6">Total of the chosen baskets${d.unassigned ? ` <span class="sf-chip warn">${d.unassigned} line${d.unassigned === 1 ? '' : 's'} with no supplier</span>` : ''}${d.typed ? ` <span class="qb-dim">(${d.typed} typed-cost line${d.typed === 1 ? '' : 's'} not included)</span>` : ''}</td><td class="q-num"><b>${qm(d.chosenTotal)}</b></td></tr></tbody></table>`;
+  const ovr = id => (q.overrides || []).find(o => o.lineId === id);
+  const lineRows = d.live.map(l => {
+    const x = d.c.lines[l.id], qo = qQtyOrder(q, l), low = qCheapest(l), o = ovr(l.id), nonCheap = x.selSupplierId && x.cheapestId && x.selSupplierId !== x.cheapestId;
+    const cells = d.rows.map(r => { const p = l.prices.find(z => z.supplierId === r.s.id && Number(z.price) > 0); if(!p) return `<td class="qb-dim">—</td>`; const isSel = x.selSupplierId === r.s.id, isLow = low && low.supplierId === r.s.id;
+      return `<td class="q-num${isSel ? ' sc-sel' : ''}${isLow ? ' sc-low' : ''}" title="${isSel ? 'Chosen' : ''}${isLow ? ' · lowest' : ''}${p.leadTimeDays ? ' · ' + p.leadTimeDays + ' days lead' : ''}">${qm(qo * qNetPrice(p))}${isLow ? ' ▾' : ''}</td>`; }).join('');
+    const opts = [['', q.mode === 'template' ? 'Cheapest' : 'Cheapest (automatic)']].concat(d.rows.filter(r => l.prices.some(z => z.supplierId === r.s.id && Number(z.price) > 0)).map(r => [r.s.id, r.s.name]));
+    return `<tr><td>${escHtml(l.description || 'Item')}${l.hire ? ' <span class="dc-ptc">hire</span>' : ''}${nonCheap && o ? `<div class="sc-ovr">Not the cheapest: ${escHtml(o.reason)}</div>` : (nonCheap ? '<div class="sc-ovr">Not the cheapest (no reason saved)</div>' : '')}</td><td class="q-num">${qo}</td>${cells}
+      <td>${qbSel('line', l.id, 'selectedSupplierId', qbOpts(opts, l.selectedSupplierId), { aria: 'Supplier for ' + (l.description || 'this line') }).replace('<select', locked ? '<select disabled' : '<select')}</td></tr>`;
+  }).join('');
+  const lines = `<div class="qb-scroll"><table class="qb-table qb-narrow sc-lines"><thead><tr><th>Line</th><th>Qty</th>${d.rows.map(r => `<th>${escHtml(r.s.name)}</th>`).join('')}<th>Supplier for this line</th></tr></thead><tbody>${lineRows}</tbody></table></div>`;
+  return `<div class="card" id="qbCompareCard"><div class="qb-sec-h"><h3>Compare suppliers</h3></div>
+    <p class="q-help">Landed cost is materials plus the supplier's delivery charge (free above its threshold, nothing when collecting), ex VAT. The cheapest basket is highlighted among suppliers that price every line. Change a line's supplier below and both baskets re-total straight away.${locked ? ' This quote is locked, so the choices are read-only.' : ''}</p>
+    <div class="qb-scroll">${head}</div><div class="qb-sec-h" style="margin-top:14px;"><h4>Line by line</h4></div>${lines}</div>`;
+}
+function selCompareRefresh(){
+  const q = qFind(qUi.openId), el = document.getElementById('qbCompareCard'); if(!q || !el) return;
+  const ae = document.activeElement; if(ae && el.contains(ae)) return;
+  const tmp = document.createElement('div'); tmp.innerHTML = qbCompareHtml(q); el.replaceWith(tmp.firstElementChild);
+}
+/* choosing a supplier that is not the cheapest for the line asks for a reason */
+async function selPickSupplier(q, l, sid){
+  const x = qCalc(q).lines[l.id]; sid = sid === '' ? '' : Number(sid);
+  const cheap = qCheapest(l), notCheap = sid !== '' && cheap && sid !== cheap.supplierId && qNetPrice(l.prices.find(p => p.supplierId === sid) || cheap) > qNetPrice(cheap);
+  if(notCheap){
+    const has = (q.overrides || []).find(o => o.lineId === l.id && o.supplierId === sid);
+    let reason = has ? has.reason : '';
+    if(!reason){
+      const sp = l.prices.find(p => p.supplierId === sid);
+      const ok = await showConfirmLabel('Not the cheapest: why?', `${l.description || 'This line'}: ${qbSupName(sid)} is ${qm(qQtyOrder(q, l) * (qNetPrice(sp) - qNetPrice(cheap)))} dearer than ${qbSupName(cheap.supplierId)}, the cheapest. A short reason is saved with the quote.`, 'Use this supplier', '<input type="text" id="ovrReason" maxlength="160" placeholder="e.g. in stock this week, or a trade account discount">');
+      if(!ok){ qbRender(); return; }
+      reason = (_confirmExtraNote || '').trim(); if(!reason){ showToast('A reason is needed to choose a supplier that is not the cheapest. Nothing was changed.', null, 7000); qbRender(); return; }
+    }
+    q.overrides = (q.overrides || []).filter(o => o.lineId !== l.id); q.overrides.push({ id: selId('ov_'), lineId: l.id, supplierId: sid, cheapestId: cheap.supplierId, reason, by: whoName(), date: fmt(new Date()) });
+    q.timeline.push({ date: fmt(new Date()), note: `${l.description || 'Line'}: ${qbSupName(sid)} chosen, not the cheapest (${qbSupName(cheap.supplierId)}). Reason: ${reason}`, created: Date.now(), kind: 'override' });
+  } else if(q.overrides) q.overrides = q.overrides.filter(o => o.lineId !== l.id);
+  l.selectedSupplierId = sid;
+  if(l.stageId){ qSyncStageDrops(q); }
+  qbTouch(q, true);
+}
+SEL_SET_CARDS.length;   // (no settings for step 5)
 
 /* BT:js-selling end */
 
