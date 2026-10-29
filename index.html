@@ -2546,6 +2546,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   @media (max-width: 640px) { .qs-head { display: none; } .qs-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .qs-row select { grid-column: 2 / 3; } .lq-row { grid-template-columns: 1fr; } }
   @media (max-width: 640px) { .sl-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .sl-row .sl-nf { grid-column: 2 / 3; } .sl-row > span:empty { display: none; } #panel-settings .set-content .sl-row input[type=text] { flex: none; width: 100%; } }
   .attn { cursor: help; }
+  .sel-chased { margin-left: 6px; padding: 2px 10px; }
 
 /* BT:css-selling end */
 </style>
@@ -4759,7 +4760,7 @@ function tileHtml(pl, r, color){
     if(Number(r.estValue) > 0) rows += `<div class="bd-t-row"><span class="k">Ballpark</span><span>${money(r.estValue)}</span></div>`;
     if(sfDays(r)) rows += `<div class="bd-t-row"><span class="k">Duration</span><span>${sfDays(r)} days</span></div>`;
     if(sfIso(r.prefStart) || sfIso(r.deadline)) rows += `<div class="bd-t-row"><span class="k">${sfIso(r.deadline) ? 'Deadline' : 'Start'}</span><span>${dShow(sfIso(r.deadline) || r.prefStart)}</span></div>`;
-    flag = qualBadgeHtml(r) + sfNotFitChip(r) + attnChipHtml('lead', r);
+    flag = qualBadgeHtml(r) + sfNotFitChip(r) + attnChipHtml('lead', r) + noContactChipHtml(leadDaysSince(r));
     const last = leadLastContact(r);
     rows += `<div class="bd-t-row"><span class="k">Last contacted</span><span>${last ? fmtDisplay(toDate(last)) : '—'}</span></div>`;
   } else if(pl === 'sales'){
@@ -5515,7 +5516,7 @@ function leadDetailHtml(l, i){
       <span class="lc-code">${recordCode(l.id, 'lead')}</span>${tier ? tierBadgeHtml(tier) : ''}
       <span class="lc-name${l.projectName ? '' : ' empty'}">${escHtml(l.projectName || 'No project name yet')}</span>
       <span class="lc-type">${isCommercial ? 'Commercial' : 'Residential'}</span>
-      <span class="lc-pill" style="${leadStatusStyle(l.stageId)}">${escHtml(leadStageName(l))}</span>${qualBadgeHtml(l)}${sfNotFitChip(l)}${attnChipHtml('lead', l)}
+      <span class="lc-pill" style="${leadStatusStyle(l.stageId)}">${escHtml(leadStageName(l))}</span>${qualBadgeHtml(l)}${sfNotFitChip(l)}${attnChipHtml('lead', l)}${noContactChipHtml(leadDaysSince(l))}
     </div>
     <div class="lc-sum">
       ${block('contact', 'Contact', `${val(l.contact || (isCommercial ? l.company : ''))}${val(l.phone)}${val(l.email)}${extra ? `<span class="v dim">+${extra} additional</span>` : ''}`)}
@@ -5558,7 +5559,7 @@ function renderLeads(){
         : `<input class="computed" disabled value="—" title="Residential — no company">`}</td>
       <td><input class="lead-pc${l.postcodeManual?' manual':''}" data-tab="leads" data-idx="${i}" data-field="postcode" value="${escAttr(l.postcode||'')}" title="${l.postcodeManual?'Set manually — clear this cell to go back to automatic':'Filled automatically from the address — type to override'}"></td>
       <td class="computed" title="Pulled from the latest communication entry">${last?fmtDisplay(toDate(last)):'—'}</td>
-      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(l)}${sfNotFitChip(l)}${attnChipHtml('lead', l)}</div></td>
+      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(l)}${sfNotFitChip(l)}${attnChipHtml('lead', l)}${noContactChipHtml(leadDaysSince(l))}</div></td>
       <td><button class="icon-btn" data-action="delete-lead" data-idx="${i}" title="Delete lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
     </tr>`;
     if(isOpen){ html += `<tr class="detail-row${active}"><td colspan="10">${leadDetailHtml(l, i)}</td></tr>`; }
@@ -6931,9 +6932,9 @@ document.addEventListener('click', (e) => {
 function whoName(){ const w = whoAmI(); return w.name || (session && session.username) || 'unknown'; }
 function chgLog(p, kind, r, changes){ p.changeLog = p.changeLog || []; p.changeLog.push({ id: qRand('ch_'), at: new Date().toISOString(), by: whoName(), kind, cause: r.cause, reason: r.reason, changes }); }
 /* ---------- edit mode: gate, draft, save (with a reason), discard, reset ---------- */
-function showConfirmLabel(title, msg, label){
+function showConfirmLabel(title, msg, label, extra){
   const btn = document.querySelector('#modalOverlay [data-modal="confirm"]'), old = btn.textContent; btn.textContent = label;
-  return showConfirm(title, msg).then(v => { btn.textContent = old; return v; });
+  return showConfirm(title, msg, extra).then(v => { btn.textContent = old; return v; });
 }
 function pwDraftInit(p, kind){
   if(kind === 'timeline') return { stages: {} };
@@ -8429,13 +8430,13 @@ function renderQuotes(){
   const s = qUi.q.trim().toLowerCase();
   const list = state.quotes.filter(q => (qUi.status === 'all' || q.status === qUi.status) && (!s || [qRef(q), q.customer, q.project, q.status, qLinkedText(q)].join(' ').toLowerCase().includes(s)))
     .sort((a, b) => b.date.localeCompare(a.date) || b.jobNumber - a.jobNumber || b.version - a.version);
-  const heads = ['Reference', 'Customer', 'Project', 'Version', 'Status', 'Total ex VAT'].concat(vatOn ? ['Total inc VAT'] : []).concat(['Date', 'Linked lead']);
+  const heads = ['Reference', 'Customer', 'Project', 'Version', 'Status', 'Days since contact', 'Next follow-up', 'Total ex VAT'].concat(vatOn ? ['Total inc VAT'] : []).concat(['Date', 'Linked record']);
   let html = `<table class="quotes-table"><thead><tr>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
   if(!list.length) html += `<tr><td colspan="${heads.length}"><div class="sup-empty">${state.quotes.length ? 'No quotes match these filters.' : 'No quotes yet — start one with “+ New quote”.'}</div></td></tr>`;
   list.forEach(q => {
-    const c = qCalc(q);
-    html += `<tr class="sup-row" data-qba="open" data-id="${q.id}" tabindex="0"><td class="code-cell">${escHtml(qRef(q))}</td><td class="q-strong">${escHtml(q.customer || '—')}</td><td>${escHtml(q.project || '—')}</td>
-      <td>${q.version}</td><td><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span>${apListChips(q)}</td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
+    const c = qCalc(q), x = qlistCells(q);
+    html += `<tr class="sup-row" data-qba="open" data-id="${q.id}" tabindex="0"><td class="code-cell">${escHtml(qRef(q))}</td><td class="q-strong">${x.cust}</td><td>${x.proj}</td>
+      <td>${q.version}</td><td><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span>${apListChips(q)}</td><td>${x.since}</td><td>${x.next}</td><td class="q-num">${qm(c.totalEx)}</td>${vatOn ? `<td class="q-num">${qm(c.totalInc)}</td>` : ''}
       <td>${escHtml(dShow(q.date))}</td><td>${escHtml(qLinkedText(q) || '—')}</td></tr>`;
   });
   wrap.innerHTML = html + '</tbody></table>';
@@ -8918,6 +8919,7 @@ document.addEventListener('change', (e) => {
 });
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-qba]'); if(!b || !state) return;
+  if(b.dataset.qba === 'open' && e.target.closest && e.target.closest('[data-nav],[data-sel-task]')) return;   // a link inside the row, not the row
   qbAction(b.dataset.qba, b);
 });
 document.addEventListener('keydown', (e) => { if(e.key === 'Enter' && e.target.dataset && e.target.dataset.qba === 'open'){ qbAction('open', e.target); } });
@@ -10322,10 +10324,7 @@ function qSendDone(q, email){   // "I've sent it": deliberate; sets Sent and wri
   q.timeline.push({ date: today, note: `Quote ${ref} sent to ${email}`, created: Date.now() + 3, kind: 'sent' });
   const deal = qDeal(q);
   if(deal){ deal.rec.comms = Array.isArray(deal.rec.comms) ? deal.rec.comms : []; deal.rec.comms.push({ date: today, note: `Quote ${ref} sent to ${email}`, created: Date.now(), src: 'quote', quoteId: q.id }); }   // counts as a contact: stamps Last contacted
-  const calls = typeOpt('tt_call') ? 'tt_call' : defaultTypeId();
-  const t = createTask({ title: `Follow up quote ${ref}`, dueDate: addDaysIso(today, Number(st.followUpDays) || 0), typeId: calls, owner: whoAmI().name || meName(),
-    description: `Quote ${ref} (${q.customer || ''}${q.project ? ', ' + q.project : ''}) was sent to ${email} on ${today}. Check it arrived and ask whether they have any questions.`, linkedIds: deal ? [recordCode(deal.rec.id, deal.pl)] : [] });
-  t.quoteId = q.id;
+  fuEnsure(q, wdAdd(today, st.followUpGapDays));   // Stage 3: one follow-up task per quote (autoKey), due after the gap in working days
   saveState(); return true;
 }
 function qSetPdfDone(q){ qUi.pdfDone = qUi.pdfDone || new Set(); qUi.pdfDone.add(q.id); }
@@ -10392,7 +10391,7 @@ function renderApprovalSettings(){
     <div class="q-err" id="apErr-${l.id}" role="alert"></div></div>`;
   el.innerHTML = `<p class="q-help" style="margin:0 0 10px;"><b>Approvals are a team process, not security: anyone with the login can choose any name.</b> Everything is OFF until you enable a lane. Approvers come from the team list used for task owners.</p>${st.approvalLanes.map(lane).join('<hr style="border:0;border-top:1px solid var(--line);margin:18px 0;">')}`;
   document.getElementById('apSendCard').innerHTML = `<div class="assumptions-grid">
-      <div class="lp-f"><label>Follow-up after sending (days)</label><input type="number" min="0" step="1" data-ap="followUpDays" value="${st.followUpDays}"></div>
+      <div class="lp-f"><label>Follow-up after sending</label><div class="q-help" style="margin:0;">Now set in working days in Settings, Selling (Follow-up and contact).</div></div>
       <div class="lp-f"><label>Sending Gmail account</label><input type="text" data-ap="sendAccount" value="${escAttr(st.sendAccount)}" autocomplete="off"></div></div>
     <div class="q-sub">Quote email template</div>
     <p class="q-help" style="margin:0 0 8px;">Merge fields: {customerName} {project} {ref} {validUntil} {total} {businessName} {phone}. The app opens a Gmail draft for you to check, attach the PDF to and send yourself. It never sends anything.</p>
@@ -12522,7 +12521,7 @@ function recTasksHtml(pl, rec, opts){
       <button class="tkr-title" data-crm="open" data-id="${t.id}" title="${escAttr(t.title)}">${escHtml(t.title)}</button>
       ${opts.compact ? '' : `<span class="tkr-code" title="${escAttr(linkedText(t))}">${escHtml(recLinks(t)[0] || '')}${recLinks(t).length > 1 ? ' +' + (recLinks(t).length - 1) : ''}</span>`}
       <span class="tkr-due${over ? ' over' : ''}">${t.dueDate ? fmtDisplay(toDate(t.dueDate)) : 'No date'}</span>
-      ${prioPill(t.priorityId)}</div>`;
+      ${prioPill(t.priorityId)}${chasedBtnHtml(t)}</div>`;
   }).join('');
   const more = opts.limit && list.length > opts.limit ? `<button class="link-btn tkr-more" data-lp="crm" data-id="${rec.id}">View all ${list.length} in CRM</button>` : '';
   const addBtn = `<button class="btn secondary" data-crm="tk-add" data-pl="${pl}" data-id="${rec.id}">${taskForms[key] ? 'Cancel' : '+ Add task'}</button>`;
@@ -12797,6 +12796,7 @@ function tkPropsHtml(){
 function tkFormHtml(){
   const o = tkObj();
   return `<div class="tk-form">
+      ${taskPanel ? chasedBtnHtml(o) : ''}
       ${tkPropsHtml()}
       <div><div class="tk-linkrow" id="tkLinks"></div><div class="tk-picker" id="tkPicker" hidden></div></div>
       <div><div class="tk-lbl"><label for="tkDesc">Description</label><span class="tk-saved" id="tkSaved" role="status" aria-live="polite"></span></div>
@@ -13148,7 +13148,7 @@ function todayTaskRow(t, over){
         ${linkSummaryHtml(t, `data-crm="rec" data-id="${t.id}"`) || taskRefsSummary(t)}
         ${t.recur ? `<span title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}
         ${todayUi.scope === 'all' ? `<span>${escHtml(t.owner || 'Unassigned')}</span>` : ''}
-        ${over && t.dueDate ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(t.dueDate)))}</span>` : ''}</span></div>`;
+        ${over && t.dueDate ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(t.dueDate)))}</span>` : ''}${chasedBtnHtml(t)}</span></div>`;
 }
 function todayActionRow(x, over){
   const r = x.r, arch = archiving.has(r);
@@ -18808,6 +18808,96 @@ function attnReasons(pl, r){
   return out;
 }
 function attnChipHtml(pl, r){ const x = attnReasons(pl, r); return x.length ? `<span class="sf-chip warn attn" title="${escAttr(x.join('. '))}">⚠ Needs attention</span>` : ''; }
+
+/* =====================================================================
+   STEP 4: QUOTES HUB AND FOLLOW-UP
+   Settings, Selling: follow-up gap (working days, default 3), the follow-up task name ({quote} stands for the reference), and the no-contact
+   flag (working days, default 5). Working days are Monday to Friday; bank holidays are ignored for now.
+   The older "follow-up days" setting (calendar days, default 7, in Approvals) is left stored as it is but no longer used: it counted calendar days.
+   ===================================================================== */
+function ensureSellingModel4(o){
+  const st = o.settings = o.settings || {}, int = (v, d, min) => { const n = Math.round(Number(v)); return (v === '' || v == null || isNaN(n) || n < min) ? d : n; };
+  st.followUpGapDays = int(st.followUpGapDays, 3, 1);
+  st.noContactDays = int(st.noContactDays, 5, 1);
+  st.followUpTaskName = typeof st.followUpTaskName === 'string' && st.followUpTaskName.trim() ? st.followUpTaskName : 'Follow up quote {quote}';
+  if(typeof ensureSellingModel5 === 'function') ensureSellingModel5(o);
+}
+const isWork = d => d.getDay() !== 0 && d.getDay() !== 6;
+function wdAdd(iso, n){ const d = toDate(iso); let k = Math.max(0, Math.round(n)); while(k > 0){ d.setDate(d.getDate() + 1); if(isWork(d)) k--; } return fmt(d); }
+function wdSince(from, to){   // working days after `from` up to and including `to`
+  if(!from || !to || to <= from) return 0; const d = toDate(from), e = toDate(to); let n = 0;
+  while(d < e){ d.setDate(d.getDate() + 1); if(isWork(d)) n++; } return n;
+}
+const SEL_CHANNELS = [['call', 'Call'], ['email', 'Email'], ['text', 'Text'], ['visit', 'Visit'], ['other', 'Other']];
+function fuKey(q){ return 'fu:' + q.id; }
+function fuTaskOf(q){ return state.crmTasks.find(t => t.status === 'open' && t.autoKey === fuKey(q)) || null; }
+function fuTitle(q){ return String(state.settings.followUpTaskName || 'Follow up quote {quote}').replace(/\{quote\}/gi, qRef(q)).replace(/\{customer\}/gi, q.customer || '').trim(); }
+/* the one follow-up task for a sent quote: autoKey stops it being created twice */
+function fuEnsure(q, due, text){
+  const ex = fuTaskOf(q); if(ex) return ex;
+  const today = fmt(new Date()), deal = qDeal(q), calls = typeOpt('tt_call') ? 'tt_call' : defaultTypeId();
+  const t = createTask({ title: fuTitle(q), dueDate: due || wdAdd(today, state.settings.followUpGapDays), typeId: calls, owner: whoAmI().name || meName(), quoteId: q.id,
+    description: text || `Quote ${qRef(q)} (${q.customer || ''}${q.project ? ', ' + q.project : ''}) was sent${q.sentTo ? ' to ' + q.sentTo : ''}${q.sentAt ? ' on ' + q.sentAt : ''}. Check it arrived and ask whether they have any questions. Press Chased when you have been in touch.`,
+    linkedIds: deal ? [recordCode(deal.rec.id, deal.pl)] : [] });
+  t.autoKey = fuKey(q); return t;
+}
+function chasedBtnHtml(t){ return t && t.status === 'open' && String(t.autoKey || '').startsWith('fu:') ? `<button type="button" class="btn qb-sm sel-chased" data-chased="${escAttr(t.id)}" title="Log that you chased this and set the next follow-up">Chased</button>` : ''; }
+async function selChase(taskId){
+  const t = findTask(taskId); if(!t || t.status !== 'open') return;
+  const q = qFind(t.quoteId), today = fmt(new Date()), live = !!q && q.status === 'Sent', sugg = wdAdd(today, state.settings.followUpGapDays);
+  const extra = `<select id="chaseChannel" aria-label="How did you chase it?">${SEL_CHANNELS.map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select><textarea id="chaseNote" placeholder="Optional note: what was said"></textarea>${live ? `<label class="lp-f" style="display:block;margin-top:8px;"><span style="display:block;font-size:12px;">Next follow-up (suggested: ${state.settings.followUpGapDays} working days)</span><input type="date" id="chaseNext" value="${sugg}"></label>` : '<p class="q-help">The quote is no longer waiting for an answer, so no further follow-up is suggested.</p>'}`;
+  const pr = showConfirmLabel(`Chased: ${t.title}`, 'How did you chase it?', 'Save chase', extra);
+  const ni = document.getElementById('chaseNext'); let next = sugg; if(ni) ni.addEventListener('input', () => { next = sfIso(ni.value) || sugg; });
+  const ok = await pr; if(!ok) return;
+  const ch = SEL_CHANNELS.find(c => c[0] === _confirmExtraValue) || SEL_CHANNELS[4], note = (_confirmExtraNote || '').trim(), text = `Chased by ${ch[1].toLowerCase()}${note ? ': ' + note : ''}`;
+  if(q){
+    const deal = qDeal(q); q.timeline.push({ date: today, note: text, created: Date.now(), kind: 'chase', channel: ch[0] });
+    if(deal){ deal.rec.comms = Array.isArray(deal.rec.comms) ? deal.rec.comms : []; deal.rec.comms.push({ date: today, note: `Quote ${qRef(q)}: ${text}`, created: Date.now(), src: 'chase', channel: ch[0], quoteId: q.id }); }   // a customer contact: resets days since contact
+  }
+  t.notes.push({ id: 'n' + Date.now().toString(36), text, created: Date.now(), author: meName(), date: today });
+  t.status = 'done'; t.completedAt = new Date().toISOString(); t.completedBy = meName();
+  let nx = null; if(live) nx = fuEnsure(q, next, `Chased on ${today} (${ch[1].toLowerCase()}). Next follow-up on quote ${qRef(q)}.`);
+  render(); saveState();
+  showToast(nx ? `Chase logged (${ch[1].toLowerCase()}). Next follow-up ${fmtDisplay(toDate(nx.dueDate))}.` : 'Chase logged.');
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-chased]'); if(b && state){ e.stopPropagation(); e.preventDefault(); selChase(b.dataset.chased); return; }
+  const k = e.target.closest && e.target.closest('[data-sel-task]'); if(k && state){ e.stopPropagation(); e.preventDefault(); openTaskPanel(k.dataset.selTask); }
+}, true);
+/* days since contact (working days), on quotes that are waiting for an answer and on open leads */
+function quoteLastContact(q){
+  const ds = [q.sentAt]; (q.timeline || []).forEach(x => { if(x.kind === 'chase' || x.kind === 'sent') ds.push(x.date); });
+  const d = qDeal(q); if(d) ds.push(leadLastContact(d.rec));
+  return ds.filter(Boolean).sort().pop() || '';
+}
+function quoteDaysSince(q){ if(q.status !== 'Sent') return null; const l = quoteLastContact(q); return l ? wdSince(l, fmt(new Date())) : null; }
+function leadDaysSince(r){ const ref = leadLastContact(r) || (typeof leadCreatedDate === 'function' ? leadCreatedDate(r) : ''); return ref ? wdSince(ref, fmt(new Date())) : null; }
+function noContactChipHtml(n){ return n !== null && n >= state.settings.noContactDays ? `<span class="sf-chip warn" title="No contact for ${n} working days (the flag is set in Settings, Selling)">${n} days since contact</span>` : ''; }
+SEL_SET_CARDS.push(['Follow-up and contact', () => {
+  const st = state.settings;
+  return `<p class="q-help" style="margin:0 0 8px;">When a quote is marked as sent, a follow-up task is made automatically (once per quote) and shows on Today. Press <b>Chased</b> on the task, pick the channel, and the next one is suggested. Gaps count Monday to Friday; bank holidays are ignored for now.</p>
+    <div class="assumptions-grid" style="max-width:760px;">
+      <div><label>Follow-up gap (working days)</label><input type="number" min="1" step="1" data-fu="followUpGapDays" value="${st.followUpGapDays}"></div>
+      <div><label>No-contact flag after (working days)</label><input type="number" min="1" step="1" data-fu="noContactDays" value="${st.noContactDays}"></div>
+      <div style="grid-column:1/-1;"><label>Follow-up task name</label><input type="text" data-fu="followUpTaskName" value="${escAttr(st.followUpTaskName)}"><div class="q-help">{quote} becomes the quote reference, {customer} the customer name.</div></div>
+    </div>
+    <p class="q-help" style="margin:8px 0 0;">The earlier setting “follow-up after sending (days)” was in calendar days (${st.followUpDays}). It is kept as stored but no longer used.</p>`;
+}]);
+document.addEventListener('change', (e) => {
+  const el = e.target, k = el.dataset && el.dataset.fu; if(!k || !state) return;
+  if(k === 'followUpTaskName'){ if(el.value.trim()) state.settings.followUpTaskName = el.value.trim(); }
+  else { const n = Math.round(Number(el.value)); if(!isNaN(n) && n >= 1) state.settings[k] = n; }
+  saveState(); render();
+});
+/* ---------- the quotes list columns ---------- */
+function qlistCells(q){
+  const d = qDeal(q), ds = quoteDaysSince(q), t = fuTaskOf(q), cid = (q.contactIds || [])[0];
+  const cust = q.customer ? (cid && ctFind(cid) ? `<button type="button" class="sp-link" data-nav="contact:${escAttr(cid)}">${escHtml(q.customer)}</button>` : escHtml(q.customer)) : '—';
+  const proj = q.project ? (d ? `<button type="button" class="sp-link" data-nav="deal2:${d.rec.id}">${escHtml(q.project)}</button>` : escHtml(q.project)) : (d ? `<button type="button" class="sp-link" data-nav="deal2:${d.rec.id}">${escHtml(recordCode(d.rec.id, d.pl))}</button>` : '—');
+  const since = ds === null ? '<span class="qb-dim">—</span>' : (noContactChipHtml(ds) || `${ds} working day${ds === 1 ? '' : 's'}`);
+  const next = t ? `<button type="button" class="sp-link" data-sel-task="${escAttr(t.id)}" title="Open the follow-up task">${escHtml(dShow(t.dueDate))}</button>${t.dueDate < fmt(new Date()) ? ' <span class="sf-chip bad">overdue</span>' : ''}` : (q.status === 'Sent' ? '<span class="sf-chip warn">none planned</span>' : '<span class="qb-dim">—</span>');
+  return { cust, proj, since, next };
+}
 
 /* BT:js-selling end */
 
