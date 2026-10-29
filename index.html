@@ -2746,6 +2746,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <button type="button" class="nav-label nav-gbtn" id="gh-business" aria-expanded="false" aria-controls="gp-business"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Business</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-business" role="group" aria-labelledby="gh-business">
       <button type="button" class="tab g-business" data-tab="businessplan">Business Plan</button>
+      <button type="button" class="tab g-business" data-tab="businesscosts">Business costs</button>
       <button type="button" class="tab g-business" data-tab="actions">Business tasks</button>
     </div>
   </div>
@@ -3069,6 +3070,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div id="txnPending"></div>
     <div class="btn-row"><button class="btn" data-fin="txn-add">+ Add transaction</button></div>
     <div class="table-scroll" id="transactionsTableWrap"></div>
+  </div>
+
+  <!-- BUSINESS COSTS -->
+  <div class="panel" id="panel-businesscosts">
+    <div class="page-head">
+      <h2>Business costs</h2>
+      <div class="desc">What the business pays whether or not a job is running: insurance, accountancy, subscriptions, phone. Each has an amount, how often it recurs and when it is next due. Dated costs go into the Cash Flow Forecast, and a matching transaction ticks a cost off as paid once you confirm it.</div>
+    </div>
+    <div id="bcBody"></div>
   </div>
 
   <!-- CLASSIFY -->
@@ -10664,6 +10674,7 @@ function finSrcLink(src, text){
   if(src.t === 'po') return d('po:' + src.id);
   if(src.t === 'deal') return d('deal:' + src.id);
   if(src.t === 'asset') return d('asset:' + src.id);
+  if(src.t === 'bcost') return d('bcost:' + src.id);
   return t;
 }
 function finNavOpen(kind, id, extra){
@@ -10672,21 +10683,23 @@ function finNavOpen(kind, id, extra){
   else if(kind === 'deal'){ openDetail('sales', Number(id)); }
   else if(kind === 'po' && typeof poOpen === 'function') poOpen(Number(id));
   else if(kind === 'asset') assetNavOpen(id);
+  else if(kind === 'bcost'){ bcUi.flash = id; activateTab('businesscosts'); renderBusinessCosts(); window.scrollTo(0, 0); setTimeout(() => { const el = document.querySelector('#bcBody tr.inv-flash'); if(el) el.scrollIntoView({ block: 'center' }); }, 30); }
   else if(kind === 'page'){ if(document.querySelector('.tab[data-tab="' + id + '"]')){ activateTab(id); window.scrollTo(0, 0); } }
 }
 /* ---------- cash flow: every number can be opened to the lines behind it ---------- */
 const cfUi = { sel: null };
 navExtra('cf', () => cfUi.sel, v => { cfUi.sel = v; });
-const CF_ROWS = [['committed', 'Cash in: customer payments (projects, incl. scope additions)', 1], ['weighted', 'Cash in: weighted pipeline', 1], ['materials', 'Cash out: materials (stage costs)', -1], ['qIn', 'Quotes: cash in (accepted)', 1], ['qOut', 'Quotes and projects: supplier payments (accepted)', -1],
+const CF_ROWS = [['bizcost', 'Cash out: business costs (Business costs page)', -1], ['committed', 'Cash in: customer payments (projects, incl. scope additions)', 1], ['weighted', 'Cash in: weighted pipeline', 1], ['materials', 'Cash out: materials (stage costs)', -1], ['qIn', 'Quotes: cash in (accepted)', 1], ['qOut', 'Quotes and projects: supplier payments (accepted)', -1],
   ['qInIf', 'Quotes: cash in (if won, sent)', 1], ['qOutIf', 'Quotes: cash out (if won, sent)', -1], ['fixed', 'Cash out: fixed overhead', -1], ['actIn', 'Actual: money in (bank)', 1], ['actOut', 'Actual: money out (bank)', -1], ['custOrder', 'Memo: customer orders placed (contract + variations)', 0], ['supOrder', 'Memo: supplier orders (by drop date)', 0]];
 function computeCashFlow(months){
-  const fixedMonthly = totalOverhead() / 12, today = fmt(new Date()), curKey = today.slice(0, 7), startD = bankStartDate();
+  const fixedMonthly = bcFixedMonthly(), today = fmt(new Date()), curKey = today.slice(0, 7), startD = bankStartDate();
   const colKey = d => { const k = String(d).slice(0, 7); return k < curKey ? curKey : k; };   // an unsettled item whose date has passed has not happened: it is still to come, so it sits in this month
   const counted = state.transactions.filter(txCounted), actOf = (key, f) => counted.filter(t => txCashDate(t).slice(0, 7) === key && f(t));
   const projLines = qid => { const q = qFind(qid), root = q && (q.linkedIds || []).map(linkedRoot).find(id => state.projects.some(p => p.id === id)), pr = root && state.projects.find(p => p.id === root); return !!(pr && (pr.paymentLines || []).some(l => l.quoteRowId && q.payments.some(r => r.id === l.quoteRowId))); };
   const qItems = qAllCashItems().filter(i => !(i.kind === 'in' && projLines(i.qid))), liveRoots = new Set(qLive().flatMap(q => (q.linkedIds || []).map(linkedRoot)));   // a deal with a live quote is counted from the quote, not from its stage costs
   const tradeDays = (state.settings && state.settings.tradeAccountDays) || 30, FL = finLines(), srcQ = i => ({ t: 'quote', id: i.qid });
   const extra = typeof cfAssetLines === 'function' ? cfAssetLines : null;
+  const bcMap = {}, bcSet = bcMatchedKeys(); bcForecastItems(monthKey(months[months.length - 1])).forEach(it => { const k = colKey(it.date); (bcMap[k] = bcMap[k] || []).push(it); });   // Stage 5: dated business costs
   let closing = null, closingIf = null;
   return months.map((m, mi) => {
     const key = monthKey(m), past = key < curKey, cur = key === curKey; let committedIn = 0, weightedIn = 0, materialsOut = 0; const ln = {}; CF_ROWS.forEach(r => ln[r[0]] = []); ln.assets = [];
@@ -10713,13 +10726,14 @@ function computeCashFlow(months){
     let qIn = 0, qOut = 0, qInIf = 0, qOutIf = 0;
     qItems.forEach(i => { if(colKey(i.date) !== key) return; const acc = i.status === 'Accepted', row = i.kind === 'in' ? (acc ? 'qIn' : 'qInIf') : (acc ? 'qOut' : 'qOutIf'); add(row, i.label + (i.estimated ? ' (est.)' : '') + ' · ' + i.ref, i.amount, i.date, srcQ(i)); if(i.kind === 'in'){ if(acc) qIn += i.amount; else qInIf += i.amount; } else { if(acc) qOut += i.amount; else qOutIf += i.amount; } });
     FL.filter(x => (x.kind === 'custOrder' || x.kind === 'supOrder') && x.date && x.date.slice(0, 7) === key).forEach(x => add(x.kind, x.label, x.amount, x.date, x.src, x.pname));
-    const overheadDone = r2(actOf(key, t => t.category === 'Overhead' && Number(t.moneyOut) > 0).reduce((a, t) => a + Number(t.moneyOut), 0)), fixed = past ? 0 : Math.max(0, r2(fixedMonthly - overheadDone));   // overhead already paid this month is an actual: only the rest is forecast
+    let bizOut = 0; (bcMap[key] || []).forEach(it => { bizOut += it.amount; add('bizcost', it.name + (it.date < today ? ' (overdue)' : ''), it.amount, it.date, { t: 'bcost', id: it.id }); });
+    const overheadDone = r2(actOf(key, t => t.category === 'Overhead' && Number(t.moneyOut) > 0 && !bcSet.has(bcTxnKey(t))).reduce((a, t) => a + Number(t.moneyOut), 0)), fixed = past ? 0 : Math.max(0, r2(fixedMonthly - overheadDone));   // overhead already paid this month is an actual: only the rest is forecast
     add('fixed', 'Fixed monthly overhead (Settings > Pricing)' + (overheadDone > 0 ? ' less ' + qm(overheadDone) + ' already paid' : ''), fixed, fmt(m), null);
     let assetsOut = 0; if(extra && !past){ extra(key).forEach(a => { assetsOut += a.amount; ln.assets.push(a); }); }
-    const fnet = committedIn + weightedIn + qIn - materialsOut - qOut - fixed - assetsOut, anet = actIn - actOut, net = fnet + anet;
+    const fnet = committedIn + weightedIn + qIn - materialsOut - qOut - fixed - assetsOut - bizOut, anet = actIn - actOut, net = fnet + anet;
     if(closing === null){ const pk = prevMonthKey(key), base = (key <= curKey) ? bankBalance(monthEnd(pk)) : bankBalance(); closing = base; closingIf = base; }
     closing += net; closingIf += net + qInIf - qOutIf;
-    return { key, label: monthLabel(m), past, cur, preStart: monthEnd(key) < startD, actIn, actOut, committedIn, weightedIn, materialsOut, fixedMonthly: fixed, assetsOut, qIn, qOut, qInIf, qOutIf, net, closing, closingIf, lines: ln, custOrders: ln.custOrder.reduce((a, x) => a + x.amount, 0), supOrders: ln.supOrder.reduce((a, x) => a + x.amount, 0) };
+    return { key, label: monthLabel(m), past, cur, preStart: monthEnd(key) < startD, actIn, actOut, bizOut, committedIn, weightedIn, materialsOut, fixedMonthly: fixed, assetsOut, qIn, qOut, qInIf, qOutIf, net, closing, closingIf, lines: ln, custOrders: ln.custOrder.reduce((a, x) => a + x.amount, 0), supOrders: ln.supOrder.reduce((a, x) => a + x.amount, 0) };
   });
 }
 function cfCell(c, row, v, neg, extraCls){
@@ -10738,7 +10752,7 @@ function renderCashflow(){
     `<div><label>Starting balance (£)</label><input type="number" step="any" data-tab="settings" data-field="startingCash" value="${bankStart()}"></div>
      <div><label>Starting balance as at</label><input type="date" data-tab="settings" data-field="startingBalanceDate" value="${bankStartDate()}"></div>
      <div><label>Bank balance now (actual)</label><input class="computed" disabled value="${qm(bankBalance())}"></div>
-     <div><label>Fixed monthly overhead (£)</label><input class="computed" disabled value="${money(totalOverhead()/12)}"></div>
+     <div><label>Fixed monthly overhead (£)</label><input class="computed" disabled value="${money(bcFixedMonthly())}"></div>
      <div class="cf-recon">${reconStatusHtml()}</div>`;
   document.getElementById('cashflowTotals').innerHTML = finTotalsHtml();
   const months = getMonthRange(); const cf = computeCashFlow(months), hasAssets = cf.some(c => c.assetsOut > 0);
@@ -10754,6 +10768,7 @@ function renderCashflow(){
     ${R('qInIf', 'Quotes — cash in <em>(if won, sent)</em>', c => c.qInIf, false, 'cf-ifwon')}
     ${R('qOutIf', 'Quotes — cash out <em>(if won, sent)</em>', c => c.qOutIf, true, 'cf-ifwon')}
     ${R('fixed', 'Cash out — fixed overhead', c => c.fixedMonthly, true)}
+    ${cf.some(c => c.bizOut > 0) ? R('bizcost', 'Cash out — business costs (Business costs page)', c => c.bizOut, true) : ''}
     ${hasAssets ? R('assets', 'Cash out — approved asset plan', c => c.assetsOut, true) : ''}
     <tr><td><strong>Net cash flow</strong></td>${cf.map(c=>`<td><strong>${c.net<0?'-':''}${money(Math.abs(c.net))}</strong></td>`).join('')}</tr>
     <tr><td>Closing balance <em>(actual to date, then forecast)</em></td>${cf.map(c=>c.preStart ? '<td class="qb-dim" title="Before the starting balance date">—</td>' : `<td${c.closing<0?' style="color:var(--bt-bad-fg);font-weight:700;"':''}>${money(c.closing)}</td>`).join('')}</tr>
@@ -12124,7 +12139,7 @@ function applyContractSigned(r){
 }
 
 /* ---------- pricing ---------- */
-function totalOverhead(){ const a=state.assumptions; return Number(a.ohInsurance)+Number(a.ohAccounting)+Number(a.ohVehicle)+Number(a.ohTools)+Number(a.ohMarketing); }
+function totalOverhead(){ if(state.settings && state.settings.bizCostsForOverheads) return bcYearly(); const a=state.assumptions; return Number(a.ohInsurance)+Number(a.ohAccounting)+Number(a.ohVehicle)+Number(a.ohTools)+Number(a.ohMarketing); }
 function overheadPerDay(){ return totalOverhead() / (Number(state.assumptions.workingDaysPerYear)||1); }
 function renderAssumptionsGrid(){
   const a = state.assumptions;
@@ -12136,7 +12151,7 @@ function renderAssumptionsGrid(){
   document.getElementById('assumptionsGrid').innerHTML = fields.map(([k,l]) =>
     `<div><label>${l}</label><input type="number" step="0.01" data-tab="assumptions" data-field="${k}" value="${a[k]}"></div>`
   ).join('') +
-    `<div><label>Total overhead (£/yr)</label><input class="computed" disabled value="${money(totalOverhead())}"></div>
+    `<div><label>Total overhead (£/yr)${state.settings.bizCostsForOverheads ? ' · from the Business costs list' : ''}</label><input class="computed" disabled value="${money(totalOverhead())}"></div>
      <div><label>Overhead per working day (£)</label><input class="computed" disabled value="${overheadPerDay().toFixed(2)}"></div>`;
 }
 function renderPricing(){
@@ -14439,7 +14454,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
-  try{ renderClassify(); }catch(e){ console.error(e); }
+  try{ renderClassify(); renderBusinessCosts(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
@@ -14856,7 +14871,7 @@ const BTT_SPECS = [
   { k: 'milestonesTableWrap', label: 'Milestones' },
   { k: 'panel-crmprojects:code-name', label: 'Projects overview' }
 ];
-const BTT_CARD_KEYS = ['leadsTableWrap', 'pipelineTableWrap', 'projectsTableWrap', 'crmTableWrap', 'actionsTableWrap', 'suppliersTableWrap', 'transactionsTableWrap', 'panel-invoicing:project-invoice', 'panel-purchaseorders:po-project', 'cls-waiting', 'cls-done'];
+const BTT_CARD_KEYS = ['leadsTableWrap', 'pipelineTableWrap', 'projectsTableWrap', 'crmTableWrap', 'actionsTableWrap', 'suppliersTableWrap', 'transactionsTableWrap', 'panel-invoicing:project-invoice', 'panel-purchaseorders:po-project', 'cls-waiting', 'cls-done', 'bc-list'];
 const BTT_EXTRA_RE = /^(notes?|comments?|description|email|phone|postcode|address|website|serial|residual|life|insurance|service|created|source|payment terms|lead time|categories|linked|replacement|book value|last contacted|last touched|in progress|raised|version|prob|owner|sent|tier|type|date raised|\+ owner)\b/i;
 const BTT_ESS_RE = /^(code|ref|reference|po|invoice|name|title|project|project name|project \/ client|supplier|customer|company|contact|item|action|stage|status|lead status|sales stage|month|date|due|deadline|amount|value|total|quote|agreed value|total ex vat|tier name|in \(|out \()/i;
 const BTT_NAME_RE = /^(name|title|project|project name|project \/ client|supplier|customer|company|contact|description|item|action|stage|long-term goal|trade area|role|category|linked record|linked lead|main contact|categories)/i;
@@ -15181,6 +15196,7 @@ function activateTab(name){
   if(typeof approverMode === 'function' && state && approverMode() && !approverPages().includes(name)) name = 'quotations';   // an approver only reaches the pages their scope allows
   if(name === 'admin'){ name = 'actions'; setTimeout(() => { const t = document.getElementById('bizAdminSec'); if(t) t.scrollIntoView({ block: 'start' }); }, 30); }   // Setup & Admin now lives on the Business tasks page
   if(name === 'actions' && typeof canSeeBusiness === 'function' && state && !canSeeBusiness()){ showToast('Business tasks are only visible to the people set under Settings'); return; }
+  if(name === 'businesscosts' && typeof canSeeBusiness === 'function' && state && !canSeeBusiness()){ showToast('Business costs are only visible to the people set under Settings'); return; }
   const tab = document.querySelector('.tab[data-tab="' + name + '"]'), panel = document.getElementById('panel-' + name);
   if(!tab || !panel) return;
   document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.removeAttribute('aria-current'); });
@@ -15234,6 +15250,7 @@ const MENU_ICONS = {
   approvals: '<circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/>',
   cashflow: '<path d="M3 12c3-6 6-6 9 0s6 6 9 0"/>',
   invoicing: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/>',
+  businesscosts: '<rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="15" x2="11" y2="15"/>',
   classify: '<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/><line x1="11" y1="12" x2="15" y2="12"/>',
   transactions: '<polyline points="17 3 21 7 17 11"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 13 3 17 7 21"/><line x1="3" y1="17" x2="15" y2="17"/>',
   pricing: '<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
@@ -18317,7 +18334,8 @@ document.addEventListener('change', (e) => {
 });
 /* hide the Business tasks page from anyone not allowed, wherever the menu is drawn */
 function bizSyncMenu(){
-  const ok = canSeeBusiness(), t = document.querySelector('#sidebar .tab[data-tab="actions"]'); if(!t) return;
+  const ok = canSeeBusiness(), t = document.querySelector('#sidebar .tab[data-tab="actions"]'), t2 = document.querySelector('#sidebar .tab[data-tab="businesscosts"]'); if(!t) return;
+  if(t2 && t2.hidden === ok){ t2.hidden = !ok; try{ if(menuUi.built) menuBuild(); }catch(e){} if(!ok && navTabName() === 'businesscosts') activateTab('today'); }   // Stage 5: the costs page follows the same visibility setting
   if(t.hidden === !ok) return; t.hidden = !ok; try{ if(menuUi.built) menuBuild(); }catch(e){}
   if(!ok && navTabName() === 'actions') activateTab('today');
 }
@@ -20013,6 +20031,147 @@ document.addEventListener('change', (e) => {
   if(d.clsPid !== undefined){ const k = d.clsPid; clsUi.draft[k] = Object.assign({}, clsUi.draft[k], { pid: el.value }); return; }
   if(d.clsEdit !== undefined){ const t = state.transactions[Number(d.clsEdit)]; if(!t) return; clsApply(t, el.value, 'chosen', t.costProjectId); clsAfter(); return; }
   if(d.clsEditpid !== undefined){ const t = state.transactions[Number(d.clsEditpid)]; if(!t) return; clsApply(t, 'job', t.classHow || 'chosen', el.value); clsAfter(); }
+});
+
+
+/* =====================================================================
+   Step 3: BUSINESS COSTS
+   state.businessCosts: [{ id, name, amount, freq ('weekly'|'monthly'|'quarterly'|'yearly'|'oneoff'), nextDue, category, notes, fromOh, done, paid: [{ due, date, amount, txn, at, by }], dismissed: [txn key] }]
+   Empty by default. The five yearly overhead lines in the Pricing Model are never removed or changed, and totalOverhead() gives the same figure as before unless
+   settings.bizCostsForOverheads is switched on (a button on this page, off by default, asks first). Dated list items feed the cash flow forecast on their due dates.
+   An item started from an overhead line (fromOh) takes that line's share out of the forecast's evenly spread "fixed overhead" row, so it is not counted twice.
+   A matching transaction is only ever SUGGESTED; ticking a cost off as paid is your confirmation.
+   ===================================================================== */
+const BC_FREQ = [['weekly', 'Weekly'], ['monthly', 'Monthly'], ['quarterly', 'Quarterly'], ['yearly', 'Yearly'], ['oneoff', 'One-off']];
+const BC_CATS = ['Insurance', 'Accounting', 'Vehicle', 'Tools', 'Marketing', 'Software and subscriptions', 'Phone', 'Fuel', 'Premises', 'Other'];
+const BC_OH = [['ohInsurance', 'Insurance', 'Insurance'], ['ohAccounting', 'Accounting', 'Accounting'], ['ohVehicle', 'Vehicle', 'Vehicle'], ['ohTools', 'Tools', 'Tools'], ['ohMarketing', 'Marketing', 'Marketing']];
+function ensureMoneyModel(o){
+  const str = v => v == null ? '' : String(v), ok = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '');
+  o.businessCosts = (Array.isArray(o.businessCosts) ? o.businessCosts : []).filter(c => c && typeof c === 'object').map(c => { const n = Number(c.amount);
+    return { id: str(c.id) || 'bc_' + Math.random().toString(36).slice(2, 9), name: str(c.name), amount: (c.amount === '' || c.amount == null || isNaN(n) || n < 0) ? '' : n, freq: BC_FREQ.some(f => f[0] === c.freq) ? c.freq : 'monthly',
+      nextDue: ok(c.nextDue) ? c.nextDue : '', category: str(c.category), notes: str(c.notes), fromOh: str(c.fromOh), done: c.done === true,
+      paid: (Array.isArray(c.paid) ? c.paid : []).filter(x => x && typeof x === 'object').map(x => ({ due: str(x.due), date: str(x.date), amount: Number(x.amount) || 0, txn: str(x.txn), at: str(x.at), by: str(x.by) })),
+      dismissed: (Array.isArray(c.dismissed) ? c.dismissed : []).map(String) }; });
+  const st = o.settings = o.settings || {}; st.bizCostsForOverheads = st.bizCostsForOverheads === true;
+}
+(function(){ const o = ensurePlanModel3; ensurePlanModel3 = function(x){ o(x); ensureMoneyModel(x); }; })();
+const bcAmt = c => Number(c.amount) > 0 ? Number(c.amount) : 0;
+function bcPerMonth(c){ const a = bcAmt(c); return c.freq === 'weekly' ? a * 52 / 12 : c.freq === 'monthly' ? a : c.freq === 'quarterly' ? a / 3 : c.freq === 'yearly' ? a / 12 : 0; }
+function bcRaw(){ return (state.businessCosts || []).reduce((s, c) => s + bcPerMonth(c), 0); }
+function bcMonthly(){ return r2(bcRaw()); }
+function bcYearly(){ return r2(bcRaw() * 12); }
+function bcNext(iso, freq){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if(!m) return '';
+  if(freq === 'weekly') return addDaysIso(iso, 7);
+  const add = freq === 'monthly' ? 1 : freq === 'quarterly' ? 3 : freq === 'yearly' ? 12 : 0; if(!add) return '';
+  const y = +m[1], mo = +m[2] - 1 + add, d = +m[3], ty = y + Math.floor(mo / 12), tm = ((mo % 12) + 12) % 12, last = new Date(Date.UTC(ty, tm + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(ty, tm, Math.min(d, last))).toISOString().slice(0, 10);
+}
+/* every unpaid due date of a cost up to the last forecast month */
+function bcForecastItems(lastKey){
+  const out = [];
+  (state.businessCosts || []).forEach(c => {
+    if(!c.nextDue || c.done || !(bcAmt(c) > 0)) return; let d = c.nextDue, guard = 0;
+    while(d && d.slice(0, 7) <= lastKey && guard++ < 400){ out.push({ id: c.id, name: c.name || 'Business cost', amount: bcAmt(c), date: d }); if(c.freq === 'oneoff') break; d = bcNext(d, c.freq); }
+  });
+  return out;
+}
+/* the share of the evenly spread yearly overheads that a dated list item now covers, so the forecast does not count it twice */
+function bcOhLinked(){ return r2((state.businessCosts || []).filter(c => c.fromOh && c.nextDue && !c.done).reduce((s, c) => s + (Number((state.assumptions || {})[c.fromOh]) || 0), 0)); }
+function bcOhLinesTotal(){ const a = state.assumptions; return Number(a.ohInsurance) + Number(a.ohAccounting) + Number(a.ohVehicle) + Number(a.ohTools) + Number(a.ohMarketing); }
+function bcFixedMonthly(){ return state.settings.bizCostsForOverheads ? 0 : Math.max(0, (bcOhLinesTotal() - bcOhLinked()) / 12); }
+function bcTxnKey(t){ return t.uid || [t.date, t.moneyOut, t.description].join('|'); }
+function bcMatchedKeys(){ const s = new Set(); (state.businessCosts || []).forEach(c => c.paid.forEach(x => { if(x.txn) s.add(x.txn); })); return s; }
+const bcIsMatched = t => bcMatchedKeys().has(bcTxnKey(t));
+/* the best transaction for a cost's next due date: near the date, near the amount, not a job or asset cost; the name helps */
+function bcSuggest(c){
+  if(!c.nextDue || c.done || !(bcAmt(c) > 0)) return null; const used = bcMatchedKeys(), word = String(c.name || '').trim().toLowerCase().split(/\s+/)[0] || '', best = { s: -1, t: null };
+  state.transactions.forEach((t, i) => {
+    const out = Number(t.moneyOut) || 0; if(!(out > 0) || !t.date || used.has(bcTxnKey(t)) || c.dismissed.includes(bcTxnKey(t))) return;
+    if(t.projectId || clsOf(t) === 'job' || clsOf(t) === 'asset') return;
+    const dd = Math.abs(daysBetween(c.nextDue, t.date)), diff = Math.abs(out - bcAmt(c)) / bcAmt(c); if(dd > 21 || diff > 0.05) return;
+    const nm = word && String(t.description || '').toLowerCase().includes(word), cat = t.category === 'Overhead' || clsOf(t) === 'business'; if(!nm && !cat) return;
+    const sc = (nm ? 3 : 0) + (cat ? 1 : 0) + (1 - diff) + (1 - dd / 21); if(sc > best.s){ best.s = sc; best.t = t; best.i = i; }
+  });
+  return best.t ? { t: best.t, i: best.i } : null;
+}
+/* average gross margin: the margin now on every project with an accepted quote, as a share of what those projects bring in (contract and approved variations) */
+function bcMargin(){
+  let rev = 0, mar = 0, n = 0;
+  state.projects.forEach(p => { let mg = null; try{ mg = projMarginCC(p); }catch(e){} if(!mg) return; const r = mg.contract + mg.vars; if(!(r > 0)) return; rev += r; mar += mg.now; n++; });
+  return { n, rev: r2(rev), margin: r2(mar), pct: rev > 0 ? mar / rev * 100 : 0 };
+}
+const bcUi = { flash: '' };
+function bcCatOpts(){ return '<datalist id="bcCats">' + BC_CATS.map(c => `<option value="${escAttr(c)}">`).join('') + '</datalist>'; }
+function renderBusinessCosts(){
+  const el = document.getElementById('bcBody'); if(!el || !state) return;
+  const list = state.businessCosts, mo = bcMonthly(), mg = bcMargin(), be = mg.pct > 0 ? mo / (mg.pct / 100) : 0, today = fmt(new Date());
+  const next = list.filter(c => c.nextDue && !c.done).sort((a, b) => a.nextDue.localeCompare(b.nextDue))[0];
+  const kpi = (l, v, s, a, cls) => `<div class="kpi" style="--accent:${a}"><div class="label">${l}</div><div class="value ${cls || ''}">${v}</div><div class="fin-sub">${s}</div></div>`;
+  const sugg = list.map(c => ({ c, m: bcSuggest(c) })).filter(x => x.m);
+  const startedKeys = new Set(list.map(c => c.fromOh)), canStart = BC_OH.some(o => !startedKeys.has(o[0]));
+  const rows = list.map(c => {
+    const at = `data-bc-id="${escAttr(c.id)}"`, od = c.nextDue && !c.done && c.nextDue < today;
+    return `<tr class="${bcUi.flash === c.id ? 'inv-flash' : ''}${c.done ? ' pw-removed' : ''}"><td><input data-bc="name" ${at} value="${escAttr(c.name)}" placeholder="e.g. Public liability insurance" aria-label="Name"></td>
+      <td><input type="number" step="0.01" min="0" class="qb-n" data-bc="amount" ${at} value="${c.amount === '' ? '' : c.amount}" aria-label="Amount"></td>
+      <td><select data-bc="freq" ${at} aria-label="How often">${BC_FREQ.map(f => `<option value="${f[0]}"${c.freq === f[0] ? ' selected' : ''}>${f[1]}</option>`).join('')}</select></td>
+      <td><span${od ? ' class="over"' : ''}><input type="date" data-bc="nextDue" ${at} value="${escAttr(c.nextDue)}" aria-label="Next due"></span>${c.done ? '<div class="qb-dim">paid</div>' : (od ? '<div class="qb-flag bad">overdue</div>' : '')}</td>
+      <td><input data-bc="category" ${at} list="bcCats" value="${escAttr(c.category)}" aria-label="Category"></td>
+      <td><input data-bc="notes" ${at} value="${escAttr(c.notes)}" aria-label="Notes"></td>
+      <td class="qb-calc">${c.freq === 'oneoff' ? '<span class="qb-dim">one-off</span>' : qm(bcPerMonth(c))}${c.fromOh ? '<div class="qb-dim" style="font-size:var(--bt-fs-xs);">from the Pricing Model ' + escHtml((BC_OH.find(o => o[0] === c.fromOh) || [0, c.fromOh])[1].toLowerCase()) + ' line</div>' : ''}${c.paid.length ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${c.paid.length} paid · last ${pwD(c.paid[c.paid.length - 1].date)}</div>` : ''}</td>
+      <td><button type="button" class="icon-btn" data-bc-a="del" ${at} aria-label="Delete cost">${X_SVG}</button></td></tr>`;
+  }).join('');
+  const useOn = state.settings.bizCostsForOverheads;
+  el.innerHTML = `${bcCatOpts()}<div class="kpi-row">${kpi('Monthly business costs', qm(mo), 'recurring items, per month (weekly x 52 ÷ 12, quarterly ÷ 3, yearly ÷ 12)', 'var(--oak)')}
+    ${kpi('Break-even sales a month', mg.pct > 0 ? qm(be) : '—', mg.pct > 0 ? 'monthly costs ÷ ' + mg.pct.toFixed(1) + '% average gross margin' : 'needs a project with an accepted quote to work out the margin', 'var(--green)')}
+    ${kpi('Average gross margin', mg.pct > 0 ? mg.pct.toFixed(1) + '%' : '—', mg.n + ' project' + (mg.n === 1 ? '' : 's') + ': margin now ' + qm(mg.margin) + ' on ' + qm(mg.rev), 'var(--slate)')}
+    ${kpi('Next due', next ? pwD(next.nextDue) : '—', next ? escHtml(next.name || 'Business cost') + ' · ' + qm(bcAmt(next)) : 'no dated cost yet', 'var(--bt-plum)')}</div>
+    ${sugg.length ? `<div class="card" id="bcSugg"><div class="qb-sec-h"><h4>Suggested matches <span class="qb-dim">(a transaction that looks like a cost's next payment: you confirm)</span></h4></div>
+      <table class="qb-table qb-narrow"><thead><tr><th>Cost</th><th>Due</th><th>Transaction</th><th>Amount</th><th></th></tr></thead><tbody>${sugg.map(({ c, m }) => `<tr><td>${escHtml(c.name || 'Business cost')}</td><td>${pwD(c.nextDue)}</td><td>${pwD(m.t.date)} · ${escHtml(m.t.description || '')} ${finSrcLink({ t: 'txn', id: m.t.uid || String(m.i) }, 'open →')}</td><td class="qb-calc">${qm(m.t.moneyOut)}</td><td><button type="button" class="btn qb-sm" data-bc-a="match" data-bc-id="${escAttr(c.id)}">Tick off as paid…</button> <button type="button" class="btn secondary qb-sm" data-bc-a="nomatch" data-bc-id="${escAttr(c.id)}">Not this one</button></td></tr>`).join('')}</tbody></table></div>` : ''}
+    <div class="btn-row"><button type="button" class="btn" data-bc-a="add">+ Add business cost</button>${canStart ? '<button type="button" class="btn secondary" data-bc-a="start">Start from the existing overheads</button>' : ''}
+      ${useOn ? '<button type="button" class="btn secondary" data-bc-a="use-off">Stop using this list for the Pricing Model overheads</button>' : '<button type="button" class="btn secondary" data-bc-a="use-on">Use this list for the Pricing Model overheads</button>'}</div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table" data-rt="bc-list"><thead><tr><th>Name</th><th>Amount (£)</th><th>How often</th><th>Next due</th><th>Category</th><th>Notes</th><th>Per month</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="8"><div class="sup-empty">No business costs yet. Add one, or start from the five yearly overhead lines in the Pricing Model.</div></td></tr>'}</tbody>
+      ${list.length ? `<tfoot><tr class="qb-foot"><td><b>Total per month</b></td><td></td><td></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(mo)}</b></td><td></td></tr></tfoot>` : ''}</table></div></div>
+    <p class="q-help">Dated costs go into the Cash Flow Forecast on their due dates, row “Cash out: business costs”. The forecast still spreads the five yearly Pricing Model overhead lines evenly (${qm(bcFixedMonthly())} a month now); a cost started from one of those lines, once it has a date, takes that line's share out of the spread so it is not counted twice. Break-even is the sales a month needed for the margin on jobs to cover these costs. The profit share is not a business cost here: it is taken from each job's profit.</p>
+    <p class="q-help">Pricing Model overheads are ${useOn ? '<b>using this list</b> (' + qm(bcYearly()) + ' a year)' : '<b>unchanged</b> (' + qm(bcOhLinesTotal()) + ' a year from the five lines)'}. ${useOn ? '' : 'Nothing changes there unless you press “Use this list for the Pricing Model overheads” and confirm.'}</p>`;
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-bc-a]'); if(!b || !state) return; const a = b.dataset.bcA, c = (state.businessCosts || []).find(x => x.id === b.dataset.bcId);
+  if(a === 'add'){ const n = { id: 'bc_' + Math.random().toString(36).slice(2, 9), name: '', amount: '', freq: 'monthly', nextDue: '', category: '', notes: '', fromOh: '', done: false, paid: [], dismissed: [] }; state.businessCosts.push(n); bcUi.flash = n.id; saveState(); render(); setTimeout(() => { const i = document.querySelector(`[data-bc="name"][data-bc-id="${n.id}"]`); if(i) i.focus(); }, 30); return; }
+  if(a === 'start'){
+    const have = new Set(state.businessCosts.map(x => x.fromOh)), add = BC_OH.filter(o => !have.has(o[0]));
+    add.forEach(o => state.businessCosts.push({ id: 'bc_' + o[0], name: o[1], amount: Number(state.assumptions[o[0]]) || 0, freq: 'yearly', nextDue: '', category: o[2], notes: 'Started from the Pricing Model overhead line. Set the date it is next due.', fromOh: o[0], done: false, paid: [], dismissed: [] }));
+    saveState(); render(); showToast(add.length + ' cost' + (add.length === 1 ? '' : 's') + ' started from the overhead lines. The Pricing Model lines are unchanged.'); return; }
+  if(a === 'use-on'){
+    const ok = await showConfirm('Use this list for the Pricing Model overheads?', `The Pricing Model's total overhead would become ${qm(bcYearly())} a year from this list, instead of ${qm(bcOhLinesTotal())} from the five lines, and every price and overhead per day that follows from it would move. The five lines are kept and can be switched back at any time. The Cash Flow Forecast would stop spreading the five lines and use the dated list instead.`);
+    if(!ok) return; state.settings.bizCostsForOverheads = true; saveState(); render(); showToast('The Pricing Model now uses this list'); return; }
+  if(a === 'use-off'){ state.settings.bizCostsForOverheads = false; saveState(); render(); showToast('The Pricing Model is back on the five overhead lines'); return; }
+  if(!c) return;
+  if(a === 'del'){ const i = state.businessCosts.indexOf(c); state.businessCosts.splice(i, 1); undoDeleted('Business cost deleted: ' + String(c.name || 'unnamed').slice(0, 40), ['businessCosts'], i, c); saveState(); render(); return; }
+  if(a === 'nomatch'){ const m = bcSuggest(c); if(m){ c.dismissed.push(bcTxnKey(m.t)); saveState(); render(); } return; }
+  if(a === 'match'){
+    const m = bcSuggest(c); if(!m) return; const t = m.t, askClass = !clsOf(t);
+    finUi.mode = 'bcmatch'; finUi.key = c.id;
+    finOpen('Tick off as paid?', `<p class="q-help" style="margin:0 0 8px;"><b>${escHtml(c.name || 'Business cost')}</b> due ${pwD(c.nextDue)} (${qm(bcAmt(c))})<br>will be ticked off as paid by the transaction ${pwD(t.date)} · ${escHtml(t.description || '')} · ${qm(t.moneyOut)}.</p>
+      ${c.freq === 'oneoff' ? '<p class="q-help">It is a one-off, so it is marked paid and leaves the forecast.</p>' : `<p class="q-help">Next due moves to ${pwD(bcNext(c.nextDue, c.freq))}.</p>`}
+      ${askClass ? '<label class="q-check"><input type="checkbox" id="bcMarkClass" checked> Also mark the transaction as a business cost (Classify)</label>' : ''}
+      <div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn" type="button" data-bc-a="match-ok" data-bc-id="${escAttr(c.id)}">Tick off as paid</button></div>`);
+    return; }
+  if(a === 'match-ok'){
+    const m = bcSuggest(c); if(!m){ finClose(); return; } const t = m.t, mark = !!(document.getElementById('bcMarkClass') || {}).checked;
+    c.paid.push({ due: c.nextDue, date: t.date, amount: Number(t.moneyOut) || 0, txn: bcTxnKey(t), at: new Date().toISOString(), by: meName() });
+    if(c.freq === 'oneoff') c.done = true; else c.nextDue = bcNext(c.nextDue, c.freq);
+    if(mark && !clsOf(t)) clsApply(t, 'business', 'chosen', 0);
+    finClose(); clsSyncTask(); saveState(); render(); showToast('Ticked off as paid'); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el || !el.dataset || el.dataset.bc === undefined || !state) return; const c = state.businessCosts.find(x => x.id === el.dataset.bcId); if(!c) return; const k = el.dataset.bc;
+  if(k === 'amount'){ const n = parseFloat(el.value); c.amount = (el.value === '' || isNaN(n) || n < 0) ? '' : n; }
+  else if(k === 'nextDue'){ c.nextDue = /^\d{4}-\d{2}-\d{2}$/.test(el.value) ? el.value : ''; if(c.nextDue) c.done = false; }
+  else if(k === 'freq'){ c.freq = el.value; if(c.freq !== 'oneoff') c.done = false; }
+  else if(k === 'name' || k === 'category' || k === 'notes') c[k] = el.value.trim();
+  else return;
+  saveState(); render();
 });
 
 /* BT:js-money end */
