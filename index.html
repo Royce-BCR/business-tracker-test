@@ -1745,6 +1745,7 @@
   .dc-ph { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; } .dc-thumb { position: relative; display: inline-block; } .dc-thumb img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); display: block; } .dc-x { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; min-width: 24px; min-height: 24px; border-radius: 50%; border: 0; background: var(--bt-bad-fg); color: #fff; cursor: pointer; line-height: 1; }
   .dc-mini img { width: 28px; height: 28px; object-fit: cover; border-radius: 4px; margin-left: 6px; vertical-align: middle; border: 1px solid var(--line); }
   .dc-ptc { display: inline-block; background: var(--bt-warn-bg); color: var(--bt-warn-fg); border: 1px solid var(--bt-warn-bd); border-radius: var(--bt-r-pill); padding: 1px 8px; font-size: 11px; font-weight: 700; } .dc-st { font-weight: 700; } .dc-st-short, .dc-st-substituted { color: var(--bt-warn-fg); } .dc-st-damaged { color: var(--bt-bad-fg); } .dc-st-received { color: var(--bt-ok-fg); } .td-allrec { white-space: nowrap; }
+  .var-hub { margin-bottom: var(--bt-s3); padding: var(--bt-s3) var(--bt-s4); } .var-hub > summary, .var-table summary { cursor: pointer; } .var-list { margin: 6px 0 4px 10px; } .po-hire { display: inline-flex; margin-left: 10px; } .po-hire + select { margin-left: 6px; max-width: 180px; }
   .po-tools { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; margin-bottom: var(--bt-s3); } .po-hero { margin: var(--bt-s2) 0 var(--bt-s3); } .po-trace { display: flex; flex-wrap: wrap; gap: var(--bt-s2) var(--bt-s4); align-items: baseline; margin-bottom: var(--bt-s2); } .po-trace small { display: block; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; } .po-bigref { font-size: 20px; letter-spacing: .01em; } .po-extra { margin-top: var(--bt-s3); }
   .po-note { font-size: 12.5px; color: var(--slate); margin-bottom: var(--bt-s3); } .po-steps { display: flex; gap: var(--bt-s2); align-items: center; margin: var(--bt-s1) 0 var(--bt-s3); font-size: 12.5px; color: var(--text-muted); } .po-steps span.done { color: var(--bt-ok-fg); font-weight: 600; } .po-steps span.cur { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--ink); } .po-steps i { font-style: normal; }
   /* ---------------- Q4: thumb-sized controls on phones and touch screens (desktop with a mouse is unchanged) ---------------- */
@@ -3486,6 +3487,7 @@ function ensureQuoteModel(o, seedAction){
   ['labourRateHour','labourRateHalfDay','labourRateDay'].forEach(k => { st[k] = qNum(st[k], 0); });
   { const r = qNum(st.labourProfitPct, 0); st.labourProfitPct = r === '' ? 0 : r; }
   if(!String(st.poPrefix || '').trim()) st.poPrefix = 'PO-BWR-'; if(st.poApprovalThreshold === undefined || st.poApprovalThreshold === '') st.poApprovalThreshold = 1000; st.poApprovalOn = st.poApprovalOn === true; st.poInApprovals = st.poInApprovals === true;   // purchase orders: prefix, optional approval above a value
+  { const r = Number(st.varianceThresholdPct); st.varianceThresholdPct = r > 0 ? r : 0; }   // supplier price variance threshold (%): 0 means every variance is flagged and given a reason
   { const r = qNum(st.variationThresholdPct, 0); st.variationThresholdPct = (r === '' || st.variationThresholdPct === undefined) ? 10 : r; }   // % of contract value approved in variations before a new quote version is suggested
   st.materialsMarkupPct = qNum(st.materialsMarkupPct, 0);
   // units: stable ids, names kept as typed
@@ -6845,10 +6847,10 @@ function pwMaterialsHtml(p, i){
       <td><input type="date" data-pwd="drop" data-id="${escAttr(x.d.id)}" data-f="paymentDueDate" value="${escAttr(x.d.paymentDueDate || '')}" aria-label="Supplier payment due">${x.d.dueManual ? ' <span class="qb-flag manual">typed</span>' : ''}</td>
       <td class="qb-calc">${qm(x.out)}${x.flags.map(f => `<div class="qb-warn">⚠ ${escHtml(f)}</div>`).join('')}</td>
       <td><button type="button" class="icon-btn" data-pw="drop-del" data-id="${escAttr(x.d.id)}" title="Remove this drop" aria-label="Remove drop">${X_SVG}</button></td></tr>`).join('');
-    const lineRows = wq.lines.map(l => `<tr><td>${escHtml(l.description || 'Item')}</td><td class="qb-calc">${l.qty} ${escHtml(qUnitName(l))}</td><td><select data-pwd="line-drop" data-id="${escAttr(l.id)}" aria-label="Drop for ${escAttr(l.description || 'item')}"><option value="">— no drop —</option>${wq.drops.map(d => `<option value="${escAttr(d.id)}"${l.deliveryDropId === d.id ? ' selected' : ''}>${escHtml((d.date ? pwD(d.date) + ' · ' : '') + (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop')))}</option>`).join('')}</select></td></tr>`).join('');
+    const lineRows = wq.lines.map(l => `<tr><td>${escHtml(l.description || 'Item')}${l.hire ? ' <span class="dc-ptc">hire</span>' : ''}</td><td class="qb-calc">${l.qty} ${escHtml(qUnitName(l))}</td><td><label class="q-check"><input type="checkbox" data-pwd="line-hire" data-id="${escAttr(l.id)}"${l.hire ? ' checked' : ''} aria-label="Hire ${escAttr(l.description || 'item')}"> Hire</label>${l.hire ? `<select data-pwd="line-hiresup" data-id="${escAttr(l.id)}" aria-label="Hire supplier"><option value="">Hire supplier…</option>${state.suppliers.filter(x => x.status !== 'Inactive' || String(x.id) === String(l.hireSupplierId)).map(x => `<option value="${x.id}"${String(x.id) === String(l.hireSupplierId) ? ' selected' : ''}>${escHtml(x.name)}</option>`).join('')}</select>` : ''}</td><td><select data-pwd="line-drop" data-id="${escAttr(l.id)}" aria-label="Drop for ${escAttr(l.description || 'item')}"><option value="">— no drop —</option>${wq.drops.map(d => `<option value="${escAttr(d.id)}"${l.deliveryDropId === d.id ? ' selected' : ''}>${escHtml((d.date ? pwD(d.date) + ' · ' : '') + (d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Drop')))}</option>`).join('')}</select></td></tr>`).join('');
     table = `${pwEditBar(p, 'delivery', `<button type="button" class="btn secondary qb-sm" data-pw="drop-add">+ Add drop</button>`)}
       <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Supplier</th><th>Method</th><th>Charge ex VAT</th><th>Supplier paid by</th><th>Owed</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="7"><div class="sup-empty">No drops. Add one.</div></td></tr>'}</tbody></table></div>
-      <h4 style="margin:14px 0 6px;">Move lines between drops</h4><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Material line</th><th>Qty</th><th>On drop</th></tr></thead><tbody>${lineRows || '<tr><td colspan="3"><div class="sup-empty">No material lines.</div></td></tr>'}</tbody></table></div>`;
+      <h4 style="margin:14px 0 6px;">Move lines between drops</h4><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Material line</th><th>Qty</th><th>Hire</th><th>On drop</th></tr></thead><tbody>${lineRows || '<tr><td colspan="4"><div class="sup-empty">No material lines.</div></td></tr>'}</tbody></table></div>`;
   } else {
     const rows = dl.drops.map(x => `<tr class="${x.flags.length ? 'qb-warnrow' : ''}"><td>${x.date ? pwD(x.date) : '<span class="qb-dim">no date</span>'}</td><td>${escHtml(x.supplier)}<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${x.method === 'collect' ? 'Collect' : 'Delivered'}</div></td><td>${escHtml(x.items.join(', ') || '—')}</td>
       <td>${x.flags.map(f => `<div class="qb-warn">⚠ ${escHtml(f)}</div>`).join('') || '<span class="pw-ok">✓</span>'}</td><td class="qb-calc">${qm(x.out)}</td>
@@ -7084,6 +7086,8 @@ document.addEventListener('change', (ev) => {
   if(el.dataset.pwe === 'stage'){ const d = pwDraftStage(el.dataset.sid); d[el.dataset.f] = isoOk(el.value); if(d.start && d.end && d.end < d.start){ if(el.dataset.f === 'start') d.end = d.start; else d.start = d.end; } pwRedraw(el); return; }
   if(el.dataset.pwd){
     const plan = pwUi.edit.draft.plan, id = el.dataset.id, f = el.dataset.f;
+    if(el.dataset.pwd === 'line-hire'){ const l = plan.lines.find(x => x.id === id); if(l){ l.hire = el.checked; if(!l.hire) l.hireSupplierId = ''; } pwRedraw(); return; }
+    if(el.dataset.pwd === 'line-hiresup'){ const l = plan.lines.find(x => x.id === id); if(l) l.hireSupplierId = Number(el.value) > 0 ? Number(el.value) : ''; return; }
     if(el.dataset.pwd === 'line-drop'){ const l = plan.lines.find(x => x.id === id); if(l){ l.deliveryDropId = el.value; qAutoDrops(pwDraftQuote()); } pwRedraw(el); return; }
     const d = plan.drops.find(x => x.id === id); if(!d) return;
     if(f === 'date'){ d.date = isoOk(el.value); }
@@ -7943,7 +7947,7 @@ const QS_FIELD = {   // key -> kind. 'int' needs a whole number >= min (blank / 
   insuranceCover: { k: 'free' }, complaintDays: { k: 'int', min: 1 }, complaintDayType: { k: 'sel' }, vatNumber: { k: 'vatno' }, vatRate: { k: 'num', min: 0, max: 100 },
   tradeAccountDays: { k: 'int', min: 0 }, labourRateHour: { k: 'opt' }, labourRateHalfDay: { k: 'opt' }, labourRateDay: { k: 'opt' },
   labourProfitPct: { k: 'num', min: 0 }, materialsMarkupPct: { k: 'opt' }, helperRateDay: { k: 'opt' }, showRightToCancel: { k: 'bool' },
-  hoursPerDay: { k: 'int', min: 1 }, quoteViewMode: { k: 'view' }, variationThresholdPct: { k: 'num', min: 0, max: 1000 }, poPrefix: { k: 'text' }, poApprovalOn: { k: 'bool' }, poApprovalThreshold: { k: 'num', min: 0 }, poInApprovals: { k: 'bool' }, showGroupPricesC: { k: 'bool' }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
+  hoursPerDay: { k: 'int', min: 1 }, quoteViewMode: { k: 'view' }, variationThresholdPct: { k: 'num', min: 0, max: 1000 }, varianceThresholdPct: { k: 'num', min: 0, max: 1000 }, poPrefix: { k: 'text' }, poApprovalOn: { k: 'bool' }, poApprovalThreshold: { k: 'num', min: 0 }, poInApprovals: { k: 'bool' }, showGroupPricesC: { k: 'bool' }, bizTagline: { k: 'free' }, bizAddress: { k: 'free' }, bizPhone: { k: 'free' }, bizEmail: { k: 'free' }
 };
 function qtF(label, field, o){
   o = o || {}; const v = state.settings[field];
@@ -7997,6 +8001,7 @@ function renderQuoteSettings(){
       <button class="icon-btn" data-qa="stype-del" data-id="${escAttr(x.id)}" title="Remove" aria-label="Remove ${escAttr(x.name)}">${X_SVG}</button></div>`).join('')}</div>
     <button class="btn secondary" style="margin-top:10px;" data-qa="stype-add">+ Add type</button>
     <div class="q-sub">Change control on a live project</div><div class="assumptions-grid">${qtF('Variation threshold for suggesting a new quote (%)', 'variationThresholdPct', { step: '0.1', help: 'When approved variations pass this share of the contract value, the project suggests a new quote version instead of more variations. Default 10.' })}</div>
+    <div class="q-sub">Supplier price variance</div><div class="assumptions-grid">${qtF('Variance threshold (%)', 'varianceThresholdPct', { step: '0.1', help: 'When a confirmed supplier price or quantity differs from the quote, the difference is logged with a cause. Any line whose difference is above this percentage of its quoted cost is flagged for review. At 0 every variance is flagged and given a reason. Raise it if that becomes too noisy.' })}</div>
     <div class="q-sub">Purchase orders</div><div class="assumptions-grid">${qtF('PO number prefix', 'poPrefix', { type: 'text', help: 'Numbers run PO-BWR-0001, PO-BWR-0002… Changing the prefix only affects new POs.' })}
       <div class="lp-f"><label>Approval</label><label class="q-check"><input type="checkbox" data-q="poApprovalOn"${s.poApprovalOn ? ' checked' : ''}> Require approval for large POs</label></div>
       ${qtF('Approval value threshold (£, inc VAT if registered)', 'poApprovalThreshold', { step: '1', help: 'With approval on, a PO at or above this value is flagged in red and cannot be sent until approved.' })}
@@ -8154,7 +8159,7 @@ function qNewLine(q, o){
   const st = state.settings, units = state.quoteUnits || [];
   const u = units.find(x => x.id === 'un_each') || units[0];
   const l = Object.assign({ id: qRand('ln_'), description: '', categoryId: '', unitId: u ? u.id : '', unitName: u ? u.name : '', qty: 1, wastagePct: 0, wastageManual: false, prices: [], selectedSupplierId: '',
-    costOverride: '', markupPct: st.materialsMarkupPct === '' ? 0 : st.materialsMarkupPct, vatRate: st.vatRate, customerGroup: '', showOnQuote: true, deliveryDropId: '', optGroup: '', stageId: '', deliverStageId: '', deliverDate: '' }, o || {});
+    costOverride: '', markupPct: st.materialsMarkupPct === '' ? 0 : st.materialsMarkupPct, vatRate: st.vatRate, customerGroup: '', showOnQuote: true, deliveryDropId: '', optGroup: '', stageId: '', deliverStageId: '', deliverDate: '', hire: false, hireSupplierId: '' }, o || {});
   return l;
 }
 function qNormLine(l, supIds){
@@ -8168,7 +8173,7 @@ function qNormLine(l, supIds){
     selectedSupplierId: Number(l.selectedSupplierId) > 0 ? Number(l.selectedSupplierId) : '',
     costOverride: (l.costOverride === '' || l.costOverride == null || isNaN(Number(l.costOverride)) || Number(l.costOverride) < 0) ? '' : Number(l.costOverride),
     markupPct: qNumOr(l.markupPct, 0), vatRate: qNumOr(l.vatRate, state.settings.vatRate), customerGroup: str(l.customerGroup), showOnQuote: l.showOnQuote !== false,
-    deliveryDropId: str(l.deliveryDropId), optGroup: str(l.optGroup).trim(),
+    deliveryDropId: str(l.deliveryDropId), optGroup: str(l.optGroup).trim(), hire: l.hire === true, hireSupplierId: Number(l.hireSupplierId) > 0 ? Number(l.hireSupplierId) : '',   // hire instead of buy: the line's cost is the hire cost, counted like any other supplier cost
     stageId: str(l.stageId), deliverStageId: str(l.deliverStageId), deliverDate: /^\d{4}-\d{2}-\d{2}$/.test(l.deliverDate || '') ? l.deliverDate : ''   // the stage line it is for, and when it is delivered (stage start unless an earlier stage or a typed date)   // optional line group (e.g. Tiled roof): left out of the total until ticked
   };
   if(!out.unitId){ const u = units.find(x => x.name.toLowerCase() === out.unitName.toLowerCase()); if(u) out.unitId = u.id; }
@@ -8731,6 +8736,8 @@ function qbChange(el){
     else if(f === 'markupPct' || f === 'vatRate') l[f] = qNumOr(v, 0);
     else if(f === 'costOverride') l.costOverride = (v === '' || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
     else if(f === 'showOnQuote') l.showOnQuote = !!v;
+    else if(f === 'hire'){ l.hire = !!v; if(!l.hire) l.hireSupplierId = ''; rebuild = true; setTimeout(() => openQuoteLinePanel(q.id, l.id), 0); }   // the side panel redraws to show or hide the hire supplier
+    else if(f === 'hireSupplierId') l.hireSupplierId = Number(v) > 0 ? Number(v) : '';
     else if(f === 'optGroup'){ l.optGroup = String(v).trim(); rebuild = true; }
     else if(f === 'deliveryDropId') l.deliveryDropId = v;
     else if(f === 'stageId'){ l.stageId = v; if(!v){ l.deliverStageId = ''; l.deliverDate = ''; } qSyncStageDrops(q); rebuild = true; }
@@ -8897,6 +8904,8 @@ function qlBodyHtml(q, l){
       ${f('Optional group', qbIn('line', l.id, 'optGroup', l.optGroup, { ph: 'None: always in the total' }), 'Lines sharing an optional group (for example “Tiled roof”) stay out of the total until the group is ticked on the quote.')}
       ${f('Delivery drop', qbSel('line', l.id, 'deliveryDropId', qbOpts(dropOpts, l.deliveryDropId)), l.stageId ? 'This line is tied to a stage, so its drop is managed from the Stage and Delivery date columns on the quote.' : '')}
       <label class="q-check"><input type="checkbox" data-qb="line" data-id="${l.id}" data-f="showOnQuote"${l.showOnQuote ? ' checked' : ''}> Show on quote</label>
+      <label class="q-check"><input type="checkbox" data-qb="line" data-id="${l.id}" data-f="hire"${l.hire ? ' checked' : ''}> Hire instead of buy</label>
+      ${l.hire ? f('Hire supplier', qbSel('line', l.id, 'hireSupplierId', qbOpts(state.suppliers.filter(x => x.status !== 'Inactive' || String(x.id) === String(l.hireSupplierId)).map(x => [x.id, x.name]), l.hireSupplierId, '— choose —')), 'The cost above is the hire cost. It counts as a supplier cost on the job like any other line.') : ''}
     </section>
     <section class="lp-sec" id="lp-sec-prices" data-sec="prices"><h3>Supplier prices</h3>
       ${q.supplierCols.length ? prices : '<div class="lp-empty">Add a supplier column on the quote to enter prices.</div>'}</section>`;
@@ -11199,7 +11208,7 @@ function poCanApprove(po){ const me = whoAmI().name; if(!poViaApprovals()) retur
 function poDelivered(po){ const p = state.projects.find(x => x.id === po.pid); return !!(p && p.dropState && p.dropState[po.did] && p.dropState[po.did].delivered); }
 function poSnapshot(p, did){
   const wq = projWorkQuote(p), d = wq.drops.find(x => x.id === did); if(!d) return null; const c = qCalc(wq), cu = projCustomer(p);
-  const items = wq.lines.filter(l => l.deliveryDropId === did && c.lines[l.id] && !c.lines[l.id].excluded).map(l => ({ lineId: l.id, desc: l.description || 'Item', qty: c.lines[l.id].qtyOrder, unit: qUnitName(l), price: r2(c.lines[l.id].costEach), vatRate: Number(l.vatRate) || 0 }));
+  const items = wq.lines.filter(l => l.deliveryDropId === did && c.lines[l.id] && !c.lines[l.id].excluded).map(l => ({ lineId: l.id, desc: l.description || 'Item', qty: c.lines[l.id].qtyOrder, unit: qUnitName(l), price: r2(c.lines[l.id].costEach), vatRate: Number(l.vatRate) || 0, hire: l.hire ? { supplierId: Number(l.hireSupplierId) > 0 ? Number(l.hireSupplierId) : '' } : null }));
   if(d.method !== 'collect' && Number(d.charge) > 0) items.push({ lineId: '', desc: 'Delivery charge', qty: 1, unit: '', price: r2(d.charge), vatRate: Number(state.settings.vatRate) || 0 });
   return { supplierId: d.supplierId || '', supplierName: d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Supplier'), items, deliveryDate: d.date || '', method: d.method,
     address: d.method === 'collect' ? '' : [cu.address, cu.postcode && !String(cu.address).includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ') };
@@ -11223,7 +11232,7 @@ function renderPOs(){
   const po = poUi.open ? poFind(poUi.open) : null; if(poUi.open && !po) poUi.open = 0;
   if(po) { el.innerHTML = poDetailHtml(po); return; }
   const list = (state.purchaseOrders || []).slice().sort((a, b) => b.no - a.no), me = whoAmI().name;
-  el.innerHTML = `<div class="po-note">${state.settings.poApprovalOn ? `Approval is <b>on</b>: POs of <b>${qm(state.settings.poApprovalThreshold)}</b> or more are flagged and cannot be sent until approved${poViaApprovals() ? ' (through the Approvals process)' : ''}.` : 'PO approval is off (Settings &gt; Quotes &gt; Purchase orders).'} Create a PO from a delivery drop in a project's Materials and deliveries section.</div>
+  el.innerHTML = varHubHtml() + `<div class="po-note">${state.settings.poApprovalOn ? `Approval is <b>on</b>: POs of <b>${qm(state.settings.poApprovalThreshold)}</b> or more are flagged and cannot be sent until approved${poViaApprovals() ? ' (through the Approvals process)' : ''}.` : 'PO approval is off (Settings &gt; Quotes &gt; Purchase orders).'} Create a PO from a delivery drop in a project's Materials and deliveries section.</div>
     <div class="po-tools"><button type="button" class="btn qb-sm" data-po2="open">+ New order</button><span class="qb-dim">Create the orders for a project's suppliers, or add a second order for the same supplier.</span></div>
     <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>PO</th><th>Project</th><th>Supplier</th><th>Delivery</th><th>Value</th><th>Status</th><th>Approval</th><th></th></tr></thead><tbody>${list.map(x => { const need = poNeedsApproval(x), act = poActualDelivery(x), aq = poQuoteOf(x);
       return `<tr class="${need && !poApproved(x) ? 'po-needs' : ''}"><td><b>${escHtml(x.ref)}</b>${aq ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(qRef(aq))}</div>` : ''}</td><td>${finSrcLink({ t: 'project', id: x.pid, sec: 'materials' }, recordCode(x.pid, 'project'))}</td><td>${escHtml(x.supplierName)}</td><td>${x.deliveryDate ? pwD(x.deliveryDate) : '—'}${act ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">delivered ${escHtml(pwD(act))}</div>` : ''}</td><td class="qb-calc">${qm(poTotals(x).payable)}</td><td>${poPill(x)}${poProject(x) ? dcPtcMark(poProject(x), x.did) : ''}</td>
@@ -11232,7 +11241,7 @@ function renderPOs(){
 function poDetailHtml(po){
   const t = poTotals(po), need = poNeedsApproval(po), appr = poApproved(po), draft = po.status === 'Draft', p = state.projects.find(x => x.id === po.pid), sup = po.supplierId ? supFind(po.supplierId) : null;
   const can = poCanApprove(po), blockSend = need && !appr, step = PO_STATUS.indexOf(po.status);
-  const items = po.items.map((i, ix) => `<tr><td>${draft ? `<input data-po-i="${ix}" data-f="desc" value="${escAttr(i.desc)}">` : escHtml(i.desc)}</td><td>${draft ? `<input type="number" step="any" min="0" class="qb-n" data-po-i="${ix}" data-f="qty" value="${i.qty}">` : i.qty} ${escHtml(i.unit)}</td><td class="qb-calc">${draft ? `<input type="number" step="any" min="0" class="qb-n" data-po-i="${ix}" data-f="price" value="${i.price}">` : qm(i.price)}</td><td class="qb-calc">${qm((Number(i.qty) || 0) * (Number(i.price) || 0))}</td>${draft ? `<td><button type="button" class="icon-btn" data-po="item-del" data-i="${ix}" aria-label="Remove item">${X_SVG}</button></td>` : ''}</tr>`).join('');
+  const items = po.items.map((i, ix) => `<tr><td>${draft ? `<input data-po-i="${ix}" data-f="desc" value="${escAttr(i.desc)}">` : escHtml(i.desc)}${i.lineId === '' ? '' : (draft ? `<label class="q-check po-hire"><input type="checkbox" data-po-i="${ix}" data-f="hire"${i.hire ? ' checked' : ''}> Hire</label>${i.hire ? `<select data-po-i="${ix}" data-f="hireSup" aria-label="Hire supplier"><option value="">Hire supplier…</option>${state.suppliers.filter(x => x.status !== 'Inactive' || String(x.id) === String(i.hire.supplierId)).map(x => `<option value="${x.id}"${String(x.id) === String(i.hire.supplierId) ? ' selected' : ''}>${escHtml(x.name)}</option>`).join('')}</select>` : ''}` : (i.hire ? ` <span class="dc-ptc">hire${i.hire.supplierId ? ': ' + escHtml(qbSupName(i.hire.supplierId)) : ''}</span>` : ''))}</td><td>${draft ? `<input type="number" step="any" min="0" class="qb-n" data-po-i="${ix}" data-f="qty" value="${i.qty}">` : i.qty} ${escHtml(i.unit)}</td><td class="qb-calc">${draft ? `<input type="number" step="any" min="0" class="qb-n" data-po-i="${ix}" data-f="price" value="${i.price}">` : qm(i.price)}</td><td class="qb-calc">${qm((Number(i.qty) || 0) * (Number(i.price) || 0))}</td>${draft ? `<td><button type="button" class="icon-btn" data-po="item-del" data-i="${ix}" aria-label="Remove item">${X_SVG}</button></td>` : ''}</tr>`).join('');
   const acts = [];
   if(draft && !appr){ acts.push(`<button type="button" class="btn qb-sm" data-po="approve" data-id="${po.id}"${can.ok ? '' : ' disabled'} title="${escAttr(can.ok ? '' : can.why)}">Approve</button>`); }
   if(po.status === 'Draft' || po.status === 'Approved') acts.push(`<button type="button" class="btn qb-sm" data-po="sent" data-id="${po.id}"${blockSend ? ' disabled' : ''} title="${blockSend ? 'Requires approval before it can be sent' : ''}">Mark sent</button>`);
@@ -11306,7 +11315,9 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('change', (e) => {
   const el = e.target; if(!el.dataset) return; const po = poFind(poUi.open); if(!po) return;
-  if(el.dataset.poI !== undefined){ const i = po.items[Number(el.dataset.poI)]; if(!i) return; const f = el.dataset.f; i[f] = f === 'desc' ? el.value.trim() : Math.max(0, Number(el.value) || 0); }
+  if(el.dataset.poI !== undefined){ const i = po.items[Number(el.dataset.poI)]; if(!i) return; const f = el.dataset.f;
+    if(f === 'hire') i.hire = el.checked ? { supplierId: (i.hire && i.hire.supplierId) || '' } : null; else if(f === 'hireSup') i.hire = { supplierId: Number(el.value) > 0 ? Number(el.value) : '' };
+    else i[f] = f === 'desc' ? el.value.trim() : Math.max(0, Number(el.value) || 0); }
   else if(el.dataset.poF){ po[el.dataset.poF] = el.dataset.poF === 'deliveryDate' ? isoOk(el.value) : el.value.trim(); }
   else return;
   saveState(); clearTimeout(window._poLazy); window._poLazy = setTimeout(render, 350);
@@ -11585,8 +11596,34 @@ function pcRecordHtml(po){
   return `<div class="rp-card"><div class="rp-card-h"><h4>Prices confirmed</h4>${btn('Edit prices', 'secondary')}</div>
     <div class="rp-row"><span>Quoted (ex VAT)</span><span>${qm(c.quoted)}</span></div><div class="rp-row"><span>Confirmed (ex VAT)</span><span><b>${qm(c.final)}</b></span></div>
     <div class="rp-row"><span>Variance</span><span><b class="${Math.abs(v) < 0.005 ? '' : (v > 0 ? 'over' : 'under')}">${Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v))}</b></span></div>
+    ${varByCauseHtml(varRows(x => x === po), { noProject: true })}
     ${c.lines.filter(l => l.cause).map(l => `<div class="rp-row"><span>${escHtml(l.desc)}<span class="rp-dim"> · ${escHtml(varCauseName(l.cause))}${l.note ? ': ' + escHtml(l.note) : ''}</span></span><span>${l.fq} × ${qm(l.fp)} <span class="rp-dim">(quoted ${l.qq} × ${qm(l.qp)})</span></span></div>`).join('')}
     ${recs.length ? `<h5 style="margin:10px 0 4px;">Receipts and invoices</h5>${recs.map(r => `<div class="rp-row"><span>${r.file ? `<a href="${escAttr(r.file.data)}" target="_blank" rel="noopener" download="${escAttr(r.file.name)}">${escHtml(r.file.name)}</a>` : '<span class="rp-dim">no file</span>'}${r.ref ? ' · ' + escHtml(r.ref) : ''}</span><span>${escHtml(pwD(r.date))} · ${qm(r.total)}</span></div>`).join('')}` : ''}</div>`;
+}
+/* ---------- Stage 2: variance (confirmed price against quote), by cause ----------
+   Read straight from the confirmed prices on each order (po.pc.lines), so nothing is copied: every row links back to its order and project. Ex VAT. Positive = dearer than quoted, negative = cheaper. */
+function varRows(filter){
+  const out = [], thr = varThresholdPct();
+  (state.purchaseOrders || []).forEach(po => {
+    if(!po.pc || !Array.isArray(po.pc.lines) || (filter && !filter(po))) return; const p = poProject(po);
+    po.pc.lines.forEach(l => { if(!l.cause) return; const q = (Number(l.qq) || 0) * (Number(l.qp) || 0), d = r2((Number(l.fq) || 0) * (Number(l.fp) || 0) - q), pct = q ? Math.abs(d) / q * 100 : (d ? 100 : 0); out.push({ po, p, l, d, pct, review: pct > thr || (!q && d !== 0) }); });
+  });
+  return out;
+}
+function varByCauseHtml(rows, o){
+  o = o || {}; if(!rows.length) return `<div class="pw-empty">${o.empty || 'No variances recorded yet.'}</div>`;
+  const by = {}; rows.forEach(r => { const g = by[r.l.cause] = by[r.l.cause] || { rows: [], up: 0, down: 0 }; g.rows.push(r); if(r.d > 0) g.up += r.d; else g.down += r.d; });
+  const tot = rows.reduce((a, r) => a + r.d, 0), rev = rows.filter(r => r.review).length;
+  const sgn = v => Math.abs(v) < 0.005 ? '—' : `<b class="${v > 0 ? 'over' : 'under'}">${v > 0 ? '+' : '−'}${qm(Math.abs(v))}</b>`;
+  return `<div class="qb-scroll"><table class="qb-table qb-narrow var-table"><thead><tr><th>Cause</th><th>Lines</th><th class="r">Dearer (+)</th><th class="r">Cheaper (−)</th><th class="r">Net</th></tr></thead><tbody>${VAR_CAUSES.filter(([k]) => by[k]).map(([k, n]) => { const g = by[k]; return `<tr><td><details><summary>${escHtml(n)}</summary><div class="var-list">${g.rows.map(r => `<div class="rp-lrow"><span>${r.po ? `<button type="button" class="sp-link" data-nav="po:${r.po.id}">${escHtml(r.po.ref)}</button>` : ''}${r.p && !o.noProject ? ` · <button type="button" class="sp-link" data-nav="project:${r.p.id}">${escHtml(recordCode(r.p.id, 'project'))}</button>` : ''} · ${escHtml(r.l.desc)}${r.l.note ? `<span class="rp-dim"> · ${escHtml(r.l.note)}</span>` : ''}${r.review ? ' <span class="dc-ptc">review</span>' : ''}</span><span class="rp-lmeta">${sgn(r.d)}</span></div>`).join('')}</div></details></td><td>${g.rows.length}</td><td class="r">${sgn(g.up)}</td><td class="r">${sgn(g.down)}</td><td class="r">${sgn(g.up + g.down)}</td></tr>`; }).join('')}</tbody><tfoot><tr class="qb-foot"><td colspan="4" style="text-align:right;">Net variance ex VAT</td><td class="r">${sgn(tot)}</td></tr></tfoot></table></div>
+    <div class="rp-hint">${rev} of ${rows.length} line${rows.length === 1 ? '' : 's'} flagged for review (threshold ${varThresholdPct()}%, set under Settings &gt; Quotes).</div>`;
+}
+function varProjectCard(p){
+  const rows = varRows(po => po.pid === p.id); if(!rows.length) return '';
+  return `<div class="rp-card"><h4>Supplier variances by cause</h4>${varByCauseHtml(rows, { noProject: true })}</div>`;
+}
+function varHubHtml(){
+  const rows = varRows(); return `<details class="card var-hub"${rows.length ? ' open' : ''}><summary><b>Variance by cause</b> <span class="qb-dim">confirmed supplier prices against the quote, across all orders</span></summary>${varByCauseHtml(rows, { empty: 'Nothing yet. Variances appear here when prices are confirmed after a delivery and differ from the quote.' })}</details>`;
 }
 /* ---------- moving a record between the three pipelines ----------
    Promotion and return keep everything. The record keeps its id (so its code, quotes and tasks stay linked) and carries:
@@ -17474,13 +17511,21 @@ function rpOutstanding(p){
   return `<div class="rp-card"><h4>Outstanding</h4><div class="rp-out">${col('Waiting on us', us, 'Nothing waiting on us')}${col('Waiting on others', them, 'Nothing waiting on others')}</div></div>`;
 }
 function rpSuppliers(p){
-  const by = new Map();
-  projDeliveries(p).drops.forEach(x => { const k = x.d.supplierId || x.supplier; const r = by.get(k) || { id: x.d.supplierId || 0, name: x.supplier, out: 0, date: '', delivered: true }; r.out += x.out; if(!x.delivered){ r.delivered = false; if(x.date && (!r.date || x.date < r.date)) r.date = x.date; } else if(!r.date && x.date) r.date = x.date; by.set(k, r); });
-  return [...by.values()];
+  const by = new Map(), wq = projWorkQuote(p), c = wq ? qCalc(wq) : null, vatOn = qVatOn(), add = (k, id, name, out, x, hire) => { const r = by.get(k) || { id: id || 0, name, out: 0, date: '', delivered: true, hire: !!hire }; r.out += out; if(!x.delivered){ r.delivered = false; if(x.date && (!r.date || x.date < r.date)) r.date = x.date; } else if(!r.date && x.date) r.date = x.date; by.set(k, r); };
+  projDeliveries(p).drops.forEach(x => {
+    let hireOut = 0;   // lines marked hire go to their hire supplier, as a separate row, and come off the delivery's own supplier
+    if(wq && c) wq.lines.filter(l => l.hire && l.deliveryDropId === x.d.id && c.lines[l.id] && !c.lines[l.id].excluded).forEach(l => { const cost = r2(c.lines[l.id].lineCost * (vatOn ? 1 + (Number(l.vatRate) || 0) / 100 : 1)), sid = Number(l.hireSupplierId) > 0 ? Number(l.hireSupplierId) : (x.d.supplierId || 0); hireOut += cost; add('h:' + (sid || 'x'), sid, (sid ? qbSupName(sid) : x.supplier) + ' (hire)', cost, x, true); });
+    add(x.d.supplierId || x.supplier, x.d.supplierId, x.supplier, r2(x.out - hireOut), x, false);
+  });
+  (state.purchaseOrders || []).filter(o => o.pid === p.id).forEach(o => o.items.filter(i => String(i.lineId).startsWith('x_')).forEach(i => {   // items typed on the order that are not on the plan
+    const cost = r2((Number(i.qty) || 0) * (Number(i.price) || 0) * (qVatOn() ? 1 + (Number(i.vatRate) || 0) / 100 : 1)), sid = i.hire && Number(i.hire.supplierId) > 0 ? Number(i.hire.supplierId) : (o.supplierId || 0), x = { delivered: !!poActualDelivery(o), date: poPlannedDate(o) };
+    add(i.hire ? 'h:' + (sid || 'x') : (o.supplierId || o.supplierName), sid, (sid ? qbSupName(sid) : o.supplierName) + (i.hire ? ' (hire)' : ''), cost, x, !!i.hire);
+  }));
+  return [...by.values()].filter(r => r.out !== 0 || !r.hire);
 }
 function rpSuppliersTile(p){
   const L = rpSuppliers(p);
-  const row = s => `<div class="rp-row"><span>${s.id ? `<button type="button" class="sp-link" data-nav="supplier:${s.id}">${escHtml(s.name)}</button>` : escHtml(s.name)}</span><span class="rp-dim">${qm(s.out)} · ${s.delivered ? 'delivered' : s.date ? escHtml(pwD(s.date)) : 'no date'}</span></div>`;
+  const row = s => `<div class="rp-row"><span>${s.id ? `<button type="button" class="sp-link" data-nav="supplier:${s.id}">${escHtml(s.name)}</button>` : escHtml(s.name)}${s.hire ? ' <span class="dc-ptc">hire</span>' : ''}</span><span class="rp-dim">${qm(s.out)} · ${s.delivered ? 'delivered' : s.date ? escHtml(pwD(s.date)) : 'no date'}</span></div>`;
   return `<div class="rp-card"><h4>Suppliers</h4>${L.length ? L.map(row).join('') : '<div class="pw-empty">No supplier drops on the quote yet.</div>'}</div>`;
 }
 function rpInvoicesTile(p){
@@ -17494,7 +17539,7 @@ function rpQualTile(p){
   return `<div class="rp-card"><h4>Qualification ${snap && Object.keys(snap).length ? `<span class="rp-pill ${done === 4 ? 'ok' : done >= 2 ? 'warn' : 'neu'}">${score} · ${done} of ${QUAL_FIELDS.length}</span>` : ''}</h4>${rows}<div class="rp-hint">Carried from the lead stage.</div></div>`;
 }
 function rpOverviewHtml(p){
-  return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${rpQualTile(p)}</div>`;
+  return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${varProjectCard(p)}${rpQualTile(p)}</div>`;
 }
 function rpPlanHtml(p){
   return `${rpSchedPanel(p)}<div class="rp-plan" id="rpPlan">${pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p)))}</div>`;
