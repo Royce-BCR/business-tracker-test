@@ -2343,6 +2343,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-pill { display: inline-block; padding: 2px 9px; border-radius: var(--bt-r-pill); font-size: var(--bt-fs-2xs); font-weight: 700; letter-spacing: .02em; border: 1px solid transparent; vertical-align: middle; }
 .rp-pill.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); } .rp-pill.bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
 .rp-pill.warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); } .rp-pill.neu { background: var(--bt-neu-bg); color: var(--bt-neu-fg); border-color: var(--bt-neu-bd); }
+.rp-pill.s6-planning, .rp-pill.s6-materials { background: var(--bt-neu-bg); color: var(--bt-neu-fg); border-color: var(--bt-neu-bd); } .rp-pill.s6-onsite, .rp-pill.s6-signoff { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); } .rp-pill.s6-invoiced, .rp-pill.s6-completed { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); }
 .rp-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--bt-s3); }
 .rp-lbody { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--bt-s4) var(--bt-s4); overscroll-behavior: contain; }
 .rp-sec { border-bottom: 1px solid var(--bt-chalk); } .rp-sec:last-child { border-bottom: 0; }
@@ -4005,6 +4006,20 @@ function effectiveProb(r){
 function autoProjectStageId(p){   // the furthest stage with a confirmed actual ('' if none). A planned date never moves a stage.
   return projStageActualId(p);
 }
+/* Six Project Pipeline stages, derived on the fly from the nine confirmed milestones. Nothing is stored and no project is remapped: the nine stored stages (and stageId) stay as they are.
+   Planning: nothing past the contract / design sign-off is confirmed. Materials: materials ordered (or delivered). On site: on-site start confirmed. Sign-off: build complete (or signed off) and not yet invoiced.
+   Invoiced: invoiced (or paid, but not yet signed off). Completed: paid AND signed off (or the project has been completed). Only confirmed dates count, never planned ones. */
+const PROJ_STAGE6 = [['planning', 'Planning'], ['materials', 'Materials'], ['onsite', 'On site'], ['signoff', 'Sign-off'], ['invoiced', 'Invoiced'], ['completed', 'Completed']];
+function projStage6(p){
+  const has = k => !!projMsActual(p, k); let id = 'planning';
+  if(has('materialsOrdered') || has('materialsDelivered')) id = 'materials';
+  if(has('onSiteStart')) id = 'onsite';
+  if(has('buildComplete') || has('signOff')) id = 'signoff';
+  if(has('invoiced') || has('paid')) id = 'invoiced';
+  if((has('paid') && has('signOff')) || projIsCompleted(p)) id = 'completed';
+  return { id, name: (PROJ_STAGE6.find(x => x[0] === id) || [])[1] || '', n: PROJ_STAGE6.findIndex(x => x[0] === id) + 1 };
+}
+const proj6Pill = p => { const s = projStage6(p); return `<span class="rp-pill s6 s6-${s.id}" title="Pipeline stage ${s.n} of ${PROJ_STAGE6.length}, from confirmed dates">${escHtml(s.name)}</span>`; };
 function stageById(pl, id){ return ((state.pipelineStages||{})[pl]||[]).find(s => s.id === id) || null; }
 function stageName(pl, id){ const s = stageById(pl, id); return s ? s.name : '—'; }
 function firstStageId(pl){ const l = (state.pipelineStages||{})[pl] || []; return l.length ? l[0].id : ''; }
@@ -4655,6 +4670,7 @@ function tileHtml(pl, r, color){
     if(roll.start) rows += `<div class="bd-t-row"><span class="k">Starts</span><span>${fmtDisplay(roll.start)}</span></div>`;
   } else {
     sub = '';
+    rows += `<div class="bd-t-row"><span class="k">Stage</span><span>${proj6Pill(r)}</span></div>`;
     rows += `<div class="bd-t-row"><span class="k">Agreed value</span><span>${money(r.agreedValue)}</span></div>`;
     const nm = nextMilestone(r);
     rows += `<div class="bd-t-row"><span class="k">${nm ? (nm.next ? 'Next' : 'Last') + ': ' + escHtml(nm.label) : 'Next milestone'}</span><span>${nm ? fmtDisplay(nm.d) : '—'}</span></div>`;
@@ -7762,7 +7778,7 @@ function renderProjects(){
       <td class="code-cell">${recordCode(p.id,'project')}${tierBadgeSmall(p.id, p)}</td>
       <td><input data-tab="projects" data-idx="${i}" data-field="name" value="${escAttr(p.name)}"></td>
       <td><input type="number" step="1" data-tab="projects" data-idx="${i}" data-field="agreedValue" value="${p.agreedValue||0}"${projAcceptedQuote(p) ? ' readonly title="Live from the accepted quote (ex VAT)"' : ''}></td>
-      <td><select class="lead-pill progress-pill" data-tab="projects" data-idx="${i}" data-field="stageId" title="Project stage">${projStages.map(s=>`<option value="${escHtml(s.id)}"${projStageId(p)===s.id?' selected':''}>${escHtml(s.name)}</option>`).join('')}</select></td>
+      <td><select class="lead-pill progress-pill" data-tab="projects" data-idx="${i}" data-field="stageId" title="Project stage">${projStages.map(s=>`<option value="${escHtml(s.id)}"${projStageId(p)===s.id?' selected':''}>${escHtml(s.name)}</option>`).join('')}</select><div style="margin-top:4px;">${proj6Pill(p)}</div></td>
       <td>${projArchived(p) ? `<span class="pw-done-pill" style="margin:0;">Completed ${escHtml(dShow(p.completed.date))}</span> <button type="button" class="btn secondary qb-sm" data-pj="reopen" data-id="${p.id}">Reopen</button>` : `<button type="button" class="sp-link" data-pj="open" data-id="${p.id}" title="Open the project">${escHtml(projJourney(p).next.label)}</button>`}</td>
       <td class="${costFlag?'':''}" style="${costFlag?'color:var(--bt-bad-fg);font-weight:600;':''}">${money(p.budgetedCost)} / ${money(p.actualCost)}</td>
       <td><button class="icon-btn" data-action="delete-projrec" data-idx="${i}" title="Delete project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
@@ -17086,6 +17102,7 @@ function rpLeftHtml(p){
   const about = `
     <div class="rp-f rp-edit"><label for="rpf_pipeline">Pipeline</label><select id="rpf_pipeline" aria-label="Pipeline"><option>Project Pipeline</option></select></div>
     ${rpEdit(p, 'stageId', { select: stageOpts, hint: 'Moves when a milestone is confirmed. Choose here to set it by hand.' })}
+    ${rpRO('Pipeline stage', proj6Pill(p), 'Worked out from confirmed milestone dates: it moves when you confirm one', 'calc')}
     ${rpRO('Reference', escHtml(code), 'Never changes', 'locked')}
     ${rpEdit(p, 'jobType', { label: 'Job type', ph: 'e.g. Oak pergola' })}
     ${rpRO('Value (ex VAT)', ct.live ? `<b>${qm(ct.value)}</b>` : (ct.value ? `<b>${qm(ct.value)}</b>` : ''), ct.live ? `Edit the value in Quote ${quoteLink}` : 'No accepted quote yet: the value is typed in the full workspace')}
@@ -17122,7 +17139,7 @@ function rpLeftHtml(p){
   return `<div class="rp-head">
       <div class="rp-head-top"><button type="button" class="rp-back" data-pw="back">← All projects</button><button type="button" class="rp-legacy" data-rp="legacy" title="The earlier project page, with every section">Open full workspace</button></div>
       <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(p.name))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(p.name)}</h2><div class="rp-sub">${escHtml(sub)}</div></div></div>
-      <div class="rp-pills"><span class="rp-pill ${st.k}">${escHtml(st.t)}</span><span class="rp-pill neu">${escHtml(stageName_)}</span>${p.tentative ? '<span class="rp-pill warn">Tentative</span>' : ''}</div>
+      <div class="rp-pills"><span class="rp-pill ${st.k}">${escHtml(st.t)}</span>${proj6Pill(p)}<span class="rp-pill neu" title="Stored stage">${escHtml(stageName_)}</span>${p.tentative ? '<span class="rp-pill warn">Tentative</span>' : ''}</div>
       <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rp="q-note">Note</button><button type="button" class="btn secondary qb-sm" data-rp="q-task">Task</button><button type="button" class="btn secondary qb-sm" data-rp="q-time">Log time</button><button type="button" class="btn secondary qb-sm" data-rp="q-call">Call</button></div>
     </div>
     <div class="rp-lbody">${rpSec('about', 'About this project', about)}${rpSec('dates', 'Dates and workload', dates)}${rpSec('money', 'Money', moneySec)}${rpSec('cust', 'Customer and contact', cust)}${rpSec('site', 'Site', site)}</div>
