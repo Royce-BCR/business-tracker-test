@@ -8112,6 +8112,8 @@ function renderSettings(){
      <div class="fin-help ps-words"><b>How it is worked out (default: ${psMethodName(psDefault().method)}):</b> ${escHtml(psWordsGeneric(psDefault().method, psDefault().method === 'pct' ? psDefault().pct : psDefault().hour))} A project can use a different method or value: open the project, Working plan, Retained profit.</div>
      <div class="fin-help">Taken off project profit for every labour hour (sold, planned and logged) to give <b>retained profit</b>. This is separate from “Labour profit share (%)” in Quote settings: that percentage is the profit built into the labour <em>price</em> (labour cost = price ÷ (1 + %)) and is already inside project profit; the hourly figure is then deducted from it. Set one or the other to what you intend, so the same share is not taken twice.</div>
      ${POT_BUCKETS.map(b => `<div><label>Retained pot: ${b[1]} (%)</label><input type="number" step="1" min="0" data-tab="settings" data-field="${b[0]}" value="${potPct(b[0])}"></div>`).join('')}
+     ${potSettingsHtml()}
+     <div class="fin-help">Each pot is a percentage of retained profit (the default) or a fixed amount put aside every month. Percentage pots share what is left of retained profit after any fixed amounts.</div>
      <div class="fin-help">The four buckets share the retained profit pot${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) === 100 ? '.' : ` (they add up to ${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0)}%, so they are scaled to 100% on the Dashboard).`}</div>
      <div><label>Invoice warning after (days overdue)</label><input type="number" step="1" min="0" data-tab="settings" data-field="invoiceWarnDays" value="${s.invoiceWarnDays === undefined || s.invoiceWarnDays === '' ? 14 : s.invoiceWarnDays}"></div>
      <div><label>Forecast horizon (months, if no dated work)</label><input type="number" step="1" data-tab="settings" data-field="forecastMonths" value="${s.forecastMonths}"></div>`;
@@ -11289,10 +11291,11 @@ function cashPosition(){ return bankBalance(); }   // starting balance plus the 
 function assetCommitted(){ return r2((state.assetPlan || []).filter(a => a.funding === 'retained' && ['Approved', 'Ordered', 'Bought'].includes(a.status)).reduce((s, a) => s + (Number(a.cost) || 0), 0)); }
 function dbPotHtml(){
   const rt = retainedTotals(), committed = assetCommitted(), un = r2(rt.toDate - committed), cash = cashPosition(), sum = POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) || 1;
-  const bucket = b => { const pct = potPct(b[0]), amt = r2(rt.toDate * pct / sum); return `<div class="pot-b"><small>${b[1]} · ${Math.round(pct / sum * 100)}%</small><b>${money(amt)}</b>${b[0] === 'potAssetsPct' ? `<em>${money(committed)} committed</em>` : ''}</div>`; };
+  const pp = potPositions(rt.toDate), pos = {}; pp.rows.forEach(r => { pos[r.b[0]] = r; });
+  const bucket = b => { const r = pos[b[0]], amt = r.method === 'fixed' ? r.amt : r2((pp.allPct ? pp.pool : Math.max(0, pp.pool)) * r.pct / pp.sum); return `<div class="pot-b"><small>${b[1]} · ${r.method === 'fixed' ? money(r.perMonth) + ' a month' : Math.round(r.pct / pp.sum * 100) + '%'}</small><b>${money(amt)}</b>${b[0] === 'potAssetsPct' ? `<em>${money(committed)} committed</em>` : ''}${r.method === 'fixed' ? `<em>fixed: ${r.months} month${r.months === 1 ? '' : 's'} so far</em>` : ''}</div>`; };
   return `<div class="pot"><div class="pot-main"><div class="db-card-h"><h3>Retained profit</h3><span class="pot-sub">project profit minus profit share (default ${escHtml(psMethodName(psDefault().method))}: ${psDefault().method === 'pct' ? (psDefault().pct ? psDefault().pct + '%' : 'not set') : (psDefault().hour ? '£' + psDefault().hour + '/h' : 'not set')}), recognised as invoices are raised</span></div>
       <div class="pot-fig"><div><small>Retained profit to date</small><b>${money(rt.toDate)}</b></div><div><small>Committed to the asset plan</small><b>${money(committed)}</b></div><div><small>Unallocated</small><b class="${un < 0 ? 'over' : ''}">${money(un)}</b></div></div>
-      <div class="pot-buckets">${POT_BUCKETS.map(bucket).join('')}</div>
+      <div class="pot-buckets">${POT_BUCKETS.map(bucket).join('')}</div>${pp.allPct ? '' : `<div class="pot-sub" style="margin-top:6px;">Fixed pots take ${money(pp.fixedSum)} to date; the percentage pots share the other ${money(pp.pool)}${pp.short ? ' (retained profit to date does not yet cover the fixed amounts)' : ''}.</div>`}
       <div class="pot-links"><button type="button" class="sp-link" data-dash="go" data-tab="assets">Asset plan &amp; register →</button> <span class="pot-sub">Whole-job retained profit forecast: ${money(rt.plan)}</span></div></div>
     <div class="pot-cash"><small>Cash position</small><b class="${cash < 0 ? 'over' : ''}">${money(cash)}</b><em>starting cash plus actual transactions. Profit is not cash: retained profit is earned on the jobs, cash is what is in the bank.</em></div></div>`;
 }
@@ -11333,7 +11336,7 @@ function assetRegisterHtml(){
 function assetPlanHtml(){
   const rt = retainedTotals(), items = state.assetPlan.slice().sort((a, b) => String(a.neededBy || '9999').localeCompare(String(b.neededBy || '9999'))), aPct = potPct('potAssetsPct') / (POT_BUCKETS.reduce((s, b) => s + potPct(b[0]), 0) || 1);
   let cum = 0; const aff = {};
-  items.forEach(a => { if(a.funding === 'retained'){ cum += Number(a.cost) || 0; const avail = a.neededBy ? retainedBy(a.neededBy) : rt.plan; aff[a.id] = { cum: r2(cum), avail, head: r2(avail - cum), bucket: r2(avail * aPct - cum) }; } });
+  items.forEach(a => { if(a.funding === 'retained'){ cum += Number(a.cost) || 0; const avail = a.neededBy ? retainedBy(a.neededBy) : rt.plan; aff[a.id] = { cum: r2(cum), avail, head: r2(avail - cum), bucket: r2(potAssetsAt(avail, a.neededBy || fmt(new Date())) - cum) }; } });
   const rows = state.assetPlan.map(a => {
     const at = `data-asset-plan="${a.id}"`, f = (k, type) => `<input ${type === 'number' ? 'type="number" step="any" min="0" class="qb-n"' : (type === 'date' ? 'type="date"' : '')} ${at} data-f="${k}" value="${escAttr(a[k] === undefined ? '' : a[k])}">`, sel = (k, opts) => `<select ${at} data-f="${k}">${opts.map(o => { const [v, n] = Array.isArray(o) ? o : [o, o]; return `<option value="${escAttr(v)}"${String(a[k]) === String(v) ? ' selected' : ''}>${escHtml(n)}</option>`; }).join('')}</select>`;
     const af = aff[a.id], bought = a.status === 'Bought', ev = af ? (af.head >= 0 ? `<span class="qb-flag ok">affordable</span> <span class="qb-dim">headroom ${qm(af.head)}</span>` : `<span class="qb-flag bad">short ${qm(-af.head)}</span>`) + `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">cumulative ${qm(af.cum)} vs retained ${qm(af.avail)} by then · assets bucket ${af.bucket >= 0 ? 'ok' : 'short ' + qm(-af.bucket)}</div>` : '<span class="qb-dim">not funded from retained profit</span>';
@@ -14498,7 +14501,7 @@ function applyFieldChange(el){
   if(tab==='assumptions') state.assumptions[field] = value;
   else if(tab==='businessPlan') state.businessPlan[field] = value;
   else if(tab==='dashsettings'){ const n = Math.floor(Number(value)); if(field === 'leadStaleDays' && n >= 1) state.settings.leadStaleDays = n; }   // below 1 is ignored and the box goes back to the saved value
-  else if(tab==='settings') state.settings[field] = value;
+  else if(tab==='settings'){ state.settings[field] = value; if(/^pot\w+Method$/.test(field)) potMethodChanged(field); }
   else if(tab==='stagename' || tab==='stagepct'){
     const item = listFor(el.dataset.pl).find(x => x.id === el.dataset.id);
     if(item){
@@ -20173,6 +20176,45 @@ document.addEventListener('change', (e) => {
   else return;
   saveState(); render();
 });
+
+
+/* =====================================================================
+   Step 4: SET-ASIDE METHOD PER POT
+   Each pot (Assets, Tax, Buffer, Growth) is either a PERCENTAGE of retained profit (the default, today's shares 30, 25, 20, 25) or a FIXED MONTHLY AMOUNT.
+   New optional settings per pot: potXxxMethod ('pct' | 'fixed'), potXxxFixed (GBP a month), potXxxFrom (first month the fixed amount is put aside, set when the pot is switched).
+   With every pot on percentage the figures are exactly what they were: retained profit to date x the pot's share, scaled to 100. A fixed pot puts aside its amount for each month
+   from its start month to the current month, whatever the profit; the percentage pots then share what is left of retained profit to date in their own proportions.
+   ===================================================================== */
+const potKey = (f, suffix) => f.replace(/Pct$/, suffix);
+const potMethod = f => state.settings[potKey(f, 'Method')] === 'fixed' ? 'fixed' : 'pct';
+function potFixedAmt(f){ const n = Number(state.settings[potKey(f, 'Fixed')]); return n > 0 ? n : 0; }
+function potFromMonth(f){ const v = String(state.settings[potKey(f, 'From')] || ''); return /^\d{4}-\d{2}/.test(v) ? v.slice(0, 7) : fmt(new Date()).slice(0, 7); }
+function potMonths(f, date){ const a = potFromMonth(f), b = String(date || fmt(new Date())).slice(0, 7); if(b < a) return 0; const [ya, ma] = a.split('-').map(Number), [yb, mb] = b.split('-').map(Number); return (yb - ya) * 12 + (mb - ma) + 1; }
+function potFixedTo(f, date){ return r2(potFixedAmt(f) * potMonths(f, date)); }
+/* where each pot stands, given the retained profit to date (and the date the fixed pots are counted to) */
+function potPositions(toDate, date){
+  const fixedSum = r2(POT_BUCKETS.filter(b => potMethod(b[0]) === 'fixed').reduce((s, b) => s + potFixedTo(b[0], date), 0)), pctPots = POT_BUCKETS.filter(b => potMethod(b[0]) === 'pct');
+  const sum = pctPots.reduce((a, b) => a + potPct(b[0]), 0) || 1, pool = pctPots.length === POT_BUCKETS.length ? toDate : r2(toDate - fixedSum);
+  const rows = POT_BUCKETS.map(b => { const m = potMethod(b[0]);
+    if(m === 'fixed') return { b, method: 'fixed', amt: potFixedTo(b[0], date), perMonth: potFixedAmt(b[0]), months: potMonths(b[0], date), share: null };
+    return { b, method: 'pct', pct: potPct(b[0]), share: potPct(b[0]) / sum, amt: r2(Math.max(0, pool) * potPct(b[0]) / sum) }; });
+  return { rows, fixedSum, pool, sum, short: pool < 0, allPct: pctPots.length === POT_BUCKETS.length };
+}
+function potSettingsHtml(){
+  return POT_BUCKETS.map(b => { const f = b[0], m = potMethod(f), s = state.settings;
+    return `<div><label>${b[1]}: set-aside method</label><select data-tab="settings" data-field="${potKey(f, 'Method')}"><option value="pct"${m === 'pct' ? ' selected' : ''}>Percentage of retained profit</option><option value="fixed"${m === 'fixed' ? ' selected' : ''}>Fixed monthly amount</option></select></div>
+      ${m === 'fixed' ? `<div><label>${b[1]}: £ a month</label><input type="number" step="1" min="0" data-tab="settings" data-field="${potKey(f, 'Fixed')}" value="${potFixedAmt(f) || ''}" placeholder="0"></div><div><label>${b[1]}: put aside from</label><input type="date" data-tab="settings" data-field="${potKey(f, 'From')}" value="${escAttr(String(s[potKey(f, 'From')] || ''))}"></div>` : ''}`; }).join('');
+}
+function potMethodChanged(field){
+  const f = field.replace(/Method$/, 'Pct'); if(!POT_BUCKETS.some(b => b[0] === f)) return;
+  if(potMethod(f) === 'fixed' && !/^\d{4}-\d{2}-\d{2}$/.test(String(state.settings[potKey(f, 'From')] || ''))) state.settings[potKey(f, 'From')] = fmt(new Date()).slice(0, 8) + '01';
+}
+/* the Assets pot as it stands at a date, for the asset plan's affordability check (identical to before while every pot is on percentage) */
+function potAssetsAt(avail, date){
+  const pp = potPositions(avail, date);
+  if(pp.allPct) return avail * potPct('potAssetsPct') / (POT_BUCKETS.reduce((s, b) => s + potPct(b[0]), 0) || 1);
+  return pp.rows[0].amt;
+}
 
 /* BT:js-money end */
 
