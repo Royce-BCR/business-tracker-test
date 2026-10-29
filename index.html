@@ -2454,6 +2454,22 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 @media (max-width: 700px) { .td-step, .td-nav .btn { min-height: 44px; } .td-crit-grid { grid-template-columns: 1fr; } }
 
 .td-nav input[type=date] { width: 168px; flex: none; }
+
+.rp-sched { background: var(--bt-card); border: 1px solid var(--bt-brand-2); border-radius: var(--bt-r-card); padding: var(--bt-s3) var(--bt-s4); margin-bottom: var(--bt-s4); }
+.rp-sched-h h3 { margin: 0 0 4px; font-size: var(--bt-fs-md); } .rp-sched-h p { margin: 0 0 var(--bt-s3); font-size: var(--bt-fs-sm); color: var(--bt-ink-2); } .rp-sched-h s { color: var(--text-muted); }
+.rp-warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border: 1px solid var(--bt-warn-bd); border-radius: var(--bt-r-btn); padding: var(--bt-s2) var(--bt-s3); margin-bottom: var(--bt-s3); font-size: var(--bt-fs-sm); } .rp-warn .sp-link { color: inherit; }
+.rp-s-tab { width: 100%; border-collapse: collapse; font-size: var(--bt-fs-sm); } .rp-s-tab th { text-align: left; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 6px 8px; border-bottom: 1px solid var(--line); } .rp-s-tab td { padding: 6px 8px; border-bottom: 1px solid var(--bt-chalk); vertical-align: top; }
+.rp-s-tab tr.locked td { color: var(--text-muted); background: var(--bt-surface-2); } .rp-s-tab tr.moved .rp-s-i { font-weight: 600; } .rp-s-i { min-width: 180px; } .rp-s-tag { display: inline-block; margin-right: 8px; padding: 1px 7px; border-radius: var(--bt-r-pill); background: var(--bt-neu-bg); color: var(--bt-neu-fg); font-size: var(--bt-fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.rp-s-n input[type=date] { min-height: 36px; padding: 2px 6px; border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-chip); font: inherit; background: var(--bt-card); width: 100%; box-sizing: border-box; } .rp-s-n input.rp-chg { border-color: var(--bt-brand-2); box-shadow: 0 0 0 2px color-mix(in srgb, var(--bt-brand-2) 22%, transparent); } .rp-s-n div, .rp-s-o div { min-height: 36px; display: flex; align-items: center; } .rp-s-n div + div, .rp-s-o div + div { margin-top: 4px; }
+.rp-sched-f { display: flex; flex-wrap: wrap; gap: var(--bt-s2); margin-top: var(--bt-s3); } .rp-tent { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border: 1px solid var(--bt-warn-bd); border-radius: var(--bt-r-card); padding: var(--bt-s3) var(--bt-s4); margin-bottom: var(--bt-s4); font-size: var(--bt-fs-sm); } .rp-tent-b { display: flex; flex-wrap: wrap; gap: var(--bt-s2); margin-top: var(--bt-s2); }
+@media (max-width: 700px) { .rp-sched .btn, .rp-tent .btn { min-height: 44px; flex: 1 1 100%; } }
+
+.rp-sched .qb-scroll { overflow-x: auto; } .rp-s-tab { min-width: 500px; } .rp-s-o { white-space: nowrap; width: 112px; } .rp-s-n { width: 152px; }
+
+.rp-s-list { border-top: 1px solid var(--line); } .rp-s-row { display: flex; flex-wrap: wrap; gap: 4px var(--bt-s3); justify-content: space-between; align-items: center; padding: 8px 4px; border-bottom: 1px solid var(--bt-chalk); }
+.rp-s-row.locked { color: var(--text-muted); background: var(--bt-surface-2); } .rp-s-row.moved .rp-s-i { font-weight: 600; } .rp-s-row .rp-s-i { flex: 1 1 180px; min-width: 0; }
+.rp-s-d { flex: 0 0 auto; display: grid; gap: 4px; } .rp-s-f { display: flex; align-items: center; gap: 8px; justify-content: flex-end; } .rp-s-was { font-size: var(--bt-fs-xs); color: var(--text-muted); white-space: nowrap; }
+.rp-s-f input[type=date] { min-height: 36px; padding: 2px 6px; border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-chip); font: inherit; background: var(--bt-card); width: 150px; } .rp-s-f input.rp-chg { border-color: var(--bt-brand-2); box-shadow: 0 0 0 2px color-mix(in srgb, var(--bt-brand-2) 22%, transparent); }
 </style>
 </head>
 <body>
@@ -15031,6 +15047,7 @@ function navBarRender(){
   el.hidden = !s;
   el.innerHTML = s ? `<button type="button" class="btn secondary nav-back" data-nav-back>← Back to ${escHtml(s.label)}</button>${nav.stack.length > 1 ? `<span class="nav-trail">${nav.stack.length} steps back: ${nav.stack.map(x => escHtml(x.label)).join(' › ')}</span>` : ''}` : '';
   document.documentElement.style.setProperty('--navh', s ? el.offsetHeight + 'px' : '0px');
+  if(typeof rpFitEl === 'function') document.querySelectorAll('.rp').forEach(rpFitEl);   // the record pages fill the space under the Back bar
 }
 function navResume(){
   let saved = null; try{ saved = JSON.parse(sessionStorage.getItem(NAV_KEY) || 'null'); }catch(e){}
@@ -17165,7 +17182,6 @@ function rpPlanHtml(p){
   return `${rpSchedPanel(p)}<div class="rp-plan" id="rpPlan">${pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p)))}</div>`;
 }
 function pwSecWrapFlat(html){ const m = html.match(/^<section class="pw-sec" id="pw-(\w+)" data-sec="(\w+)"><h3>([\s\S]*?)<\/h3>([\s\S]*)<\/section>\s*$/); return m ? `<section class="pw-sec open rp-flat" id="pw-${m[1]}" data-sec="${m[2]}"><div class="pw-sec-b">${m[4]}</div></section>` : html; }
-function rpSchedPanel(p){ return ''; }   // the reschedule review is added with the Plan tab step
 
 /* ---- right column: linked records (filled in by the associations step) ---- */
 function rpRightHtml(p){ return `<div class="rp-rhead"><h3>Linked records</h3></div><div class="rp-rbody" id="rpRight">${rpLinksHtml(p)}</div>`; }
@@ -17185,8 +17201,8 @@ function rpRenderProject(p){
 function rpFit(){ rpFitEl(document.querySelector('#projectWorkspace .rp')); }
 function rpFitEl(rp){
   if(!rp) return;
-  const top = rp.getBoundingClientRect().top + window.scrollY, h = window.innerHeight - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navtop')) || 0) - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navh')) || 0) - 16;
-  rp.style.setProperty('--rp-h', Math.max(420, h) + 'px');
+  const top = rp.getBoundingClientRect().top + window.scrollY, h = window.innerHeight - top - 12;
+  rp.style.setProperty('--rp-h', Math.max(420, Math.round(h)) + 'px');
 }
 window.addEventListener('resize', () => { document.querySelectorAll('.rp').forEach(rpFitEl); });
 
@@ -17204,6 +17220,7 @@ function rpSetField(p, k, raw){
     set('start', s || ''); set('complete', c || ''); set('dur', n ? String(n) : '');
   } else if(v === String(o[k] == null ? '' : o[k])) delete f[k]; else f[k] = v;
   if(!Object.keys(f).length) rpUi.draft = null;
+  if(rpUi.draft && rpUi.draft.sched && RP_DATE_KEYS.includes(k)){ rpSchedRefresh(p); rpSyncDraftUi(p); rpRenderProject(p); return; }   // the review follows the profile dates
   rpSyncDraftUi(p);
 }
 /* update the date fields and the bar in place, so the field you clicked into keeps the focus */
@@ -17254,7 +17271,6 @@ document.addEventListener('click', (e) => {
   if(a === 'bar-cancel'){ rpCancel(p); return; }
   if(a === 'bar-confirm' || a === 'bar-tentative'){ rpBeginSchedule(p, a === 'bar-tentative' ? 'tentative' : 'confirm'); return; }
 });
-function rpBeginSchedule(p, mode){ const d = rpDraft(p); if(!d) return; d.sched = { mode }; rpUi.tab = 'plan'; rpRenderProject(p); }
 
 /* ---- linked records: a view over links that already exist (deal ids, quote links, POs, invoice rows, contact links). Nothing is copied. ---- */
 const rpLrow = (nav, name, meta) => `<div class="rp-lrow">${nav ? `<button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(name)}</button>` : `<span>${escHtml(name)}</span>`}<span class="rp-lmeta">${meta || ''}</span></div>`;
@@ -17745,6 +17761,138 @@ function rcActivityHtml(owner, kind, sc){
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-rp^="task-add-"]'); if(!b || !state) return; const k = b.dataset.rp.slice(9);
   const id = k === 'supplier' ? rsUi.id : (k === 'company' ? cxUi.coid : cxUi.cid); if(id) openNewTask(null, { refs: [{ kind: k, id: String(id) }] });
+});
+/* ======================= PLAN TAB: THE RESCHEDULE REVIEW =======================
+   A date edited in the profile lands here. Every linked date that has not happened yet (on-site start, phases, deliveries, supplier payments, invoice dates,
+   build complete, sign-off) is shifted by the same change, each one editable, with its old date beside it. Delivered, invoiced and confirmed items stay as they are.
+   Nothing in any linked record changes until you choose: Confirm schedule, Keep as tentative (the project's own start and complete are flagged, linked dates wait) or Cancel changes. */
+PW_EDIT_NAME.reschedule = 'schedule';
+/* move a date by the same change as the project: before the start by the start change, after complete by the complete change, in between in proportion */
+function rpShiftDate(d, b){
+  if(!d || !b) return d;
+  const sd = b.os && b.ns ? daysBetween(b.os, b.ns) : null, cd = b.oc && b.nc ? daysBetween(b.oc, b.nc) : null;
+  if(sd === null && cd === null) return d;
+  let delta;
+  if(sd === null) delta = cd; else if(cd === null) delta = sd;
+  else if(d <= b.os) delta = sd; else if(d >= b.oc) delta = cd;
+  else delta = Math.round(sd + (cd - sd) * daysBetween(b.os, d) / Math.max(1, daysBetween(b.os, b.oc)));
+  return delta ? addDaysIso(d, delta) : d;
+}
+/* every linked date, oldest first. A row: { id, kind, label, tag, fields:[{ k, old, new }], locked, note, ref } */
+function rpSchedRows(p, b){
+  const rows = [], sh = d => rpShiftDate(d, b), tagOf = { ms: 'Milestone', stage: 'Phase', drop: 'Delivery', pay: 'Supplier payment', line: 'Invoice' };
+  const add = r => { r.tag = tagOf[r.kind]; r.fields.forEach(f => { if(f.new === undefined) f.new = r.locked ? f.old : sh(f.old); }); rows.push(r); };
+  projEnsure(p);
+  [['onSiteStart', 'On-site start', b.ns], ['buildComplete', 'Build complete', b.nc]].forEach(([k, n, nv]) => { const i = projMsInfo(p, k); if(i.actual) add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: i.actual.date }], locked: true, note: 'Confirmed ' + pwD(i.actual.date) + ', stays', ref: k }); else add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: i.planned || '', new: nv || '' }], ref: k, project: true }); });
+  RP_MS.forEach(([k, n]) => { if(k === 'onSiteStart' || k === 'buildComplete' || k === 'contractSigned') return; const i = projMsInfo(p, k);
+    if(i.actual) add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: i.actual.date }], locked: true, note: 'Confirmed, stays', ref: k });
+    else if((p.milestones || {})[k]) add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: p.milestones[k] }], ref: k }); });
+  (p.stages || []).forEach(s => { slEnsure(s); if(!(s.start || s.end)) return; const done = !!(s.actEnd && s.actEnd.date);
+    add({ id: 'st:' + s.id, kind: 'stage', label: s.label || 'Stage', fields: [{ k: 'start', old: s.start || '' }, { k: 'end', old: s.end || '' }], locked: done, note: done ? 'Finished, stays' : '', ref: s.id }); });
+  const aq = projAcceptedQuote(p);
+  projDeliveries(p).drops.forEach(x => {
+    const name = (x.method === 'collect' ? 'Collection: ' : 'Delivery: ') + x.supplier, po = poForDrop(p.id, x.d.id);
+    if(x.date) add({ id: 'dr:' + x.d.id, kind: 'drop', label: name, fields: [{ k: 'date', old: x.date }], locked: !!x.delivered || !aq, note: x.delivered ? 'Delivered ' + pwD(x.delivered) + ', stays' : !aq ? 'The quote is not accepted yet: change it on the quote' : (po && po.status !== 'Draft' && po.status !== 'Approved' ? po.ref + ' has gone to the supplier: tell them' : ''), ref: x.d.id });
+    if(x.due && x.out > 0) add({ id: 'sp:' + x.d.id, kind: 'pay', label: 'Pay ' + x.supplier, fields: [{ k: 'date', old: x.due }], locked: !!x.paid || !aq, note: x.paid ? 'Paid, stays' : !aq ? 'The quote is not accepted yet' : '', ref: x.d.id });
+  });
+  (p.paymentLines || []).forEach((l, i) => { if(!l.dueDate) return; const done = !!(l.invoicedDate || l.paidDate);
+    add({ id: 'pl:' + (l.uid || i), kind: 'line', label: (l.desc || 'Payment') + ' · ' + qm(l.amount), fields: [{ k: 'date', old: l.dueDate }], locked: done, note: l.paidDate ? 'Paid, stays' : l.invoicedDate ? 'Invoiced ' + pwD(l.invoicedDate) + ', stays' : '', ref: l.uid || i }); });
+  return rows.sort((a, b) => String(a.fields[0].old || '9999').localeCompare(String(b.fields[0].old || '9999')) || a.label.localeCompare(b.label));
+}
+function rpOverlaps(p, s, c){
+  if(!s || !c) return [];
+  return state.projects.filter(o => o.id !== p.id && !projIsCompleted(o)).map(o => ({ o, d: rpDates(o) })).filter(x => x.d.start && x.d.complete && x.d.start <= c && x.d.complete >= s);
+}
+/* open the review for the pending change (or, from the tentative banner, for the dates that are waiting to be confirmed) */
+function rpBeginSchedule(p, mode, fromTentative){
+  let d = rpDraft(p);
+  if(!fromTentative && d && d.sched && !d.sched.tent){ d.sched.mode = mode; rpUi.tab = 'plan'; rpSchedRefresh(p); rpRenderProject(p); const cs = document.querySelector('#projectWorkspace .rp-cscroll'); if(cs) cs.scrollTop = 0; return; }   // already open: keep the dates you have edited
+  if(fromTentative){
+    const t = p.tentative, cur = rpDates(p); if(!t) return;
+    d = rpUi.draft = { pid: p.id, f: {}, sched: null }; d.sched = { mode, base: { os: t.prev.start, oc: t.prev.complete, ns: cur.start, nc: cur.complete }, tent: true };
+  } else {
+    if(!d) return; const o = rpDates(p); d.sched = { mode, base: { os: o.start, oc: o.complete, ns: rpVal(p, 'start'), nc: rpVal(p, 'complete') } };
+  }
+  d.sched.rows = rpSchedRows(p, d.sched.base); rpUi.tab = 'plan'; rpRenderProject(p);
+  const cs = document.querySelector('#projectWorkspace .rp-cscroll'); if(cs) cs.scrollTop = 0;
+}
+function rpSchedRefresh(p){ const d = rpDraft(p); if(!d || !d.sched || d.sched.tent) return; const o = rpDates(p); d.sched.base = { os: o.start, oc: o.complete, ns: rpVal(p, 'start'), nc: rpVal(p, 'complete') }; d.sched.rows = rpSchedRows(p, d.sched.base); }
+function rpSchedPanel(p){
+  const d = rpDraft(p), t = p.tentative;
+  const banner = t && !(d && d.sched) ? `<div class="rp-tent"><b>Tentative since ${escHtml(dShow(t.since))}</b>${t.by ? ' (' + escHtml(t.by) + ')' : ''}. The project's start and complete dates are flagged tentative. Phases, deliveries and invoices still follow the previous dates (${escHtml(pwD(t.prev.start))} to ${escHtml(pwD(t.prev.complete))}) until you confirm.
+    <div class="rp-tent-b"><button type="button" class="btn qb-sm" data-rp="tent-review">Review and confirm the schedule</button><button type="button" class="btn secondary qb-sm" data-rp="tent-revert">Go back to the previous dates</button></div></div>` : '';
+  if(!d || !d.sched) return banner;
+  const sc = d.sched, b = sc.base, ov = rpOverlaps(p, b.ns, b.nc), n = sc.rows.reduce((a, r) => a + (r.locked ? 0 : r.fields.filter(f => f.new !== f.old).length), 0);
+  const warn = ov.length ? `<div class="rp-warn" role="alert"><b>⚠ These dates overlap ${ov.length === 1 ? 'another project' : ov.length + ' other projects'}.</b> ${ov.map(x => `<div>${rpLink('project:' + x.o.id, recordCode(x.o.id, 'project') + ' ' + x.o.name)}: ${escHtml(pwD(x.d.start))} to ${escHtml(pwD(x.d.complete))}${x.o.owner ? ' · owner ' + escHtml(x.o.owner) : ''}${projCustomer(x.o).name ? ' · customer ' + escHtml(projCustomer(x.o).name) : ''}</div>`).join('')}<div>Speak to them first. <b>Keep as tentative</b> is the safer choice until you have.</div></div>` : '';
+  const dateIn = (r, f, i) => r.locked || !f.old && !f.new ? `<span class="rp-dim">stays</span>` : `<input type="date" class="${f.new !== f.old ? 'rp-chg' : ''}" data-rps="${escAttr(r.id)}" data-f="${f.k}" value="${escAttr(f.new)}" aria-label="New date for ${escAttr(r.label)}">`;
+  const body = sc.rows.map(r => `<div class="rp-s-row${r.locked ? ' locked' : ''}${r.fields.some(f => f.new !== f.old) ? ' moved' : ''}"><div class="rp-s-i"><span class="rp-s-tag">${escHtml(r.tag)}</span>${escHtml(r.label)}${r.note ? `<div class="rp-dim">${escHtml(r.note)}</div>` : ''}</div>
+      <div class="rp-s-d">${r.fields.map((f, i) => `<div class="rp-s-f"><span class="rp-s-was">${r.fields.length > 1 ? (f.k === 'start' ? 'start ' : 'end ') : ''}was ${f.old ? escHtml(pwD(f.old)) : '—'}</span>${dateIn(r, f, i)}</div>`).join('')}</div></div>`).join('');
+  const hl = (a, c) => a === c ? escHtml(pwD(a)) : `<s>${escHtml(pwD(a))}</s> ${escHtml(pwD(c))}`;
+  return `${banner}<section class="rp-sched" id="rpSched" aria-label="Review the new schedule"><div class="rp-sched-h"><h3>Review the new schedule</h3>
+    <p>Start ${hl(b.os, b.ns)} · Complete ${hl(b.oc, b.nc)}${b.ns && b.nc ? ` · ${rpWD(b.ns, b.nc)} working days` : ''}. ${n} linked date${n === 1 ? '' : 's'} will move. Change any date below before you confirm. Nothing changes anywhere else until you do.</p></div>${warn}
+    <div class="rp-s-list">${body || '<div class="pw-empty">There are no linked dates to move.</div>'}</div>
+    <div class="rp-sched-f"><button type="button" class="btn${ov.length ? ' secondary' : ''}" data-rp="sched-confirm">Confirm schedule</button><button type="button" class="btn${ov.length ? '' : ' secondary'}" data-rp="sched-tentative">Keep as tentative</button><button type="button" class="btn secondary" data-rp="sched-cancel">Cancel changes</button></div></section>`;
+}
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el.dataset || el.dataset.rps === undefined) return; const p = rpFind(pwUi.id), d = p && rpDraft(p); if(!d || !d.sched) return;
+  const r = d.sched.rows.find(x => x.id === el.dataset.rps), f = r && r.fields.find(x => x.k === el.dataset.f); if(!f) return;
+  f.new = isoOk(el.value) || f.old; rpRenderProject(p);
+});
+/* what is written on Confirm: the same stores the Working plan, Timeline and Invoice schedule edits write to, each with its own history entry */
+function rpApplyRows(p, sc, why){
+  const lines = [], now = new Date().toISOString(), by = whoName();
+  sc.rows.forEach(r => {
+    if(r.locked) return;
+    if(r.kind === 'stage'){
+      const s = (p.stages || []).find(x => x.id === r.ref); if(!s) return;
+      let ns = r.fields.find(x => x.k === 'start').new || '', ne = r.fields.find(x => x.k === 'end').new || ''; if(ns && ne && ne < ns) ne = ns;
+      if(ns === (s.start || '') && ne === (s.end || '')) return;
+      (s.planLog = s.planLog || []).push({ id: qRand('pl_'), kind: 'planned', fromTxt: pwD(s.start) + ' → ' + pwD(s.end), toTxt: pwD(ns) + ' → ' + pwD(ne), at: now, by, reason: why });
+      lines.push(`${r.label}: ${pwD(s.start)} → ${pwD(s.end)} to ${pwD(ns)} → ${pwD(ne)}`); s.start = ns; s.end = ne; return;
+    }
+    r.fields.forEach(f => {
+      if(f.new === f.old || !f.new) return;
+      if(r.kind === 'ms'){ projSetPlanned(p, r.ref, f.new, why); lines.push(`${r.label}: ${pwD(f.old)} → ${pwD(f.new)}`); }
+      else if(r.kind === 'drop' || r.kind === 'pay'){ const plan = projPlanEnsure(p), dr = plan && plan.drops.find(x => x.id === r.ref); if(!dr) return;
+        if(r.kind === 'drop'){ dr.date = f.new; const po = poForDrop(p.id, r.ref); if(po && (po.status === 'Draft' || po.status === 'Approved')) po.deliveryDate = f.new; } else dr.paymentDueDate = f.new;
+        lines.push(`${r.label}: ${pwD(f.old)} → ${pwD(f.new)}`); }
+      else if(r.kind === 'line'){ const l = (p.paymentLines || []).find((x, i) => (x.uid || i) === r.ref); if(!l) return; (l.planLog = l.planLog || []).push({ field: 'due', from: l.dueDate || '', to: f.new, at: now, by, reason: why }); l.dueDate = f.new; if(l.quoteRowId) l.dueManual = true; lines.push(`Invoice ${l.desc || 'Payment'}: ${pwD(f.old)} → ${pwD(f.new)}`); }
+    });
+  });
+  if(p.paymentLines) p.paymentLines.sort((a, b) => String(a.dueDate || '9999').localeCompare(String(b.dueDate || '9999')));
+  return lines;
+}
+async function rpConfirmSchedule(p){
+  const d = rpDraft(p); if(!d || !d.sched) return; const sc = d.sched;
+  const preview = sc.rows.flatMap(r => r.locked ? [] : r.fields.filter(f => f.new !== f.old && f.new).map(f => `${r.label}${r.fields.length > 1 ? ' (' + f.k + ')' : ''}: ${pwD(f.old)} → ${pwD(f.new)}`)).concat(Object.keys(d.f).filter(k => !RP_DATE_KEYS.includes(k)).map(k => `${RP_LABELS[k] || k} changed`));
+  if(!preview.length && !sc.tent){ showToast('No dates have changed'); return; }
+  const r = await chgAsk('Confirm this schedule?', preview.length ? preview : ['Confirm the tentative dates as the schedule'], { causes: SCHEDULE_CAUSES, save: 'Confirm schedule' }); if(!r) return;
+  const why = (r.cause ? ((SCHEDULE_CAUSES.find(c => c[0] === r.cause) || [0, r.cause])[1]) + ': ' : '') + r.reason;
+  rpApplyPlain(p, d.f); const lines = rpApplyRows(p, sc, why); p.tentative = null; rpUi.draft = null;
+  chgLog(p, 'reschedule', r, lines.length ? lines : ['Tentative dates confirmed']); saveState(); render(); showToast('Schedule confirmed: ' + lines.length + ' date' + (lines.length === 1 ? '' : 's') + ' updated');
+}
+function rpKeepTentative(p){
+  const d = rpDraft(p); if(!d || !d.sched) return; const sc = d.sched, b = sc.base, now = fmt(new Date());
+  if(sc.tent){ showToast('The schedule is still tentative'); rpUi.draft = null; rpRenderProject(p); return; }
+  rpApplyPlain(p, d.f);
+  const prev = p.tentative ? p.tentative.prev : { start: b.os || '', complete: b.oc || '' };
+  if(b.ns) projSetPlanned(p, 'onSiteStart', b.ns, 'Tentative'); if(b.nc) projSetPlanned(p, 'buildComplete', b.nc, 'Tentative');
+  p.tentative = { since: p.tentative ? p.tentative.since : now, by: whoName(), prev };
+  chgLog(p, 'reschedule', { cause: '', reason: 'Kept as tentative' }, [`Start ${pwD(b.os)} → ${pwD(b.ns)} (tentative)`, `Complete ${pwD(b.oc)} → ${pwD(b.nc)} (tentative)`]);
+  rpUi.draft = null; saveState(); render(); showToast('Kept as tentative. Linked dates have not moved.');
+}
+function rpRevertTentative(p){
+  const t = p.tentative; if(!t) return;
+  projSetPlanned(p, 'onSiteStart', t.prev.start || '', 'Tentative change reverted'); projSetPlanned(p, 'buildComplete', t.prev.complete || '', 'Tentative change reverted');
+  chgLog(p, 'reschedule', { cause: '', reason: 'Tentative change reverted' }, [`Back to ${pwD(t.prev.start)} to ${pwD(t.prev.complete)}`]); p.tentative = null; rpUi.draft = null; saveState(); render(); showToast('Back to the previous dates');
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-rp^="sched-"],[data-rp^="tent-"]'); if(!b || !state) return; const p = rpFind(pwUi.id); if(!p) return; const a = b.dataset.rp;
+  if(a === 'sched-confirm') rpConfirmSchedule(p);
+  else if(a === 'sched-tentative') rpKeepTentative(p);
+  else if(a === 'sched-cancel'){ rpUi.draft = null; render(); showToast('Changes cancelled. Everything is as it was.'); }
+  else if(a === 'tent-review') rpBeginSchedule(p, 'confirm', true);
+  else if(a === 'tent-revert') rpRevertTentative(p);
 });
 /* BT:js-records end */
 
