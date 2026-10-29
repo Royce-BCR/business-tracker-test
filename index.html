@@ -18627,6 +18627,7 @@ const QUAL_LABEL = { strong: 'Strong', unclear: 'Unclear', weak: 'Weak' }, QUAL_
 function qualBadgeHtml(rec){
   if(!state.qualQuestions.length) return '';
   const e = qualEval(rec);
+  if(!e.answered) return `<span class="sf-chip qual-score" title="Qualification: nothing has been answered, so this has not been assessed (display only; nothing is stored)">Not assessed</span>`;   // no answers at all: neutral, not "Unclear"
   return `<span class="sf-chip ${QUAL_CLS[e.key]} qual-score" title="Qualification: ${e.answered} of ${e.total} answered, scored ${Math.round(e.pct * 100)}%${e.blocking.length ? '. Holding promotion: ' + escAttr(e.blocking.map(x => x.q.name).join(', ')) : ''}">${QUAL_SYM[e.key]} ${QUAL_LABEL[e.key]}</span>`;
 }
 function qualGateMsg(rec){
