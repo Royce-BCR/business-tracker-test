@@ -2555,6 +2555,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .sc-low { background: var(--bt-ok-bg); }
   .sc-ovr { font-size: 11px; color: var(--bt-warn-fg); font-weight: 600; }
   .sc-lines select { min-width: 150px; }
+  body.is-approver :is(.panel, #quoteBuilderView) button:is(.btn, .icon-btn):not(.apv-ok):not([data-qba^="ap-"]):not([data-qba="open"]):not([data-qba="open-quote"]):not([data-qba="list"]):not([data-qba="filter"]):not([data-qba="tab"]):not([data-nav]):not(.sp-link):not([data-qbs-step]):not([data-qbs-toggle]) { display: none !important; }
+  body.is-approver [data-qba="new"], body.is-approver [data-qba="add-line"] { display: none !important; }
 
 /* BT:css-selling end */
 </style>
@@ -3997,7 +3999,7 @@ function hideLoginShowApp(){ const o = document.getElementById('loginOverlay'); 
 function renderAuthUI(){
   const lb = document.getElementById('logoutBar');
   if(lb) lb.innerHTML = session
-    ? `<div class="who">${escAttr(session.username)}<span class="role">${session.role==='admin'?'admin':'user'}</span></div><button class="logout-link" data-action="logout">Log out</button>`
+    ? `<div class="who">${escAttr(session.username)}<span class="role">${session.role==='admin'?'admin':(session.role==='approver'?'approver':'user')}</span></div><button class="logout-link" data-action="logout">Log out</button>`
     : '';
   const admin = isAdmin();
   document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = admin ? '' : 'none'; });
@@ -15027,6 +15029,7 @@ BTT_CARD_MQ.addEventListener('change', () => bttQueue());
 bttQueue();
 
 function activateTab(name){
+  if(typeof approverMode === 'function' && state && approverMode() && !approverPages().includes(name)) name = 'quotations';   // an approver only reaches the pages their scope allows
   if(name === 'admin'){ name = 'actions'; setTimeout(() => { const t = document.getElementById('bizAdminSec'); if(t) t.scrollIntoView({ block: 'start' }); }, 30); }   // Setup & Admin now lives on the Business tasks page
   if(name === 'actions' && typeof canSeeBusiness === 'function' && state && !canSeeBusiness()){ showToast('Business tasks are only visible to the people set under Settings'); return; }
   const tab = document.querySelector('.tab[data-tab="' + name + '"]'), panel = document.getElementById('panel-' + name);
@@ -19001,6 +19004,49 @@ async function selPickSupplier(q, l, sid){
   qbTouch(q, true);
 }
 SEL_SET_CARDS.length;   // (no settings for step 5)
+
+/* =====================================================================
+   STEP 6: APPROVER ACCESS TYPE (built, not switched on)
+   Settings, Selling holds the scope (commercial, finance or both). The view itself keys off a login role of "approver" (session.role) or, for an
+   admin testing it, a per-browser preview that is never stored in the saved data. NO user or login is created by any of this; the login system,
+   its role list and the Supabase users are untouched. An approver sees the quotes (and the finance pages when the scope allows) read-only,
+   and can decide through the existing Approvals flow, which carries the comment. Anything else cannot be saved from an approver's browser.
+   ===================================================================== */
+const APV_PREVIEW_KEY = STORAGE_PREFIX + 'business-tracker-approver-preview';
+const APV_SCOPES = [['commercial', 'Commercial: quotes and approvals'], ['finance', 'Finance: quotes, approvals and the finance figures'], ['both', 'Both: commercial and finance']];
+const APV_PAGES = { commercial: ['quotations', 'approvals'], finance: ['quotations', 'approvals', 'cashflow', 'transactions', 'reconciliation', 'pricing', 'revenue', 'invoicing', 'supplierinvoices', 'dashboard'] };
+function ensureSellingModel6(o){ const st = o.settings = o.settings || {}; st.approverScope = ['commercial', 'finance', 'both'].includes(st.approverScope) ? st.approverScope : 'commercial'; }
+(function(){ const o = ensureSellingModel5; ensureSellingModel5 = function(x){ o(x); ensureSellingModel6(x); if(typeof ensureSellingModel7 === 'function') ensureSellingModel7(x); }; })();
+function approverMode(){ if(session && session.role === 'approver') return true; try{ return isAdmin() && sessionStorage.getItem(APV_PREVIEW_KEY) === '1'; }catch(e){ return false; } }
+function approverPages(){ const sc = state.settings.approverScope; return sc === 'commercial' ? APV_PAGES.commercial : APV_PAGES.finance.filter(p => sc === 'both' || ['quotations', 'approvals', 'cashflow', 'transactions', 'reconciliation', 'pricing', 'revenue', 'invoicing', 'supplierinvoices', 'dashboard'].includes(p)); }
+let apvWrite = false;   // true only while an approval decision is being recorded
+function apvApply(){
+  const on = !!state && approverMode(); document.body.classList.toggle('is-approver', on);
+  let st = document.getElementById('apvStyle'); if(!on){ if(st) st.remove(); return; }
+  const ok = approverPages(), all = [...document.querySelectorAll('.tab[data-tab]')].map(t => t.dataset.tab).filter(t => !ok.includes(t));
+  const sel = all.map(t => `#sidebar .tab[data-tab="${t}"],[data-go="${t}"]`).join(',');
+  if(!st){ st = document.createElement('style'); st.id = 'apvStyle'; document.head.appendChild(st); }
+  st.textContent = `${sel}{display:none!important}`;
+  document.querySelectorAll('#main :is(input,select,textarea):not(.apv-ok)').forEach(el => { if(!el.closest('#decOverlay') && !el.matches('[type=search],.crm-search')){ el.disabled = true; } });
+  const cur = (typeof menuCurrent === 'function') ? menuCurrent() : ''; if(cur && !ok.includes(cur)) activateTab('quotations');
+}
+(function(){   // nothing an approver does is saved, except recording a decision through Approvals
+  const save = saveState; saveState = function(){ if(approverMode() && !apvWrite) return; return save.apply(this, arguments); };
+  const dec = apDecide; apDecide = function(){ apvWrite = true; try{ return dec.apply(this, arguments); } finally { setTimeout(() => { apvWrite = false; }, 50); } };
+  const m = new MutationObserver(() => { if(document.body.classList.contains('is-approver') || approverMode()) apvApply(); }); m.observe(document.body, { childList: true, subtree: true });
+})();
+SEL_SET_CARDS.push(['Approver access', () => {
+  const sc = state.settings.approverScope, pv = (() => { try{ return sessionStorage.getItem(APV_PREVIEW_KEY) === '1'; }catch(e){ return false; } })();
+  return `<p class="q-help" style="margin:0 0 8px;">An <b>Approver</b> sees the quotes in a read-only view (and the finance figures if the scope allows), and can approve or comment through Approvals. They cannot change anything else. This is built but <b>not switched on</b>: no user or login has been created for Gerry or Mike.</p>
+    <div class="lp-f" style="max-width:420px;"><label>Approver scope</label><select data-apv="scope" aria-label="Approver scope">${APV_SCOPES.map(([k, n]) => `<option value="${k}"${sc === k ? ' selected' : ''}>${n}</option>`).join('')}</select></div>
+    <details style="margin-top:10px;"><summary style="cursor:pointer;font-weight:600;">What it takes to switch it on</summary><ol class="q-help" style="margin:8px 0 0 18px;"><li>Allow the role <b>approver</b> in the users setup in Supabase (the user table and its add-user function currently accept admin and user only). This is a login change, so it needs your go-ahead.</li><li>Create a login for Gerry and one for Mike with that role. A username must match the approver's name in Settings, Approvals (for example Gerry) so their decisions carry their name.</li><li>Add Approver to the Role list in Settings, Admin, Add a new user.</li><li>Pick the scope here (one scope applies to every approver; say if Gerry and Mike need different ones).</li></ol></details>
+    ${isAdmin() ? `<label class="q-check" style="margin-top:10px;"><input type="checkbox" data-apv="preview"${pv ? ' checked' : ''}> Preview the approver view in this browser <span class="q-help">(admin only, not saved, no user created; untick to go back)</span></label>` : ''}`;
+}]);
+document.addEventListener('change', (e) => {
+  const el = e.target, k = el.dataset && el.dataset.apv; if(!k || !state) return;
+  if(k === 'scope'){ state.settings.approverScope = ['commercial', 'finance', 'both'].includes(el.value) ? el.value : 'commercial'; saveState(); render(); }
+  else if(k === 'preview' && isAdmin()){ try{ if(el.checked) sessionStorage.setItem(APV_PREVIEW_KEY, '1'); else sessionStorage.removeItem(APV_PREVIEW_KEY); }catch(err){} location.reload(); }
+});
 
 /* BT:js-selling end */
 
