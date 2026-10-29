@@ -2519,6 +2519,31 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 @media (max-width: 999px), (pointer: coarse) { .rp-hint .sp-link, .rp-ro .sp-link { padding: 14px 6px; margin: -14px -6px; position: relative; } }
 /* BT:css-selling begin */
   /* Stage 3: selling */
+  .ph-head, .pt-head { display: grid; gap: 6px; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+  .ph-head { grid-template-columns: minmax(0, 1fr) 64px 64px 34px; }
+  .ph-row { display: grid; grid-template-columns: minmax(0, 1fr) 64px 64px 34px; gap: 6px; margin-bottom: 8px; align-items: center; padding-bottom: 8px; border-bottom: 1px dashed var(--line); }
+  .ph-row .ph-sub { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .ph-row .ph-sub input[type=date] { width: 138px; }
+  .ph-row .ph-sub .q-check { min-height: 0; font-size: var(--bt-fs-xs); }
+  .ph-row input, .pt-row input[type=text], .pt-row input[type=number] { border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); min-width: 0; width: 100%; }
+  .ph-row input[type=checkbox], .pt-row input[type=checkbox] { width: auto; }
+  .ph-row.ph-stack { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px; }
+  .ph-row.ph-stack .ph-nm { grid-column: 1 / -1; font-weight: 600; }
+  .ph-row.ph-stack .pt-f > span { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+  .ph-row.ph-stack .ph-sub { grid-column: 1 / -1; font-size: var(--bt-fs-xs); }
+  .ph-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .ph-tbl input { width: 100%; min-width: 0; } .ph-tbl td:nth-child(2) input, .ph-tbl td:nth-child(3) input { width: 72px; }
+  .ph-card .ph-btns { margin-top: 10px; }
+  .pt-head, .pt-row { grid-template-columns: 58px minmax(0, 1fr) 80px 70px 80px 34px; }
+  .pt-row { display: grid; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .pt-f > span { display: none; } .pt-f { display: block; margin: 0; }
+  .pt-list, .pt-head { max-width: 720px; }
+  @media (max-width: 700px) {
+    .pt-head { display: none; }
+    .pt-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto; grid-template-areas: "nm nm nm nm" "hr dy sl dl" "mv mv mv mv"; padding: 8px 0 10px; border-bottom: 1px dashed var(--line); gap: 6px 8px; margin-bottom: 4px; }
+    .pt-nm { grid-area: nm; } .pt-hr { grid-area: hr; } .pt-dy { grid-area: dy; } .pt-sl { grid-area: sl; } .pt-dl { grid-area: dl; } .pt-mv { grid-area: mv; }
+    .pt-f > span { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; }
+  }
   .hd-wk { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; margin: 0 0 10px; }
   .hd-wk-l { font-weight: 600; font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
   #panel-settings .set-content .hd-wk { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, max-content)); gap: 2px 16px; }
@@ -14422,7 +14447,7 @@ document.addEventListener('click', (e) => {
   if(action === 'add-row'){
     const tab = btn.dataset.tab;
     const row = newRowFor(tab);
-    if(tab === 'pipeline'){ row.id = allocRecordId(); expandedProjects.add(row.id); }
+    if(tab === 'pipeline'){ row.id = allocRecordId(); phPrefill(row); expandedProjects.add(row.id); }
     state[tab].push(row); render(); saveState();
   }
   else if(action === 'delete-row'){
@@ -14454,7 +14479,7 @@ document.addEventListener('click', (e) => {
     if(gone) undoDeleted('Stage line deleted: ' + String(gone.label || 'Stage').slice(0, 40), ['pipeline', { id: rec.id }, 'stages'], s, gone);
     render(); saveState();
   }
-  else if(action === 'add-lead'){ const l = newRowFor('leads'); l.id = allocRecordId(); expandedLeads.add(l.id); state.leads.push(l); render(); saveState(); }
+  else if(action === 'add-lead'){ const l = newRowFor('leads'); l.id = allocRecordId(); phPrefill(l); expandedLeads.add(l.id); state.leads.push(l); render(); saveState(); }
   else if(action === 'delete-lead'){
     const at = Number(btn.dataset.idx), gone = state.leads.splice(at, 1)[0];
     if(gone) undoDeleted('Lead deleted: ' + String(gone.projectName || gone.contact || gone.company || recordCode(gone.id, 'lead')).slice(0, 40), ['leads'], at, gone);
@@ -17649,7 +17674,7 @@ function rpLeftHtml(p){
     ${p.tentative ? `<div class="rp-note tent">Tentative since ${escHtml(dShow(p.tentative.since))}. The dates below are not confirmed yet.</div>` : ''}
     ${rpEdit(p, 'start', { type: 'date' })}${rpEdit(p, 'complete', { type: 'date' })}${rpEdit(p, 'dur', { type: 'number', label: 'Duration (working days)' })}
     <div class="rp-hint rp-dateh">Start, complete and duration are linked: change start or duration and complete moves, change complete and duration follows.</div>
-    ${rpRO('Hours planned', h.plan ? `<b>${hrs(h.plan)}</b>` : '', `From the plan, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>`)}
+    ${phHasHours(p) ? rpRO('Hours planned', `<b>${hrs(phHours(p))}</b>`, `Adds up the phase hours, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>${h.plan && Math.abs(h.plan - phHours(p)) > 0.01 ? ` · the Working plan holds ${hrs(h.plan)}` : ''}`) : rpRO('Hours planned', h.plan ? `<b>${hrs(h.plan)}</b>` : '', `From the plan, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>`)}
     ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>` : '', 'From time logs')}`;
   const moneySec = `
     <div class="rp-three"><div class="rp-ro"><small>Billed</small><b>${qm(money.billed)}</b></div><div class="rp-ro"><small>Paid</small><b>${qm(money.paid)}</b></div><div class="rp-ro${money.overdue ? ' rp-bad' : ''}"><small>Overdue</small><b>${qm(money.overdue)}</b></div></div>
@@ -17744,7 +17769,7 @@ function rpOverviewHtml(p){
   return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${varProjectCard(p)}${rpQualTile(p)}</div>`;
 }
 function rpPlanHtml(p){
-  return `${rpSchedPanel(p)}<div class="rp-plan" id="rpPlan">${pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p)))}</div>`;
+  return `${rpSchedPanel(p)}${phPlanCardHtml(p)}<div class="rp-plan" id="rpPlan">${pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p)))}</div>`;
 }
 function pwSecWrapFlat(html){ const m = html.match(/^<section class="pw-sec" id="pw-(\w+)" data-sec="(\w+)"><h3>([\s\S]*?)<\/h3>([\s\S]*)<\/section>\s*$/); return m ? `<section class="pw-sec open rp-flat" id="pw-${m[1]}" data-sec="${m[2]}"><div class="pw-sec-b">${m[4]}</div></section>` : html; }
 
@@ -18490,7 +18515,7 @@ function ensureSellingModel(o){
 /* ---------- fields every lead, sale and project carries ---------- */
 function sfRec(kind, id){ id = Number(id); return (kind === 'lead' ? state.leads : kind === 'sales' ? state.pipeline : state.projects).find(r => r.id === id) || null; }
 function sfPhases(r){ return (Array.isArray(r.phases) ? r.phases : []).filter(p => p && typeof p === 'object'); }
-function sfDays(r){ const ph = sfPhases(r); if(ph.length) return ph.reduce((a, p) => a + (Number(p.days) || 0), 0); const n = Number(r.estDays); return n > 0 ? n : 0; }
+function sfDays(r){ const ph = sfPhases(r); if(ph.length) return ph.filter(p => !p.selling).reduce((a, p) => a + (Number(p.days) || 0), 0); const n = Number(r.estDays); return n > 0 ? n : 0; }   // Stage 4: a phase marked selling time (site visit, scope, quote) is not time on site
 function jobTypeOf(r){ return state.jobTypes.find(j => j.id === r.jobTypeId) || null; }
 function jobNotFit(r){ const j = jobTypeOf(r); return !!(j && j.notFit); }
 function sfIso(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : ''; }
@@ -18506,7 +18531,7 @@ function sfEditHtml(kind, r, i, o){
   const dur = ph.length
     ? f('Estimated duration (days)', `<div class="sf-calc" aria-readonly="true"><b>${sfDays(r)}</b> days <span class="rp-tag">Calculated</span></div>`, 'Adds up the phases below. Remove the phases to type one figure instead.')
     : f('Estimated duration (days)', `<input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="estDays" value="${r.estDays === '' || r.estDays == null ? '' : escAttr(r.estDays)}" placeholder="Working days on site">`, 'How long the job is likely to take. You can split it into phases.');
-  const phases = `<div class="lp-f"><label>Phases <span class="lp-opt">optional</span></label>${ph.map((p, pi) => `<div class="sf-phase"><input type="text" ${base} data-field="phaseName" data-pi="${pi}" value="${escAttr(p.name || '')}" placeholder="Phase name" aria-label="Phase name"><input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${p.days === '' || p.days == null ? '' : escAttr(p.days)}" placeholder="Days" aria-label="Days"><button type="button" class="icon-btn" data-sf="phase-del" data-kind="${kind}" data-id="${id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button></div>`).join('')}<button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="${kind}" data-id="${id}">+ Add a phase</button></div>`;
+  const phases = phEditorHtml(kind, r, base);
   const warn = sfDeadlineWarn(r);
   return `${val}${f('Job type', jt, SF_NF_HINT, 'sf-jt-hint')}${dur}${phases}${f('Customer\'s preferred start', `<input type="date" ${base} data-field="prefStart" value="${escAttr(sfIso(r.prefStart))}">`)}${f('Deadline', `<input type="date" ${base} data-field="deadline" value="${escAttr(sfIso(r.deadline))}">`, warn ? `<span class="sf-warn">${warn}</span>` : 'Optional: a date the job must be finished by.')}`;
 }
@@ -18525,6 +18550,7 @@ function sfApply(el){
   else if(f === 'jobTypeId'){ r.jobTypeId = state.jobTypes.some(j => j.id === v) ? v : ''; }
   else if(f === 'prefStart' || f === 'deadline'){ r[f] = sfIso(v); }
   else if(f === 'phaseName' || f === 'phaseDays'){ const p = sfPhases(r)[Number(d.pi)]; if(p){ if(f === 'phaseName') p.name = v.trim(); else { const n = Math.round(Number(v)); p.days = (v === '' || isNaN(n)) ? '' : Math.max(0, n); } } }
+  else if(f.startsWith('phase')){ const p = sfPhases(r)[Number(d.pi)]; if(p) phApply(p, f, v, el); }
 }
 const sfUi = { rebuild: false };
 /* the lead panel is not rebuilt on every change (that would drop the focus), so the calculated bits are refreshed in place */
@@ -18539,6 +18565,7 @@ document.addEventListener('click', (e) => {
   const r = sfRec(b.dataset.kind, b.dataset.id); if(!r) return;
   if(b.dataset.sf === 'phase-add'){ r.phases = sfPhases(r).concat([{ id: selId('ph_'), name: '', days: '' }]); }
   else if(b.dataset.sf === 'phase-del'){ const ph = sfPhases(r); ph.splice(Number(b.dataset.pi), 1); r.phases = ph; }
+  else if(b.dataset.sf === 'phase-tpl'){ if(!phApplyTemplate(r)) return; }
   else return;
   sfUi.rebuild = true; render(); saveState();
 });
@@ -19153,6 +19180,106 @@ document.addEventListener('change', (e) => {
   else return;
   saveState(); render();
 });
+
+/* =====================================================================
+   STEP 2: PHASE TEMPLATE AND BUDGETED HOURS
+   state.phaseTemplate: [{ id, name, hours, days, selling }]  (Settings, Planning and capacity). A new lead or sales deal is pre-filled from it.
+   A phase (lead / sale / project .phases[]) now optionally also holds: hours (budget), start, end (ISO), selling (true for site visit, scope, quote),
+   and, from step 3, done: { date, hours, mode: 'assumed' | 'confirmed', by, at }. A phase marked selling is not counted in the days on site.
+   Existing records are never touched: the template is applied to a record only when it is new or when "Apply the template" is pressed.
+   ===================================================================== */
+const PLAN_TPL = [['Site visit', 3, 1, true], ['Scope', 2, 1, true], ['Quote', 3, 1, true], ['Order', 1, 1, false], ['Delivery', 2, 1, false], ['Install: groundwork', 16, 2, false], ['Install: build', 24, 3, false], ['Sign-off', 1, 1, false]];
+function ensurePlanModel2(o){
+  const str = v => v == null ? '' : String(v), num = v => { const n = Number(v); return v === '' || v == null || isNaN(n) || n < 0 ? '' : n; };
+  let t = Array.isArray(o.phaseTemplate) ? o.phaseTemplate.filter(x => x && typeof x === 'object') : null;
+  if(!t) t = PLAN_TPL.map(([name, hours, days, selling], i) => ({ id: 'pt_' + (i + 1), name, hours, days, selling }));
+  o.phaseTemplate = t.map((x, i) => ({ id: str(x.id) || selId('pt_'), name: str(x.name).trim() || 'Phase', hours: num(x.hours), days: num(x.days), selling: x.selling === true }));
+  if(typeof ensurePlanModel3 === 'function') ensurePlanModel3(o);
+}
+const phNum = v => { const n = Number(v); return v === '' || v == null || isNaN(n) || n < 0 ? 0 : n; };
+const phNew = t => ({ id: selId('ph_'), name: t.name, days: t.days, hours: t.hours, start: '', end: '', selling: !!t.selling });
+function phPrefill(r){ if(!sfPhases(r).length && state.phaseTemplate.length) r.phases = state.phaseTemplate.map(phNew); }
+/* by hand: adds the template phases the record does not already have (matched by name); an existing phase is never changed */
+function phApplyTemplate(r){
+  const have = new Set(sfPhases(r).map(p => String(p.name || '').trim().toLowerCase())), add = state.phaseTemplate.filter(t => !have.has(t.name.trim().toLowerCase())).map(phNew);
+  if(!add.length){ showToast('Every phase in the template is already there'); return false; }
+  r.phases = sfPhases(r).concat(add); return true;
+}
+const phHours = r => sfPhases(r).reduce((a, p) => a + phNum(p.hours), 0);
+const phHasHours = r => sfPhases(r).some(p => phNum(p.hours) > 0);
+function phApply(p, f, v, el){
+  if(f === 'phaseHours'){ const n = parseFloat(v); p.hours = (v === '' || isNaN(n)) ? '' : Math.max(0, Math.round(n * 4) / 4); }
+  else if(f === 'phaseStart' || f === 'phaseEnd'){
+    const k = f === 'phaseStart' ? 'start' : 'end'; p[k] = isoOk(v);
+    if(k === 'start' && p.start && !p.end && phNum(p.days) > 0) p.end = wdEnd(p.start, phNum(p.days));   // the end follows from the days, in working days
+    if(p.start && p.end && p.end < p.start){ if(k === 'start') p.end = p.start; else p.start = p.end; }
+  }
+  else if(f === 'phaseSelling') p.selling = !!(el && el.checked);
+}
+function phStatusHtml(p){
+  const d = p.done; if(!d || typeof d !== 'object') return '';
+  return `<span class="sf-chip ${d.mode === 'confirmed' ? 'ok' : 'warn'}" title="${d.mode === 'confirmed' ? 'The hours were adjusted and confirmed' : 'The budget was accepted as it stood: not confirmed'}">✓ ${hrs(phNum(d.hours))} ${d.mode === 'confirmed' ? 'confirmed' : 'assumed'}</span>`;
+}
+function phRowHtml(kind, r, p, pi, base){
+  const v = x => x === '' || x == null ? '' : escAttr(x), id = r.id;
+  return `<div class="ph-row${p.selling ? ' selling' : ''}"><input type="text" ${base} data-field="phaseName" data-pi="${pi}" value="${escAttr(p.name || '')}" placeholder="Phase name" aria-label="Phase name">
+    <input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${v(p.days)}" placeholder="Days" aria-label="Days">
+    <input type="number" min="0" step="0.25" inputmode="decimal" ${base} data-field="phaseHours" data-pi="${pi}" value="${v(p.hours)}" placeholder="Hrs" aria-label="Budgeted hours">
+    <button type="button" class="icon-btn" data-sf="phase-del" data-kind="${kind}" data-id="${id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button>
+    <div class="ph-sub"><input type="date" ${base} data-field="phaseStart" data-pi="${pi}" value="${v(sfIso(p.start))}" aria-label="Start"><input type="date" ${base} data-field="phaseEnd" data-pi="${pi}" value="${v(sfIso(p.end))}" aria-label="End">
+      <label class="q-check"><input type="checkbox" ${base} data-field="phaseSelling" data-pi="${pi}"${p.selling ? ' checked' : ''}> Selling time</label>${phStatusHtml(p)}</div></div>`;
+}
+function phEditorHtml(kind, r, base){
+  const ph = sfPhases(r), id = r.id;
+  return `<div class="lp-f"><label>Phases <span class="lp-opt">optional</span></label>${ph.length ? '<div class="ph-head"><span>Phase</span><span>Days</span><span>Hours</span><span></span></div>' : ''}${ph.map((p, pi) => phRowHtml(kind, r, p, pi, base)).join('')}
+    ${phHasHours(r) ? `<div class="lp-hint ph-sum">Budgeted time: <b>${hrs(phHours(r))}</b> in all${sfPhases(r).some(p => p.selling && phNum(p.hours) > 0) ? ` (${hrs(sfPhases(r).filter(p => p.selling).reduce((a, p) => a + phNum(p.hours), 0))} of it selling time)` : ''}</div>` : ''}
+    <div class="ph-btns"><button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="${kind}" data-id="${id}">+ Add a phase</button><button type="button" class="btn secondary qb-sm" data-sf="phase-tpl" data-kind="${kind}" data-id="${id}" title="Adds the phases from the template (Settings, Planning and capacity) that are not here yet">Apply the template</button></div></div>`;
+}
+/* the project's Plan tab: the same phases (name, days and hours are editable here; their dates move through the review above) */
+function phPlanCardHtml(p){
+  const ph = sfPhases(p), base = `data-tab="sellf" data-kind="project" data-id="${p.id}"`, v = x => x === '' || x == null ? '' : escAttr(x);
+  const rows = ph.map((x, pi) => `<div class="ph-row ph-stack${x.selling ? ' selling' : ''}"><input class="ph-nm" type="text" ${base} data-field="phaseName" data-pi="${pi}" value="${escAttr(x.name || '')}" aria-label="Phase name">
+    <label class="pt-f"><span>Days</span><input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${v(x.days)}" aria-label="Days"></label>
+    <label class="pt-f"><span>Budget (h)</span><input type="number" min="0" step="0.25" inputmode="decimal" ${base} data-field="phaseHours" data-pi="${pi}" value="${v(x.hours)}" aria-label="Budgeted hours"></label>
+    <button type="button" class="icon-btn" data-sf="phase-del" data-kind="project" data-id="${p.id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button>
+    <div class="ph-sub"><span class="ph-dt">${sfIso(x.start) || sfIso(x.end) ? escHtml((sfIso(x.start) ? pwD(x.start) : '—') + ' → ' + (sfIso(x.end) ? pwD(x.end) : '—')) : '<span class="qb-dim">No dates yet</span>'}</span>${x.selling ? '<span class="sf-chip">Selling time</span>' : ''}${phStatusHtml(x)}</div></div>`).join('');
+  return `<section class="rp-card ph-card" id="phPlan"><h4>Phases</h4>
+    ${ph.length ? `${rows}
+      <div class="rp-hint">${phHasHours(p) ? `Budgeted time ${hrs(phHours(p))}: this is the Hours planned on the profile. ` : ''}Dates are changed through the review above, so nothing linked moves until you confirm.</div>` : '<div class="pw-empty">No phases yet. Add them, or apply the template.</div>'}
+    <div class="ph-btns"><button type="button" class="btn secondary qb-sm" data-sf="phase-add" data-kind="project" data-id="${p.id}">+ Add a phase</button><button type="button" class="btn secondary qb-sm" data-sf="phase-tpl" data-kind="project" data-id="${p.id}" title="Adds the phases from the template that are not here yet; nothing already here changes">Apply the template</button></div></section>`;
+}
+PLAN_SET_CARDS.push(['Phase template', () => {
+  const l = state.phaseTemplate;
+  return `<p class="q-help" style="margin:0 0 8px;">The phases every new lead and sales deal starts with, each with a budgeted time in hours and a duration in working days. Tick <b>Selling time</b> for the phases that are part of winning the job (site visit, scope, quote): their hours are costed at the labour rate even when the deal is lost, and their days are not counted as days on site. Jobs that already exist are never changed; press <b>Apply the template</b> on a job to add what it is missing.</p>
+    <div class="pt-head"><span>Order</span><span>Phase</span><span>Hours</span><span>Days</span><span>Selling</span><span></span></div>
+    <div class="pt-list">${l.map((t, i) => `<div class="pt-row"><div class="tier-move pt-mv"><button type="button" class="icon-btn" data-pt="up" data-id="${escAttr(t.id)}" title="Move up" aria-label="Move up"${i === 0 ? ' disabled style="opacity:.3"' : ''}>${UP_SVG}</button><button type="button" class="icon-btn" data-pt="down" data-id="${escAttr(t.id)}" title="Move down" aria-label="Move down"${i === l.length - 1 ? ' disabled style="opacity:.3"' : ''}>${DOWN_SVG}</button></div>
+      <input class="pt-nm" type="text" data-pt="name" data-id="${escAttr(t.id)}" value="${escAttr(t.name)}" aria-label="Phase">
+      <label class="pt-f pt-hr"><span>Hours</span><input type="number" min="0" step="0.25" inputmode="decimal" data-pt="hours" data-id="${escAttr(t.id)}" value="${t.hours === '' ? '' : t.hours}" aria-label="Budgeted hours"></label>
+      <label class="pt-f pt-dy"><span>Days</span><input type="number" min="0" step="1" inputmode="numeric" data-pt="days" data-id="${escAttr(t.id)}" value="${t.days === '' ? '' : t.days}" aria-label="Duration in days"></label>
+      <label class="q-check pt-sl"><input type="checkbox" data-pt="selling" data-id="${escAttr(t.id)}"${t.selling ? ' checked' : ''}><span class="pt-sl-t">Selling</span></label>
+      <button type="button" class="icon-btn pt-dl" data-pt="del" data-id="${escAttr(t.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('') || '<div class="q-help">No phases: new jobs start without any.</div>'}</div>
+    <button type="button" class="btn secondary" style="margin-top:10px;" data-pt="add">+ Add a phase</button>
+    <p class="q-help" style="margin:10px 0 0;">Total <b>${hrs(l.reduce((a, t) => a + phNum(t.hours), 0))}</b> over ${l.length} phase${l.length === 1 ? '' : 's'}. Hours move in quarter-hour steps.</p>`;
+}]);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-pt]'); if(!b || !state || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+  const list = state.phaseTemplate, a = b.dataset.pt, i = list.findIndex(x => x.id === b.dataset.id);
+  if(a === 'add'){ const t = { id: selId('pt_'), name: 'New phase', hours: '', days: '', selling: false }; list.push(t); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-pt="name"][data-id="${t.id}"]`); if(el){ el.focus(); el.select(); } }, 30); return; }
+  if(i < 0) return;
+  if(a === 'up' || a === 'down'){ const j = i + (a === 'up' ? -1 : 1); if(j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; saveState(); render(); return; }
+  if(a === 'del'){ const gone = list.splice(i, 1)[0]; undoDeleted('Template phase deleted: ' + String(gone.name).slice(0, 40), ['phaseTemplate'], i, gone); saveState(); render(); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.pt || !state) return;
+  const t = state.phaseTemplate.find(x => x.id === d.id); if(!t) return;
+  if(d.pt === 'name') t.name = el.value.trim() || t.name;
+  else if(d.pt === 'hours'){ const n = parseFloat(el.value); t.hours = (el.value === '' || isNaN(n)) ? '' : Math.max(0, Math.round(n * 4) / 4); }
+  else if(d.pt === 'days'){ const n = Math.round(Number(el.value)); t.days = (el.value === '' || isNaN(n)) ? '' : Math.max(0, n); }
+  else if(d.pt === 'selling') t.selling = el.checked;
+  else return;
+  saveState(); render();
+});
+
 /* BT:js-planning end */
 
 /* ---------- init ---------- */
