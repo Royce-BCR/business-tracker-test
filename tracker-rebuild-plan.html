@@ -1,0 +1,809 @@
+<title>Tracker Rebuild Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:wght@500;600&display=swap">
+<style>
+/* Layout: one reading column with a contents strip, record-page wireframes and phase cards as the only boxed objects.
+   Colours and fonts are the tracker's own (paper, ink, oak, field green; Source Serif 4 headings, Inter body). */
+:root {
+  --bg:#f4f2ed; --surface:#ffffff; --surface2:#faf8f4; --ink:#1c1f22; --ink2:#33383d; --muted:#5f5a50;
+  --line:#e0dbd0; --line-strong:#bdb6a6;
+  --oak:#8a5a26; --oak-soft:#f3e7d6; --green:#3f6b4f; --green-soft:#e3f0e7;
+  --warn:#7a4b00; --warn-bg:#fdeccb; --bad:#a4302a; --bad-bg:#fbe3e0; --info:#234f8a; --info-bg:#e2ecf8;
+  --band:#1c1f22; --on-band:#ffffff; --on-band-muted:#cfcabf;
+  --g-command:#8b95a3; --g-growth:#6fae86; --g-finance:#d09a5e; --g-ops:#c6b89d; --g-rev:#6aa5c9; --g-org:#b58fb0;
+  --serif:'Source Serif 4',Georgia,serif; --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#17191b; --surface:#1f2326; --surface2:#252a2e; --ink:#ece8df; --ink2:#d6d1c6; --muted:#a39d91;
+  --line:#343a3f; --line-strong:#4b5258;
+  --oak:#d9ac72; --oak-soft:#3a2d1c; --green:#86c49d; --green-soft:#1f3328;
+  --warn:#f0c46c; --warn-bg:#3a2e12; --bad:#f09a93; --bad-bg:#3d1f1c; --info:#9cc0ee; --info-bg:#1b2b42;
+  --band:#0f1112; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg:#17191b; --surface:#1f2326; --surface2:#252a2e; --ink:#ece8df; --ink2:#d6d1c6; --muted:#a39d91;
+  --line:#343a3f; --line-strong:#4b5258;
+  --oak:#d9ac72; --oak-soft:#3a2d1c; --green:#86c49d; --green-soft:#1f3328;
+  --warn:#f0c46c; --warn-bg:#3a2e12; --bad:#f09a93; --bad-bg:#3d1f1c; --info:#9cc0ee; --info-bg:#1b2b42;
+  --band:#0f1112; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.top { background: var(--band); color: var(--on-band); padding-block: 40px 32px; border-bottom: 4px solid var(--oak); }
+.eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--on-band-muted); font-weight: 600; }
+h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 8px 0 12px; text-wrap: balance; }
+.lede { max-width: 62ch; color: var(--on-band-muted); font-size: 16px; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 20px; font-size: 13px; color: var(--on-band-muted); }
+nav.toc { background: var(--surface2); border-bottom: 1px solid var(--line); padding-block: 12px; }
+nav.toc .wrap { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+nav.toc a { font-size: 13px; color: var(--ink2); text-decoration: none; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+nav.toc a:hover, nav.toc a:focus-visible { border-color: var(--oak); color: var(--oak); outline: none; }
+section { padding-block: 40px 8px; }
+section + section { border-top: 1px solid var(--line); margin-top: 24px; }
+h2 { font-family: var(--serif); font-weight: 600; font-size: 26px; line-height: 1.2; margin: 0 0 8px; text-wrap: balance; }
+h3 { font-size: 16px; font-weight: 600; margin: 28px 0 8px; }
+p { margin: 0 0 12px; max-width: 70ch; }
+.sub { color: var(--muted); max-width: 66ch; margin-bottom: 20px; }
+ul, ol { margin: 0 0 14px; padding-left: 20px; max-width: 70ch; }
+li { margin-bottom: 5px; }
+strong { font-weight: 600; }
+.pill { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; padding: 2px 9px; border-radius: 999px; background: var(--oak-soft); color: var(--oak); white-space: nowrap; }
+.pill.ok { background: var(--green-soft); color: var(--green); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.pill.info { background: var(--info-bg); color: var(--info); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; min-width: 0; }
+.card h4 { margin: 0 0 6px; font-size: 15px; }
+.card p, .card li { font-size: 14px; }
+.card p:last-child, .card ul:last-child { margin-bottom: 0; }
+.note { background: var(--oak-soft); border-radius: 10px; padding: 14px 16px; max-width: 70ch; font-size: 14px; }
+.note.bad { background: var(--bad-bg); }
+.note.ok { background: var(--green-soft); }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--surface2); padding: 10px 14px; border-bottom: 1px solid var(--line); }
+td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+/* record page wireframe */
+.rec { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,2fr) minmax(0,1.15fr); gap: 12px; margin: 8px 0 8px; }
+.rec > div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; font-size: 13px; min-width: 0; }
+.rec .col-h { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--muted); margin-bottom: 8px; display: block; }
+.rec ul { padding-left: 16px; margin: 0; }
+.rec li { margin-bottom: 4px; font-size: 13px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tabs span { font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.tabs span.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.heads { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)); gap: 8px; margin-bottom: 10px; }
+.heads div { background: var(--surface2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--muted); }
+.heads b { display: block; color: var(--ink); font-size: 13px; font-weight: 600; }
+.heads .red b { color: var(--bad); }
+.tile { background: var(--surface2); border: 1px dashed var(--line-strong); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
+.tile b { color: var(--ink); font-weight: 600; }
+.assoc { display: block; padding: 6px 8px; margin-bottom: 6px; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; background: var(--surface2); }
+.assoc b { font-weight: 600; display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.assoc .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; padding: 2px 0; }
+.assoc .row small { color: var(--muted); font-size: 11.5px; }
+.prof-head { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; min-width: 0; }
+.av { flex: none; width: 42px; height: 42px; border-radius: 50%; background: var(--oak-soft); color: var(--oak); font-family: var(--serif); font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center; }
+.av.sm { width: 28px; height: 28px; font-size: 11px; }
+.prof-name { font-family: var(--serif); font-weight: 600; font-size: 16px; line-height: 1.2; }
+.prof-sub { font-size: 12px; color: var(--muted); }
+.prof-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.qa { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+.qa span { font-size: 11.5px; padding: 3px 9px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink2); background: var(--surface2); }
+.psec { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
+.psec h6 { margin: 0 0 6px; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.kv { display: grid; grid-template-columns: minmax(0, 6.2em) minmax(0, 1fr); gap: 4px 8px; margin: 0; font-size: 12.5px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.gates { display: grid; gap: 3px; font-size: 12px; }
+.gates span { display: flex; align-items: center; gap: 6px; }
+.gates i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex: none; }
+.gates i.part { background: var(--warn-bg); box-shadow: inset 0 0 0 2px var(--warn); }
+.task { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; margin-bottom: 4px; }
+.task i { flex: none; width: 12px; height: 12px; margin-top: 3px; border: 1.5px solid var(--line-strong); border-radius: 3px; }
+.task.od { color: var(--bad); } .task.od i { border-color: var(--bad); }
+.sel { display: flex; justify-content: space-between; align-items: center; gap: 6px; border: 1px solid var(--line-strong); border-radius: 6px; padding: 2px 8px; background: var(--surface); font-size: 12px; }
+.sel::after { content: "\25BE"; color: var(--muted); }
+.kv dd.bad { color: var(--bad); font-weight: 600; }
+.pinbox { background: var(--surface2); border: 1px dashed var(--line-strong); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
+.pin-h { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--warn); margin-bottom: 5px; }
+.tl-item { border-left: 2px solid var(--line); margin-left: 5px; padding: 4px 0 6px 12px; position: relative; font-size: 12.5px; }
+.tl-item::before { content: ""; position: absolute; left: -6px; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
+.tl-item small { color: var(--muted); font-size: 11.5px; }
+.lk { color: var(--oak); text-decoration: underline; text-underline-offset: 2px; font-weight: 600; }
+
+.rec.live > div:nth-child(2) { padding: 0; display: flex; flex-direction: column; max-height: 540px; overflow: hidden; }
+.cen-head { flex: none; padding: 14px 14px 4px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.cen-body { flex: 1; overflow-y: auto; padding: 12px 14px 14px; }
+.tabs span[role=tab] { cursor: pointer; }
+.tabs span[role=tab]:focus-visible { outline: 2px solid var(--oak); outline-offset: 2px; }
+.pane[hidden] { display: none; }
+.rec.live > div:nth-child(1), .rec.live > div:nth-child(3) { max-height: 540px; overflow-y: auto; }
+.card { background: var(--surface2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 12.5px; }
+.card .ctop { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 3px; }
+.card .ctype { font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.card small { color: var(--muted); font-size: 11.5px; }
+.card.open { border-color: var(--line-strong); }
+.card.od { border-color: var(--bad); }
+.card.od .ctype { color: var(--bad); }
+.card .task { margin: 0 0 2px; font-weight: 600; }
+.card .src { color: var(--oak); text-decoration: underline; text-underline-offset: 2px; font-size: 11.5px; }
+.feed-h { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 4px 0 6px; }
+
+.rec.live > div:nth-child(1) { padding: 0; }
+.pin-head { position: sticky; top: 0; z-index: 2; background: var(--surface); padding: 14px 14px 8px; border-bottom: 1px solid var(--line); }
+.secs { padding: 0 14px 14px; }
+details.psec > summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+details.psec > summary::-webkit-details-marker { display: none; }
+details.psec > summary::after { content: "\25BE"; color: var(--muted); font-size: 12px; }
+details.psec:not([open]) > summary::after { content: "\25B8"; }
+details.psec > summary h6 { margin: 0; }
+details.psec[open] > summary { margin-bottom: 6px; }
+details.psec > summary:focus-visible { outline: 2px solid var(--oak); outline-offset: 2px; }
+.kv.pipe { background: var(--surface2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; margin-bottom: 8px; }
+
+.rec.live > div:nth-child(2) .cen-head { padding-bottom: 0; border-bottom: 1px solid var(--line); }
+.tabs { flex-wrap: nowrap; overflow-x: auto; gap: 0; margin: 0; border: 0; scrollbar-width: thin; }
+.tabs span[role=tab] { border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 8px 8px; font-size: 12px; white-space: nowrap; background: none; color: var(--muted); }
+.tabs span[role=tab].on { background: none; color: var(--ink); border-bottom-color: var(--oak); font-weight: 600; }
+.cen-body { padding-top: 0; }
+.pane-pin { position: sticky; top: 0; z-index: 1; background: var(--surface); padding: 12px 0 8px; }
+.pane-pin .heads { margin-bottom: 0; }
+.mini { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 78px), 1fr)); gap: 8px; }
+.mini div { background: var(--surface2); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-size: 11.5px; color: var(--muted); }
+.mini b { display: block; color: var(--ink); font-size: 14px; }
+.mini .red b { color: var(--bad); }
+.ms { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.ms .m { flex: none; font-size: 11.5px; border: 1px solid var(--line); border-radius: 8px; padding: 5px 9px; background: var(--surface2); color: var(--muted); white-space: nowrap; }
+.ms .m small { display: block; font-size: 10.5px; }
+.ms .m i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; border: 1.5px solid var(--line-strong); }
+.ms .m.done { color: var(--ink); } .ms .m.done i { background: var(--green); border-color: var(--green); }
+.ms .m.next { border-color: var(--oak); color: var(--ink); } .ms .m.next i { border-color: var(--oak); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--muted); margin: 4px 0 2px; }
+.legend .k { display: inline-block; width: 16px; height: 0; border-top: 2px solid var(--ink); margin-right: 5px; vertical-align: middle; }
+.legend .k.in { border-color: var(--green); } .legend .k.out { border-color: var(--oak); }
+.legend .k.dash { border-top-style: dashed; border-color: var(--muted); } .legend .k.solid { border-color: var(--muted); }
+.legend .k.hollow, .legend .k.filled { width: 9px; height: 9px; border: 2px solid var(--oak); border-radius: 50%; }
+.legend .k.filled { background: var(--oak); }
+svg.chart { width: 100%; height: auto; display: block; margin-bottom: 10px; }
+svg.chart .ax { font-size: 9.5px; fill: var(--muted); font-family: var(--sans); } svg.chart .ax.lab { fill: var(--ink2); font-size: 10.5px; }
+svg.chart .gl { stroke: var(--line); stroke-width: 1; }
+svg.chart .today { stroke: var(--oak); stroke-width: 1; stroke-dasharray: 3 3; }
+svg.chart .s { fill: none; stroke-width: 2.2; } svg.chart .s.in { stroke: var(--green); } svg.chart .s.out { stroke: var(--oak); }
+svg.chart .s.plan { stroke-dasharray: 5 4; opacity: .7; }
+svg.chart .pm { fill: var(--surface); stroke: var(--oak); stroke-width: 2; } svg.chart .am { fill: var(--oak); stroke: var(--oak); stroke-width: 2; }
+svg.chart .late { stroke: var(--bad); stroke-width: 2; }
+.prow { display: grid; grid-template-columns: 76px minmax(0,1fr) auto; gap: 2px 10px; align-items: center; border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; font-size: 12.5px; }
+.prow .pd { font-size: 11.5px; color: var(--muted); grid-row: 1 / span 2; }
+.prow .pt b { font-weight: 600; display: block; } .prow .pt small { color: var(--muted); font-size: 11.5px; }
+.prow .pa { text-align: right; font-weight: 600; }
+.prow .ps { grid-column: 3; display: flex; gap: 6px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+.prow.od { border-color: var(--bad); } .prow.od .pd { color: var(--bad); }
+.prow.done { opacity: .75; } .prow.done .pt b { text-decoration: line-through; text-decoration-color: var(--line-strong); }
+.prow .act { font: inherit; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--oak); background: var(--surface); color: var(--oak); cursor: pointer; }
+.prow .act:hover { background: var(--oak-soft); } .prow .act:focus-visible { outline: 2px solid var(--oak); outline-offset: 2px; }
+
+.f { display: grid; grid-template-columns: minmax(0, 5.4em) minmax(0, 1fr); gap: 4px 8px; margin-bottom: 7px; font-size: 12.5px; align-items: start; }
+.f > label { color: var(--muted); padding-top: 4px; }
+.f small { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+.f small .lk { font-size: 11px; }
+.inp { font: inherit; font-size: 12.5px; width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong); border-radius: 6px; padding: 3px 8px; background: var(--surface); color: var(--ink); min-width: 0; }
+.inp.ro { background: var(--surface2); color: var(--muted); border: 1px dashed var(--line); cursor: not-allowed; }
+.inp.ed:focus-visible, .inp:focus-visible { outline: 2px solid var(--oak); outline-offset: 1px; }
+.inp.dirty { border-color: var(--oak); background: var(--oak-soft); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .two small { margin: 0 0 1px; }
+.chg { position: sticky; bottom: 0; z-index: 3; background: var(--surface); border-top: 2px solid var(--oak); padding: 10px 14px; box-shadow: 0 -6px 12px rgba(0,0,0,.06); }
+.chg[hidden] { display: none; }
+.chg-t { font-size: 12px; margin-bottom: 8px; }
+.chg-t small { display: block; color: var(--muted); margin-top: 2px; }
+.chg-b { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { font: inherit; font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); cursor: pointer; }
+.btn.pri { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn.tent { border-color: var(--warn); color: var(--warn); }
+.btn:focus-visible { outline: 2px solid var(--oak); outline-offset: 2px; }
+.prow .pdate { font: inherit; font-size: 12px; border: 1px solid var(--line-strong); border-radius: 6px; padding: 2px 6px; background: var(--surface); color: var(--ink); }
+.prow .ps small { color: var(--muted); font-size: 11px; }
+.warnrow { border: 1px solid var(--warn); background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 8px 10px; font-size: 12px; margin-bottom: 8px; }
+.plan-b { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+@media (max-width: 760px) { .rec.live > div:nth-child(1), .rec.live > div:nth-child(3), .rec.live > div:nth-child(2) { max-height: none; } .rec { grid-template-columns: minmax(0,1fr); } }
+/* chain */
+.chain { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; counter-reset: step; padding: 0; list-style: none; max-width: none; }
+.chain li { counter-increment: step; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 0; font-size: 13.5px; position: relative; min-width: 0; }
+.chain li::before { content: counter(step); display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+.chain b { display: block; font-size: 14px; margin-bottom: 2px; }
+.chain .rk { color: var(--oak); font-size: 12px; font-weight: 600; }
+/* three boards */
+.boards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.board { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 14px; min-width: 0; border-top: 4px solid var(--oak); }
+.board.sales { border-top-color: var(--g-rev); } .board.proj { border-top-color: var(--g-ops); }
+.board h4 { margin: 0 0 6px; font-size: 15px; }
+.stages { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+.stages span { font-size: 11.5px; padding: 2px 8px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--line); }
+.stages span.end { background: var(--bad-bg); color: var(--bad); border-color: transparent; }
+.stages span.win { background: var(--green-soft); color: var(--green); border-color: transparent; }
+/* menu comparison */
+.menu { display: grid; gap: 8px; }
+.menu .g { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 10px 12px; border-left: 5px solid var(--c, var(--line-strong)); min-width: 0; }
+.menu .g b { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 2px; }
+.menu .g span { font-size: 13.5px; }
+/* phases */
+.phase { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
+.phase > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; padding: 14px 18px; background: var(--surface2); border-bottom: 1px solid var(--line); }
+.phase > header .n { font-family: var(--serif); font-weight: 600; font-size: 14px; color: var(--oak); }
+.phase > header h3 { margin: 0; font-size: 17px; font-family: var(--serif); font-weight: 600; flex: 1 1 200px; }
+.phase .body { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 0; }
+.phase .body > div { padding: 14px 18px; border-right: 1px solid var(--line); min-width: 0; }
+.phase .body > div:last-child { border-right: 0; }
+.phase .body h5 { margin: 0 0 6px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.phase .body ul { margin: 0; padding-left: 18px; }
+.phase .body li { font-size: 13.5px; }
+@media (max-width: 700px) { .phase .body > div { border-right: 0; border-bottom: 1px solid var(--line); } .phase .body > div:last-child { border-bottom: 0; } }
+.dec { counter-reset: dec; padding: 0; list-style: none; max-width: none; display: grid; gap: 10px; }
+.dec li { counter-increment: dec; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px 12px 48px; position: relative; margin: 0; }
+.dec li::before { content: counter(dec); position: absolute; left: 14px; top: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--oak-soft); color: var(--oak); font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+.dec b { display: block; font-size: 14px; }
+.dec span { font-size: 13.5px; color: var(--muted); }
+footer { padding-block: 32px 48px; color: var(--muted); font-size: 13px; }
+a:focus-visible { outline: 2px solid var(--oak); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.wf { display: grid; gap: 6px; margin: 4px 0 8px; max-width: 640px; }
+.wf div { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: 10px; align-items: center; font-size: 13px; }
+.wf i { display: block; height: 18px; border-radius: 4px; width: var(--w); background: var(--oak); }
+.wf i.in { background: var(--green); } .wf i.pr { background: var(--ink); }
+@media (max-width: 520px) { .wf div { grid-template-columns: minmax(0,1fr); gap: 2px; } }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.seg .pill { font-size: 12px; }
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="eyebrow">Brookwood Rural · Business Tracker</div>
+  <h1>Rebuilding the tracker around records and the links between them</h1>
+  <p class="lede">The design that came out of the brainstorm with Royce on 27 and 28 October, and the order we would build it in. Written to be read by Lynton, Gerry and Mike as well as by the person running the build.</p>
+  <div class="meta"><span>Draft for review</span><span>Updated 28 October 2026</span><span>Build on the test site first</span></div>
+</div></header>
+
+<nav class="toc" aria-label="Contents"><div class="wrap">
+  <a href="#problem">The problem</a><a href="#model">The model</a><a href="#page">Record page</a><a href="#chain">Ordering chain</a><a href="#today">Today</a><a href="#tasks">Tasks</a><a href="#pipeline">Lead to project</a><a href="#phases">Phases and hours</a><a href="#calendar">Calendar</a><a href="#menu">Menu</a><a href="#finance">Finance</a><a href="#costs">Costs and set-asides</a><a href="#reports">Reports and data</a><a href="#plan">Build plan</a><a href="#decisions">Decisions</a>
+</div></nav>
+
+<main class="wrap">
+
+<section id="problem">
+  <h2>What is wrong today</h2>
+  <p class="sub">Every part of the tracker works on its own, and most of it was built because it was asked for. The trouble is how the parts connect.</p>
+  <div class="grid3">
+    <div class="card"><h4>You have to know where to look</h4><p>The menu is organised by function. To find a purchase order, a supplier's invoice or a quote you have to remember which area holds it, and it is often only reachable from inside one project.</p></div>
+    <div class="card"><h4>Records do not stand up on their own</h4><p>A supplier shows as a name on a line, not as a page you can open. From a project there is no way to click through to a supplier, fix a detail and come back.</p></div>
+    <div class="card"><h4>The handover points are unclear</h4><p>A quote turns into orders, orders into deliveries, deliveries into invoices. Nothing shows how one line becomes the next, so it feels piecemeal even though each piece is useful.</p></div>
+  </div>
+  <h3>What already exists and will be reused</h3>
+  <p>Most of the plumbing is already in the tracker, so this is mostly a change of layout and a few missing links, not a new system:</p>
+  <ul>
+    <li>Links between records and a Back button that returns you to where you were (the navigation stack).</li>
+    <li>Contacts and companies, with their linked projects, quotes and invoices on the right of a record.</li>
+    <li>Quotes, approvals, purchase orders, invoicing, transactions, cash flow, assets and actions, each already built.</li>
+    <li>The design tokens, tables and side panels adopted in the October design batches.</li>
+  </ul>
+  <div class="note"><strong>Principle for the whole rebuild.</strong> Nothing is typed twice. Every new screen is a different way of looking at records that already exist, and anything new stored must default safely so existing data, including Harvey, Auro and Guy Nunn, loads unchanged.</div>
+</section>
+
+<section id="model">
+  <h2>The model: records, hubs and views</h2>
+  <p class="sub">Two kinds of hub, one business area and a set of reports. Each hub is somewhere you can start from.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Kind</th><th>What it is</th><th>Records</th><th>You go there to</th></tr></thead>
+    <tbody>
+      <tr><td>Entity hubs</td><td>Things that exist in their own right. Each gets the full three-column record page.</td><td>Contacts and companies (the customer), Projects, Suppliers</td><td>See everything about one customer, job or supplier and jump to anything linked to it.</td></tr>
+      <tr><td>Working hubs</td><td>Stages of the process. A list you work through, where any single record opens straight from the list for editing.</td><td>Quotes, Orders and deliveries, Invoices (in and out), Tasks</td><td>Chase quotes, sign off deliveries, check invoices, clear tasks.</td></tr>
+      <tr><td>Business area</td><td>Work on the business rather than on a job. Kept apart on purpose, so admin never hides under a delivery chase.</td><td>Business tasks (Actions and Setup &amp; Admin merged), business plan, business costs</td><td>VAT return, insurance, subscriptions, trade accounts, growth work.</td></tr>
+      <tr><td>Views and reports</td><td>Read-only pictures over the same records. They hold no numbers of their own.</td><td>Today, Calendar, Cash flow, Profit and loss, Reports</td><td>Plan the day, check capacity, see where the money is, review the month.</td></tr>
+    </tbody>
+  </table></div>
+  <p style="margin-top:14px">A quote is part of a process, while a project or a customer is a whole thing the quote serves. That is why quotes, orders and invoices are lists you work in, and customers, projects and suppliers are pages you visit.</p>
+  <h3>Associations work in both directions</h3>
+  <p>The supplier page is the clearest case. Open a supplier you need to pay and you see the quote requests sent to them, the prices they have given, the orders placed, the invoices still to pay, and every project they are linked to. The same links appear from the project side. Cash flow then reads from the same records, so the money picture follows from the chain and is not typed separately.</p>
+  <div class="note ok"><strong>Subcontractors.</strong> Not needed yet, so not built. The supplier record gets a type (materials or subcontractor) now, and the project timeline can show a dated work item that is not Lynton's own labour. Adding subcontract work later is then a day or two, not a rework.</div>
+</section>
+
+<section id="page">
+  <h2>The standard record page</h2>
+  <p class="sub">One layout for customers, projects and suppliers, in the way HubSpot lays out a contact. Learn it once and every record works the same. Shown here for a project.</p>
+  <div class="rec live" id="recdemo" aria-label="Wireframe of the record page: details on the left, tabbed working area in the centre, linked records on the right">
+    <div>
+      <div class="pin-head"><span class="col-h">Left: the profile (header stays pinned)</span>
+      <div class="prof-head"><span class="av" aria-hidden="true">BQ</span><div style="min-width:0"><div class="prof-name">BBQ shelter</div><div class="prof-sub">P-101 &middot; Quote Q-101-2 &middot; Guy Nunn</div></div></div>
+      <div class="prof-pills"><span class="pill ok">On track</span><span class="pill">Referral</span></div>
+      <div class="qa" aria-hidden="true"><span>Note</span><span>Task</span><span>Log time</span><span>Call</span></div></div>
+      <div class="secs">
+      <details class="psec" open><summary><h6>About this project</h6></summary><dl class="kv pipe"><dt>Pipeline</dt><dd><span class="sel">Project Pipeline</span></dd><dt>Stage</dt><dd><span class="sel">Planning</span></dd></dl><div class="f"><label>Reference</label><div><input class="inp ro" value="P-101" readonly aria-label="Reference, locked"><small>Locked, never changes</small></div></div><div class="f"><label for="f-job">Job type</label><div><input class="inp ed" id="f-job" data-k="job" value="Garden structure"></div></div><div class="f"><label>Value</label><div><input class="inp ro" value="£18,400" readonly aria-label="Value, read only"><small>Edit the value in <span class="lk">Quote Q-101-2</span></small></div></div><div class="f"><label>Margin</label><div><div class="two"><span><small>Sold</small><input class="inp ro" value="31%" readonly aria-label="Margin sold"></span><span><small>Now</small><input class="inp ro" value="29%" readonly aria-label="Margin now"></span></div><small>Calculated from the quote and the costs</small></div></div><div class="f"><label>Agreed</label><div><input class="inp ro" value="12 Oct" readonly aria-label="Agreed date, read only"><small>Set when the contract is marked agreed</small></div></div><div class="f"><label for="f-own">Owner</label><div><select class="inp ed" id="f-own" data-k="own"><option>Lynton</option><option>Gerry</option><option>Mike</option><option>Peter</option></select></div></div><div class="f"><label for="f-src">Source</label><div><select class="inp ed" id="f-src" data-k="src"><option>Referral</option><option>Website</option><option>Repeat customer</option><option>Event</option></select><small>Created 2 Sep</small></div></div></details>
+      <details class="psec" open><summary><h6>Dates and workload <span class="pill warn" id="tent" hidden>Tentative</span></h6></summary><div class="f"><label for="f-st">Start</label><div><input type="date" class="inp ed" id="f-st" data-k="st" value="2026-11-02"></div></div><div class="f"><label for="f-en">Complete</label><div><input type="date" class="inp ed" id="f-en" data-k="en" value="2026-11-20"></div></div><div class="f"><label for="f-du">Duration</label><div><input type="number" min="1" class="inp ed" id="f-du" data-k="du" value="15"><small>working days</small></div></div><div class="f"><label>Hrs planned</label><div><input class="inp ro" value="96 hrs" readonly aria-label="Hours planned, read only"><small>From the plan</small></div></div><div class="f"><label>Hrs logged</label><div><input class="inp ro" value="40 hrs" readonly aria-label="Hours logged, read only"><small>From time logs</small></div></div></details>
+      <details class="psec" open><summary><h6>Money</h6></summary><dl class="kv"><dt>Billed</dt><dd>&pound;9,200</dd><dt>Paid</dt><dd>&pound;4,600</dd><dt>Overdue</dt><dd class="bad">&pound;1,200</dd></dl></details>
+      <details class="psec" open><summary><h6>Customer and contact</h6></summary><div class="prof-head" style="margin-bottom:6px"><span class="av sm" aria-hidden="true">GN</span><div style="min-width:0"><span class="lk">Guy Nunn</span><div class="prof-sub">Homeowner</div></div></div><dl class="kv"><dt>Phone</dt><dd>07700 900123</dd><dt>Email</dt><dd>guy@example.com</dd><dt>Prefers</dt><dd>WhatsApp</dd></dl></details>
+      <details class="psec" open><summary><h6>Site</h6></summary><dl class="kv"><dt>Address</dt><dd>Hill Farm, Chew Valley</dd><dt>Access</dt><dd>Gated track, call on arrival</dd><dt>Services</dt><dd>Power on site, no mains water</dd><dt>Visited</dt><dd>14 Sep</dd></dl></details>
+      </div>
+      <div class="chg" id="chg" role="alert" hidden><div class="chg-t" id="chg-t"></div><div class="chg-b" id="chg-b"></div></div>
+    </div>
+    <div>
+      <div class="cen-head">
+      <span class="col-h">Centre: the working area (scrolls on its own)</span>
+      <div class="tabs" role="tablist"><span role="tab" tabindex="0" data-t="ov" class="on" aria-selected="true">Overview</span><span role="tab" tabindex="0" data-t="ac" aria-selected="false">Activity</span><span role="tab" tabindex="0" data-t="mo" aria-selected="false">Money</span><span role="tab" tabindex="0" data-t="ma" aria-selected="false">Materials and deliveries</span><span role="tab" tabindex="0" data-t="pl" aria-selected="false">Plan</span></div>
+      </div>
+      <div class="cen-body">
+      <div class="pane" id="p-ov">
+        <div class="pane-pin"><div class="heads"><div><b>&pound;18,400</b>Sales value</div><div><b>On track</b>Status</div><div><b>Thu 5 Nov</b>Next on site</div><div class="red"><b>&pound;1,200</b>Overdue</div><div><b>Fri 13 Nov</b>Next invoice</div></div></div>
+        <div class="tile"><b>Outstanding.</b> Waiting on us: delivery not signed off (yesterday). Waiting on others: customer sign-off on design.</div>
+        <div class="tile"><b>Suppliers.</b> Each supplier as a line, with cost and delivery date.</div>
+        <div class="tile"><b>Invoices.</b> Raised, due, paid, with the next one highlighted.</div>
+        <div class="tile"><b>Qualification.</b> <span class="pill ok">Strong</span> The score and the answers behind it, carried over from the lead stage.<div class="gates" style="display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px"><span><i></i>Decision maker</span><span><i></i>Budget</span><span><i></i>Competition</span><span><i class="part"></i>Timeline</span></div></div>
+      </div>
+      <div class="pane" id="p-ac" hidden>
+        <div class="pane-pin"><div class="ms" aria-label="Key milestones"><span class="m done"><i></i>Contract signed<small>12 Oct</small></span><span class="m done"><i></i>Design signed<small>14 Oct</small></span><span class="m done"><i></i>Materials ordered<small>27 Oct</small></span><span class="m"><i></i>Materials delivered<small>5 Nov</small></span><span class="m next"><i></i>On site<small>2 Nov</small></span><span class="m"><i></i>Build complete<small>20 Nov</small></span><span class="m"><i></i>Invoiced<small>20 Nov</small></span><span class="m"><i></i>Paid<small>27 Nov</small></span><span class="m"><i></i>Sign-off<small>27 Nov</small></span></div></div>
+<div class="feed-h">Open, oldest due first</div>
+        <div class="card open od"><div class="ctop"><span class="ctype">Task &middot; overdue</span><small>due Tue 27 Oct &middot; Lynton</small></div><div class="task"><i></i>Sign off delivery</div><span class="src">Open in Tasks (T-212)</span></div>
+        <div class="card open"><div class="ctop"><span class="ctype">Task</span><small>due Fri 30 Oct &middot; Mike</small></div><div class="task"><i></i>Confirm tile prices</div><span class="src">Open in Tasks (T-219)</span></div>
+        <div class="feed-h">History, newest first</div>
+        <div class="card"><div class="ctop"><span class="ctype">Note</span><small>Wed 28 Oct &middot; Lynton</small></div>Customer happy with the tile colour<br><span class="src">Edit note</span></div>
+        <div class="card"><div class="ctop"><span class="ctype">Task done</span><small>Tue 27 Oct</small></div>Chase tile supplier<br><span class="src">Open in Tasks (T-208)</span></div>
+        <div class="card"><div class="ctop"><span class="ctype">Payment</span><small>Mon 26 Oct</small></div>P-101-INV1 received, &pound;4,600<br><span class="src">Open invoice P-101-INV1</span></div>
+        <div class="card"><div class="ctop"><span class="ctype">Quote</span><small>Mon 19 Oct</small></div>Q-101-2 (v2) accepted<br><span class="src">Open quote Q-101-2</span></div>
+      </div>
+      <div class="pane" id="p-mo" hidden>
+        <div class="pane-pin"><div class="mini"><div><b>&pound;4,600</b>Received</div><div class="red"><b>&pound;1,200</b>Overdue</div><div><b>&pound;3,790</b>Paid out</div><div><b>&pound;13,800</b>Still to invoice</div></div></div>
+        <div class="legend"><span><i class="k in"></i>Money in</span><span><i class="k out"></i>Money out</span><span><i class="k dash"></i>Planned (dashed)</span><span><i class="k solid"></i>Actual (solid)</span></div>
+        <svg class="chart" viewBox="0 0 560 152" role="img" aria-label="Money in and out for the project, planned and actual. Money in actual is 4,600 pounds so far against 18,400 planned. Money out actual is 3,790 pounds."><line x1="34" x2="548" y1="128.0" y2="128.0" class="gl"/><text x="30" y="131.0" text-anchor="end" class="ax">0</text><line x1="34" x2="548" y1="69.0" y2="69.0" class="gl"/><text x="30" y="72.0" text-anchor="end" class="ax">9k</text><line x1="34" x2="548" y1="10.0" y2="10.0" class="gl"/><text x="30" y="13.0" text-anchor="end" class="ax">18k</text><line x1="165.8" x2="165.8" y1="10" y2="128" class="today"/><text x="168.8" y="17" class="ax">today</text><path d="M126.3,128.0 L126.3,128.0 L126.3,90.8 L363.5,90.8 L363.5,69.0 L455.7,69.0 L455.7,39.5 L548.0,39.5 L548.0,10.0 L548.0,10.0" class="s in plan"/><path d="M47.2,128.0 L47.2,128.0 L47.2,123.9 L139.4,123.9 L139.4,103.7 L179.0,103.7 L179.0,97.8 L548.0,97.8" class="s out plan"/><path d="M126.3,128.0 L126.3,128.0 L126.3,98.5 L165.8,98.5" class="s in"/><path d="M47.2,128.0 L47.2,128.0 L47.2,123.9 L139.4,123.9 L139.4,103.7 L165.8,103.7" class="s out"/><text x="34.0" y="146" text-anchor="middle" class="ax">19 Oct</text><text x="165.8" y="146" text-anchor="middle" class="ax">29 Oct</text><text x="363.5" y="146" text-anchor="middle" class="ax">13 Nov</text><text x="548.0" y="146" text-anchor="middle" class="ax">27 Nov</text></svg>
+        <div class="feed-h">Money in: invoices and payments, in date order</div><div class="prow done"><div class="pd">Mon 26 Oct</div><div class="pt"><b>P-101-INV1 received</b><small>Part payment</small></div><div class="pa">&pound;4,600</div><div class="ps"><span class="pill ok">Done</span></div></div><div class="prow od"><div class="pd">Mon 26 Oct</div><div class="pt"><b>P-101-INV1 balance</b><small>Chase Guy Nunn</small></div><div class="pa">&pound;1,200</div><div class="ps"><span class="pill bad">Overdue</span><button type="button" class="act" data-act="Mark received">Mark received</button></div></div><div class="prow"><div class="pd">Fri 13 Nov</div><div class="pt"><b>P-101-INV2 due</b><small>Raised 30 Oct</small></div><div class="pa">&pound;3,400</div><div class="ps"><span class="pill">Planned</span><button type="button" class="act" data-act="Mark received">Mark received</button></div></div><div class="prow"><div class="pd">Fri 20 Nov</div><div class="pt"><b>INV3, on build complete</b><small>Planned, not raised</small></div><div class="pa">&pound;4,600</div><div class="ps"><span class="pill">Planned</span><button type="button" class="act" data-act="Raise invoice">Raise invoice</button></div></div><div class="prow"><div class="pd">Fri 27 Nov</div><div class="pt"><b>INV4, on sign-off</b><small>Planned, not raised</small></div><div class="pa">&pound;4,600</div><div class="ps"><span class="pill">Planned</span><button type="button" class="act" data-act="Raise invoice">Raise invoice</button></div></div><div class="feed-h" style="margin-top:12px">Money out: supplier payments</div><div class="prow done"><div class="pd">Tue 20 Oct</div><div class="pt"><b>Screwfix, PO-0004</b><small>Paid up front</small></div><div class="pa">&pound;640</div><div class="ps"><span class="pill ok">Done</span></div></div><div class="prow done"><div class="pd">Tue 27 Oct</div><div class="pt"><b>Local timber merchant, PO-0005</b><small>Paid up front</small></div><div class="pa">&pound;3,150</div><div class="ps"><span class="pill ok">Done</span></div></div><div class="prow"><div class="pd">Fri 30 Oct</div><div class="pt"><b>Tile supplier, PO-0006</b><small>Order and pay</small></div><div class="pa">&pound;920</div><div class="ps"><span class="pill warn">Due</span><button type="button" class="act" data-act="Confirm paid">Confirm paid</button></div></div>
+      </div>
+      <div class="pane" id="p-ma" hidden>
+        <div class="pane-pin"><div class="mini"><div><b>1 of 3</b>Delivered</div><div><b>1 day</b>Late so far</div><div><b>Fri 30 Oct</b>Next action</div><div><b>&pound;4,710</b>Ordered or planned</div></div></div>
+        <div class="legend"><span><i class="k hollow"></i>Planned date</span><span><i class="k filled"></i>Actual date</span></div>
+        <svg class="chart" viewBox="0 0 560 130" role="img" aria-label="Delivery timeline, planned against actual. Screwfix planned Monday 26 October, delivered Tuesday 27 October. Timber planned Thursday 5 November. Tiles planned Monday 9 November."><text x="0" y="30" class="ax lab">Screwfix, PO-0004</text><line x1="118" x2="540" y1="26" y2="26" class="gl"/><line x1="236.2" x2="253.0" y1="26" y2="26" class="late"/><circle cx="236.2" cy="26" r="5" class="pm"/><circle cx="253.0" cy="26" r="5" class="am"/><text x="262.0" y="30" class="ax">1 day late</text><text x="0" y="60" class="ax lab">Timber, PO-0005</text><line x1="118" x2="540" y1="56" y2="56" class="gl"/><circle cx="405.0" cy="56" r="5" class="pm"/><text x="0" y="90" class="ax lab">Tiles, PO-0006</text><line x1="118" x2="540" y1="86" y2="86" class="gl"/><circle cx="472.5" cy="86" r="5" class="pm"/><line x1="286.8" x2="286.8" y1="8" y2="108" class="today"/><text x="289.8" y="16" class="ax">today</text><text x="118.0" y="124" text-anchor="middle" class="ax">19 Oct</text><text x="286.8" y="124" text-anchor="middle" class="ax">29 Oct</text><text x="405.0" y="124" text-anchor="middle" class="ax">5 Nov</text><text x="540.0" y="124" text-anchor="middle" class="ax">13 Nov</text></svg>
+        <div class="feed-h">Orders and deliveries, in date order</div><div class="prow done"><div class="pd">Tue 27 Oct</div><div class="pt"><b>PO-BWR-0004 Screwfix</b><small>Planned Mon 26 Oct, delivered 1 day late</small></div><div class="pa">&pound;640</div><div class="ps"><span class="pill ok">Done</span></div></div><div class="prow"><div class="pd">Fri 30 Oct</div><div class="pt"><b>PO-BWR-0006 Tile supplier: order</b><small>Planned order date</small></div><div class="pa">&pound;920</div><div class="ps"><span class="pill warn">Due</span><button type="button" class="act" data-act="Confirm ordered">Confirm ordered</button></div></div><div class="prow"><div class="pd">Thu 5 Nov</div><div class="pt"><b>PO-BWR-0005 Local timber merchant</b><small>Ordered 27 Oct, delivery planned</small></div><div class="pa">&pound;3,150</div><div class="ps"><span class="pill">Planned</span><button type="button" class="act" data-act="Confirm delivered">Confirm delivered</button></div></div><div class="prow"><div class="pd">Mon 9 Nov</div><div class="pt"><b>PO-BWR-0006 Tile supplier: delivery</b><small>Delivery planned</small></div><div class="pa">&pound;920</div><div class="ps"><span class="pill">Planned</span><button type="button" class="act" data-act="Confirm delivered">Confirm delivered</button></div></div><div class="prow"><div class="pd">Any time</div><div class="pt"><b>Check prices against supplier invoice</b><small>Now or later, per order</small></div><div class="pa">&nbsp;</div><div class="ps"><span class="pill">Planned</span><button type="button" class="act" data-act="Confirm prices">Confirm prices</button></div></div>
+      </div>
+      <div class="pane" id="p-pl" hidden>
+        <div class="pane-pin"><div class="tile" id="plan-banner" style="margin:0"><b>Plan.</b> Stages, budgeted hours and the dated schedule for this project. Change the start, complete or duration in the left panel to reschedule it here.</div></div>
+        <div id="plan-body"></div>
+      </div>
+      </div>
+    </div>
+    <div>
+      <span class="col-h">Right: linked records</span>
+      <span class="assoc"><b>Customer</b><span class="row"><span class="lk">Guy Nunn</span><small>main contact</small></span></span>
+      <span class="assoc"><b>Suppliers</b><span class="row"><span class="lk">Screwfix</span><small>£640 · delivered 27 Oct</small></span><span class="row"><span class="lk">Local timber merchant</span><small>£3,150 · Thu 5 Nov</small></span><span class="row"><span class="lk">Tile supplier</span><small>£920 · Mon 9 Nov</small></span></span>
+      <span class="assoc"><b>Quotes</b><span class="row"><span class="lk">Q-101-2</span><small>v2 accepted</small></span></span>
+      <span class="assoc"><b>Orders</b><span class="row"><span class="lk">PO-BWR-0004</span><small>delivered</small></span><span class="row"><span class="lk">PO-BWR-0005</span><small>due Thu 5 Nov</small></span><span class="row"><span class="lk">PO-BWR-0006</span><small>planned</small></span></span>
+      <span class="assoc"><b>Invoices</b><span class="row"><span class="lk">P-101-INV1</span><small>part paid, £1,200 overdue</small></span><span class="row"><span class="lk">P-101-INV2</span><small>due Fri 13 Nov</small></span></span>
+    </div>
+  </div>
+  <p>The names, codes and figures above are illustrative, not live data. The left panel is the profile, an at-a-glance overview of the record. Its header (name, status and quick actions) stays pinned at the top while you scroll, and every section beneath it can be collapsed or expanded. The pipeline and the stage sit at the top of About this project, directly under the header, and can be changed in place. The agreed date stays blank until the contract is marked agreed. Start date, complete date and duration give the picture of workload. Contact details sit with the customer, because they belong to the project, and the site has its own section for address, access and services. The right-hand tiles list the actual records, each with its status or date, and every name is a link: clicking a supplier opens the supplier page, clicking an order opens the order, and Back returns to the project. The centre shows the same suppliers as a working summary with costs and delivery dates, so you can read the picture without clicking anywhere.</p>
+  <h3>The activity feed is a view of real records</h3>
+  <p>Try the tabs in the wireframe: each tab shows only its own view. Overview holds the headline strip, what is outstanding and the summary tiles; Activity holds the feed; Money and Materials and deliveries each have their own view. The header and tabs stay fixed and the centre scrolls on its own, so the left and right panels stay put while you read down the feed.</p>
+  <p>There is no separate &ldquo;pinned&rdquo; box. A task, a note, a call, a quote sent, a delivery, an invoice and a payment are each a standalone record that keeps its own identity, and the feed pulls each one through as a card. A card shows the record&rsquo;s type, date and owner, can be edited or ticked off in place, and links back to the record&rsquo;s own page (a task in Tasks, an invoice in Invoices, a contact in Contacts). Nothing is copied as text. Edit it in the feed and the source record changes, because they are the same record.</p>
+  <p>Order is automatic. Open tasks sit at the top of the feed, ordered by due date with the oldest (the most overdue) first, so what is waiting longest is read first. Below them, the history runs newest first. When a task is ticked off it leaves the top and drops into the history on its completion date.</p>
+  <h3>Every field is a field: locked, calculated or editable</h3>
+  <p>The left panel follows one rule. Everything is shown as a field, and the field tells you what you can do with it. A locked field (the reference) is greyed and never changes. A calculated field (value, the two margins, agreed date, hours planned and logged) is greyed too, with a line saying where to change it, for example &ldquo;Edit the value in Quote Q-101-2&rdquo;. Margin shows as two boxes, Sold and Now. Editable fields (job type, owner, source, start, complete, duration) look editable and a changed one is highlighted.</p>
+  <p>Start, complete and duration are linked: change one and the others follow, counting working days. As soon as a date changes, a bar appears at the foot of the panel with three choices. <b>Confirm and update project</b> opens the Plan tab with every linked delivery, invoice and milestone shifted for you to adjust, then confirm. <b>Tentative change</b> opens the same view but keeps the dates flagged as tentative, and warns if they overlap another project so you know who to speak to first. <b>Cancel</b> puts everything back. Other edits (owner, job type, source) just ask Save update or Cancel. Try it: change the start date in the wireframe.</p>
+  <h3>Money and Materials and deliveries are working views</h3>
+  <p>Only the Overview carries the pinned dashboard strip. Every other tab has its own header. Activity starts with a one-line strip of the nine key milestones (done, next, to come), then the feed. Money starts with four numbers and a simple graph of money in and money out, planned (dashed) against actual (solid), with a marker for today. Materials and deliveries starts with a planned-against-actual date graph for each order, with late deliveries drawn in red.</p>
+  <p>Beneath each graph is the same sequential list, in date order, of what is planned and what has happened: invoices and payments in Money, orders and deliveries in Materials. Each planned line has one button (Mark received, Raise invoice, Confirm paid, Confirm ordered, Confirm delivered, Confirm prices). Pressing it confirms the item on the spot, it stops being planned and becomes actual, and the graph and the milestones update. In the wireframe only the row changes when you press a button; in the build the graph and milestones follow. The list is date-bound and sequential like the timeline, but it is a to-do list of confirmations as much as a history.</p>
+  <h3>What changes between record types</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Record</th><th>Headline strip</th><th>Right-hand links</th></tr></thead>
+    <tbody>
+      <tr><td>Contact or company</td><td>Live projects, total billed, overdue, last contact, next follow-up</td><td>For a company: its people. For a person: their company, if any. Both: projects, quotes, invoices</td></tr>
+      <tr><td>Project</td><td>Sales value, status (on or off track), next on site, overdue, next invoice</td><td>Customer, suppliers, quotes, orders, invoices</td></tr>
+      <tr><td>Supplier</td><td>Open orders, amount to pay, next delivery, average price against the cheapest quoted</td><td>Quote requests, orders, invoices, projects, contact details</td></tr>
+    </tbody>
+  </table></div>
+  <h3>The outstanding block</h3>
+  <p>Anything that should have happened and has not been checked off shows in the Overview, split into <strong>waiting on us</strong> and <strong>waiting on someone else</strong>. A delivery due yesterday and not signed off is the typical case. Overdue money shows in red in the headline strip.</p>
+  <p>Customers and projects are the pages Lynton opens before picking up the phone, so the project Overview leads with what a customer asks about: timing, deliveries, status, then money.</p>
+</section>
+
+<section id="chain">
+  <h2>The ordering chain, from site visit to payment</h2>
+  <p class="sub">Most jobs have one up-front order split across several suppliers (fixings from Screwfix, timber from the local merchant), with room for a second order or delivery. Today most suppliers are paid up front, because there are no trade accounts yet.</p>
+  <ol class="chain">
+    <li><span class="rk">Scope</span><b>Site visit and list</b>Items and labour listed from the visit. Gerry reviews materials and labour before the quote goes out.</li>
+    <li><span class="rk">Quote requests</span><b>Several prices per line</b>Each line can hold prices from more than one supplier, so suppliers compete.</li>
+    <li><span class="rk">Compare</span><b>Whole baskets</b>The decision view shows total landed cost per supplier, delivery included. Cheapest is flagged. Overrides are recorded with a reason.</li>
+    <li><span class="rk">Orders</span><b>One per supplier</b>Choosing a supplier creates the order, with its delivery date. A second order or delivery can be added later.</li>
+    <li><span class="rk">Deliveries</span><b>Sign off on site</b>A checklist of the order lines, ticked as they come off the van. Short quantities, substitutions and damage are flagged, with a photo option.</li>
+    <li><span class="rk">Invoice check</span><b>Confirm final prices</b>Attach the email invoice, photo or receipt, pick the order, confirm actual prices. Differences are recorded as variances.</li>
+    <li><span class="rk">Pay</span><b>Money moves</b>Payment is recorded against the order and feeds transactions and cash flow. With a trade account the same chain applies, with a gap before paying.</li>
+  </ol>
+  <h3>Rules agreed for the chain</h3>
+  <ul>
+    <li><strong>Marking a delivery complete</strong> asks: check final prices now, or later? Later is expected about nine times in ten and becomes a "confirm prices" task on Today and on the order until done. A short or substituted delivery is marked "price to confirm" automatically.</li>
+    <li><strong>Small differences</strong> are logged with a quick reason and carry on. <strong>Anything over a threshold</strong> needs a short note and appears for review. The threshold is a setting and defaults to 0 percent, so every variance is flagged and given a reason. Raise it later if that proves too noisy.</li>
+    <li><strong>Hire is an option on a line.</strong> Any quote or order line can be marked as hire instead of buy, with the hire supplier and cost. It counts as a supplier cost on the job like any other line. Whether to buy or hire a bigger tool is still weighed in the asset plan.</li>
+    <li><strong>Logging a receipt takes under a minute</strong>, by whoever holds it, from a phone on site if needed.</li>
+  </ul>
+  <h3>Variances are recorded by cause, and each cause has an owner</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Cause</th><th>Example</th><th>Fix belongs to</th></tr></thead>
+    <tbody>
+      <tr><td>Left off the list</td><td>Materials missed in scoping, added later as extra cost</td><td>Scoping and quoting</td></tr>
+      <tr><td>Quantity or labour underestimated</td><td>More timber than listed, more hours than planned</td><td>Scoping and quoting</td></tr>
+      <tr><td>Supplier price moved</td><td>Timber came in dearer than quoted</td><td>Purchasing</td></tr>
+      <tr><td>Short, substituted or damaged</td><td>Out of stock, substitute supplied</td><td>Purchasing and delivery</td></tr>
+      <tr><td>Paid late, paid early or up front</td><td>No trade account, so cash goes out before the customer pays</td><td>Finance (money management)</td></tr>
+      <tr><td>Positive</td><td>Finished half a day early, better price found</td><td>Keep and repeat</td></tr>
+    </tbody>
+  </table></div>
+  <p style="margin-top:14px">Two reports follow: a project view comparing actual against quoted for that job, and a business view across all jobs grouped by cause, so patterns show up.</p>
+</section>
+
+<section id="today">
+  <h2>Today</h2>
+  <p class="sub">A day view over the same task and event records, so there is one source with two ways of looking at it.</p>
+  <div class="grid2">
+    <div class="card"><h4>Navigating days</h4><ul><li>Back and forward arrows step one day at a time.</li><li>A date picker jumps to a specific date, and a Today button snaps back.</li><li>Stepping to Thursday answers "can you deliver Thursday?" by showing what is on site that day.</li></ul></div>
+    <div class="card"><h4>What the page holds</h4><ul><li><strong>Time-critical block on top:</strong> deliveries to sign off, overdue items, prices to confirm.</li><li><strong>Customer actions</strong> tile, then a <strong>Business actions</strong> tile, kept separate.</li><li>Each tile lists up to ten, overdue first in red, then by priority and time, with "see all" beyond that. The cap is a setting.</li></ul></div>
+  </div>
+  <h3>Signing off a delivery from Today</h3>
+  <p>A pending delivery shows on Today. Tapping it opens the order's checklist. The same screen opens from the project, the order and the supplier, wherever Lynton starts. Targets are large and simple for a tablet or phone on site.</p>
+</section>
+
+<section id="tasks">
+  <h2>Tasks</h2>
+  <p class="sub">One task engine and two homes. Jobs and customers are one mode of work, and working on the business is another. Mixing them is how admin gets buried.</p>
+  <div class="grid2">
+    <div class="card"><h4>Tasks hub, for jobs and customers</h4><ul><li>Chase a quote, confirm prices, sign off a delivery, ring the council about permissions.</li><li>Attached to a project, customer, quote, order or supplier, and shown in the centre of that record.</li><li>Filter by person, customer, project, due date and type. Overdue in red.</li><li>Created automatically by the system (follow-ups, price checks) or by hand at any time.</li></ul></div>
+    <div class="card"><h4>Business area, for working on the business</h4><ul><li>VAT return, insurance renewal, setting up a trade account.</li><li>Attached to nobody. Visible to Lynton and Royce to start with, with Mike's access decided when he has a login.</li><li>Today shows it as its own tile, so a VAT deadline cannot hide.</li></ul></div>
+  </div>
+  <h3>One task form for both</h3>
+  <p>Title, description, due date, priority, type, assignee, status, recurrence and a reminder time. Job tasks link to their record automatically. Recurring tasks, such as the quarterly VAT return, repeat on their own.</p>
+</section>
+
+<section id="pipeline">
+  <h2>From lead to project</h2>
+  <p class="sub">Three boards, one record. Each phase keeps its own board and drag and drop, but a card that crosses to the next board is the same record, so nothing is re-keyed or lost.</p>
+  <div class="boards">
+    <div class="board"><h4>Lead Pipeline</h4><p style="font-size:13.5px;margin:0">Qualify in or out as fast as possible.</p><div class="stages"><span>New enquiry</span><span>Qualifying</span><span class="win">Qualified</span><span class="end">Disqualified</span></div></div>
+    <div class="board sales"><h4>Sales Pipeline</h4><p style="font-size:13.5px;margin:0">Site visit, scope, quote, negotiation, commitment, decision.</p><div class="stages"><span>Site visit</span><span>Scoping</span><span>Quoted</span><span>Negotiation</span><span>Commitment</span><span class="win">Won</span><span class="end">Closed lost</span></div></div>
+    <div class="board proj"><h4>Project Pipeline</h4><p style="font-size:13.5px;margin:0">Contract signed through to paid.</p><div class="stages"><span>Planning</span><span>Materials</span><span>On site</span><span>Sign-off</span><span>Invoiced</span><span class="win">Completed</span></div></div>
+  </div>
+  <p style="margin-top:14px;font-size:13.5px;color:var(--muted)">The stage names above are a starting proposal. The final names follow the ones already used in the tracker.</p>
+  <h3>Project Pipeline stages in detail</h3>
+  <p>Five working stages and one end stage. A job enters at Planning the moment it is won in the Sales Pipeline, with the contract signed and the deposit invoice raised, so there is no separate stage for the signed contract. Each stage lines up with the nine milestone dates the tracker already holds, so existing projects slot in without reshaping any data. A card moves forward when the real date is confirmed, never from a planned date.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Stage</th><th>What it means</th><th>Moves on when</th><th>Milestones covered</th></tr></thead>
+    <tbody>
+      <tr><td>Planning</td><td>The first stage of a won job. It arrives with the contract signed, the deposit invoice raised and the job weighted at 100 percent. Design is signed off, dates set, supplier prices compared and orders being chosen.</td><td>The first order is placed.</td><td>Contract signed, design signed</td></tr>
+      <tr><td>Materials</td><td>Orders placed and deliveries coming in. Each delivery is signed off against its checklist.</td><td>Materials needed for the start are delivered.</td><td>Materials ordered, materials delivered</td></tr>
+      <tr><td>On site</td><td>Work in progress. Hours logged against the phase plan.</td><td>The build is complete.</td><td>On site start, build complete</td></tr>
+      <tr><td>Sign-off</td><td>Snagging and the customer's final check. Variations settled.</td><td>The customer signs off.</td><td>Sign-off</td></tr>
+      <tr><td>Invoiced</td><td>Final invoice raised and awaiting payment. Chased on the due date.</td><td>The final payment lands.</td><td>Invoiced, paid</td></tr>
+      <tr><td>Completed</td><td>Signed off and paid. Leaves the live board for the archive and can be reopened.</td><td>End stage</td><td>All nine done</td></tr>
+    </tbody>
+  </table></div>
+  <p style="margin-top:14px;font-size:13.5px;color:var(--muted)">Stage payments, such as a deposit or a mid-job instalment, follow the quote's payment schedule and appear on the project's timeline. They do not need stages of their own.</p>
+  <h3>Lead stage</h3>
+  <ul>
+    <li><strong>Enquiry capture.</strong> Enquiries arrive by email, WhatsApp, phone or in person, and all land in one place as a new lead with contact details, a note on the first conversation and a location if known.</li>
+    <li><strong>Qualification gates move to Settings.</strong> Questions, weighting and whether each is a hard gate or a guide are editable. The answers produce a simple score ("strong", "unclear", "weak") shown as a badge on the lead card and on the project page. Default: a hard gate, so a lead cannot be promoted past the gate until its questions are answered. Each question can be switched to a guide in Settings, and the default itself is a setting too.</li>
+    <li><strong>Job type.</strong> Some types, such as maintenance, can be marked "not a fit" so they are flagged early.</li>
+    <li><strong>Value and time on every lead.</strong> A ballpark value, an estimated duration in days (split into phases if needed), the customer's preferred start and any deadline.</li>
+    <li><strong>Needs attention.</strong> The lead board marks any lead that has gone quiet or is missing key information.</li>
+  </ul>
+  <h3>Sales stage</h3>
+  <ul>
+    <li><strong>Follow-up.</strong> When a quote is sent the system suggests a follow-up task, by default three working days out (two to three is the range, editable). Lynton chases however he likes, taps "Chased", picks the channel and adds an optional note. The next follow-up is suggested automatically. The gap and the task name are settings.</li>
+    <li><strong>No contact flag.</strong> A quote shows "X days since contact" once past a threshold, starting at five working days.</li>
+    <li><strong>Gerry's review.</strong> The existing approval process is switched on, so every new quote's materials and labour get one approve or "check this" decision, with a comment, before it goes to the customer.</li>
+  </ul>
+  <h3>End stages and the archive</h3>
+  <p>Each board has clear end stages: disqualified for leads, closed lost for sales, completed for projects. Closed lost needs a reason, and if nobody knows why, the reason is "stalled, no response". A record that reaches an end stage leaves the live board and shows in a greyed archive view. Reopening puts it back at the stage it left, with a timeline note of who revived it and when. Nothing is deleted.</p>
+</section>
+
+<section id="phases">
+  <h2>Work phases, budgeted hours and the true cost of a deal</h2>
+  <p class="sub">The pipeline stages and the work plan are two different things. Mixing them on one board clutters it, so they are split.</p>
+  <div class="grid2">
+    <div class="card"><h4>Commercial stages</h4><p>Short, around five or six per board. These are what you drag cards through, and they describe where the deal stands.</p></div>
+    <div class="card"><h4>The phase plan</h4><p>Planned tasks with dates, hours and cost: site visit, scope, quote, order, delivery, install phases, sign-off. A template in Settings pre-fills each new job, and each phase can carry its own delivery dates.</p></div>
+  </div>
+  <h3>Budget by default, confirm by tapping</h3>
+  <ol>
+    <li>Each phase template has a standard budget, for example three hours for a site visit including travel.</li>
+    <li>When a phase comes due it appears on Today. Lynton taps Done, and the system asks "Was that 3 hours?". Yes keeps the budget. Otherwise a scroll picker adjusts it in 15-minute steps.</li>
+    <li>If he skips the second step, the budget stands and the record is marked "budget, not confirmed".</li>
+  </ol>
+  <p>This is the same tick-then-confirm habit as the delivery sign-off, so there is one pattern to learn across the system.</p>
+  <h3>What it gives you</h3>
+  <ul>
+    <li>Planned hours times the labour rate gives the budgeted cost. Confirmed hours give the actual. The variance shows per phase and per job, with under-budget shown as a positive.</li>
+    <li>Selling time is costed too, including on deals you never win. You see total selling cost against total won value and what a typical lead costs to qualify, which tells you whether to charge for site visits or qualify harder earlier.</li>
+    <li>Reports show the share of confirmed against assumed hours, so a quietly accepted default cannot make the variance look flat.</li>
+    <li>Quote lines tie to phases, so a material can take the delivery date of the phase it is for. That covers the barbecue shelter example: foundation materials one Monday, structure materials the next.</li>
+  </ul>
+</section>
+
+<section id="calendar">
+  <h2>Calendar and capacity</h2>
+  <p class="sub">A cross-project view with layers you switch on and off. It answers what is happening on which day and whether Lynton is free.</p>
+  <div class="grid2">
+    <div class="card"><h4>Layers</h4><ul><li>Confirmed projects</li><li>Sales opportunities, weighted by likelihood</li><li>Leads, weighted</li><li>Deliveries</li><li>Business tasks, if wanted</li></ul><p style="margin-top:8px">Switch on projects and leads together to see overlaps and gaps, and which leads to prioritise or push back. Clicking a day opens that day on Today.</p></div>
+    <div class="card"><h4>Capacity</h4><ul><li>Capacity is a setting: the people and their available hours or days each week. Today it is Lynton alone, and Gerry, Mike and Peter can be added.</li><li>The same capacity view works at all three levels. At the lead stage it shows weighted lead estimates against what is free. At the sales stage it shows opportunities, still weighted. At the project stage it is the detailed phased plan.</li><li><strong>Every project page has the Gantt</strong>, as the phase timeline and that project&rsquo;s slice of the capacity view. It is a permanent part of the page, not something to drop later.</li></ul></div>
+  </div>
+</section>
+
+<section id="menu">
+  <h2>The menu</h2>
+  <p class="sub">The structure follows from the hubs and from the choices made in the review. Names stay as close as possible to the ones already in the tracker.</p>
+  <div class="grid2">
+    <div>
+      <h3 style="margin-top:0">Now</h3>
+      <div class="menu">
+        <div class="g" style="--c:var(--g-command)"><b>Command</b><span>Today, Dashboard</span></div>
+        <div class="g" style="--c:var(--g-growth)"><b>CRM</b><span>Contacts, Companies, Tasks, Projects</span></div>
+        <div class="g" style="--c:var(--g-growth)"><b>Growth</b><span>Leads, Sales pipeline</span></div>
+        <div class="g" style="--c:var(--g-rev)"><b>Revenue</b><span>Quotations, Approvals, Revenue Forecast</span></div>
+        <div class="g" style="--c:var(--g-finance)"><b>Finance</b><span>Cash flow, Invoicing, Transactions, Pricing Model, Bank Reconciliation</span></div>
+        <div class="g" style="--c:var(--g-ops)"><b>Operations</b><span>Project pipeline, Suppliers, Purchase orders</span></div>
+        <div class="g" style="--c:var(--g-org)"><b>Organisation</b><span>Setup &amp; Admin, Business Plan, Actions, Assets, Settings</span></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Proposed</h3>
+      <div class="menu">
+        <div class="g" style="--c:var(--g-command)"><b>Command</b><span>Today, Calendar, Dashboard, Reports</span></div>
+        <div class="g" style="--c:var(--g-growth)"><b>CRM</b><span>Contacts, Companies, Projects, Tasks</span></div>
+        <div class="g" style="--c:var(--g-rev)"><b>Commercial</b><span>Lead Pipeline, Sales Pipeline, Quotes, Customer invoices</span></div>
+        <div class="g" style="--c:var(--g-ops)"><b>Operations</b><span>Project Pipeline, Suppliers, Orders and deliveries, Supplier invoices, Assets</span></div>
+        <div class="g" style="--c:var(--g-finance)"><b>Finance</b><span>Cash flow, Transactions, Bank reconciliation, Profit and loss, Budget and forecast, Balance sheet, Pricing Model</span></div>
+        <div class="g" style="--c:var(--g-org)"><b>Business</b><span>Business tasks, Business plan, Business costs</span></div>
+        <div class="g" style="--c:var(--g-command)"><b>Settings</b><span>A single item at the bottom</span></div>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:14px">The left column is the menu as it stands now, read from the tracker's code. Approvals folds into Quotes as Gerry's review. Revenue Forecast becomes Budget and forecast in Finance. Invoicing splits: customer invoices go to Commercial and supplier invoices to Operations.</p>
+  <h3>Decided in the review</h3>
+  <div class="grid2">
+    <div class="card"><h4>Two selling and buying groups</h4><p>Commercial covers selling: Lead Pipeline, Sales Pipeline, Quotes and customer invoices. Operations covers buying and delivering: Project Pipeline, Suppliers, Orders and deliveries, supplier invoices and Assets.</p></div>
+    <div class="card"><h4>Pipelines split by function</h4><p>The Projects list in CRM is the one place to find any project at any stage. A small strip on the dashboard shows how many records sit in each board.</p></div>
+    <div class="card"><h4>CRM keeps its place</h4><p>Contacts, Companies, Projects and Tasks, as the tracker has them today.</p></div>
+    <div class="card"><h4>Business tasks and Admin merged</h4><p>The Actions page and Setup &amp; Admin become one Business tasks page.</p></div>
+    <div class="card"><h4>Reports sit under Command</h4><p>Next to Today, Calendar and Dashboard, as a library of job reports and business reports.</p></div>
+  </div>
+</section>
+
+<section id="finance">
+  <h2>Finance: the money, in the standard order</h2>
+  <p class="sub">Finance should give all the tools a normal small business uses to manage money. Business is how the business runs, and Reports is a separate library you pull from. Several of these pages already exist, so most of the work is extending them.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Page</th><th>The question it answers</th><th>State in the tracker</th></tr></thead>
+    <tbody>
+      <tr><td>Cash flow</td><td>What is in the bank, what is coming, and what is the lowest point in the next six to eight weeks?</td><td><span class="pill ok">Exists</span> Extend with a weekly review of expected against landed, and ageing tabs for money owed to you and by you.</td></tr>
+      <tr><td>Transactions</td><td>What actually went in and out?</td><td><span class="pill ok">Exists</span> Extend with job cost or business cost, and invoice or receipt attachments.</td></tr>
+      <tr><td>Bank reconciliation</td><td>Do the books match the statement?</td><td><span class="pill ok">Exists</span> Monthly, with accounts, loans and locked months.</td></tr>
+      <tr><td>Profit and loss</td><td>Money earned, less job costs, less business costs, by month.</td><td><span class="pill warn">New</span></td></tr>
+      <tr><td>Budget and forecast</td><td>What do we expect over three to six months, and how is it tracking?</td><td><span class="pill ok">Exists</span> as Revenue Forecast. Extend with plan against actual.</td></tr>
+      <tr><td>Balance sheet</td><td>What does the business own and owe? A one-page snapshot.</td><td><span class="pill warn">New</span> Simplified: cash, owed to you, owed by you, equipment, loans, VAT due.</td></tr>
+      <tr><td>Pricing Model</td><td>Day rate, markup, margin and the overheads they cover.</td><td><span class="pill ok">Exists</span> Its five yearly overhead lines move to Business costs.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>The weekly review is the forecast, checked</h3>
+  <p>A cash flow forecast is dated money in and out, projected forward. The review adds a check on top. Each expected item, such as an invoice you will raise on Friday when a stage completes and the payment you expect seven days later, gets a status of <strong>landed</strong>, <strong>late</strong> or <strong>moved</strong>. Anything late carries forward with a chase task. This builds on the planned-against-actual dates already in the tracker.</p>
+  <h3>What to look at, and how often</h3>
+  <div class="grid3">
+    <div class="card"><h4>Weekly, fifteen minutes</h4><ul><li>Cash in the bank today, and the lowest point in the next six to eight weeks.</li><li>Money owed to you, and how late it is.</li><li>Money you owe, and what falls due before the next customer payment.</li><li>Expected against actual for the week.</li><li>Quotes out and follow-ups due, because that is next month's cash.</li></ul></div>
+    <div class="card"><h4>Monthly, an hour</h4><ul><li>Gross margin per job, quoted against actual.</li><li>Business costs against plan, and the break-even figure.</li><li>Profit after set-asides, then the profit share.</li><li>Pipeline weighted by likelihood, against break-even.</li><li>Hours confirmed against budget, and selling time spent on lost deals.</li></ul></div>
+    <div class="card"><h4>Quarterly, a sit-down</h4><ul><li>Cash runway at current costs with no new sales.</li><li>Which job types make money per day of Lynton's time.</li><li>Quote win rate, and time from enquiry to decision.</li><li>Customer concentration.</li><li>VAT and tax reserve, and the asset pot against the register.</li><li>A rolling three to six month forecast, refreshed.</li></ul></div>
+  </div>
+  <div class="note ok" style="margin-top:14px"><strong>If you only watch three numbers:</strong> the lowest cash point, overdue money, and margin per job.</div>
+</section>
+
+<section id="costs">
+  <h2>Business costs, assets and set-asides</h2>
+  <p class="sub">Costs fall into two kinds. Keeping them apart is what makes the profit figures honest.</p>
+  <div class="grid2">
+    <div class="card"><h4>Job costs</h4><p>Exist because of a specific project: materials, delivery, hire, subcontractors, and an optional tool-use charge. They count against the job's margin.</p></div>
+    <div class="card"><h4>Business costs</h4><p>Paid whether or not a job is running: insurance, subscriptions (website, AI tools), accountancy, phone, and most fuel unless mileage is charged to jobs. They are covered by the margin from all jobs together.</p></div>
+  </div>
+  <h3>Business costs page</h3>
+  <p>Each cost has an amount, how often it recurs, when it is next due and a category. Recurring ones feed the cash flow forecast, and a matching transaction ticks them off as paid. At the moment overheads are five yearly figures in the Pricing Model (insurance, accounting, vehicle, tools, marketing), spread evenly through the year. The page replaces those with real items and dates, so the monthly overhead figure follows from the list. It also gives the break-even: monthly business costs divided by average gross margin percentage is the sales needed each month.</p>
+  <h3>The monthly waterfall</h3>
+  <p style="margin-bottom:8px">How a month reads from top to bottom. The bars show the shape only, not figures.</p>
+  <div class="wf" role="img" aria-label="Waterfall: money in, less job costs gives gross margin, less business costs gives operating profit, less profit share gives retained profit, shared into set-asides">
+    <div>Money in<i class="in" style="--w:100%"></i></div>
+    <div>Less job costs<i style="--w:55%"></i></div>
+    <div>Gross margin<i class="pr" style="--w:45%"></i></div>
+    <div>Less business costs<i style="--w:18%"></i></div>
+    <div>Operating profit<i class="pr" style="--w:27%"></i></div>
+    <div>Less profit share<i style="--w:8%"></i></div>
+    <div>Retained profit pot<i class="pr" style="--w:19%"></i></div>
+  </div>
+  <p>The pot is then shared into set-asides: Assets, Tax, Buffer and Growth. The tracker already shares retained profit this way, using default shares of 30, 25, 20 and 25 percent, and already takes the profit share off per labour hour. <strong>Decided:</strong> nothing comes out ahead of the retained profit number. The profit share is Lynton&rsquo;s income, and what remains is retained profit, which is shared into the pots. The build still reads the current calculation first and reports before changing anything, to make sure the code matches this.</p>
+  <h3>Fixed or percentage</h3>
+  <p>A fixed set-aside puts aside, say, £200 a month whatever happens, which suits things that must be funded, like replacing kit. A percentage puts aside a share of whatever profit the month makes, which suits things that should flex, like tax. Each bucket gets a method in Settings. The default stays percentage, so nothing changes until you switch one.</p>
+  <h3>Assets, in plain terms</h3>
+  <ul>
+    <li><strong>Register.</strong> Anything above a set value goes on the register with its cost and date. Cheaper kit is just a running cost. The tracker's register already holds cost, purchase date, useful life (five years by default), residual value, service and insurance dates.</li>
+    <li><strong>Replacement pot.</strong> Cost less residual, divided by life, is the yearly wear and so what to put aside to replace it. That comes from the Assets set-aside each month, not from each job.</li>
+    <li><strong>Optional usage charge.</strong> A job that needs a tool can carry a charge, which helps quote competitively and recovers the cost over time. Once recovered, the charge can stop or carry on at a small amount. It is off by default, per asset.</li>
+    <li><strong>Buy or hire.</strong> A plan item can hold a hire cost for comparison. For a tile cutter needed on three jobs, the plan shows when buying beats hiring. The asset plan already tracks priority, status and funding for wishlist items.</li>
+  </ul>
+</section>
+
+<section id="reports">
+  <h2>Reports, and where the numbers come from</h2>
+  <p class="sub">Finance pages are live working views. Reports are the questions you ask on a schedule, each with a date range. Both read the same records, and the people keeping those records up to date are the only input.</p>
+  <div class="grid2">
+    <div class="card"><h4>Job reports</h4><ul><li>Quoted against actual per job</li><li>Variance by cause</li><li>Hours budgeted against confirmed</li><li>Selling cost per deal, won and lost</li><li>Delivery and supplier performance</li></ul></div>
+    <div class="card"><h4>Business reports</h4><ul><li>Profit and loss</li><li>Cash runway</li><li>Win rate, and margin by job type</li><li>Customer concentration and overdue ageing</li><li>A monthly board-style summary</li></ul></div>
+  </div>
+  <h3>Where each figure comes from</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Record</th><th>What it holds that reports need</th><th>Feeds</th></tr></thead>
+    <tbody>
+      <tr><td>Transactions</td><td>Date, money in or out, category, linked project, planned or not, linked invoice or order code</td><td>Actual cash, profit and loss, variance, reconciliation</td></tr>
+      <tr><td>Invoices and payment lines</td><td>Amount, due date, invoiced date, paid date</td><td>Money owed to you, expected money in, overdue ageing</td></tr>
+      <tr><td>Orders, deliveries and supplier invoices</td><td>Supplier, expected cost, delivery date, confirmed price, variance reason</td><td>Money you owe, expected money out, job cost, variance</td></tr>
+      <tr><td>Quote, as sold</td><td>Sold price, cost, hours at the time of acceptance</td><td>The baseline for every margin and variance</td></tr>
+      <tr><td>Phases and hours</td><td>Planned hours, confirmed or assumed hours, selling time</td><td>Labour cost, cost of a deal, profit share</td></tr>
+      <tr><td>Business costs</td><td>Amount, frequency, next due</td><td>Overheads, break-even, forecast</td></tr>
+      <tr><td>Assets and plan</td><td>Cost, life, residual, funding, status</td><td>Replacement pot, balance sheet</td></tr>
+      <tr><td>Bank reconciliation</td><td>Accounts, statement balances, loans, locked months</td><td>Bank position, balance sheet, trust in the actuals</td></tr>
+      <tr><td>Leads, sales and projects</td><td>Stage, value, probability, dates, job type, end reason</td><td>Weighted pipeline, win rate, capacity</td></tr>
+    </tbody>
+  </table></div>
+  <h3>The rules that keep the numbers reliable</h3>
+  <ol>
+    <li><strong>Every transaction has a type</strong> (job cost or business cost) and, for job costs, a project. An uncategorised one shows as a task on Today.</li>
+    <li><strong>Every money event links to what it settles</strong>, an invoice code or an order reference, so expected items tick off by themselves. The tracker already carries a linked code on transactions.</li>
+    <li><strong>One date per fact</strong>: invoiced, paid, delivered, confirmed. A planned date never counts as done.</li>
+    <li><strong>Reconcile monthly.</strong> A reconciled month locks its actuals, and the tracker already does this.</li>
+    <li><strong>Nothing is typed twice.</strong> A wrong figure in a report is fixed by correcting the record behind it, and every figure opens its lines to show which.</li>
+    <li><strong>A data-quality strip on every report</strong> says how far to trust it: how many transactions are uncategorised, invoices missing dates, or hours still assumed.</li>
+  </ol>
+  <div class="note"><strong>What is missing today.</strong> A job cost or business cost flag on transaction types (the current types include Overhead and Equipment, but nothing maps them), supplier invoices with confirmed prices, customer type and job type, selling-time hours, and a list of business costs. Stages 2, 3, 4 and 5 add these. Stage 2 and the stages after it capture the data in the right shape from the start, and stage 5 tidies what is already there.</div>
+</section>
+
+<section id="plan">
+  <h2>Build plan</h2>
+  <p class="sub">Seven stages after a prerequisites step, down from eleven. Each stage groups work that depends on the same foundations, and ends with something you can see and check in a few minutes. Every stage is safe to stop after, and inside each stage the steps are in a fixed order with a short summary after each one.</p>
+  <div class="note bad"><strong>Rules for every stage.</strong> Build on the test site only (test repository, Supabase row 2). Never write to the live row. Stop and ask before changing login, the Supabase config, the environment banner, or reshaping stored data. New fields default safely. Reuse the existing design tokens, tables, side panels and Back navigation. Test at tablet and phone width. Finish each step with a plain-English summary, and each stage with the checks below.</div>
+  <h3>Why seven, and in this order</h3>
+  <ul>
+    <li><strong>The menu and the records first.</strong> Navigation was the main frustration, so stage 1 starts by regrouping the menu around the pages that already exist (nothing is removed). Everything else is a view of, or a link between, records, so the record page, the tasks and Today follow. Tasks are merged in because the activity feed is built from them.</li>
+    <li><strong>Buy, then sell, then plan.</strong> Ordering was the first pain point, so it comes next. Selling creates the lead durations and values that capacity needs, so planning and capacity come after it.</li>
+    <li><strong>Money in two parts.</strong> The foundations (costs, categories, set-asides, assets) come before the pages and reports that read them, and the reports come last because they hold no numbers of their own.</li>
+    <li><strong>The menu grows with the build.</strong> Each stage adds its new pages to the right group as they arrive, so the team learns the structure once. Stage 7 is only a final naming and polish pass.</li>
+  </ul>
+  <div class="scroll"><table>
+    <thead><tr><th>Before</th><th>Now</th><th>Why they were joined</th></tr></thead>
+    <tbody>
+      <tr><td>1 Record page, 2 Tasks and Today</td><td>Stage 1</td><td>Tasks are standalone records shown in the record page feed, and Today reads them.</td></tr>
+      <tr><td>3 Orders and deliveries</td><td>Stage 2</td><td>Unchanged, plus the Materials and deliveries tab and the hire option.</td></tr>
+      <tr><td>5 Quotes hub, 6 Lead stage</td><td>Stage 3</td><td>One selling flow from lead to quote. Qualification, follow-ups and quote comparison share the same lead and quote records.</td></tr>
+      <tr><td>7 Phase plan, 8 Calendar and capacity</td><td>Stage 4</td><td>Capacity is only useful with phase dates and hours, so they are built together, with the Gantt on every project page.</td></tr>
+      <tr><td>4 Finance foundations</td><td>Stage 5</td><td>Moved after buying and selling, so categories are applied to data captured in the new shape. Gains the project Money tab.</td></tr>
+      <tr><td>9 Finance pages, 10 Reports library</td><td>Stage 6</td><td>Reports are views over the finance pages and use the same checks.</td></tr>
+      <tr><td>11 Menu and polish</td><td>Stage 1 and stage 7</td><td>The menu regrouping moves to the start of stage 1 and each later stage adds its pages. Stage 7 keeps the page template and the tablet and phone pass.</td></tr>
+    </tbody>
+  </table></div>
+  <div style="height:16px"></div>
+<article class="phase"><header><span class="n">Stage 0</span><h3>Prerequisites</h3><span class="pill info">Before any build</span></header><div class="body"><div><h5>What gets built</h5><ul><li>The six-phase fixes brief was merged into the test site on 27 October: planned against actual dates, supplier payment confirmation, starting balance, bank reconciliation, profit share methods and completed projects. The commits are visible, but it still needs checking in the browser against the brief&rsquo;s test list.</li><li>With your say-so, live is backed up and copied into the test row, so Harvey, Auro and Guy Nunn data can be tested against.</li></ul></div><div><h5>Check it when the stage is done</h5><ul><li>Run the brief&rsquo;s test list on test and note anything that fails.</li><li>Confirm the live backup exists before any copy.</li></ul></div><div><h5>Watch for</h5><ul><li>Nothing is written to live.</li><li>Financial records are never overwritten without checking with you.</li><li>Harvey and Auro accounts stay as they are.</li></ul></div></div></article>
+<article class="phase"><header><span class="n">Stage 1</span><h3>Records, tasks and Today</h3><span class="pill">Large</span></header><div class="body"><div><h5>Build in this order</h5><ol><li><b>The new menu.</b> Regroup the existing pages under Command, CRM, Commercial, Operations, Finance, Business and a single Settings item. Nothing is removed or renamed beyond what the grouping needs, and favourites and the collapsible menu are kept. Pages that do not exist yet are not shown.</li><li><b>Record page frame.</b> The three columns, the pinned profile header with collapsible sections, the one-line tabs and the Overview. Fields follow one rule: locked, calculated (with where to edit it) or editable. A changed date shows Confirm and update, Tentative or Cancel.</li><li><b>Associations and the first three records.</b> A view over existing links so supplier, order, invoice and quote links open both ways. Project first, then Supplier, then Customer. Back returns to where you were.</li><li><b>Task engine.</b> One task form with recurrence and assignee, the Tasks hub, record-level task lists, and the Business tasks page. Tasks are standalone records. The Actions page and Setup and Admin merge into Business tasks.</li><li><b>Activity feed.</b> A view over real records: open tasks on top by due date (oldest first), then history, with the milestone strip. Notes, tasks, quotes, deliveries and payments are cards that edit in place and link to their own record.</li><li><b>Today.</b> A day view with arrows and a date picker, the time-critical block, and the two action tiles, ten items each with a See more link.</li><li><b>Plan tab.</b> The existing Gantt is kept on the project Plan tab, and the reschedule flow lands here.</li></ol><p style="font-size:13px;margin-top:6px"><b>Settings added:</b> Today list length (10), who sees business tasks and costs.</p></div><div><h5>Check it when the stage is done</h5><ul><li>Every page that existed before is still reachable from the new menu, in its new group.</li><li>Open a project, click a supplier, edit a detail, press Back and land where you were.</li><li>Create a task and see it at the top of the activity feed and on Today. Tick it and watch it drop into history.</li><li>Change a start date and be taken to the Plan tab to confirm, mark tentative, or cancel.</li><li>Sign in as someone other than Lynton or Royce and confirm business tasks are hidden.</li></ul></div><div><h5>Watch for</h5><ul><li>No new data tables unless a link truly does not exist.</li><li>Existing Tasks and Actions are carried across, not lost.</li><li>The menu is regrouped, not rebuilt: no page is removed, and any page that does not fit yet stays where it is.</li><li>The date-change flow changes nothing in linked records until you confirm the schedule.</li><li>This is the largest stage. Good places for you to look are after steps 1, 3, 5 and 6. The build only stops for something unexpected.</li></ul></div></div></article>
+<article class="phase"><header><span class="n">Stage 2</span><h3>Buying: orders, deliveries and invoice check</h3><span class="pill">Large</span></header><div class="body"><div><h5>Build in this order</h5><ol><li><b>Orders hub.</b> One order per supplier from a quote, and a second order possible. Every order is reachable from the project and from the supplier.</li><li><b>Delivery checklist</b> from Today, with short, substituted and damaged flags and photos.</li><li><b>Confirm prices</b> now or later, with invoice or receipt upload. Later becomes a task.</li><li><b>Variance</b> with a reason, by cause, against a threshold that defaults to 0 percent.</li><li><b>Hire option</b> on any line, as a supplier cost.</li><li><b>Materials and deliveries tab</b> on the project: the planned against actual graph and the list of orders and deliveries with confirm buttons.</li><li><b>Menu.</b> Add Orders and deliveries and Supplier invoices to Operations.</li></ol><p style="font-size:13px;margin-top:6px"><b>Settings added:</b> variance threshold (0 percent).</p></div><div><h5>Check it when the stage is done</h5><ul><li>Sign off a delivery from Today with one short item.</li><li>Choose &ldquo;later&rdquo; and see a confirm-prices task appear.</li><li>Enter a receipt price that differs and see the variance with its cause.</li><li>Mark one line as hire and see it in the job&rsquo;s supplier costs.</li></ul></div><div><h5>Watch for</h5><ul><li>Supplier payment confirmation reuses the fixes already built.</li><li>Quote prices are never changed by a receipt. Variances sit beside them.</li><li>Tortworth supplier settings stay as they are unless you say otherwise.</li></ul></div></div></article>
+<article class="phase"><header><span class="n">Stage 3</span><h3>Selling: leads, qualification and quotes</h3><span class="pill">Large</span></header><div class="body"><div><h5>Build in this order</h5><ol><li><b>Lead fields.</b> Value, duration, preferred start, deadline, job type with &ldquo;not a fit&rdquo;, and the customer lifecycle (lead, opportunity, customer, referrer, evangelist).</li><li><b>Qualification gates</b> in Settings with weighting, and the score badge. The default is a hard gate, switchable per question.</li><li><b>End stages.</b> Needs-attention markers, and the archive with reopen on all three boards.</li><li><b>Quotes hub</b> with follow-up tasks (default three working days), the days-since-contact flag at five, and settings for gap and task name.</li><li><b>Multiple prices per line</b> and the whole-basket comparison with override reasons.</li><li><b>Approver access type</b> in Settings, with a scope of commercial, finance or both, ready for Gerry and Mike. No logins are created in this stage.</li><li><b>Menu.</b> Add Quotes (with Approvals folded in as Gerry&rsquo;s review) and Customer invoices to Commercial.</li></ol><p style="font-size:13px;margin-top:6px"><b>Settings added:</b> gate mode, follow-up gap, no-contact flag, customer lifecycle names, approver scope.</p></div><div><h5>Check it when the stage is done</h5><ul><li>Create a lead, answer the gates, and try to promote it with a gate unanswered. It should refuse.</li><li>Send a quote and see the follow-up appear on Today in three working days.</li><li>Move one line to another supplier and watch both baskets re-total.</li><li>Close one as lost, find it in the archive and reopen it.</li></ul></div><div><h5>Watch for</h5><ul><li>Existing leads, sales and projects keep their data and stage.</li><li>Giving Gerry or Mike a login touches access, so it stops for your approval first.</li><li>Customer lifecycle replaces the old customer type list. Segment (homeowner, commercial) can be added later as a separate field.</li></ul></div></div></article>
+<article class="phase"><header><span class="n">Stage 4</span><h3>Planning, time and capacity</h3><span class="pill">Large</span></header><div class="body"><div><h5>Build in this order</h5><ol><li><b>Phase templates</b> in Settings with budgeted hours, pre-filled on each new job.</li><li><b>Tick-then-confirm</b> on Today with the 15-minute picker, and the confirmed-against-assumed marker.</li><li><b>Selling-time costing</b>, including lost deals.</li><li><b>Team capacity setting:</b> people and their weekly hours or days.</li><li><b>Gantt on every project page</b>, upgraded into that project&rsquo;s slice of the capacity view.</li><li><b>Capacity view across the business</b> with layers: projects, weighted opportunities, weighted leads, deliveries. It works at the lead stage, the sales stage, and in detail at the project stage. Clicking a day opens Today for it.</li><li><b>Overlap warnings</b> feed the tentative-change flow from stage 1.</li><li><b>Menu.</b> Add Calendar and capacity to Command.</li></ol><p style="font-size:13px;margin-top:6px"><b>Settings added:</b> phase templates, team capacity.</p></div><div><h5>Check it when the stage is done</h5><ul><li>Open any project and see its Gantt with the phases and dates.</li><li>Switch projects and leads on together and find an overlap.</li><li>Change a project start date so it clashes, and see the overlap warning offer Tentative.</li><li>Mark a site visit done, accept the budget, then adjust a second one, and see both on the cost report.</li></ul></div><div><h5>Watch for</h5><ul><li>Capacity is only as good as the lead durations from stage 3 and the phase dates from this stage.</li><li>The labour rate and profit share methods keep the settings already agreed.</li><li>Quotes already sent are not changed.</li></ul></div></div></article>
+<article class="phase"><header><span class="n">Stage 5</span><h3>Money foundations</h3><span class="pill">Medium</span></header><div class="body"><div><h5>Build in this order</h5><ol><li><b>Transaction categories.</b> Every transaction is a job cost or a business cost, with a project where it belongs. An uncategorised one raises a task.</li><li><b>Business costs page</b> replaces the five yearly overhead lines, with recurring dates feeding cash flow.</li><li><b>Set-asides.</b> Each pot gets a method, percentage by default and fixed monthly optional, in Settings.</li><li><b>Assets under Operations</b> as the equipment register with the asset plan and hire comparison. Tool cost on jobs is off by default.</li><li><b>Profit calculation read first.</b> The build reports how profit share, retained profit and the pots are calculated today before touching anything.</li><li><b>Money tab</b> on the project: graph of money in and out, planned against actual, and the list of planned invoices and payments with confirm buttons.</li><li><b>Menu.</b> Add Business costs to Business. Assets sits in Operations.</li></ol><p style="font-size:13px;margin-top:6px"><b>Settings added:</b> set-aside method per pot, tool cost on jobs (off).</p></div><div><h5>Check it when the stage is done</h5><ul><li>Add a recurring insurance cost and see it in the cash flow forecast.</li><li>Leave a transaction uncategorised and see the task.</li><li>Mark a planned invoice as received on the project Money tab and see the graph move.</li><li>Compare the build&rsquo;s profit calculation report with what the tracker does today.</li></ul></div><div><h5>Watch for</h5><ul><li>Existing transactions are matched to a type by rule, and any that cannot be matched are left for you to classify. Nothing is reclassified silently.</li><li>Pricing Model figures stay the same until you move them.</li><li>Nothing comes out ahead of the retained profit number, and the build confirms the code matches.</li></ul></div></div></article>
+<article class="phase"><header><span class="n">Stage 6</span><h3>Finance pages and reports</h3><span class="pill">Large</span></header><div class="body"><div><h5>Build in this order</h5><ol><li><b>Weekly review</b> on Cash flow: each expected item shown as landed, late or moved, with a chase task for late ones.</li><li><b>Ageing tabs</b> for money owed to you and money you owe.</li><li><b>Profit and loss by month,</b> a simplified balance sheet and the monthly waterfall.</li><li><b>Reports library:</b> job reports and business reports, each with a date range and the data-quality strip.</li><li><b>Monthly summary page:</b> the three headline numbers, the waterfall, and the pipeline against break-even.</li><li><b>Menu.</b> Add Profit and loss, Budget and forecast and Balance sheet to Finance, and Reports to Command.</li></ol></div><div><h5>Check it when the stage is done</h5><ul><li>Mark a payment late and see the chase task.</li><li>Compare a month&rsquo;s profit and loss with the bank reconciliation.</li><li>Open a finished job&rsquo;s report and trace every figure back to a record by clicking it.</li></ul></div><div><h5>Watch for</h5><ul><li>Check the simple versions against what Mike sees in the accounts before relying on them.</li><li>Reports hold no numbers of their own. A wrong figure is fixed by correcting the record.</li><li>Each page shows a data-quality strip.</li></ul></div></div></article>
+<article class="phase"><header><span class="n">Stage 7</span><h3>Polish and tablet pass</h3><span class="pill">Medium</span></header><div class="body"><div><h5>Build in this order</h5><ol><li><b>Menu final pass.</b> Check names, order and favourites now that every page exists.</li><li><b>One page template</b> across areas: headline strip, filters, list, side panel, with calm spacing and one primary action per area.</li><li><b>A walk through every page</b> on tablet and phone, with large touch targets on site.</li></ol></div><div><h5>Check it when the stage is done</h5><ul><li>Find a supplier, a quote and an invoice in two clicks each.</li><li>Use a delivery sign-off one-handed at phone width.</li></ul></div><div><h5>Watch for</h5><ul><li>A short before-and-after of clicks to log time, confirm a delivery, confirm a payment and raise an invoice.</li></ul></div></div></article>
+</section>
+
+<section id="decisions">
+  <h2>Decisions</h2>
+  <p class="sub">Answered on 29 October. Each one is built in as the default, and where it is a setting, it can be changed later without rebuilding anything.</p>
+  <ol class="dec">
+    <li><b>Where Assets lives</b><span>Operations, as the equipment register, for now. It can move later. Finance shows the set-aside pot.</span></li>
+    <li><b>Set-aside method</b><span>Percentage by default (Assets 30, Tax 25, Buffer 20, Growth 25), kept in Settings. A fixed monthly amount is available per pot.</span></li>
+    <li><b>Order of profit</b><span>Nothing comes out ahead of the retained profit number. The profit share is Lynton&rsquo;s income, and the rest is retained profit, shared into the pots. The build confirms the existing calculation matches before changing anything.</span></li>
+    <li><b>Tool cost on jobs</b><span>Off by default. It can be switched on where it is needed.</span></li>
+    <li><b>Hire</b><span>An option on a line item, counted as a supplier cost. The asset plan still holds the buy-or-hire comparison.</span></li>
+    <li><b>Variance threshold</b><span>Editable in Settings, defaulting to 0 percent, so every variance is flagged.</span></li>
+    <li><b>Qualification gates</b><span>A hard gate by default, with the mode set in Settings, per question and overall.</span></li>
+    <li><b>Today list length</b><span>Editable, default ten per tile, with a See more link.</span></li>
+    <li><b>Follow-up gap</b><span>Two to three working days, default three, editable. The five-working-day no-contact flag stays.</span></li>
+    <li><b>Who sees business tasks and costs</b><span>Lynton and Royce by default, then Mike and Gerry when they have logins. A per-user visibility setting an admin can adjust is planned, but is not needed yet.</span></li>
+    <li><b>Gerry and Mike&rsquo;s access</b><span>An approver access type, scoped to commercial, finance or both. Neither has a user yet, so no login is created until you approve it.</span></li>
+    <li><b>Customer types</b><span>The customer lifecycle: lead, opportunity, customer, referrer, evangelist. The names and order are editable in Settings.</span></li>
+    <li><b>Gantt and capacity</b><span>The Gantt is a permanent part of every project page, and the capacity view is a core part of selling and planning, at the lead stage, the sales stage and the detailed project stage. Built in stage 4, with the Gantt kept from stage 1.</span></li>
+  </ol>
+  <h3>Settings these decisions create</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Setting</th><th>Default</th><th>Stage</th></tr></thead>
+    <tbody>
+      <tr><td>Today list length</td><td>10</td><td>1</td></tr>
+      <tr><td>Business tasks and costs visible to</td><td>Lynton, Royce</td><td>1</td></tr>
+      <tr><td>Variance threshold</td><td>0 percent</td><td>2</td></tr>
+      <tr><td>Qualification gate mode</td><td>Hard gate</td><td>3</td></tr>
+      <tr><td>Follow-up gap and no-contact flag</td><td>3 working days, 5 working days</td><td>3</td></tr>
+      <tr><td>Customer lifecycle names</td><td>Lead, opportunity, customer, referrer, evangelist</td><td>3</td></tr>
+      <tr><td>Approver access scope</td><td>Commercial, finance or both</td><td>3</td></tr>
+      <tr><td>Phase templates and team capacity</td><td>From the agreed templates; Lynton alone</td><td>4</td></tr>
+      <tr><td>Set-aside method per pot</td><td>Percentage</td><td>5</td></tr>
+      <tr><td>Tool cost on jobs</td><td>Off</td><td>5</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Still to confirm</h3>
+  <ul>
+    <li>That the profit order above matches the code. Checked in stage 5, before any change.</li>
+    <li>Whether the current CRM holds anything beyond customers and notes (referrers, marketing lists) that needs a home. The code is checked in stage 1.</li>
+    <li>The exact stage names on each board. These follow what the tracker already uses.</li>
+    <li>How the simplified balance sheet and profit and loss compare with what Mike sees in the accounts. Checked in stage 6.</li>
+    <li>Lynton has not yet reviewed any of this. His reaction to the record page and Today is the most useful check before stage 2.</li>
+  </ul>
+</section>
+
+</main>
+<script>
+(function(){
+var r=document.getElementById('recdemo');if(!r)return;
+var DAY=864e5,MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function pd(v){var a=v.split('-');return new Date(Date.UTC(+a[0],+a[1]-1,+a[2]));}
+function iso(d){return d.toISOString().slice(0,10);}
+function fmt(d){return WD[d.getUTCDay()]+' '+d.getUTCDate()+' '+MON[d.getUTCMonth()];}
+function isWd(d){var x=d.getUTCDay();return x>0&&x<6;}
+function addWd(d,n){var t=new Date(d.getTime()),c=1;while(c<n){t=new Date(t.getTime()+DAY);if(isWd(t))c++;}return t;}
+function cntWd(a,b){var c=0,t=new Date(a.getTime());while(t<=b){if(isWd(t))c++;t=new Date(t.getTime()+DAY);}return c;}
+var F={};r.querySelectorAll('.inp.ed').forEach(function(e){F[e.getAttribute('data-k')]=e;});
+var base={},cur={};function snap(o){for(var k in F)o[k]=F[k].value;}snap(base);
+var bar=document.getElementById('chg'),bt=document.getElementById('chg-t'),bb=document.getElementById('chg-b'),tent=document.getElementById('tent');
+var other={name:'P-103 Hill barn',s:'2026-11-16',e:'2026-11-27'};
+function btn(txt,cls,fn){var b=document.createElement('button');b.type='button';b.className='btn '+(cls||'');b.textContent=txt;b.addEventListener('click',fn);return b;}
+function showTab(t){var tb=r.querySelector('[data-t='+t+']');if(tb)tb.click();}
+function dirty(){var d=[],dd=false;for(var k in F){var ch=F[k].value!==base[k];F[k].classList.toggle('dirty',ch);if(ch){d.push(k);if(k==='st'||k==='en'||k==='du')dd=true;}}return {d:d,dates:dd};}
+function revert(){for(var k in F)F[k].value=base[k];refresh();tent.hidden=true;}
+function refresh(){var x=dirty();bar.hidden=!x.d.length;if(!x.d.length)return;bb.innerHTML='';
+ if(x.dates){var os=pd(base.st),ns=pd(F.st.value),oe=pd(base.en),ne=pd(F.en.value);
+  bt.innerHTML='<b>Dates changed.</b> Start '+fmt(os)+' to '+fmt(ns)+', complete '+fmt(oe)+' to '+fmt(ne)+'.<small>This moves the linked deliveries, invoices and milestones. Open the plan to check them.</small>';
+  bb.appendChild(btn('Confirm and update project','pri',function(){openPlan('confirm');}));
+  bb.appendChild(btn('Tentative change','tent',function(){openPlan('tent');}));
+ }else{bt.innerHTML='<b>Details changed.</b> Save this update to the project?';
+  bb.appendChild(btn('Save update','pri',function(){snap(base);refresh();}));}
+ bb.appendChild(btn('Cancel','',function(){revert();}));}
+function onDate(e){var k=e.target.getAttribute('data-k');
+ if(k==='st'||k==='du'){var s=pd(F.st.value);if(!isWd(s)){}F.en.value=iso(addWd(s,Math.max(1,+F.du.value||1)));}
+ else if(k==='en'){var s2=pd(F.st.value),e2=pd(F.en.value);if(e2>=s2)F.du.value=cntWd(s2,e2);}
+ refresh();}
+for(var k in F){F[k].addEventListener('change',k==='st'||k==='en'||k==='du'?onDate:refresh);}
+var items=[['On site start','st',null,'2026-11-02'],['PO-0005 timber delivery','mv',null,'2026-11-05'],['PO-0006 tile delivery','mv',null,'2026-11-09'],['Build complete','en',null,'2026-11-20'],['INV3 raised on build complete','en',null,'2026-11-20'],['Sign-off and INV4','en7',null,'2026-11-27']];
+function openPlan(mode){
+ var ds=Math.round((pd(F.st.value)-pd(base.st))/DAY),de=Math.round((pd(F.en.value)-pd(base.en))/DAY);
+ var ns=pd(F.st.value),ne=pd(F.en.value),ov=ns<=pd(other.e)&&ne>=pd(other.s);
+ var body=document.getElementById('plan-body');body.innerHTML='';
+ var ban=document.getElementById('plan-banner');
+ ban.innerHTML='<b>'+(mode==='tent'?'Tentative change.':'Rescheduling.')+'</b> Start '+fmt(pd(base.st))+' to '+fmt(ns)+', complete '+fmt(pd(base.en))+' to '+fmt(ne)+'. Adjust any date below, then confirm, keep it tentative, or cancel.';
+ if(ov){var w=document.createElement('div');w.className='warnrow';w.innerHTML='<b>Overlap.</b> The new dates overlap '+other.name+' ('+fmt(pd(other.s))+' to '+fmt(pd(other.e))+'). Keep this tentative until you have spoken to that customer.';body.appendChild(w);}
+ var h=document.createElement('div');h.className='feed-h';h.textContent='Linked dates, in order';body.appendChild(h);
+ items.forEach(function(it){var o=pd(it[3]),n=it[1]==='st'?ns:it[1]==='mv'?new Date(o.getTime()+ds*DAY):it[1]==='en'?new Date(o.getTime()+de*DAY):new Date(o.getTime()+de*DAY);
+  var row=document.createElement('div');row.className='prow';row.innerHTML='<div class="pd">'+fmt(o)+'</div><div class="pt"><b>'+it[0]+'</b><small>was '+fmt(o)+'</small></div><div class="pa"></div><div class="ps"><input type="date" class="pdate" aria-label="New date for '+it[0]+'" value="'+iso(n)+'"></div>';body.appendChild(row);});
+ var note=document.createElement('div');note.className='prow done';note.innerHTML='<div class="pd">Done</div><div class="pt"><b>PO-0004 Screwfix delivered 27 Oct</b><small>Delivered items stay as they are</small></div><div class="pa"></div><div class="ps"></div>';body.appendChild(note);
+ var pb=document.createElement('div');pb.className='plan-b';
+ pb.appendChild(btn('Confirm schedule','pri',function(){snap(base);tent.hidden=true;done('Schedule confirmed. The project dates, deliveries and invoices now follow the new plan.');}));
+ pb.appendChild(btn('Keep as tentative','tent',function(){tent.hidden=false;done('Saved as tentative. The dates are flagged until you confirm them.');}));
+ pb.appendChild(btn('Cancel changes','',function(){revert();ban.innerHTML='<b>Plan.</b> No changes. Dates are back as they were.';body.innerHTML='';showTab('ov');}));
+ body.appendChild(pb);
+ function done(msg){ban.innerHTML='<b>Done.</b> '+msg;body.innerHTML='';bar.hidden=true;for(var k in F)F[k].classList.remove('dirty');}
+ bar.hidden=true;showTab('pl');}
+})();
+</script>
+<script>
+(function(){var r=document.getElementById('recdemo');if(!r)return;var tabs=r.querySelectorAll('[role=tab]');
+function show(t){tabs.forEach(function(x){var on=x.getAttribute('data-t')===t;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
+r.querySelectorAll('.pane').forEach(function(p){p.hidden=(p.id!=='p-'+t);});}
+r.querySelectorAll('.act').forEach(function(b){b.addEventListener('click',function(){var row=b.closest('.prow');row.classList.add('done');row.classList.remove('od');var ps=row.querySelector('.ps');ps.innerHTML='<span class="pill ok">Confirmed 29 Oct</span>';});});
+tabs.forEach(function(x){x.addEventListener('click',function(){show(x.getAttribute('data-t'));});
+x.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();show(x.getAttribute('data-t'));}});});})();
+</script>
+
+<footer><div class="wrap">Brookwood Rural Business Tracker · design and rebuild plan · draft for review</div></footer>
