@@ -2545,6 +2545,40 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .cap-leave { margin-top: 8px; } .cap-leave summary { cursor: pointer; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--slate); }
   .cap-lv { display: grid; grid-template-columns: 138px 138px minmax(0, 1fr) 34px; gap: 6px; margin: 6px 0; align-items: center; } .cap-lv input { min-width: 0; width: 100%; }
   @media (max-width: 700px) { .cap-main { grid-template-columns: minmax(0, 1fr) 34px; } .cap-main .cap-h { grid-column: 1 / -1; grid-row: 2; } .cap-lv { grid-template-columns: 1fr 1fr 34px; } .cap-lv input[type=text] { grid-column: 1 / 3; } .cap-lv .icon-btn { grid-row: 1; grid-column: 3; } }
+  .gt-card .gt-head { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; margin-bottom: 8px; } .gt-card h4 { margin: 0; } .gt-sub { font-size: var(--bt-fs-xs); color: var(--text-muted); }
+  .gt-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bt-card); -webkit-overflow-scrolling: touch; }
+  .gt { --lw: 124px; width: calc(var(--lw) + var(--gw)); position: relative; }
+  .gt-axis, .gt-row { display: flex; }
+  .gt-l { width: var(--lw); flex: 0 0 var(--lw); position: sticky; left: 0; z-index: 5; background: var(--bt-card); border-right: 1px solid var(--line); padding: 3px 8px; font-size: 12px; display: flex; flex-direction: column; justify-content: center; min-height: 30px; overflow: hidden; box-sizing: border-box; }
+  .gt-l span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; } .gt-l small { color: var(--text-muted); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gt-t { position: relative; width: var(--gw); flex: 0 0 var(--gw); height: 30px; }
+  .gt-axis { border-bottom: 1.5px solid var(--stone-deep); background: var(--bt-surface-2); } .gt-axis .gt-l { background: var(--bt-surface-2); } .gt-axis .gt-t { height: 38px; }
+  .gt-mo { position: absolute; top: 2px; height: 16px; line-height: 16px; font-size: 11px; font-weight: 600; padding-left: 4px; border-left: 1px solid var(--line); white-space: nowrap; }
+  .gt-wkt { position: absolute; top: 20px; height: 16px; line-height: 16px; font-size: 10px; color: var(--text-muted); padding-left: 3px; border-left: 1px solid var(--line); }
+  .gt-body { position: relative; }
+  .gt-over { position: absolute; top: 0; bottom: 0; left: var(--lw); width: var(--gw); pointer-events: none; z-index: 0; } .gt-bgl { position: absolute; inset: 0; }
+  .gt-off { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--bt-ink) 5%, transparent); }
+  .gt-off.hol { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--bt-warn-fg) 22%, transparent) 0 3px, color-mix(in srgb, var(--bt-warn-fg) 6%, transparent) 3px 6px); }
+  .gt-wl { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--bt-chalk); }
+  .gt-bo { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--bt-ink) 14%, transparent) 0 5px, color-mix(in srgb, var(--bt-ink) 5%, transparent) 5px 10px); }
+  .gt-today { position: absolute; top: 0; bottom: 0; border-left: 2px solid var(--bt-bad-fg); z-index: 3; } .gt-today-t { position: absolute; top: 0; transform: translateX(-50%); background: var(--bt-bad-fg); color: var(--bt-on-dark); font-size: 10px; font-weight: 600; padding: 0 5px; border-radius: var(--bt-r-btn); z-index: 3; }
+  .gt-row { border-bottom: 1px solid var(--line); position: relative; z-index: 1; } .gt-row:last-child { border-bottom: 0; }
+  .gt-bar { position: absolute; top: 6px; height: 18px; border-radius: 4px; background: var(--bt-oak-600); box-shadow: 0 1px 2px color-mix(in srgb, var(--bt-ink) 15%, transparent); min-width: 5px; display: block; }
+  .gt-bar.sell { background: var(--slate); } .gt-bar.gt-st { background: var(--muted); opacity: .75; } .gt-bar.done { background: var(--bt-ok-fg); } .gt-bar.done.ass { background: var(--bt-warn-fg); }
+  .gt-bar.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.5) 0 4px, transparent 4px 8px); outline: 1px dashed var(--bt-warn-fg); }
+  .gt-txt { position: absolute; top: 7px; font-size: 11px; white-space: nowrap; color: var(--ink); }
+  .gt-mk { font-weight: 600; } .gt-mk.ok { color: var(--bt-ok-fg); } .gt-mk.warn { color: var(--bt-warn-fg); }
+  .gt-ms { position: absolute; top: 9px; width: 11px; height: 11px; margin-left: -6px; transform: rotate(45deg); background: var(--bt-card); border: 2px solid var(--muted); box-sizing: border-box; display: block; }
+  .gt-ms.ms-done { background: var(--bt-ok-fg); border-color: var(--bt-ok-fg); } .gt-ms.ms-overdue { background: var(--bt-bad-fg); border-color: var(--bt-bad-fg); } .gt-ms.ms-soon { border-color: var(--bt-warn-fg); background: var(--bt-warn-bg); }
+  .gt-dl { position: absolute; top: 6px; width: 18px; height: 18px; margin-left: -9px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--bt-oak-500); border-radius: var(--bt-r-chip); background: var(--bt-card); color: var(--bt-oak-700); } .gt-dl svg { width: 12px; height: 12px; } .gt-dl.done { opacity: .5; }
+  .gt-caprow .gt-t, .gt-captrack { height: 112px; } .gt-caprow { background: var(--bt-surface-2); }
+  .gt-wk { position: absolute; top: 6px; bottom: 16px; } .gt-wk.over { background: color-mix(in srgb, var(--bt-bad-fg) 12%, transparent); }
+  .gt-stack { position: absolute; left: 2px; right: 2px; top: 0; bottom: 0; display: flex; flex-direction: column-reverse; } .gt-stack i { display: block; flex: none; } .gt-stack .oth { background: color-mix(in srgb, var(--muted) 55%, transparent); } .gt-stack .mine { background: var(--bt-oak-600); } .gt-stack .mine.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.5) 0 4px, transparent 4px 8px); }
+  .gt-wk.over .gt-stack .oth, .gt-wk.over .gt-stack .mine { filter: saturate(1.2); } .gt-wk.over .gt-wv { color: var(--bt-bad-fg); font-weight: 700; }
+  .gt-capl { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--bt-ink); opacity: .7; height: 0; } .gt-wv { position: absolute; left: 0; right: 0; bottom: -15px; text-align: center; font-size: 10px; color: var(--text-muted); white-space: nowrap; }
+  .gt-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 8px; } .gt-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .gt-legend .gt-bar { position: static; width: 18px; height: 10px; min-width: 0; } .gt-legend .gt-ms, .gt-legend .gt-dl { position: static; margin: 0; } .gt-legend .gt-off { position: static; display: inline-block; width: 14px; height: 10px; } .gt-capsw { display: inline-block; width: 16px; border-top: 2px dashed var(--bt-ink); }
+  #phSched .rp-s-f input[type=date] { width: 138px; }
   .ph-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .ph-tbl input { width: 100%; min-width: 0; } .ph-tbl td:nth-child(2) input, .ph-tbl td:nth-child(3) input { width: 72px; }
   .ph-card .ph-btns { margin-top: 10px; }
@@ -6900,7 +6934,7 @@ function pwTimelineHtml(p, i){
   const sw = (state.blackouts || []).length;
   const bar = ed ? pwEditBar(p, 'timeline', `<button type="button" class="btn secondary qb-sm" data-pw="edit-baseline" title="Put every stage back to its original (baseline) dates in the draft">Reset to original dates</button>`) : '';
   return `<section class="pw-sec" id="pw-timeline" data-sec="timeline"><h3>Timeline</h3>
-    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan</h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div>
+    <div class="pw-card pw-wide"><div class="qb-sec-h"><h4>Plan</h4><div class="qb-sec-tools">${pwEditBtn(p, 'timeline', 'Edit timeline')}</div></div>${bar}${rpPlanCtx.on && !ed ? '<div class="pw-note">The Gantt for this project is at the top of the Plan tab. Press Edit timeline to drag the stage lines here.</div>' : pwMiniGantt(p)}<div class="pw-note">${ed ? 'Hover a bar for its handles: drag an end to change the start or finish, drag the middle to move the whole stage. Nothing is saved until you press Save.' : 'One timeline: stage lines hold the dates and hours; deliveries, supplier payments and payments in come from the Working plan and the payment lines.'} ${sw ? '' : 'Blackout dates (no-work periods) are set in Settings &gt; Pipelines.'}</div>
       <div class="pw-note pw-foot">The faint bar behind each stage is its original date. Weekends are shaded; rest the cursor on the chart for a moment to see the date.</div></div>
     ${pwFold('t-stages', 'Stages', 'Stage lines: dates, planned and logged hours', '<button class="btn secondary" data-pw="add-stage">+ Add stage</button>', `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Stage</th><th>Kind</th><th>Planned start</th><th>Planned end</th><th>Actual start → end</th><th>Status</th><th>Planned</th><th title="Hours sold on the accepted quote for this stage">Sold</th><th>Planned h</th><th>Logged</th><th>Paid?</th><th></th></tr></thead>
       <tbody>${stageRows || '<tr><td colspan="12"><div class="sup-empty">No stage lines on this project yet. Add one, or promote a deal that has stage lines.</div></td></tr>'}</tbody></table></div>
@@ -17792,8 +17826,10 @@ function rpQualTile(p){
 function rpOverviewHtml(p){
   return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${varProjectCard(p)}${rpQualTile(p)}</div>`;
 }
+const rpPlanCtx = { on: false };   // true while the Plan tab builds the old timeline: the new Gantt above replaces its chart
 function rpPlanHtml(p){
-  return `${rpSchedPanel(p)}${phPlanCardHtml(p)}<div class="rp-plan" id="rpPlan">${pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p)))}</div>`;
+  rpPlanCtx.on = true; let tl; try{ tl = pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p))); } finally { rpPlanCtx.on = false; }
+  return `${rpSchedPanel(p)}${phSchedPanel(p)}${phGanttHtml(p)}${phPlanCardHtml(p)}<div class="rp-plan" id="rpPlan">${tl}</div>`;
 }
 function pwSecWrapFlat(html){ const m = html.match(/^<section class="pw-sec" id="pw-(\w+)" data-sec="(\w+)"><h3>([\s\S]*?)<\/h3>([\s\S]*)<\/section>\s*$/); return m ? `<section class="pw-sec open rp-flat" id="pw-${m[1]}" data-sec="${m[2]}"><div class="pw-sec-b">${m[4]}</div></section>` : html; }
 
@@ -17809,8 +17845,10 @@ function rpRenderProject(p){
   el.innerHTML = `<div class="rp" data-kind="project"><aside class="rp-left" aria-label="Profile">${rpLeftHtml(p)}</aside><main class="rp-centre">${rpCentreHtml(p)}</main><aside class="rp-right" aria-label="Linked records">${rpRightHtml(p)}</aside></div>`;
   Object.keys(prev).forEach(s => { const n = el.querySelector(s); if(n) n.scrollTop = prev[s]; });
   try{ pwStick(); }catch(e){}
-  rpFit();
+  rpFit(); try{ gtFocus(); }catch(e){}
 }
+/* the chart opens on today (or the first phase if that is earlier), not at the far left */
+function gtFocus(){ document.querySelectorAll('.gt[data-focus]').forEach(g => { const sc = g.parentNode; if(sc && !sc.dataset.set){ sc.scrollLeft = Math.max(0, Number(g.dataset.focus) / 100 * Number(g.dataset.w) - 40); sc.dataset.set = '1'; } }); }
 /* the three columns scroll on their own: the frame is as tall as the space under the brand bar and the Back bar */
 function rpFit(){ rpFitEl(document.querySelector('#projectWorkspace .rp')); }
 function rpFitEl(rp){
@@ -17833,7 +17871,7 @@ function rpSetField(p, k, raw){
     const set = (key, val) => { if(String(val) === String(o[key])) delete f[key]; else f[key] = String(val); };
     set('start', s || ''); set('complete', c || ''); set('dur', n ? String(n) : '');
   } else if(v === String(o[k] == null ? '' : o[k])) delete f[k]; else f[k] = v;
-  if(!Object.keys(f).length) rpUi.draft = null;
+  if(!Object.keys(f).length && !(rpUi.draft && rpUi.draft.ph)) rpUi.draft = null;
   if(rpUi.draft && rpUi.draft.sched && RP_DATE_KEYS.includes(k)){ rpSchedRefresh(p); rpSyncDraftUi(p); rpRenderProject(p); return; }   // the review follows the profile dates
   rpSyncDraftUi(p);
 }
@@ -18395,7 +18433,7 @@ function rpShiftDate(d, b){
 }
 /* every linked date, oldest first. A row: { id, kind, label, tag, fields:[{ k, old, new }], locked, note, ref } */
 function rpSchedRows(p, b){
-  const rows = [], sh = d => rpShiftDate(d, b), tagOf = { ms: 'Milestone', stage: 'Phase', drop: 'Delivery', pay: 'Supplier payment', line: 'Invoice' };
+  const rows = [], sh = d => rpShiftDate(d, b), tagOf = { ms: 'Milestone', stage: 'Stage', phase: 'Phase', drop: 'Delivery', pay: 'Supplier payment', line: 'Invoice' };
   const add = r => { r.tag = tagOf[r.kind]; r.fields.forEach(f => { if(f.new === undefined) f.new = r.locked ? f.old : sh(f.old); }); rows.push(r); };
   projEnsure(p);
   [['onSiteStart', 'On-site start', b.ns], ['buildComplete', 'Build complete', b.nc]].forEach(([k, n, nv]) => { const i = projMsInfo(p, k); if(i.actual) add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: i.actual.date }], locked: true, note: 'Confirmed ' + pwD(i.actual.date) + ', stays', ref: k }); else add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: i.planned || '', new: nv || '' }], ref: k, project: true }); });
@@ -18404,6 +18442,8 @@ function rpSchedRows(p, b){
     else if((p.milestones || {})[k]) add({ id: 'ms:' + k, kind: 'ms', label: n, fields: [{ k: 'date', old: p.milestones[k] }], ref: k }); });
   (p.stages || []).forEach(s => { slEnsure(s); if(!(s.start || s.end)) return; const done = !!(s.actEnd && s.actEnd.date);
     add({ id: 'st:' + s.id, kind: 'stage', label: s.label || 'Stage', fields: [{ k: 'start', old: s.start || '' }, { k: 'end', old: s.end || '' }], locked: done, note: done ? 'Finished, stays' : '', ref: s.id }); });
+  sfPhases(p).forEach(q => { if(!(sfIso(q.start) || sfIso(q.end))) return; const done = phIsDone(q);
+    add({ id: 'ph:' + q.id, kind: 'phase', label: q.name || 'Phase', fields: [{ k: 'start', old: sfIso(q.start) }, { k: 'end', old: sfIso(q.end) }], locked: done, note: done ? 'Done, stays' : '', ref: q.id }); });
   const aq = projAcceptedQuote(p);
   projDeliveries(p).drops.forEach(x => {
     const name = (x.method === 'collect' ? 'Collection: ' : 'Delivery: ') + x.supplier, po = poForDrop(p.id, x.d.id);
@@ -18434,7 +18474,7 @@ function rpBeginSchedule(p, mode, fromTentative){
 function rpSchedRefresh(p){ const d = rpDraft(p); if(!d || !d.sched || d.sched.tent) return; const o = rpDates(p); d.sched.base = { os: o.start, oc: o.complete, ns: rpVal(p, 'start'), nc: rpVal(p, 'complete') }; d.sched.rows = rpSchedRows(p, d.sched.base); }
 function rpSchedPanel(p){
   const d = rpDraft(p), t = p.tentative;
-  const banner = t && !(d && d.sched) ? `<div class="rp-tent"><b>Tentative since ${escHtml(dShow(t.since))}</b>${t.by ? ' (' + escHtml(t.by) + ')' : ''}. The project's start and complete dates are flagged tentative. Phases, deliveries and invoices still follow the previous dates (${escHtml(pwD(t.prev.start))} to ${escHtml(pwD(t.prev.complete))}) until you confirm.
+  const banner = t && !(d && d.sched) ? `<div class="rp-tent"><b>Tentative since ${escHtml(dShow(t.since))}</b>${t.by ? ' (' + escHtml(t.by) + ')' : ''}. ${t.prev && t.prev.phases && Object.keys(t.prev.phases).length ? 'Some phase dates are' : "The project's start and complete dates are"} flagged tentative. ${t.prev && t.prev.phases && Object.keys(t.prev.phases).length ? 'The previous phase dates are kept for going back. Deliveries and invoices have not moved' : 'Phases, deliveries and invoices still follow the previous dates'} (${escHtml(pwD(t.prev.start))} to ${escHtml(pwD(t.prev.complete))}) until you confirm.
     <div class="rp-tent-b"><button type="button" class="btn qb-sm" data-rp="tent-review">Review and confirm the schedule</button><button type="button" class="btn secondary qb-sm" data-rp="tent-revert">Go back to the previous dates</button></div></div>` : '';
   if(!d || !d.sched) return banner;
   const sc = d.sched, b = sc.base, ov = rpOverlaps(p, b.ns, b.nc), n = sc.rows.reduce((a, r) => a + (r.locked ? 0 : r.fields.filter(f => f.new !== f.old).length), 0);
@@ -18464,6 +18504,12 @@ function rpApplyRows(p, sc, why){
       if(ns === (s.start || '') && ne === (s.end || '')) return;
       (s.planLog = s.planLog || []).push({ id: qRand('pl_'), kind: 'planned', fromTxt: pwD(s.start) + ' → ' + pwD(s.end), toTxt: pwD(ns) + ' → ' + pwD(ne), at: now, by, reason: why });
       lines.push(`${r.label}: ${pwD(s.start)} → ${pwD(s.end)} to ${pwD(ns)} → ${pwD(ne)}`); s.start = ns; s.end = ne; return;
+    }
+    if(r.kind === 'phase'){
+      const q = sfPhases(p).find(x => x.id === r.ref); if(!q) return; let ns = r.fields.find(x => x.k === 'start').new || '', ne = r.fields.find(x => x.k === 'end').new || ''; if(ns && ne && ne < ns) ne = ns;
+      if(ns === sfIso(q.start) && ne === sfIso(q.end)) return; const t = (a, b) => (a ? pwD(a) : '—') + ' → ' + (b ? pwD(b) : '—');
+      (q.planLog = q.planLog || []).push({ id: qRand('pl_'), kind: 'planned', fromTxt: t(sfIso(q.start), sfIso(q.end)), toTxt: t(ns, ne), at: now, by, reason: why });
+      lines.push(`${r.label}: ${t(sfIso(q.start), sfIso(q.end))} to ${t(ns, ne)}`); q.start = ns; q.end = ne; return;
     }
     r.fields.forEach(f => {
       if(f.new === f.old || !f.new) return;
@@ -18498,6 +18544,7 @@ function rpKeepTentative(p){
 }
 function rpRevertTentative(p){
   const t = p.tentative; if(!t) return;
+  Object.keys(t.prev.phases || {}).forEach(id => { const q = sfPhases(p).find(x => x.id === id); if(q){ q.start = t.prev.phases[id].start || ''; q.end = t.prev.phases[id].end || ''; } });
   projSetPlanned(p, 'onSiteStart', t.prev.start || '', 'Tentative change reverted'); projSetPlanned(p, 'buildComplete', t.prev.complete || '', 'Tentative change reverted');
   chgLog(p, 'reschedule', { cause: '', reason: 'Tentative change reverted' }, [`Back to ${pwD(t.prev.start)} to ${pwD(t.prev.complete)}`]); p.tentative = null; rpUi.draft = null; saveState(); render(); showToast('Back to the previous dates');
 }
@@ -19234,8 +19281,8 @@ const phHasHours = r => sfPhases(r).some(p => phNum(p.hours) > 0);
 function phApply(p, f, v, el){
   if(f === 'phaseHours'){ const n = parseFloat(v); p.hours = (v === '' || isNaN(n)) ? '' : Math.max(0, Math.round(n * 4) / 4); }
   else if(f === 'phaseStart' || f === 'phaseEnd'){
-    const k = f === 'phaseStart' ? 'start' : 'end'; p[k] = isoOk(v);
-    if(k === 'start' && p.start && !p.end && phNum(p.days) > 0) p.end = wdEnd(p.start, phNum(p.days));   // the end follows from the days, in working days
+    const k = f === 'phaseStart' ? 'start' : 'end', ps = sfIso(p.start), pe = sfIso(p.end); p[k] = isoOk(v);
+    if(k === 'start' && p.start){ if(ps && pe) p.end = wdEnd(p.start, wdCount(ps, pe) || 1); else if(!p.end && phNum(p.days) > 0) p.end = wdEnd(p.start, phNum(p.days)); }   // moving the start keeps the length; with no end, the days give one (working days)
     if(p.start && p.end && p.end < p.start){ if(k === 'start') p.end = p.start; else p.start = p.end; }
   }
   else if(f === 'phaseSelling') p.selling = !!(el && el.checked);
@@ -19267,7 +19314,7 @@ function phPlanCardHtml(p){
     <label class="pt-f"><span>Days</span><input type="number" min="0" step="1" inputmode="numeric" ${base} data-field="phaseDays" data-pi="${pi}" value="${v(x.days)}" aria-label="Days"></label>
     <label class="pt-f"><span>Budget (h)</span><input type="number" min="0" step="0.25" inputmode="decimal" ${base} data-field="phaseHours" data-pi="${pi}" value="${v(x.hours)}" aria-label="Budgeted hours"></label>
     <button type="button" class="icon-btn" data-sf="phase-del" data-kind="project" data-id="${p.id}" data-pi="${pi}" title="Remove phase" aria-label="Remove phase">${X_SVG}</button>
-    <div class="ph-sub"><span class="ph-dt">${sfIso(x.start) || sfIso(x.end) ? escHtml((sfIso(x.start) ? pwD(x.start) : '—') + ' → ' + (sfIso(x.end) ? pwD(x.end) : '—')) : '<span class="qb-dim">No dates yet</span>'}</span>${x.selling ? '<span class="sf-chip">Selling time</span>' : ''}${phStatusHtml(x)}${phTickBtn('project', p, x)}</div></div>`).join('');
+    <div class="ph-sub">${phIsDone(x) ? `<span class="ph-dt">${sfIso(x.start) || sfIso(x.end) ? escHtml((sfIso(x.start) ? pwD(x.start) : '—') + ' → ' + (sfIso(x.end) ? pwD(x.end) : '—')) : ''}</span>` : `<input type="date" data-rpph="start" data-pid="${escAttr(x.id)}" value="${escAttr(phDraftOf(p, x).start)}" aria-label="Start"><input type="date" data-rpph="end" data-pid="${escAttr(x.id)}" value="${escAttr(phDraftOf(p, x).end)}" aria-label="End">`}${x.selling ? '<span class="sf-chip">Selling time</span>' : ''}${phStatusHtml(x)}${phTickBtn('project', p, x)}</div></div>`).join('');
   return `<section class="rp-card ph-card" id="phPlan"><h4>Phases</h4>
     ${ph.length ? `${rows}
       <div class="rp-hint">${phHasHours(p) ? `Budgeted time ${hrs(phHours(p))}: this is the Hours planned on the profile. ` : ''}Dates are changed through the review above, so nothing linked moves until you confirm.</div>${phSellLineHtml(p)}` : '<div class="pw-empty">No phases yet. Add them, or apply the template.</div>'}
@@ -19453,6 +19500,7 @@ function ensurePlanModel3(o){
   const str = v => v == null ? '' : String(v), ok = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '');
   let l = Array.isArray(o.people) ? o.people.filter(x => x && typeof x === 'object') : null;
   if(!l) l = PLAN_PEOPLE.map(([name, h]) => ({ id: 'pe_' + name.toLowerCase(), name, weeklyHours: h, leave: [] }));
+  { const st = o.settings = o.settings || {}, n = Number(st.leadWeightPct); st.leadWeightPct = (st.leadWeightPct === '' || st.leadWeightPct == null || isNaN(n) || n < 0 || n > 100) ? 20 : Math.round(n); }   // the share of a lead's hours counted on the capacity view
   o.people = l.map(x => { const w = Number(x.weeklyHours);
     return { id: str(x.id) || selId('pe_'), name: str(x.name).trim() || 'Person', weeklyHours: (x.weeklyHours === '' || x.weeklyHours == null || isNaN(w) || w < 0) ? '' : Math.min(168, w),
       leave: (Array.isArray(x.leave) ? x.leave : []).filter(v => v && typeof v === 'object' && ok(v.start)).map(v => ({ id: str(v.id) || selId('lv_'), start: v.start, end: ok(v.end) && v.end >= v.start ? v.end : v.start, note: str(v.note) })) }; });
@@ -19503,6 +19551,182 @@ document.addEventListener('change', (e) => {
     else if(d.cap === 'lend'){ if(isoOk(el.value)) v.end = el.value < v.start ? v.start : el.value; }
     else if(d.cap === 'lnote') v.note = el.value.trim(); else return; }
   saveState(); render();
+});
+
+
+/* =====================================================================
+   STEP 5 (and the engine STEP 6 uses): DEMAND AGAINST CAPACITY, AND THE GANTT ON EVERY PROJECT PAGE
+   Demand, in hours, is worked out from what the records already hold; nothing is stored.
+   Project:      the hours on its dated phases, spread over the working days between the phase's dates (a done phase counts the hours that were ticked, assumed or confirmed).
+                 No dated phase hours: the stage lines with dates and planned time; then the on-site start to build complete with the Working plan hours.
+   Sale / lead:  its dated phases the same way; otherwise its phase hours (or its estimated days times the hours in a working day) spread from the preferred
+                 start (or back from the deadline) over the estimated days. Multiplied by the probability: a sales stage's percentage, or the lead weighting in Settings.
+   Hours that cannot be placed (no dates, no start) are counted separately, never guessed.
+   ===================================================================== */
+const capLeadWeight = () => { const n = Number(state.settings.leadWeightPct); return state.settings.leadWeightPct === '' || state.settings.leadWeightPct == null || isNaN(n) || n < 0 || n > 100 ? 0.2 : n / 100; };
+function capSpread(start, end, hours){
+  if(!(hours > 0) || !sfIso(start)) return [];
+  end = sfIso(end) && end >= start ? end : start; if(daysBetween(start, end) > 800) end = addDaysIso(start, 800);
+  const days = []; let d = start, g = 0; while(d <= end && g < 900){ if(wdIsWork(d)) days.push(d); d = addDaysIso(d, 1); g++; }
+  if(!days.length) days.push(wdSnap(start, 1));   // a span that is all weekend or holiday goes on the next working day
+  return days.map(x => [x, hours / days.length]);
+}
+const capPhaseHours = p => phIsDone(p) ? phNum(p.done.hours) : phNum(p.hours);
+function capSpans(kind, r){
+  const spans = [], un = { hours: 0, what: '' }, ph = sfPhases(r), dated = p => sfIso(p.start) || sfIso(p.end);
+  ph.filter(p => capPhaseHours(p) > 0 && dated(p)).forEach(p => spans.push({ start: sfIso(p.start) || sfIso(p.end), end: sfIso(p.end) || sfIso(p.start), hours: capPhaseHours(p), label: p.name || 'Phase', phaseId: p.id, done: phIsDone(p), selling: !!p.selling }));
+  const loose = ph.filter(p => capPhaseHours(p) > 0 && !dated(p)), looseH = loose.reduce((a, p) => a + capPhaseHours(p), 0);
+  if(kind === 'project'){
+    if(!spans.length){
+      (r.stages || []).forEach(s => { const h = slPlannedHours(s); if(h > 0 && (s.start || s.end)) spans.push({ start: s.start || s.end, end: s.end || s.start, hours: h, label: s.label || 'Stage', stage: true }); });
+      if(!spans.length){ const d = rpDates(r), h = projHours(r).plan; if(d.start && d.complete && h > 0) spans.push({ start: d.start, end: d.complete, hours: h, label: 'Working plan' }); }
+    }
+    if(looseH > 0){ un.hours = looseH; un.what = 'phases with hours but no dates'; }
+  } else {
+    const days = sfDays(r), hrsNeed = looseH > 0 ? looseH : (spans.length ? 0 : days * hpd()), win = Math.max(1, days || Math.ceil(looseH / hpd()) || 1);
+    if(hrsNeed > 0){
+      const first = spans.length ? spans.map(x => x.start).sort()[0] : '', start = sfIso(r.prefStart) || (sfIso(r.deadline) ? wdBegin(r.deadline, win) : '') || first;
+      if(start) spans.push({ start, end: wdEnd(start, win), hours: hrsNeed, label: looseH > 0 ? 'Phases' : 'Estimated duration', estimate: true });
+      else { un.hours = hrsNeed; un.what = 'no preferred start or deadline'; }
+    }
+  }
+  return { spans, unplaced: un };
+}
+function capItem(kind, r){
+  const sp = capSpans(kind, r), w = kind === 'project' ? 1 : kind === 'sales' ? effectiveProb(r) : capLeadWeight(), days = {};
+  sp.spans.forEach(s => capSpread(s.start, s.end, s.hours).forEach(([d, h]) => { days[d] = (days[d] || 0) + h * (s.done ? 1 : w); }));
+  return { kind, r, id: r.id, name: boardTitle(kind, r), code: recordCode(r.id, kind), weight: w, tentative: kind === 'project' && !!r.tentative, days, spans: sp.spans, unplaced: sp.unplaced, total: Object.values(days).reduce((a, b) => a + b, 0) };
+}
+/* which records, by layer. A project counts while it is live; a sale or lead while it is open */
+function capItems(layers){
+  layers = layers || { projects: true, sales: true, leads: true }; const out = [];
+  if(layers.projects) liveProjects().forEach(p => out.push(capItem('project', p)));
+  if(layers.sales) state.pipeline.filter(r => !r.lost).forEach(r => out.push(capItem('sales', r)));
+  if(layers.leads) activeLeads().forEach(r => out.push(capItem('lead', r)));
+  return out;
+}
+/* weeks (Monday dates) from a to b: { mon, cap, total, parts: [{ item, hours }] } */
+function capWeekRows(items, a, b){
+  const rows = []; let m = capWeekStart(a), g = 0;
+  while(m <= b && g < 300){ const end = addDaysIso(m, 6), parts = [];
+    items.forEach(it => { let h = 0; for(let i = 0; i < 7; i++){ h += it.days[addDaysIso(m, i)] || 0; } if(h > 0.001) parts.push({ item: it, hours: h }); });
+    rows.push({ mon: m, end, cap: capWeek(m), total: parts.reduce((s, x) => s + x.hours, 0), parts }); m = addDaysIso(m, 7); g++; }
+  return rows;
+}
+const capH = n => (Math.round(n * 10) / 10) + ' h';
+
+/* ---------- the Gantt ---------- */
+const GT_MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function gtRange(p, ph, st, ev){
+  const ds = [fmt(new Date())]; ph.forEach(x => { if(sfIso(x.start)) ds.push(x.start); if(sfIso(x.end)) ds.push(x.end); }); st.forEach(s => { if(s.start) ds.push(s.start); if(s.end) ds.push(s.end); }); ev.forEach(e => { if(e.date) ds.push(e.date); });
+  ds.sort(); let lo = capWeekStart(ds[0]), hi = addDaysIso(capWeekStart(ds[ds.length - 1]), 6);
+  const min = 28; if(daysBetween(lo, hi) + 1 < min) hi = addDaysIso(lo, min - 1);
+  return { lo: addDaysIso(lo, -7), hi: addDaysIso(hi, 7) };
+}
+function phGanttHtml(p){
+  const ph = sfPhases(p), dated = x => sfIso(x.start) || sfIso(x.end), phd = ph.filter(dated), undated = ph.filter(x => !dated(x));
+  const st = (p.stages || []).filter(s => s.start || s.end), ev = projEvents(p).filter(e => e.kind === 'milestone' || e.kind === 'delivery'), tent = !!p.tentative;
+  if(!phd.length && !st.length && !ev.length) return `<section class="rp-card gt-card" id="phGantt"><h4>Gantt</h4><div class="pw-empty">Nothing is dated yet. Give the phases start and end dates below and they appear here, with the hours against capacity.</div></section>`;
+  const { lo, hi } = gtRange(p, phd, st, ev), span = daysBetween(lo, hi) + 1, dw = span <= 70 ? 16 : span <= 150 ? 11 : 7, W = span * dw, today = fmt(new Date());
+  const x = d => (daysBetween(lo, d) / span * 100), pct = (a, b) => Math.max(0.6, (daysBetween(a, b) + 1) / span * 100);
+  /* axis: months, then a tick per week */
+  let months = '', weeks = '', bg = '';
+  for(let d = lo, i = 0; d <= hi; d = addDaysIso(d, 1), i++){
+    const dt = toDate(d), dow = dt.getDay();
+    if(dt.getDate() === 1 || i === 0) months += `<span class="gt-mo" style="left:${i / span * 100}%">${GT_MON[dt.getMonth()]} ${String(dt.getFullYear()).slice(2)}</span>`;
+    if(dow === 1) weeks += `<span class="gt-wkt" style="left:${i / span * 100}%">${dt.getDate()}</span>`;
+    const off = !wdIsWork(d); if(off) bg += `<i class="gt-off${holidayName(d) ? ' hol' : ''}" style="left:${i / span * 100}%;width:${100 / span}%" title="${escAttr(holidayName(d) || 'Weekend')}"></i>`;
+    if(dow === 1) bg += `<i class="gt-wl" style="left:${i / span * 100}%"></i>`;
+  }
+  (state.blackouts || []).filter(b => b.end >= lo && b.start <= hi).forEach(b => { bg += `<i class="gt-bo" style="left:${Math.max(0, x(b.start))}%;width:${pct(b.start < lo ? lo : b.start, b.end > hi ? hi : b.end)}%" title="Blackout: ${escAttr(b.label || 'no work')}"></i>`; });
+  const todayX = today >= lo && today <= hi ? `<i class="gt-today" style="left:${x(today)}%" title="Today"></i><span class="gt-today-t" style="left:${x(today)}%">Today</span>` : '';
+  const row = (label, sub, inner, cls) => `<div class="gt-row${cls ? ' ' + cls : ''}"><div class="gt-l" title="${escAttr(label)}"><span>${escHtml(label)}</span>${sub ? `<small>${sub}</small>` : ''}</div><div class="gt-t">${inner}</div></div>`;
+  const bar = (a, b, cls, txt, tip, extra) => `<i class="gt-bar ${cls}" style="left:${x(a)}%;width:${pct(a, b)}%" title="${escAttr(tip)}"></i><span class="gt-txt" style="left:calc(${x(a) + pct(a, b)}% + 4px)">${txt}</span>${extra || ''}`;
+  const phRows = phd.map(q => {
+    const a = sfIso(q.start) || sfIso(q.end), b = sfIso(q.end) || sfIso(q.start), done = phIsDone(q), hh = done ? phNum(q.done.hours) : phNum(q.hours);
+    const mark = done ? `<span class="gt-mk ${q.done.mode === 'confirmed' ? 'ok' : 'warn'}">✓ ${escHtml(phFmtH(hh))} ${q.done.mode === 'confirmed' ? 'confirmed' : 'assumed'}</span>` : (hh > 0 ? `<span class="gt-mk">${escHtml(phFmtH(hh))} budget</span>` : '');
+    const tip = `${q.name || 'Phase'} · ${pwD(a)} → ${pwD(b)}${hh > 0 ? ' · ' + phFmtH(hh) + (done ? (q.done.mode === 'confirmed' ? ' confirmed' : ' assumed (budget not confirmed)') : ' budget') : ''}${tent ? ' · tentative' : ''}`;
+    return row(q.name || 'Phase', q.selling ? 'selling time' : '', bar(a, b, `gt-ph${q.selling ? ' sell' : ''}${done ? ' done' : ''}${done && q.done.mode !== 'confirmed' ? ' ass' : ''}${tent ? ' tent' : ''}`, mark, tip));
+  }).join('');
+  const stRows = st.map(s => { const a = s.start || s.end, b = s.end || s.start, h = slPlannedHours(s), lg = slLogged(s); return row(s.label || 'Stage', 'working plan', bar(a, b, 'gt-st', `<span class="gt-mk">${h ? escHtml(phFmtH(h)) + ' planned' : ''}${lg ? ' · ' + escHtml(phFmtH(lg)) + ' logged' : ''}</span>`, `${s.label || 'Stage'} · ${pwD(a)} → ${pwD(b)}`)); }).join('');
+  const ms = ev.filter(e => e.kind === 'milestone'), dl = ev.filter(e => e.kind === 'delivery');
+  const msRow = ms.length ? row('Milestones', '', ms.map(e => `<i class="gt-ms ms-${e.ms || 'future'}${e.planned ? ' planned' : ''}" style="left:${x(e.date)}%" title="${escAttr('Milestone: ' + e.title + ' · ' + pwD(e.date) + (e.done ? ' · done' : e.planned || e.isPlan ? ' · planned' : ''))}"></i>`).join('')) : '';
+  const dlRow = dl.length ? row('Deliveries', '', dl.map(e => `<i class="gt-dl${e.done ? ' done' : ''}" style="left:${x(e.date)}%" title="${escAttr(e.title + ' · ' + pwD(e.date) + (e.done ? ' · delivered' : ''))}">${DROP_SVG}</i>`).join('')) : '';
+  /* hours against capacity, week by week, on the same axis */
+  const me = capItem('project', p), others = capItems({ projects: true }).filter(it => it.id !== p.id), rows = capWeekRows([me].concat(others), lo, hi), scale = Math.max(8, ...rows.map(r => Math.max(r.cap, r.total))) * 1.12;
+  const cap = rows.map(r => { const mine = r.parts.filter(q => q.item === me).reduce((a, q) => a + q.hours, 0), oth = r.total - mine, over = r.cap > 0 ? r.total > r.cap + 0.05 : r.total > 0.05, ix = daysBetween(lo, r.mon);
+    return `<div class="gt-wk${over ? ' over' : ''}" style="left:${ix / span * 100}%;width:${7 / span * 100}%" title="${escAttr('Week of ' + pwD(r.mon) + ': ' + capH(r.total) + ' of ' + capH(r.cap) + ' capacity (this project ' + capH(mine) + ', other projects ' + capH(oth) + ')')}"><div class="gt-stack"><i class="oth" style="height:${oth / scale * 100}%"></i><i class="mine${tent ? ' tent' : ''}" style="height:${mine / scale * 100}%"></i></div><i class="gt-capl" style="bottom:${r.cap / scale * 100}%"></i><span class="gt-wv">${r.total > 0.05 || r.cap > 0 ? Math.round(r.total) + '/' + Math.round(r.cap) : ''}</span></div>`; }).join('');
+  const overWeeks = rows.filter(r => r.total > r.cap + 0.05 && r.parts.some(q => q.item === me));
+  const unp = me.unplaced.hours > 0 ? `<div class="rp-hint">${escHtml(phFmtH(me.unplaced.hours))} of phase hours have no dates yet, so they are not in the chart.</div>` : '';
+  return `<section class="rp-card gt-card" id="phGantt"><div class="gt-head"><h4>Gantt</h4><span class="gt-sub">Phases with their hours, milestones, deliveries and today${tent ? ' · <b>tentative</b>' : ''}</span></div>
+    <div class="gt-scroll"><div class="gt" style="--gw:${W}px" data-focus="${x(phd.length ? [today].concat(phd.map(q => sfIso(q.start) || sfIso(q.end))).sort()[0] : today)}" data-w="${W}">
+      <div class="gt-axis"><div class="gt-l"></div><div class="gt-t"><div class="gt-mos">${months}</div><div class="gt-wks">${weeks}</div></div></div>
+      <div class="gt-body"><div class="gt-over"><div class="gt-bgl">${bg}${todayX}</div></div>${phRows}${stRows}${msRow}${dlRow}
+        <div class="gt-row gt-caprow"><div class="gt-l"><span>Hours against capacity</span><small>this project and other projects, per week</small></div><div class="gt-t gt-captrack">${cap}</div></div></div>
+    </div></div>
+    <div class="gt-legend"><span><i class="gt-bar gt-ph"></i>Phase</span><span><i class="gt-bar gt-ph sell"></i>Selling time</span><span><i class="gt-bar gt-ph done"></i>Done, confirmed</span><span><i class="gt-bar gt-ph done ass"></i>Done, assumed</span><span><i class="gt-bar gt-ph tent"></i>Tentative</span><span><i class="gt-ms ms-future"></i>Milestone</span><span><i class="gt-dl">${DROP_SVG}</i>Delivery</span><span><i class="gt-off hol"></i>Weekend or holiday</span><span><i class="gt-capsw"></i>Capacity</span></div>
+    ${overWeeks.length ? `<div class="rp-warn" role="status"><b>Over capacity:</b> ${overWeeks.length === 1 ? 'one week' : overWeeks.length + ' weeks'} with this project in it ${overWeeks.length === 1 ? 'is' : 'are'} above the hours the team has (${overWeeks.slice(0, 4).map(r => escHtml(pwD(r.mon)) + ' ' + Math.round(r.total) + '/' + Math.round(r.cap) + ' h').join(', ')}${overWeeks.length > 4 ? '…' : ''}).</div>` : ''}
+    ${undated.length ? `<div class="rp-hint">No dates yet: ${undated.map(q => escHtml(q.name || 'Phase')).join(', ')}.</div>` : ''}${unp}
+    <div class="rp-hint">Dates are changed in the Phases list below and go through a review: nothing linked moves until you confirm.</div></section>`;
+}
+
+/* ---------- editing a phase date: the same flow as the project dates (Confirm, Tentative or Cancel) ----------
+   A date typed in the Phases list on the Plan tab waits in the draft (rpUi.draft.ph). Nothing is saved, and nothing linked moves, until Confirm schedule
+   (with a cause and a reason, logged on the project) or Keep as tentative (the new dates are saved and the project is flagged tentative, the previous ones kept). */
+function phDraftOf(p, q){ const d = rpDraft(p), c = d && d.ph && d.ph[q.id]; return c || { start: sfIso(q.start), end: sfIso(q.end) }; }
+function phDraftSet(p, pid, field, value){
+  const q = sfPhases(p).find(x => x.id === pid); if(!q || phIsDone(q)) return;
+  let d = rpDraft(p); if(!d) d = rpUi.draft = { pid: p.id, f: {}, sched: null };
+  d.ph = d.ph || {}; const cur = Object.assign({}, phDraftOf(p, q)); cur[field] = sfIso(value);
+  if(field === 'start' && cur.start){ const prev = phDraftOf(p, q); if(prev.start && prev.end) cur.end = wdEnd(cur.start, wdCount(prev.start, prev.end) || 1); else if(!cur.end && phNum(q.days) > 0) cur.end = wdEnd(cur.start, phNum(q.days)); }   // moving the start keeps the length; with no end, the days give one (working days)
+  if(cur.start && cur.end && cur.end < cur.start){ if(field === 'start') cur.end = cur.start; else cur.start = cur.end; }
+  if(cur.start === sfIso(q.start) && cur.end === sfIso(q.end)) delete d.ph[pid]; else d.ph[pid] = cur;
+  if(!Object.keys(d.ph).length){ delete d.ph; if(!Object.keys(d.f).length && !d.sched) rpUi.draft = null; }
+  rpUi.tab = 'plan'; rpRenderProject(p);
+}
+function phDraftLines(p){
+  const d = rpDraft(p); if(!d || !d.ph) return [];
+  return Object.keys(d.ph).map(id => { const q = sfPhases(p).find(x => x.id === id); if(!q) return null; const n = d.ph[id], t = (a, b) => (a ? pwD(a) : '—') + ' → ' + (b ? pwD(b) : '—');
+    return `${q.name || 'Phase'}: ${t(sfIso(q.start), sfIso(q.end))} to ${t(n.start, n.end)}`; }).filter(Boolean);
+}
+function phSchedPanel(p){
+  const d = rpDraft(p); if(!d || !d.ph || !Object.keys(d.ph).length) return '';
+  const rows = Object.keys(d.ph).map(id => { const q = sfPhases(p).find(x => x.id === id); if(!q) return ''; const n = d.ph[id], o = (a, b) => (a ? escHtml(pwD(a)) : '—') + ' → ' + (b ? escHtml(pwD(b)) : '—');
+    return `<div class="rp-s-row moved"><div class="rp-s-i"><span class="rp-s-tag">Phase</span>${escHtml(q.name || 'Phase')}</div><div class="rp-s-d"><div class="rp-s-f"><span class="rp-s-was">was ${o(sfIso(q.start), sfIso(q.end))}</span>
+      <input type="date" class="rp-chg" data-rpph="start" data-pid="${escAttr(id)}" value="${escAttr(n.start || '')}" aria-label="New start for ${escAttr(q.name || 'phase')}"><input type="date" class="rp-chg" data-rpph="end" data-pid="${escAttr(id)}" value="${escAttr(n.end || '')}" aria-label="New end for ${escAttr(q.name || 'phase')}"></div></div></div>`; }).join('');
+  const warn = typeof capWarnHtml === 'function' ? capWarnHtml(p) : '';
+  return `<section class="rp-sched" id="phSched" aria-label="Review the new phase dates"><div class="rp-sched-h"><h3>Review the new phase dates</h3><p>${Object.keys(d.ph).length} phase${Object.keys(d.ph).length === 1 ? '' : 's'} will move. Nothing is saved, and nothing linked changes, until you confirm.</p></div>${warn}
+    <div class="rp-s-list">${rows}</div><div class="rp-sched-f"><button type="button" class="btn" data-phs="confirm">Confirm schedule</button><button type="button" class="btn secondary" data-phs="tentative">Keep as tentative</button><button type="button" class="btn secondary" data-phs="cancel">Cancel changes</button></div></section>`;
+}
+function phApplyDraft(p, why){
+  const d = rpDraft(p), now = new Date().toISOString(), by = whoName(), lines = [];
+  Object.keys(d.ph).forEach(id => { const q = sfPhases(p).find(x => x.id === id); if(!q) return; const n = d.ph[id], t = (a, b) => (a ? pwD(a) : '—') + ' → ' + (b ? pwD(b) : '—');
+    (q.planLog = q.planLog || []).push({ id: qRand('pl_'), kind: 'planned', fromTxt: t(sfIso(q.start), sfIso(q.end)), toTxt: t(n.start, n.end), at: now, by, reason: why });
+    lines.push(`${q.name || 'Phase'}: ${t(sfIso(q.start), sfIso(q.end))} to ${t(n.start, n.end)}`); q.start = n.start || ''; q.end = n.end || ''; });
+  return lines;
+}
+async function phConfirmDates(p){
+  const d = rpDraft(p); if(!d || !d.ph) return; const lines = phDraftLines(p); if(!lines.length) return;
+  const r = await chgAsk('Confirm these phase dates?', lines, { causes: SCHEDULE_CAUSES, save: 'Confirm schedule' }); if(!r) return;
+  const why = (r.cause ? ((SCHEDULE_CAUSES.find(c => c[0] === r.cause) || [0, r.cause])[1]) + ': ' : '') + r.reason, out = phApplyDraft(p, why);
+  delete d.ph; if(!Object.keys(d.f).length && !d.sched) rpUi.draft = null;
+  chgLog(p, 'reschedule', r, out); saveState(); render(); showToast('Phase dates confirmed: ' + out.length + ' updated');
+}
+function phKeepTentative(p){
+  const d = rpDraft(p); if(!d || !d.ph) return; const old = {}; Object.keys(d.ph).forEach(id => { const q = sfPhases(p).find(x => x.id === id); if(q) old[id] = { start: sfIso(q.start), end: sfIso(q.end) }; });
+  const out = phApplyDraft(p, 'Tentative'), cur = rpDates(p), t = p.tentative;
+  p.tentative = { since: t ? t.since : fmt(new Date()), by: whoName(), prev: Object.assign({}, t ? t.prev : { start: cur.start, complete: cur.complete }) };
+  p.tentative.prev.phases = Object.assign({}, old, (t && t.prev && t.prev.phases) || {});   // the earliest dates win, so Go back returns to what was confirmed
+  delete d.ph; if(!Object.keys(d.f).length && !d.sched) rpUi.draft = null;
+  chgLog(p, 'reschedule', { cause: '', reason: 'Kept as tentative' }, out.map(l => l + ' (tentative)')); saveState(); render(); showToast('Kept as tentative. Linked dates have not moved.');
+}
+document.addEventListener('change', (e) => {
+  const el = e.target, d = el.dataset; if(!d || !d.rpph || !state) return; const p = rpFind(pwUi.id); if(p) phDraftSet(p, d.pid, d.rpph, el.value);
+});
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-phs]'); if(!b || !state) return; const p = rpFind(pwUi.id); if(!p) return;
+  if(b.dataset.phs === 'confirm') phConfirmDates(p); else if(b.dataset.phs === 'tentative') phKeepTentative(p);
+  else if(b.dataset.phs === 'cancel'){ const d = rpDraft(p); if(d){ delete d.ph; if(!Object.keys(d.f).length && !d.sched) rpUi.draft = null; } rpRenderProject(p); showToast('Phase date changes cancelled'); }
 });
 
 /* BT:js-planning end */
