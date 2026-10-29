@@ -1707,6 +1707,7 @@
   .inv-st { display: inline-block; padding: 2px 10px; border-radius: var(--bt-r-pill); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
   .inv-st-Unconfirmed { background: var(--bt-neu-bg); color: var(--bt-neu-fg); } .inv-st-Pending { background: var(--bt-info-bg); color: var(--bt-info-fg); } .inv-st-Sent { background: var(--bt-info-bg); color: var(--bt-info-fg); } .inv-st-Due { background: var(--bt-warn-bg); color: var(--bt-warn-fg); }
   .inv-st-Overdue { background: var(--bt-bad-bg); color: var(--bt-bad-fg); } .inv-st-Queried { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .inv-st-Partpaid { background: var(--bt-info-bg); color: var(--bt-info-fg); } .inv-st-Paid { background: var(--bt-ok-bg); color: var(--bt-ok-fg); } .inv-st-Warning { background: var(--bt-bad-fg); color: var(--bt-on-dark); }
+  .inv-st-Writtenoff, .inv-st-Lostproject { background: var(--bt-neu-bg); color: var(--bt-neu-fg); } .inv-st-Writtenoff { text-decoration: line-through; } .inv-st-Lostproject::before { content: '\2715\00a0'; } .inv-st-Writtenoff::before { content: '\2212\00a0'; }
   .inv-st-Issued { background: var(--bt-neu-bg); color: var(--bt-neu-fg); } .inv-st-Void { background: var(--bt-bad-bg); color: var(--bt-bad-fg); text-decoration: line-through; } .inv-st-Credited, .inv-st-Creditnote { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .inv-st-Issued::before { content: '○\00a0'; }
   .inv-sect td { background: var(--bt-chalk); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
   .inv-st-Unconfirmed::before { content: '○\00a0'; } .inv-st-Pending::before, .inv-st-Sent::before, .inv-st-Partpaid::before { content: '●\00a0'; } .inv-st-Due::before, .inv-st-Queried::before { content: '▲\00a0'; } .inv-st-Overdue::before, .inv-st-Warning::before { content: '!\00a0'; } .inv-st-Paid::before { content: '✓\00a0'; }
@@ -2683,6 +2684,11 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   body.is-approver [data-qba="new"], body.is-approver [data-qba="add-line"] { display: none !important; }
 
 /* BT:css-selling end */
+
+/* BT:css-finance begin */
+  .f6-lostp { border-top: 1px solid var(--line); padding: var(--bt-s3) 0; } .f6-lostp-h { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .f6-lostl { margin: 6px 0 8px 18px; padding: 0; font-size: var(--bt-fs-sm); }
+  .f6-dupg { border: 1px solid var(--line); border-radius: var(--bt-r-md, 8px); padding: var(--bt-s3); margin-bottom: var(--bt-s3); }
+/* BT:css-finance end */
 </style>
 </head>
 <body>
@@ -3033,6 +3039,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <div class="desc">Money in from committed project payment lines (real due dates) plus weighted pipeline (sales × probability), less materials and fixed overhead, giving a running closing balance. Terms are set in Settings.</div>
     </div>
     <div id="cashflowTotals"></div>
+    <div id="cashflowLost"></div>
     <div class="card"><div class="assumptions-grid two" id="cashflowAssumptionsGrid"></div></div>
     <div class="table-scroll" id="cashflowTableWrap"></div>
     <div id="cashflowLines"></div>
@@ -3335,7 +3342,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
       <h2>Business tasks</h2>
       <div class="desc">Work on the business rather than on a job. Business tasks (some repeat), the weekly Actions and the Setup &amp; Admin checklist are kept together here. Only the people named under Settings, CRM &amp; tasks can see this page.</div>
     </div>
-    <div class="biz-jump"><button type="button" class="sp-link" data-biz="go" data-to="bizTasksSec">Business tasks</button><button type="button" class="sp-link" data-biz="go" data-to="bizActionsSec">Actions</button><button type="button" class="sp-link" data-biz="go" data-to="bizAdminSec">Setup &amp; Admin checklist</button></div>
+    <div class="biz-jump"><button type="button" class="sp-link" data-biz="go" data-to="bizTasksSec">Business tasks</button><button type="button" class="sp-link" data-biz="go" data-to="bizActionsSec">Actions</button><button type="button" class="sp-link" data-biz="go" data-to="bizAdminSec">Setup &amp; Admin checklist</button><button type="button" class="sp-link" data-biz="go" data-to="bizDupSec">Duplicate automatic tasks</button></div>
     <section class="biz-sec" id="bizTasksSec">
       <div class="biz-h"><h3>Business tasks</h3><label class="crm-check"><input type="checkbox" id="bizShowDone"> Show completed</label><button type="button" class="btn" data-biz="new-task">+ New business task</button></div>
       <div id="bizTasksWrap"></div>
@@ -3349,6 +3356,10 @@ create policy "app update" on tracker_data for update using (true) with check (t
       </datalist>
       <div class="table-scroll" id="actionsTableWrap"></div>
       <div id="archivedWrap"></div>
+    </section>
+    <section class="biz-sec" id="bizDupSec">
+      <div class="biz-h"><h3>Duplicate automatic tasks <span class="tab-count" id="dupTasksCount" hidden>0</span></h3></div>
+      <div id="dupTasksBody"></div>
     </section>
     <section class="biz-sec" id="bizAdminSec">
       <div class="biz-h"><h3>Setup &amp; Admin checklist</h3></div>
@@ -9398,7 +9409,7 @@ function qCashSource(q){ if(q.status === 'Accepted'){ const p = state.projects.f
 /* the forecast shows only what is not yet settled: a supplier drop that has been paid leaves the forecast (it is an actual in the month it happened); one on a trade account shows on its due date */
 function qCashSettle(i){
   if(i.kind !== 'out' || !i.did) return i;
-  const p = state.projects.find(x => { const aq = projAcceptedQuote(x); return aq && aq.id === i.qid; }); const st = p && p.dropState && p.dropState[i.did]; if(!st) return i;
+  const p = state.projects.find(x => { const aq = projAcceptedQuote(x); return aq && aq.id === i.qid; }); if(p && finCancelledDrop(p, i.did)) return null; const st = p && p.dropState && p.dropState[i.did]; if(!st) return i;
   if(st.paid) return null;
   if(st.onAccount && st.tradeDue) return Object.assign({}, i, { date: st.tradeDue, estimated: false, label: i.label + ' (trade account)' });
   return i;
@@ -10659,18 +10670,18 @@ function finLines(){
   state.projects.forEach(p => {
     projEnsure(p); const aq = projAcceptedQuote(p), pid = p.id, pname = p.name, code = recordCode(p.id, 'project'), base = { pid, pname, code };
     projDeliveries(p).drops.forEach(x => {
-      if(!(x.out > 0)) return; const src = { t: 'project', id: pid, sec: 'materials' };
+      if(!(x.out > 0) || finCancelledDrop(p, x.d.id)) return; const src = { t: 'project', id: pid, sec: 'materials' };
       L.push(Object.assign({ kind: 'supOrder', date: x.date || projOrderDate(p) || '', amount: x.out, label: x.supplier + (x.date ? '' : ' (no drop date)'), src, did: x.d.id, done: !!x.delivered }, base));
       L.push(Object.assign({ kind: 'supPay', date: (x.onAccount && !x.paid && x.tradeDue) ? x.tradeDue : (x.due || ''), amount: x.out, label: x.supplier + (x.onAccount && !x.paid ? ' (trade account)' : (x.d.dueManual ? ' (date typed)' : '')), src, did: x.d.id, done: !!x.paid, paidDate: x.paid, key: 'sp:' + pid + ':' + x.d.id }, base));
     });
     if(aq){ const c = aq.asSold || qCalc(aq); L.push(Object.assign({ kind: 'custOrder', date: aq.acceptedDate || aq.date, amount: r2(qVatOn() ? c.totalInc : c.totalEx), label: 'Contract ' + qRef(aq), src: { t: 'quote', id: aq.id }, done: true }, base)); }
     else if(Number(p.agreedValue) > 0) L.push(Object.assign({ kind: 'custOrder', date: (p.milestones || {}).contractSigned || '', amount: r2(Number(p.agreedValue) * vatMul()), label: 'Agreed value', src: { t: 'project', id: pid, sec: 'money' }, done: true }, base));
     (p.variations || []).filter(v => v.status === 'Approved' || v.status === 'Invoiced').forEach(v => {
-      const amt = r2((Number(v.price) || 0) * vatMul());
+      const amt = r2((Number(v.price) || 0) * vatMul()), off = finOffForecast(p, v);
       L.push(Object.assign({ kind: 'custOrder', date: v.approval ? v.approval.at : v.created, amount: amt, label: 'Variation ' + v.ref + ' · ' + v.desc, src: { t: 'project', id: pid, sec: 'variations' }, done: true }, base));
-      L.push(Object.assign({ kind: 'custPay', date: v.dueDate || addDaysIso(v.approval ? v.approval.at : v.created, terms), amount: amt, label: 'Scope addition ' + v.ref + ' · ' + v.desc + (v.status === 'Invoiced' ? '' : ' (approved, not yet invoiced)'), src: { t: 'invoice', pid, vid: v.id }, done: !!v.paidDate, paidDate: v.paidDate, variation: true, key: 'vp:' + pid + ':' + v.id }, base));
+      if(!off) L.push(Object.assign({ kind: 'custPay', date: v.dueDate || addDaysIso(v.approval ? v.approval.at : v.created, terms), amount: amt, label: 'Scope addition ' + v.ref + ' · ' + v.desc + (v.status === 'Invoiced' ? '' : ' (approved, not yet invoiced)'), src: { t: 'invoice', pid, vid: v.id }, done: !!v.paidDate, paidDate: v.paidDate, variation: true, key: 'vp:' + pid + ':' + v.id }, base));
     });
-    p.paymentLines.forEach((l, idx) => { const date = l.dueDate || l.invoicedDate || l.paidDate || ''; L.push(Object.assign({ kind: 'custPay', date, amount: Number(l.amount) || 0, label: l.desc || 'Payment', src: { t: 'invoice', pid, idx }, done: !!l.paidDate, paidDate: l.paidDate, override: !!l.dueManual, key: 'cp:' + pid + ':' + idx }, base)); });
+    p.paymentLines.forEach((l, idx) => { if(finOffForecast(p, l)) return; const date = l.dueDate || l.invoicedDate || l.paidDate || ''; L.push(Object.assign({ kind: 'custPay', date, amount: Number(l.amount) || 0, label: l.desc || 'Payment', src: { t: 'invoice', pid, idx }, done: !!l.paidDate, paidDate: l.paidDate, override: !!l.dueManual, key: 'cp:' + pid + ':' + idx }, base)); });
   });
   return L;
 }
@@ -10729,9 +10740,10 @@ function computeCashFlow(months){
     actOf(key, t => Number(t.moneyOut) > 0).forEach(t => { const a = Number(t.moneyOut); actOut += a; add('actOut', (t.description || 'Money out') + (t.payMode === 'trade' ? ' (trade account settled)' : ''), a, txCashDate(t), { t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) }, (state.projects.find(p => p.id === t.projectId) || {}).name); });
     // forecast: only items not yet settled
     state.projects.forEach(p => {
-      (p.paymentLines || []).forEach((pl, idx) => { if(pl.paidDate) return; if(pl.dueDate && colKey(pl.dueDate) === key){ const a = Number(pl.amount) || 0; committedIn += a; add('committed', (pl.desc || 'Payment') + (pl.dueManual ? ' (date typed)' : '') + (pl.dueDate < today ? ' (overdue)' : ''), a, pl.dueDate, { t: 'invoice', pid: p.id, idx }, p.name); } });
-      (p.variations || []).filter(v => v.status === 'Approved' || v.status === 'Invoiced').forEach(v => { if(v.paidDate) return; const d = v.dueDate || addDaysIso(v.approval ? v.approval.at : v.created, Number(state.settings.paymentTermsDays) || 0); if(d && colKey(d) === key){ const a = r2((Number(v.price) || 0) * vatMul()); committedIn += a; add('committed', 'Scope addition ' + v.ref + ' · ' + v.desc, a, d, { t: 'invoice', pid: p.id, vid: v.id }, p.name); } });
-      (p.stages || []).filter(s => s.kind === 'materials' && s.start).forEach(s => {
+      (p.paymentLines || []).forEach((pl, idx) => { if(pl.paidDate || finOffForecast(p, pl)) return; if(pl.dueDate && colKey(pl.dueDate) === key){ const a = Number(pl.amount) || 0; committedIn += a; add('committed', (pl.desc || 'Payment') + (pl.dueManual ? ' (date typed)' : '') + (pl.dueDate < today ? ' (overdue)' : ''), a, pl.dueDate, { t: 'invoice', pid: p.id, idx }, p.name); } });
+      (p.variations || []).filter(v => v.status === 'Approved' || v.status === 'Invoiced').forEach(v => { if(v.paidDate || finOffForecast(p, v)) return; const d = v.dueDate || addDaysIso(v.approval ? v.approval.at : v.created, Number(state.settings.paymentTermsDays) || 0); if(d && colKey(d) === key){ const a = r2((Number(v.price) || 0) * vatMul()); committedIn += a; add('committed', 'Scope addition ' + v.ref + ' · ' + v.desc, a, d, { t: 'invoice', pid: p.id, vid: v.id }, p.name); } });
+      (p.stages || []).filter(s => s.kind === 'materials' && s.start && !(p.lost && !finLostOff)).forEach(s => {   // Stage 6: a lost project's planned stage costs are not forecast
+
         const due = addCalendarDays(toDate(s.start), tradeDays);
         if(colKey(fmt(due)) === key){ materialsOut += Number(s.cost) || 0; add('materials', (s.label || 'Materials stage') + ' (stage cost)', Number(s.cost) || 0, fmt(due), { t: 'project', id: p.id, sec: 'timeline' }, p.name); }
       });
@@ -10903,11 +10915,13 @@ document.addEventListener('click', (e) => { const b = e.target.closest && e.targ
    Extra optional fields default empty: line.confirmed, line.queried, line.queryNote, line.paidAmount; variation.paidAmount. */
 const invUi = { view: 'all', status: 'all', flash: '' };
 navExtra('inv', () => ({ v: invUi.view, s: invUi.status }), o => { if(o){ invUi.view = o.v; invUi.status = o.s; } });
-const INV_STATUS = ['Unconfirmed', 'Pending', 'Sent', 'Due', 'Overdue', 'Queried', 'Part paid', 'Paid', 'Warning'];
+const INV_STATUS = ['Unconfirmed', 'Pending', 'Sent', 'Due', 'Overdue', 'Queried', 'Part paid', 'Paid', 'Warning', 'Written off', 'Lost project'];
 const INV_LIVE = ['Sent', 'Due', 'Overdue', 'Queried', 'Part paid', 'Warning'];
 function invTarget(r){ const p = state.projects.find(x => x.id === r.pid); return p ? (r.vid ? (p.variations || []).find(v => v.id === r.vid) : p.paymentLines[r.idx]) : null; }
 function invStatus(r){
   const today = fmt(new Date()), warn = invWarnDays();
+  if(r.wo && !r.paidDate) return 'Written off';   // Stage 6: a dated write-off removes the line from money owed
+  if(r.lost && !r.invoicedDate && !r.paidDate) return 'Lost project';   // Stage 6: planned, not raised, on a lost project: not in the forecast
   if(r.paidDate && (!(r.paidAmount > 0) || r.paidAmount >= r.amount - 0.005)) return 'Paid';
   if(r.invoicedDate){
     if(r.queried) return 'Queried';
@@ -10926,22 +10940,22 @@ function invRows(){
   state.projects.forEach(p => {
     projEnsure(p); const code = recordCode(p.id, 'project'), n = p.paymentLines.length;
     p.paymentLines.forEach((l, idx) => {
-      const r = { pid: p.id, pname: p.name, code, kind: 'contract', idx, uid: l.uid || '', seq: idx + 1, of: n, desc: l.desc || 'Payment', amount: Number(l.amount) || 0, dueDate: l.dueDate || '', invoicedDate: l.invoicedDate || '', paidDate: l.paidDate || '', paidAmount: Number(l.paidAmount) || 0, queried: !!l.queried, queryNote: l.queryNote || '', confirmed: !!l.confirmed };
+      const r = { pid: p.id, pname: p.name, code, kind: 'contract', idx, uid: l.uid || '', seq: idx + 1, of: n, desc: l.desc || 'Payment', amount: Number(l.amount) || 0, dueDate: l.dueDate || '', invoicedDate: l.invoicedDate || '', paidDate: l.paidDate || '', paidAmount: Number(l.paidAmount) || 0, queried: !!l.queried, queryNote: l.queryNote || '', confirmed: !!l.confirmed, lost: !!p.lost, wo: l.writtenOff || null };
       r.raiseBy = r.dueDate ? addDaysIso(r.dueDate, -terms) : ''; r.status = invStatus(r); rows.push(r);
     });
     (p.variations || []).forEach(v => {
       const amt = r2((Number(v.price) || 0) * vatMul());
-      const r = { pid: p.id, pname: p.name, code, kind: 'variation', vid: v.id, vstatus: v.status, seq: 0, of: 0, desc: v.ref + ' · ' + (v.desc || 'Scope addition'), amount: amt, dueDate: v.dueDate || '', invoicedDate: v.invoicedDate || '', paidDate: v.paidDate || '', paidAmount: Number(v.paidAmount) || 0, queried: !!v.queried, queryNote: v.queryNote || '', confirmed: v.status === 'Approved' };
+      const r = { pid: p.id, pname: p.name, code, kind: 'variation', vid: v.id, vstatus: v.status, seq: 0, of: 0, desc: v.ref + ' · ' + (v.desc || 'Scope addition'), amount: amt, dueDate: v.dueDate || '', invoicedDate: v.invoicedDate || '', paidDate: v.paidDate || '', paidAmount: Number(v.paidAmount) || 0, queried: !!v.queried, queryNote: v.queryNote || '', confirmed: v.status === 'Approved', lost: !!p.lost, wo: v.writtenOff || null };
       r.raiseBy = ''; r.blocked = v.status !== 'Approved' && v.status !== 'Invoiced'; r.status = invStatus(r); rows.push(r);
     });
   });
   return rows;
 }
-const INV_RAG = { Paid: 'g', Sent: 'a', Due: 'a', 'Part paid': 'a', Overdue: 'r', Warning: 'r', Queried: 'r', Pending: 'b', Unconfirmed: 'n' };
+const INV_RAG = { Paid: 'g', Sent: 'a', Due: 'a', 'Part paid': 'a', Overdue: 'r', Warning: 'r', Queried: 'r', Pending: 'b', Unconfirmed: 'n', 'Written off': 'n', 'Lost project': 'n' };
 function invPill(s){ return `<span class="inv-st inv-st-${s.replace(/\s+/g, '')}">${s}</span>`; }
 function invRowHtml(r, i){
   const p = state.projects.find(x => x.id === r.pid), key = r.vid ? 'v' + r.vid : String(r.idx), at = `data-inv-pid="${r.pid}" data-inv-k="${escAttr(key)}"`, today = fmt(new Date());
-  const od = r.dueDate && !r.paidDate ? daysBetween(r.dueDate, today) : 0;
+  const od = r.dueDate && !r.paidDate && !r.wo ? daysBetween(r.dueDate, today) : 0;
   const acts = []; const st = r.status;
   if(r.blocked) acts.push(`<button type="button" class="btn secondary qb-sm" disabled title="A variation cannot be invoiced until it is Approved">Blocked: awaiting approval</button>${finSrcLink({ t: 'project', id: r.pid, sec: 'variations' }, 'Approve →')}`);
   else {
@@ -10950,6 +10964,8 @@ function invRowHtml(r, i){
     if(!r.invoicedDate && !r.blocked) acts.push(`<button type="button" class="btn qb-sm" data-inv-a="sent" ${at}>Mark sent</button>`);
     if(r.invoicedDate && st !== 'Paid') acts.push(`<button type="button" class="btn qb-sm" data-inv-a="paid" ${at}>Mark paid</button>`);
     if(r.invoicedDate && st !== 'Paid') acts.push(`<button type="button" class="btn secondary qb-sm" data-inv-a="query" ${at}>${r.queried ? 'Clear query' : 'Mark queried'}</button>`);
+    if(r.lost && r.invoicedDate && st !== 'Paid' && st !== 'Written off') acts.push(`<button type="button" class="btn secondary qb-sm" data-f6="wo" data-pid="${r.pid}" data-k="${escAttr(key)}">Write off…</button>`);
+    if(r.wo && st === 'Written off') acts.push(`<button type="button" class="btn secondary qb-sm" data-f6="wo-undo" data-pid="${r.pid}" data-k="${escAttr(key)}">Reverse write-off…</button>`);
   }
   const inp = (f, val, type) => `<input type="${type || 'date'}" ${at} data-inv="${f}" value="${escAttr(val === 0 && type === 'number' ? 0 : (val || ''))}"${type === 'number' ? ' step="any" min="0" class="qb-n"' : ''}${r.blocked || ((f === 'amount' || f === 'dueDate') && ivRowDoc(r)) ? ' disabled title="Locked: this line has an invoice. Void the invoice to change it."' : ''}>`;
   const flash = invUi.flash === r.pid + ':' + key;
@@ -10957,7 +10973,7 @@ function invRowHtml(r, i){
     <td>${r.kind === 'variation' ? '<span class="qb-flag manual">scope addition</span> ' : ''}${escHtml(r.desc)}${r.kind === 'contract' ? `<div class="qb-dim">${r.seq} of ${r.of}</div>` : ''}${r.queried && r.queryNote ? `<div class="qb-warn">Query: ${escHtml(r.queryNote)}</div>` : ''}</td>
     <td class="qb-calc">${r.raiseBy ? pwD(r.raiseBy) : '—'}</td><td>${r.kind === 'contract' ? inp('dueDate', r.dueDate) : inp('dueDate', r.dueDate)}</td>
     <td>${r.kind === 'contract' ? inp('amount', r.amount, 'number') : `<b>${qm(r.amount)}</b>`}</td>
-    <td>${invPill(r.status)}${od > 0 ? `<div class="qb-dim">${od} day${od === 1 ? '' : 's'} late</div>` : ''}${r.status === 'Part paid' ? `<div class="qb-dim">${qm(r.paidAmount)} of ${qm(r.amount)}</div>` : ''}</td>
+    <td>${invPill(r.status)}${r.status === 'Lost project' ? '<div class="qb-dim">Lost project: not in the forecast</div>' : ''}${r.status === 'Written off' ? `<div class="qb-dim">${escHtml(dShow(r.wo.date))}: ${escHtml(r.wo.reason)}</div>` : ''}${r.lost && r.invoicedDate && r.status !== 'Paid' && r.status !== 'Written off' ? '<div class="qb-dim">Lost project: still owed until written off</div>' : ''}${od > 0 ? `<div class="qb-dim">${od} day${od === 1 ? '' : 's'} late</div>` : ''}${r.status === 'Part paid' ? `<div class="qb-dim">${qm(r.paidAmount)} of ${qm(r.amount)}</div>` : ''}</td>
     <td>${inp('invoicedDate', r.invoicedDate)}</td><td>${inp('paidDate', r.paidDate)}</td><td class="inv-acts">${acts.join(' ')}</td></tr>`;
 }
 const INV_HEAD = '<thead><tr><th>Project</th><th>Invoice</th><th>Raise by</th><th>Due</th><th>Amount</th><th>Status</th><th>Sent</th><th>Paid</th><th></th></tr></thead>';
@@ -10972,7 +10988,7 @@ function renderInvoicing(){
   const el = document.getElementById('invoicingBody'); if(!el) return;
   const all = invRows(), views = [['all', 'All invoices'], ['project', 'By project'], ['live', 'Live'], ['pending', 'Pending'], ['docs', 'Invoice documents']];
   const f = r => invUi.status === 'all' || r.status === invUi.status;
-  const unraised = all.filter(r => !r.invoicedDate), outstanding = all.filter(r => r.invoicedDate && r.status !== 'Paid').reduce((a, r) => a + r.amount - (r.paidAmount || 0), 0), overdue = all.filter(r => r.status === 'Overdue' || r.status === 'Warning');
+  const unraised = all.filter(r => !r.invoicedDate), outstanding = all.filter(r => r.invoicedDate && r.status !== 'Paid' && r.status !== 'Written off').reduce((a, r) => a + r.amount - (r.paidAmount || 0), 0), overdue = all.filter(r => r.status === 'Overdue' || r.status === 'Warning');
   const kpi = (l, v, s, c) => `<div class="kpi" style="--accent:${c}"><div class="label">${l}</div><div class="value">${v}</div><div class="fin-sub">${s}</div></div>`;
   let body;
   if(invUi.view === 'project'){
@@ -13385,7 +13401,7 @@ function todayProjectRow(x, over){
 function todayInvoiceData(today){
   const main = [], over = [];
   invRows().forEach(r => {
-    if(r.invoicedDate || r.paidDate || r.blocked) return;
+    if(r.invoicedDate || r.paidDate || r.blocked || r.lost) return;   // Stage 6: a lost project's planned lines are not raised
     let d = r.raiseBy || r.dueDate;
     if(!d && r.kind === 'variation'){ const v = invTarget(r); d = v ? String((v.approval && v.approval.at) || v.created || '').slice(0, 10) : ''; }
     if(!/^\d{4}-\d{2}-\d{2}$/.test(d || '') || d > today) return;
@@ -14306,7 +14322,7 @@ function pjHeadlineHtml(r){
     const p = rec; let f = {};
     try{
       const ct = projContract(p), pr = projProgress(p), inv = r.ctx.inv, invoiced = inv.filter(x => x.invoicedDate).reduce((a, x) => a + x.amount, 0),
-        paid = inv.reduce((a, x) => a + (x.status === 'Paid' ? x.amount : (x.paidAmount || 0)), 0), outstanding = inv.filter(x => x.invoicedDate && x.status !== 'Paid').reduce((a, x) => a + x.amount - (x.paidAmount || 0), 0);
+        paid = inv.reduce((a, x) => a + (x.status === 'Paid' ? x.amount : (x.paidAmount || 0)), 0), outstanding = inv.filter(x => x.invoicedDate && x.status !== 'Paid' && x.status !== 'Written off').reduce((a, x) => a + x.amount - (x.paidAmount || 0), 0);
       const aq = projAcceptedQuote(p); let matBudget = null;
       if(aq){ try{ matBudget = p.plan && p.plan.quoteId === aq.id ? projPlanItems(p).tot.matPlan : qCalc(aq).materialsCost; }catch(e){} }
       const matSpent = projActualCost(p).materials;
@@ -14474,7 +14490,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
-  try{ renderClassify(); renderBusinessCosts(); }catch(e){ console.error(e); }
+  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
@@ -16204,7 +16220,7 @@ function cxStats(sc){
   let won = 0; const rootsWithProject = new Set();
   sc.deals.forEach(d => { if(d.pl === 'project'){ rootsWithProject.add(d.root); won += projContract(d.rec).value + projVariationsValue(d.rec); } });
   cxLatestPerJob(sc.quotes.filter(q => q.status === 'Accepted' && !(q.linkedIds || []).some(c => rootsWithProject.has(linkedRoot(c))))).forEach(q => { won += qCalc(q).totalEx; });
-  const issued = sc.rows.filter(r => r.invoicedDate), invoiced = issued.reduce((a, r) => a + r.amount, 0), outstanding = issued.filter(r => r.status !== 'Paid').reduce((a, r) => a + r.amount - (r.paidAmount || 0), 0);
+  const issued = sc.rows.filter(r => r.invoicedDate), invoiced = issued.reduce((a, r) => a + r.amount, 0), outstanding = issued.filter(r => r.status !== 'Paid' && r.status !== 'Written off').reduce((a, r) => a + r.amount - (r.paidAmount || 0), 0);
   let last = ''; sc.deals.forEach(d => { const l = leadLastContact(d.rec); if(l > last) last = l; });
   return { quoted: r2(quoted), won: r2(won), invoiced: r2(invoiced), outstanding: r2(outstanding), last };
 }
@@ -17907,7 +17923,7 @@ function rpSuppliersTile(p){
   return `<div class="rp-card"><h4>Suppliers</h4>${L.length ? L.map(row).join('') : '<div class="pw-empty">No supplier drops on the quote yet.</div>'}</div>`;
 }
 function rpInvoicesTile(p){
-  const rows = invRows().filter(r => r.pid === p.id), next = rows.find(r => !r.paidDate && r.status !== 'Paid');
+  const rows = invRows().filter(r => r.pid === p.id), next = rows.find(r => !r.paidDate && r.status !== 'Paid' && r.status !== 'Written off' && r.status !== 'Lost project');
   const row = r => `<div class="rp-row${r === next ? ' rp-next' : ''}"><span>${escHtml(r.desc)}</span><span class="rp-dim">${qm(r.amount)} · ${invPill(r.status)}${r.dueDate ? ' · ' + escHtml(pwD(r.dueDate)) : ''}</span></div>`;
   return `<div class="rp-card"><h4>Invoices</h4>${rows.length ? rows.map(row).join('') : '<div class="pw-empty">No invoice schedule yet.</div>'}</div>`;
 }
@@ -20343,8 +20359,9 @@ function mnInBtn(p, i){
   const r = i.r, at = `data-inv-pid="${p.id}" data-inv-k="${escAttr(i.key)}"`;
   if(r.blocked) return '<span class="qb-dim">awaiting approval</span>';
   if(r.paidDate && (!(r.paidAmount > 0) || r.paidAmount >= r.amount - 0.005)) return `<span class="pw-ok">✓ Received ${escHtml(pwD(r.paidDate))}</span>`;
-  if(!r.invoicedDate) return `<button type="button" class="btn qb-sm" data-inv-a="sent" ${at}>Raise invoice</button>`;
-  return `<button type="button" class="btn qb-sm" data-inv-a="paid" ${at}>Mark received</button>`;
+  if(r.wo) return `<span class="qb-dim">Written off ${escHtml(dShow(r.wo.date))}</span>`;   // Stage 6
+  if(!r.invoicedDate) return r.lost ? '<span class="qb-flag bad" title="The project is closed as lost: this planned line is not in the forecast">Lost project: not in the forecast</span> <button type="button" class="btn secondary qb-sm" data-inv-a="sent" ' + at + '>Raise invoice</button>' : `<button type="button" class="btn qb-sm" data-inv-a="sent" ${at}>Raise invoice</button>`;
+  return `<button type="button" class="btn qb-sm" data-inv-a="paid" ${at}>Mark received</button>` + (r.lost ? ` <button type="button" class="btn secondary qb-sm" data-f6="wo" data-pid="${p.id}" data-k="${escAttr(i.key)}">Write off…</button>` : '');
 }
 function rpMoneyHtml(p){
   const d = mnData(p), today = fmt(new Date()), mg = mnMargin(p), sg = v => Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v)), cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
@@ -20362,6 +20379,118 @@ function rpMoneyHtml(p){
 }
 
 /* BT:js-money end */
+
+/* BT:js-finance begin */
+/* =====================================================================
+   STAGE 6: FINANCE PAGES AND REPORTS
+   Nothing on these pages holds a number of its own: every figure is read from the records and every figure opens the record or list behind it.
+   New optional stored fields, all empty by default: payment line / variation .writtenOff { date, reason, by, amount }; .landedTxn (uid of an existing transaction a line was matched to);
+   state.reviewMarks { <item key>: { status: 'late' | 'moved' | 'landed', at, by, note, to } }. No existing record is converted, renamed or removed.
+   ===================================================================== */
+/* ---- step 0: lost projects ----
+   A project closed as lost (p.lost): its planned lines that were never invoiced leave the forecast and the money lists; a raised invoice that is not paid stays as money owed until
+   it is written off (a dated record with a reason); an unpaid supplier payment stays unless its order is cancelled; paid lines stay as actuals. Nothing is written off automatically. */
+let finLostOff = false;   // only ever true for a moment, to work out what the forecast would show without the rule
+function finOffForecast(p, l){
+  if(l && l.writtenOff && !l.paidDate) return true;
+  return !!(p && p.lost && !finLostOff && l && !l.invoicedDate && !l.paidDate);
+}
+function finCancelledDrop(p, did){ return !!(p && p.lost && !finLostOff && (state.purchaseOrders || []).some(o => o.pid === p.id && o.did === did && o.status === 'Cancelled')); }
+function finLostEffect(){
+  const months = getMonthRange(), curKey = fmt(new Date()).slice(0, 7), pick = cf => cf.filter(c => c.key >= curKey && !c.preStart);
+  const on = pick(computeCashFlow(months)); let off; finLostOff = true; try{ off = pick(computeCashFlow(months)); }finally{ finLostOff = false; }
+  const low = a => a.length ? a.reduce((m, c) => c.closing < m.v ? { v: c.closing, label: c.label } : m, { v: Infinity, label: '' }) : { v: 0, label: '' };
+  return { withRule: { low: low(on), end: on.length ? on[on.length - 1].closing : 0 }, without: { low: low(off), end: off.length ? off[off.length - 1].closing : 0 } };
+}
+function finLostData(){
+  const all = invRows();
+  return state.projects.filter(p => p.lost).map(p => {
+    const rows = all.filter(r => r.pid === p.id), owedOf = r => r2(r.amount - (r.paidAmount || 0));
+    const removed = rows.filter(r => !r.invoicedDate && !r.paidDate && !r.blocked && !r.wo), stays = rows.filter(r => r.invoicedDate && !r.paidDate && !r.wo), written = rows.filter(r => r.wo), paid = rows.filter(r => r.paidDate);
+    const sup = finLines().filter(x => x.pid === p.id && x.kind === 'supPay' && !x.done), cancelled = (state.purchaseOrders || []).filter(o => o.pid === p.id && o.status === 'Cancelled');
+    return { p, rows, removed, stays, written, paid, sup, cancelled, owedOf, removedTotal: r2(removed.reduce((a, r) => a + r.amount, 0)), staysTotal: r2(stays.reduce((a, r) => a + owedOf(r), 0)), writtenTotal: r2(written.reduce((a, r) => a + (Number(r.wo.amount) || 0), 0)), supTotal: r2(sup.reduce((a, x) => a + x.amount, 0)) };
+  });
+}
+function finLostHtml(){
+  const d = finLostData(); if(!d.length) return '';
+  const ef = finLostEffect(), sg = v => (v < 0 ? '-' : '') + qm(Math.abs(v)), dif = ef.withRule.end - ef.without.end;
+  const line = r => { const key = r.vid ? 'v' + r.vid : String(r.idx);
+    return `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${escAttr(key)}">${escHtml(r.desc)}</button></td><td>${r.dueDate ? pwD(r.dueDate) : '—'}${r.dueDate && r.dueDate < fmt(new Date()) ? ' <span class="qb-flag bad">' + daysBetween(r.dueDate, fmt(new Date())) + ' days late</span>' : ''}</td><td class="qb-calc">${qm(r.amount - (r.paidAmount || 0))}</td>
+      <td><button type="button" class="btn secondary qb-sm" data-f6="wo" data-pid="${r.pid}" data-k="${escAttr(key)}">Write off…</button></td></tr>`; };
+  const wline = r => { const key = r.vid ? 'v' + r.vid : String(r.idx);
+    return `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${escAttr(key)}">${escHtml(r.desc)}</button></td><td colspan="2" class="qb-dim">written off ${escHtml(dShow(r.wo.date))}: ${escHtml(r.wo.reason)} (${escHtml(r.wo.by || '')})</td><td class="qb-calc">${qm(r.wo.amount)}</td>
+      <td><button type="button" class="btn secondary qb-sm" data-f6="wo-undo" data-pid="${r.pid}" data-k="${escAttr(key)}">Reverse…</button></td></tr>`; };
+  return `<div class="card f6-lost"><div class="qb-sec-h"><h4>Lost projects and the forecast <span class="db-count">${d.length}</span></h4></div>
+    <p class="q-help">A project closed as lost leaves the forecast: planned lines that were never invoiced are not counted. Invoices already raised and not paid stay as money owed until you write them off here. Unpaid supplier payments stay until their order is cancelled. Paid lines stay as actuals. Nothing is written off for you.</p>
+    <div class="kpi-row"><div class="kpi" style="--accent:var(--oak)"><div class="label">Forecast end balance</div><div class="value">${sg(ef.withRule.end)}</div><div class="fin-sub">${dif === 0 ? 'no difference from the rule' : (dif < 0 ? sg(Math.abs(dif)) + ' lower' : sg(dif) + ' higher') + ' than if the lost lines still counted (' + sg(ef.without.end) + ')'}</div></div>
+      <div class="kpi" style="--accent:var(--plum)"><div class="label">Lowest point</div><div class="value">${sg(ef.withRule.low.v)}</div><div class="fin-sub">${escHtml(ef.withRule.low.label)}${ef.without.low.v !== ef.withRule.low.v ? ' · would be ' + sg(ef.without.low.v) + ' without the rule' : ''}</div></div></div>
+    ${d.map(x => `<div class="f6-lostp"><div class="f6-lostp-h"><button type="button" class="sp-link" data-nav="project:${x.p.id}:money"><b>${escHtml(recordCode(x.p.id, 'project'))}</b> ${escHtml(x.p.name)}</button> <span class="qb-flag bad">Lost project</span> <span class="qb-dim">${x.p.lostDate ? 'closed ' + escHtml(dShow(x.p.lostDate)) : ''}${x.p.lostReason ? ' · ' + escHtml(lostReasonName(x.p.lostReason)) : ''}</span></div>
+      <ul class="f6-lostl"><li><b>${qm(x.removedTotal)}</b> planned and not invoiced: ${x.removed.length} line${x.removed.length === 1 ? '' : 's'} not in the forecast</li><li><b>${qm(x.staysTotal)}</b> raised and still owed: stays as money owed until written off</li><li><b>${qm(x.writtenTotal)}</b> written off</li><li><b>${qm(x.supTotal)}</b> supplier payments still to pay${x.cancelled.length ? ' (' + x.cancelled.length + ' cancelled order' + (x.cancelled.length === 1 ? '' : 's') + ' not counted)' : ': cancel the order to remove one'}</li></ul>
+      ${x.stays.length || x.written.length ? `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Invoice</th><th>Due</th><th>Amount</th><th></th></tr></thead><tbody>${x.stays.map(line).join('')}${x.written.map(wline).join('')}</tbody></table></div>` : ''}</div>`).join('')}</div>`;
+}
+function renderLostEffect(){ const el = document.getElementById('cashflowLost'); if(el && state) el.innerHTML = finLostHtml(); }
+function finLineTarget(pid, k){ const p = state.projects.find(x => x.id === Number(pid)); if(!p) return null; const tgt = String(k).startsWith('v') ? (p.variations || []).find(v => v.id === String(k).slice(1)) : p.paymentLines[Number(k)]; return tgt ? { p, tgt, row: invRows().find(r => r.pid === p.id && (String(k).startsWith('v') ? r.vid === String(k).slice(1) : String(r.idx) === String(k))) } : null; }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-f6="wo"], [data-f6="wo-undo"]'); if(!b || !state) return;
+  const x = finLineTarget(b.dataset.pid, b.dataset.k); if(!x || !x.row) return; const { p, tgt, row } = x;
+  if(b.dataset.f6 === 'wo'){
+    const owed = r2(row.amount - (row.paidAmount || 0)); if(!(owed > 0)){ showToast('Nothing is owed on this line.'); return; }
+    const ok = await showConfirm('Write off ' + qm(owed) + '?', `${recordCode(p.id, 'project')} ${p.name}: ${row.desc}. This removes the line from money owed and from the forecast, dated today. The invoice itself and the retained profit recognised on it are not changed. A reason is needed.`, '<textarea id="woReason" placeholder="Why is this being written off?" rows="3"></textarea>');
+    if(!ok) return; const reason = String(_confirmExtraNote || '').trim();
+    if(reason.length < 3){ showToast('A reason is needed to write off. Nothing was changed.', null, 7000); return; }
+    tgt.writtenOff = { date: fmt(new Date()), reason, by: whoName(), amount: owed };
+    selLog(p, 'Wrote off ' + qm(owed) + ' (' + row.desc + '): ' + reason);
+    saveState(); render(); showToast('Written off: ' + qm(owed));
+  } else {
+    if(!tgt.writtenOff) return; const ok = await showConfirm('Reverse this write-off?', `${row.desc} goes back to money owed.`); if(!ok) return;
+    selLog(p, 'Reversed the write-off of ' + qm(tgt.writtenOff.amount) + ' (' + row.desc + ')'); delete tgt.writtenOff; saveState(); render(); showToast('Write-off reversed');
+  }
+});
+/* ---- step 0: duplicate automatic tasks ----
+   Stage 5 fixed automatic tasks losing their autoKey on load, so a second copy may have been made. Two or more OPEN tasks with the same autoKey and target, or with the same
+   title and record where one looks automatic, are listed. Nothing is deleted until you tick and confirm; a deleted task goes to Undo history. */
+function dupSig(t){ return [Number(t.quoteId) || 0, (t.refs || []).map(r => r.kind + ':' + r.id).sort().join(','), (t.linkedIds || []).slice().sort().join(',')].join('|'); }
+function dupAutoTitle(t){
+  const fu = String((state.settings || {}).followUpTaskName || 'Follow up quote').split('{')[0].trim().toLowerCase(), ti = String(t.title || '').toLowerCase();
+  return !!t.autoKey || (fu && ti.startsWith(fu)) || ti.startsWith('confirm prices:') || ti.startsWith('classify transactions') || ti.startsWith('chase ');
+}
+function dupTaskGroups(){
+  const open = state.crmTasks.filter(t => t.status === 'open'), par = {}, find = id => par[id] === id ? id : (par[id] = find(par[id])), uni = (x, y) => { par[find(x)] = find(y); };
+  open.forEach(t => { par[t.id] = t.id; });
+  const byA = {}, byB = {};
+  open.forEach(t => { if(t.autoKey) (byA[t.autoKey + '|' + dupSig(t)] = byA[t.autoKey + '|' + dupSig(t)] || []).push(t); const kb = String(t.title || '').trim().toLowerCase() + '|' + dupSig(t); (byB[kb] = byB[kb] || []).push(t); });
+  Object.values(byA).forEach(g => g.forEach(t => uni(g[0].id, t.id)));
+  Object.values(byB).forEach(g => { if(g.length > 1 && g.some(dupAutoTitle)) g.forEach(t => uni(g[0].id, t.id)); });
+  const comp = {}; open.forEach(t => (comp[find(t.id)] = comp[find(t.id)] || []).push(t));
+  return Object.values(comp).filter(g => g.length > 1).map(g => {
+    const keys = new Set(g.map(t => t.autoKey || '')), why = keys.size === 1 && g[0].autoKey ? 'Same automatic key and target (' + g[0].autoKey + ')' : 'Same title and record, made automatically' + (g.some(t => t.autoKey) ? ' (' + g.filter(t => t.autoKey).map(t => t.autoKey)[0] + ')' : ' (the automatic key was lost before the Stage 5 fix)');
+    const ord = g.slice().sort((a, b) => (b.notes.length - a.notes.length) || ((b.autoKey ? 1 : 0) - (a.autoKey ? 1 : 0)) || taskNum(a) - taskNum(b));
+    return { why, keep: ord[0], extra: ord.slice(1), tasks: g.slice().sort((a, b) => taskNum(a) - taskNum(b)) };
+  });
+}
+const dupUi = { sel: null };
+function renderDupTasks(){
+  const el = document.getElementById('dupTasksBody'); if(!el || !state) return;
+  const g = dupTaskGroups(), ids = new Set(g.flatMap(x => x.tasks.map(t => t.id)));
+  if(!dupUi.sel){ dupUi.sel = new Set(); dupUi.seen = new Set(); }
+  g.forEach(x => x.extra.forEach(t => { if(!dupUi.seen.has(t.id)){ dupUi.seen.add(t.id); if(!t.notes.length) dupUi.sel.add(t.id); } }));   // the extra copies are ticked the first time they show; a task with notes never is
+  dupUi.sel.forEach(id => { if(!ids.has(id)) dupUi.sel.delete(id); });
+  const nSel = dupUi.sel.size;
+  el.innerHTML = !g.length ? '<div class="sup-empty">No duplicate automatic tasks. Two open tasks made by the same automatic rule for the same record would be listed here.</div>'
+    : `<p class="q-help">Each group below has the same task more than once. The task marked Keep is the one with notes, then the one with an automatic key, then the oldest. Tick the ones to delete. Nothing is deleted until you press the button and confirm; a deleted task goes to Undo history.</p>
+      ${g.map(x => `<div class="f6-dupg"><div class="qb-dim">${escHtml(x.why)}</div><table class="qb-table qb-narrow"><thead><tr><th></th><th>Task</th><th>Title</th><th>Due</th><th>Linked</th><th>Notes</th></tr></thead><tbody>${x.tasks.map(t => `<tr><td>${t === x.keep ? '<span class="qb-flag ok">Keep</span>' : `<input type="checkbox" data-f6="dup" data-id="${escAttr(t.id)}" aria-label="Delete ${escAttr(t.id)}"${dupUi.sel.has(t.id) ? ' checked' : ''}>`}</td><td><button type="button" class="sp-link" data-crm="open" data-id="${escAttr(t.id)}">${escHtml(t.id)}</button></td><td>${escHtml(t.title)}${t.autoKey ? ' <span class="qb-dim">(' + escHtml(t.autoKey) + ')</span>' : ''}</td><td>${t.dueDate ? pwD(t.dueDate) : '—'}</td><td>${taskRefsSummary(t) || escHtml((t.linkedIds || []).join(', ')) || '—'}</td><td>${t.notes.length ? t.notes.length + ' note' + (t.notes.length === 1 ? '' : 's') : '—'}</td></tr>`).join('')}</tbody></table></div>`).join('')}
+      <div class="btn-row"><button type="button" class="btn" data-f6="dup-del"${nSel ? '' : ' disabled'}>Delete the ${nSel} ticked task${nSel === 1 ? '' : 's'}…</button></div>`;
+  const c = document.getElementById('dupTasksCount'); if(c){ c.textContent = g.reduce((a, x) => a + x.extra.length, 0); c.hidden = !g.length; }
+}
+document.addEventListener('change', (e) => { const el = e.target; if(el && el.dataset && el.dataset.f6 === 'dup' && dupUi.sel){ if(el.checked) dupUi.sel.add(el.dataset.id); else dupUi.sel.delete(el.dataset.id); renderDupTasks(); } });
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-f6="dup-del"]'); if(!b || !state || !dupUi.sel || !dupUi.sel.size) return;
+  const list = state.crmTasks.filter(t => dupUi.sel.has(t.id) && t.status === 'open'); if(!list.length) return;
+  const ok = await showConfirm('Delete ' + list.length + ' duplicate task' + (list.length === 1 ? '' : 's') + '?', list.map(t => t.id + ' ' + t.title).join('; ') + '. The one marked Keep in each group stays. They go to Undo history for 24 hours.'); if(!ok) return;
+  list.forEach(t => { const ix = state.crmTasks.indexOf(t); if(ix >= 0){ state.crmTasks.splice(ix, 1); undoDeleted('Task deleted: ' + t.id, ['crmTasks'], ix, t, null, true); } });
+  dupUi.sel = new Set(); saveState(); render(); showToast(list.length + ' duplicate task' + (list.length === 1 ? '' : 's') + ' deleted (see Undo history)');
+});
+/* BT:js-finance end */
 
 /* ---------- init ---------- */
 (async () => {
