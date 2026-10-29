@@ -1738,6 +1738,7 @@
   /* ---------------- Purchase orders ---------------- */
   .po-st { display: inline-block; padding: 2px 10px; border-radius: var(--bt-r-pill); font-size: 11.5px; font-weight: 700; } .po-st-Draft { background: var(--bt-neu-bg); color: var(--bt-neu-fg); } .po-st-Approved { background: var(--bt-info-bg); color: var(--bt-info-fg); } .po-st-Sent { background: var(--bt-info-bg); color: var(--bt-info-fg); } .po-st-Delivered { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .po-st-Matched { background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
   .po-needs td { background: var(--bt-bad-bg); } .po-needs td:first-child { box-shadow: inset 4px 0 0 var(--bt-bad-fg); } .po-flag { display: inline-block; background: var(--bt-bad-fg); color: var(--bt-on-dark); border-radius: var(--bt-r-pill); padding: 2px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 700px) { #pcTable, #pcTable tbody, #pcTable tr, #pcTable td { display: block; } #pcTable thead { display: none; } #pcTable tr { border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: 8px 10px; margin-bottom: 8px; } #pcTable td { border: 0; padding: 4px 0; text-align: left; } #pcTable td[data-label] { display: flex; justify-content: space-between; align-items: center; gap: 8px; } #pcTable td[data-label]::before { content: attr(data-label); font-size: 12px; color: var(--text-muted); font-weight: 600; } #pcTable td:first-child { font-weight: 700; } #pcTable select, #pcTable input[data-pcf="note"] { width: 100%; margin-top: 4px; } #pcTable .qb-n { width: 110px; } }
   .dc-line { border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3); margin-bottom: var(--bt-s2); background: var(--bt-card); } .dc-top { display: flex; justify-content: space-between; gap: 8px; margin-bottom: var(--bt-s2); flex-wrap: wrap; }
   .dc-seg { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: var(--bt-s2); } .dc-b { flex: 1 1 22%; min-height: 44px; border: 1px solid var(--bt-border-strong); background: var(--bt-card); border-radius: var(--bt-r-btn); font: inherit; font-weight: 600; cursor: pointer; padding: 6px 8px; }
   .dc-b.on.dc-b-received { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); } .dc-b.on.dc-b-short, .dc-b.on.dc-b-substituted { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); } .dc-b.on.dc-b-damaged { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
@@ -6510,6 +6511,7 @@ function spItemsFor(p, did){
   const base = poSnapshot(p, did); if(!base) return null; const po = poForDrop(p.id, did), ordered = po && po.status !== 'Draft' ? po.items : null, used = new Set();
   const items = base.items.map(i => { const o = ordered ? ordered.find((x, ix) => !used.has(ix) && x.lineId === i.lineId && (i.lineId !== '' || x.desc === i.desc)) : null; if(o) used.add(ordered.indexOf(o)); return { lineId: i.lineId, desc: i.desc, unit: i.unit, vatRate: i.vatRate, qq: Number(i.qty) || 0, qp: Number(i.price) || 0, fq: o ? Number(o.qty) || 0 : Number(i.qty) || 0, fp: o ? Number(o.price) || 0 : Number(i.price) || 0, reason: '' }; });
   if(ordered) ordered.forEach((o, ix) => { if(!used.has(ix)) items.push({ lineId: o.lineId, desc: o.desc, unit: o.unit, vatRate: o.vatRate, qq: 0, qp: 0, fq: Number(o.qty) || 0, fp: Number(o.price) || 0, reason: '' }); });
+  if(po && po.pc && Array.isArray(po.pc.lines)) items.forEach(i => { const c = po.pc.lines.find(x => String(x.k) === String(i.lineId) && (i.lineId !== '' || x.desc === i.desc)); if(c){ i.fq = Number(c.fq) || 0; i.fp = Number(c.fp) || 0; if(i.fq !== i.qq || i.fp !== i.qp) i.reason = pcReasonText(c); } });   // prices already confirmed from the receipt: the payment starts from them (nothing typed twice)
   return { items, snap: base, po };
 }
 function spOpen(pid, did){
@@ -6517,11 +6519,11 @@ function spOpen(pid, did){
   const x = projDeliveries(p).drops.find(d => d.d.id === did); if(!x){ showToast('That delivery is not on the project any more'); return; }
   const ex = spTx(p, did); if(ex){ spShowExisting(p, did, ex); return; }   // one payment per drop: show it instead of making another
   const r = spItemsFor(p, did); if(!r || !r.items.length){ showToast('There is nothing on this drop to pay for'); return; }
-  spUi.pid = pid; spUi.did = did; spUi.items = r.items; spUi.po = r.po; finUi.mode = 'sp'; finUi.file = null;
+  spUi.pid = pid; spUi.did = did; spUi.items = r.items; spUi.po = r.po; finUi.mode = 'sp'; finUi.file = r.po ? pcFileOf(r.po) : null;
   const today = fmt(new Date()), qt = spTotals(r.items, ['qq', 'qp']), sups = state.suppliers.filter(s => s.status !== 'Inactive' || String(s.id) === String(x.d.supplierId));
   const rows = r.items.map((it, i) => `<tr data-spr="${i}"><td>${escHtml(it.desc)}${it.qq === 0 && it.qp === 0 ? ' <span class="qb-flag manual">not in the plan</span>' : ''}</td><td class="qb-calc">${it.qq} ${escHtml(it.unit || '')}</td><td class="qb-calc">${qm(it.qp)}</td>
     <td><input type="number" step="any" min="0" class="qb-n" data-spf="fq" data-i="${i}" value="${it.fq}" aria-label="Final quantity"></td><td><input type="number" step="any" min="0" class="qb-n" data-spf="fp" data-i="${i}" value="${it.fp}" aria-label="Final price each, ex VAT"></td>
-    <td class="qb-calc" data-spd="${i}"></td><td><input data-spf="reason" data-i="${i}" maxlength="160" placeholder="Why it differs" aria-label="Reason" hidden></td></tr>`).join('');
+    <td class="qb-calc" data-spd="${i}"></td><td><input data-spf="reason" data-i="${i}" maxlength="160" placeholder="Why it differs" aria-label="Reason" value="${escAttr(it.reason || '')}" hidden></td></tr>`).join('');
   finOpen('Confirm supplier payment', `<p class="q-help" style="margin:0 0 8px;">${escHtml(p.name)} · ${escHtml(x.supplier)}${x.date ? ' · drop ' + pwD(x.date) : ''} · quoted <b>${qm(qt.payable)}</b>${r.po ? ' · ' + escHtml(r.po.ref) : ''}</p>
     <div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Date</label><input type="date" id="spDate" value="${today}"></div>
       <div class="lp-f"><label>Supplier actually used</label><select id="spSup">${sups.map(s => `<option value="${s.id}"${String(s.id) === String(x.d.supplierId) ? ' selected' : ''}>${escHtml(s.name)}</option>`).join('')}${x.d.supplierId ? '' : `<option value="" selected>${escHtml(x.supplier)}</option>`}</select></div></div>
@@ -6532,7 +6534,7 @@ function spOpen(pid, did){
     <div id="spSum" class="fin-var"></div>
     <label class="q-check" style="margin-top:6px;"><input type="checkbox" id="spPlan"> Also update the Working plan with these final prices and quantities</label><p class="q-help" style="margin:2px 0 0;">Left unticked, the plan and the quote keep the quoted cost as the budget and the final figures are stored as actuals.</p>
     <div class="chg-err" id="finErr"></div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn" type="button" data-fin="save">Confirm payment</button></div>`, true);
-  spDueDefault(); spRefresh();
+  spDueDefault(); spRefresh(); if(finUi.file){ const nm = document.getElementById('finFileName'); if(nm) nm.textContent = '✓ ' + finUi.file.name + ' (from the receipt on the order)'; }
 }
 function spDueDefault(){
   const d = document.getElementById('spDue'), date = document.getElementById('spDate'); if(!d || !date) return; const sup = supFind(Number(document.getElementById('spSup').value)), days = (sup && sup.paymentTerms !== '' ? Number(sup.paymentTerms) : 0) || Number(state.settings.tradeAccountDays) || 30;
@@ -11330,7 +11332,7 @@ function poHeroHtml(po){
     <div class="rp-strip">${cell('Planned delivery', pl ? escHtml(pwD(pl)) : '—', moved ? 'the plan now says ' + escHtml(pwD(drop.date)) : (pl ? escHtml(pwRel(pl)) : 'no date'))}${cell('Actual delivery', ac ? escHtml(pwD(ac)) : '—', ac ? (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' late</b>' : 'on time') : (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' overdue</b>' : 'not yet'), late ? 'bad' : '')}${cell('Ordered', ds.ordered || po.sentAt ? escHtml(pwD(ds.ordered || po.sentAt)) : '—', ds.ordered || po.sentAt ? '' : 'not yet')}${cell('Status', escHtml(po.status), p && dcPtcMark(p, po.did) ? dcPtcMark(p, po.did) : '')}${cell('Value', qm(poTotals(po).payable), qVatOn() ? 'inc VAT' : '')}</div></div>`;
 }
 function poExtraHtml(po){
-  return `<div class="po-extra">${dcRecordHtml(po)}${rpRefTasksHtml('po', po.id)}</div>`;
+  return `<div class="po-extra">${dcRecordHtml(po)}${pcRecordHtml(po)}${rpRefTasksHtml('po', po.id)}</div>`;
 }
 /* the "New order" dialog: orders for the suppliers already on the quote, or a second order for a supplier */
 const po2Ui = { pid: 0, sup: '', date: '', lines: new Set(), err: '' };
@@ -11447,7 +11449,7 @@ function dcQuick(pid, did){
   const p = state.projects.find(x => x.id === pid); if(!p) return; const lines = dcLinesFor(p, did).map(l => Object.assign(l, { s: 'received', got: l.qty }));
   const undo = dcCommit(p, did, lines, fmt(new Date())); showToast('Delivery signed off: all received', undo); dcAfter(pid, did, false);
 }
-function dcAfter(pid, did, flagged){ /* the "check prices now or later" question is added with the price check */ }
+function dcAfter(pid, did, flagged){ setTimeout(() => pcAsk(pid, did, flagged), 350); }   // after a delivery: check final prices now or later?
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-dc]'); if(!b || finUi.mode !== 'dc') return; const a = b.dataset.dc;
   if(a === 's'){ dcRead(); const l = dcUi.lines[Number(b.dataset.i)]; if(l){ l.s = b.dataset.v; if(l.s !== 'short') l.got = l.qty; dcDraw(); } }
@@ -11469,6 +11471,123 @@ function dcRecordHtml(po){
     ${exc ? '' : '<div class="rp-hint">Everything came as ordered.</div>'}</div>`;
 }
 
+/* ---------- Stage 2: confirm prices and the invoice or receipt check ----------
+   After a delivery: check the final prices now, or later (later makes a "Confirm prices" task on Today and on the order until done). The order keeps what the supplier actually charged:
+   po.pc = { at, by, date, receiptId, quoted, final, variance, lines[{ k, desc, unit, qq, qp, fq, fp, cause, note }] }, po.receipts[{ id, at, by, date, ref, total, file }].
+   The quote and the order's own prices are never changed: the variance sits beside them. A confirmed supplier payment starts from these figures and the same file. */
+const VAR_CAUSES = [['price', 'Price rise / fall'], ['qty', 'Quantity change'], ['sub', 'Substitution'], ['delivery', 'Delivery charge'], ['error', 'Error'], ['other', 'Other']];
+const varCauseName = k => (VAR_CAUSES.find(x => x[0] === k) || ['', k || '—'])[1];
+function varThresholdPct(){ const v = Number(state.settings.varianceThresholdPct); return v > 0 ? v : 0; }   // percent, default 0: every variance is flagged and given a reason
+function pcReasonText(c){ return varCauseName(c.cause) + (c.note ? ': ' + c.note : ''); }
+function poPricesConfirmed(po){ return !!po.pc || po.status === 'Matched'; }
+function poNeedsPrices(po){ return !!poActualDelivery(po) && !poPricesConfirmed(po) && po.status !== 'Cancelled'; }
+function pcFileOf(po){ const r = (po.receipts || []).slice().reverse().find(x => x.file && x.file.data); return r ? r.file : null; }
+function pcTaskFor(po){ return state.crmTasks.find(t => t.status === 'open' && t.autoKey === 'pc:' + po.id) || null; }
+function pcTaskEnsure(po){
+  if(pcTaskFor(po)) return null; const p = poProject(po);
+  const t = createTask({ title: 'Confirm prices: ' + po.ref + ' · ' + (po.supplierName || ''), dueDate: fmt(new Date()), owner: meName(), scope: 'job', refs: [{ kind: 'po', id: String(po.id) }], linkedIds: p ? [recordCode(p.id, 'project')] : [], description: 'Check the supplier invoice or receipt for ' + po.ref + ' and enter the final prices.' });
+  t.autoKey = 'pc:' + po.id; return t;
+}
+function pcTaskClose(po){ const t = pcTaskFor(po); if(t){ t.status = 'done'; t.completedAt = new Date().toISOString(); t.completedBy = meName(); } }
+function pcOrderFor(pid, did){   // the order for this delivery: made (as a Draft that has been delivered) when there is none yet, so the check has somewhere to live
+  let po = poForDrop(pid, did); if(po) return po; po = poMake(pid, did); if(!po) return null;
+  const p = poProject(po), st = p && p.dropState ? p.dropState[did] : null; po.status = 'Delivered'; po.deliveredAt = (st && st.delivered) || fmt(new Date()); return po;
+}
+function pcAsk(pid, did, flagged){
+  const p = state.projects.find(x => x.id === pid); if(!p) return; const po = poForDrop(pid, did);
+  if(po && poPricesConfirmed(po)) return;
+  finUi.mode = 'pcask'; finOpen('Check the final prices?', `<p class="q-help" style="margin:0 0 10px;">${escHtml(p.name)} · ${escHtml((projDeliveries(p).drops.find(d => d.d.id === did) || {}).supplier || '')}${po ? ' · ' + escHtml(po.ref) : ''}${flagged ? '<br><b>Price to confirm:</b> something was short or substituted.' : ''}</p>
+    <div class="modal-actions" style="flex-wrap:wrap;"><button class="btn secondary" type="button" data-pc="later" data-pid="${pid}" data-did="${escAttr(did)}">Later</button><button class="btn" type="button" data-pc="now" data-pid="${pid}" data-did="${escAttr(did)}">Check final prices now</button></div>
+    <p class="q-help" style="margin:8px 0 0;">Later puts a “Confirm prices” task on Today and on the order until it is done.</p>`);
+}
+function pcLater(pid, did){
+  const po = pcOrderFor(pid, did); if(!po){ finClose(); return; } const t = pcTaskEnsure(po); finClose(); saveState(); render();
+  showToast(t ? 'Task added: ' + t.title : 'The confirm-prices task is already on Today');
+}
+const pcUi = { pid: 0, did: '', po: 0, lines: [], date: '', ref: '', err: '' };
+function pcLinesFor(po, p){
+  const st = p && p.dropState ? p.dropState[po.did] : null, chk = st && st.check ? st.check.lines : [], old = po.pc ? po.pc.lines : [];
+  return po.items.map(i => {
+    const o = old.find(x => String(x.k) === String(i.lineId) && (i.lineId !== '' || x.desc === i.desc)), c = chk.find(x => String(x.k) === String(i.lineId));
+    const qq = Number(i.qty) || 0, qp = Number(i.price) || 0, fq = o ? Number(o.fq) : (c && c.s === 'short' ? Number(c.got) || 0 : qq);
+    return { k: String(i.lineId), desc: i.desc, unit: i.unit || '', vatRate: Number(i.vatRate) || 0, qq, qp, fq, fp: o ? Number(o.fp) : qp, cause: o ? o.cause : (i.lineId === '' ? 'delivery' : (c && c.s === 'substituted' ? 'sub' : '')), note: o ? o.note || '' : '', sub: !!(c && c.s === 'substituted') };
+  });
+}
+function pcSuggest(l){ if(l.k === '') return 'delivery'; if(l.sub) return 'sub'; if(l.fq !== l.qq && l.fp === l.qp) return 'qty'; if(l.fp !== l.qp && l.fq === l.qq) return 'price'; return 'other'; }
+function pcDiff(l){ return r2(l.fq * l.fp - l.qq * l.qp); }
+function pcOpen(poId){
+  const po = poFind(Number(poId)); if(!po) return; const p = poProject(po); if(!p) return;
+  pcUi.pid = po.pid; pcUi.did = po.did; pcUi.po = po.id; pcUi.lines = pcLinesFor(po, p); pcUi.date = fmt(new Date()); pcUi.ref = ''; pcUi.err = ''; finUi.mode = 'pc'; finUi.file = null; pcDraw(true);
+}
+function pcRead(){
+  document.querySelectorAll('#pcTable [data-pcf]').forEach(el => { const l = pcUi.lines[Number(el.dataset.i)]; if(!l) return; const f = el.dataset.pcf; if(f === 'fq' || f === 'fp') l[f] = Math.max(0, Number(el.value) || 0); else l[f] = el.value; });
+  const d = document.getElementById('pcDate'), r = document.getElementById('pcRef'); if(d) pcUi.date = isoOk(d.value) || pcUi.date; if(r) pcUi.ref = r.value;
+}
+function pcDraw(open){
+  const po = poFind(pcUi.po), p = po && poProject(po); if(!po || !p) return finClose(); const L = pcUi.lines, thr = varThresholdPct();
+  const rows = L.map((l, i) => `<tr data-pcr="${i}"><td>${escHtml(l.desc)}${l.sub ? ' <span class="dc-ptc">substituted</span>' : ''}</td><td class="qb-calc" data-label="Quoted">${l.qq} ${escHtml(l.unit)} × ${qm(l.qp)}</td>
+      <td data-label="Final qty"><input type="number" step="any" min="0" class="qb-n" data-pcf="fq" data-i="${i}" value="${l.fq}" aria-label="Final quantity"></td><td data-label="Final price ex VAT"><input type="number" step="any" min="0" class="qb-n" data-pcf="fp" data-i="${i}" value="${l.fp}" aria-label="Final price each, ex VAT"></td>
+      <td class="qb-calc" data-pcd="${i}" data-label="Difference"></td><td><select data-pcf="cause" data-i="${i}" aria-label="Cause" hidden><option value="">Cause…</option>${VAR_CAUSES.map(([k, n]) => `<option value="${k}"${l.cause === k ? ' selected' : ''}>${n}</option>`).join('')}</select><input data-pcf="note" data-i="${i}" maxlength="160" placeholder="Note" value="${escAttr(l.note)}" aria-label="Note" hidden></td></tr>`).join('');
+  const body = `<p class="q-help" style="margin:0 0 8px;">${escHtml(po.ref)} · ${escHtml(po.supplierName || '')} · ${escHtml(p.name)}. The quote and the order prices are not changed: differences are recorded beside them.</p>
+    <div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Invoice or receipt number</label><input id="pcRef" maxlength="60" value="${escAttr(pcUi.ref)}" placeholder="optional"></div><div class="lp-f"><label>Date on it</label><input type="date" id="pcDate" value="${escAttr(pcUi.date)}" max="${fmt(new Date())}"></div></div>
+    ${finFileHtml(false)}
+    <div class="qb-scroll"><table class="qb-table qb-narrow" id="pcTable"><thead><tr><th>Item</th><th>Quoted</th><th>Final qty</th><th>Final price ex VAT</th><th>Difference</th><th>Cause</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div id="pcSum" class="fin-var"></div>
+    <div class="chg-err" id="finErr">${escHtml(pcUi.err)}</div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn" type="button" data-pc="save">Confirm prices</button></div>`;
+  if(open) finOpen('Confirm prices', body, true); else document.getElementById('finBody').innerHTML = body;
+  pcRefresh();
+}
+function pcRefresh(){
+  pcRead(); const thr = varThresholdPct(); let q = 0, f = 0, over = 0;
+  pcUi.lines.forEach((l, i) => {
+    const d = pcDiff(l), differs = Math.abs(d) >= 0.005 || l.fq !== l.qq || l.fp !== l.qp, base = l.qq * l.qp, pct = base ? Math.abs(d) / base * 100 : (d ? 100 : 0), isOver = differs && pct > thr;
+    q += l.qq * l.qp; f += l.fq * l.fp; if(isOver) over++;
+    const c = document.querySelector(`#pcTable [data-pcd="${i}"]`), ca = document.querySelector(`#pcTable [data-pcf="cause"][data-i="${i}"]`), no = document.querySelector(`#pcTable [data-pcf="note"][data-i="${i}"]`);
+    if(c) c.innerHTML = Math.abs(d) < 0.005 ? (differs ? '<span class="qb-dim">same total</span>' : '<span class="qb-dim">—</span>') : `<b class="${d > 0 ? 'over' : 'under'}">${d > 0 ? '+' : '−'}${qm(Math.abs(d))}</b>${isOver ? '<div class="qb-dim" style="font-size:var(--bt-fs-xs);">for review</div>' : ''}`;
+    if(ca){ ca.hidden = !differs; if(differs && !l.cause){ l.cause = pcSuggest(l); ca.value = l.cause; } } if(no) no.hidden = !differs;
+  });
+  const v = r2(f - q), el = document.getElementById('pcSum'); if(el) el.innerHTML = `Quoted <b>${qm(r2(q))}</b> · final <b>${qm(r2(f))}</b> ex VAT · variance <b class="${Math.abs(v) < 0.005 ? '' : (v > 0 ? 'over' : 'under')}">${Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v))}</b>${over ? ` · ${over} line${over === 1 ? '' : 's'} flagged for review (threshold ${thr}%)` : ''}`;
+}
+document.addEventListener('input', (e) => { if(finUi.mode === 'pc' && e.target.closest && e.target.closest('#pcTable')) pcRefresh(); });
+document.addEventListener('change', (e) => { if(finUi.mode === 'pc' && e.target.closest && e.target.closest('#pcTable')) pcRefresh(); });
+function pcSave(){
+  pcRead(); const po = poFind(pcUi.po), p = po && poProject(po), er = document.getElementById('finErr'); if(!po || !p) return finClose();
+  const L = pcUi.lines, differs = l => Math.abs(pcDiff(l)) >= 0.005 || l.fq !== l.qq || l.fp !== l.qp;
+  if(pcUi.date > fmt(new Date())){ er.textContent = 'A receipt cannot be dated in the future.'; return; }
+  const bad = L.find(l => differs(l) && !l.cause); if(bad){ er.textContent = `“${bad.desc}” differs from the quote: choose the cause.`; return; }
+  const sum = (a, b) => spTotals(L.map(l => ({ lineId: l.k, vatRate: l.vatRate, qty: l[a], price: l[b] })), null), q = sum('qq', 'qp'), f = sum('fq', 'fp');
+  const qEx = r2(L.reduce((a, l) => a + l.qq * l.qp, 0)), fEx = r2(L.reduce((a, l) => a + l.fq * l.fp, 0)), now = new Date().toISOString();
+  const was = { pc: po.pc, receipts: (po.receipts || []).slice(), ptc: (p.dropState[po.did] || {}).ptc, task: pcTaskFor(po) };
+  let rec = null; if(finUi.file || pcUi.ref.trim()){ rec = { id: qRand('rc_'), at: now, by: whoName(), date: pcUi.date, ref: pcUi.ref.trim(), total: f.payable, file: finUi.file || null }; po.receipts = (po.receipts || []).concat([rec]); }
+  po.pc = { at: now, by: whoName(), date: pcUi.date, receiptId: rec ? rec.id : (po.pc ? po.pc.receiptId : ''), quoted: qEx, final: fEx, variance: r2(fEx - qEx), lines: L.map(l => ({ k: l.k, desc: l.desc, unit: l.unit, qq: l.qq, qp: l.qp, fq: l.fq, fp: l.fp, cause: differs(l) ? l.cause : '', note: differs(l) ? String(l.note || '').trim() : '' })) };
+  const st = dcState(p, po.did); st.ptc = null; pcTaskClose(po);
+  const tx = spTx(p, po.did), note = tx && Math.abs(r2(f.payable - (Number(tx.moneyOut) || 0))) >= 0.005 ? ` The payment already confirmed (${qm(tx.moneyOut)}) is not changed.` : '';
+  finClose(); saveState(); render();
+  showToast('Prices confirmed for ' + po.ref + (Math.abs(r2(fEx - qEx)) >= 0.005 ? ': ' + (fEx > qEx ? '+' : '−') + qm(Math.abs(r2(fEx - qEx))) + ' ex VAT against the quote.' : ': as quoted.') + note, () => { po.pc = was.pc; po.receipts = was.receipts; st.ptc = was.ptc; if(was.task){ was.task.status = 'open'; was.task.completedAt = ''; was.task.completedBy = ''; } saveState(); render(); });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-pc]'); if(!b || !state) return; const a = b.dataset.pc;
+  if(a === 'open'){ e.stopPropagation(); pcOpen(b.dataset.id); }
+  else if(a === 'now'){ const po = pcOrderFor(Number(b.dataset.pid), b.dataset.did); if(po){ saveState(); render(); pcOpen(po.id); } else finClose(); }
+  else if(a === 'later') pcLater(Number(b.dataset.pid), b.dataset.did);
+  else if(a === 'save') pcSave();
+  else if(a === 'receipt'){ e.stopPropagation(); pcOpen(b.dataset.id); }
+});
+/* the order's price check: status, the per-line comparison, the receipts */
+function pcRecordHtml(po){
+  const p = poProject(po), ds = p && p.dropState ? p.dropState[po.did] : null, delivered = !!poActualDelivery(po), task = pcTaskFor(po);
+  const btn = (label, cls) => `<button type="button" class="btn ${cls || ''} qb-sm" data-pc="open" data-id="${po.id}">${label}</button>`;
+  if(!po.pc){
+    return `<div class="rp-card"><div class="rp-card-h"><h4>Prices ${delivered ? '<span class="dc-ptc">to confirm</span>' : ''}</h4>${delivered ? btn('Confirm prices') : (po.status === 'Draft' ? '' : btn('Add a receipt or invoice', 'secondary'))}</div>
+      <div class="pw-empty">${delivered ? 'The delivery is in but the final prices have not been checked.' + (task ? ' A task is on Today: ' + escHtml(task.title) + '.' : '') : 'Prices are confirmed after the delivery, from the supplier invoice or receipt. Quote prices never change.'}</div></div>`;
+  }
+  const c = po.pc, v = c.variance, recs = po.receipts || [];
+  return `<div class="rp-card"><div class="rp-card-h"><h4>Prices confirmed</h4>${btn('Edit prices', 'secondary')}</div>
+    <div class="rp-row"><span>Quoted (ex VAT)</span><span>${qm(c.quoted)}</span></div><div class="rp-row"><span>Confirmed (ex VAT)</span><span><b>${qm(c.final)}</b></span></div>
+    <div class="rp-row"><span>Variance</span><span><b class="${Math.abs(v) < 0.005 ? '' : (v > 0 ? 'over' : 'under')}">${Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v))}</b></span></div>
+    ${c.lines.filter(l => l.cause).map(l => `<div class="rp-row"><span>${escHtml(l.desc)}<span class="rp-dim"> · ${escHtml(varCauseName(l.cause))}${l.note ? ': ' + escHtml(l.note) : ''}</span></span><span>${l.fq} × ${qm(l.fp)} <span class="rp-dim">(quoted ${l.qq} × ${qm(l.qp)})</span></span></div>`).join('')}
+    ${recs.length ? `<h5 style="margin:10px 0 4px;">Receipts and invoices</h5>${recs.map(r => `<div class="rp-row"><span>${r.file ? `<a href="${escAttr(r.file.data)}" target="_blank" rel="noopener" download="${escAttr(r.file.name)}">${escHtml(r.file.name)}</a>` : '<span class="rp-dim">no file</span>'}${r.ref ? ' · ' + escHtml(r.ref) : ''}</span><span>${escHtml(pwD(r.date))} · ${qm(r.total)}</span></div>`).join('')}` : ''}</div>`;
+}
 /* ---------- moving a record between the three pipelines ----------
    Promotion and return keep everything. The record keeps its id (so its code, quotes and tasks stay linked) and carries:
      leadSnapshot  the lead as it was when promoted (the read-only "Original lead info" view)
@@ -13005,13 +13124,13 @@ function renderToday(){
   document.getElementById('todayScope').innerHTML = `<button data-today="scope" data-v="mine" class="${todayUi.scope === 'mine' ? 'active' : ''}">My items</button><button data-today="scope" data-v="all" class="${todayUi.scope === 'all' ? 'active' : ''}">Everyone</button>`;
   updateGreeting();
   /* time-critical: deliveries to sign off, invoices and orders due, prices to confirm (supplier quotes awaiting a reply sit beside them) */
-  const priceRows = (state.purchaseOrders || []).filter(po => po.status === 'Delivered' && !po.match).sort((a, b) => cmpText(a.deliveredAt || '', b.deliveredAt || ''));
+  const priceRows = (state.purchaseOrders || []).filter(po => poNeedsPrices(po)).sort((a, b) => cmpText(poActualDelivery(a), poActualDelivery(b)));
   const lim = state.settings.todayLimit || 10;
   const sub = (key, title, d, rowFn, empty) => {
     const rows = d.over.map(x => ({ x, over: true })).concat(d.main.map(x => ({ x, over: false })));
     const more = !!todayUi.more[key], shown = more ? rows : rows.slice(0, lim), hid = rows.length - shown.length;
     return `<div class="td-sub-blk"><div class="td-head"><h3>${title}</h3><span class="n">${rows.length}</span></div>${shown.length ? shown.map(r => rowFn(r.x, r.over)).join('') : `<div class="td-empty">${empty}</div>`}${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">See more (${hid})</button>` : ''}</div>`; };
-  const priceBlk = `<div class="td-sub-blk"><div class="td-head"><h3>Prices to confirm</h3><span class="n">${priceRows.length}</span></div>${priceRows.length ? priceRows.slice(0, todayUi.more.price ? 999 : lim).map(po => `<div class="td-row" data-today="nav" data-spec="po:${po.id}"><span class="td-title">${escHtml(po.ref)} · ${escHtml(po.supplierName || '')}<span class="td-sub">${escHtml((state.projects.find(x => x.id === po.pid) || {}).name || '')}</span></span><span class="td-meta"><span>Delivered, check the price</span><span>${qm(poTotals(po).payable)}</span></span></div>`).join('') : '<div class="td-empty">Nothing to check.</div>'}${priceRows.length > lim && !todayUi.more.price ? `<button type="button" class="link-btn td-more" data-today="more" data-k="price">See more (${priceRows.length - lim})</button>` : ''}</div>`;
+  const priceBlk = `<div class="td-sub-blk"><div class="td-head"><h3>Prices to confirm</h3><span class="n">${priceRows.length}</span></div>${priceRows.length ? priceRows.slice(0, todayUi.more.price ? 999 : lim).map(po => `<div class="td-row" data-today="nav" data-spec="po:${po.id}"><span class="td-title">${escHtml(po.ref)} · ${escHtml(po.supplierName || '')}<span class="td-sub">${escHtml((state.projects.find(x => x.id === po.pid) || {}).name || '')}</span></span><span class="td-meta"><span>Delivered ${escHtml(pwD(poActualDelivery(po)))}${(poProject(po) && dcPtcMark(poProject(po), po.did)) || ''}</span><span>${qm(poTotals(po).payable)}</span><button type="button" class="btn qb-sm" data-pc="open" data-id="${po.id}">Confirm prices</button></span></div>`).join('') : '<div class="td-empty">Nothing to check.</div>'}${priceRows.length > lim && !todayUi.more.price ? `<button type="button" class="link-btn td-more" data-today="more" data-k="price">See more (${priceRows.length - lim})</button>` : ''}</div>`;
   crit.innerHTML = `<div class="td-crit-h"><h3>Time-critical</h3><span class="td-crit-s">${dl.main.length + dl.over.length} to sign off · ${inv.main.length + inv.over.length} invoices · ${ord.main.length + ord.over.length} orders${isToday ? '' : ' · for ' + escHtml(fmtDisplay(toDate(sel)))}</span></div>
     <div class="td-crit-grid">${sub('del', 'Deliveries to sign off', dl, todayDeliveryRow, 'Nothing waiting for sign-off.')}${sub('ord', 'Orders to place', ord, todayOrderRow, 'No orders waiting.')}${sub('inv', 'Invoices to raise', inv, todayInvoiceRow, 'No invoices to raise.')}${priceBlk}<div class="td-sub-blk" id="todayRfq" hidden></div></div>`;
   /* action tiles: job actions, then business actions (only for the people Settings allows) */
