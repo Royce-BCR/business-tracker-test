@@ -1745,6 +1745,17 @@
   .dc-ph { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; } .dc-thumb { position: relative; display: inline-block; } .dc-thumb img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); display: block; } .dc-x { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; min-width: 24px; min-height: 24px; border-radius: 50%; border: 0; background: var(--bt-bad-fg); color: #fff; cursor: pointer; line-height: 1; }
   .dc-mini img { width: 28px; height: 28px; object-fit: cover; border-radius: 4px; margin-left: 6px; vertical-align: middle; border: 1px solid var(--line); }
   .dc-ptc { display: inline-block; background: var(--bt-warn-bg); color: var(--bt-warn-fg); border: 1px solid var(--bt-warn-bd); border-radius: var(--bt-r-pill); padding: 1px 8px; font-size: 11px; font-weight: 700; } .dc-st { font-weight: 700; } .dc-st-short, .dc-st-substituted { color: var(--bt-warn-fg); } .dc-st-damaged { color: var(--bt-bad-fg); } .dc-st-received { color: var(--bt-ok-fg); } .td-allrec { white-space: nowrap; }
+  .rp-strip.mg-strip { grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); } .mg-wrap { display: grid; gap: var(--bt-s3); container-type: inline-size; } .mg-graph { --lab: 150px; position: relative; } .mg-axis, .mg-row { display: grid; grid-template-columns: var(--lab) 1fr; align-items: center; } .mg-lab { font-size: 12.5px; padding-right: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mg-ticks { position: relative; height: 20px; border-bottom: 1px solid var(--line); font-size: 11px; color: var(--text-muted); } .mg-ticks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; } .mg-ticks span:first-child { transform: none; } .mg-ticks span.end { transform: translateX(-100%); }
+  .mg-rows { position: relative; } .mg-row { height: 34px; border-bottom: 1px dashed var(--line); } .mg-track { position: relative; height: 100%; }
+  .mg-m { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; box-sizing: border-box; display: inline-block; } .mg-plan { border: 2px solid var(--bt-ink); background: var(--bt-card); } .mg-act { background: var(--bt-ok-fg); border: 2px solid var(--bt-ok-fg); } .mg-m.bad { border-color: var(--bt-bad-fg); } .mg-act.bad { background: var(--bt-bad-fg); } .mg-plan.bad { background: var(--bt-card); }
+  .mg-link { position: absolute; top: 50%; height: 2px; margin-top: -1px; background: var(--bt-ok-fg); opacity: .55; } .mg-link.bad { background: var(--bt-bad-fg); }
+  .mg-today { position: absolute; top: 0; bottom: 0; border-left: 2px dashed var(--bt-brand-2); pointer-events: none; } .mg-today b { position: absolute; bottom: -17px; left: -16px; font-size: 10.5px; font-style: normal; color: var(--bt-brand-2); }
+  .mg-legend { display: flex; gap: var(--bt-s4); padding-top: 14px; font-size: 12px; color: var(--text-muted); margin-top: var(--bt-s2); } .mg-legend .mg-m { position: static; margin: 0 4px 0 0; vertical-align: middle; width: 12px; height: 12px; }
+  .mg-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'main act' 'steps steps'; gap: var(--bt-s2) var(--bt-s3); align-items: center; padding: var(--bt-s3) 0; border-bottom: 1px solid var(--line); } .mg-item:last-child { border-bottom: 0; } .mg-item.late { box-shadow: inset 3px 0 0 var(--bt-bad-fg); padding-left: 10px; }
+  .mg-i-main { grid-area: main; min-width: 0; } .mg-i-act { grid-area: act; } .mg-i-steps { grid-area: steps; display: flex; gap: var(--bt-s3); flex-wrap: wrap; } .mg-step { font-size: 12.5px; display: block; } .mg-step small { display: block; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; } .mg-step.done { color: var(--bt-ok-fg); } .mg-step.due { color: var(--bt-bad-fg); font-weight: 600; } .mg-flag { color: var(--bt-bad-fg); font-size: 12px; font-weight: 600; }
+  @container (max-width: 560px) { .mg-graph { --lab: 92px; } .mg-ticks span:nth-child(2), .mg-ticks span:nth-child(4) { display: none; } }
+  @media (max-width: 700px) { .mg-graph { --lab: 92px; } .mg-item { grid-template-columns: 1fr; grid-template-areas: 'main' 'steps' 'act'; } .mg-i-act .btn { width: 100%; } .mg-ticks span:nth-child(2), .mg-ticks span:nth-child(4) { display: none; } }
   .var-hub { margin-bottom: var(--bt-s3); padding: var(--bt-s3) var(--bt-s4); } .var-hub > summary, .var-table summary { cursor: pointer; } .var-list { margin: 6px 0 4px 10px; } .po-hire { display: inline-flex; margin-left: 10px; } .po-hire + select { margin-left: 6px; max-width: 180px; }
   .po-tools { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; margin-bottom: var(--bt-s3); } .po-hero { margin: var(--bt-s2) 0 var(--bt-s3); } .po-trace { display: flex; flex-wrap: wrap; gap: var(--bt-s2) var(--bt-s4); align-items: baseline; margin-bottom: var(--bt-s2); } .po-trace small { display: block; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; } .po-bigref { font-size: 20px; letter-spacing: .01em; } .po-extra { margin-top: var(--bt-s3); }
   .po-note { font-size: 12.5px; color: var(--slate); margin-bottom: var(--bt-s3); } .po-steps { display: flex; gap: var(--bt-s2); align-items: center; margin: var(--bt-s1) 0 var(--bt-s3); font-size: 12.5px; color: var(--text-muted); } .po-steps span.done { color: var(--bt-ok-fg); font-weight: 600; } .po-steps span.cur { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--ink); } .po-steps i { font-style: normal; }
@@ -11625,6 +11636,65 @@ function varProjectCard(p){
 function varHubHtml(){
   const rows = varRows(); return `<details class="card var-hub"${rows.length ? ' open' : ''}><summary><b>Variance by cause</b> <span class="qb-dim">confirmed supplier prices against the quote, across all orders</span></summary>${varByCauseHtml(rows, { empty: 'Nothing yet. Variances appear here when prices are confirmed after a delivery and differ from the quote.' })}</details>`;
 }
+/* ---------- Stage 2: Materials and deliveries tab (project record page) ----------
+   One row per order (a delivery on the Working plan, with its order when it has one): the planned against actual delivery graph, then a date-ordered list. Each row has one button for the
+   next step (Confirm ordered, Confirm delivered, Confirm prices) that confirms there and then. Nothing is stored for the tab itself: it reads the drop state, the orders and the delivery check. */
+function mgRows(p){
+  const today = fmt(new Date());
+  return projDeliveries(p).drops.map(x => {
+    const po = poForDrop(p.id, x.d.id), ds = (p.dropState || {})[x.d.id] || {}, pl = po ? (poPlannedDate(po) || x.date) : x.date, ac = ds.delivered || (po && po.deliveredAt) || '', ord = ds.ordered || (po && po.sentAt) || '', conf = po ? poPricesConfirmed(po) : false;
+    const late = pl ? (ac ? (ac > pl ? Math.round((toDate(ac) - toDate(pl)) / 86400000) : 0) : (pl < today ? Math.round((toDate(today) - toDate(pl)) / 86400000) : 0)) : 0;
+    const next = !ord && !ac ? 'ordered' : !ac ? 'delivered' : !conf ? 'prices' : '';
+    return { x, po, did: x.d.id, label: (po ? po.ref + ' · ' : '') + x.supplier, supplier: x.supplier, pl, ac, ord, conf, late, next, value: po ? poTotals(po).payable : x.out, hire: !!(projWorkQuote(p) && projWorkQuote(p).lines.some(l => l.hire && l.deliveryDropId === x.d.id)) };
+  });
+}
+const MG_BTN = { ordered: 'Confirm ordered', delivered: 'Confirm delivered', prices: 'Confirm prices' };
+function mgHeadlineHtml(p){
+  const R = mgRows(p), today = fmt(new Date()), cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  const dn = R.filter(r => r.ac).length, late = R.reduce((a, r) => a + r.late, 0), lateN = R.filter(r => r.late).length;
+  const nx = R.filter(r => r.next).map(r => ({ r, d: r.next === 'ordered' ? (r.pl ? addDaysIso(r.pl, -3) : '') : r.next === 'delivered' ? r.pl : (r.ac || '') })).sort((a, b) => (a.d || '9999').localeCompare(b.d || '9999'))[0];
+  const ordered = R.filter(r => r.ord).reduce((a, r) => a + r.value, 0), planned = R.reduce((a, r) => a + r.value, 0);
+  return `<div class="rp-strip mg-strip">${cell('Delivered', R.length ? dn + ' of ' + R.length : '—', R.length ? 'orders' : 'no orders yet')}${cell('Days late so far', String(late), lateN ? lateN + ' order' + (lateN === 1 ? '' : 's') + ' late' : 'none late', late ? 'bad' : '')}${cell('Next action', nx ? escHtml(MG_BTN[nx.r.next]) : (R.length ? 'All done' : '—'), nx ? escHtml(nx.r.supplier) + (nx.r.pl ? ' · ' + escHtml(pwD(nx.r.pl)) : '') : '')}${cell('Value ordered', qm(ordered), 'of ' + qm(planned) + ' planned')}</div>`;
+}
+function mgGraphHtml(R, today){
+  const dated = R.filter(r => r.pl || r.ac); if(!dated.length) return '<div class="pw-empty">No dated deliveries yet. Dates come from the delivery drops on the Working plan.</div>';
+  const all = []; R.forEach(r => { if(r.pl) all.push(r.pl); if(r.ac) all.push(r.ac); }); all.push(today);
+  let lo = all.reduce((a, d) => d < a ? d : a), hi = all.reduce((a, d) => d > a ? d : a); lo = addDaysIso(lo, -2); hi = addDaysIso(hi, 2);
+  const span = Math.max(1, Math.round((toDate(hi) - toDate(lo)) / 86400000)), pct = d => Math.max(0, Math.min(100, Math.round((toDate(d) - toDate(lo)) / 86400000 / span * 1000) / 10));
+  const ticks = [0, 1, 2, 3, 4].map(i => addDaysIso(lo, Math.round(span * i / 4)));
+  const rows = R.map(r => {
+    const bad = r.late > 0, a = r.pl ? pct(r.pl) : null, b = r.ac ? pct(r.ac) : null, from = a != null && b != null ? Math.min(a, b) : null, w = a != null && b != null ? Math.abs(a - b) : 0;
+    const tip = `${r.label}: planned ${r.pl ? pwD(r.pl) : 'no date'}${r.ac ? ', delivered ' + pwD(r.ac) : ', not delivered yet'}${bad ? ', ' + r.late + ' day' + (r.late === 1 ? '' : 's') + ' late' : ''}`;
+    return `<div class="mg-row" title="${escAttr(tip)}"><div class="mg-lab">${escHtml(r.label)}</div><div class="mg-track" role="img" aria-label="${escAttr(tip)}">${from != null && w > 0 ? `<i class="mg-link${bad ? ' bad' : ''}" style="left:${from}%;width:${w}%"></i>` : ''}${a != null ? `<i class="mg-m mg-plan${bad && !r.ac ? ' bad' : ''}" style="left:${a}%"></i>` : ''}${b != null ? `<i class="mg-m mg-act${bad ? ' bad' : ''}" style="left:${b}%"></i>` : ''}</div></div>`;
+  }).join('');
+  return `<div class="mg-graph"><div class="mg-axis"><div class="mg-lab"></div><div class="mg-ticks">${ticks.map((d, i) => `<span style="left:${i * 25}%"${i === 4 ? ' class="end"' : ''}>${escHtml(fmtDisplay(toDate(d)).replace(/ \d{4}$/, ''))}</span>`).join('')}</div></div>
+    <div class="mg-rows">${rows}<i class="mg-today" style="left:calc(var(--lab) + (100% - var(--lab)) * ${pct(today) / 100})" title="Today"><b>Today</b></i></div>
+    <div class="mg-legend"><span><i class="mg-m mg-plan"></i> Planned</span><span><i class="mg-m mg-act"></i> Actual</span><span><i class="mg-m mg-act bad"></i> Late</span></div></div>`;
+}
+function rpMaterialsHtml(p){
+  const R = mgRows(p), today = fmt(new Date()), sorted = R.slice().sort((a, b) => (a.pl || '9999').localeCompare(b.pl || '9999') || a.supplier.localeCompare(b.supplier)), canNew = !!projAcceptedQuote(p);
+  const step = (label, d, done, due) => `<span class="mg-step ${done ? 'done' : due ? 'due' : ''}"><small>${label}</small>${done ? '✓ ' + escHtml(pwD(d)) : (d ? escHtml(pwD(d)) : '—')}</span>`;
+  const list = sorted.map(r => `<div class="mg-item${r.late ? ' late' : ''}"><div class="mg-i-main"><b>${r.po ? `<button type="button" class="sp-link" data-nav="po:${r.po.id}">${escHtml(r.po.ref)}</button> · ` : ''}${escHtml(r.supplier)}</b>${r.hire ? ' <span class="dc-ptc">hire</span>' : ''}${r.po && r.x.d.supplierId ? '' : ''}<span class="rp-dim"> ${qm(r.value)}${r.x.items.length ? ' · ' + escHtml(r.x.items.slice(0, 3).join(', ')) + (r.x.items.length > 3 ? '…' : '') : ''}</span>${r.late ? `<div class="mg-flag">${r.late} day${r.late === 1 ? '' : 's'} late${r.ac ? '' : ' so far'}</div>` : ''}${r.po && r.x.d.supplierId && (p.dropState[r.did] || {}).ptc ? ' <span class="dc-ptc">price to confirm</span>' : ''}</div>
+      <div class="mg-i-steps">${step('Ordered', r.ord, !!r.ord, !r.ord && r.pl && r.pl <= addDaysIso(today, 3))}${step('Delivery', r.ac || r.pl, !!r.ac, !r.ac && r.pl && r.pl <= today)}${step('Prices', r.conf ? (r.po.pc ? r.po.pc.date : '') : '', r.conf, !!r.ac && !r.conf)}</div>
+      <div class="mg-i-act">${r.next ? `<button type="button" class="btn qb-sm" data-mg="${r.next}" data-pid="${p.id}" data-did="${escAttr(r.did)}">${MG_BTN[r.next]}</button>` : '<span class="pw-ok">✓ Complete</span>'}</div></div>`).join('');
+  return `<div class="mg-wrap"><div class="rp-card"><div class="rp-card-h"><h4>Planned against actual delivery</h4>${canNew ? `<button type="button" class="btn secondary qb-sm" data-po2="open" data-pid="${p.id}">+ New order</button>` : ''}</div>${mgGraphHtml(R, today)}</div>
+    <div class="rp-card"><h4>Orders and deliveries <span class="db-count">${R.length}</span></h4>${list || '<div class="pw-empty">No deliveries yet: they come from the delivery drops on the accepted quote.</div>'}</div></div>`;
+}
+function mgConfirmOrdered(p, did){
+  const x = projDeliveries(p).drops.find(d => d.d.id === did); if(!x) return; const today = fmt(new Date()), st = dcState(p, did); let po = poForDrop(p.id, did);
+  if(!po && poCreateInfo(p, x).ok) po = poMake(p.id, did);
+  if(po && poNeedsApproval(po) && !poApproved(po)){ showToast(po.ref + ' needs approval before it can be placed. Open the order to approve it.'); return; }
+  const was = { ordered: st.ordered, status: po ? po.status : null, sentAt: po ? po.sentAt : null };
+  if(po && (po.status === 'Draft' || po.status === 'Approved')){ po.status = 'Sent'; po.sentAt = today; }
+  st.ordered = today; if(!projMsActual(p, 'materialsOrdered')) projAdvance(p);
+  saveState(); render(); showToast('Ordered: ' + x.supplier + (po ? ' (' + po.ref + ')' : ''), () => { st.ordered = was.ordered || ''; if(po && was.status){ po.status = was.status; po.sentAt = was.sentAt; } saveState(); render(); });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-mg]'); if(!b || !state) return; const p = state.projects.find(x => x.id === Number(b.dataset.pid)); if(!p) return; const a = b.dataset.mg, did = b.dataset.did;
+  if(a === 'ordered') mgConfirmOrdered(p, did);
+  else if(a === 'delivered') dcOpen(p.id, did);
+  else if(a === 'prices'){ const po = pcOrderFor(p.id, did); if(po){ saveState(); render(); pcOpen(po.id); } }
+});
 /* ---------- moving a record between the three pipelines ----------
    Promotion and return keep everything. The record keeps its id (so its code, quotes and tasks stay linked) and carries:
      leadSnapshot  the lead as it was when promoted (the read-only "Original lead info" view)
@@ -15424,7 +15494,9 @@ document.addEventListener('click', (e) => {
 function navOpen(spec){
   const [kind, id, extra] = String(spec).split(':');
   if(kind === 'quote'){ const q = qFind(Number(id)); if(!q) return; qUi.openId = q.id; qUi.tab = 'quotes'; activateTab('quotations'); renderQuotes(); window.scrollTo(0, 0); }
-  else if(kind === 'project'){ if(!state.projects.some(p => p.id === Number(id))) return; openProjectWorkspace(Number(id), false, !!extra); if(extra) setTimeout(() => pwGoSection(extra), 30); }
+  else if(kind === 'project'){ if(!state.projects.some(p => p.id === Number(id))) return;
+    if(extra === 'materials'){ openProjectWorkspace(Number(id), false, false); rpUi.pid = Number(id); rpUi.tab = 'materials'; const pp = rpFind(Number(id)); if(pp) rpRenderProject(pp); window.scrollTo(0, 0); return; }   // the Materials and deliveries tab
+    openProjectWorkspace(Number(id), false, !!extra); if(extra) setTimeout(() => pwGoSection(extra), 30); }
   else if(kind === 'supplier'){ if(!supFind(Number(id))){ showToast('That supplier no longer exists'); return; } cxPrepNav(); rsOpen(Number(id)); }
   else if(cxNavOpen(kind, id, extra)) return;
   else if(typeof finNavOpen === 'function') finNavOpen(kind, id, extra);
@@ -17357,7 +17429,7 @@ lrSchedule(LR_BASE_MS);
    ===================================================================== */
 const rpUi = { pid: 0, tab: 'overview', sec: {}, secs: {}, draft: null, edit: '' };
 navExtra('rp', () => ({ pid: rpUi.pid, tab: rpUi.tab, sec: Object.assign({}, rpUi.sec) }), v => { if(v){ rpUi.pid = v.pid || 0; rpUi.tab = v.tab || 'overview'; rpUi.sec = v.sec || {}; } });
-const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan']];
+const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan'], ['materials', 'Materials and deliveries']];
 const RP_DATE_KEYS = ['start', 'complete', 'dur'];
 const RP_LABELS = { stageId: 'Stage', jobType: 'Job type', owner: 'Owner', source: 'Source', start: 'Start date', complete: 'Complete date', dur: 'Duration', address: 'Site address', postcode: 'Postcode', access: 'Access', services: 'Services', lastVisited: 'Last visited', contact: 'Contact', company: 'Company', phone: 'Phone', email: 'Email' };
 const RP_CHEV = '<svg class="rp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -17550,7 +17622,7 @@ function pwSecWrapFlat(html){ const m = html.match(/^<section class="pw-sec" id=
 function rpRightHtml(p){ return `<div class="rp-rhead"><h3>Linked records</h3></div><div class="rp-rbody" id="rpRight">${rpLinksHtml(p)}</div>`; }
 
 /* ---- the frame ---- */
-function rpCentreHtml(p){ return rpTabsHtml() + `<div class="rp-cbody" id="rpCbody">${rpUi.tab === 'overview' ? rpHeadlineHtml(p) : ''}<div class="rp-cscroll">${rpUi.tab === 'overview' ? rpOverviewHtml(p) : rpUi.tab === 'activity' ? rpActivityHtml(p) : rpPlanHtml(p)}</div></div>`; }
+function rpCentreHtml(p){ return rpTabsHtml() + `<div class="rp-cbody" id="rpCbody">${rpUi.tab === 'overview' ? rpHeadlineHtml(p) : rpUi.tab === 'materials' ? mgHeadlineHtml(p) : ''}<div class="rp-cscroll">${rpUi.tab === 'overview' ? rpOverviewHtml(p) : rpUi.tab === 'activity' ? rpActivityHtml(p) : rpUi.tab === 'materials' ? rpMaterialsHtml(p) : rpPlanHtml(p)}</div></div>`; }
 function rpRenderProject(p){
   projEnsure(p); if(rpUi.pid !== p.id){ rpUi.pid = p.id; rpUi.tab = 'overview'; rpUi.sec = {}; if(rpUi.draft && rpUi.draft.pid !== p.id) rpUi.draft = null; }
   const el = document.getElementById('projectWorkspace'), prev = {};
