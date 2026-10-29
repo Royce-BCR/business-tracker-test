@@ -2767,6 +2767,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
       <button type="button" class="tab g-finance" data-tab="pnl">Profit and loss</button>
+      <button type="button" class="tab g-finance" data-tab="balance">Balance sheet</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
       <button type="button" class="tab g-finance" data-tab="revenue">Revenue Forecast</button>
@@ -3124,6 +3125,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <div class="desc">Money earned, less job costs, by month, with the business costs beside it and a check against the bank. Nothing is typed here: every figure is read from the invoices, the Working plans, the transactions and the Business costs list, and opens the lines behind it.</div>
     </div>
     <div id="pnlBody"></div>
+  </div>
+
+  <!-- BALANCE SHEET -->
+  <div class="panel" id="panel-balance">
+    <div class="page-head">
+      <h2>Balance sheet</h2>
+      <div class="desc">What the business has and what it owes, today. Every line opens the records behind it.</div>
+    </div>
+    <div id="balanceBody"></div>
   </div>
 
   <!-- AGEING -->
@@ -14521,7 +14531,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
-  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); renderAgeing(); renderPnl(); }catch(e){ console.error(e); }
+  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); renderAgeing(); renderPnl(); renderBalance(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
@@ -20816,6 +20826,34 @@ document.addEventListener('click', (e) => {
 document.addEventListener('change', (e) => { const el = e.target; if(!el || !el.dataset || !state) return; const f = el.dataset.f6;
   if(f === 'pl-from' || f === 'pl-to'){ if(/^\d{4}-\d{2}$/.test(el.value)){ plUi[f === 'pl-from' ? 'from' : 'to'] = el.value; if(plUi.from > plUi.to){ if(f === 'pl-from') plUi.to = plUi.from; else plUi.from = plUi.to; } } renderPnl(); }
   else if(f === 'pl-rec'){ plUi.rec = el.value; renderPnl(); } });
+/* ---- step 4: simplified balance sheet (every line reads a record list and opens it) ---- */
+function bsData(){
+  const cur = finToday().slice(0, 7), R = recon(), cash = R.accounts.map(a => ({ a, v: bankBalance(undefined, a.id) })), owedMe = owedToMe(), owe = iOwe();
+  const reg = (state.assets || []).filter(a => a.status !== 'Retired'), regCost = r2(reg.reduce((s, a) => s + (Number(a.cost) || 0), 0));
+  const loans = R.loans.map(l => { const b = loanBalance(l, cur); return { l, v: r2(b.v), from: b.from }; }), loanTot = r2(loans.reduce((s, x) => s + x.v, 0));
+  const rt = retainedTotals(), cashTot = r2(cash.reduce((s, x) => s + x.v, 0)), me = finSum(owedMe), ow = finSum(owe);
+  const assetsTot = r2(cashTot + me + regCost), liabTot = r2(ow + loanTot), net = r2(assetsTot - liabTot);
+  return { cash, cashTot, owedMe, me, owe, ow, reg, regCost, loans, loanTot, rt, assetsTot, liabTot, net, diff: r2(net - rt.toDate) };
+}
+function bsHtml(){
+  const d = bsData(), row = (label, v, nav, sub, cls) => `<tr><td>${nav ? `<button type="button" class="sp-link" data-nav-tab="${nav}">${escHtml(label)}</button>` : escHtml(label)}${sub ? `<div class="qb-dim">${sub}</div>` : ''}</td><td class="qb-calc ${cls || ''}">${qm(v)}</td></tr>`;
+  return `<div class="card f6-note"><b>A simple view.</b> It is built from the tracker's own records and has not been checked against the accounts. Compare each line with what Mike sees before relying on it. Assets are shown at cost with no depreciation, and VAT, stock and work in progress are not included.</div>
+    <div class="f6-cols"><div class="card"><div class="qb-sec-h"><h4>What the business has</h4></div><table class="qb-table qb-narrow"><tbody>
+      ${d.cash.map(x => row('Cash: ' + x.a.name, x.v, 'reconciliation', x.a.main ? 'starting balance plus transactions (Bank Reconciliation)' : '', x.v < 0 ? 'over' : '')).join('')}
+      ${row('Money owed to me', d.me, 'ageing', d.owedMe.length + ' unpaid invoice' + (d.owedMe.length === 1 ? '' : 's') + ' (Ageing)')}
+      ${row('Equipment at cost', d.regCost, 'assets', d.reg.length + ' item' + (d.reg.length === 1 ? '' : 's') + ' on the Asset register, not retired')}
+      <tr class="f6-sub"><td>Total</td><td class="qb-calc">${qm(d.assetsTot)}</td></tr></tbody></table></div>
+    <div class="card"><div class="qb-sec-h"><h4>What the business owes</h4></div><table class="qb-table qb-narrow"><tbody>
+      ${row('Money I owe', d.ow, 'ageing', d.owe.length + ' unpaid supplier payment' + (d.owe.length === 1 ? '' : 's') + ' and business cost' + (d.owe.length === 1 ? '' : 's') + ' (Ageing)')}
+      ${d.loans.map(x => row('Loan: ' + (x.l.lender || 'unnamed'), x.v, 'reconciliation', x.from ? 'balance as recorded for ' + escHtml(monthLabel(new Date(x.from + '-01T00:00:00'))) : 'no balance recorded')).join('') || '<tr><td colspan="2"><span class="qb-dim">No loans recorded in Bank Reconciliation.</span></td></tr>'}
+      <tr class="f6-sub"><td>Total</td><td class="qb-calc">${qm(d.liabTot)}</td></tr></tbody></table></div></div>
+    <div class="card"><div class="qb-sec-h"><h4>The position</h4></div><table class="qb-table qb-narrow"><tbody>
+      ${row('What it has, less what it owes', d.net, '', 'total above less total owed', d.net < 0 ? 'over' : '')}
+      ${row('Retained profit to date', d.rt.toDate, 'pnl', 'recognised as invoiced, after the profit share, before the pots (Profit and loss)')}
+      ${row('Difference', d.diff, '', 'owner money in or out, profit share paid, VAT, business costs and anything not classified: a question for the accounts', Math.abs(d.diff) > 0.005 ? '' : '')}</tbody></table>
+      <p class="q-help">Retained profit is earned on the jobs; cash is what is in the bank. The pots: <button type="button" class="sp-link" data-nav-tab="dashboard">Dashboard →</button></p></div>`;
+}
+function renderBalance(){ const el = document.getElementById('balanceBody'); if(el && state) el.innerHTML = bsHtml() + dqStripHtml('', ''); }
 /* BT:js-finance end */
 
 /* ---------- init ---------- */
