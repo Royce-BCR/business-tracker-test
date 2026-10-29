@@ -17770,7 +17770,7 @@ function rpLeftHtml(p){
     ${rpEdit(p, 'start', { type: 'date' })}${rpEdit(p, 'complete', { type: 'date' })}${rpEdit(p, 'dur', { type: 'number', label: 'Duration (working days)' })}
     <div class="rp-hint rp-dateh">Start, complete and duration are linked: change start or duration and complete moves, change complete and duration follows.</div>
     ${phHasHours(p) ? rpRO('Hours planned', `<b>${hrs(phHours(p))}</b>`, `Adds up the phase hours, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>${h.plan && Math.abs(h.plan - phHours(p)) > 0.01 ? ` · the Working plan holds ${hrs(h.plan)}` : ''}`) : rpRO('Hours planned', h.plan ? `<b>${hrs(h.plan)}</b>` : '', `From the plan, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>`)}
-    ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>${phLoggedChips(p)}` : '', 'From time logs and the phases ticked done')}`;
+    ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>${phLoggedChips(p)}` : '', 'From time logs and the phases ticked done' + phLoggedSourceHint(p))}`;
   const moneySec = `
     <div class="rp-three"><div class="rp-ro"><small>Billed</small><b>${qm(money.billed)}</b></div><div class="rp-ro"><small>Paid</small><b>${qm(money.paid)}</b></div><div class="rp-ro${money.overdue ? ' rp-bad' : ''}"><small>Overdue</small><b>${qm(money.overdue)}</b></div></div>
     <div class="rp-hint">Read-only, from the invoice schedule. <button type="button" class="sp-link" data-rp="legacy" data-sec="money">Open the schedule</button></div>`;
@@ -19406,6 +19406,11 @@ function phLoggedSplit(p){
 function phMarkHtml(conf, ass){
   return (ass > 0 ? `<span class="sf-chip warn" title="Budget accepted as it stood: not confirmed">${hrs(ass)} assumed</span>` : '') + (conf > 0 && ass > 0 ? ` <span class="sf-chip ok" title="Hours that were logged or adjusted and confirmed">${hrs(conf)} confirmed</span>` : (conf > 0 ? ` <span class="sf-chip ok" title="Hours that were logged or adjusted and confirmed">confirmed</span>` : ''));
 }
+/* Hours logged is the sum of two sources: time logged on stage lines and hours on done phases. Show the split; when both hold hours, ask whether the same work is in both. Counting is unchanged. */
+function phLoggedSourceHint(p){
+  const stage = (p.stages || []).reduce((a, s) => a + slLogged(s), 0), ph = phDoneHours(p); if(!(stage > 0) && !(ph > 0)) return '';
+  return ` · ${hrs(ph)} from phases, ${hrs(stage)} from stage lines${stage > 0 && ph > 0 ? '<div class="rp-note">Hours are logged in both places: check the same work is not logged twice.</div>' : ''}`;
+}
 function phLoggedChips(p){ const x = phLoggedSplit(p); return ' ' + phMarkHtml(x.confirmed, x.assumed); }
 function phTickBtn(kind, r, p){
   const at = `data-kind="${kind}" data-rid="${r.id}" data-pid="${escAttr(p.id)}"`;
@@ -19554,7 +19559,8 @@ const capFull = () => capPeople().reduce((a, x) => a + Number(x.weeklyHours), 0)
 PLAN_SET_CARDS.push(['People and capacity', () => {
   const l = state.people, hp = hpd();
   return `<p class="q-help" style="margin:0 0 8px;">The people who do the work and the hours each has in a week. Everything on the capacity view is measured against these hours, so a person with no hours filled in adds nothing to capacity. A week with a bank holiday or someone's leave has fewer hours. Adding a person here does not give them a login.</p>
-    <div class="assumptions-grid two" style="max-width:560px;margin-bottom:12px;"><div><label for="capHpd">Hours in a working day</label><input id="capHpd" type="number" min="1" max="24" step="1" inputmode="numeric" data-cap="hpd" value="${hp}"><div class="q-help">The same figure as Hours per day in Quotes and pricing. It turns a duration in days into hours.</div></div></div>
+    <div class="assumptions-grid two" style="max-width:560px;margin-bottom:12px;"><div><label for="capHpd">Hours in a working day</label><input id="capHpd" type="number" min="1" max="24" step="1" inputmode="numeric" data-cap="hpd" value="${hp}"><div class="q-help">The same figure as Hours per day in Quotes and pricing. It turns a duration in days into hours.</div></div>
+      <div><label for="capLw">Default lead weighting (%)</label><input id="capLw" type="number" min="0" max="100" step="1" inputmode="numeric" data-cap="leadw" value="${Math.round(capLeadWeight() * 100)}"><div class="q-help">The share of a lead's hours counted on the capacity view, because a lead may not turn into work. A sales stage uses its own probability; a project counts in full. Default 20.</div></div></div>
     <div class="cap-list">${l.map(x => `<div class="cap-row"><div class="cap-main"><input type="text" data-cap="name" data-id="${escAttr(x.id)}" value="${escAttr(x.name)}" aria-label="Name">
       <label class="cap-h"><span>Hours a week</span><input type="number" min="0" max="168" step="0.5" inputmode="decimal" data-cap="hours" data-id="${escAttr(x.id)}" value="${x.weeklyHours === '' ? '' : x.weeklyHours}" placeholder="Not filled in" aria-label="Available hours a week"></label>
       <button type="button" class="icon-btn" data-cap="del" data-id="${escAttr(x.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>
@@ -19576,6 +19582,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('change', (e) => {
   const el = e.target, d = el.dataset; if(!d || !d.cap || !state) return;
   if(d.cap === 'hpd'){ const n = Math.round(Number(el.value)); if(n >= 1 && n <= 24) state.settings.hoursPerDay = n; saveState(); render(); return; }
+  if(d.cap === 'leadw'){ const n = Math.round(Number(el.value)); if(el.value !== '' && !isNaN(n) && n >= 0 && n <= 100) state.settings.leadWeightPct = n; saveState(); render(); return; }
   const x = state.people.find(q => q.id === d.id); if(!x) return;
   if(d.cap === 'name') x.name = el.value.trim() || x.name;
   else if(d.cap === 'hours'){ const n = parseFloat(el.value); x.weeklyHours = (el.value === '' || isNaN(n) || n < 0) ? '' : Math.min(168, Math.round(n * 4) / 4); }
