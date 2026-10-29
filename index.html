@@ -2605,9 +2605,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-commercial" role="group" aria-labelledby="gh-commercial">
       <button type="button" class="tab g-commercial" data-tab="leads">Lead Pipeline</button>
       <button type="button" class="tab g-commercial" data-tab="salespipeline">Sales Pipeline</button>
-      <button type="button" class="tab g-commercial" data-tab="quotations">Quotes</button>
-      <button type="button" class="tab g-commercial" data-tab="approvals">Approvals <span class="tab-count" id="apBadge" hidden></span></button>
-      <button type="button" class="tab g-commercial" data-tab="invoicing">Invoicing</button>
+      <button type="button" class="tab g-commercial" data-tab="quotations">Quotes <span class="tab-count" id="apBadge" hidden></span></button>
+      <button type="button" class="tab g-commercial" data-tab="invoicing">Customer invoices</button>
     </div>
   </div>
 
@@ -2930,7 +2929,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <!-- INVOICING -->
   <div class="panel" id="panel-invoicing">
     <div class="page-head">
-      <h2>Invoicing</h2>
+      <h2>Customer invoices</h2>
       <div class="desc">Every invoice from your projects' payment schedules and approved variations (scope additions). Edit dates and amounts in place; the same data shows in each project's Money section. A variation cannot be invoiced until it is approved.</div>
     </div>
     <div id="invoicingBody"></div>
@@ -3133,11 +3132,6 @@ create policy "app update" on tracker_data for update using (true) with check (t
   </div>
 
   <!-- APPROVALS -->
-  <div class="panel" id="panel-approvals">
-    <div class="page-head"><h2>Approvals</h2><div class="desc">Quotes waiting for a decision. Approvals are a team process, not security: anyone with the login can choose any name. Turn lanes on in Settings &gt; Approvals.</div></div>
-    <div id="apprInbox"></div>
-  </div>
-
   <!-- QUOTES -->
   <div class="panel" id="panel-quotations">
     <div id="quoteListView">
@@ -3154,6 +3148,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
         <div class="qb-scroll" id="quoteListWrap"></div>
       </div>
       <div id="quoteAgeingView" hidden></div>
+      <div id="quoteReviewView" hidden><p class="desc" style="margin:0 0 12px;max-width:760px;">Gerry's review. Quotes waiting for a decision, with everything Approvals did before: Waiting for me, All approvals, purchase orders and the comment on each decision. Approvals are a team process, not security: anyone with the login can choose any name. Turn lanes on in Settings, Approvals.</p><div id="apprInbox"></div></div>
     </div>
     <div id="quoteBuilderView" hidden></div>
   </div>
@@ -8433,8 +8428,9 @@ function renderQuotes(){
   document.getElementById('quoteListView').hidden = !!qUi.openId;
   document.getElementById('quoteBuilderView').hidden = !qUi.openId;
   const vatOn = qVatOn();
-  document.getElementById('quoteTabs').innerHTML = [['quotes', 'Quotes'], ['ageing', 'Price ageing']].map(([v, n]) => `<button type="button" data-qba="tab" data-v="${v}" class="${qUi.tab === v ? 'active' : ''}">${n}</button>`).join('');
-  document.getElementById('quoteListTab').hidden = qUi.tab !== 'quotes'; document.getElementById('quoteAgeingView').hidden = qUi.tab !== 'ageing';
+  document.getElementById('quoteTabs').innerHTML = [['quotes', 'Quotes'], ['ageing', 'Price ageing'], ['review', 'Review']].map(([v, n]) => `<button type="button" data-qba="tab" data-v="${v}" class="${qUi.tab === v ? 'active' : ''}">${n}${v === 'review' && typeof apReviewCount === 'function' && apReviewCount() ? ` <span class="tab-count">${apReviewCount()}</span>` : ''}</button>`).join('');
+  document.getElementById('quoteListTab').hidden = qUi.tab !== 'quotes'; document.getElementById('quoteAgeingView').hidden = qUi.tab !== 'ageing'; document.getElementById('quoteReviewView').hidden = qUi.tab !== 'review';
+  if(qUi.tab === 'review') renderApprovals();
   if(qUi.tab === 'ageing') renderQuoteAgeing();
   const sf = document.getElementById('quoteFilters');
   sf.innerHTML = `<div class="view-toggle" role="group" aria-label="Status">${[['all', 'All']].concat(QUOTE_FILTERS.map(s => [s, s])).map(([v, n]) => `<button type="button" data-qba="filter" data-v="${v}" class="${qUi.status === v ? 'active' : ''}">${n}</button>`).join('')}</div>`;
@@ -10360,6 +10356,7 @@ function apBadges(){
   const n = apWaitingFor(whoAmI().name).length + (typeof poWaitingFor === 'function' ? poWaitingFor(whoAmI().name).length : 0);
   ['apBadge', 'revBadge'].forEach(id => { const el = document.getElementById(id); if(el){ el.textContent = n; el.hidden = !n; } });
 }
+function apReviewCount(){ return apWaitingFor(whoAmI().name).length + (typeof poWaitingFor === 'function' ? poWaitingFor(whoAmI().name).length : 0); }
 function apSummary(q){ const c = qCalc(q); const f = apCashFacts(q, c); return `${qm(c.totalEx)} ex VAT · margin ${qpct(c.pctBefore)} before wages · ${f.negMonth ? 'cash dips negative in ' + monthLabel(toDate(f.negMonth.key + '-01')) : 'cash stays positive'}`; }
 function renderApprovals(){
   const box = document.getElementById('apprInbox'); if(!box) return;
@@ -14139,7 +14136,7 @@ function pjHeadlineHtml(r){
     if(f){
       S.push(pjStat('Contract value', f.ct.value > 0 ? pjMoney(f.ct.value) : 'Not set', f.ct.value > 0 ? escHtml(r.valueLabel) : ''));
       if(f.pr.n) S.push(pjStat('Stage progress', Math.max(0, f.pr.i + 1) + ' of ' + f.pr.n, escHtml(stageName('project', projStageId(p)))));
-      if(f.hasInv){ S.push(pjStat('Invoiced', pjMoney(f.invoiced), 'As on the Invoicing page')); S.push(pjStat('Paid', pjMoney(f.paid))); S.push(pjStat('Outstanding', pjMoney(f.outstanding), '', f.outstanding > 0 && r.overdue.some(o => o.kind === 'Invoice') ? 'bad' : '')); }
+      if(f.hasInv){ S.push(pjStat('Invoiced', pjMoney(f.invoiced), 'As on the Customer invoices page')); S.push(pjStat('Paid', pjMoney(f.paid))); S.push(pjStat('Outstanding', pjMoney(f.outstanding), '', f.outstanding > 0 && r.overdue.some(o => o.kind === 'Invoice') ? 'bad' : '')); }
       if(f.matBudget !== null) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'of ' + pjMoney(f.matBudget) + ' budget', f.matSpent > f.matBudget + 0.5 ? 'bad' : ''));
       else if(f.matSpent > 0) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'No budget set'));
       if(f.margin) S.push(pjStat('Estimated margin', pjMoney(f.margin.v), Math.round(f.margin.pct) + '% · ' + escHtml(f.margin.note)));
@@ -15029,6 +15026,7 @@ BTT_CARD_MQ.addEventListener('change', () => bttQueue());
 bttQueue();
 
 function activateTab(name){
+  if(name === 'approvals'){ name = 'quotations'; if(typeof qUi !== 'undefined'){ qUi.tab = 'review'; qUi.openId = 0; setTimeout(() => { try{ renderQuotes(); }catch(e){} }, 0); } }   // Approvals is now the Review tab on Quotes
   if(typeof approverMode === 'function' && state && approverMode() && !approverPages().includes(name)) name = 'quotations';   // an approver only reaches the pages their scope allows
   if(name === 'admin'){ name = 'actions'; setTimeout(() => { const t = document.getElementById('bizAdminSec'); if(t) t.scrollIntoView({ block: 'start' }); }, 30); }   // Setup & Admin now lives on the Business tasks page
   if(name === 'actions' && typeof canSeeBusiness === 'function' && state && !canSeeBusiness()){ showToast('Business tasks are only visible to the people set under Settings'); return; }
@@ -15064,7 +15062,7 @@ document.querySelectorAll('.tab').forEach(tab => {
    The choices are PER DEVICE: they live in localStorage under STORAGE_PREFIX (so test and live never share) and never in the saved state. */
 const MENU_KEY = STORAGE_PREFIX + 'business-tracker-menu';
 const MENU_BOTTOM_DEFAULT = ['today', 'quotations', 'projectpipeline', 'crm'];
-const MENU_BADGE_IDS = { today: 'todayBadge', approvals: 'apBadge', contacts: 'dupBadge' };   // the existing badges, read as they are
+const MENU_BADGE_IDS = { today: 'todayBadge', quotations: 'apBadge', contacts: 'dupBadge' };   // the existing badges, read as they are
 const MENU_BAR_LABEL = { crm: 'CRM' };
 const MENU_ICONS = {
   command: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
@@ -16274,7 +16272,7 @@ function cxAssocHtml(c){
 function cxKpiHtml(st){
   const k = (l, v, s) => `<div class="kpi" style="--accent:var(--slate)"><div class="label">${l}</div><div class="value">${v}</div>${s ? `<div class="fin-sub">${s}</div>` : ''}</div>`;
   const vat = qVatOn() ? 'inc VAT' : '';
-  return `<div class="kpi-row cx-kpis">${k('Total quoted', qm(st.quoted), 'ex VAT, latest version of each job sent')}${k('Total won', qm(st.won), 'ex VAT, contracts and variations')}${k('Total invoiced', qm(st.invoiced), 'as in Invoicing' + (vat ? ', ' + vat : ''))}${k('Outstanding', qm(st.outstanding), 'invoiced, not yet paid')}${k('Last contact', st.last ? escHtml(dShow(st.last)) : '—', st.last ? cxAgo(st.last) : 'nothing logged yet')}</div>`;
+  return `<div class="kpi-row cx-kpis">${k('Total quoted', qm(st.quoted), 'ex VAT, latest version of each job sent')}${k('Total won', qm(st.won), 'ex VAT, contracts and variations')}${k('Total invoiced', qm(st.invoiced), 'as on Customer invoices' + (vat ? ', ' + vat : ''))}${k('Outstanding', qm(st.outstanding), 'invoiced, not yet paid')}${k('Last contact', st.last ? escHtml(dShow(st.last)) : '—', st.last ? cxAgo(st.last) : 'nothing logged yet')}</div>`;
 }
 function cxAgo(iso){ const n = dashDays(iso, fmt(new Date())); return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago'; }
 function cxDealsHtml(sc, ownerKind, ownerId){
@@ -16293,7 +16291,7 @@ function cxQuotesHtml(sc){
 function cxInvoicesHtml(sc){
   const docs = sc.docs.slice().sort((a, b) => b.seq - a.seq).map(i => { const st = ivDisplayStatus(i); return `<tr><td><button type="button" class="sp-link" data-iv="open" data-id="${escAttr(i.id)}">${escHtml(i.number)}</button></td><td>${escHtml(i.desc || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(Math.abs(i.total))}</td><td>${invPill(st)}</td></tr>`; }).join('');
   const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : r.uid))).map(r => `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${r.vid ? 'v' + r.vid : r.idx}">${escHtml(r.code)}</button></td><td>${escHtml(r.desc)}</td><td>${r.invoicedDate ? escHtml(dShow(r.invoicedDate)) : '—'}</td><td>${r.dueDate ? escHtml(dShow(r.dueDate)) : '—'}</td><td class="qb-calc">${qm(r.amount)}</td><td>${invPill(r.status)}</td></tr>`).join('');
-  return `<div class="card"><div class="qb-sec-h"><h4>Invoices <span class="qb-dim">(status colours as on the Invoicing page${qVatOn() ? '; amounts inc VAT' : ''})</span></h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Invoice</th><th>For</th><th>Issued / sent</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${docs}${rest || ''}${docs || rest ? '' : '<tr><td colspan="6"><div class="sup-empty">No invoices yet.</div></td></tr>'}</tbody></table></div></div>`;
+  return `<div class="card"><div class="qb-sec-h"><h4>Invoices <span class="qb-dim">(status colours as on the Customer invoices page${qVatOn() ? '; amounts inc VAT' : ''})</span></h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Invoice</th><th>For</th><th>Issued / sent</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${docs}${rest || ''}${docs || rest ? '' : '<tr><td colspan="6"><div class="sup-empty">No invoices yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function cxPaymentsHtml(sc){
   const rows = sc.payments.map(({ t, ix }) => `<tr><td>${escHtml(dShow(t.date))}</td><td>${escHtml(t.description || '')}</td><td class="qb-calc">${qm(t.moneyIn)}</td><td><button type="button" class="sp-link" data-nav="txn:${escAttr(t.uid || ix)}">Open →</button></td></tr>`).join('');
