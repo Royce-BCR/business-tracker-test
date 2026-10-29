@@ -2470,6 +2470,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-s-row.locked { color: var(--text-muted); background: var(--bt-surface-2); } .rp-s-row.moved .rp-s-i { font-weight: 600; } .rp-s-row .rp-s-i { flex: 1 1 180px; min-width: 0; }
 .rp-s-d { flex: 0 0 auto; display: grid; gap: 4px; } .rp-s-f { display: flex; align-items: center; gap: 8px; justify-content: flex-end; } .rp-s-was { font-size: var(--bt-fs-xs); color: var(--text-muted); white-space: nowrap; }
 .rp-s-f input[type=date] { min-height: 36px; padding: 2px 6px; border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-chip); font: inherit; background: var(--bt-card); width: 150px; } .rp-s-f input.rp-chg { border-color: var(--bt-brand-2); box-shadow: 0 0 0 2px color-mix(in srgb, var(--bt-brand-2) 22%, transparent); }
+
+@media (max-width: 999px), (pointer: coarse) {
+  .rp-back, .rp-legacy { min-height: 44px; display: inline-flex; align-items: center; }
+  .rp-lrow, .rp-row { min-height: 44px; align-items: center; }
+  .rp-lrow .sp-link, .rp-row .sp-link, .rp-fc-f .sp-link, .rp-tile-h .sp-link, .rp-out li .sp-link, .rp-tent .sp-link { min-height: 44px; display: inline-flex; align-items: center; }
+  .rp-tabs button { min-height: 48px; } .rp-sec-t { min-height: 48px; } .rp-s-f input[type=date] { min-height: 44px; }
+}
+
+@media (max-width: 999px), (pointer: coarse) { .rp-hint .sp-link, .rp-ro .sp-link { padding: 14px 6px; margin: -14px -6px; position: relative; } }
 </style>
 </head>
 <body>
