@@ -2391,7 +2391,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-dateh { margin: -4px 0 var(--bt-s3); }
 .rp-bar { flex: none; display: flex; flex-direction: column; gap: var(--bt-s2); padding: var(--bt-s3) var(--bt-s4); background: var(--bt-surface-2); border-top: 2px solid var(--bt-brand-2); box-shadow: 0 -6px 16px color-mix(in srgb, var(--bt-ink) 8%, transparent); } .rp-bar[hidden] { display: none; }
 .rp-bar-t { font-size: var(--bt-fs-xs); } .rp-bar-b { display: flex; flex-wrap: wrap; gap: 6px; }
-.rp-tabs { flex: none; display: flex; gap: var(--bt-s5); overflow-x: auto; padding: 0 var(--bt-s4); border-bottom: 1px solid var(--line); scrollbar-width: none; background: var(--bt-card); } .rp-tabs::-webkit-scrollbar { display: none; }
+.rp-tabs { flex: none; display: flex; gap: var(--bt-s5); overflow-x: auto; padding: 0 var(--bt-s4); border-bottom: 1px solid var(--line); scrollbar-width: thin; background: var(--bt-card); } .rp-tabs::-webkit-scrollbar { height: 6px; } .rp-tabs::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
 .rp-tabs button { flex: none; min-height: var(--bt-control); padding: 0 2px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; font: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
 .rp-tabs button:hover { color: var(--bt-ink); } .rp-tabs button.active { color: var(--bt-ink); border-bottom-color: var(--bt-brand-2); }
 .rp-cbody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -2534,6 +2534,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .bh-side small { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--bt-text-muted); }
   .bh-side b { font-size: var(--bt-fs-md); } .bh-side em { display: block; font-size: var(--bt-fs-xs); color: var(--bt-text-muted); font-style: normal; }
   .bh-be, .bh-at { font-size: var(--bt-fs-sm); margin-top: 4px; }
+  .rp-strip.mn-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); } .mn-strip .rp-hl b { font-size: 14px; white-space: nowrap; } .rp-strip.mn-strip2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } @media (max-width: 700px) { .rp-strip.mn-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } } .mn-wrap { display: grid; gap: var(--bt-s3); }
+  .mn-graph svg { width: 100%; height: auto; display: block; max-height: 320px; } .mn-grid { stroke: var(--line); stroke-width: 1; } .mn-ax { fill: var(--text-muted); font-size: 11px; }
+  .mn-ln { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; } .mn-ln.plan { stroke-dasharray: 6 4; opacity: .8; } .mn-pt { fill: var(--c); stroke: var(--bt-card); stroke-width: 2; } .mn-pt.hollow { fill: var(--bt-card); stroke: var(--c); }
+  .mn-today { stroke: var(--bt-ink); stroke-width: 1; stroke-dasharray: 2 3; } .mn-todaylab { fill: var(--bt-ink); font-weight: 600; }
+  .mn-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--bt-fs-xs); margin-top: 6px; } .mn-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .mn-key { display: inline-block; width: 22px; height: 0; border-top: 2px solid var(--c); } .mn-key.plan { border-top-style: dashed; }
+  .mn-item { display: flex; justify-content: space-between; align-items: center; gap: var(--bt-s3); padding: var(--bt-s2) 0; border-bottom: 1px solid var(--line); } .mn-item:last-child { border-bottom: 0; } .mn-item.late { background: linear-gradient(90deg, var(--bt-bad-bg, transparent), transparent 30%); }
+  .mn-i-main { min-width: 0; } .mn-i-sub { font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 2px; } .mn-i-act { flex: none; }
+  @media (max-width: 700px) { .mn-item { flex-direction: column; align-items: stretch; } .mn-i-act .btn { width: 100%; min-height: 44px; } }
   .cap-row input:not([type=checkbox]), .hd-row input:not([type=checkbox]), .hd-row select, .ph-row input:not([type=checkbox]), .pt-row input[type=text], .pt-row input[type=number] { border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); min-width: 0; width: 100%; }
   .ph-row input[type=checkbox], .pt-row input[type=checkbox] { width: auto; }
   .ph-row.ph-stack { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px; }
@@ -15784,7 +15793,7 @@ function navOpen(spec){
   const [kind, id, extra] = String(spec).split(':');
   if(kind === 'quote'){ const q = qFind(Number(id)); if(!q) return; qUi.openId = q.id; qUi.tab = 'quotes'; activateTab('quotations'); renderQuotes(); window.scrollTo(0, 0); }
   else if(kind === 'project'){ if(!state.projects.some(p => p.id === Number(id))) return;
-    if(extra === 'materials'){ openProjectWorkspace(Number(id), false, false); rpUi.pid = Number(id); rpUi.tab = 'materials'; const pp = rpFind(Number(id)); if(pp) rpRenderProject(pp); window.scrollTo(0, 0); return; }   // the Materials and deliveries tab
+    if(extra === 'materials' || extra === 'money'){ openProjectWorkspace(Number(id), false, false); rpUi.pid = Number(id); rpUi.tab = extra; const pp = rpFind(Number(id)); if(pp) rpRenderProject(pp); window.scrollTo(0, 0); return; }   // the Materials and deliveries tab
     openProjectWorkspace(Number(id), false, !!extra); if(extra) setTimeout(() => pwGoSection(extra), 30); }
   else if(kind === 'supplier'){ if(!supFind(Number(id))){ showToast('That supplier no longer exists'); return; } cxPrepNav(); rsOpen(Number(id)); }
   else if(cxNavOpen(kind, id, extra)) return;
@@ -17722,7 +17731,7 @@ lrSchedule(LR_BASE_MS);
    ===================================================================== */
 const rpUi = { pid: 0, tab: 'overview', sec: {}, secs: {}, draft: null, edit: '' };
 navExtra('rp', () => ({ pid: rpUi.pid, tab: rpUi.tab, sec: Object.assign({}, rpUi.sec) }), v => { if(v){ rpUi.pid = v.pid || 0; rpUi.tab = v.tab || 'overview'; rpUi.sec = v.sec || {}; } });
-const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan'], ['materials', 'Materials and deliveries']];
+const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan'], ['materials', 'Materials and deliveries'], ['money', 'Money']];
 const RP_DATE_KEYS = ['start', 'complete', 'dur'];
 const RP_LABELS = { stageId: 'Stage', jobType: 'Job detail', jobTypeId: 'Job type', estValue: 'Ballpark value', estDays: 'Estimated duration', prefStart: 'Preferred start', deadline: 'Deadline', owner: 'Owner', source: 'Source', start: 'Start date', complete: 'Complete date', dur: 'Duration', address: 'Site address', postcode: 'Postcode', access: 'Access', services: 'Services', lastVisited: 'Last visited', contact: 'Contact', company: 'Company', phone: 'Phone', email: 'Email' };
 const RP_CHEV = '<svg class="rp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -17920,13 +17929,14 @@ function pwSecWrapFlat(html){ const m = html.match(/^<section class="pw-sec" id=
 function rpRightHtml(p){ return `<div class="rp-rhead"><h3>Linked records</h3></div><div class="rp-rbody" id="rpRight">${rpLinksHtml(p)}</div>`; }
 
 /* ---- the frame ---- */
-function rpCentreHtml(p){ return rpTabsHtml() + `<div class="rp-cbody" id="rpCbody">${rpUi.tab === 'overview' ? rpHeadlineHtml(p) : rpUi.tab === 'materials' ? mgHeadlineHtml(p) : ''}<div class="rp-cscroll">${rpUi.tab === 'overview' ? rpOverviewHtml(p) : rpUi.tab === 'activity' ? rpActivityHtml(p) : rpUi.tab === 'materials' ? rpMaterialsHtml(p) : rpPlanHtml(p)}</div></div>`; }
+function rpCentreHtml(p){ return rpTabsHtml() + `<div class="rp-cbody" id="rpCbody">${rpUi.tab === 'overview' ? rpHeadlineHtml(p) : rpUi.tab === 'materials' ? mgHeadlineHtml(p) : rpUi.tab === 'money' ? mnHeadlineHtml(p) : ''}<div class="rp-cscroll">${rpUi.tab === 'overview' ? rpOverviewHtml(p) : rpUi.tab === 'activity' ? rpActivityHtml(p) : rpUi.tab === 'materials' ? rpMaterialsHtml(p) : rpUi.tab === 'money' ? rpMoneyHtml(p) : rpPlanHtml(p)}</div></div>`; }
 function rpRenderProject(p){
   projEnsure(p); if(rpUi.pid !== p.id){ rpUi.pid = p.id; rpUi.tab = 'overview'; rpUi.sec = {}; if(rpUi.draft && rpUi.draft.pid !== p.id) rpUi.draft = null; }
   const el = document.getElementById('projectWorkspace'), prev = {};
   ['.rp-left .rp-lbody', '.rp-centre .rp-cscroll', '.rp-right .rp-rbody'].forEach(s => { const n = el.querySelector(s); if(n) prev[s] = n.scrollTop; });
   el.innerHTML = `<div class="rp" data-kind="project"><aside class="rp-left" aria-label="Profile">${rpLeftHtml(p)}</aside><main class="rp-centre">${rpCentreHtml(p)}</main><aside class="rp-right" aria-label="Linked records">${rpRightHtml(p)}</aside></div>`;
   Object.keys(prev).forEach(s => { const n = el.querySelector(s); if(n) n.scrollTop = prev[s]; });
+  try{ const at = el.querySelector('.rp-tabs button.active'), bar = at && at.parentNode; if(bar && at.offsetLeft + at.offsetWidth > bar.clientWidth + bar.scrollLeft) bar.scrollLeft = at.offsetLeft + at.offsetWidth - bar.clientWidth + 16; }catch(e){}   // a tab that is off the edge (Money) is brought into view
   try{ pwStick(); }catch(e){}
   rpFit(); try{ gtFocus(); }catch(e){}
 }
@@ -20272,6 +20282,84 @@ document.addEventListener('change', (e) => {
   const el = e.target; if(!el || !el.dataset || el.dataset.tool !== 'uses' || !state) return; const p = state.projects.find(x => x.id === Number(el.dataset.toolPid)), u = p && (p.toolUse || []).find(x => x.id === el.dataset.uid); if(!u) return;
   u.uses = Math.max(0, Math.round(Number(el.value) || 0)); saveState(); render();
 });
+
+
+/* =====================================================================
+   Step 6: THE MONEY TAB ON A PROJECT
+   A view over records that already exist; nothing new is stored. Money in is the project's invoice schedule and scope additions (invRows), money out is its supplier payments
+   (finLines) and the transactions linked to it. Each planned line has one button that reuses the existing confirmation: Raise invoice (the schedule's Mark sent, or the invoice
+   document when there is one), Mark received (the receipt completion) and Confirm paid (Confirm supplier payment). Pressing it confirms there and then; the tab redraws.
+   "Margin now" and the job cost here take the confirmed receipt prices (po.pc.variance, ex VAT) where they exist. The figures behind retained profit, profit share and the pots are not touched.
+   ===================================================================== */
+function mnVariance(p){
+  const pos = (state.purchaseOrders || []).filter(po => po.pc && poProject(po) === p);
+  return { n: pos.length, v: r2(pos.reduce((s, po) => s + (Number(po.pc.variance) || 0), 0)) };
+}
+function mnMargin(p){
+  const mg = projMarginCC(p); if(!mg) return null; const rv = mnVariance(p), rev = mg.contract + mg.vars, planCost = r2(rev - mg.now);
+  return { sold: mg.soldM, soldPct: mg.soldPct, plan: mg.now, planCost, cost: r2(planCost + rv.v), now: r2(mg.now - rv.v), nowPct: rev ? (mg.now - rv.v) / rev * 100 : 0, rv, rev };
+}
+function mnData(p){
+  const ins = invRows().filter(r => r.pid === p.id).map(r => ({ r, key: r.vid ? 'v' + r.vid : String(r.idx), date: r.dueDate || '', amount: r.amount, got: r.paidDate ? (r.paidAmount > 0 ? r.paidAmount : r.amount) : (r.paidAmount > 0 ? r.paidAmount : 0), gotDate: r.paidDate || '' }));
+  const outs = finLines().filter(x => x.kind === 'supPay' && x.pid === p.id).map(x => { const tx = spTx(p, x.did); return { x, tx, date: x.date || '', amount: x.amount, done: x.done, paidDate: tx ? (txCashDate(tx) || tx.date) : (x.paidDate || ''), paidAmt: tx ? Number(tx.moneyOut) || 0 : 0 }; });
+  const txs = state.transactions.filter(t => t.projectId === p.id && Number(t.moneyOut) > 0 && !txUnsettledTrade(t));
+  return { ins, outs, txs };
+}
+function mnTotals(d){
+  const today = fmt(new Date());
+  return { received: r2(d.ins.reduce((s, i) => s + i.got, 0)), overdue: r2(d.ins.filter(i => i.r.status === 'Overdue' || i.r.status === 'Warning').reduce((s, i) => s + i.amount - (i.r.paidAmount || 0), 0)),
+    paidOut: r2(d.txs.reduce((s, t) => s + (Number(t.moneyOut) || 0), 0)), toInvoice: r2(d.ins.filter(i => !i.r.invoicedDate && !i.r.blocked && !i.r.paidDate).reduce((s, i) => s + i.amount, 0)), today };
+}
+function mnHeadlineHtml(p){
+  const t = mnTotals(mnData(p)), cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  return `<div class="rp-strip mn-strip">${cell('Received', qm(t.received), 'money in so far')}${cell('Overdue', qm(t.overdue), t.overdue ? 'raised and past due' : 'none', t.overdue ? 'bad' : '')}${cell('Paid out', qm(t.paidOut), 'suppliers and other costs')}${cell('Still to invoice', qm(t.toInvoice), 'not yet raised')}</div>`;
+}
+function mnSeries(events, upTo){   // cumulative steps: [{ d, cum }]
+  let cum = 0; return events.filter(e => e.d && (!upTo || e.d <= upTo)).sort((a, b) => a.d.localeCompare(b.d)).map(e => { cum = r2(cum + e.a); return { d: e.d, cum, a: e.a, label: e.label }; });
+}
+function mnGraphHtml(p, d){
+  const today = fmt(new Date());
+  const pin = d.ins.filter(i => i.date).map(i => ({ d: i.date, a: i.amount, label: i.r.desc })), ain = d.ins.filter(i => i.gotDate && i.got > 0).map(i => ({ d: i.gotDate, a: i.got, label: i.r.desc }));
+  const pout = d.outs.filter(o => o.date).map(o => ({ d: o.date, a: o.amount, label: o.x.label })), aout = d.txs.filter(t => txCashDate(t)).map(t => ({ d: txCashDate(t), a: Number(t.moneyOut) || 0, label: t.description || 'Cost' }));
+  const S = { pin: mnSeries(pin), ain: mnSeries(ain), pout: mnSeries(pout), aout: mnSeries(aout) }, all = [today].concat(...Object.values(S).map(s => s.map(x => x.d)));
+  if(all.length === 1) return '<div class="pw-empty">Nothing is dated yet. Money in comes from the invoice schedule, money out from the supplier payments.</div>';
+  let lo = all.reduce((a, x) => x < a ? x : a), hi = all.reduce((a, x) => x > a ? x : a); lo = addDaysIso(lo, -3); hi = addDaysIso(hi, 3);
+  const top = Math.max(1, ...Object.values(S).map(s => s.length ? s[s.length - 1].cum : 0)) * 1.08, W = 480, H = 230, L = 52, R = 12, T = 12, B = 28, pw = W - L - R, ph = H - T - B;
+  const span = Math.max(1, daysBetween(lo, hi)), X = x => r2(L + pw * Math.max(0, Math.min(1, daysBetween(lo, x) / span))), Y = v => r2(T + ph - ph * Math.max(0, v) / top);
+  const path = (s, end) => { let q = `M${X(lo)},${Y(0)}`; s.forEach(e => { q += ` H${X(e.d)} V${Y(e.cum)}`; }); return q + ` H${X(end)}`; };
+  const yt = [0, 1, 2, 3].map(i => top * i / 3), xt = [0, 1, 2, 3].map(i => addDaysIso(lo, Math.round(span * i / 3)));
+  const col = { in: 'var(--green)', out: 'var(--oak)' }, tipFor = (s, name) => s.map(e => `<circle cx="${X(e.d)}" cy="${Y(e.cum)}" r="${name.startsWith('Planned') ? 3.5 : 3}" class="mn-pt ${name.startsWith('Planned') ? 'hollow' : ''}" style="--c:${name.includes('in') ? col.in : col.out}"><title>${escHtml(name + ': ' + e.label + ' ' + qm(e.a) + ' on ' + dShow(e.d) + ' (running total ' + qm(e.cum) + ')')}</title></circle>`).join('');
+  const last = s => s.length ? s[s.length - 1].cum : 0, aria = `Money in: planned ${qm(last(S.pin))}, received ${qm(last(S.ain))}. Money out: planned ${qm(last(S.pout))}, paid ${qm(last(S.aout))}.`;
+  return `<div class="mn-graph"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${escAttr(aria)}" preserveAspectRatio="xMidYMid meet">
+    ${yt.map(v => `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" class="mn-grid"/><text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end" class="mn-ax">${v >= 1000 ? '£' + (Math.round(v / 100) / 10) + 'k' : '£' + Math.round(v)}</text>`).join('')}
+    ${xt.map((x, i) => `<text x="${X(x)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === 3 ? 'end' : 'middle'}" class="mn-ax">${escHtml(fmtDisplay(toDate(x)).replace(/ \d{4}$/, ''))}</text>`).join('')}
+    <path d="${path(S.pin, hi)}" class="mn-ln plan" style="--c:${col.in}"/><path d="${path(S.pout, hi)}" class="mn-ln plan" style="--c:${col.out}"/>
+    <path d="${path(S.ain, today)}" class="mn-ln act" style="--c:${col.in}"/><path d="${path(S.aout, today)}" class="mn-ln act" style="--c:${col.out}"/>
+    ${tipFor(S.pin, 'Planned money in')}${tipFor(S.pout, 'Planned money out')}${tipFor(S.ain, 'Received (money in)')}${tipFor(S.aout, 'Paid (money out)')}
+    <line x1="${X(today)}" x2="${X(today)}" y1="${T}" y2="${T + ph}" class="mn-today"/><text x="${Math.min(X(today) + 4, W - R - 28)}" y="${T + 10}" class="mn-ax mn-todaylab">Today</text></svg>
+    <div class="mn-legend"><span><i class="mn-key plan" style="--c:${col.in}"></i>Money in, planned ${qm(last(S.pin))}</span><span><i class="mn-key act" style="--c:${col.in}"></i>Money in, received ${qm(last(S.ain))}</span><span><i class="mn-key plan" style="--c:${col.out}"></i>Money out, planned ${qm(last(S.pout))}</span><span><i class="mn-key act" style="--c:${col.out}"></i>Money out, paid ${qm(last(S.aout))}</span></div></div>`;
+}
+function mnInBtn(p, i){
+  const r = i.r, at = `data-inv-pid="${p.id}" data-inv-k="${escAttr(i.key)}"`;
+  if(r.blocked) return '<span class="qb-dim">awaiting approval</span>';
+  if(r.paidDate && (!(r.paidAmount > 0) || r.paidAmount >= r.amount - 0.005)) return `<span class="pw-ok">✓ Received ${escHtml(pwD(r.paidDate))}</span>`;
+  if(!r.invoicedDate) return `<button type="button" class="btn qb-sm" data-inv-a="sent" ${at}>Raise invoice</button>`;
+  return `<button type="button" class="btn qb-sm" data-inv-a="paid" ${at}>Mark received</button>`;
+}
+function rpMoneyHtml(p){
+  const d = mnData(p), today = fmt(new Date()), mg = mnMargin(p), sg = v => Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v)), cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  const ins = d.ins.slice().sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')), outs = d.outs.slice().sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
+  const inRow = i => { const r = i.r, late = r.dueDate && !r.paidDate && r.dueDate < today;
+    return `<div class="mn-item${late ? ' late' : ''}"><div class="mn-i-main"><b>${escHtml(r.desc)}</b><span class="rp-dim"> ${qm(r.amount)}${r.kind === 'contract' ? ' · ' + r.seq + ' of ' + r.of : ' · scope addition'}</span><div class="mn-i-sub">${invPill(r.status)}${r.dueDate ? ' due ' + escHtml(pwD(r.dueDate)) : ' no date'}${r.invoicedDate ? ' · raised ' + escHtml(pwD(r.invoicedDate)) : (r.raiseBy ? ' · raise by ' + escHtml(pwD(r.raiseBy)) : '')}${late ? ` · <b class="over">${daysBetween(r.dueDate, today)} day${daysBetween(r.dueDate, today) === 1 ? '' : 's'} late</b>` : ''}</div></div><div class="mn-i-act">${mnInBtn(p, i)}</div></div>`; };
+  const outRow = o => { const late = o.date && !o.done && o.date < today;
+    return `<div class="mn-item${late ? ' late' : ''}"><div class="mn-i-main"><b>${escHtml(o.x.label)}</b><span class="rp-dim"> planned ${qm(o.amount)}${o.done && o.tx ? ' · paid ' + qm(o.paidAmt) : ''}</span><div class="mn-i-sub">${o.done ? 'paid ' + (o.paidDate ? escHtml(pwD(o.paidDate)) : '') : (o.date ? 'due ' + escHtml(pwD(o.date)) : 'no date')}${late ? ` · <b class="over">${daysBetween(o.date, today)} day${daysBetween(o.date, today) === 1 ? '' : 's'} late</b>` : ''}${o.tx && o.tx.payMode === 'trade' && !o.tx.settledDate ? ' · on trade account, unpaid' : ''}</div></div>
+      <div class="mn-i-act">${o.done ? '<span class="pw-ok">✓ Paid</span>' : `<button type="button" class="btn qb-sm" data-spay="confirm" data-pid="${p.id}" data-did="${escAttr(o.x.did)}">Confirm paid</button>`}</div></div>`; };
+  const marginHtml = mg ? `<div class="rp-card"><h4>Margin and job cost <span class="qb-dim">(ex VAT, confirmed receipt prices where there are any)</span></h4><div class="rp-strip mn-strip2" style="border:0;">${cell('Margin as sold', qm(mg.sold), mg.soldPct.toFixed(1) + '%')}${cell('Margin now', qm(mg.now), mg.nowPct.toFixed(1) + '%' + (mg.rv.n ? ' · confirmed prices' : ''), mg.now < mg.sold - 0.005 ? 'bad' : '')}${cell('Job cost', qm(mg.cost), mg.rv.n ? 'plan ' + qm(mg.planCost) : 'from the Working plan')}${cell('Variance from receipts', mg.rv.n ? sg(mg.rv.v) : '—', mg.rv.n ? mg.rv.n + ' order' + (mg.rv.n === 1 ? '' : 's') + (mg.rv.v > 0.005 ? ' cost more' : mg.rv.v < -0.005 ? ' cost less' : ' as quoted') : 'no prices confirmed yet', mg.rv.v > 0.005 ? 'bad' : '')}</div>
+    <p class="q-help" style="margin:8px 0 0;">Margin now here is the Working plan margin less the variance on confirmed receipts. Retained profit, profit share and the pots still use the Working plan figures.${toolCostOn() && projToolCost(p) ? ' Tool cost on this job (' + qm(projToolCost(p)) + ') is recorded but not counted in the margin.' : ''}</p></div>` : '';
+  return `<div class="mn-wrap">${marginHtml}<div class="rp-card"><div class="rp-card-h"><h4>Money in and out, planned against actual</h4><button type="button" class="btn secondary qb-sm" data-rp="legacy" data-sec="money">Open the invoice schedule</button></div>${mnGraphHtml(p, d)}</div>
+    <div class="rp-card"><h4>Money in <span class="db-count">${ins.length}</span></h4>${ins.map(inRow).join('') || '<div class="pw-empty">No invoice schedule yet.</div>'}</div>
+    <div class="rp-card"><h4>Money out <span class="db-count">${outs.length}</span></h4>${outs.map(outRow).join('') || '<div class="pw-empty">No supplier payments yet: they come from the delivery drops on the accepted quote.</div>'}</div></div>`;
+}
 
 /* BT:js-money end */
 
