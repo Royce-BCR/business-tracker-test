@@ -104,3 +104,15 @@ New stored fields, all optional and defaulting empty or to the values above: lea
 - **Reschedule review** warns by capacity instead of by overlapping dates, and suggests Tentative. A tentative project stays on the calendar in full, striped.
 
 New stored fields, all optional and defaulting safely: `state.holidays`, `state.phaseTemplate`, `state.people`; `settings.workingWeek`, `settings.leadWeightPct` (default 20); phase `hours`, `start`, `end`, `selling`, `done`; `project.tentative.prev.phases`. Nothing existing is renamed, removed or converted.
+
+## Money foundations (Stage 5, test site)
+
+- **Classify** (Finance): each money-out line can be a job cost (with its project), a business cost or an asset purchase. The class is suggested from the category and only stored when accepted, one at a time or with "Accept all suggestions" (asks first). Unclassified costs share one rolling task on Today. No amount, date, category or link on a transaction is changed.
+- **Business costs** (Business): recurring costs with a due date feed the Cash Flow Forecast; a matching transaction is suggested and ticked off when you confirm. Monthly figure and break-even sales. "Start from the existing overheads" copies the five Pricing Model lines (they stay); "Use this list for the Pricing Model overheads" is off until pressed and confirmed.
+- **Set-aside method per pot** (Settings, Finance): percentage (default, 30, 25, 20, 25) or a fixed monthly amount. Default figures are unchanged.
+- **Assets**: optional charge per use (Settings switch "Tool cost on jobs", off by default), tools used on a job, hire cost and expected uses on the asset plan with buy against hire side by side.
+- **Money tab** on a project: four figures, planned against actual graph, one confirm button per planned line (reusing the invoice and supplier payment confirmations). Margin now and job cost here use confirmed receipt prices.
+- Settings: default lead weighting (Planning and capacity). Hours logged on a project shows the split by source.
+- `stage5-profit-note.md` explains the order in which money is taken today.
+
+New stored fields, all optional: `transaction.costClass`, `.costProjectId`, `.classHow`, `.classAt`, `.classBy`; `state.businessCosts`; `settings.bizCostsForOverheads`, `settings.pot*Method`, `.pot*Fixed`, `.pot*From`, `settings.toolCostOnJobs`; `asset.usageCharge`, `.usageAfter`; plan item `.hireCost`, `.uses`; `project.toolUse`. Tasks now keep their `autoKey` when a saved document is loaded.
