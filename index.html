@@ -2688,6 +2688,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 /* BT:css-finance begin */
   .f6-lostp { border-top: 1px solid var(--line); padding: var(--bt-s3) 0; } .f6-lostp-h { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .f6-lostl { margin: 6px 0 8px 18px; padding: 0; font-size: var(--bt-fs-sm); }
   .f6-dupg { border: 1px solid var(--line); border-radius: var(--bt-r-md, 8px); padding: var(--bt-s3); margin-bottom: var(--bt-s3); }
+  .f6-tile { text-align: left; cursor: pointer; font: inherit; } .f6-tile.sel { outline: 2px solid var(--bt-oak-500, #a0794a); } .f6-bk { display: inline-flex; gap: 4px; flex-wrap: wrap; }
   .f6-acts { display: flex; gap: 4px; flex-wrap: wrap; } .f6-in { color: var(--bt-ok-fg); } .f6-weeks td, .f6-weeks th { white-space: nowrap; } .f6-low { background: var(--bt-warn-bg); } .f6-wklist { margin-top: var(--bt-s3); }
   .f6-ul { margin: 4px 0 10px 16px; padding: 0; font-size: var(--bt-fs-sm); } .f6-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s4); margin-top: var(--bt-s3); } .f6-cand { display: block; margin: 6px 0; }
 /* BT:css-finance end */
@@ -2760,6 +2761,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
       <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
+      <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
       <button type="button" class="tab g-finance" data-tab="revenue">Revenue Forecast</button>
@@ -3108,6 +3110,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <div class="desc">What the business pays whether or not a job is running: insurance, accountancy, subscriptions, phone. Each has an amount, how often it recurs and when it is next due. Dated costs go into the Cash Flow Forecast, and a matching transaction ticks a cost off as paid once you confirm it.</div>
     </div>
     <div id="bcBody"></div>
+  </div>
+
+  <!-- AGEING -->
+  <div class="panel" id="panel-ageing">
+    <div class="page-head">
+      <h2>Ageing</h2>
+      <div class="desc">Who owes the business, and what the business owes, by how late it is. Nothing is typed here: every line opens the invoice, payment or cost behind it.</div>
+    </div>
+    <div id="ageingBody"></div>
   </div>
 
   <!-- CLASSIFY -->
@@ -14496,7 +14507,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
-  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); }catch(e){ console.error(e); }
+  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); renderAgeing(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
@@ -20649,6 +20660,34 @@ document.addEventListener('click', async (e) => {
   }
 });
 /* a line matched to an existing transaction (not made by "Mark paid") must not get a second receipt made for it */
+/* ---- step 2: ageing (reads owedToMe() and iOwe(), the same lists the weekly review totals come from) ---- */
+const ageUi = { tab: 'me', by: 'who', bucket: '' };
+navExtra('age', () => ({ t: ageUi.tab, b: ageUi.by, k: ageUi.bucket }), o => { if(o){ ageUi.tab = o.t; ageUi.by = o.b; ageUi.bucket = o.k; } });
+function ageLineHtml(x){
+  const kind = x.kind === 'cust' ? 'Invoice' : x.kind === 'sup' ? 'Supplier payment' : 'Business cost';
+  return `<tr><td>${x.kind === 'biz' ? '' : `<button type="button" class="sp-link" data-nav="project:${x.pid}:money">${escHtml(x.code)}</button> `}${escHtml(x.pname)}</td><td><button type="button" class="sp-link" data-nav="${escAttr(x.nav)}">${escHtml(x.label)}</button><div class="qb-dim">${kind}${x.queried ? ' · queried' : ''}</div></td><td>${x.due ? pwD(x.due) : '<span class="qb-dim">no date</span>'}</td><td>${x.late > 0 ? `<b class="over">${x.late} day${x.late === 1 ? '' : 's'}</b>` : (x.due ? '<span class="qb-dim">not yet due</span>' : '—')}</td><td class="qb-calc">${qm(x.owed)}</td></tr>`;
+}
+function ageHtml(){
+  const me = ageUi.tab === 'me', all = me ? owedToMe() : iOwe(), shown = ageUi.bucket ? all.filter(x => x.bucket === ageUi.bucket) : all, overdue = all.filter(x => x.late > 0);
+  const tile = (k, n, list, cls) => `<button type="button" class="kpi f6-tile${ageUi.bucket === k ? ' sel' : ''}" data-f6="age-bucket" data-k="${k}" style="--accent:${cls}"><div class="label">${n}</div><div class="value">${qm(finSum(list))}</div><div class="fin-sub">${list.length} line${list.length === 1 ? '' : 's'}</div></button>`;
+  const grp = {}; shown.forEach(x => { const k = ageUi.by === 'project' ? (x.kind === 'biz' ? 'Business costs' : x.code + ' ' + x.pname) : x.who; (grp[k] = grp[k] || []).push(x); });
+  const groups = Object.keys(grp).sort((a, b) => finSum(grp[b]) - finSum(grp[a]) || a.localeCompare(b));
+  const byLabel = me ? ['who', 'By customer'] : ['who', 'By supplier or cost'];
+  return `<div class="view-toggle" role="group" aria-label="Ageing">${[['me', 'Money owed to me'], ['owe', 'Money I owe']].map(([k, n]) => `<button type="button" data-f6="age-tab" data-v="${k}" class="${ageUi.tab === k ? 'active' : ''}">${n}</button>`).join('')}</div>
+    <p class="q-help">${me ? 'Customer invoices that have been raised and not paid, by how many days past their due date. A written-off invoice is not listed. Same list as Owed to me on the weekly review.' : 'Supplier payments not yet paid and the next due date of each business cost, by how many days past their due date. Same list as I owe on the weekly review.'}</p>
+    <div class="kpi-row">${FIN_BUCKETS.map(([k, n], i) => tile(k, n, all.filter(x => x.bucket === k), ['var(--green)', 'var(--oak)', 'var(--plum)', 'var(--bt-bad-fg)'][i])).join('')}
+      <div class="kpi" style="--accent:var(--slate)"><div class="label">Total</div><div class="value">${qm(finSum(all))}</div><div class="fin-sub">${all.length} lines</div></div>
+      <div class="kpi" style="--accent:var(--bt-bad-fg)"><div class="label">Overdue</div><div class="value ${overdue.length ? 'over' : ''}">${qm(finSum(overdue))}</div><div class="fin-sub">${overdue.length} line${overdue.length === 1 ? '' : 's'} past due</div></div></div>
+    <div class="view-toggle" role="group" aria-label="Group">${[[byLabel[0], byLabel[1]], ['project', 'By project']].map(([k, n]) => `<button type="button" data-f6="age-by" data-v="${k}" class="${ageUi.by === k ? 'active' : ''}">${n}</button>`).join('')}${ageUi.bucket ? ` <button type="button" class="btn secondary qb-sm" data-f6="age-bucket" data-k="">Show all buckets</button>` : ''}</div>
+    ${groups.map(g => { const l = grp[g].slice().sort((a, b) => b.late - a.late); return `<div class="card"><div class="qb-sec-h"><h4>${escHtml(g)} <span class="qb-dim">${qm(finSum(l))}</span></h4><span class="f6-bk">${FIN_BUCKETS.map(([k, n]) => { const v = finSum(l.filter(x => x.bucket === k)); return v ? `<span class="qb-flag ${k === 'cur' ? 'ok' : 'bad'}">${escHtml(n)} ${qm(v)}</span>` : ''; }).join(' ')}</span></div>
+      <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Project</th><th>Line</th><th>Due</th><th>Past due</th><th>Owed</th></tr></thead><tbody>${l.map(ageLineHtml).join('')}</tbody></table></div></div>`; }).join('') || '<div class="sup-empty">Nothing here.</div>'}`;
+}
+function renderAgeing(){ const el = document.getElementById('ageingBody'); if(el && state) el.innerHTML = ageHtml(); }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-f6^="age-"]'); if(!b || !state) return; const a = b.dataset.f6;
+  if(a === 'age-tab'){ ageUi.tab = b.dataset.v; ageUi.bucket = ''; } else if(a === 'age-by') ageUi.by = b.dataset.v; else if(a === 'age-bucket') ageUi.bucket = ageUi.bucket === b.dataset.k ? '' : b.dataset.k;
+  renderAgeing();
+});
 /* BT:js-finance end */
 
 /* ---------- init ---------- */
