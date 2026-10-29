@@ -2689,6 +2689,10 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .f6-lostp { border-top: 1px solid var(--line); padding: var(--bt-s3) 0; } .f6-lostp-h { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .f6-lostl { margin: 6px 0 8px 18px; padding: 0; font-size: var(--bt-fs-sm); }
   .f6-dupg { border: 1px solid var(--line); border-radius: var(--bt-r-md, 8px); padding: var(--bt-s3); margin-bottom: var(--bt-s3); }
   .f6-tile { text-align: left; cursor: pointer; font: inherit; } .f6-tile.sel { outline: 2px solid var(--bt-oak-500, #a0794a); } .f6-bk { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+  .f6-dqs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 var(--bt-s3); padding: var(--bt-s2) var(--bt-s3); border: 1px solid var(--line); border-radius: var(--bt-r-md, 8px); background: var(--bt-surface-2); } .f6-dqt { font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin-right: 4px; }
+  .f6-dq { font: inherit; font-size: var(--bt-fs-xs); border: 1px solid var(--line); border-radius: var(--bt-r-pill); padding: 2px 10px; background: var(--bt-paper, #fff); cursor: pointer; } .f6-dq.warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .f6-dq.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); } .f6-dql { flex-basis: 100%; }
+  .f6-pl th, .f6-pl td { white-space: nowrap; } .f6-fc { background: var(--bt-surface-2); } .f6-sub td { font-weight: 600; border-top: 1px solid var(--line); } .f6-sect td { background: var(--bt-chalk); font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); } .f6-memo td { color: var(--text-muted); font-style: italic; } .f6-bridge h5 { margin: 0 0 6px; }
+  .f6-ul .sp-link { display: inline; text-align: left; }
   .f6-acts { display: flex; gap: 4px; flex-wrap: wrap; } .f6-in { color: var(--bt-ok-fg); } .f6-weeks td, .f6-weeks th { white-space: nowrap; } .f6-low { background: var(--bt-warn-bg); } .f6-wklist { margin-top: var(--bt-s3); }
   .f6-ul { margin: 4px 0 10px 16px; padding: 0; font-size: var(--bt-fs-sm); } .f6-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s4); margin-top: var(--bt-s3); } .f6-cand { display: block; margin: 6px 0; }
 /* BT:css-finance end */
@@ -2762,6 +2766,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
       <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
+      <button type="button" class="tab g-finance" data-tab="pnl">Profit and loss</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
       <button type="button" class="tab g-finance" data-tab="revenue">Revenue Forecast</button>
@@ -3110,6 +3115,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <div class="desc">What the business pays whether or not a job is running: insurance, accountancy, subscriptions, phone. Each has an amount, how often it recurs and when it is next due. Dated costs go into the Cash Flow Forecast, and a matching transaction ticks a cost off as paid once you confirm it.</div>
     </div>
     <div id="bcBody"></div>
+  </div>
+
+  <!-- PROFIT AND LOSS -->
+  <div class="panel" id="panel-pnl">
+    <div class="page-head">
+      <h2>Profit and loss</h2>
+      <div class="desc">Money earned, less job costs, by month, with the business costs beside it and a check against the bank. Nothing is typed here: every figure is read from the invoices, the Working plans, the transactions and the Business costs list, and opens the lines behind it.</div>
+    </div>
+    <div id="pnlBody"></div>
   </div>
 
   <!-- AGEING -->
@@ -14507,7 +14521,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
-  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); renderAgeing(); }catch(e){ console.error(e); }
+  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); renderAgeing(); renderPnl(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
@@ -20688,6 +20702,120 @@ document.addEventListener('click', (e) => {
   if(a === 'age-tab'){ ageUi.tab = b.dataset.v; ageUi.bucket = ''; } else if(a === 'age-by') ageUi.by = b.dataset.v; else if(a === 'age-bucket') ageUi.bucket = ageUi.bucket === b.dataset.k ? '' : b.dataset.k;
   renderAgeing();
 });
+/* ---- data-quality strip: how far to trust a page. Counts are read from the records; each one opens where it is fixed. ---- */
+const dqUi = { open: '' };
+function dqCounts(from, to){   // from / to are YYYY-MM (inclusive) or ''
+  const inR = d => !!d && (!from || d.slice(0, 7) >= from) && (!to || d.slice(0, 7) <= to), cur = finToday().slice(0, 7);
+  const uncl = state.transactions.filter(t => clsNeeds(t) && inR(txCashDate(t) || t.date));
+  const pos = (state.purchaseOrders || []).filter(po => poNeedsPrices(po) && inR(poActualDelivery(po)));
+  const ass = []; phRecords().forEach(({ kind, r }) => sfPhases(r).filter(ph => phIsDone(ph) && ph.done.mode !== 'confirmed' && inR(ph.done.date)).forEach(ph => ass.push({ kind, r, ph })));
+  const mon = reconMonths().filter(k => k < cur && (!from || k >= from) && (!to || k <= to) && !reconLockedMonth(MAIN_ACC, k));
+  const miss = state.transactions.filter(t => inR(txCashDate(t) || t.date) && (!String(t.category || '').trim() || (clsOf(t) === 'job' && !clsProjectId(t))));
+  return { uncl, pos, ass, mon, miss };
+}
+function dqNavFor(kind, r){ return kind === 'project' ? 'project:' + r.id + ':plan' : 'deal2:' + r.id; }
+function dqStripHtml(from, to){
+  const c = dqCounts(from, to), chip = (k, n, label, page, tip) => `<button type="button" class="f6-dq ${n ? 'warn' : 'ok'}" data-f6="dq" data-k="${k}" title="${escAttr(tip)}"><b>${n}</b> ${escHtml(label)}</button>`;
+  const lines = { uncl: c.uncl.map(t => ({ t: (t.description || 'Transaction') + ' ' + qm(t.moneyOut), nav: 'txn:' + (t.uid || state.transactions.indexOf(t)) })), pos: c.pos.map(po => ({ t: po.ref + ' ' + (po.supplierName || ''), nav: 'po:' + po.id })),
+    ass: c.ass.map(x => ({ t: boardTitle(x.kind, x.r) + ': ' + (x.ph.name || 'phase') + ' ' + phFmtH(x.ph.done.hours), nav: dqNavFor(x.kind, x.r) })), mon: c.mon.map(k => ({ t: monthLabel(new Date(k + '-01T00:00:00')) + ' not reconciled', nav: 'recon:' + k })), miss: c.miss.map(t => ({ t: (t.description || 'Transaction') + (clsOf(t) === 'job' && !clsProjectId(t) ? ' (job cost, no project)' : ' (no category)'), nav: 'txn:' + (t.uid || state.transactions.indexOf(t)) })) };
+  const page = { uncl: ['classify', 'Open Classify'], pos: ['purchaseorders', 'Open Orders and deliveries'], ass: ['today', 'Open Today'], mon: ['reconciliation', 'Open Bank Reconciliation'], miss: ['transactions', 'Open Transactions'] };
+  return `<div class="f6-dqs" role="group" aria-label="Data quality"><span class="f6-dqt">Data quality</span>${chip('uncl', c.uncl.length, 'unclassified transactions', '', 'Money out with no job, business or asset class')}${chip('pos', c.pos.length, 'unconfirmed prices', '', 'Delivered orders whose receipt prices are not confirmed')}${chip('ass', c.ass.length, 'assumed hours', '', 'Phases ticked done with the budget accepted, not confirmed')}${chip('mon', c.mon.length, 'unreconciled months', '', 'Past months not reconciled to the bank')}${chip('miss', c.miss.length, 'missing categories', '', 'No category, or a job cost with no project')}
+    ${dqUi.open && lines[dqUi.open] ? `<div class="f6-dql"><ul class="f6-ul">${lines[dqUi.open].slice(0, 40).map(l => `<li><button type="button" class="sp-link" data-nav="${escAttr(l.nav)}">${escHtml(l.t)}</button></li>`).join('') || '<li class="qb-dim">Nothing to fix.</li>'}${lines[dqUi.open].length > 40 ? `<li class="qb-dim">and ${lines[dqUi.open].length - 40} more: open the page.</li>` : ''}</ul><button type="button" class="btn secondary qb-sm" data-nav-tab="${page[dqUi.open][0]}">${page[dqUi.open][1]} →</button></div>` : ''}</div>`;
+}
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-f6="dq"]'); if(!b || !state) return; dqUi.open = dqUi.open === b.dataset.k ? '' : b.dataset.k; render(); });
+/* the reconciliation page opens at a month when a data-quality line asks for it */
+(function(){ const o = finNavOpen; finNavOpen = function(kind, id, extra){ if(kind === 'recon'){ reconUi.month = id; activateTab('reconciliation'); renderRecon(true); window.scrollTo(0, 0); return; } return o(kind, id, extra); }; })();
+/* ---- step 3: profit and loss by month ----
+   Revenue, job costs, project profit, profit share and retained profit are exactly the code's figures (projRetained), recognised in proportion to the invoices dated in the month
+   (the recognition rule projInvoicedShare uses), so the actual months add up to retainedTotals().toDate. Business costs sit beside, never inside, the retained profit. */
+const plUi = { from: '', to: '', sel: null, rec: '' };
+navExtra('pl', () => ({ f: plUi.from, t: plUi.to, s: plUi.sel, r: plUi.rec }), o => { if(o){ plUi.from = o.f; plUi.to = o.t; plUi.sel = o.s; plUi.rec = o.r; } });
+const monthAdd = (key, n) => { const [y, m] = key.split('-').map(Number); return monthKey(new Date(y, m - 1 + n, 1)); };
+const monthsBetween = (a, b) => { const out = []; let k = a, g = 0; while(k <= b && g++ < 120){ out.push(k); k = monthAdd(k, 1); } return out; };
+function plBase(p){
+  const r = projRetained(p), aq = projAcceptedQuote(p); let price;
+  if(aq && p.plan){ const mg = projMarginCC(p); price = mg.contract + mg.vars; } else price = Number(p.agreedValue) || 0;   // the same branch projRetained takes
+  return { r, price, jobCost: price - r.plan.profit };
+}
+function plTx(key){ return state.transactions.filter(t => { const d = txCashDate(t); return d && d.slice(0, 7) === key && d >= accOpening(accFind(txAccId(t))).date; }); }
+function plBiz(key){
+  const cur = finToday().slice(0, 7), listed = (state.businessCosts || []).length > 0, useList = state.settings.bizCostsForOverheads === true;
+  const planned = listed ? bcMonthly() : (useList ? 0 : r2(bcOhLinesTotal() / 12)), est = !listed && !useList, paid = r2(plTx(key).filter(t => clsOf(t) === 'business').reduce((s, t) => s + (Number(t.moneyOut) || 0), 0));
+  return { planned, est, paid, used: key < cur ? paid : planned, basis: key < cur ? 'actual' : (est ? 'estimate' : 'planned') };
+}
+function plCompute(keys){
+  const cur = finToday().slice(0, 7), all = invRows(), projs = state.projects.map(p => { const b = plBase(p), rows = all.filter(r => r.pid === p.id), total = rows.reduce((s, r) => s + r.amount, 0); return { p, b, rows, total }; });
+  const months = keys.map(k => ({ key: k, forecast: k > cur, cur: k === cur, rev: 0, job: 0, profit: 0, share: 0, retained: 0, parts: [] }));
+  projs.forEach(x => { if(!(x.total > 0)) return;
+    x.rows.forEach(r => { let k = r.invoicedDate ? r.invoicedDate.slice(0, 7) : ''; const fc = !r.invoicedDate;
+      if(fc){ if(x.p.lost || r.blocked) return; const d = r.raiseBy || r.dueDate; if(!d) return; k = d.slice(0, 7); if(k < cur) k = cur; }
+      const m = months.find(y => y.key === k); if(!m) return; const sh = r.amount / x.total;
+      m.rev += x.b.price * sh; m.job += x.b.jobCost * sh; m.profit += x.b.r.plan.profit * sh; m.share += x.b.r.plan.share * sh; m.retained += x.b.r.plan.retained * sh;
+      m.parts.push({ p: x.p, r, sh, rev: x.b.price * sh, job: x.b.jobCost * sh, profit: x.b.r.plan.profit * sh, share: x.b.r.plan.share * sh, retained: x.b.r.plan.retained * sh, fc }); }); });
+  months.forEach(m => { const tx = plTx(m.key), out = t => Number(t.moneyOut) || 0, cls = c => tx.filter(t => out(t) > 0 && clsOf(t) === c), sm = a => r2(a.reduce((s, t) => s + out(t), 0));
+    m.tx = tx; m.jobTx = cls('job'); m.bizTx = cls('business'); m.assetTx = cls('asset'); m.unclTx = tx.filter(clsNeeds); m.jobPaid = sm(m.jobTx); m.assetPaid = sm(m.assetTx); m.unclPaid = sm(m.unclTx); m.biz = plBiz(m.key); m.afterBiz = m.retained - m.biz.used; });
+  return months;
+}
+function plRows(){ return [['rev', 'Revenue as invoiced (ex VAT)'], ['job', 'Less job costs (Working plan and unplanned, recognised as invoiced)'], ['profit', 'Project profit'], ['share', 'Less profit share'], ['retained', 'Retained profit']]; }
+function plLinesFor(row, m){
+  const L = [], proj = x => ({ t: 'project', id: x.p.id, sec: 'money' }), inv = x => ({ t: 'invoice', pid: x.p.id, idx: x.r.idx, vid: x.r.vid });
+  if(['rev', 'job', 'profit', 'share', 'retained'].includes(row)) m.parts.forEach(x => L.push({ label: x.p.name + ': ' + x.r.desc + (x.fc ? ' (forecast, not yet invoiced)' : ''), amount: x[row], date: x.r.invoicedDate || x.r.raiseBy || x.r.dueDate, src: row === 'rev' ? inv(x) : proj(x), note: (Math.round(x.sh * 1000) / 10) + '% of the job' }));
+  const tl = t => ({ label: (t.description || 'Transaction') + (t.projectId ? '' : ''), amount: Number(t.moneyOut) || Number(t.moneyIn) || 0, date: txCashDate(t), src: { t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) } });
+  if(row === 'jobTx') m.jobTx.forEach(t => L.push(tl(t))); if(row === 'bizTx') m.bizTx.forEach(t => L.push(tl(t))); if(row === 'assetTx') m.assetTx.forEach(t => L.push(tl(t))); if(row === 'unclTx') m.unclTx.forEach(t => L.push(tl(t)));
+  if(row === 'biz'){ if(m.key < finToday().slice(0, 7)) m.bizTx.forEach(t => L.push(tl(t))); else (state.businessCosts || []).forEach(c => L.push({ label: (c.name || 'Business cost') + ' (' + (BC_FREQ.find(f => f[0] === c.freq) || ['', c.freq])[1].toLowerCase() + ')', amount: r2(bcPerMonth(c)), date: c.nextDue, src: { t: 'bcost', id: c.id }, note: 'monthly equivalent' })); }
+  return L;
+}
+function plRecon(m){
+  const tx = m.tx, inn = t => Number(t.moneyIn) || 0, out = t => Number(t.moneyOut) || 0, landed = new Set(); state.projects.forEach(p => (p.paymentLines || []).concat(p.variations || []).forEach(l => { if(l.landedTxn) landed.add(l.landedTxn); }));
+  const bankIn = r2(tx.reduce((s, t) => s + inn(t), 0)), bankOut = r2(tx.reduce((s, t) => s + out(t), 0)), isLine = t => inn(t) > 0 && (t.lineUid || /^(cp|vp):/.test(t.srcKey || '') || landed.has(rvTxId(t)));
+  const linked = tx.filter(isLine), other = tx.filter(t => inn(t) > 0 && !isLine(t)), C = r2(linked.reduce((s, t) => s + inn(t), 0)), D = r2(other.reduce((s, t) => s + inn(t), 0));
+  const invd = invRows().filter(r => r.invoicedDate && r.invoicedDate.slice(0, 7) === m.key), B = r2(invd.reduce((s, r) => s + r.amount, 0)), A = r2(m.parts.filter(x => !x.fc).reduce((s, x) => s + x.rev, 0));   // only what has been invoiced: a forecast part of this month is not in the bank yet
+  const inItems = [{ k: 'vat', t: 'VAT and rounding on the invoices raised this month (invoiced ' + qm(B) + ' against revenue ' + qm(A) + ')', v: r2(B - A), nav: 'page:invoicing', list: invd.map(r => ({ label: r.pname + ': ' + r.desc, amount: r.amount, src: { t: 'invoice', pid: r.pid, idx: r.idx, vid: r.vid } })) },
+    { k: 'timing', t: 'Timing: receipts against invoices this month, less the invoices raised this month', v: r2(C - B), nav: 'page:invoicing', list: linked.map(t => ({ label: t.description || 'Receipt', amount: inn(t), src: { t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) } })) },
+    { k: 'other', t: 'Money in not tied to an invoice line (' + other.length + ')', v: D, nav: 'page:transactions', list: other.map(t => ({ label: t.description || 'Money in', amount: inn(t), src: { t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) } })) }];
+  const J = r2(m.parts.filter(x => !x.fc).reduce((s, x) => s + x.job, 0)), Bz = r2(m.biz.used), tl = t => ({ label: t.description || 'Money out', amount: out(t), src: { t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) } });
+  const outItems = [{ k: 'job', t: 'Job costs: P&L ' + qm(J) + ' (Working plan, as invoiced) against ' + qm(m.jobPaid) + ' paid and classed as job cost', v: r2(J - m.jobPaid), list: m.jobTx.map(tl) }, { k: 'biz', t: 'Business costs: P&L ' + qm(Bz) + ' (' + m.biz.basis + ') against ' + qm(m.biz.paid) + ' paid and classed as business cost', v: r2(Bz - m.biz.paid), list: m.bizTx.map(tl) },
+    { k: 'asset', t: 'Asset purchases paid (not a profit and loss cost)', v: -m.assetPaid, list: m.assetTx.map(tl) }, { k: 'uncl', t: 'Money out with no class yet (' + m.unclTx.length + '): it is in the bank and in no P&L line', v: -m.unclPaid, list: m.unclTx.map(tl), nav: 'page:classify' }];
+  const inDiff = r2(bankIn - A), outDiff = r2(bankOut - (J + Bz));
+  return { bankIn, bankOut, A, plOut: r2(J + Bz), inItems, outItems, inDiff, outDiff, inUnexplained: r2(inDiff - inItems.reduce((s, x) => s + x.v, 0)), outUnexplained: r2((J + Bz - bankOut) - outItems.reduce((s, x) => s + x.v, 0)), acc: recon().accounts.map(a => ({ a, locked: reconLockedMonth(a.id, m.key) })) };
+}
+function plHtml(){
+  const cur = finToday().slice(0, 7); if(!plUi.from) plUi.from = monthAdd(cur, -5); if(!plUi.to) plUi.to = monthAdd(cur, 3);
+  const keys = monthsBetween(plUi.from, plUi.to), M = plCompute(keys), tot = f => M.reduce((s, m) => s + f(m), 0), money2 = v => (v < 0 ? '-' : '') + qm(Math.abs(v));
+  const cell = (row, m, v, neg) => { const n = plLinesFor(row, m).length, sel = plUi.sel && plUi.sel.row === row && plUi.sel.key === m.key; return `<td class="qb-calc${m.forecast ? ' f6-fc' : ''}">${n ? `<button type="button" class="cf-n${sel ? ' sel' : ''}" data-f6="pl-sel" data-row="${row}" data-key="${m.key}" title="Show the ${n} line${n === 1 ? '' : 's'} behind this number">${neg && Math.abs(v) > 0.004 ? '−' : ''}${money2(Math.abs(v))}</button>` : (neg && Math.abs(v) > 0.004 ? '−' : '') + money2(Math.abs(v))}</td>`; };
+  const R = (row, label, f, neg, cls) => `<tr${cls ? ` class="${cls}"` : ''}><td>${label}</td>${M.map(m => cell(row, m, f(m), neg)).join('')}<td class="qb-calc"><b>${neg ? '−' : ''}${money2(Math.abs(tot(f)))}</b></td></tr>`;
+  const noList = (state.businessCosts || []).length === 0 && !state.settings.bizCostsForOverheads;
+  const selM = plUi.sel && M.find(m => m.key === plUi.sel.key), selL = selM ? plLinesFor(plUi.sel.row, selM).sort((a, b) => String(a.date || '').localeCompare(String(b.date || ''))) : [];
+  const rk = plUi.rec && M.some(m => m.key === plUi.rec) ? plUi.rec : (M.filter(m => !m.forecast).pop() || M[0]).key, rm = M.find(m => m.key === rk), rc = plRecon(rm);
+  const bridge = (title, bank, pl, items, un, diffLbl) => `<div class="f6-bridge"><h5>${title}</h5><table class="qb-table qb-narrow"><tbody><tr><td>Per the profit and loss</td><td class="qb-calc">${qm(pl)}</td></tr><tr><td>Per the bank (Transactions this month)</td><td class="qb-calc">${qm(bank)}</td></tr><tr><td><b>Difference</b></td><td class="qb-calc"><b>${money2(r2(bank - pl))}</b></td></tr></tbody></table>
+    <details open><summary>What explains it</summary><ul class="f6-ul">${items.map(x => `<li>${x.nav ? `<button type="button" class="sp-link" data-nav-tab="${x.nav.replace('page:', '')}">${escHtml(x.t)}</button>` : escHtml(x.t)}: <b>${money2(x.v)}</b>${x.list.length ? `<details><summary>${x.list.length} line${x.list.length === 1 ? '' : 's'}</summary><ul class="f6-ul">${x.list.map(l => `<li>${finSrcLink(l.src, l.label)} ${qm(l.amount)}</li>`).join('')}</ul></details>` : ''}</li>`).join('')}<li class="${Math.abs(un) < 0.005 ? 'qb-dim' : 'over'}">Left unexplained: <b>${money2(un)}</b></li></ul></details></div>`;
+  return `<div class="q-inline" style="gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:var(--bt-s3);"><div class="lp-f"><label>From</label><input type="month" data-f6="pl-from" value="${plUi.from}"></div><div class="lp-f"><label>To</label><input type="month" data-f6="pl-to" value="${plUi.to}"></div></div>
+    ${dqStripHtml(plUi.from, plUi.to)}
+    <p class="q-help">Revenue is recognised as it is invoiced (a month with invoices not yet raised is a forecast, shaded). Job costs, project profit, profit share and retained profit are the figures the tracker already calculates, taken at the same share. Business costs are shown below, not taken off the retained profit or the pots. Every figure opens its lines.</p>
+    <div class="card"><div class="qb-scroll"><table class="qb-table f6-pl" data-flip="pl" style="min-width:${220 + M.length * 110}px"><thead><tr><th></th>${M.map(m => `<th class="${m.forecast ? 'f6-fc' : ''}">${escHtml(monthLabel(new Date(m.key + '-01T00:00:00')))}${m.forecast ? '<div class="qb-dim">forecast</div>' : m.cur ? '<div class="qb-dim">this month, part forecast</div>' : ''}</th>`).join('')}<th>Total</th></tr></thead><tbody>
+      ${R('rev', 'Revenue as invoiced (ex VAT)', m => m.rev)}${R('job', 'Less job costs (Working plan and unplanned, as invoiced)', m => m.job, true)}${R('profit', '<b>Project profit</b>', m => m.profit, false, 'f6-sub')}${R('share', 'Less profit share', m => m.share, true)}${R('retained', '<b>Retained profit</b> <span class="qb-dim">(then shared into the pots)</span>', m => m.retained, false, 'f6-sub')}
+      <tr class="f6-sect"><td colspan="${M.length + 2}">Beside the retained profit (not taken off it)</td></tr>
+      ${R('biz', 'Business costs <span class="qb-dim">(' + (noList ? 'no list yet: evenly spread Pricing Model overheads, an estimate' : 'paid for past months, the Business costs list from this month') + ')</span>', m => m.biz.used, true)}
+      ${R('bizTx', 'Business costs paid (classed business)', m => m.biz.paid, true, 'f6-memo')}
+      <tr><td><b>Retained profit less business costs</b> <span class="qb-dim">(for information)</span></td>${M.map(m => `<td class="qb-calc${m.forecast ? ' f6-fc' : ''}"><b>${money2(m.afterBiz)}</b></td>`).join('')}<td class="qb-calc"><b>${money2(tot(m => m.afterBiz))}</b></td></tr>
+      ${R('jobTx', 'Memo: job costs paid (classed job cost)', m => m.jobPaid, true, 'f6-memo')}${R('assetTx', 'Memo: asset purchases paid (not a cost here)', m => m.assetPaid, true, 'f6-memo')}
+      <tr class="f6-uncl"><td><b>Unclassified</b> <span class="qb-dim">money out with no class: in no line above</span> <button type="button" class="sp-link" data-nav-tab="classify">Classify →</button></td>${M.map(m => `<td class="qb-calc">${m.unclTx.length ? `<button type="button" class="cf-n" data-f6="pl-sel" data-row="unclTx" data-key="${m.key}">−${money2(m.unclPaid)}</button><div class="qb-dim">${m.unclTx.length} line${m.unclTx.length === 1 ? '' : 's'}</div>` : '—'}</td>`).join('')}<td class="qb-calc"><b>${tot(m => m.unclTx.length)} lines</b></td></tr>
+      </tbody></table></div></div>
+    ${selL.length ? `<div class="card cf-lines"><div class="qb-sec-h"><h4>${escHtml((plRows().find(r => r[0] === plUi.sel.row) || [0, { jobTx: 'Job costs paid', bizTx: 'Business costs paid', assetTx: 'Asset purchases paid', unclTx: 'Unclassified money out', biz: 'Business costs' }[plUi.sel.row]])[1])} · ${escHtml(monthLabel(new Date(selM.key + '-01T00:00:00')))} <span class="qb-dim">(${selL.length} lines, total ${qm(selL.reduce((s, x) => s + x.amount, 0))})</span></h4><button type="button" class="btn secondary qb-sm" data-f6="pl-sel-close">Close</button></div>
+      <table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Line</th><th>Amount</th><th>Source</th></tr></thead><tbody>${selL.map(x => `<tr><td>${x.date ? pwD(x.date) : '—'}</td><td>${escHtml(x.label)}${x.note ? ' <span class="qb-dim">' + escHtml(x.note) + '</span>' : ''}</td><td class="qb-calc">${qm(x.amount)}</td><td>${finSrcLink(x.src, 'Open')}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    <div class="card"><div class="qb-sec-h"><h4>Profit and loss against the bank</h4><select data-f6="pl-rec" aria-label="Month">${M.filter(m => !m.forecast).map(m => `<option value="${m.key}"${m.key === rk ? ' selected' : ''}>${escHtml(monthLabel(new Date(m.key + '-01T00:00:00')))}</option>`).join('')}</select></div>
+      <p class="q-help">${rc.acc.map(x => `${escHtml(x.a.name)}: ${x.locked ? 'reconciled ✓' : '<b>not reconciled</b>'}`).join(' · ')} · <button type="button" class="sp-link" data-nav="recon:${rk}">Open this month in Bank Reconciliation →</button></p>
+      <div class="f6-cols">${bridge('Money in', rc.bankIn, rc.A, rc.inItems, rc.inUnexplained)}${bridge('Money out', rc.bankOut, rc.plOut, rc.outItems.map(x => Object.assign({}, x, { v: -x.v })), rc.outUnexplained)}</div></div>`;
+}
+function renderPnl(){ const el = document.getElementById('pnlBody'); if(el && state) el.innerHTML = plHtml(); }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-f6="pl-sel"], [data-f6="pl-sel-close"]'); if(!b || !state) return;
+  if(b.dataset.f6 === 'pl-sel-close') plUi.sel = null; else plUi.sel = plUi.sel && plUi.sel.row === b.dataset.row && plUi.sel.key === b.dataset.key ? null : { row: b.dataset.row, key: b.dataset.key };
+  const y = window.scrollY; renderPnl(); window.scrollTo(0, y);
+});
+document.addEventListener('change', (e) => { const el = e.target; if(!el || !el.dataset || !state) return; const f = el.dataset.f6;
+  if(f === 'pl-from' || f === 'pl-to'){ if(/^\d{4}-\d{2}$/.test(el.value)){ plUi[f === 'pl-from' ? 'from' : 'to'] = el.value; if(plUi.from > plUi.to){ if(f === 'pl-from') plUi.to = plUi.from; else plUi.from = plUi.to; } } renderPnl(); }
+  else if(f === 'pl-rec'){ plUi.rec = el.value; renderPnl(); } });
 /* BT:js-finance end */
 
 /* ---------- init ---------- */
