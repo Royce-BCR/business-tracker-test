@@ -2423,6 +2423,27 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .biz-people { display: flex; flex-wrap: wrap; gap: var(--bt-s2) var(--bt-s5); } .biz-people .q-check { min-height: var(--bt-control); display: inline-flex; align-items: center; gap: 8px; }
 .crm-dues { display: inline-flex; align-items: center; gap: 6px; } .crm-dues input { min-height: var(--bt-control); padding: 4px 8px; }
 .tk-pickgrp { padding: 8px 10px 2px; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 700; }
+
+.rp-msbar { margin: 0 0 var(--bt-s4); } .rp-ms-l { font-size: var(--bt-fs-xs); color: var(--text-muted); margin-bottom: 4px; }
+.rp-mss { list-style: none; margin: 0; padding: 0 0 var(--bt-s2); display: flex; gap: 0; overflow-x: auto; scrollbar-width: thin; }
+.rp-ms { flex: 1 0 96px; min-width: 96px; position: relative; padding-top: 22px; text-align: center; font-size: var(--bt-fs-2xs); line-height: 1.3; color: var(--text-muted); }
+.rp-ms::before { content: ''; position: absolute; top: 9px; left: 0; right: 0; height: 2px; background: var(--line); } .rp-ms:first-child::before { left: 50%; } .rp-ms:last-child::before { right: 50%; }
+.rp-ms.done::before { background: var(--bt-ok-fg); }
+.rp-ms-dot { position: absolute; top: 2px; left: calc(50% - 8px); width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--bt-border-strong); background: var(--bt-card); display: grid; place-items: center; font-size: 10px; color: var(--bt-on-dark); z-index: 1; }
+.rp-ms.done .rp-ms-dot { background: var(--bt-ok-fg); border-color: var(--bt-ok-fg); } .rp-ms.next .rp-ms-dot { border-color: var(--bt-brand-2); background: var(--bt-card); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bt-brand-2) 25%, transparent); } .rp-ms.over .rp-ms-dot { border-color: var(--bt-bad-fg); box-shadow: 0 0 0 3px var(--bt-bad-bg); }
+.rp-ms-n { display: block; font-weight: 700; color: var(--bt-ink-2); font-size: var(--bt-fs-xs); } .rp-ms-d { display: block; min-height: 1.3em; } .rp-ms-d i { font-style: normal; opacity: .8; }
+.rp-ms-s { display: block; text-transform: uppercase; letter-spacing: .05em; font-size: 10px; } .rp-ms.next .rp-ms-s { color: var(--bt-brand-2-text); font-weight: 700; } .rp-ms.over .rp-ms-s { color: var(--bt-bad-fg); } .rp-ms.done .rp-ms-s { color: var(--bt-ok-fg); }
+.rp-compose { display: flex; flex-wrap: wrap; gap: var(--bt-s2); margin-bottom: var(--bt-s4); } .rp-compose input[type=text] { flex: 1 1 200px; min-width: 0; min-height: var(--bt-control); padding: 6px 10px; border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-btn); font: inherit; } .rp-compose input[type=date] { min-height: var(--bt-control); padding: 4px 8px; border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-btn); font: inherit; }
+.rp-feed-sec { margin-bottom: var(--bt-s5); } .rp-feed-sec > h4 { margin: 0; font-size: 13px; display: flex; align-items: center; gap: 8px; } .rp-feed-sub { font-size: var(--bt-fs-xs); color: var(--text-muted); margin-bottom: var(--bt-s2); }
+.rp-fc { background: var(--bt-card); border: 1px solid var(--line); border-left: 3px solid var(--bt-border-strong); border-radius: var(--bt-r-btn); padding: var(--bt-s2) var(--bt-s3); margin-bottom: var(--bt-s2); }
+.rp-fc.task { border-left-color: var(--bt-brand-2); } .rp-fc.task.over { border-left-color: var(--bt-bad-fg); background: var(--bt-surface-2); } .rp-fc.done { border-left-color: var(--bt-ok-fg); }
+.rp-fc-h { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: var(--bt-fs-2xs); color: var(--text-muted); } .rp-fc-t { font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--bt-ink-2); } .rp-fc.over .rp-fc-t, .rp-fc.over .rp-fc-d { color: var(--bt-bad-fg); } .rp-fc-o::before { content: '· '; }
+.rp-fc-b { margin-top: 2px; font-size: var(--bt-fs-sm); overflow-wrap: anywhere; } .rp-fc-task { display: flex; align-items: center; gap: 10px; } .rp-fc-struck { text-decoration: line-through; color: var(--text-muted); }
+.rp-fc-f { margin-top: 3px; font-size: var(--bt-fs-xs); display: flex; gap: var(--bt-s3); flex-wrap: wrap; } .rp-fc-edit { width: 100%; box-sizing: border-box; padding: 6px 10px; border: 1px solid var(--bt-brand-2); border-radius: var(--bt-r-btn); font: inherit; } .rp-fc-btns { display: flex; gap: 6px; margin-top: 6px; }
+@media (max-width: 700px) { .rp-compose .btn { flex: 1 1 auto; } .rp-fc-f .sp-link { min-height: 32px; } }
+
+.rp-fc-task > span { flex: 1; min-width: 0; text-align: left; } .rp-fc-task .cbx { flex: none; margin: 0; }
+.rp-compose input[type=date] { width: 150px; flex: none; }
 </style>
 </head>
 <body>
@@ -16887,7 +16908,7 @@ lrSchedule(LR_BASE_MS);
    New stored fields, all optional and empty by default: project.jobType, project.owner, project.site { access, services, lastVisited }.
    The existing project workspace is kept whole behind "Open full workspace" until the later stages replace its sections.
    ===================================================================== */
-const rpUi = { pid: 0, tab: 'overview', sec: {}, secs: {}, draft: null };
+const rpUi = { pid: 0, tab: 'overview', sec: {}, secs: {}, draft: null, edit: '' };
 navExtra('rp', () => ({ pid: rpUi.pid, tab: rpUi.tab, sec: Object.assign({}, rpUi.sec) }), v => { if(v){ rpUi.pid = v.pid || 0; rpUi.tab = v.tab || 'overview'; rpUi.sec = v.sec || {}; } });
 const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan']];
 const RP_DATE_KEYS = ['start', 'complete', 'dur'];
@@ -17063,11 +17084,6 @@ function rpQualTile(p){
 }
 function rpOverviewHtml(p){
   return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${rpQualTile(p)}</div>`;
-}
-function rpActivityHtml(p){
-  const notes = (p.comms || []).filter(c => c && c.note).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)) || (b.created || 0) - (a.created || 0));
-  return `<div class="rp-card"><h4>Tasks</h4>${recTasksHtml('project', p)}</div>
-    <div class="rp-card"><div class="rp-card-h"><h4>Notes</h4><button type="button" class="btn secondary qb-sm" data-rp="q-note">Add note</button></div>${notes.length ? notes.map(n => `<div class="rp-note-row"><span class="rp-dim">${escHtml(pwD(n.date))}</span><span>${escHtml(n.note)}</span></div>`).join('') : '<div class="pw-empty">No notes yet.</div>'}</div>`;
 }
 function rpPlanHtml(p){
   return `${rpSchedPanel(p)}<div class="rp-plan" id="rpPlan">${pwSecWrapFlat(pwTimelineHtml(p, state.projects.indexOf(p)))}</div>`;
@@ -17271,7 +17287,7 @@ function rsHeadHtml(s){
     <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rs="note">Note</button>${supPhone(s) ? `<a class="btn secondary qb-sm" href="tel:${escAttr(String(supPhone(s)).replace(/\s+/g, ''))}">Call</a>` : ''}${supEmail(s) ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(supEmail(s))}">Email</a>` : ''}</div>`;
 }
 function rsCentreBody(s){
-  if(rsUi.tab === 'activity') return rpRefTasksHtml('supplier', s.id) + `<div class="rp-card"><h4>Notes</h4><div id="spNotes">${supNotesHtml(s, state.suppliers.indexOf(s))}</div></div>`;
+  if(rsUi.tab === 'activity') return rsActivityHtml(s);
   const r = supRecords(s.id), q = u => rpLrow('quote:' + u.q.id, u.ref, `${rpQPill(u.q)}${u.amount ? ' ' + escHtml(u.amount) : ''}`);
   return `<div class="rp-card"><h4>Live quotes on open projects ${r.onProj.length ? `<span class="db-count">${r.onProj.length}</span>` : ''}</h4>${r.onProj.length ? r.onProj.map(q).join('') : '<div class="pw-empty">None. A quote counts when it is Draft, Sent or Accepted, has not expired and is linked to a project that is still open.</div>'}</div>
     <div class="rp-card"><h4>Orders placed ${r.placed.length ? `<span class="db-count">${r.placed.length}</span>` : ''}</h4>${r.placed.length ? rpOrderRows(r.placed).join('') : '<div class="pw-empty">No purchase orders have been sent to this supplier yet.</div>'}</div>
@@ -17302,7 +17318,7 @@ document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-rs]'); if(!b || !state) return; const a = b.dataset.rs, s = supFind(rsUi.id); if(!s) return;
   if(a === 'back'){ rsClose(); return; }
   if(a === 'tab'){ rsUi.tab = b.dataset.tab; rsRender(s); return; }
-  if(a === 'note'){ rsUi.tab = 'activity'; rsRender(s); const n = document.querySelector('#spNotes [data-sc="note"]'); if(n) n.focus(); return; }
+  if(a === 'note'){ rsUi.tab = 'activity'; rsRender(s); const n = document.getElementById('rpFeedText'); if(n) n.focus(); return; }
 });
 navExtra('rssec', () => rsUi.sec, v => { if(v) rsUi.sec = v; });
 
@@ -17327,7 +17343,7 @@ function rcRight(sc, extraTiles){
   return (extraTiles || '') + rpTile('Projects', rcDealRows({ deals: projects }), 'No projects yet.') + rpTile('Leads and sales', rcDealRows({ deals: sc.deals.filter(d => d.pl !== 'project') }), 'None.')
     + rpTile('Quotes', rpQuoteRows(sc.quotes), 'No quotes yet.') + rpTile('Invoices', rpInvoiceRows(sc), 'No invoices yet.');
 }
-function rcBody(sc, owner, kind){ return cxPg.tab === 'activity' ? rpRefTasksHtml(kind === 'company' ? 'company' : 'contact', owner.id) + cxTimelineHtml(owner, sc, kind) : cxDealsHtml(sc, kind, owner.id) + cxQuotesHtml(sc) + cxInvoicesHtml(sc) + cxPaymentsHtml(sc); }
+function rcBody(sc, owner, kind){ return cxPg.tab === 'activity' ? rcActivityHtml(owner, kind, sc) : cxDealsHtml(sc, kind, owner.id) + cxQuotesHtml(sc) + cxInvoicesHtml(sc) + cxPaymentsHtml(sc); }
 function rcSec(k, t, b){ return rpSec(k, t, b, '', 'cx'); }
 function rcContactPage(c){
   rcTouch('c:' + c.id);
@@ -17366,7 +17382,7 @@ function rcCompanyPage(co){
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-rc]'); if(!b || !state) return; const a = b.dataset.rc;
   if(a === 'tab'){ cxPg.tab = b.dataset.tab; cxRender(); return; }
-  if(a === 'note'){ cxPg.tab = 'activity'; cxRender(); const n = document.getElementById('cxNoteText'); if(n) n.focus(); return; }
+  if(a === 'note'){ cxPg.tab = 'activity'; cxRender(); const n = document.getElementById('rpFeedText'); if(n) n.focus(); return; }
 });
 /* ======================= TASKS: the engine around the one task form =======================
    A task is a standalone record (state.crmTasks): title, due date, assignee (owner), status, scope ('job' or 'business'), notes, the records it attaches to
@@ -17504,6 +17520,156 @@ function bizSyncMenu(){
   if(t.hidden === !ok) return; t.hidden = !ok; try{ if(menuUi.built) menuBuild(); }catch(e){}
   if(!ok && navTabName() === 'actions') activateTab('today');
 }
+/* ======================= ACTIVITY FEED (every record) =======================
+   A view over real records, never copied text. Open tasks sit on top (oldest due first, overdue marked); below them the history, newest first:
+   notes, finished tasks, quotes, deliveries, invoices and payments, each its own card with a link to the record's own page.
+   Cards and stages move on confirmed dates only. Nothing is stored for the feed itself: existing timeline notes are read exactly as they are kept. */
+const RP_MS = [['contractSigned', 'Contract signed'], ['designSigned', 'Design signed'], ['materialsOrdered', 'Materials ordered'], ['materialsDelivered', 'Materials delivered'], ['onSiteStart', 'On site'], ['buildComplete', 'Build complete'], ['invoiced', 'Invoiced'], ['paid', 'Paid'], ['signOff', 'Sign-off']];
+/* the nine milestones on one line: done (confirmed), next (the first nobody has confirmed, the same rule as nextMilestone) or to come */
+function rpMilestoneStrip(p, label){
+  const next = projNextMs(p), today = fmt(new Date());
+  const items = RP_MS.map(([k, n]) => {
+    const i = projMsInfo(p, k), done = !!i.actual, isNext = !done && next && next.key === k, d = done ? i.actual.date : i.planned;
+    const st = done ? 'done' : isNext ? 'next' : 'later', over = isNext && i.planned && i.planned < today;
+    return `<li class="rp-ms ${st}${over ? ' over' : ''}" title="${escAttr(n + ': ' + (done ? 'confirmed ' + pwD(d) : d ? 'planned ' + pwD(d) : 'no date yet'))}"><span class="rp-ms-dot" aria-hidden="true">${done ? '✓' : ''}</span><span class="rp-ms-n">${escHtml(n)}</span><span class="rp-ms-d">${done ? escHtml(pwD(d)) : d ? '<i>' + escHtml(pwD(d)) + '</i>' : ''}</span><span class="rp-ms-s">${done ? 'done' : isNext ? (over ? 'next, overdue' : 'next') : 'to come'}</span></li>`;
+  }).join('');
+  return `<div class="rp-msbar" role="group" aria-label="Key milestones">${label ? `<div class="rp-ms-l">${label}</div>` : ''}<ol class="rp-mss">${items}</ol></div>`;
+}
+const rpDay = v => String(v || '').slice(0, 10);
+function rpDayShow(v){ const d = rpDay(v); return d ? pwD(d) : ''; }
+/* a card: { type, tone, date, by, html, foot } */
+function rpCardHtml(c){
+  return `<article class="rp-fc ${c.tone || ''}"><div class="rp-fc-h"><span class="rp-fc-t">${escHtml(c.type)}</span><span class="rp-fc-d">${escHtml(rpDayShow(c.date))}</span>${c.by ? `<span class="rp-fc-o">${escHtml(c.by)}</span>` : ''}</div><div class="rp-fc-b">${c.html}</div>${c.foot ? `<div class="rp-fc-f">${c.foot}</div>` : ''}</article>`;
+}
+const rpLink = (nav, text) => `<button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(text)}</button>`;
+/* tasks */
+function rpOpenTaskCard(t){
+  const today = fmt(new Date()), over = t.dueDate && t.dueDate < today;
+  return `<article class="rp-fc task${over ? ' over' : ''}"><div class="rp-fc-h"><span class="rp-fc-t">Task${over ? ' · overdue' : ''}</span><span class="rp-fc-d">${t.dueDate ? 'due ' + escHtml(pwD(t.dueDate)) : 'no date'}</span>${t.owner ? `<span class="rp-fc-o">${escHtml(t.owner)}</span>` : ''}</div>
+    <div class="rp-fc-b rp-fc-task"><div class="cbx" data-crm="tick" data-id="${t.id}" title="Mark done">${CHECK_SVG}</div><span>${escHtml(t.title)}${t.recur ? ` <span class="rp-dim" title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}</span></div>
+    <div class="rp-fc-f"><button type="button" class="sp-link" data-crm="open" data-id="${t.id}">Open in Tasks (${escHtml(t.id)})</button></div></article>`;
+}
+function rpDoneTaskCard(t){
+  return { type: 'Task done', tone: 'done', date: rpDay(t.completedAt), at: t.completedAt || '', by: t.completedBy || t.owner,
+    html: `<span class="rp-fc-struck">${escHtml(t.title)}</span>`, foot: `<button type="button" class="sp-link" data-crm="open" data-id="${t.id}">Open in Tasks (${escHtml(t.id)})</button> <button type="button" class="sp-link" data-crm="tick" data-id="${t.id}">Reopen</button>` };
+}
+/* notes (editable in place where the note is the person's own) */
+function rpNoteCard(o){
+  const editing = rpUi.edit === o.ref;
+  const body = editing
+    ? `<textarea class="rp-fc-edit" id="rpFeedEdit" rows="3" maxlength="600" aria-label="Edit note">${escHtml(o.text)}</textarea><div class="rp-fc-btns"><button type="button" class="btn qb-sm" data-rp="fnote-save" data-ref="${escAttr(o.ref)}">Save</button><button type="button" class="btn secondary qb-sm" data-rp="fnote-cancel">Cancel</button></div>`
+    : `<span class="rp-fc-note">${escHtml(o.text)}</span>`;
+  return { type: o.type || 'Note', tone: o.tone || '', date: o.date, at: o.at || '', by: o.by, html: body, foot: (o.ref && !editing ? `<button type="button" class="sp-link" data-rp="fnote-edit" data-ref="${escAttr(o.ref)}">Edit note</button> ` : '') + (o.nav ? rpLink(o.nav, o.navText || 'Open') : '') };
+}
+const rpAt = (date, created) => String(date || '') + '|' + String(created || 0).padStart(14, '0');
+/* ---- project ---- */
+function rpProjectFeed(p){
+  const open = recordTasks(p).filter(t => t.status === 'open'), hist = [];
+  (p.comms || []).forEach((c, i) => { if(!c || !c.note) return;
+    const isTask = c.src === 'task', doc = c.src === 'doc' || c.src === 'rfq' || c.src === 'action';
+    hist.push(Object.assign(rpNoteCard({ ref: !isTask && !doc ? 'p:' + p.id + ':comms:' + i : '', type: isTask ? 'Task note' : c.src === 'rfq' ? 'Quote request' : doc ? 'Document' : 'Note', date: c.date, by: c.by, text: commShownText(c) }), { at: rpAt(c.date, c.created) })); });
+  state.crmTasks.filter(t => t.status === 'done' && linkedMatches(t, p.id) && taskVisible(t) && t.completedAt).forEach(t => { const c = rpDoneTaskCard(t); hist.push(Object.assign(c, { at: rpAt(c.date, Date.parse(t.completedAt) || 0) })); });
+  state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === p.id)).forEach(q => {
+    const d = rpDay(q.acceptedDate || q.sentAt || q.date); if(!d) return;
+    hist.push({ type: 'Quote', date: d, at: rpAt(d, q.id), html: `${rpLink('quote:' + q.id, qRef(q) + ' v' + q.version)} ${rpQPill(q)} <span class="rp-dim">${rpM(qCalc(q).totalEx)} ex VAT</span>`, foot: rpLink('quote:' + q.id, 'Open ' + qRef(q)) });
+  });
+  projDeliveries(p).drops.forEach(x => {
+    const po = poForDrop(p.id, x.d.id), link = po ? rpLink('po:' + po.id, po.ref) : '', sup = x.d.supplierId ? rpLink('supplier:' + x.d.supplierId, x.supplier) : escHtml(x.supplier);
+    if(x.ordered) hist.push({ type: 'Order placed', date: x.ordered, at: rpAt(x.ordered, 1), html: `${sup} <span class="rp-dim">${escHtml(x.items.slice(0, 3).join(', '))}</span>`, foot: link });
+    if(x.delivered) hist.push({ type: 'Delivery', tone: 'done', date: x.delivered, at: rpAt(x.delivered, 2), html: `${sup} delivered${x.date && x.date !== x.delivered ? ` <span class="rp-dim">(planned ${escHtml(pwD(x.date))})</span>` : ''}`, foot: link });
+    if(x.paid) hist.push({ type: 'Supplier payment', date: x.paid, at: rpAt(x.paid, 3), html: `${sup} <b>${rpM(x.out)}</b> paid`, foot: link });
+  });
+  invRows().filter(r => r.pid === p.id).forEach(r => {
+    const nav = 'invoicing:' + r.pid + ':' + (r.vid ? 'v' + r.vid : r.idx);
+    if(r.invoicedDate) hist.push({ type: 'Invoice', date: r.invoicedDate, at: rpAt(r.invoicedDate, 4), html: `${escHtml(r.desc)} <b>${rpM(r.amount)}</b> ${invPill(r.status)}`, foot: rpLink(nav, 'Open invoice') });
+    if(r.paidDate) hist.push({ type: 'Payment', tone: 'done', date: r.paidDate, at: rpAt(r.paidDate, 5), html: `${escHtml(r.desc)} received <b>${rpM(r.paidAmount || r.amount)}</b>`, foot: rpLink(nav, 'Open invoice') });
+  });
+  return { open, hist };
+}
+/* ---- supplier ---- */
+function rpSupplierFeed(s){
+  const open = refTasks('supplier', s.id), hist = [];
+  (s.notes || []).forEach((n, i) => hist.push(Object.assign(rpNoteCard({ ref: 's:' + s.id + ':notes:' + i, date: n.date, text: n.note }), { at: rpAt(n.date, n.created) })));
+  state.crmTasks.filter(t => t.status === 'done' && (t.refs || []).some(r => r.kind === 'supplier' && r.id === String(s.id)) && taskVisible(t) && t.completedAt).forEach(t => { const c = rpDoneTaskCard(t); hist.push(Object.assign(c, { at: rpAt(c.date, Date.parse(t.completedAt) || 0) })); });
+  (state.purchaseOrders || []).filter(o => o.supplierId === s.id).forEach(o => {
+    const proj = rpLink('project:' + o.pid, recordCode(o.pid, 'project'));
+    if(o.createdAt) hist.push({ type: 'Order', date: o.createdAt, at: rpAt(o.createdAt, 1), html: `${rpLink('po:' + o.id, o.ref)} ${poPill(o)} <span class="rp-dim">${rpM(poTotals(o).payable)}</span>`, foot: proj });
+    if(o.sentAt) hist.push({ type: 'Order sent', date: o.sentAt, at: rpAt(o.sentAt, 2), html: `${rpLink('po:' + o.id, o.ref)} sent`, foot: proj });
+    if(o.deliveredAt) hist.push({ type: 'Delivery', tone: 'done', date: o.deliveredAt, at: rpAt(o.deliveredAt, 3), html: `${rpLink('po:' + o.id, o.ref)} delivered`, foot: proj });
+  });
+  qSupplierUses(s.id).forEach(u => { const d = rpDay(u.q.sentAt || u.q.date); if(d) hist.push({ type: 'Quote', date: d, at: rpAt(d, u.q.id), html: `${rpLink('quote:' + u.q.id, u.ref)} ${rpQPill(u.q)}${u.detail ? ` <span class="rp-dim">${escHtml(u.detail)}</span>` : ''}`, foot: rpLink('quote:' + u.q.id, 'Open ' + u.ref) }); });
+  rsPayments(s).filter(r => r.x.paid).forEach(r => hist.push({ type: 'Supplier payment', date: r.x.paid, at: rpAt(r.x.paid, 4), html: `${rpM(r.x.out)} paid for ${rpLink('project:' + r.p.id + ':money', recordCode(r.p.id, 'project'))}` }));
+  return { open, hist };
+}
+/* ---- contact / company ---- */
+function rpCustomerFeed(owner, kind, sc){
+  const key = (kind === 'company' ? 'company' : 'contact'), open = refTasks(key, owner.id), hist = [];
+  const ids = new Set(sc.deals.map(d => d.root));
+  state.crmTasks.filter(t => t.status === 'open' && recRoots(t).some(r => ids.has(r)) && taskVisible(t) && !open.includes(t)).forEach(t => open.push(t));
+  open.sort(taskCmp('due', 'asc'));
+  cxTimeline(owner, sc, kind === 'company').forEach(t => {
+    const mine = t.mine && !t.auto;
+    hist.push(Object.assign(rpNoteCard({ ref: mine && t.id ? 'c:' + kind + ':' + owner.id + ':' + t.id : '', type: t.mine ? (t.auto ? 'Record' : 'Note') : t.iv ? 'Invoice' : (t.nav || '').startsWith('quote:') ? 'Quote' : 'Deal note', date: t.date, by: t.by, text: t.text, nav: t.nav || '', navText: t.tag ? 'Open ' + t.tag : '' }), { at: rpAt(t.date, t.created) }));
+  });
+  state.crmTasks.filter(t => t.status === 'done' && t.completedAt && taskVisible(t) && ((t.refs || []).some(r => r.kind === key && r.id === String(owner.id)) || recRoots(t).some(r => ids.has(r)))).forEach(t => { const c = rpDoneTaskCard(t); hist.push(Object.assign(c, { at: rpAt(c.date, Date.parse(t.completedAt) || 0) })); });
+  sc.quotes.forEach(q => { const d = rpDay(q.acceptedDate || q.sentAt || q.date); if(d) hist.push({ type: 'Quote', date: d, at: rpAt(d, q.id), html: `${rpLink('quote:' + q.id, qRef(q) + ' v' + q.version)} ${rpQPill(q)} <span class="rp-dim">${rpM(qCalc(q).totalEx)} ex VAT</span>`, foot: rpLink('quote:' + q.id, 'Open ' + qRef(q)) }); });
+  sc.rows.forEach(r => {
+    const nav = 'invoicing:' + r.pid + ':' + (r.vid ? 'v' + r.vid : r.idx);
+    if(r.invoicedDate) hist.push({ type: 'Invoice', date: r.invoicedDate, at: rpAt(r.invoicedDate, 4), html: `${escHtml(r.desc)} <b>${rpM(r.amount)}</b> ${invPill(r.status)}`, foot: rpLink(nav, 'Open invoice') });
+  });
+  sc.payments.forEach(({ t, ix }) => hist.push({ type: 'Payment', tone: 'done', date: t.date, at: rpAt(t.date, 5), html: `${escHtml(t.description || 'Payment')} received <b>${rpM(t.moneyIn)}</b>`, foot: rpLink('txn:' + (t.uid || ix), 'Open transaction') }));
+  return { open, hist };
+}
+function rpFeedHtml(ctx, o){
+  const f = o.feed, hist = f.hist.slice().sort((a, b) => String(b.at || b.date).localeCompare(String(a.at || a.date)));
+  const strip = o.strip || '';
+  const composer = `<div class="rp-compose"><input type="date" id="rpFeedDate" value="${fmt(new Date())}" aria-label="Note date"><input type="text" id="rpFeedText" placeholder="Add a note…" maxlength="400" autocomplete="off" aria-label="Note"><button type="button" class="btn" data-rp="fnote-add" data-ctx="${escAttr(ctx)}">Add note</button>${o.task ? `<button type="button" class="btn secondary" data-rp="${o.task}">+ Task</button>` : ''}</div>`;
+  const openCards = f.open.map(rpOpenTaskCard).join('');
+  return `${strip}<div class="rp-feed">${composer}
+    <div class="rp-feed-sec"><h4>Open${f.open.length ? ` <span class="db-count">${f.open.length}</span>` : ''}</h4><div class="rp-feed-sub">Oldest due first</div>${openCards || '<div class="pw-ok-big">✓ No open tasks</div>'}</div>
+    <div class="rp-feed-sec"><h4>History</h4><div class="rp-feed-sub">Newest first</div>${hist.length ? hist.map(rpCardHtml).join('') : '<div class="pw-empty">Nothing recorded yet.</div>'}</div></div>`;
+}
+/* notes: add and edit in place */
+function rpNoteTarget(ref){
+  const [kind, id, field, key] = String(ref).split(':');
+  if(kind === 'p'){ const p = rpFind(Number(id)), c = p && (p.comms || [])[Number(key)]; return c ? { obj: c, f: 'note' } : null; }
+  if(kind === 's'){ const s = supFind(Number(id)), n = s && (s.notes || [])[Number(key)]; return n ? { obj: n, f: 'note' } : null; }
+  if(kind === 'c'){ const o = id === 'company' ? coFind(field) : ctFind(field), n = o && (o.timeline || []).find(x => x.id === key); return n ? { obj: n, f: 'note' } : null; }
+  return null;
+}
+function rpRefreshFeed(){
+  if(pwUi.id && document.querySelector('#projectWorkspace .rp')) rpRenderProject(rpFind(pwUi.id));
+  else if(rsUi.id && supFind(rsUi.id)) rsRender(supFind(rsUi.id));
+  else if(cxUi.cid || cxUi.coid) cxRender();
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-rp^="fnote-"]'); if(!b || !state) return; const a = b.dataset.rp;
+  if(a === 'fnote-edit'){ rpUi.edit = b.dataset.ref; rpRefreshFeed(); const t = document.getElementById('rpFeedEdit'); if(t) t.focus(); return; }
+  if(a === 'fnote-cancel'){ rpUi.edit = ''; rpRefreshFeed(); return; }
+  if(a === 'fnote-save'){ const t = rpNoteTarget(b.dataset.ref), box = document.getElementById('rpFeedEdit'); if(t && box && box.value.trim()){ t.obj[t.f] = box.value.trim(); saveState(); } rpUi.edit = ''; render(); return; }
+  if(a === 'fnote-add'){
+    const box = document.getElementById('rpFeedText'), dt = document.getElementById('rpFeedDate'), text = box ? box.value.trim() : ''; if(!text){ if(box) box.focus(); return; }
+    const date = isoOk(dt && dt.value) || fmt(new Date()), ctx = b.dataset.ctx.split(':');
+    if(ctx[0] === 'project'){ const p = rpFind(Number(ctx[1])); if(!p) return; p.comms = p.comms || []; p.comms.push({ date, note: text, created: Date.now(), by: whoName() }); }
+    else if(ctx[0] === 'supplier'){ const s = supFind(Number(ctx[1])); if(!s) return; s.notes.push({ date, note: text, created: Date.now() }); }
+    else { const o = ctx[0] === 'company' ? coFind(ctx[1]) : ctFind(ctx[1]); if(!o) return; o.timeline.push({ id: cxId('tl_'), date, note: text, created: Date.now(), by: whoName(), kind: 'note' }); }
+    saveState(); render(); const again = document.getElementById('rpFeedText'); if(again) again.focus();
+  }
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Enter' && e.target && e.target.id === 'rpFeedText'){ e.preventDefault(); const b = document.querySelector('[data-rp="fnote-add"]'); if(b) b.click(); } });
+/* the activity tab for each kind of record */
+function rpActivityHtml(p){
+  return rpFeedHtml('project:' + p.id, { feed: rpProjectFeed(p), strip: rpMilestoneStrip(p), task: 'q-task' });
+}
+function rsActivityHtml(s){ return rpFeedHtml('supplier:' + s.id, { feed: rpSupplierFeed(s), task: 'task-add-supplier' }); }
+function rcActivityHtml(owner, kind, sc){
+  const live = sc.deals.filter(d => d.pl === 'project' && !d.completed).sort((a, b) => b.root - a.root)[0], p = live && live.rec;
+  return rpFeedHtml(kind + ':' + owner.id, { feed: rpCustomerFeed(owner, kind, sc), strip: p ? rpMilestoneStrip(p, `Milestones for ${escHtml(recordCode(p.id, 'project'))} · ${escHtml(p.name)}`) : '', task: kind === 'company' ? 'task-add-company' : 'task-add-contact' });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-rp^="task-add-"]'); if(!b || !state) return; const k = b.dataset.rp.slice(9);
+  const id = k === 'supplier' ? rsUi.id : (k === 'company' ? cxUi.coid : cxUi.cid); if(id) openNewTask(null, { refs: [{ kind: k, id: String(id) }] });
+});
 /* BT:js-records end */
 
 /* ---------- init ---------- */
