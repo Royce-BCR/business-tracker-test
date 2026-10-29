@@ -2391,7 +2391,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-dateh { margin: -4px 0 var(--bt-s3); }
 .rp-bar { flex: none; display: flex; flex-direction: column; gap: var(--bt-s2); padding: var(--bt-s3) var(--bt-s4); background: var(--bt-surface-2); border-top: 2px solid var(--bt-brand-2); box-shadow: 0 -6px 16px color-mix(in srgb, var(--bt-ink) 8%, transparent); } .rp-bar[hidden] { display: none; }
 .rp-bar-t { font-size: var(--bt-fs-xs); } .rp-bar-b { display: flex; flex-wrap: wrap; gap: 6px; }
-.rp-tabs { flex: none; display: flex; gap: var(--bt-s5); overflow-x: auto; padding: 0 var(--bt-s4); border-bottom: 1px solid var(--line); scrollbar-width: none; background: var(--bt-card); } .rp-tabs::-webkit-scrollbar { display: none; }
+.rp-tabs { flex: none; display: flex; gap: var(--bt-s5); overflow-x: auto; padding: 0 var(--bt-s4); border-bottom: 1px solid var(--line); scrollbar-width: thin; background: var(--bt-card); } .rp-tabs::-webkit-scrollbar { height: 6px; } .rp-tabs::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
 .rp-tabs button { flex: none; min-height: var(--bt-control); padding: 0 2px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; font: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
 .rp-tabs button:hover { color: var(--bt-ink); } .rp-tabs button.active { color: var(--bt-ink); border-bottom-color: var(--bt-brand-2); }
 .rp-cbody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -2525,6 +2525,24 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .ph-row .ph-sub { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
   .ph-row .ph-sub input[type=date] { width: 138px; }
   .ph-row .ph-sub .q-check { min-height: 0; font-size: var(--bt-fs-xs); }
+  .cls-act { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .cls-act select { max-width: 190px; }
+  .bh-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s3); }
+  .bh-card { border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3); background: var(--bt-card); }
+  .bh-sides { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-s3); margin: var(--bt-s2) 0; }
+  .bh-side { background: var(--bt-neu-bg); border-radius: var(--bt-r-btn); padding: var(--bt-s2) var(--bt-s3); }
+  .bh-side small { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--bt-text-muted); }
+  .bh-side b { font-size: var(--bt-fs-md); } .bh-side em { display: block; font-size: var(--bt-fs-xs); color: var(--bt-text-muted); font-style: normal; }
+  .bh-be, .bh-at { font-size: var(--bt-fs-sm); margin-top: 4px; }
+  .rp-strip.mn-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); } .mn-strip .rp-hl b { font-size: 14px; white-space: nowrap; } .rp-strip.mn-strip2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } @media (max-width: 700px) { .rp-strip.mn-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } } .mn-wrap { display: grid; gap: var(--bt-s3); }
+  .mn-graph svg { width: 100%; height: auto; display: block; max-height: 320px; } .mn-grid { stroke: var(--line); stroke-width: 1; } .mn-ax { fill: var(--text-muted); font-size: 11px; }
+  .mn-ln { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; } .mn-ln.plan { stroke-dasharray: 6 4; opacity: .8; } .mn-pt { fill: var(--c); stroke: var(--bt-card); stroke-width: 2; } .mn-pt.hollow { fill: var(--bt-card); stroke: var(--c); }
+  .mn-today { stroke: var(--bt-ink); stroke-width: 1; stroke-dasharray: 2 3; } .mn-todaylab { fill: var(--bt-ink); font-weight: 600; }
+  .mn-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--bt-fs-xs); margin-top: 6px; } .mn-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .mn-key { display: inline-block; width: 22px; height: 0; border-top: 2px solid var(--c); } .mn-key.plan { border-top-style: dashed; }
+  .mn-item { display: flex; justify-content: space-between; align-items: center; gap: var(--bt-s3); padding: var(--bt-s2) 0; border-bottom: 1px solid var(--line); } .mn-item:last-child { border-bottom: 0; } .mn-item.late { background: linear-gradient(90deg, var(--bt-bad-bg, transparent), transparent 30%); }
+  .mn-i-main { min-width: 0; } .mn-i-sub { font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 2px; } .mn-i-act { flex: none; }
+  @media (max-width: 700px) { .mn-item { flex-direction: column; align-items: stretch; } .mn-i-act .btn { width: 100%; min-height: 44px; } }
   .cap-row input:not([type=checkbox]), .hd-row input:not([type=checkbox]), .hd-row select, .ph-row input:not([type=checkbox]), .pt-row input[type=text], .pt-row input[type=number] { border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); min-width: 0; width: 100%; }
   .ph-row input[type=checkbox], .pt-row input[type=checkbox] { width: auto; }
   .ph-row.ph-stack { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px; }
@@ -2733,6 +2751,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-finance" role="group" aria-labelledby="gh-finance">
       <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
+      <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
       <button type="button" class="tab g-finance" data-tab="revenue">Revenue Forecast</button>
@@ -2743,6 +2762,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <button type="button" class="nav-label nav-gbtn" id="gh-business" aria-expanded="false" aria-controls="gp-business"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Business</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-business" role="group" aria-labelledby="gh-business">
       <button type="button" class="tab g-business" data-tab="businessplan">Business Plan</button>
+      <button type="button" class="tab g-business" data-tab="businesscosts">Business costs</button>
       <button type="button" class="tab g-business" data-tab="actions">Business tasks</button>
     </div>
   </div>
@@ -3066,6 +3086,24 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div id="txnPending"></div>
     <div class="btn-row"><button class="btn" data-fin="txn-add">+ Add transaction</button></div>
     <div class="table-scroll" id="transactionsTableWrap"></div>
+  </div>
+
+  <!-- BUSINESS COSTS -->
+  <div class="panel" id="panel-businesscosts">
+    <div class="page-head">
+      <h2>Business costs</h2>
+      <div class="desc">What the business pays whether or not a job is running: insurance, accountancy, subscriptions, phone. Each has an amount, how often it recurs and when it is next due. Dated costs go into the Cash Flow Forecast, and a matching transaction ticks a cost off as paid once you confirm it.</div>
+    </div>
+    <div id="bcBody"></div>
+  </div>
+
+  <!-- CLASSIFY -->
+  <div class="panel" id="panel-classify">
+    <div class="page-head">
+      <h2>Classify</h2>
+      <div class="desc">Mark each cost as a job cost (with its project), a business cost or an asset purchase. The page suggests a class from the category; nothing is stored until you accept it.</div>
+    </div>
+    <div id="clsBody"></div>
   </div>
 
   <div class="panel" id="panel-reconciliation">
@@ -3998,6 +4036,7 @@ async function loadState(){
 let saveTimer = null;
 function saveState(){
   try{ finEnsureReceipts(); }catch(e){}
+  try{ clsSyncTask(); }catch(e){}   // Stage 5: the one rolling task for costs with no class
   if(typeof cxDirty === 'function') cxDirty();
   setSaveStatus('Saving…');
   clearTimeout(saveTimer);
@@ -4158,6 +4197,7 @@ async function startApp(){
   undoPrune(); undoBadge();
   ensurePipelineIds();
   finMarkLegacy();   // payment lines already paid at load are not given receipts behind your back
+  try{ if(clsSyncTask()) saveState(); }catch(e){}
   loadTodayScope();
   render();
   activateTab('today');   // Today is the landing page after every login
@@ -8088,6 +8128,9 @@ function renderSettings(){
      <div class="fin-help ps-words"><b>How it is worked out (default: ${psMethodName(psDefault().method)}):</b> ${escHtml(psWordsGeneric(psDefault().method, psDefault().method === 'pct' ? psDefault().pct : psDefault().hour))} A project can use a different method or value: open the project, Working plan, Retained profit.</div>
      <div class="fin-help">Taken off project profit for every labour hour (sold, planned and logged) to give <b>retained profit</b>. This is separate from “Labour profit share (%)” in Quote settings: that percentage is the profit built into the labour <em>price</em> (labour cost = price ÷ (1 + %)) and is already inside project profit; the hourly figure is then deducted from it. Set one or the other to what you intend, so the same share is not taken twice.</div>
      ${POT_BUCKETS.map(b => `<div><label>Retained pot: ${b[1]} (%)</label><input type="number" step="1" min="0" data-tab="settings" data-field="${b[0]}" value="${potPct(b[0])}"></div>`).join('')}
+     ${potSettingsHtml()}
+     ${toolSettingHtml()}
+     <div class="fin-help">Each pot is a percentage of retained profit (the default) or a fixed amount put aside every month. Percentage pots share what is left of retained profit after any fixed amounts.</div>
      <div class="fin-help">The four buckets share the retained profit pot${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) === 100 ? '.' : ` (they add up to ${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0)}%, so they are scaled to 100% on the Dashboard).`}</div>
      <div><label>Invoice warning after (days overdue)</label><input type="number" step="1" min="0" data-tab="settings" data-field="invoiceWarnDays" value="${s.invoiceWarnDays === undefined || s.invoiceWarnDays === '' ? 14 : s.invoiceWarnDays}"></div>
      <div><label>Forecast horizon (months, if no dated work)</label><input type="number" step="1" data-tab="settings" data-field="forecastMonths" value="${s.forecastMonths}"></div>`;
@@ -10650,6 +10693,7 @@ function finSrcLink(src, text){
   if(src.t === 'po') return d('po:' + src.id);
   if(src.t === 'deal') return d('deal:' + src.id);
   if(src.t === 'asset') return d('asset:' + src.id);
+  if(src.t === 'bcost') return d('bcost:' + src.id);
   return t;
 }
 function finNavOpen(kind, id, extra){
@@ -10658,20 +10702,23 @@ function finNavOpen(kind, id, extra){
   else if(kind === 'deal'){ openDetail('sales', Number(id)); }
   else if(kind === 'po' && typeof poOpen === 'function') poOpen(Number(id));
   else if(kind === 'asset') assetNavOpen(id);
+  else if(kind === 'bcost'){ bcUi.flash = id; activateTab('businesscosts'); renderBusinessCosts(); window.scrollTo(0, 0); setTimeout(() => { const el = document.querySelector('#bcBody tr.inv-flash'); if(el) el.scrollIntoView({ block: 'center' }); }, 30); }
+  else if(kind === 'page'){ if(document.querySelector('.tab[data-tab="' + id + '"]')){ activateTab(id); window.scrollTo(0, 0); } }
 }
 /* ---------- cash flow: every number can be opened to the lines behind it ---------- */
 const cfUi = { sel: null };
 navExtra('cf', () => cfUi.sel, v => { cfUi.sel = v; });
-const CF_ROWS = [['committed', 'Cash in: customer payments (projects, incl. scope additions)', 1], ['weighted', 'Cash in: weighted pipeline', 1], ['materials', 'Cash out: materials (stage costs)', -1], ['qIn', 'Quotes: cash in (accepted)', 1], ['qOut', 'Quotes and projects: supplier payments (accepted)', -1],
+const CF_ROWS = [['bizcost', 'Cash out: business costs (Business costs page)', -1], ['committed', 'Cash in: customer payments (projects, incl. scope additions)', 1], ['weighted', 'Cash in: weighted pipeline', 1], ['materials', 'Cash out: materials (stage costs)', -1], ['qIn', 'Quotes: cash in (accepted)', 1], ['qOut', 'Quotes and projects: supplier payments (accepted)', -1],
   ['qInIf', 'Quotes: cash in (if won, sent)', 1], ['qOutIf', 'Quotes: cash out (if won, sent)', -1], ['fixed', 'Cash out: fixed overhead', -1], ['actIn', 'Actual: money in (bank)', 1], ['actOut', 'Actual: money out (bank)', -1], ['custOrder', 'Memo: customer orders placed (contract + variations)', 0], ['supOrder', 'Memo: supplier orders (by drop date)', 0]];
 function computeCashFlow(months){
-  const fixedMonthly = totalOverhead() / 12, today = fmt(new Date()), curKey = today.slice(0, 7), startD = bankStartDate();
+  const fixedMonthly = bcFixedMonthly(), today = fmt(new Date()), curKey = today.slice(0, 7), startD = bankStartDate();
   const colKey = d => { const k = String(d).slice(0, 7); return k < curKey ? curKey : k; };   // an unsettled item whose date has passed has not happened: it is still to come, so it sits in this month
   const counted = state.transactions.filter(txCounted), actOf = (key, f) => counted.filter(t => txCashDate(t).slice(0, 7) === key && f(t));
   const projLines = qid => { const q = qFind(qid), root = q && (q.linkedIds || []).map(linkedRoot).find(id => state.projects.some(p => p.id === id)), pr = root && state.projects.find(p => p.id === root); return !!(pr && (pr.paymentLines || []).some(l => l.quoteRowId && q.payments.some(r => r.id === l.quoteRowId))); };
   const qItems = qAllCashItems().filter(i => !(i.kind === 'in' && projLines(i.qid))), liveRoots = new Set(qLive().flatMap(q => (q.linkedIds || []).map(linkedRoot)));   // a deal with a live quote is counted from the quote, not from its stage costs
   const tradeDays = (state.settings && state.settings.tradeAccountDays) || 30, FL = finLines(), srcQ = i => ({ t: 'quote', id: i.qid });
   const extra = typeof cfAssetLines === 'function' ? cfAssetLines : null;
+  const bcMap = {}, bcSet = bcMatchedKeys(); bcForecastItems(monthKey(months[months.length - 1])).forEach(it => { const k = colKey(it.date); (bcMap[k] = bcMap[k] || []).push(it); });   // Stage 5: dated business costs
   let closing = null, closingIf = null;
   return months.map((m, mi) => {
     const key = monthKey(m), past = key < curKey, cur = key === curKey; let committedIn = 0, weightedIn = 0, materialsOut = 0; const ln = {}; CF_ROWS.forEach(r => ln[r[0]] = []); ln.assets = [];
@@ -10698,13 +10745,14 @@ function computeCashFlow(months){
     let qIn = 0, qOut = 0, qInIf = 0, qOutIf = 0;
     qItems.forEach(i => { if(colKey(i.date) !== key) return; const acc = i.status === 'Accepted', row = i.kind === 'in' ? (acc ? 'qIn' : 'qInIf') : (acc ? 'qOut' : 'qOutIf'); add(row, i.label + (i.estimated ? ' (est.)' : '') + ' · ' + i.ref, i.amount, i.date, srcQ(i)); if(i.kind === 'in'){ if(acc) qIn += i.amount; else qInIf += i.amount; } else { if(acc) qOut += i.amount; else qOutIf += i.amount; } });
     FL.filter(x => (x.kind === 'custOrder' || x.kind === 'supOrder') && x.date && x.date.slice(0, 7) === key).forEach(x => add(x.kind, x.label, x.amount, x.date, x.src, x.pname));
-    const overheadDone = r2(actOf(key, t => t.category === 'Overhead' && Number(t.moneyOut) > 0).reduce((a, t) => a + Number(t.moneyOut), 0)), fixed = past ? 0 : Math.max(0, r2(fixedMonthly - overheadDone));   // overhead already paid this month is an actual: only the rest is forecast
+    let bizOut = 0; (bcMap[key] || []).forEach(it => { bizOut += it.amount; add('bizcost', it.name + (it.date < today ? ' (overdue)' : ''), it.amount, it.date, { t: 'bcost', id: it.id }); });
+    const overheadDone = r2(actOf(key, t => t.category === 'Overhead' && Number(t.moneyOut) > 0 && !bcSet.has(bcTxnKey(t))).reduce((a, t) => a + Number(t.moneyOut), 0)), fixed = past ? 0 : Math.max(0, r2(fixedMonthly - overheadDone));   // overhead already paid this month is an actual: only the rest is forecast
     add('fixed', 'Fixed monthly overhead (Settings > Pricing)' + (overheadDone > 0 ? ' less ' + qm(overheadDone) + ' already paid' : ''), fixed, fmt(m), null);
     let assetsOut = 0; if(extra && !past){ extra(key).forEach(a => { assetsOut += a.amount; ln.assets.push(a); }); }
-    const fnet = committedIn + weightedIn + qIn - materialsOut - qOut - fixed - assetsOut, anet = actIn - actOut, net = fnet + anet;
+    const fnet = committedIn + weightedIn + qIn - materialsOut - qOut - fixed - assetsOut - bizOut, anet = actIn - actOut, net = fnet + anet;
     if(closing === null){ const pk = prevMonthKey(key), base = (key <= curKey) ? bankBalance(monthEnd(pk)) : bankBalance(); closing = base; closingIf = base; }
     closing += net; closingIf += net + qInIf - qOutIf;
-    return { key, label: monthLabel(m), past, cur, preStart: monthEnd(key) < startD, actIn, actOut, committedIn, weightedIn, materialsOut, fixedMonthly: fixed, assetsOut, qIn, qOut, qInIf, qOutIf, net, closing, closingIf, lines: ln, custOrders: ln.custOrder.reduce((a, x) => a + x.amount, 0), supOrders: ln.supOrder.reduce((a, x) => a + x.amount, 0) };
+    return { key, label: monthLabel(m), past, cur, preStart: monthEnd(key) < startD, actIn, actOut, bizOut, committedIn, weightedIn, materialsOut, fixedMonthly: fixed, assetsOut, qIn, qOut, qInIf, qOutIf, net, closing, closingIf, lines: ln, custOrders: ln.custOrder.reduce((a, x) => a + x.amount, 0), supOrders: ln.supOrder.reduce((a, x) => a + x.amount, 0) };
   });
 }
 function cfCell(c, row, v, neg, extraCls){
@@ -10723,7 +10771,7 @@ function renderCashflow(){
     `<div><label>Starting balance (£)</label><input type="number" step="any" data-tab="settings" data-field="startingCash" value="${bankStart()}"></div>
      <div><label>Starting balance as at</label><input type="date" data-tab="settings" data-field="startingBalanceDate" value="${bankStartDate()}"></div>
      <div><label>Bank balance now (actual)</label><input class="computed" disabled value="${qm(bankBalance())}"></div>
-     <div><label>Fixed monthly overhead (£)</label><input class="computed" disabled value="${money(totalOverhead()/12)}"></div>
+     <div><label>Fixed monthly overhead (£)</label><input class="computed" disabled value="${money(bcFixedMonthly())}"></div>
      <div class="cf-recon">${reconStatusHtml()}</div>`;
   document.getElementById('cashflowTotals').innerHTML = finTotalsHtml();
   const months = getMonthRange(); const cf = computeCashFlow(months), hasAssets = cf.some(c => c.assetsOut > 0);
@@ -10739,6 +10787,7 @@ function renderCashflow(){
     ${R('qInIf', 'Quotes — cash in <em>(if won, sent)</em>', c => c.qInIf, false, 'cf-ifwon')}
     ${R('qOutIf', 'Quotes — cash out <em>(if won, sent)</em>', c => c.qOutIf, true, 'cf-ifwon')}
     ${R('fixed', 'Cash out — fixed overhead', c => c.fixedMonthly, true)}
+    ${cf.some(c => c.bizOut > 0) ? R('bizcost', 'Cash out — business costs (Business costs page)', c => c.bizOut, true) : ''}
     ${hasAssets ? R('assets', 'Cash out — approved asset plan', c => c.assetsOut, true) : ''}
     <tr><td><strong>Net cash flow</strong></td>${cf.map(c=>`<td><strong>${c.net<0?'-':''}${money(Math.abs(c.net))}</strong></td>`).join('')}</tr>
     <tr><td>Closing balance <em>(actual to date, then forecast)</em></td>${cf.map(c=>c.preStart ? '<td class="qb-dim" title="Before the starting balance date">—</td>' : `<td${c.closing<0?' style="color:var(--bt-bad-fg);font-weight:700;"':''}>${money(c.closing)}</td>`).join('')}</tr>
@@ -11002,7 +11051,7 @@ function renderTransactions(){
     html += `<tr class="${txnUi.flash === i ? 'inv-flash' : ''}">
       <td><input type="date" data-tab="transactions" data-idx="${i}" data-field="date" value="${t.date||''}"></td>
       <td><input data-tab="transactions" data-idx="${i}" data-field="description" value="${escAttr(t.description||'')}"></td>
-      <td><select data-tab="transactions" data-idx="${i}" data-field="category">${cats.map(c=>`<option${t.category===c?' selected':''}>${escHtml(c)}</option>`).join('')}</select></td>
+      <td><select data-tab="transactions" data-idx="${i}" data-field="category">${cats.map(c=>`<option${t.category===c?' selected':''}>${escHtml(c)}</option>`).join('')}</select>${typeof clsBadge === 'function' ? '<div style="margin-top:4px;">' + clsBadge(t) + '</div>' : ''}</td>
       <td>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button><div class="qb-dim">${escHtml(t.projCat || '')} ${t.planned === false || (t.projectId && !t.planned) ? '<span class="qb-flag bad">unplanned</span>' : '<span class="qb-flag ok">planned</span>'}${t.payMode === 'trade' ? (t.settledDate ? ' <span class="qb-flag ok">trade · settled ' + pwD(t.settledDate) + '</span>' : ' <span class="qb-flag bad">on account · due ' + pwD(t.tradeDue) + '</span> <button type="button" class="sp-link" data-spay="settle" data-uid="' + escAttr(t.uid) + '">settle…</button>') : ''}${t.origin === 'supplier-payment' ? ' <span class="qb-flag">confirmed payment</span>' : ''}</div>` : '<span class="qb-dim">—</span>'}</td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyIn" value="${t.moneyIn||0}"></td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyOut" value="${t.moneyOut||0}"></td>
@@ -11259,10 +11308,11 @@ function cashPosition(){ return bankBalance(); }   // starting balance plus the 
 function assetCommitted(){ return r2((state.assetPlan || []).filter(a => a.funding === 'retained' && ['Approved', 'Ordered', 'Bought'].includes(a.status)).reduce((s, a) => s + (Number(a.cost) || 0), 0)); }
 function dbPotHtml(){
   const rt = retainedTotals(), committed = assetCommitted(), un = r2(rt.toDate - committed), cash = cashPosition(), sum = POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) || 1;
-  const bucket = b => { const pct = potPct(b[0]), amt = r2(rt.toDate * pct / sum); return `<div class="pot-b"><small>${b[1]} · ${Math.round(pct / sum * 100)}%</small><b>${money(amt)}</b>${b[0] === 'potAssetsPct' ? `<em>${money(committed)} committed</em>` : ''}</div>`; };
+  const pp = potPositions(rt.toDate), pos = {}; pp.rows.forEach(r => { pos[r.b[0]] = r; });
+  const bucket = b => { const r = pos[b[0]], amt = r.method === 'fixed' ? r.amt : r2((pp.allPct ? pp.pool : Math.max(0, pp.pool)) * r.pct / pp.sum); return `<div class="pot-b"><small>${b[1]} · ${r.method === 'fixed' ? money(r.perMonth) + ' a month' : Math.round(r.pct / pp.sum * 100) + '%'}</small><b>${money(amt)}</b>${b[0] === 'potAssetsPct' ? `<em>${money(committed)} committed</em>` : ''}${r.method === 'fixed' ? `<em>fixed: ${r.months} month${r.months === 1 ? '' : 's'} so far</em>` : ''}</div>`; };
   return `<div class="pot"><div class="pot-main"><div class="db-card-h"><h3>Retained profit</h3><span class="pot-sub">project profit minus profit share (default ${escHtml(psMethodName(psDefault().method))}: ${psDefault().method === 'pct' ? (psDefault().pct ? psDefault().pct + '%' : 'not set') : (psDefault().hour ? '£' + psDefault().hour + '/h' : 'not set')}), recognised as invoices are raised</span></div>
       <div class="pot-fig"><div><small>Retained profit to date</small><b>${money(rt.toDate)}</b></div><div><small>Committed to the asset plan</small><b>${money(committed)}</b></div><div><small>Unallocated</small><b class="${un < 0 ? 'over' : ''}">${money(un)}</b></div></div>
-      <div class="pot-buckets">${POT_BUCKETS.map(bucket).join('')}</div>
+      <div class="pot-buckets">${POT_BUCKETS.map(bucket).join('')}</div>${pp.allPct ? '' : `<div class="pot-sub" style="margin-top:6px;">Fixed pots take ${money(pp.fixedSum)} to date; the percentage pots share the other ${money(pp.pool)}${pp.short ? ' (retained profit to date does not yet cover the fixed amounts)' : ''}.</div>`}
       <div class="pot-links"><button type="button" class="sp-link" data-dash="go" data-tab="assets">Asset plan &amp; register →</button> <span class="pot-sub">Whole-job retained profit forecast: ${money(rt.plan)}</span></div></div>
     <div class="pot-cash"><small>Cash position</small><b class="${cash < 0 ? 'over' : ''}">${money(cash)}</b><em>starting cash plus actual transactions. Profit is not cash: retained profit is earned on the jobs, cash is what is in the bank.</em></div></div>`;
 }
@@ -11292,22 +11342,22 @@ function assetRegisterHtml(){
     const due = k => a[k] && a[k] < today ? ' class="over"' : '';
     return `<tr class="${assetUi.flash === a.id ? 'inv-flash' : ''}${a.status === 'Retired' ? ' pw-removed' : ''}"><td>${f('name')}</td><td>${f('category')}</td><td>${f('supplier')}</td><td>${f('purchased', 'date')}</td><td>${f('cost', 'number')}</td><td>${f('life', 'number', 'style="width:64px"')}</td><td>${f('residual', 'number')}</td>
       <td><select ${at} data-f="status">${ASSET_STATUS.map(s => `<option${a.status === s ? ' selected' : ''}>${s}</option>`).join('')}</select></td><td>${f('serial')}</td><td><span${due('serviceDue')}>${f('serviceDue', 'date')}</span></td><td><span${due('insuranceDue')}>${f('insuranceDue', 'date')}</span></td>
-      <td class="qb-calc">${qm(d.book)}</td><td class="qb-calc">${qm(d.yearly)}</td><td>${tx >= 0 ? finSrcLink({ t: 'txn', id: a.txnUid }, 'transaction →') : ''}${a.planId ? '<div class="qb-dim">from plan</div>' : ''}</td><td><button type="button" class="icon-btn" data-asset-a="del" ${at} aria-label="Delete asset">${X_SVG}</button></td></tr>`;
+      <td class="qb-calc">${qm(d.book)}</td><td class="qb-calc">${qm(d.yearly)}</td>${toolCostOn() ? `<td>${f('usageCharge', 'number')}</td><td>${f('usageAfter', 'number')}</td><td class="qb-calc">${qm(assetRecovered(a))}${assetToRecover(a) > 0 ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">of ${qm(assetToRecover(a))}${assetRecovered(a) >= assetToRecover(a) ? ' · recovered' : ''}</div>` : ''}</td>` : ''}<td>${tx >= 0 ? finSrcLink({ t: 'txn', id: a.txnUid }, 'transaction →') : ''}${a.planId ? '<div class="qb-dim">from plan</div>' : ''}</td><td><button type="button" class="icon-btn" data-asset-a="del" ${at} aria-label="Delete asset">${X_SVG}</button></td></tr>`;
   }).join('');
   const t = state.assets.filter(a => a.status === 'Owned').reduce((s, a) => { const d = assetDep(a); s.cost += Number(a.cost) || 0; s.book += d.book; s.yr += d.yearly; return s; }, { cost: 0, book: 0, yr: 0 });
   return `<div class="kpi-row"><div class="kpi" style="--accent:var(--oak)"><div class="label">Cost of owned assets</div><div class="value">${qm(t.cost)}</div><div class="fin-sub">ex VAT</div></div><div class="kpi" style="--accent:var(--green)"><div class="label">Book value</div><div class="value">${qm(t.book)}</div><div class="fin-sub">after straight-line depreciation</div></div><div class="kpi" style="--accent:var(--slate)"><div class="label">Replacement set-aside per year</div><div class="value">${qm(t.yr)}</div><div class="fin-sub">(cost − residual) ÷ expected life, owned assets</div></div></div>
     <div class="btn-row"><button type="button" class="btn" data-asset-a="add">+ Add asset</button></div>
-    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Name</th><th>Category</th><th>Supplier</th><th>Purchased</th><th>Cost ex VAT</th><th>Life (yrs)</th><th>Residual</th><th>Status</th><th>Serial</th><th>Service due</th><th>Insurance due</th><th>Book value</th><th>Replacement / yr</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="15"><div class="sup-empty">No assets yet. Add one, or buy an item from the Asset plan.</div></td></tr>'}</tbody>
-      ${state.assets.length ? `<tfoot><tr class="qb-foot"><td><b>Totals (owned)</b></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.cost)}</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.book)}</b></td><td class="qb-calc"><b>${qm(t.yr)}</b></td><td></td><td></td></tr></tfoot>` : ''}</table></div></div>`;
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Name</th><th>Category</th><th>Supplier</th><th>Purchased</th><th>Cost ex VAT</th><th>Life (yrs)</th><th>Residual</th><th>Status</th><th>Serial</th><th>Service due</th><th>Insurance due</th><th>Book value</th><th>Replacement / yr</th>${toolCostOn() ? '<th>Charge per use</th><th>Charge once recovered</th><th>Recovered</th>' : ''}<th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="15"><div class="sup-empty">No assets yet. Add one, or buy an item from the Asset plan.</div></td></tr>'}</tbody>
+      ${state.assets.length ? `<tfoot><tr class="qb-foot"><td><b>Totals (owned)</b></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.cost)}</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.book)}</b></td><td class="qb-calc"><b>${qm(t.yr)}</b></td>${toolCostOn() ? '<td></td><td></td><td></td>' : ''}<td></td><td></td></tr></tfoot>` : ''}</table></div></div>`;
 }
 function assetPlanHtml(){
   const rt = retainedTotals(), items = state.assetPlan.slice().sort((a, b) => String(a.neededBy || '9999').localeCompare(String(b.neededBy || '9999'))), aPct = potPct('potAssetsPct') / (POT_BUCKETS.reduce((s, b) => s + potPct(b[0]), 0) || 1);
   let cum = 0; const aff = {};
-  items.forEach(a => { if(a.funding === 'retained'){ cum += Number(a.cost) || 0; const avail = a.neededBy ? retainedBy(a.neededBy) : rt.plan; aff[a.id] = { cum: r2(cum), avail, head: r2(avail - cum), bucket: r2(avail * aPct - cum) }; } });
+  items.forEach(a => { if(a.funding === 'retained'){ cum += Number(a.cost) || 0; const avail = a.neededBy ? retainedBy(a.neededBy) : rt.plan; aff[a.id] = { cum: r2(cum), avail, head: r2(avail - cum), bucket: r2(potAssetsAt(avail, a.neededBy || fmt(new Date())) - cum) }; } });
   const rows = state.assetPlan.map(a => {
     const at = `data-asset-plan="${a.id}"`, f = (k, type) => `<input ${type === 'number' ? 'type="number" step="any" min="0" class="qb-n"' : (type === 'date' ? 'type="date"' : '')} ${at} data-f="${k}" value="${escAttr(a[k] === undefined ? '' : a[k])}">`, sel = (k, opts) => `<select ${at} data-f="${k}">${opts.map(o => { const [v, n] = Array.isArray(o) ? o : [o, o]; return `<option value="${escAttr(v)}"${String(a[k]) === String(v) ? ' selected' : ''}>${escHtml(n)}</option>`; }).join('')}</select>`;
     const af = aff[a.id], bought = a.status === 'Bought', ev = af ? (af.head >= 0 ? `<span class="qb-flag ok">affordable</span> <span class="qb-dim">headroom ${qm(af.head)}</span>` : `<span class="qb-flag bad">short ${qm(-af.head)}</span>`) + `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">cumulative ${qm(af.cum)} vs retained ${qm(af.avail)} by then · assets bucket ${af.bucket >= 0 ? 'ok' : 'short ' + qm(-af.bucket)}</div>` : '<span class="qb-dim">not funded from retained profit</span>';
-    return `<tr class="${assetUi.flash === a.id ? 'inv-flash' : ''}"><td>${f('item')}</td><td>${f('reason')}</td><td>${f('neededBy', 'date')}</td><td>${f('cost', 'number')}</td><td>${sel('priority', PLAN_PRIORITY)}</td><td>${sel('status', PLAN_STATUS)}</td>
+    return `<tr class="${assetUi.flash === a.id ? 'inv-flash' : ''}"><td>${f('item')}</td><td>${f('reason')}</td><td>${f('neededBy', 'date')}</td><td>${f('cost', 'number')}</td><td>${f('hireCost', 'number')}</td><td>${f('uses', 'number')}</td><td>${sel('priority', PLAN_PRIORITY)}</td><td>${sel('status', PLAN_STATUS)}</td>
       <td>${sel('projectId', [['', '— none —']].concat(state.projects.map(p => [String(p.id), recordCode(p.id, 'project') + ' ' + p.name])))}</td><td>${sel('funding', FUNDING)}</td><td>${ev}</td>
       <td>${bought ? (a.assetId ? finSrcLink({ t: 'asset', id: a.assetId }, 'in register →') : '') + (a.txnUid ? ' ' + finSrcLink({ t: 'txn', id: a.txnUid }, 'transaction →') : '') : `<button type="button" class="btn qb-sm" data-asset-a="buy" ${at.replace('data-asset-plan', 'data-pid')}>Mark bought…</button>`}</td><td><button type="button" class="icon-btn" data-asset-a="plan-del" ${at.replace('data-asset-plan', 'data-pid')} aria-label="Delete plan item">${X_SVG}</button></td></tr>`;
   }).join('');
@@ -11315,8 +11365,8 @@ function assetPlanHtml(){
   const byProj = rt.rows.map(({ p, r }) => `<tr><td>${finSrcLink({ t: 'project', id: p.id, sec: 'plan' }, recordCode(p.id, 'project') + ' ' + p.name)}</td><td class="qb-calc">${qm(r.plan.profit)}</td><td class="qb-calc">${r.plan.hours ? r.plan.hours.toFixed(1) + ' h' : '—'}</td><td class="qb-calc">−${qm(r.plan.share)}</td><td class="qb-calc"><b>${qm(r.plan.retained)}</b></td><td class="qb-calc">${Math.round(r.frac * 100)}%</td><td class="qb-calc">${qm(r.toDate)}</td></tr>`).join('');
   return `<div class="kpi-row"><div class="kpi" style="--accent:var(--green)"><div class="label">Retained profit to date</div><div class="value">${qm(rt.toDate)}</div><div class="fin-sub">forecast over the jobs ${qm(rt.plan)}</div></div><div class="kpi" style="--accent:var(--oak)"><div class="label">Committed to the plan</div><div class="value">${qm(committed)}</div><div class="fin-sub">approved, ordered or bought, funded from retained profit</div></div><div class="kpi" style="--accent:var(--slate)"><div class="label">Unallocated</div><div class="value ${rt.toDate - committed < 0 ? 'flag' : ''}">${qm(rt.toDate - committed)}</div><div class="fin-sub">retained to date − committed</div></div></div>
     <div class="btn-row"><button type="button" class="btn" data-asset-a="plan-add">+ Add plan item</button></div>
-    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Item</th><th>Reason</th><th>Needed by</th><th>Est. cost ex VAT</th><th>Priority</th><th>Status</th><th>Project</th><th>Funding</th><th>Affordability against retained profit</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="11"><div class="sup-empty">Nothing planned. Add the kit you will need; approved items go into the cash flow forecast on their needed-by date.</div></td></tr>'}</tbody></table></div>
-      <p class="q-help">Affordability adds up every item funded from retained profit in needed-by order and compares it with the retained profit expected by that date (each job's retained profit, in proportion to its invoices dated by then). Approved and ordered items appear in the Cash Flow Forecast as money out on the needed-by date.</p></div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Item</th><th>Reason</th><th>Needed by</th><th>Est. cost ex VAT</th><th>Hire cost each time</th><th>Expected uses</th><th>Priority</th><th>Status</th><th>Project</th><th>Funding</th><th>Affordability against retained profit</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="13"><div class="sup-empty">Nothing planned. Add the kit you will need; approved items go into the cash flow forecast on their needed-by date.</div></td></tr>'}</tbody></table></div>
+      <p class="q-help">Affordability adds up every item funded from retained profit in needed-by order and compares it with the retained profit expected by that date (each job's retained profit, in proportion to its invoices dated by then). Approved and ordered items appear in the Cash Flow Forecast as money out on the needed-by date. A hire cost and the expected number of uses compare buying with hiring below.</p></div>${planBuyHireHtml()}
     <details class="card" style="margin-top:14px;"><summary><b>Retained profit by project</b> <span class="qb-dim">(project profit minus profit share)</span></summary><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Project</th><th>Profit (plan)</th><th>Hours</th><th>Profit share</th><th>Retained</th><th>Invoiced</th><th>To date</th></tr></thead><tbody>${byProj || '<tr><td colspan="7"><div class="sup-empty">No projects.</div></td></tr>'}</tbody><tfoot><tr class="qb-foot"><td><b>Total</b></td><td class="qb-calc"><b>${qm(rt.profit)}</b></td><td></td><td class="qb-calc"><b>−${qm(rt.share)}</b></td><td class="qb-calc"><b>${qm(rt.plan)}</b></td><td></td><td class="qb-calc"><b>${qm(rt.toDate)}</b></td></tr></tfoot></table></div></details>`;
 }
 function renderAssets(){
@@ -11362,7 +11412,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('change', (e) => {
   const el = e.target; if(!el.dataset || !el.dataset.f) return;
   const reg = el.dataset.asset ? state.assets.find(x => x.id === el.dataset.asset) : null, pl = el.dataset.assetPlan ? state.assetPlan.find(x => x.id === el.dataset.assetPlan) : null, o = reg || pl; if(!o) return;
-  const f = el.dataset.f, numeric = ['cost', 'life', 'residual'].includes(f); o[f] = numeric ? Math.max(0, Number(el.value) || 0) : (el.type === 'date' ? isoOk(el.value) : el.value);
+  const f = el.dataset.f, numeric = ['cost', 'life', 'residual'].includes(f), optNum = ['usageCharge', 'usageAfter', 'hireCost', 'uses'].includes(f); o[f] = numeric ? Math.max(0, Number(el.value) || 0) : optNum ? (el.value === '' ? '' : Math.max(0, Number(el.value) || 0)) : (el.type === 'date' ? isoOk(el.value) : el.value);
   if(reg && f === 'status' && el.value === 'Retired' && !reg.retiredDate) reg.retiredDate = fmt(new Date());
   if(pl && f === 'status' && el.value === 'Bought' && !pl.assetId){ o.status = 'Approved'; saveState(); assetOpenBuy(pl.id); return; }
   saveState(); clearTimeout(window._assetLazy); window._assetLazy = setTimeout(render, 350);
@@ -12109,7 +12159,7 @@ function applyContractSigned(r){
 }
 
 /* ---------- pricing ---------- */
-function totalOverhead(){ const a=state.assumptions; return Number(a.ohInsurance)+Number(a.ohAccounting)+Number(a.ohVehicle)+Number(a.ohTools)+Number(a.ohMarketing); }
+function totalOverhead(){ if(state.settings && state.settings.bizCostsForOverheads) return bcYearly(); const a=state.assumptions; return Number(a.ohInsurance)+Number(a.ohAccounting)+Number(a.ohVehicle)+Number(a.ohTools)+Number(a.ohMarketing); }
 function overheadPerDay(){ return totalOverhead() / (Number(state.assumptions.workingDaysPerYear)||1); }
 function renderAssumptionsGrid(){
   const a = state.assumptions;
@@ -12121,7 +12171,7 @@ function renderAssumptionsGrid(){
   document.getElementById('assumptionsGrid').innerHTML = fields.map(([k,l]) =>
     `<div><label>${l}</label><input type="number" step="0.01" data-tab="assumptions" data-field="${k}" value="${a[k]}"></div>`
   ).join('') +
-    `<div><label>Total overhead (£/yr)</label><input class="computed" disabled value="${money(totalOverhead())}"></div>
+    `<div><label>Total overhead (£/yr)${state.settings.bizCostsForOverheads ? ' · from the Business costs list' : ''}</label><input class="computed" disabled value="${money(totalOverhead())}"></div>
      <div><label>Overhead per working day (£)</label><input class="computed" disabled value="${overheadPerDay().toFixed(2)}"></div>`;
 }
 function renderPricing(){
@@ -12414,7 +12464,7 @@ function migrateTaskTimeline(r){
   if(!r || !Array.isArray(r.comms)) return;
   r.comms.forEach(c => { if(c && typeof c === 'object' && (TASK_NOTE_PREFIX_RE.test(String(c.note || '')) || c.src === 'action') && c.src !== 'task') c.src = 'task'; });
 }
-const TASK_REF_KINDS = ['contact', 'company', 'supplier', 'quote', 'po'];   // records a task can attach to besides a lead, sale or project (those use linkedIds)
+const TASK_REF_KINDS = ['contact', 'company', 'supplier', 'quote', 'po', 'page'];   // records a task can attach to besides a lead, sale or project (those use linkedIds)
 const RECUR_UNITS = ['day', 'week', 'month', 'year'];
 function normRecur(r){ const n = r && Math.floor(Number(r.every)); return n >= 1 && n <= 52 && RECUR_UNITS.includes(r.unit) ? { every: n, unit: r.unit } : null; }
 function ensureTaskModel(o){
@@ -12450,7 +12500,8 @@ function ensureTaskModel(o){
     createdAt: iso(t.createdAt), createdBy: iso(t.createdBy),
     scope: t.scope === 'business' ? 'business' : 'job',   // a job task belongs with a customer's work; a business task with running the business
     refs: (Array.isArray(t.refs) ? t.refs : []).filter(r => r && typeof r === 'object' && TASK_REF_KINDS.includes(r.kind) && r.id !== undefined && r.id !== '').map(r => ({ kind: r.kind, id: String(r.id) })),
-    recur: normRecur(t.recur), spawnedId: iso(t.spawnedId)
+    recur: normRecur(t.recur), spawnedId: iso(t.spawnedId),
+    ...(iso(t.autoKey) ? { autoKey: iso(t.autoKey) } : {})   // the key an automatic task was made with; kept so it is not made again after a reload
   }));
   o.crmTasks.forEach(t => migrateNotesToDescription(t, t.notes));
   (Array.isArray(o.actions) ? o.actions : []).concat(Array.isArray(o.archivedActions) ? o.archivedActions : []).forEach(a => {
@@ -14423,6 +14474,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
+  try{ renderClassify(); renderBusinessCosts(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
@@ -14466,7 +14518,7 @@ function applyFieldChange(el){
   if(tab==='assumptions') state.assumptions[field] = value;
   else if(tab==='businessPlan') state.businessPlan[field] = value;
   else if(tab==='dashsettings'){ const n = Math.floor(Number(value)); if(field === 'leadStaleDays' && n >= 1) state.settings.leadStaleDays = n; }   // below 1 is ignored and the box goes back to the saved value
-  else if(tab==='settings') state.settings[field] = value;
+  else if(tab==='settings'){ state.settings[field] = value; if(/^pot\w+Method$/.test(field)) potMethodChanged(field); }
   else if(tab==='stagename' || tab==='stagepct'){
     const item = listFor(el.dataset.pl).find(x => x.id === el.dataset.id);
     if(item){
@@ -14839,7 +14891,7 @@ const BTT_SPECS = [
   { k: 'milestonesTableWrap', label: 'Milestones' },
   { k: 'panel-crmprojects:code-name', label: 'Projects overview' }
 ];
-const BTT_CARD_KEYS = ['leadsTableWrap', 'pipelineTableWrap', 'projectsTableWrap', 'crmTableWrap', 'actionsTableWrap', 'suppliersTableWrap', 'transactionsTableWrap', 'panel-invoicing:project-invoice', 'panel-purchaseorders:po-project'];
+const BTT_CARD_KEYS = ['leadsTableWrap', 'pipelineTableWrap', 'projectsTableWrap', 'crmTableWrap', 'actionsTableWrap', 'suppliersTableWrap', 'transactionsTableWrap', 'panel-invoicing:project-invoice', 'panel-purchaseorders:po-project', 'cls-waiting', 'cls-done', 'bc-list'];
 const BTT_EXTRA_RE = /^(notes?|comments?|description|email|phone|postcode|address|website|serial|residual|life|insurance|service|created|source|payment terms|lead time|categories|linked|replacement|book value|last contacted|last touched|in progress|raised|version|prob|owner|sent|tier|type|date raised|\+ owner)\b/i;
 const BTT_ESS_RE = /^(code|ref|reference|po|invoice|name|title|project|project name|project \/ client|supplier|customer|company|contact|item|action|stage|status|lead status|sales stage|month|date|due|deadline|amount|value|total|quote|agreed value|total ex vat|tier name|in \(|out \()/i;
 const BTT_NAME_RE = /^(name|title|project|project name|project \/ client|supplier|customer|company|contact|description|item|action|stage|long-term goal|trade area|role|category|linked record|linked lead|main contact|categories)/i;
@@ -15164,6 +15216,7 @@ function activateTab(name){
   if(typeof approverMode === 'function' && state && approverMode() && !approverPages().includes(name)) name = 'quotations';   // an approver only reaches the pages their scope allows
   if(name === 'admin'){ name = 'actions'; setTimeout(() => { const t = document.getElementById('bizAdminSec'); if(t) t.scrollIntoView({ block: 'start' }); }, 30); }   // Setup & Admin now lives on the Business tasks page
   if(name === 'actions' && typeof canSeeBusiness === 'function' && state && !canSeeBusiness()){ showToast('Business tasks are only visible to the people set under Settings'); return; }
+  if(name === 'businesscosts' && typeof canSeeBusiness === 'function' && state && !canSeeBusiness()){ showToast('Business costs are only visible to the people set under Settings'); return; }
   const tab = document.querySelector('.tab[data-tab="' + name + '"]'), panel = document.getElementById('panel-' + name);
   if(!tab || !panel) return;
   document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.removeAttribute('aria-current'); });
@@ -15217,6 +15270,8 @@ const MENU_ICONS = {
   approvals: '<circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/>',
   cashflow: '<path d="M3 12c3-6 6-6 9 0s6 6 9 0"/>',
   invoicing: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/>',
+  businesscosts: '<rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="15" x2="11" y2="15"/>',
+  classify: '<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/><line x1="11" y1="12" x2="15" y2="12"/>',
   transactions: '<polyline points="17 3 21 7 17 11"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 13 3 17 7 21"/><line x1="3" y1="17" x2="15" y2="17"/>',
   pricing: '<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
   projectpipeline: '<rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="13" rx="1"/>',
@@ -15738,7 +15793,7 @@ function navOpen(spec){
   const [kind, id, extra] = String(spec).split(':');
   if(kind === 'quote'){ const q = qFind(Number(id)); if(!q) return; qUi.openId = q.id; qUi.tab = 'quotes'; activateTab('quotations'); renderQuotes(); window.scrollTo(0, 0); }
   else if(kind === 'project'){ if(!state.projects.some(p => p.id === Number(id))) return;
-    if(extra === 'materials'){ openProjectWorkspace(Number(id), false, false); rpUi.pid = Number(id); rpUi.tab = 'materials'; const pp = rpFind(Number(id)); if(pp) rpRenderProject(pp); window.scrollTo(0, 0); return; }   // the Materials and deliveries tab
+    if(extra === 'materials' || extra === 'money'){ openProjectWorkspace(Number(id), false, false); rpUi.pid = Number(id); rpUi.tab = extra; const pp = rpFind(Number(id)); if(pp) rpRenderProject(pp); window.scrollTo(0, 0); return; }   // the Materials and deliveries tab
     openProjectWorkspace(Number(id), false, !!extra); if(extra) setTimeout(() => pwGoSection(extra), 30); }
   else if(kind === 'supplier'){ if(!supFind(Number(id))){ showToast('That supplier no longer exists'); return; } cxPrepNav(); rsOpen(Number(id)); }
   else if(cxNavOpen(kind, id, extra)) return;
@@ -17676,7 +17731,7 @@ lrSchedule(LR_BASE_MS);
    ===================================================================== */
 const rpUi = { pid: 0, tab: 'overview', sec: {}, secs: {}, draft: null, edit: '' };
 navExtra('rp', () => ({ pid: rpUi.pid, tab: rpUi.tab, sec: Object.assign({}, rpUi.sec) }), v => { if(v){ rpUi.pid = v.pid || 0; rpUi.tab = v.tab || 'overview'; rpUi.sec = v.sec || {}; } });
-const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan'], ['materials', 'Materials and deliveries']];
+const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan'], ['materials', 'Materials and deliveries'], ['money', 'Money']];
 const RP_DATE_KEYS = ['start', 'complete', 'dur'];
 const RP_LABELS = { stageId: 'Stage', jobType: 'Job detail', jobTypeId: 'Job type', estValue: 'Ballpark value', estDays: 'Estimated duration', prefStart: 'Preferred start', deadline: 'Deadline', owner: 'Owner', source: 'Source', start: 'Start date', complete: 'Complete date', dur: 'Duration', address: 'Site address', postcode: 'Postcode', access: 'Access', services: 'Services', lastVisited: 'Last visited', contact: 'Contact', company: 'Company', phone: 'Phone', email: 'Email' };
 const RP_CHEV = '<svg class="rp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -17770,7 +17825,7 @@ function rpLeftHtml(p){
     ${rpEdit(p, 'start', { type: 'date' })}${rpEdit(p, 'complete', { type: 'date' })}${rpEdit(p, 'dur', { type: 'number', label: 'Duration (working days)' })}
     <div class="rp-hint rp-dateh">Start, complete and duration are linked: change start or duration and complete moves, change complete and duration follows.</div>
     ${phHasHours(p) ? rpRO('Hours planned', `<b>${hrs(phHours(p))}</b>`, `Adds up the phase hours, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>${h.plan && Math.abs(h.plan - phHours(p)) > 0.01 ? ` · the Working plan holds ${hrs(h.plan)}` : ''}`) : rpRO('Hours planned', h.plan ? `<b>${hrs(h.plan)}</b>` : '', `From the plan, see <button type="button" class="sp-link" data-rp="tab" data-tab="plan">Plan</button>`)}
-    ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>${phLoggedChips(p)}` : '', 'From time logs and the phases ticked done')}`;
+    ${rpRO('Hours logged', h.logged ? `<b>${hrs(h.logged)}</b>${phLoggedChips(p)}` : '', 'From time logs and the phases ticked done' + phLoggedSourceHint(p))}`;
   const moneySec = `
     <div class="rp-three"><div class="rp-ro"><small>Billed</small><b>${qm(money.billed)}</b></div><div class="rp-ro"><small>Paid</small><b>${qm(money.paid)}</b></div><div class="rp-ro${money.overdue ? ' rp-bad' : ''}"><small>Overdue</small><b>${qm(money.overdue)}</b></div></div>
     <div class="rp-hint">Read-only, from the invoice schedule. <button type="button" class="sp-link" data-rp="legacy" data-sec="money">Open the schedule</button></div>`;
@@ -17861,7 +17916,7 @@ function rpQualTile(p){
   return `<div class="rp-card"><h4>Qualification ${has ? qualBadgeHtml(p) : ''}</h4>${qualRowsHtml(p)}<div class="rp-hint">Carried from the lead stage. The questions and their weights are in Settings, Selling.</div></div>`;
 }
 function rpOverviewHtml(p){
-  return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${varProjectCard(p)}${rpQualTile(p)}</div>`;
+  return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${toolJobCardHtml(p)}${varProjectCard(p)}${rpQualTile(p)}</div>`;
 }
 const rpPlanCtx = { on: false };   // true while the Plan tab builds the old timeline: the new Gantt above replaces its chart
 function rpPlanHtml(p){
@@ -17874,13 +17929,14 @@ function pwSecWrapFlat(html){ const m = html.match(/^<section class="pw-sec" id=
 function rpRightHtml(p){ return `<div class="rp-rhead"><h3>Linked records</h3></div><div class="rp-rbody" id="rpRight">${rpLinksHtml(p)}</div>`; }
 
 /* ---- the frame ---- */
-function rpCentreHtml(p){ return rpTabsHtml() + `<div class="rp-cbody" id="rpCbody">${rpUi.tab === 'overview' ? rpHeadlineHtml(p) : rpUi.tab === 'materials' ? mgHeadlineHtml(p) : ''}<div class="rp-cscroll">${rpUi.tab === 'overview' ? rpOverviewHtml(p) : rpUi.tab === 'activity' ? rpActivityHtml(p) : rpUi.tab === 'materials' ? rpMaterialsHtml(p) : rpPlanHtml(p)}</div></div>`; }
+function rpCentreHtml(p){ return rpTabsHtml() + `<div class="rp-cbody" id="rpCbody">${rpUi.tab === 'overview' ? rpHeadlineHtml(p) : rpUi.tab === 'materials' ? mgHeadlineHtml(p) : rpUi.tab === 'money' ? mnHeadlineHtml(p) : ''}<div class="rp-cscroll">${rpUi.tab === 'overview' ? rpOverviewHtml(p) : rpUi.tab === 'activity' ? rpActivityHtml(p) : rpUi.tab === 'materials' ? rpMaterialsHtml(p) : rpUi.tab === 'money' ? rpMoneyHtml(p) : rpPlanHtml(p)}</div></div>`; }
 function rpRenderProject(p){
   projEnsure(p); if(rpUi.pid !== p.id){ rpUi.pid = p.id; rpUi.tab = 'overview'; rpUi.sec = {}; if(rpUi.draft && rpUi.draft.pid !== p.id) rpUi.draft = null; }
   const el = document.getElementById('projectWorkspace'), prev = {};
   ['.rp-left .rp-lbody', '.rp-centre .rp-cscroll', '.rp-right .rp-rbody'].forEach(s => { const n = el.querySelector(s); if(n) prev[s] = n.scrollTop; });
   el.innerHTML = `<div class="rp" data-kind="project"><aside class="rp-left" aria-label="Profile">${rpLeftHtml(p)}</aside><main class="rp-centre">${rpCentreHtml(p)}</main><aside class="rp-right" aria-label="Linked records">${rpRightHtml(p)}</aside></div>`;
   Object.keys(prev).forEach(s => { const n = el.querySelector(s); if(n) n.scrollTop = prev[s]; });
+  try{ const at = el.querySelector('.rp-tabs button.active'), bar = at && at.parentNode; if(bar && at.offsetLeft + at.offsetWidth > bar.clientWidth + bar.scrollLeft) bar.scrollLeft = at.offsetLeft + at.offsetWidth - bar.clientWidth + 16; }catch(e){}   // a tab that is off the edge (Money) is brought into view
   try{ pwStick(); }catch(e){}
   rpFit(); try{ gtFocus(); }catch(e){}
 }
@@ -18176,7 +18232,7 @@ function canSeeBusiness(){
   return (state.settings.bizAccess || []).some(n => String(n).toLowerCase() === w.toLowerCase());
 }
 const taskVisible = t => t.scope !== 'business' || canSeeBusiness();
-const REF_LABEL = { contact: 'Contact', company: 'Company', supplier: 'Supplier', quote: 'Quote', po: 'Order' };
+const REF_LABEL = { contact: 'Contact', company: 'Company', supplier: 'Supplier', quote: 'Quote', po: 'Order', page: 'Page' };
 function refInfo(r){
   let name = '', missing = false;
   if(r.kind === 'contact'){ const c = ctFind(r.id); name = c ? ctName(c) : ''; }
@@ -18184,6 +18240,7 @@ function refInfo(r){
   else if(r.kind === 'supplier'){ const s = supFind(Number(r.id)); name = s ? (s.name || supCode(s)) : ''; }
   else if(r.kind === 'quote'){ const q = qFind(Number(r.id)); name = q ? qRef(q) + (q.customer ? ' · ' + q.customer : '') : ''; }
   else if(r.kind === 'po'){ const o = poFind(Number(r.id)); name = o ? o.ref : ''; }
+  else if(r.kind === 'page'){ name = navTabLabel(r.id); if(name === r.id) name = ''; }   // Stage 5: a task can point at a page, such as Finance > Classify
   if(!name){ missing = true; name = '(record removed)'; }
   return { kind: REF_LABEL[r.kind] || r.kind, name, missing };
 }
@@ -18298,7 +18355,8 @@ document.addEventListener('change', (e) => {
 });
 /* hide the Business tasks page from anyone not allowed, wherever the menu is drawn */
 function bizSyncMenu(){
-  const ok = canSeeBusiness(), t = document.querySelector('#sidebar .tab[data-tab="actions"]'); if(!t) return;
+  const ok = canSeeBusiness(), t = document.querySelector('#sidebar .tab[data-tab="actions"]'), t2 = document.querySelector('#sidebar .tab[data-tab="businesscosts"]'); if(!t) return;
+  if(t2 && t2.hidden === ok){ t2.hidden = !ok; try{ if(menuUi.built) menuBuild(); }catch(e){} if(!ok && navTabName() === 'businesscosts') activateTab('today'); }   // Stage 5: the costs page follows the same visibility setting
   if(t.hidden === !ok) return; t.hidden = !ok; try{ if(menuUi.built) menuBuild(); }catch(e){}
   if(!ok && navTabName() === 'actions') activateTab('today');
 }
@@ -19406,6 +19464,11 @@ function phLoggedSplit(p){
 function phMarkHtml(conf, ass){
   return (ass > 0 ? `<span class="sf-chip warn" title="Budget accepted as it stood: not confirmed">${hrs(ass)} assumed</span>` : '') + (conf > 0 && ass > 0 ? ` <span class="sf-chip ok" title="Hours that were logged or adjusted and confirmed">${hrs(conf)} confirmed</span>` : (conf > 0 ? ` <span class="sf-chip ok" title="Hours that were logged or adjusted and confirmed">confirmed</span>` : ''));
 }
+/* Hours logged is the sum of two sources: time logged on stage lines and hours on done phases. Show the split; when both hold hours, ask whether the same work is in both. Counting is unchanged. */
+function phLoggedSourceHint(p){
+  const stage = (p.stages || []).reduce((a, s) => a + slLogged(s), 0), ph = phDoneHours(p); if(!(stage > 0) && !(ph > 0)) return '';
+  return ` · ${hrs(ph)} from phases, ${hrs(stage)} from stage lines${stage > 0 && ph > 0 ? '<div class="rp-note">Hours are logged in both places: check the same work is not logged twice.</div>' : ''}`;
+}
 function phLoggedChips(p){ const x = phLoggedSplit(p); return ' ' + phMarkHtml(x.confirmed, x.assumed); }
 function phTickBtn(kind, r, p){
   const at = `data-kind="${kind}" data-rid="${r.id}" data-pid="${escAttr(p.id)}"`;
@@ -19554,7 +19617,8 @@ const capFull = () => capPeople().reduce((a, x) => a + Number(x.weeklyHours), 0)
 PLAN_SET_CARDS.push(['People and capacity', () => {
   const l = state.people, hp = hpd();
   return `<p class="q-help" style="margin:0 0 8px;">The people who do the work and the hours each has in a week. Everything on the capacity view is measured against these hours, so a person with no hours filled in adds nothing to capacity. A week with a bank holiday or someone's leave has fewer hours. Adding a person here does not give them a login.</p>
-    <div class="assumptions-grid two" style="max-width:560px;margin-bottom:12px;"><div><label for="capHpd">Hours in a working day</label><input id="capHpd" type="number" min="1" max="24" step="1" inputmode="numeric" data-cap="hpd" value="${hp}"><div class="q-help">The same figure as Hours per day in Quotes and pricing. It turns a duration in days into hours.</div></div></div>
+    <div class="assumptions-grid two" style="max-width:560px;margin-bottom:12px;"><div><label for="capHpd">Hours in a working day</label><input id="capHpd" type="number" min="1" max="24" step="1" inputmode="numeric" data-cap="hpd" value="${hp}"><div class="q-help">The same figure as Hours per day in Quotes and pricing. It turns a duration in days into hours.</div></div>
+      <div><label for="capLw">Default lead weighting (%)</label><input id="capLw" type="number" min="0" max="100" step="1" inputmode="numeric" data-cap="leadw" value="${Math.round(capLeadWeight() * 100)}"><div class="q-help">The share of a lead's hours counted on the capacity view, because a lead may not turn into work. A sales stage uses its own probability; a project counts in full. Default 20.</div></div></div>
     <div class="cap-list">${l.map(x => `<div class="cap-row"><div class="cap-main"><input type="text" data-cap="name" data-id="${escAttr(x.id)}" value="${escAttr(x.name)}" aria-label="Name">
       <label class="cap-h"><span>Hours a week</span><input type="number" min="0" max="168" step="0.5" inputmode="decimal" data-cap="hours" data-id="${escAttr(x.id)}" value="${x.weeklyHours === '' ? '' : x.weeklyHours}" placeholder="Not filled in" aria-label="Available hours a week"></label>
       <button type="button" class="icon-btn" data-cap="del" data-id="${escAttr(x.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>
@@ -19576,6 +19640,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('change', (e) => {
   const el = e.target, d = el.dataset; if(!d || !d.cap || !state) return;
   if(d.cap === 'hpd'){ const n = Math.round(Number(el.value)); if(n >= 1 && n <= 24) state.settings.hoursPerDay = n; saveState(); render(); return; }
+  if(d.cap === 'leadw'){ const n = Math.round(Number(el.value)); if(el.value !== '' && !isNaN(n) && n >= 0 && n <= 100) state.settings.leadWeightPct = n; saveState(); render(); return; }
   const x = state.people.find(q => q.id === d.id); if(!x) return;
   if(d.cap === 'name') x.name = el.value.trim() || x.name;
   else if(d.cap === 'hours'){ const n = parseFloat(el.value); x.weeklyHours = (el.value === '' || isNaN(n) || n < 0) ? '' : Math.min(168, Math.round(n * 4) / 4); }
@@ -19891,6 +19956,412 @@ function capWarnWeeks(p, weeks){
 const capWarnHtml = p => capWarnWeeks(p, capCheck(p, capProposalFromDraft(p)));
 
 /* BT:js-planning end */
+
+/* BT:js-money begin */
+/* =====================================================================
+   STAGE 5: MONEY FOUNDATIONS
+   Step 2: job cost, business cost or asset purchase on a transaction.
+   New optional fields on a transaction, all empty by default: costClass ('job' | 'business' | 'asset'), costProjectId (the job a job cost belongs to, when the
+   transaction has no project link of its own), classHow ('suggestion' | 'chosen'), classAt, classBy. Nothing else on a transaction is touched: amount, date,
+   category, project link and linked code stay exactly as they were. A suggestion is worked out from the category each time it is shown and is never stored
+   until someone accepts it. Only money-out lines are costs, so only those are asked about.
+   ===================================================================== */
+const CLS_LABELS = { job: 'Job cost', business: 'Business cost', asset: 'Asset purchase' };
+const CLS_RULES = [
+  [/^(materials?|delivery|hire|labou?r|sub-?contract\w*)\b/i, 'job', 'Materials, delivery, hire, labour and subcontractors are normally a job cost'],
+  [/^overhead/i, 'business', 'Overhead is a business cost'],
+  [/^(equipment|asset|tools?)\b/i, 'asset', 'Equipment is normally an asset purchase']
+];
+const clsOf = t => (t && CLS_LABELS[t.costClass]) ? t.costClass : '';
+const clsNeeds = t => !!t && Number(t.moneyOut) > 0 && !clsOf(t);
+function clsSuggest(t){
+  if(!clsNeeds(t)) return null; const c = String(t.category || '').trim();
+  for(const [re, cls, why] of CLS_RULES) if(re.test(c)) return { cls, why };
+  return null;
+}
+const clsProjectId = t => Number(t.projectId) || Number(t.costProjectId) || 0;
+function clsApply(t, cls, how, pid){
+  t.costClass = cls; t.classHow = how; t.classAt = new Date().toISOString(); t.classBy = meName();
+  if(cls === 'job' && !Number(t.projectId) && Number(pid) > 0) t.costProjectId = Number(pid); else delete t.costProjectId;
+}
+function clsClear(t){ ['costClass', 'costProjectId', 'classHow', 'classAt', 'classBy'].forEach(k => delete t[k]); }
+function clsBadge(t){
+  const c = clsOf(t); if(!c) return Number(t.moneyOut) > 0 ? '<span class="qb-flag bad">not classified</span>' : '';
+  const pid = clsProjectId(t), p = pid ? state.projects.find(x => x.id === pid) : null;
+  return `<span class="qb-flag ok">${CLS_LABELS[c]}</span>${c === 'job' ? (p ? ' <span class="qb-dim">' + escHtml(recordCode(p.id, 'project')) + '</span>' : ' <span class="qb-flag bad">no project</span>') : ''}`;
+}
+/* one rolling task (autoKey 'txcls') so unclassified costs are not forgotten; it follows the count and closes at zero */
+function clsSyncTask(){
+  if(!state || !Array.isArray(state.transactions) || !Array.isArray(state.crmTasks)) return false;
+  const n = state.transactions.filter(clsNeeds).length, today = fmt(new Date()), open = state.crmTasks.find(t => t.status === 'open' && t.autoKey === 'txcls');
+  if(!n){ if(open){ open.status = 'done'; open.completedAt = new Date().toISOString(); open.completedBy = meName() || 'system'; return true; } return false; }
+  const title = 'Classify transactions: ' + n + ' waiting';
+  if(open){ if(open.title !== title){ open.title = title; return true; } return false; }
+  if(state.crmTasks.some(t => t.autoKey === 'txcls' && t.status === 'done' && String(t.completedAt || '').slice(0, 10) === today)) return false;   // ticked off today: leave it until tomorrow
+  const t = createTask({ title, dueDate: today, scope: 'business', owner: meName(), refs: [{ kind: 'page', id: 'classify' }], description: 'Some costs are not yet marked as a job cost, a business cost or an asset purchase. Open Finance > Classify: accept the suggestions or choose for each one. Nothing is changed until you accept it.' });
+  t.autoKey = 'txcls'; return true;
+}
+const clsUi = { view: 'waiting', draft: {}, flash: '' };
+function clsProjOptions(sel){ return '<option value="">— no project —</option>' + state.projects.map(p => `<option value="${p.id}"${Number(sel) === p.id ? ' selected' : ''}>${escHtml(recordCode(p.id, 'project') + ' ' + p.name)}</option>`).join(''); }
+function renderClassify(){
+  const el = document.getElementById('clsBody'); if(!el || !state) return;
+  const tx = state.transactions.map((t, i) => ({ t, i })), waiting = tx.filter(x => clsNeeds(x.t)).sort((a, b) => String(b.t.date || '').localeCompare(String(a.t.date || ''))), done = tx.filter(x => clsOf(x.t)).sort((a, b) => String(b.t.date || '').localeCompare(String(a.t.date || '')));
+  const sug = waiting.filter(x => clsSuggest(x.t)), noProj = done.filter(x => clsOf(x.t) === 'job' && !clsProjectId(x.t)), cnt = c => done.filter(x => clsOf(x.t) === c).length;
+  const kpi = (l, v, s, a) => `<div class="kpi" style="--accent:${a}"><div class="label">${l}</div><div class="value">${v}</div><div class="fin-sub">${s}</div></div>`;
+  const row = ({ t, i }) => {
+    const s = clsSuggest(t), d = clsUi.draft[i] || {}, cls = d.cls !== undefined ? d.cls : '', pid = d.pid !== undefined ? d.pid : (t.projectId || ''), p = t.projectId ? state.projects.find(x => x.id === t.projectId) : null;
+    return `<tr class="${clsUi.flash === i ? 'inv-flash' : ''}"><td>${t.date ? pwD(t.date) : '—'}</td><td>${escHtml(t.description || '')}</td><td>${escHtml(t.category || '')}</td><td class="qb-calc">${qm(t.moneyOut)}</td>
+      <td>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button>` : '<span class="qb-dim">—</span>'}</td>
+      <td>${s ? `<span class="qb-flag ok">${CLS_LABELS[s.cls]}</span><div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(s.why)}</div>` : '<span class="qb-dim">No rule matches: left for you</span>'}</td>
+      <td><div class="cls-act">${s ? `<button type="button" class="btn qb-sm" data-cls="accept" data-idx="${i}">Accept ${escHtml(CLS_LABELS[s.cls].toLowerCase())}</button>` : ''}
+        <select data-cls-sel="${i}" aria-label="Class"><option value="">Choose…</option>${Object.keys(CLS_LABELS).map(k => `<option value="${k}"${cls === k ? ' selected' : ''}>${CLS_LABELS[k]}</option>`).join('')}</select>
+        ${cls === 'job' && !p ? `<select data-cls-pid="${i}" aria-label="Project">${clsProjOptions(pid)}</select>` : ''}
+        ${cls ? `<button type="button" class="btn secondary qb-sm" data-cls="save" data-idx="${i}">Save</button>` : ''}</div></td></tr>`;
+  };
+  const drow = ({ t, i }) => {
+    const c = clsOf(t), p = t.projectId ? state.projects.find(x => x.id === t.projectId) : null;
+    return `<tr><td>${t.date ? pwD(t.date) : '—'}</td><td>${escHtml(t.description || '')}</td><td class="qb-calc">${qm(t.moneyOut)}</td>
+      <td><select data-cls-edit="${i}" aria-label="Class">${Object.keys(CLS_LABELS).map(k => `<option value="${k}"${c === k ? ' selected' : ''}>${CLS_LABELS[k]}</option>`).join('')}</select></td>
+      <td>${c === 'job' ? (p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button>` : `<select data-cls-editpid="${i}" aria-label="Project">${clsProjOptions(t.costProjectId)}</select>`) : '<span class="qb-dim">—</span>'}</td>
+      <td class="qb-dim">${t.classHow === 'suggestion' ? 'accepted suggestion' : 'chosen'}${t.classBy ? ' · ' + escHtml(t.classBy) : ''}</td><td><button type="button" class="btn secondary qb-sm" data-cls="clear" data-idx="${i}">Clear</button></td></tr>`;
+  };
+  el.innerHTML = `<div class="kpi-row">${kpi('Waiting', waiting.length, 'costs with no class yet', 'var(--oak)')}${kpi('With a suggestion', sug.length, 'the rule matched the category', 'var(--green)')}${kpi('Classified', done.length, cnt('job') + ' job · ' + cnt('business') + ' business · ' + cnt('asset') + ' asset', 'var(--slate)')}${kpi('Job costs with no project', noProj.length, 'pick the job they belong to', 'var(--bt-plum)')}</div>
+    <p class="q-help">A suggestion is only shown here: nothing is stored until you accept it. Amounts, dates, categories and project links are never changed. Money in is not asked about. Accepting a class does not change any profit or pot figure.</p>
+    <div class="view-toggle" role="group" aria-label="Classify">${[['waiting', 'Waiting (' + waiting.length + ')'], ['done', 'Classified (' + done.length + ')']].map(([v, n]) => `<button type="button" data-cls="view" data-v="${v}" class="${clsUi.view === v ? 'active' : ''}">${n}</button>`).join('')}</div>
+    ${clsUi.view === 'waiting' ? `<div class="btn-row"><button type="button" class="btn" data-cls="all"${sug.length ? '' : ' disabled'}>Accept all suggestions${sug.length ? ' (' + sug.length + ')' : ''}</button></div>
+      <div class="card"><div class="qb-scroll"><table class="qb-table inv-table" data-rt="cls-waiting"><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Out</th><th>Project</th><th>Suggestion</th><th>Class</th></tr></thead><tbody>${waiting.map(row).join('') || '<tr><td colspan="7"><div class="sup-empty">Every cost has a class. Nothing is waiting.</div></td></tr>'}</tbody></table></div></div>`
+    : `<div class="card"><div class="qb-scroll"><table class="qb-table inv-table" data-rt="cls-done"><thead><tr><th>Date</th><th>Description</th><th>Out</th><th>Class</th><th>Project</th><th>How</th><th></th></tr></thead><tbody>${done.map(drow).join('') || '<tr><td colspan="7"><div class="sup-empty">Nothing classified yet.</div></td></tr>'}</tbody></table></div></div>`}`;
+}
+function clsAfter(msg){ clsSyncTask(); saveState(); render(); if(msg) showToast(msg); }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-cls]'); if(!b || !state) return; const a = b.dataset.cls, t = state.transactions[Number(b.dataset.idx)];
+  if(a === 'view'){ clsUi.view = b.dataset.v; renderClassify(); return; }
+  if(a === 'accept'){ const s = clsSuggest(t); if(!t || !s) return; clsApply(t, s.cls, 'suggestion', 0); delete clsUi.draft[b.dataset.idx]; clsAfter('Marked as ' + CLS_LABELS[s.cls].toLowerCase()); return; }
+  if(a === 'save'){ const d = clsUi.draft[b.dataset.idx]; if(!t || !d || !d.cls) return; clsApply(t, d.cls, 'chosen', d.pid); delete clsUi.draft[b.dataset.idx]; clsAfter('Saved: ' + CLS_LABELS[d.cls].toLowerCase()); return; }
+  if(a === 'clear'){ if(!t) return; clsClear(t); clsAfter('Class cleared'); return; }
+  if(a === 'all'){
+    const list = state.transactions.filter(x => clsSuggest(x)), by = c => list.filter(x => clsSuggest(x).cls === c).length, jobNoPid = list.filter(x => clsSuggest(x).cls === 'job' && !x.projectId).length, left = state.transactions.filter(clsNeeds).length - list.length;
+    if(!list.length) return;
+    const ok = await showConfirm('Accept all suggestions?', `This marks ${list.length} cost${list.length === 1 ? '' : 's'}: ${by('job')} as job cost${jobNoPid ? ' (' + jobNoPid + ' with no project yet: you pick it afterwards)' : ''}, ${by('business')} as business cost, ${by('asset')} as asset purchase. ${left} with no matching rule stay unclassified. No amount, date, category or link is changed, and each can be cleared afterwards.`);
+    if(!ok) return; list.forEach(x => clsApply(x, clsSuggest(x).cls, 'suggestion', 0)); clsAfter(list.length + ' suggestion' + (list.length === 1 ? '' : 's') + ' accepted');
+  }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el || !el.dataset || !state) return; const d = el.dataset;
+  if(d.clsSel !== undefined){ const k = d.clsSel; clsUi.draft[k] = Object.assign({}, clsUi.draft[k], { cls: el.value }); renderClassify(); return; }
+  if(d.clsPid !== undefined){ const k = d.clsPid; clsUi.draft[k] = Object.assign({}, clsUi.draft[k], { pid: el.value }); return; }
+  if(d.clsEdit !== undefined){ const t = state.transactions[Number(d.clsEdit)]; if(!t) return; clsApply(t, el.value, 'chosen', t.costProjectId); clsAfter(); return; }
+  if(d.clsEditpid !== undefined){ const t = state.transactions[Number(d.clsEditpid)]; if(!t) return; clsApply(t, 'job', t.classHow || 'chosen', el.value); clsAfter(); }
+});
+
+
+/* =====================================================================
+   Step 3: BUSINESS COSTS
+   state.businessCosts: [{ id, name, amount, freq ('weekly'|'monthly'|'quarterly'|'yearly'|'oneoff'), nextDue, category, notes, fromOh, done, paid: [{ due, date, amount, txn, at, by }], dismissed: [txn key] }]
+   Empty by default. The five yearly overhead lines in the Pricing Model are never removed or changed, and totalOverhead() gives the same figure as before unless
+   settings.bizCostsForOverheads is switched on (a button on this page, off by default, asks first). Dated list items feed the cash flow forecast on their due dates.
+   An item started from an overhead line (fromOh) takes that line's share out of the forecast's evenly spread "fixed overhead" row, so it is not counted twice.
+   A matching transaction is only ever SUGGESTED; ticking a cost off as paid is your confirmation.
+   ===================================================================== */
+const BC_FREQ = [['weekly', 'Weekly'], ['monthly', 'Monthly'], ['quarterly', 'Quarterly'], ['yearly', 'Yearly'], ['oneoff', 'One-off']];
+const BC_CATS = ['Insurance', 'Accounting', 'Vehicle', 'Tools', 'Marketing', 'Software and subscriptions', 'Phone', 'Fuel', 'Premises', 'Other'];
+const BC_OH = [['ohInsurance', 'Insurance', 'Insurance'], ['ohAccounting', 'Accounting', 'Accounting'], ['ohVehicle', 'Vehicle', 'Vehicle'], ['ohTools', 'Tools', 'Tools'], ['ohMarketing', 'Marketing', 'Marketing']];
+function ensureMoneyModel(o){
+  const str = v => v == null ? '' : String(v), ok = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '');
+  o.businessCosts = (Array.isArray(o.businessCosts) ? o.businessCosts : []).filter(c => c && typeof c === 'object').map(c => { const n = Number(c.amount);
+    return { id: str(c.id) || 'bc_' + Math.random().toString(36).slice(2, 9), name: str(c.name), amount: (c.amount === '' || c.amount == null || isNaN(n) || n < 0) ? '' : n, freq: BC_FREQ.some(f => f[0] === c.freq) ? c.freq : 'monthly',
+      nextDue: ok(c.nextDue) ? c.nextDue : '', category: str(c.category), notes: str(c.notes), fromOh: str(c.fromOh), done: c.done === true,
+      paid: (Array.isArray(c.paid) ? c.paid : []).filter(x => x && typeof x === 'object').map(x => ({ due: str(x.due), date: str(x.date), amount: Number(x.amount) || 0, txn: str(x.txn), at: str(x.at), by: str(x.by) })),
+      dismissed: (Array.isArray(c.dismissed) ? c.dismissed : []).map(String) }; });
+  const st = o.settings = o.settings || {}; st.bizCostsForOverheads = st.bizCostsForOverheads === true;
+}
+(function(){ const o = ensurePlanModel3; ensurePlanModel3 = function(x){ o(x); ensureMoneyModel(x); }; })();
+const bcAmt = c => Number(c.amount) > 0 ? Number(c.amount) : 0;
+function bcPerMonth(c){ const a = bcAmt(c); return c.freq === 'weekly' ? a * 52 / 12 : c.freq === 'monthly' ? a : c.freq === 'quarterly' ? a / 3 : c.freq === 'yearly' ? a / 12 : 0; }
+function bcRaw(){ return (state.businessCosts || []).reduce((s, c) => s + bcPerMonth(c), 0); }
+function bcMonthly(){ return r2(bcRaw()); }
+function bcYearly(){ return r2(bcRaw() * 12); }
+function bcNext(iso, freq){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if(!m) return '';
+  if(freq === 'weekly') return addDaysIso(iso, 7);
+  const add = freq === 'monthly' ? 1 : freq === 'quarterly' ? 3 : freq === 'yearly' ? 12 : 0; if(!add) return '';
+  const y = +m[1], mo = +m[2] - 1 + add, d = +m[3], ty = y + Math.floor(mo / 12), tm = ((mo % 12) + 12) % 12, last = new Date(Date.UTC(ty, tm + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(ty, tm, Math.min(d, last))).toISOString().slice(0, 10);
+}
+/* every unpaid due date of a cost up to the last forecast month */
+function bcForecastItems(lastKey){
+  const out = [];
+  (state.businessCosts || []).forEach(c => {
+    if(!c.nextDue || c.done || !(bcAmt(c) > 0)) return; let d = c.nextDue, guard = 0;
+    while(d && d.slice(0, 7) <= lastKey && guard++ < 400){ out.push({ id: c.id, name: c.name || 'Business cost', amount: bcAmt(c), date: d }); if(c.freq === 'oneoff') break; d = bcNext(d, c.freq); }
+  });
+  return out;
+}
+/* the share of the evenly spread yearly overheads that a dated list item now covers, so the forecast does not count it twice */
+function bcOhLinked(){ return r2((state.businessCosts || []).filter(c => c.fromOh && c.nextDue && !c.done).reduce((s, c) => s + (Number((state.assumptions || {})[c.fromOh]) || 0), 0)); }
+function bcOhLinesTotal(){ const a = state.assumptions; return Number(a.ohInsurance) + Number(a.ohAccounting) + Number(a.ohVehicle) + Number(a.ohTools) + Number(a.ohMarketing); }
+function bcFixedMonthly(){ return state.settings.bizCostsForOverheads ? 0 : Math.max(0, (bcOhLinesTotal() - bcOhLinked()) / 12); }
+function bcTxnKey(t){ return t.uid || [t.date, t.moneyOut, t.description].join('|'); }
+function bcMatchedKeys(){ const s = new Set(); (state.businessCosts || []).forEach(c => c.paid.forEach(x => { if(x.txn) s.add(x.txn); })); return s; }
+const bcIsMatched = t => bcMatchedKeys().has(bcTxnKey(t));
+/* the best transaction for a cost's next due date: near the date, near the amount, not a job or asset cost; the name helps */
+function bcSuggest(c){
+  if(!c.nextDue || c.done || !(bcAmt(c) > 0)) return null; const used = bcMatchedKeys(), word = String(c.name || '').trim().toLowerCase().split(/\s+/)[0] || '', best = { s: -1, t: null };
+  state.transactions.forEach((t, i) => {
+    const out = Number(t.moneyOut) || 0; if(!(out > 0) || !t.date || used.has(bcTxnKey(t)) || c.dismissed.includes(bcTxnKey(t))) return;
+    if(t.projectId || clsOf(t) === 'job' || clsOf(t) === 'asset') return;
+    const dd = Math.abs(daysBetween(c.nextDue, t.date)), diff = Math.abs(out - bcAmt(c)) / bcAmt(c); if(dd > 21 || diff > 0.05) return;
+    const nm = word && String(t.description || '').toLowerCase().includes(word), cat = t.category === 'Overhead' || clsOf(t) === 'business'; if(!nm && !cat) return;
+    const sc = (nm ? 3 : 0) + (cat ? 1 : 0) + (1 - diff) + (1 - dd / 21); if(sc > best.s){ best.s = sc; best.t = t; best.i = i; }
+  });
+  return best.t ? { t: best.t, i: best.i } : null;
+}
+/* average gross margin: the margin now on every project with an accepted quote, as a share of what those projects bring in (contract and approved variations) */
+function bcMargin(){
+  let rev = 0, mar = 0, n = 0;
+  state.projects.forEach(p => { let mg = null; try{ mg = projMarginCC(p); }catch(e){} if(!mg) return; const r = mg.contract + mg.vars; if(!(r > 0)) return; rev += r; mar += mg.now; n++; });
+  return { n, rev: r2(rev), margin: r2(mar), pct: rev > 0 ? mar / rev * 100 : 0 };
+}
+const bcUi = { flash: '' };
+function bcCatOpts(){ return '<datalist id="bcCats">' + BC_CATS.map(c => `<option value="${escAttr(c)}">`).join('') + '</datalist>'; }
+function renderBusinessCosts(){
+  const el = document.getElementById('bcBody'); if(!el || !state) return;
+  const list = state.businessCosts, mo = bcMonthly(), mg = bcMargin(), be = mg.pct > 0 ? mo / (mg.pct / 100) : 0, today = fmt(new Date());
+  const next = list.filter(c => c.nextDue && !c.done).sort((a, b) => a.nextDue.localeCompare(b.nextDue))[0];
+  const kpi = (l, v, s, a, cls) => `<div class="kpi" style="--accent:${a}"><div class="label">${l}</div><div class="value ${cls || ''}">${v}</div><div class="fin-sub">${s}</div></div>`;
+  const sugg = list.map(c => ({ c, m: bcSuggest(c) })).filter(x => x.m);
+  const startedKeys = new Set(list.map(c => c.fromOh)), canStart = BC_OH.some(o => !startedKeys.has(o[0]));
+  const rows = list.map(c => {
+    const at = `data-bc-id="${escAttr(c.id)}"`, od = c.nextDue && !c.done && c.nextDue < today;
+    return `<tr class="${bcUi.flash === c.id ? 'inv-flash' : ''}${c.done ? ' pw-removed' : ''}"><td><input data-bc="name" ${at} value="${escAttr(c.name)}" placeholder="e.g. Public liability insurance" aria-label="Name"></td>
+      <td><input type="number" step="0.01" min="0" class="qb-n" data-bc="amount" ${at} value="${c.amount === '' ? '' : c.amount}" aria-label="Amount"></td>
+      <td><select data-bc="freq" ${at} aria-label="How often">${BC_FREQ.map(f => `<option value="${f[0]}"${c.freq === f[0] ? ' selected' : ''}>${f[1]}</option>`).join('')}</select></td>
+      <td><span${od ? ' class="over"' : ''}><input type="date" data-bc="nextDue" ${at} value="${escAttr(c.nextDue)}" aria-label="Next due"></span>${c.done ? '<div class="qb-dim">paid</div>' : (od ? '<div class="qb-flag bad">overdue</div>' : '')}</td>
+      <td><input data-bc="category" ${at} list="bcCats" value="${escAttr(c.category)}" aria-label="Category"></td>
+      <td><input data-bc="notes" ${at} value="${escAttr(c.notes)}" aria-label="Notes"></td>
+      <td class="qb-calc">${c.freq === 'oneoff' ? '<span class="qb-dim">one-off</span>' : qm(bcPerMonth(c))}${c.fromOh ? '<div class="qb-dim" style="font-size:var(--bt-fs-xs);">from the Pricing Model ' + escHtml((BC_OH.find(o => o[0] === c.fromOh) || [0, c.fromOh])[1].toLowerCase()) + ' line</div>' : ''}${c.paid.length ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${c.paid.length} paid · last ${pwD(c.paid[c.paid.length - 1].date)}</div>` : ''}</td>
+      <td><button type="button" class="icon-btn" data-bc-a="del" ${at} aria-label="Delete cost">${X_SVG}</button></td></tr>`;
+  }).join('');
+  const useOn = state.settings.bizCostsForOverheads;
+  el.innerHTML = `${bcCatOpts()}<div class="kpi-row">${kpi('Monthly business costs', qm(mo), 'recurring items, per month (weekly x 52 ÷ 12, quarterly ÷ 3, yearly ÷ 12)', 'var(--oak)')}
+    ${kpi('Break-even sales a month', mg.pct > 0 ? qm(be) : '—', mg.pct > 0 ? 'monthly costs ÷ ' + mg.pct.toFixed(1) + '% average gross margin' : 'needs a project with an accepted quote to work out the margin', 'var(--green)')}
+    ${kpi('Average gross margin', mg.pct > 0 ? mg.pct.toFixed(1) + '%' : '—', mg.n + ' project' + (mg.n === 1 ? '' : 's') + ': margin now ' + qm(mg.margin) + ' on ' + qm(mg.rev), 'var(--slate)')}
+    ${kpi('Next due', next ? pwD(next.nextDue) : '—', next ? escHtml(next.name || 'Business cost') + ' · ' + qm(bcAmt(next)) : 'no dated cost yet', 'var(--bt-plum)')}</div>
+    ${sugg.length ? `<div class="card" id="bcSugg"><div class="qb-sec-h"><h4>Suggested matches <span class="qb-dim">(a transaction that looks like a cost's next payment: you confirm)</span></h4></div>
+      <table class="qb-table qb-narrow"><thead><tr><th>Cost</th><th>Due</th><th>Transaction</th><th>Amount</th><th></th></tr></thead><tbody>${sugg.map(({ c, m }) => `<tr><td>${escHtml(c.name || 'Business cost')}</td><td>${pwD(c.nextDue)}</td><td>${pwD(m.t.date)} · ${escHtml(m.t.description || '')} ${finSrcLink({ t: 'txn', id: m.t.uid || String(m.i) }, 'open →')}</td><td class="qb-calc">${qm(m.t.moneyOut)}</td><td><button type="button" class="btn qb-sm" data-bc-a="match" data-bc-id="${escAttr(c.id)}">Tick off as paid…</button> <button type="button" class="btn secondary qb-sm" data-bc-a="nomatch" data-bc-id="${escAttr(c.id)}">Not this one</button></td></tr>`).join('')}</tbody></table></div>` : ''}
+    <div class="btn-row"><button type="button" class="btn" data-bc-a="add">+ Add business cost</button>${canStart ? '<button type="button" class="btn secondary" data-bc-a="start">Start from the existing overheads</button>' : ''}
+      ${useOn ? '<button type="button" class="btn secondary" data-bc-a="use-off">Stop using this list for the Pricing Model overheads</button>' : '<button type="button" class="btn secondary" data-bc-a="use-on">Use this list for the Pricing Model overheads</button>'}</div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table" data-rt="bc-list"><thead><tr><th>Name</th><th>Amount (£)</th><th>How often</th><th>Next due</th><th>Category</th><th>Notes</th><th>Per month</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="8"><div class="sup-empty">No business costs yet. Add one, or start from the five yearly overhead lines in the Pricing Model.</div></td></tr>'}</tbody>
+      ${list.length ? `<tfoot><tr class="qb-foot"><td><b>Total per month</b></td><td></td><td></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(mo)}</b></td><td></td></tr></tfoot>` : ''}</table></div></div>
+    <p class="q-help">Dated costs go into the Cash Flow Forecast on their due dates, row “Cash out: business costs”. The forecast still spreads the five yearly Pricing Model overhead lines evenly (${qm(bcFixedMonthly())} a month now); a cost started from one of those lines, once it has a date, takes that line's share out of the spread so it is not counted twice. Break-even is the sales a month needed for the margin on jobs to cover these costs. The profit share is not a business cost here: it is taken from each job's profit.</p>
+    <p class="q-help">Pricing Model overheads are ${useOn ? '<b>using this list</b> (' + qm(bcYearly()) + ' a year)' : '<b>unchanged</b> (' + qm(bcOhLinesTotal()) + ' a year from the five lines)'}. ${useOn ? '' : 'Nothing changes there unless you press “Use this list for the Pricing Model overheads” and confirm.'}</p>`;
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-bc-a]'); if(!b || !state) return; const a = b.dataset.bcA, c = (state.businessCosts || []).find(x => x.id === b.dataset.bcId);
+  if(a === 'add'){ const n = { id: 'bc_' + Math.random().toString(36).slice(2, 9), name: '', amount: '', freq: 'monthly', nextDue: '', category: '', notes: '', fromOh: '', done: false, paid: [], dismissed: [] }; state.businessCosts.push(n); bcUi.flash = n.id; saveState(); render(); setTimeout(() => { const i = document.querySelector(`[data-bc="name"][data-bc-id="${n.id}"]`); if(i) i.focus(); }, 30); return; }
+  if(a === 'start'){
+    const have = new Set(state.businessCosts.map(x => x.fromOh)), add = BC_OH.filter(o => !have.has(o[0]));
+    add.forEach(o => state.businessCosts.push({ id: 'bc_' + o[0], name: o[1], amount: Number(state.assumptions[o[0]]) || 0, freq: 'yearly', nextDue: '', category: o[2], notes: 'Started from the Pricing Model overhead line. Set the date it is next due.', fromOh: o[0], done: false, paid: [], dismissed: [] }));
+    saveState(); render(); showToast(add.length + ' cost' + (add.length === 1 ? '' : 's') + ' started from the overhead lines. The Pricing Model lines are unchanged.'); return; }
+  if(a === 'use-on'){
+    const ok = await showConfirm('Use this list for the Pricing Model overheads?', `The Pricing Model's total overhead would become ${qm(bcYearly())} a year from this list, instead of ${qm(bcOhLinesTotal())} from the five lines, and every price and overhead per day that follows from it would move. The five lines are kept and can be switched back at any time. The Cash Flow Forecast would stop spreading the five lines and use the dated list instead.`);
+    if(!ok) return; state.settings.bizCostsForOverheads = true; saveState(); render(); showToast('The Pricing Model now uses this list'); return; }
+  if(a === 'use-off'){ state.settings.bizCostsForOverheads = false; saveState(); render(); showToast('The Pricing Model is back on the five overhead lines'); return; }
+  if(!c) return;
+  if(a === 'del'){ const i = state.businessCosts.indexOf(c); state.businessCosts.splice(i, 1); undoDeleted('Business cost deleted: ' + String(c.name || 'unnamed').slice(0, 40), ['businessCosts'], i, c); saveState(); render(); return; }
+  if(a === 'nomatch'){ const m = bcSuggest(c); if(m){ c.dismissed.push(bcTxnKey(m.t)); saveState(); render(); } return; }
+  if(a === 'match'){
+    const m = bcSuggest(c); if(!m) return; const t = m.t, askClass = !clsOf(t);
+    finUi.mode = 'bcmatch'; finUi.key = c.id;
+    finOpen('Tick off as paid?', `<p class="q-help" style="margin:0 0 8px;"><b>${escHtml(c.name || 'Business cost')}</b> due ${pwD(c.nextDue)} (${qm(bcAmt(c))})<br>will be ticked off as paid by the transaction ${pwD(t.date)} · ${escHtml(t.description || '')} · ${qm(t.moneyOut)}.</p>
+      ${c.freq === 'oneoff' ? '<p class="q-help">It is a one-off, so it is marked paid and leaves the forecast.</p>' : `<p class="q-help">Next due moves to ${pwD(bcNext(c.nextDue, c.freq))}.</p>`}
+      ${askClass ? '<label class="q-check"><input type="checkbox" id="bcMarkClass" checked> Also mark the transaction as a business cost (Classify)</label>' : ''}
+      <div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button><button class="btn" type="button" data-bc-a="match-ok" data-bc-id="${escAttr(c.id)}">Tick off as paid</button></div>`);
+    return; }
+  if(a === 'match-ok'){
+    const m = bcSuggest(c); if(!m){ finClose(); return; } const t = m.t, mark = !!(document.getElementById('bcMarkClass') || {}).checked;
+    c.paid.push({ due: c.nextDue, date: t.date, amount: Number(t.moneyOut) || 0, txn: bcTxnKey(t), at: new Date().toISOString(), by: meName() });
+    if(c.freq === 'oneoff') c.done = true; else c.nextDue = bcNext(c.nextDue, c.freq);
+    if(mark && !clsOf(t)) clsApply(t, 'business', 'chosen', 0);
+    finClose(); clsSyncTask(); saveState(); render(); showToast('Ticked off as paid'); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el || !el.dataset || el.dataset.bc === undefined || !state) return; const c = state.businessCosts.find(x => x.id === el.dataset.bcId); if(!c) return; const k = el.dataset.bc;
+  if(k === 'amount'){ const n = parseFloat(el.value); c.amount = (el.value === '' || isNaN(n) || n < 0) ? '' : n; }
+  else if(k === 'nextDue'){ c.nextDue = /^\d{4}-\d{2}-\d{2}$/.test(el.value) ? el.value : ''; if(c.nextDue) c.done = false; }
+  else if(k === 'freq'){ c.freq = el.value; if(c.freq !== 'oneoff') c.done = false; }
+  else if(k === 'name' || k === 'category' || k === 'notes') c[k] = el.value.trim();
+  else return;
+  saveState(); render();
+});
+
+
+/* =====================================================================
+   Step 4: SET-ASIDE METHOD PER POT
+   Each pot (Assets, Tax, Buffer, Growth) is either a PERCENTAGE of retained profit (the default, today's shares 30, 25, 20, 25) or a FIXED MONTHLY AMOUNT.
+   New optional settings per pot: potXxxMethod ('pct' | 'fixed'), potXxxFixed (GBP a month), potXxxFrom (first month the fixed amount is put aside, set when the pot is switched).
+   With every pot on percentage the figures are exactly what they were: retained profit to date x the pot's share, scaled to 100. A fixed pot puts aside its amount for each month
+   from its start month to the current month, whatever the profit; the percentage pots then share what is left of retained profit to date in their own proportions.
+   ===================================================================== */
+const potKey = (f, suffix) => f.replace(/Pct$/, suffix);
+const potMethod = f => state.settings[potKey(f, 'Method')] === 'fixed' ? 'fixed' : 'pct';
+function potFixedAmt(f){ const n = Number(state.settings[potKey(f, 'Fixed')]); return n > 0 ? n : 0; }
+function potFromMonth(f){ const v = String(state.settings[potKey(f, 'From')] || ''); return /^\d{4}-\d{2}/.test(v) ? v.slice(0, 7) : fmt(new Date()).slice(0, 7); }
+function potMonths(f, date){ const a = potFromMonth(f), b = String(date || fmt(new Date())).slice(0, 7); if(b < a) return 0; const [ya, ma] = a.split('-').map(Number), [yb, mb] = b.split('-').map(Number); return (yb - ya) * 12 + (mb - ma) + 1; }
+function potFixedTo(f, date){ return r2(potFixedAmt(f) * potMonths(f, date)); }
+/* where each pot stands, given the retained profit to date (and the date the fixed pots are counted to) */
+function potPositions(toDate, date){
+  const fixedSum = r2(POT_BUCKETS.filter(b => potMethod(b[0]) === 'fixed').reduce((s, b) => s + potFixedTo(b[0], date), 0)), pctPots = POT_BUCKETS.filter(b => potMethod(b[0]) === 'pct');
+  const sum = pctPots.reduce((a, b) => a + potPct(b[0]), 0) || 1, pool = pctPots.length === POT_BUCKETS.length ? toDate : r2(toDate - fixedSum);
+  const rows = POT_BUCKETS.map(b => { const m = potMethod(b[0]);
+    if(m === 'fixed') return { b, method: 'fixed', amt: potFixedTo(b[0], date), perMonth: potFixedAmt(b[0]), months: potMonths(b[0], date), share: null };
+    return { b, method: 'pct', pct: potPct(b[0]), share: potPct(b[0]) / sum, amt: r2(Math.max(0, pool) * potPct(b[0]) / sum) }; });
+  return { rows, fixedSum, pool, sum, short: pool < 0, allPct: pctPots.length === POT_BUCKETS.length };
+}
+function potSettingsHtml(){
+  return POT_BUCKETS.map(b => { const f = b[0], m = potMethod(f), s = state.settings;
+    return `<div><label>${b[1]}: set-aside method</label><select data-tab="settings" data-field="${potKey(f, 'Method')}"><option value="pct"${m === 'pct' ? ' selected' : ''}>Percentage of retained profit</option><option value="fixed"${m === 'fixed' ? ' selected' : ''}>Fixed monthly amount</option></select></div>
+      ${m === 'fixed' ? `<div><label>${b[1]}: £ a month</label><input type="number" step="1" min="0" data-tab="settings" data-field="${potKey(f, 'Fixed')}" value="${potFixedAmt(f) || ''}" placeholder="0"></div><div><label>${b[1]}: put aside from</label><input type="date" data-tab="settings" data-field="${potKey(f, 'From')}" value="${escAttr(String(s[potKey(f, 'From')] || ''))}"></div>` : ''}`; }).join('');
+}
+function potMethodChanged(field){
+  const f = field.replace(/Method$/, 'Pct'); if(!POT_BUCKETS.some(b => b[0] === f)) return;
+  if(potMethod(f) === 'fixed' && !/^\d{4}-\d{2}-\d{2}$/.test(String(state.settings[potKey(f, 'From')] || ''))) state.settings[potKey(f, 'From')] = fmt(new Date()).slice(0, 8) + '01';
+}
+/* the Assets pot as it stands at a date, for the asset plan's affordability check (identical to before while every pot is on percentage) */
+function potAssetsAt(avail, date){
+  const pp = potPositions(avail, date);
+  if(pp.allPct) return avail * potPct('potAssetsPct') / (POT_BUCKETS.reduce((s, b) => s + potPct(b[0]), 0) || 1);
+  return pp.rows[0].amt;
+}
+
+
+/* =====================================================================
+   Step 5: ASSETS, TOOL COST ON JOBS, BUY OR HIRE
+   Optional new fields: asset.usageCharge (GBP per use on a job), asset.usageAfter (a smaller charge once the cost is recovered, empty = stop charging),
+   plan item.hireCost (GBP per hire) and plan item.uses (expected number of uses), project.toolUse [{ id, assetId, uses, charge, date }] (charge is the rate at the time it was added).
+   settings.toolCostOnJobs ('on' | anything else = off) is the switch, off by default. While it is off nothing is shown or changed on any job and the register and plan
+   look as before apart from the new empty hire boxes on the plan. Tool cost is recorded and shown; it does not feed any job's margin, retained profit or the pots.
+   ===================================================================== */
+const toolCostOn = () => !!(state && state.settings && state.settings.toolCostOnJobs === 'on');
+function assetRecovered(a){ return r2(state.projects.reduce((s, p) => s + (p.toolUse || []).filter(u => u.assetId === a.id).reduce((t, u) => t + (Number(u.uses) || 0) * (Number(u.charge) || 0), 0), 0)); }
+function assetToRecover(a){ return Math.max(0, (Number(a.cost) || 0) - Math.min(Number(a.cost) || 0, Math.max(0, Number(a.residual) || 0))); }
+function assetChargeNow(a){ const c = Number(a.usageCharge) || 0, after = Number(a.usageAfter) || 0; return c > 0 && assetRecovered(a) >= assetToRecover(a) && assetToRecover(a) > 0 ? after : c; }
+function projToolCost(p){ return r2((p.toolUse || []).reduce((s, u) => s + (Number(u.uses) || 0) * (Number(u.charge) || 0), 0)); }
+function toolSettingHtml(){ return `<div><label>Tool cost on jobs</label><select data-tab="settings" data-field="toolCostOnJobs"><option value="off"${toolCostOn() ? '' : ' selected'}>Off</option><option value="on"${toolCostOn() ? ' selected' : ''}>On</option></select><div class="q-help">Off: nothing changes on any job. On: a job can record the tools it used, charged per use from the asset register.</div></div>`; }
+/* buy against hire for a plan item: where buying starts to be cheaper, and what each costs at the expected number of uses */
+function planBuyHire(a){
+  const cost = Number(a.cost) || 0, h = Number(a.hireCost) || 0, u = Number(a.uses) || 0; if(!(cost > 0) || !(h > 0)) return null;
+  const be = cost / h, hireTotal = r2(h * u), diff = r2(hireTotal - cost);
+  return { cost, h, u, be, beUses: Math.ceil(be - 1e-9), hireTotal, diff, verdict: !(u > 0) ? '' : diff > 0.005 ? 'buy' : diff < -0.005 ? 'hire' : 'even' };
+}
+function planBuyHireHtml(){
+  const rows = state.assetPlan.map(a => ({ a, c: planBuyHire(a) })).filter(x => x.c); if(!rows.length) return '';
+  return `<div class="card" style="margin-top:14px;"><div class="qb-sec-h"><h4>Buy or hire <span class="qb-dim">(plan items with a hire cost)</span></h4></div><div class="bh-grid">${rows.map(({ a, c }) => `<div class="bh-card"><b>${escHtml(a.item || 'Item')}</b>
+    <div class="bh-sides"><div class="bh-side"><small>Buy</small><b>${qm(c.cost)}</b><em>once, ex VAT</em></div><div class="bh-side"><small>Hire</small><b>${qm(c.h)}</b><em>each time</em></div></div>
+    <div class="bh-be">Buying is cheaper after <b>${c.beUses} use${c.beUses === 1 ? '' : 's'}</b> <span class="qb-dim">(${qm(c.cost)} ÷ ${qm(c.h)} = ${c.be.toFixed(1)})</span></div>
+    ${c.verdict ? `<div class="bh-at">At ${c.u} expected use${c.u === 1 ? '' : 's'}: hire costs ${qm(c.hireTotal)}, buying ${qm(c.cost)}: <b>${c.verdict === 'buy' ? 'buying saves ' + qm(c.diff) : c.verdict === 'hire' ? 'hiring saves ' + qm(-c.diff) : 'the same either way'}</b></div>` : '<div class="bh-at qb-dim">Enter the expected number of uses to compare the totals.</div>'}</div>`).join('')}</div></div>`;
+}
+/* the card on a project's Overview, only while the switch is on */
+function toolJobCardHtml(p){
+  if(!toolCostOn()) return '';
+  const rows = (p.toolUse || []), assets = state.assets.filter(a => a.status === 'Owned' && Number(a.usageCharge) > 0), at = `data-tool-pid="${p.id}"`;
+  return `<div class="rp-card" id="rpTools"><h4>Tools used on this job <span class="qb-dim">${qm(projToolCost(p))}</span></h4>
+    ${rows.length ? `<table class="qb-table qb-narrow"><thead><tr><th>Tool</th><th>Uses</th><th>Per use</th><th>Cost</th><th></th></tr></thead><tbody>${rows.map(u => { const a = state.assets.find(x => x.id === u.assetId);
+      return `<tr><td>${escHtml(a ? a.name : '(asset removed)')}</td><td><input type="number" min="0" step="1" class="qb-n" data-tool="uses" ${at} data-uid="${escAttr(u.id)}" value="${u.uses}" aria-label="Uses"></td><td class="qb-calc">${qm(u.charge)}</td><td class="qb-calc">${qm((Number(u.uses) || 0) * (Number(u.charge) || 0))}</td><td><button type="button" class="icon-btn" data-tool="del" ${at} data-uid="${escAttr(u.id)}" aria-label="Remove">${X_SVG}</button></td></tr>`; }).join('')}</tbody></table>` : '<div class="sup-empty">No tools recorded on this job.</div>'}
+    ${assets.length ? `<div class="q-inline" style="gap:8px;margin-top:8px;"><select data-tool="pick" ${at} aria-label="Tool">${assets.map(a => `<option value="${escAttr(a.id)}">${escHtml(a.name)} · ${qm(assetChargeNow(a))} a use</option>`).join('')}</select><button type="button" class="btn secondary qb-sm" data-tool="add" ${at}>+ Add tool use</button></div>` : '<p class="q-help">No asset has a charge per use yet. Set one in the Asset register.</p>'}
+    <p class="q-help">Recorded against the job and counted as recovered on the asset. It does not change this job's margin, retained profit or the pots.</p></div>`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('button[data-tool]'); if(!b || !state) return; const p = state.projects.find(x => x.id === Number(b.dataset.toolPid)); if(!p) return; p.toolUse = Array.isArray(p.toolUse) ? p.toolUse : [];
+  if(b.dataset.tool === 'add'){ const sel = b.parentNode.querySelector('select[data-tool="pick"]'), a = sel && state.assets.find(x => x.id === sel.value); if(!a) return; const ex = p.toolUse.find(u => u.assetId === a.id);
+    if(ex) ex.uses = (Number(ex.uses) || 0) + 1; else p.toolUse.push({ id: 'tu_' + Math.random().toString(36).slice(2, 8), assetId: a.id, uses: 1, charge: assetChargeNow(a), date: fmt(new Date()) }); }
+  else if(b.dataset.tool === 'del'){ p.toolUse = p.toolUse.filter(u => u.id !== b.dataset.uid); } else return;
+  saveState(); render();
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el || !el.dataset || el.dataset.tool !== 'uses' || !state) return; const p = state.projects.find(x => x.id === Number(el.dataset.toolPid)), u = p && (p.toolUse || []).find(x => x.id === el.dataset.uid); if(!u) return;
+  u.uses = Math.max(0, Math.round(Number(el.value) || 0)); saveState(); render();
+});
+
+
+/* =====================================================================
+   Step 6: THE MONEY TAB ON A PROJECT
+   A view over records that already exist; nothing new is stored. Money in is the project's invoice schedule and scope additions (invRows), money out is its supplier payments
+   (finLines) and the transactions linked to it. Each planned line has one button that reuses the existing confirmation: Raise invoice (the schedule's Mark sent, or the invoice
+   document when there is one), Mark received (the receipt completion) and Confirm paid (Confirm supplier payment). Pressing it confirms there and then; the tab redraws.
+   "Margin now" and the job cost here take the confirmed receipt prices (po.pc.variance, ex VAT) where they exist. The figures behind retained profit, profit share and the pots are not touched.
+   ===================================================================== */
+function mnVariance(p){
+  const pos = (state.purchaseOrders || []).filter(po => po.pc && poProject(po) === p);
+  return { n: pos.length, v: r2(pos.reduce((s, po) => s + (Number(po.pc.variance) || 0), 0)) };
+}
+function mnMargin(p){
+  const mg = projMarginCC(p); if(!mg) return null; const rv = mnVariance(p), rev = mg.contract + mg.vars, planCost = r2(rev - mg.now);
+  return { sold: mg.soldM, soldPct: mg.soldPct, plan: mg.now, planCost, cost: r2(planCost + rv.v), now: r2(mg.now - rv.v), nowPct: rev ? (mg.now - rv.v) / rev * 100 : 0, rv, rev };
+}
+function mnData(p){
+  const ins = invRows().filter(r => r.pid === p.id).map(r => ({ r, key: r.vid ? 'v' + r.vid : String(r.idx), date: r.dueDate || '', amount: r.amount, got: r.paidDate ? (r.paidAmount > 0 ? r.paidAmount : r.amount) : (r.paidAmount > 0 ? r.paidAmount : 0), gotDate: r.paidDate || '' }));
+  const outs = finLines().filter(x => x.kind === 'supPay' && x.pid === p.id).map(x => { const tx = spTx(p, x.did); return { x, tx, date: x.date || '', amount: x.amount, done: x.done, paidDate: tx ? (txCashDate(tx) || tx.date) : (x.paidDate || ''), paidAmt: tx ? Number(tx.moneyOut) || 0 : 0 }; });
+  const txs = state.transactions.filter(t => t.projectId === p.id && Number(t.moneyOut) > 0 && !txUnsettledTrade(t));
+  return { ins, outs, txs };
+}
+function mnTotals(d){
+  const today = fmt(new Date());
+  return { received: r2(d.ins.reduce((s, i) => s + i.got, 0)), overdue: r2(d.ins.filter(i => i.r.status === 'Overdue' || i.r.status === 'Warning').reduce((s, i) => s + i.amount - (i.r.paidAmount || 0), 0)),
+    paidOut: r2(d.txs.reduce((s, t) => s + (Number(t.moneyOut) || 0), 0)), toInvoice: r2(d.ins.filter(i => !i.r.invoicedDate && !i.r.blocked && !i.r.paidDate).reduce((s, i) => s + i.amount, 0)), today };
+}
+function mnHeadlineHtml(p){
+  const t = mnTotals(mnData(p)), cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  return `<div class="rp-strip mn-strip">${cell('Received', qm(t.received), 'money in so far')}${cell('Overdue', qm(t.overdue), t.overdue ? 'raised and past due' : 'none', t.overdue ? 'bad' : '')}${cell('Paid out', qm(t.paidOut), 'suppliers and other costs')}${cell('Still to invoice', qm(t.toInvoice), 'not yet raised')}</div>`;
+}
+function mnSeries(events, upTo){   // cumulative steps: [{ d, cum }]
+  let cum = 0; return events.filter(e => e.d && (!upTo || e.d <= upTo)).sort((a, b) => a.d.localeCompare(b.d)).map(e => { cum = r2(cum + e.a); return { d: e.d, cum, a: e.a, label: e.label }; });
+}
+function mnGraphHtml(p, d){
+  const today = fmt(new Date());
+  const pin = d.ins.filter(i => i.date).map(i => ({ d: i.date, a: i.amount, label: i.r.desc })), ain = d.ins.filter(i => i.gotDate && i.got > 0).map(i => ({ d: i.gotDate, a: i.got, label: i.r.desc }));
+  const pout = d.outs.filter(o => o.date).map(o => ({ d: o.date, a: o.amount, label: o.x.label })), aout = d.txs.filter(t => txCashDate(t)).map(t => ({ d: txCashDate(t), a: Number(t.moneyOut) || 0, label: t.description || 'Cost' }));
+  const S = { pin: mnSeries(pin), ain: mnSeries(ain), pout: mnSeries(pout), aout: mnSeries(aout) }, all = [today].concat(...Object.values(S).map(s => s.map(x => x.d)));
+  if(all.length === 1) return '<div class="pw-empty">Nothing is dated yet. Money in comes from the invoice schedule, money out from the supplier payments.</div>';
+  let lo = all.reduce((a, x) => x < a ? x : a), hi = all.reduce((a, x) => x > a ? x : a); lo = addDaysIso(lo, -3); hi = addDaysIso(hi, 3);
+  const top = Math.max(1, ...Object.values(S).map(s => s.length ? s[s.length - 1].cum : 0)) * 1.08, W = 480, H = 230, L = 52, R = 12, T = 12, B = 28, pw = W - L - R, ph = H - T - B;
+  const span = Math.max(1, daysBetween(lo, hi)), X = x => r2(L + pw * Math.max(0, Math.min(1, daysBetween(lo, x) / span))), Y = v => r2(T + ph - ph * Math.max(0, v) / top);
+  const path = (s, end) => { let q = `M${X(lo)},${Y(0)}`; s.forEach(e => { q += ` H${X(e.d)} V${Y(e.cum)}`; }); return q + ` H${X(end)}`; };
+  const yt = [0, 1, 2, 3].map(i => top * i / 3), xt = [0, 1, 2, 3].map(i => addDaysIso(lo, Math.round(span * i / 3)));
+  const col = { in: 'var(--green)', out: 'var(--oak)' }, tipFor = (s, name) => s.map(e => `<circle cx="${X(e.d)}" cy="${Y(e.cum)}" r="${name.startsWith('Planned') ? 3.5 : 3}" class="mn-pt ${name.startsWith('Planned') ? 'hollow' : ''}" style="--c:${name.includes('in') ? col.in : col.out}"><title>${escHtml(name + ': ' + e.label + ' ' + qm(e.a) + ' on ' + dShow(e.d) + ' (running total ' + qm(e.cum) + ')')}</title></circle>`).join('');
+  const last = s => s.length ? s[s.length - 1].cum : 0, aria = `Money in: planned ${qm(last(S.pin))}, received ${qm(last(S.ain))}. Money out: planned ${qm(last(S.pout))}, paid ${qm(last(S.aout))}.`;
+  return `<div class="mn-graph"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${escAttr(aria)}" preserveAspectRatio="xMidYMid meet">
+    ${yt.map(v => `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" class="mn-grid"/><text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end" class="mn-ax">${v >= 1000 ? '£' + (Math.round(v / 100) / 10) + 'k' : '£' + Math.round(v)}</text>`).join('')}
+    ${xt.map((x, i) => `<text x="${X(x)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === 3 ? 'end' : 'middle'}" class="mn-ax">${escHtml(fmtDisplay(toDate(x)).replace(/ \d{4}$/, ''))}</text>`).join('')}
+    <path d="${path(S.pin, hi)}" class="mn-ln plan" style="--c:${col.in}"/><path d="${path(S.pout, hi)}" class="mn-ln plan" style="--c:${col.out}"/>
+    <path d="${path(S.ain, today)}" class="mn-ln act" style="--c:${col.in}"/><path d="${path(S.aout, today)}" class="mn-ln act" style="--c:${col.out}"/>
+    ${tipFor(S.pin, 'Planned money in')}${tipFor(S.pout, 'Planned money out')}${tipFor(S.ain, 'Received (money in)')}${tipFor(S.aout, 'Paid (money out)')}
+    <line x1="${X(today)}" x2="${X(today)}" y1="${T}" y2="${T + ph}" class="mn-today"/><text x="${Math.min(X(today) + 4, W - R - 28)}" y="${T + 10}" class="mn-ax mn-todaylab">Today</text></svg>
+    <div class="mn-legend"><span><i class="mn-key plan" style="--c:${col.in}"></i>Money in, planned ${qm(last(S.pin))}</span><span><i class="mn-key act" style="--c:${col.in}"></i>Money in, received ${qm(last(S.ain))}</span><span><i class="mn-key plan" style="--c:${col.out}"></i>Money out, planned ${qm(last(S.pout))}</span><span><i class="mn-key act" style="--c:${col.out}"></i>Money out, paid ${qm(last(S.aout))}</span></div></div>`;
+}
+function mnInBtn(p, i){
+  const r = i.r, at = `data-inv-pid="${p.id}" data-inv-k="${escAttr(i.key)}"`;
+  if(r.blocked) return '<span class="qb-dim">awaiting approval</span>';
+  if(r.paidDate && (!(r.paidAmount > 0) || r.paidAmount >= r.amount - 0.005)) return `<span class="pw-ok">✓ Received ${escHtml(pwD(r.paidDate))}</span>`;
+  if(!r.invoicedDate) return `<button type="button" class="btn qb-sm" data-inv-a="sent" ${at}>Raise invoice</button>`;
+  return `<button type="button" class="btn qb-sm" data-inv-a="paid" ${at}>Mark received</button>`;
+}
+function rpMoneyHtml(p){
+  const d = mnData(p), today = fmt(new Date()), mg = mnMargin(p), sg = v => Math.abs(v) < 0.005 ? 'none' : (v > 0 ? '+' : '−') + qm(Math.abs(v)), cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  const ins = d.ins.slice().sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')), outs = d.outs.slice().sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
+  const inRow = i => { const r = i.r, late = r.dueDate && !r.paidDate && r.dueDate < today;
+    return `<div class="mn-item${late ? ' late' : ''}"><div class="mn-i-main"><b>${escHtml(r.desc)}</b><span class="rp-dim"> ${qm(r.amount)}${r.kind === 'contract' ? ' · ' + r.seq + ' of ' + r.of : ' · scope addition'}</span><div class="mn-i-sub">${invPill(r.status)}${r.dueDate ? ' due ' + escHtml(pwD(r.dueDate)) : ' no date'}${r.invoicedDate ? ' · raised ' + escHtml(pwD(r.invoicedDate)) : (r.raiseBy ? ' · raise by ' + escHtml(pwD(r.raiseBy)) : '')}${late ? ` · <b class="over">${daysBetween(r.dueDate, today)} day${daysBetween(r.dueDate, today) === 1 ? '' : 's'} late</b>` : ''}</div></div><div class="mn-i-act">${mnInBtn(p, i)}</div></div>`; };
+  const outRow = o => { const late = o.date && !o.done && o.date < today;
+    return `<div class="mn-item${late ? ' late' : ''}"><div class="mn-i-main"><b>${escHtml(o.x.label)}</b><span class="rp-dim"> planned ${qm(o.amount)}${o.done && o.tx ? ' · paid ' + qm(o.paidAmt) : ''}</span><div class="mn-i-sub">${o.done ? 'paid ' + (o.paidDate ? escHtml(pwD(o.paidDate)) : '') : (o.date ? 'due ' + escHtml(pwD(o.date)) : 'no date')}${late ? ` · <b class="over">${daysBetween(o.date, today)} day${daysBetween(o.date, today) === 1 ? '' : 's'} late</b>` : ''}${o.tx && o.tx.payMode === 'trade' && !o.tx.settledDate ? ' · on trade account, unpaid' : ''}</div></div>
+      <div class="mn-i-act">${o.done ? '<span class="pw-ok">✓ Paid</span>' : `<button type="button" class="btn qb-sm" data-spay="confirm" data-pid="${p.id}" data-did="${escAttr(o.x.did)}">Confirm paid</button>`}</div></div>`; };
+  const marginHtml = mg ? `<div class="rp-card"><h4>Margin and job cost <span class="qb-dim">(ex VAT, confirmed receipt prices where there are any)</span></h4><div class="rp-strip mn-strip2" style="border:0;">${cell('Margin as sold', qm(mg.sold), mg.soldPct.toFixed(1) + '%')}${cell('Margin now', qm(mg.now), mg.nowPct.toFixed(1) + '%' + (mg.rv.n ? ' · confirmed prices' : ''), mg.now < mg.sold - 0.005 ? 'bad' : '')}${cell('Job cost', qm(mg.cost), mg.rv.n ? 'plan ' + qm(mg.planCost) : 'from the Working plan')}${cell('Variance from receipts', mg.rv.n ? sg(mg.rv.v) : '—', mg.rv.n ? mg.rv.n + ' order' + (mg.rv.n === 1 ? '' : 's') + (mg.rv.v > 0.005 ? ' cost more' : mg.rv.v < -0.005 ? ' cost less' : ' as quoted') : 'no prices confirmed yet', mg.rv.v > 0.005 ? 'bad' : '')}</div>
+    <p class="q-help" style="margin:8px 0 0;">Margin now here is the Working plan margin less the variance on confirmed receipts. Retained profit, profit share and the pots still use the Working plan figures.${toolCostOn() && projToolCost(p) ? ' Tool cost on this job (' + qm(projToolCost(p)) + ') is recorded but not counted in the margin.' : ''}</p></div>` : '';
+  return `<div class="mn-wrap">${marginHtml}<div class="rp-card"><div class="rp-card-h"><h4>Money in and out, planned against actual</h4><button type="button" class="btn secondary qb-sm" data-rp="legacy" data-sec="money">Open the invoice schedule</button></div>${mnGraphHtml(p, d)}</div>
+    <div class="rp-card"><h4>Money in <span class="db-count">${ins.length}</span></h4>${ins.map(inRow).join('') || '<div class="pw-empty">No invoice schedule yet.</div>'}</div>
+    <div class="rp-card"><h4>Money out <span class="db-count">${outs.length}</span></h4>${outs.map(outRow).join('') || '<div class="pw-empty">No supplier payments yet: they come from the delivery drops on the accepted quote.</div>'}</div></div>`;
+}
+
+/* BT:js-money end */
 
 /* ---------- init ---------- */
 (async () => {
