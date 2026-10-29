@@ -2525,6 +2525,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .ph-row .ph-sub { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
   .ph-row .ph-sub input[type=date] { width: 138px; }
   .ph-row .ph-sub .q-check { min-height: 0; font-size: var(--bt-fs-xs); }
+  .cls-act { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .cls-act select { max-width: 190px; }
   .cap-row input:not([type=checkbox]), .hd-row input:not([type=checkbox]), .hd-row select, .ph-row input:not([type=checkbox]), .pt-row input[type=text], .pt-row input[type=number] { border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); min-width: 0; width: 100%; }
   .ph-row input[type=checkbox], .pt-row input[type=checkbox] { width: auto; }
   .ph-row.ph-stack { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px; }
@@ -2733,6 +2735,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-finance" role="group" aria-labelledby="gh-finance">
       <button type="button" class="tab g-finance" data-tab="cashflow">Cash Flow Forecast</button>
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
+      <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
       <button type="button" class="tab g-finance" data-tab="revenue">Revenue Forecast</button>
@@ -3066,6 +3069,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div id="txnPending"></div>
     <div class="btn-row"><button class="btn" data-fin="txn-add">+ Add transaction</button></div>
     <div class="table-scroll" id="transactionsTableWrap"></div>
+  </div>
+
+  <!-- CLASSIFY -->
+  <div class="panel" id="panel-classify">
+    <div class="page-head">
+      <h2>Classify</h2>
+      <div class="desc">Mark each cost as a job cost (with its project), a business cost or an asset purchase. The page suggests a class from the category; nothing is stored until you accept it.</div>
+    </div>
+    <div id="clsBody"></div>
   </div>
 
   <div class="panel" id="panel-reconciliation">
@@ -3998,6 +4010,7 @@ async function loadState(){
 let saveTimer = null;
 function saveState(){
   try{ finEnsureReceipts(); }catch(e){}
+  try{ clsSyncTask(); }catch(e){}   // Stage 5: the one rolling task for costs with no class
   if(typeof cxDirty === 'function') cxDirty();
   setSaveStatus('Saving…');
   clearTimeout(saveTimer);
@@ -4158,6 +4171,7 @@ async function startApp(){
   undoPrune(); undoBadge();
   ensurePipelineIds();
   finMarkLegacy();   // payment lines already paid at load are not given receipts behind your back
+  try{ if(clsSyncTask()) saveState(); }catch(e){}
   loadTodayScope();
   render();
   activateTab('today');   // Today is the landing page after every login
@@ -10658,6 +10672,7 @@ function finNavOpen(kind, id, extra){
   else if(kind === 'deal'){ openDetail('sales', Number(id)); }
   else if(kind === 'po' && typeof poOpen === 'function') poOpen(Number(id));
   else if(kind === 'asset') assetNavOpen(id);
+  else if(kind === 'page'){ if(document.querySelector('.tab[data-tab="' + id + '"]')){ activateTab(id); window.scrollTo(0, 0); } }
 }
 /* ---------- cash flow: every number can be opened to the lines behind it ---------- */
 const cfUi = { sel: null };
@@ -11002,7 +11017,7 @@ function renderTransactions(){
     html += `<tr class="${txnUi.flash === i ? 'inv-flash' : ''}">
       <td><input type="date" data-tab="transactions" data-idx="${i}" data-field="date" value="${t.date||''}"></td>
       <td><input data-tab="transactions" data-idx="${i}" data-field="description" value="${escAttr(t.description||'')}"></td>
-      <td><select data-tab="transactions" data-idx="${i}" data-field="category">${cats.map(c=>`<option${t.category===c?' selected':''}>${escHtml(c)}</option>`).join('')}</select></td>
+      <td><select data-tab="transactions" data-idx="${i}" data-field="category">${cats.map(c=>`<option${t.category===c?' selected':''}>${escHtml(c)}</option>`).join('')}</select>${typeof clsBadge === 'function' ? '<div style="margin-top:4px;">' + clsBadge(t) + '</div>' : ''}</td>
       <td>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button><div class="qb-dim">${escHtml(t.projCat || '')} ${t.planned === false || (t.projectId && !t.planned) ? '<span class="qb-flag bad">unplanned</span>' : '<span class="qb-flag ok">planned</span>'}${t.payMode === 'trade' ? (t.settledDate ? ' <span class="qb-flag ok">trade · settled ' + pwD(t.settledDate) + '</span>' : ' <span class="qb-flag bad">on account · due ' + pwD(t.tradeDue) + '</span> <button type="button" class="sp-link" data-spay="settle" data-uid="' + escAttr(t.uid) + '">settle…</button>') : ''}${t.origin === 'supplier-payment' ? ' <span class="qb-flag">confirmed payment</span>' : ''}</div>` : '<span class="qb-dim">—</span>'}</td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyIn" value="${t.moneyIn||0}"></td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyOut" value="${t.moneyOut||0}"></td>
@@ -12414,7 +12429,7 @@ function migrateTaskTimeline(r){
   if(!r || !Array.isArray(r.comms)) return;
   r.comms.forEach(c => { if(c && typeof c === 'object' && (TASK_NOTE_PREFIX_RE.test(String(c.note || '')) || c.src === 'action') && c.src !== 'task') c.src = 'task'; });
 }
-const TASK_REF_KINDS = ['contact', 'company', 'supplier', 'quote', 'po'];   // records a task can attach to besides a lead, sale or project (those use linkedIds)
+const TASK_REF_KINDS = ['contact', 'company', 'supplier', 'quote', 'po', 'page'];   // records a task can attach to besides a lead, sale or project (those use linkedIds)
 const RECUR_UNITS = ['day', 'week', 'month', 'year'];
 function normRecur(r){ const n = r && Math.floor(Number(r.every)); return n >= 1 && n <= 52 && RECUR_UNITS.includes(r.unit) ? { every: n, unit: r.unit } : null; }
 function ensureTaskModel(o){
@@ -12450,7 +12465,8 @@ function ensureTaskModel(o){
     createdAt: iso(t.createdAt), createdBy: iso(t.createdBy),
     scope: t.scope === 'business' ? 'business' : 'job',   // a job task belongs with a customer's work; a business task with running the business
     refs: (Array.isArray(t.refs) ? t.refs : []).filter(r => r && typeof r === 'object' && TASK_REF_KINDS.includes(r.kind) && r.id !== undefined && r.id !== '').map(r => ({ kind: r.kind, id: String(r.id) })),
-    recur: normRecur(t.recur), spawnedId: iso(t.spawnedId)
+    recur: normRecur(t.recur), spawnedId: iso(t.spawnedId),
+    ...(iso(t.autoKey) ? { autoKey: iso(t.autoKey) } : {})   // the key an automatic task was made with; kept so it is not made again after a reload
   }));
   o.crmTasks.forEach(t => migrateNotesToDescription(t, t.notes));
   (Array.isArray(o.actions) ? o.actions : []).concat(Array.isArray(o.archivedActions) ? o.archivedActions : []).forEach(a => {
@@ -14423,6 +14439,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
+  try{ renderClassify(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
@@ -14839,7 +14856,7 @@ const BTT_SPECS = [
   { k: 'milestonesTableWrap', label: 'Milestones' },
   { k: 'panel-crmprojects:code-name', label: 'Projects overview' }
 ];
-const BTT_CARD_KEYS = ['leadsTableWrap', 'pipelineTableWrap', 'projectsTableWrap', 'crmTableWrap', 'actionsTableWrap', 'suppliersTableWrap', 'transactionsTableWrap', 'panel-invoicing:project-invoice', 'panel-purchaseorders:po-project'];
+const BTT_CARD_KEYS = ['leadsTableWrap', 'pipelineTableWrap', 'projectsTableWrap', 'crmTableWrap', 'actionsTableWrap', 'suppliersTableWrap', 'transactionsTableWrap', 'panel-invoicing:project-invoice', 'panel-purchaseorders:po-project', 'cls-waiting', 'cls-done'];
 const BTT_EXTRA_RE = /^(notes?|comments?|description|email|phone|postcode|address|website|serial|residual|life|insurance|service|created|source|payment terms|lead time|categories|linked|replacement|book value|last contacted|last touched|in progress|raised|version|prob|owner|sent|tier|type|date raised|\+ owner)\b/i;
 const BTT_ESS_RE = /^(code|ref|reference|po|invoice|name|title|project|project name|project \/ client|supplier|customer|company|contact|item|action|stage|status|lead status|sales stage|month|date|due|deadline|amount|value|total|quote|agreed value|total ex vat|tier name|in \(|out \()/i;
 const BTT_NAME_RE = /^(name|title|project|project name|project \/ client|supplier|customer|company|contact|description|item|action|stage|long-term goal|trade area|role|category|linked record|linked lead|main contact|categories)/i;
@@ -15217,6 +15234,7 @@ const MENU_ICONS = {
   approvals: '<circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/>',
   cashflow: '<path d="M3 12c3-6 6-6 9 0s6 6 9 0"/>',
   invoicing: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/>',
+  classify: '<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/><line x1="11" y1="12" x2="15" y2="12"/>',
   transactions: '<polyline points="17 3 21 7 17 11"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 13 3 17 7 21"/><line x1="3" y1="17" x2="15" y2="17"/>',
   pricing: '<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
   projectpipeline: '<rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="13" rx="1"/>',
@@ -18176,7 +18194,7 @@ function canSeeBusiness(){
   return (state.settings.bizAccess || []).some(n => String(n).toLowerCase() === w.toLowerCase());
 }
 const taskVisible = t => t.scope !== 'business' || canSeeBusiness();
-const REF_LABEL = { contact: 'Contact', company: 'Company', supplier: 'Supplier', quote: 'Quote', po: 'Order' };
+const REF_LABEL = { contact: 'Contact', company: 'Company', supplier: 'Supplier', quote: 'Quote', po: 'Order', page: 'Page' };
 function refInfo(r){
   let name = '', missing = false;
   if(r.kind === 'contact'){ const c = ctFind(r.id); name = c ? ctName(c) : ''; }
@@ -18184,6 +18202,7 @@ function refInfo(r){
   else if(r.kind === 'supplier'){ const s = supFind(Number(r.id)); name = s ? (s.name || supCode(s)) : ''; }
   else if(r.kind === 'quote'){ const q = qFind(Number(r.id)); name = q ? qRef(q) + (q.customer ? ' · ' + q.customer : '') : ''; }
   else if(r.kind === 'po'){ const o = poFind(Number(r.id)); name = o ? o.ref : ''; }
+  else if(r.kind === 'page'){ name = navTabLabel(r.id); if(name === r.id) name = ''; }   // Stage 5: a task can point at a page, such as Finance > Classify
   if(!name){ missing = true; name = '(record removed)'; }
   return { kind: REF_LABEL[r.kind] || r.kind, name, missing };
 }
@@ -19898,6 +19917,105 @@ function capWarnWeeks(p, weeks){
 const capWarnHtml = p => capWarnWeeks(p, capCheck(p, capProposalFromDraft(p)));
 
 /* BT:js-planning end */
+
+/* BT:js-money begin */
+/* =====================================================================
+   STAGE 5: MONEY FOUNDATIONS
+   Step 2: job cost, business cost or asset purchase on a transaction.
+   New optional fields on a transaction, all empty by default: costClass ('job' | 'business' | 'asset'), costProjectId (the job a job cost belongs to, when the
+   transaction has no project link of its own), classHow ('suggestion' | 'chosen'), classAt, classBy. Nothing else on a transaction is touched: amount, date,
+   category, project link and linked code stay exactly as they were. A suggestion is worked out from the category each time it is shown and is never stored
+   until someone accepts it. Only money-out lines are costs, so only those are asked about.
+   ===================================================================== */
+const CLS_LABELS = { job: 'Job cost', business: 'Business cost', asset: 'Asset purchase' };
+const CLS_RULES = [
+  [/^(materials?|delivery|hire|labou?r|sub-?contract\w*)\b/i, 'job', 'Materials, delivery, hire, labour and subcontractors are normally a job cost'],
+  [/^overhead/i, 'business', 'Overhead is a business cost'],
+  [/^(equipment|asset|tools?)\b/i, 'asset', 'Equipment is normally an asset purchase']
+];
+const clsOf = t => (t && CLS_LABELS[t.costClass]) ? t.costClass : '';
+const clsNeeds = t => !!t && Number(t.moneyOut) > 0 && !clsOf(t);
+function clsSuggest(t){
+  if(!clsNeeds(t)) return null; const c = String(t.category || '').trim();
+  for(const [re, cls, why] of CLS_RULES) if(re.test(c)) return { cls, why };
+  return null;
+}
+const clsProjectId = t => Number(t.projectId) || Number(t.costProjectId) || 0;
+function clsApply(t, cls, how, pid){
+  t.costClass = cls; t.classHow = how; t.classAt = new Date().toISOString(); t.classBy = meName();
+  if(cls === 'job' && !Number(t.projectId) && Number(pid) > 0) t.costProjectId = Number(pid); else delete t.costProjectId;
+}
+function clsClear(t){ ['costClass', 'costProjectId', 'classHow', 'classAt', 'classBy'].forEach(k => delete t[k]); }
+function clsBadge(t){
+  const c = clsOf(t); if(!c) return Number(t.moneyOut) > 0 ? '<span class="qb-flag bad">not classified</span>' : '';
+  const pid = clsProjectId(t), p = pid ? state.projects.find(x => x.id === pid) : null;
+  return `<span class="qb-flag ok">${CLS_LABELS[c]}</span>${c === 'job' ? (p ? ' <span class="qb-dim">' + escHtml(recordCode(p.id, 'project')) + '</span>' : ' <span class="qb-flag bad">no project</span>') : ''}`;
+}
+/* one rolling task (autoKey 'txcls') so unclassified costs are not forgotten; it follows the count and closes at zero */
+function clsSyncTask(){
+  if(!state || !Array.isArray(state.transactions) || !Array.isArray(state.crmTasks)) return false;
+  const n = state.transactions.filter(clsNeeds).length, today = fmt(new Date()), open = state.crmTasks.find(t => t.status === 'open' && t.autoKey === 'txcls');
+  if(!n){ if(open){ open.status = 'done'; open.completedAt = new Date().toISOString(); open.completedBy = meName() || 'system'; return true; } return false; }
+  const title = 'Classify transactions: ' + n + ' waiting';
+  if(open){ if(open.title !== title){ open.title = title; return true; } return false; }
+  if(state.crmTasks.some(t => t.autoKey === 'txcls' && t.status === 'done' && String(t.completedAt || '').slice(0, 10) === today)) return false;   // ticked off today: leave it until tomorrow
+  const t = createTask({ title, dueDate: today, scope: 'business', owner: meName(), refs: [{ kind: 'page', id: 'classify' }], description: 'Some costs are not yet marked as a job cost, a business cost or an asset purchase. Open Finance > Classify: accept the suggestions or choose for each one. Nothing is changed until you accept it.' });
+  t.autoKey = 'txcls'; return true;
+}
+const clsUi = { view: 'waiting', draft: {}, flash: '' };
+function clsProjOptions(sel){ return '<option value="">— no project —</option>' + state.projects.map(p => `<option value="${p.id}"${Number(sel) === p.id ? ' selected' : ''}>${escHtml(recordCode(p.id, 'project') + ' ' + p.name)}</option>`).join(''); }
+function renderClassify(){
+  const el = document.getElementById('clsBody'); if(!el || !state) return;
+  const tx = state.transactions.map((t, i) => ({ t, i })), waiting = tx.filter(x => clsNeeds(x.t)).sort((a, b) => String(b.t.date || '').localeCompare(String(a.t.date || ''))), done = tx.filter(x => clsOf(x.t)).sort((a, b) => String(b.t.date || '').localeCompare(String(a.t.date || '')));
+  const sug = waiting.filter(x => clsSuggest(x.t)), noProj = done.filter(x => clsOf(x.t) === 'job' && !clsProjectId(x.t)), cnt = c => done.filter(x => clsOf(x.t) === c).length;
+  const kpi = (l, v, s, a) => `<div class="kpi" style="--accent:${a}"><div class="label">${l}</div><div class="value">${v}</div><div class="fin-sub">${s}</div></div>`;
+  const row = ({ t, i }) => {
+    const s = clsSuggest(t), d = clsUi.draft[i] || {}, cls = d.cls !== undefined ? d.cls : '', pid = d.pid !== undefined ? d.pid : (t.projectId || ''), p = t.projectId ? state.projects.find(x => x.id === t.projectId) : null;
+    return `<tr class="${clsUi.flash === i ? 'inv-flash' : ''}"><td>${t.date ? pwD(t.date) : '—'}</td><td>${escHtml(t.description || '')}</td><td>${escHtml(t.category || '')}</td><td class="qb-calc">${qm(t.moneyOut)}</td>
+      <td>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button>` : '<span class="qb-dim">—</span>'}</td>
+      <td>${s ? `<span class="qb-flag ok">${CLS_LABELS[s.cls]}</span><div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(s.why)}</div>` : '<span class="qb-dim">No rule matches: left for you</span>'}</td>
+      <td><div class="cls-act">${s ? `<button type="button" class="btn qb-sm" data-cls="accept" data-idx="${i}">Accept ${escHtml(CLS_LABELS[s.cls].toLowerCase())}</button>` : ''}
+        <select data-cls-sel="${i}" aria-label="Class"><option value="">Choose…</option>${Object.keys(CLS_LABELS).map(k => `<option value="${k}"${cls === k ? ' selected' : ''}>${CLS_LABELS[k]}</option>`).join('')}</select>
+        ${cls === 'job' && !p ? `<select data-cls-pid="${i}" aria-label="Project">${clsProjOptions(pid)}</select>` : ''}
+        ${cls ? `<button type="button" class="btn secondary qb-sm" data-cls="save" data-idx="${i}">Save</button>` : ''}</div></td></tr>`;
+  };
+  const drow = ({ t, i }) => {
+    const c = clsOf(t), p = t.projectId ? state.projects.find(x => x.id === t.projectId) : null;
+    return `<tr><td>${t.date ? pwD(t.date) : '—'}</td><td>${escHtml(t.description || '')}</td><td class="qb-calc">${qm(t.moneyOut)}</td>
+      <td><select data-cls-edit="${i}" aria-label="Class">${Object.keys(CLS_LABELS).map(k => `<option value="${k}"${c === k ? ' selected' : ''}>${CLS_LABELS[k]}</option>`).join('')}</select></td>
+      <td>${c === 'job' ? (p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button>` : `<select data-cls-editpid="${i}" aria-label="Project">${clsProjOptions(t.costProjectId)}</select>`) : '<span class="qb-dim">—</span>'}</td>
+      <td class="qb-dim">${t.classHow === 'suggestion' ? 'accepted suggestion' : 'chosen'}${t.classBy ? ' · ' + escHtml(t.classBy) : ''}</td><td><button type="button" class="btn secondary qb-sm" data-cls="clear" data-idx="${i}">Clear</button></td></tr>`;
+  };
+  el.innerHTML = `<div class="kpi-row">${kpi('Waiting', waiting.length, 'costs with no class yet', 'var(--oak)')}${kpi('With a suggestion', sug.length, 'the rule matched the category', 'var(--green)')}${kpi('Classified', done.length, cnt('job') + ' job · ' + cnt('business') + ' business · ' + cnt('asset') + ' asset', 'var(--slate)')}${kpi('Job costs with no project', noProj.length, 'pick the job they belong to', 'var(--bt-plum)')}</div>
+    <p class="q-help">A suggestion is only shown here: nothing is stored until you accept it. Amounts, dates, categories and project links are never changed. Money in is not asked about. Accepting a class does not change any profit or pot figure.</p>
+    <div class="view-toggle" role="group" aria-label="Classify">${[['waiting', 'Waiting (' + waiting.length + ')'], ['done', 'Classified (' + done.length + ')']].map(([v, n]) => `<button type="button" data-cls="view" data-v="${v}" class="${clsUi.view === v ? 'active' : ''}">${n}</button>`).join('')}</div>
+    ${clsUi.view === 'waiting' ? `<div class="btn-row"><button type="button" class="btn" data-cls="all"${sug.length ? '' : ' disabled'}>Accept all suggestions${sug.length ? ' (' + sug.length + ')' : ''}</button></div>
+      <div class="card"><div class="qb-scroll"><table class="qb-table inv-table" data-rt="cls-waiting"><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Out</th><th>Project</th><th>Suggestion</th><th>Class</th></tr></thead><tbody>${waiting.map(row).join('') || '<tr><td colspan="7"><div class="sup-empty">Every cost has a class. Nothing is waiting.</div></td></tr>'}</tbody></table></div></div>`
+    : `<div class="card"><div class="qb-scroll"><table class="qb-table inv-table" data-rt="cls-done"><thead><tr><th>Date</th><th>Description</th><th>Out</th><th>Class</th><th>Project</th><th>How</th><th></th></tr></thead><tbody>${done.map(drow).join('') || '<tr><td colspan="7"><div class="sup-empty">Nothing classified yet.</div></td></tr>'}</tbody></table></div></div>`}`;
+}
+function clsAfter(msg){ clsSyncTask(); saveState(); render(); if(msg) showToast(msg); }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-cls]'); if(!b || !state) return; const a = b.dataset.cls, t = state.transactions[Number(b.dataset.idx)];
+  if(a === 'view'){ clsUi.view = b.dataset.v; renderClassify(); return; }
+  if(a === 'accept'){ const s = clsSuggest(t); if(!t || !s) return; clsApply(t, s.cls, 'suggestion', 0); delete clsUi.draft[b.dataset.idx]; clsAfter('Marked as ' + CLS_LABELS[s.cls].toLowerCase()); return; }
+  if(a === 'save'){ const d = clsUi.draft[b.dataset.idx]; if(!t || !d || !d.cls) return; clsApply(t, d.cls, 'chosen', d.pid); delete clsUi.draft[b.dataset.idx]; clsAfter('Saved: ' + CLS_LABELS[d.cls].toLowerCase()); return; }
+  if(a === 'clear'){ if(!t) return; clsClear(t); clsAfter('Class cleared'); return; }
+  if(a === 'all'){
+    const list = state.transactions.filter(x => clsSuggest(x)), by = c => list.filter(x => clsSuggest(x).cls === c).length, jobNoPid = list.filter(x => clsSuggest(x).cls === 'job' && !x.projectId).length, left = state.transactions.filter(clsNeeds).length - list.length;
+    if(!list.length) return;
+    const ok = await showConfirm('Accept all suggestions?', `This marks ${list.length} cost${list.length === 1 ? '' : 's'}: ${by('job')} as job cost${jobNoPid ? ' (' + jobNoPid + ' with no project yet: you pick it afterwards)' : ''}, ${by('business')} as business cost, ${by('asset')} as asset purchase. ${left} with no matching rule stay unclassified. No amount, date, category or link is changed, and each can be cleared afterwards.`);
+    if(!ok) return; list.forEach(x => clsApply(x, clsSuggest(x).cls, 'suggestion', 0)); clsAfter(list.length + ' suggestion' + (list.length === 1 ? '' : 's') + ' accepted');
+  }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el || !el.dataset || !state) return; const d = el.dataset;
+  if(d.clsSel !== undefined){ const k = d.clsSel; clsUi.draft[k] = Object.assign({}, clsUi.draft[k], { cls: el.value }); renderClassify(); return; }
+  if(d.clsPid !== undefined){ const k = d.clsPid; clsUi.draft[k] = Object.assign({}, clsUi.draft[k], { pid: el.value }); return; }
+  if(d.clsEdit !== undefined){ const t = state.transactions[Number(d.clsEdit)]; if(!t) return; clsApply(t, el.value, 'chosen', t.costProjectId); clsAfter(); return; }
+  if(d.clsEditpid !== undefined){ const t = state.transactions[Number(d.clsEditpid)]; if(!t) return; clsApply(t, 'job', t.classHow || 'chosen', el.value); clsAfter(); }
+});
+
+/* BT:js-money end */
 
 /* ---------- init ---------- */
 (async () => {
