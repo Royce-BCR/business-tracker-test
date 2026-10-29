@@ -2709,7 +2709,9 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .f6-wf { display: grid; grid-template-columns: minmax(130px, 220px) 1fr minmax(90px, auto); gap: 10px; align-items: center; padding: 5px 0; } .f6-wfb { background: var(--bt-surface-2); border-radius: 4px; height: 18px; } .f6-wfb i { display: block; height: 100%; border-radius: 4px; background: var(--oak); }
   .f6-wf.in .f6-wfb i { background: var(--green); } .f6-wf.out .f6-wfb i { background: var(--bt-bad-fg); opacity: .75; } .f6-wf.sub .f6-wfb i { background: var(--slate); } .f6-wf.sub .f6-wfl, .f6-wf.sub .f6-wfv { font-weight: 700; } .f6-wfv { text-align: right; font-variant-numeric: tabular-nums; } .f6-sect2 { margin: 10px 0 2px; font-size: var(--bt-fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
   @media (max-width: 560px) { .f6-wf { grid-template-columns: 1fr auto; } .f6-wfb { grid-column: 1 / -1; order: 3; height: 10px; } }
-  .f6-repgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--bt-s3); } .f6-repcard { text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 6px; font: inherit; } .f6-repcard:hover { border-color: var(--bt-oak-500, #a0794a); }
+  .f6-rephead { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; margin: 0 0 var(--bt-s3); } .f6-rephead h3 { margin: 0; font-size: var(--bt-fs-lg, 18px); } .f6-tomonthly { margin-left: auto; }
+.f6-gh { margin: var(--bt-s5) 0 var(--bt-s2); font-size: var(--bt-fs-md, 16px); } .f6-repcard .f6-kind { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; } .f6-repcard .f6-meta { margin-top: auto; padding-top: var(--bt-s2); font-size: var(--bt-fs-xs); color: var(--slate); } .f6-repcard { min-height: 124px; }
+.f6-repgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--bt-s3); } .f6-repcard { text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 6px; font: inherit; } .f6-repcard:hover { border-color: var(--bt-oak-500, #a0794a); }
   #reportsBody .view-toggle, #pnlBody .view-toggle, #ageingBody .view-toggle, #cfViewToggle .view-toggle { flex-wrap: wrap; max-width: 100%; }
   .f6-acts { display: flex; gap: 4px; flex-wrap: wrap; } .f6-in { color: var(--bt-ok-fg); } .f6-weeks td, .f6-weeks th { white-space: nowrap; } .f6-low { background: var(--bt-warn-bg); } .f6-wklist { margin-top: var(--bt-s3); }
   .f6-ul { margin: 4px 0 10px 16px; padding: 0; font-size: var(--bt-fs-sm); } .f6-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s4); margin-top: var(--bt-s3); } .f6-cand { display: block; margin: 6px 0; }
@@ -3200,7 +3202,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
         <h2>Reports</h2>
         <div class="desc">The questions you ask on a schedule. Each report reads the same records as the finance pages, holds no numbers of its own, and every figure opens the line behind it.</div>
       </div>
-      
+      <div class="pg-actions"><button type="button" class="btn" data-f6="rep-open-nav" data-k="biz:monthly">Monthly summary</button></div>
     </div>
     <div id="reportsBody"></div>
   </div>
@@ -6140,7 +6142,7 @@ function rtApplyTable(table, widths, fit){
   [...table.querySelector(':scope > colgroup').children].forEach((col,i) => { col.style.width = fit ? (widths[i]/sum*100).toFixed(3)+'%' : widths[i]+'px'; });
   table.style.minWidth = fit ? '0' : sum+'px';
 }
-function rtApply(root){ (root || document).querySelectorAll('table[data-rt]').forEach(t => rtApplyTable(t, rtWidths(t.dataset.rt), rtFit(t))); }
+function rtApply(root){ (root || document).querySelectorAll('table[data-rt]').forEach(t => { if(t.dataset.rt !== CRM_TABLE_ID && !RT_SPECS[t.dataset.rt]) return; rtApplyTable(t, rtWidths(t.dataset.rt), rtFit(t)); }); }   // Stage 7: a table with no width spec (Business costs, Classify) is skipped instead of stopping the rest
 function rtReset(id){   // a page table and its detail tables back to default widths
   const spec = RT_SPECS[id]; if(!spec) return;
   [id, ...(spec.nested||[])].forEach(k => { if(state.colWidths) delete state.colWidths[k]; });
@@ -21155,16 +21157,22 @@ function repBody(k){
   if(k === 'selling') return `<div class="db-card">${dashSellingHtml()}</div>`;
   return '';
 }
+const REP_JOB_D = { summary: 'Price, invoiced, paid, margin and hours on one job.', margin: 'Margin as sold against margin now, line by line.', cost: 'What was paid on the job, by category.', variance: 'Supplier price differences, by cause.', hours: 'Hours sold, planned and logged.', selling: 'Time spent selling the job and what it cost.', money: 'Money in and out on the job.' };
 function repHtml(){
   repDefaults();
-  if(!repUi.open) return `<p class="q-help">Reports are the questions you ask on a schedule. They read the same records as the finance pages, hold no numbers of their own, and every figure opens the line behind it. Each has a date range and a data-quality strip.</p>
-    <div class="card"><div class="qb-sec-h"><h4>Job reports</h4></div><p class="q-help">One project at a time: a summary, sold against now, cost by category, variance by cause, hours, cost of selling, and money in and out.</p><div class="btn-row">${REP_JOB.map(([k, n]) => `<button type="button" class="btn secondary" data-f6="rep-open" data-k="job:${k}">${escHtml(n)}</button>`).join('')}</div></div>
-    <div class="f6-repgrid">${REP_BIZ.map(([k, n, d]) => `<button type="button" class="card f6-repcard" data-f6="rep-open" data-k="biz:${k}"><b>${escHtml(n)}</b><span class="qb-dim">${escHtml(d)}</span></button>`).join('')}</div>`;
+  /* the same order on every report and on the library: title, date range (or month, or project), data-quality strip, then the report */
+  const range = (job, p, monthly) => `<div class="q-inline f6-range" style="gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:var(--bt-s3);">${job ? `<div class="lp-f"><label>Project</label><select data-f6="rep-pid">${state.projects.map(x => `<option value="${x.id}"${p && x.id === p.id ? ' selected' : ''}>${escHtml(recordCode(x.id, 'project') + ' ' + x.name)}${projStageId(x) === 'stg_proj_completed' ? ' (completed)' : ''}</option>`).join('')}</select></div>` : ''}
+    ${monthly ? `<div class="lp-f"><label>Month</label><input type="month" data-f6="rep-month" value="${repUi.to.slice(0, 7)}"></div>` : `<div class="lp-f"><label>From</label><input type="date" data-f6="rep-from" value="${repUi.from}"></div><div class="lp-f"><label>To</label><input type="date" data-f6="rep-to" value="${repUi.to}"></div>`}</div>`;
+  const dq = monthly => dqStripHtml(monthly ? repUi.to.slice(0, 7) : repUi.from.slice(0, 7), repUi.to.slice(0, 7));
+  if(!repUi.open){
+    const card = (kind, k, n, d, meta) => `<button type="button" class="card f6-repcard" data-f6="rep-open" data-k="${kind}:${k}"><span class="f6-kind">${kind === 'job' ? 'Job report' : 'Business report'}</span><b>${escHtml(n)}</b><span class="qb-dim">${escHtml(d)}</span><span class="f6-meta">${meta}</span></button>`;
+    return `<h3 class="f6-gh" style="margin-top:0;">Date range</h3><p class="q-help" style="margin:0 0 var(--bt-s2);">The range and the data-quality strip apply to whichever report you open.</p>${range(false, null, false)}${dq(false)}
+      <h3 class="f6-gh">Business reports</h3><div class="f6-repgrid">${REP_BIZ.map(([k, n, d]) => card('biz', k, n, d, k === 'monthly' ? 'One month' : 'Date range')).join('')}</div>
+      <h3 class="f6-gh">Job reports</h3><p class="q-help">One project at a time. Pick the project once you open one.</p><div class="f6-repgrid">${REP_JOB.map(([k, n]) => card('job', k, n, REP_JOB_D[k] || '', 'One project')).join('')}</div>`;
+  }
   const [kind, key] = repUi.open.split(':'), job = kind === 'job', p = job ? jrProject() : null, title = job ? 'Job report' : (REP_BIZ.find(x => x[0] === key) || [0, key])[1];
   const monthly = !job && key === 'monthly';
-  const ctl = `<div class="q-inline" style="gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:var(--bt-s3);">${job ? `<div class="lp-f"><label>Project</label><select data-f6="rep-pid">${state.projects.map(x => `<option value="${x.id}"${p && x.id === p.id ? ' selected' : ''}>${escHtml(recordCode(x.id, 'project') + ' ' + x.name)}${projStageId(x) === 'stg_proj_completed' ? ' (completed)' : ''}</option>`).join('')}</select></div>` : ''}
-    ${monthly ? `<div class="lp-f"><label>Month</label><input type="month" data-f6="rep-month" value="${repUi.to.slice(0, 7)}"></div>` : `<div class="lp-f"><label>From</label><input type="date" data-f6="rep-from" value="${repUi.from}"></div><div class="lp-f"><label>To</label><input type="date" data-f6="rep-to" value="${repUi.to}"></div>`}</div>`;
-  return `<div class="btn-row"><button type="button" class="btn secondary qb-sm" data-f6="rep-open" data-k="">← All reports</button></div><h3 style="margin:8px 0;">${escHtml(title)}</h3>${ctl}${dqStripHtml(monthly ? repUi.to.slice(0, 7) : repUi.from.slice(0, 7), monthly ? repUi.to.slice(0, 7) : repUi.to.slice(0, 7))}
+  return `<div class="f6-rephead"><button type="button" class="btn secondary qb-sm" data-f6="rep-open" data-k="">← All reports</button><h3>${escHtml(title)}</h3>${monthly ? '' : '<button type="button" class="sp-link f6-tomonthly" data-f6="rep-open" data-k="biz:monthly">Monthly summary →</button>'}</div>${range(job, p, monthly)}${dq(monthly)}
     ${job ? `<div class="view-toggle" role="group" aria-label="Job report sections">${REP_JOB.map(([k, n]) => `<button type="button" data-f6="rep-sec" data-v="${k}" class="${repUi.sec === k ? 'active' : ''}">${escHtml(n)}</button>`).join('')}</div>${jrHtml(p, repUi.sec)}` : repBody(key)}`;
 }
 function renderReports(){ const el = document.getElementById('reportsBody'); if(el && state) el.innerHTML = repHtml(); }
