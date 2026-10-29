@@ -2714,6 +2714,21 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .f6-acts { display: flex; gap: 4px; flex-wrap: wrap; } .f6-in { color: var(--bt-ok-fg); } .f6-weeks td, .f6-weeks th { white-space: nowrap; } .f6-low { background: var(--bt-warn-bg); } .f6-wklist { margin-top: var(--bt-s3); }
   .f6-ul { margin: 4px 0 10px 16px; padding: 0; font-size: var(--bt-fs-sm); } .f6-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s4); margin-top: var(--bt-s3); } .f6-cand { display: block; margin: 6px 0; }
 /* BT:css-finance end */
+/* BT:css-template begin (Stage 7: one page template across the list and board areas) */
+.pg > .page-head, .pg #quoteListView > .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--bt-s3) var(--bt-s5); flex-wrap: wrap; margin-bottom: var(--bt-s4); }
+.pg .page-head > div:first-child { flex: 1 1 360px; min-width: 0; }
+.pg .page-head .desc { max-width: 68ch; }
+.pg-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--bt-s2); flex-wrap: wrap; flex: 0 0 auto; margin: 0; }
+.pg-actions:empty { display: none; }
+.pg .page-head .btn { margin-top: var(--bt-s1); }
+.pg-strip { margin: 0 0 var(--bt-s4); grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.pg-strip:empty { display: none; }
+.pg-strip .pj-tile { min-height: 0; padding: var(--bt-s2) var(--bt-s4); }
+.pg-strip .pj-tile .v { font-size: var(--bt-fs-lg, 20px); }
+.pg > .crm-filters, .pg > .pj-controls, .pg #quoteListTab > .crm-filters, .pg .cx-filters { margin: 0 0 var(--bt-s3); }
+.pg > .view-toggle, .pg > .pj-mode, .pg #quoteTabs { margin-top: 0; margin-bottom: var(--bt-s3); }
+@media (max-width: 700px){ .pg .page-head > div:first-child { flex-basis: 100%; } .pg-actions { width: 100%; justify-content: flex-start; } .pg-actions .btn { min-height: 44px; } .pg-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* BT:css-template end */
 </style>
 </head>
 <body>
@@ -2963,26 +2978,32 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- LEADS -->
-  <div class="panel" id="panel-leads">
-    <div class="page-head">
-      <h2>Lead Pipeline</h2>
-      <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once every <em>hard-gate</em> qualification question is answered satisfactorily (the questions, weights and gate or guide mode are in Settings, Selling) — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
+  <div class="panel pg" id="panel-leads">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Lead Pipeline</h2>
+        <div class="desc">The CRM database — one row per business, from cold contact to qualified opportunity. Click the chevron to open a lead's qualification detail. A lead can only be <strong>promoted into the Sales Pipeline</strong> once every <em>hard-gate</em> qualification question is answered satisfactorily (the questions, weights and gate or guide mode are in Settings, Selling) — the gate that separates a lead from a real opportunity to quote. Promoting carries the record forward and switches its code from <strong>L-</strong> to <strong>S-</strong>.</div>
+      </div>
+      <div class="pg-actions"><button class="btn" data-action="add-lead">+ Add lead</button></div>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="leads"></div>
     <div class="view-toggle" id="viewToggle-lead"></div>
-    <div class="btn-row"><button class="btn" data-action="add-lead">+ Add lead</button></div>
     <div class="table-scroll" id="leadsTableWrap"></div>
     <div class="view-pane pane-board" id="leadsBoardWrap"></div>
     <div id="lostLeadsWrap"></div>
   </div>
 
   <!-- SALES PIPELINE -->
-  <div class="panel" id="panel-salespipeline">
-    <div class="page-head">
-      <h2>Sales Pipeline</h2>
-      <div class="desc">Live inquiry → quotable → quote sent → closed-won &amp; signed. Click the chevron on any project to expand its stages — each stage carries its own dates and cost, and the project timeline &amp; cost roll up from them. Use the Table / Board / Gantt switcher to see it as a stage board or a timeline. Only rows marked <strong>Real</strong> feed the forecast.</div>
+  <div class="panel pg" id="panel-salespipeline">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Sales Pipeline</h2>
+        <div class="desc">Live inquiry → quotable → quote sent → closed-won &amp; signed. Click the chevron on any project to expand its stages — each stage carries its own dates and cost, and the project timeline &amp; cost roll up from them. Use the Table / Board / Gantt switcher to see it as a stage board or a timeline. Only rows marked <strong>Real</strong> feed the forecast.</div>
+      </div>
+      <div class="pg-actions"><button class="btn" data-action="add-row" data-tab="pipeline">+ Add project</button></div>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="sales"></div>
     <div class="view-toggle" id="viewToggle-sales"></div>
-    <div class="btn-row"><button class="btn" data-action="add-row" data-tab="pipeline">+ Add project</button></div>
     <div class="table-scroll" id="pipelineTableWrap"></div>
     <div class="view-pane pane-board" id="pipelineBoardWrap"></div>
     <div class="view-pane pane-gantt" id="pipelineGanttWrap"></div>
@@ -2990,11 +3011,15 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- PROJECT PIPELINE -->
-  <div class="panel" id="panel-projectpipeline">
-    <div class="page-head">
-      <h2>Project Pipeline</h2>
-      <div class="desc">Delivery, from signed contract to sign-off and testimonial. A won deal is promoted here from the Sales Pipeline (once its contract is marked signed) and becomes a live project — code <strong>P-</strong>. Expand a project to track its delivery milestones, budgeted vs actual cost, and testimonial. Payment lines &amp; margin variance come in the finance pass.</div>
+  <div class="panel pg" id="panel-projectpipeline">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Project Pipeline</h2>
+        <div class="desc">Delivery, from signed contract to sign-off and testimonial. A won deal is promoted here from the Sales Pipeline (once its contract is marked signed) and becomes a live project — code <strong>P-</strong>. Expand a project to track its delivery milestones, budgeted vs actual cost, and testimonial. Payment lines &amp; margin variance come in the finance pass.</div>
+      </div>
+      
     </div>
+    <div class="pj-strip pg-strip" data-pgs="projects"></div>
     <div class="view-toggle" id="viewToggle-project"></div>
     <div id="projectsMode" class="pj-mode"></div>
     <div id="projectsPvd"></div>
@@ -3006,7 +3031,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- CRM -->
-  <div class="panel" id="panel-crm">
+  <div class="panel pg" id="panel-crm">
     <div class="page-head crm-head">
       <div>
         <h2>Tasks</h2>
@@ -3014,6 +3039,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       </div>
       <button class="btn" data-crm="new">+ New task</button>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="tasks"></div>
     <div class="crm-tabs" id="crmTabs"></div>
     <div class="crm-filters"><span id="crmFilters" class="crm-filters-dyn"></span><input type="search" id="crmSearch" class="crm-search" placeholder="Search tasks…" autocomplete="off"></div>
     <div class="table-scroll" id="crmTableWrap"></div>
@@ -3021,7 +3047,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- CRM > PROJECTS OVERVIEW (read-only) -->
-  <div class="panel" id="panel-crmprojects">
+  <div class="panel pg" id="panel-crmprojects">
     <div class="page-head">
       <h2>Projects</h2>
       <div class="desc">Every lead, sales deal and project in one read-only list. A job that moved from lead to deal to project shows once, at its furthest stage. Click a job for the detail, or use “Open in pipeline” to work on it.</div>
@@ -3041,10 +3067,10 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 
 <!-- BT:panels begin -->
   <!-- CONTACTS -->
-  <div class="panel" id="panel-contacts"><div id="contactsBody"></div></div>
+  <div class="panel pg" id="panel-contacts"><div id="contactsBody"></div></div>
 
   <!-- COMPANIES -->
-  <div class="panel" id="panel-companies"><div id="companiesBody"></div></div>
+  <div class="panel pg" id="panel-companies"><div id="companiesBody"></div></div>
 <!-- BT:panels end -->
   <!-- PRICING -->
   <div class="panel" id="panel-pricing">
@@ -3088,20 +3114,28 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- PURCHASE ORDERS -->
-  <div class="panel" id="panel-purchaseorders">
-    <div class="page-head">
-      <h2>Orders and deliveries</h2>
-      <div class="desc">One order per supplier, raised from a project's delivery drops (and a second order for the same supplier when a job needs one): supplier, items, agreed prices, planned and actual delivery. Draft, Approved, Sent, Delivered, Matched (to the supplier's invoice in Transactions).</div>
+  <div class="panel pg" id="panel-purchaseorders">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Orders and deliveries</h2>
+        <div class="desc">One order per supplier, raised from a project's delivery drops (and a second order for the same supplier when a job needs one): supplier, items, agreed prices, planned and actual delivery. Draft, Approved, Sent, Delivered, Matched (to the supplier's invoice in Transactions).</div>
+      </div>
+      <div class="pg-actions" id="pgAct-po"></div>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="orders"></div>
     <div id="poBody"></div>
   </div>
 
   <!-- SUPPLIER INVOICES -->
-  <div class="panel" id="panel-supplierinvoices">
-    <div class="page-head">
-      <h2>Supplier invoices</h2>
-      <div class="desc">The invoices and receipts entered when prices were confirmed, each linked to its order and project. Quote prices never change: differences sit beside them as variances.</div>
+  <div class="panel pg" id="panel-supplierinvoices">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Supplier invoices</h2>
+        <div class="desc">The invoices and receipts entered when prices were confirmed, each linked to its order and project. Quote prices never change: differences sit beside them as variances.</div>
+      </div>
+      
     </div>
+    <div class="pj-strip pg-strip" data-pgs="supinv"></div>
     <div id="siBody"></div>
   </div>
 
@@ -3115,24 +3149,29 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- INVOICING -->
-  <div class="panel" id="panel-invoicing">
-    <div class="page-head">
-      <h2>Customer invoices</h2>
-      <div class="desc">Every invoice from your projects' payment schedules and approved variations (scope additions). Edit dates and amounts in place; the same data shows in each project's Money section. A variation cannot be invoiced until it is approved.</div>
+  <div class="panel pg" id="panel-invoicing">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Customer invoices</h2>
+        <div class="desc">Every invoice from your projects' payment schedules and approved variations (scope additions). Edit dates and amounts in place; the same data shows in each project's Money section. A variation cannot be invoiced until it is approved.</div>
+      </div>
+      
     </div>
     <div id="invoicingBody"></div>
   </div>
 
   <!-- TRANSACTIONS -->
-  <div class="panel" id="panel-transactions">
-    <div class="page-head">
-      <h2>Transactions</h2>
-      <div class="desc">The actual line — real money in and out, logged and reconciled. Link a transaction to a project or invoice code (e.g. P-103-INV1) so it ties back to the forecast. This is the source of month-end actuals; full forecast-vs-actual variance builds on top of it next.</div>
+  <div class="panel pg" id="panel-transactions">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Transactions</h2>
+        <div class="desc">The actual line — real money in and out, logged and reconciled. Link a transaction to a project or invoice code (e.g. P-103-INV1) so it ties back to the forecast. This is the source of month-end actuals; full forecast-vs-actual variance builds on top of it next.</div>
+      </div>
+      <div class="pg-actions"><button class="btn" data-fin="txn-add">+ Add transaction</button></div>
     </div>
     <div id="txnTotals"></div>
     <div class="kpi-row" id="txnKpis"></div>
     <div id="txnPending"></div>
-    <div class="btn-row"><button class="btn" data-fin="txn-add">+ Add transaction</button></div>
     <div class="table-scroll" id="transactionsTableWrap"></div>
   </div>
 
@@ -3155,10 +3194,13 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <!-- REPORTS -->
-  <div class="panel" id="panel-reports">
-    <div class="page-head">
-      <h2>Reports</h2>
-      <div class="desc">The questions you ask on a schedule. Each report reads the same records as the finance pages, holds no numbers of its own, and every figure opens the line behind it.</div>
+  <div class="panel pg" id="panel-reports">
+    <div class="page-head crm-head">
+      <div>
+        <h2>Reports</h2>
+        <div class="desc">The questions you ask on a schedule. Each report reads the same records as the finance pages, holds no numbers of its own, and every figure opens the line behind it.</div>
+      </div>
+      
     </div>
     <div id="reportsBody"></div>
   </div>
@@ -3379,7 +3421,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
 
   <!-- APPROVALS -->
   <!-- QUOTES -->
-  <div class="panel" id="panel-quotations">
+  <div class="panel pg" id="panel-quotations">
     <div id="quoteListView">
       <div class="page-head crm-head">
         <div>
@@ -3388,6 +3430,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
         </div>
         <button class="btn" data-qba="new">+ New quote</button>
       </div>
+    <div class="pj-strip pg-strip" data-pgs="quotes"></div>
       <div class="view-toggle" id="quoteTabs" role="group" aria-label="Quotes view" style="margin-bottom:12px;"></div>
       <div id="quoteListTab">
         <div class="crm-filters"><input type="search" id="quoteSearch" class="crm-search" placeholder="Search quotes…" autocomplete="off" aria-label="Search quotes"><span id="quoteFilters" class="crm-filters-dyn"></span><span class="sup-count" id="quoteCount"></span></div>
@@ -3400,7 +3443,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
   </div>
 
   <!-- SUPPLIERS -->
-  <div class="panel" id="panel-suppliers">
+  <div class="panel pg" id="panel-suppliers">
     <div class="page-head crm-head">
       <div>
         <h2>Suppliers</h2>
@@ -3408,6 +3451,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
       </div>
       <button class="btn" data-sp="new">+ New supplier</button>
     </div>
+    <div class="pj-strip pg-strip" data-pgs="suppliers"></div>
     <div class="crm-filters"><input type="search" id="supSearch" class="crm-search" placeholder="Search suppliers…" autocomplete="off" aria-label="Search suppliers"><span id="supFilters" class="crm-filters-dyn"></span><span class="sup-count" id="supCount"></span></div>
     <div class="table-scroll" id="suppliersTableWrap"></div>
     <div class="pw" id="supplierRecord" hidden></div>
@@ -4123,6 +4167,7 @@ async function loadState(){
 
 let saveTimer = null;
 function saveState(){
+  try{ pgStripsRender(); }catch(e){}
   try{ finEnsureReceipts(); }catch(e){}
   try{ clsSyncTask(); }catch(e){}   // Stage 5: the one rolling task for costs with no class
   if(typeof cxDirty === 'function') cxDirty();
@@ -11571,10 +11616,11 @@ function renderPOs(){
   const el = document.getElementById('poBody'); if(!el) return;
   (state.purchaseOrders || []).forEach(po => { if(po.status === 'Sent' && poDelivered(po)){ po.status = 'Delivered'; po.deliveredAt = po.deliveredAt || fmt(new Date()); } });
   const po = poUi.open ? poFind(poUi.open) : null; if(poUi.open && !po) poUi.open = 0;
+  { const sl = document.getElementById('pgAct-po'); if(sl) sl.innerHTML = po ? '' : '<button type="button" class="btn" data-po2="open">+ New order</button>'; }   // Stage 7: the primary action sits in the page head like every other area
   if(po) { el.innerHTML = poDetailHtml(po); return; }
   const list = (state.purchaseOrders || []).slice().sort((a, b) => b.no - a.no), me = whoAmI().name;
   el.innerHTML = varHubHtml() + `<div class="po-note">${state.settings.poApprovalOn ? `Approval is <b>on</b>: POs of <b>${qm(state.settings.poApprovalThreshold)}</b> or more are flagged and cannot be sent until approved${poViaApprovals() ? ' (through the Approvals process)' : ''}.` : 'PO approval is off (Settings &gt; Quotes &gt; Purchase orders).'} Create a PO from a delivery drop in a project's Materials and deliveries section.</div>
-    <div class="po-tools"><button type="button" class="btn qb-sm" data-po2="open">+ New order</button><span class="qb-dim">Create the orders for a project's suppliers, or add a second order for the same supplier.</span></div>
+    <div class="po-tools"><span class="qb-dim">Create the orders for a project's suppliers, or add a second order for the same supplier.</span></div>
     <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>PO</th><th>Project</th><th>Supplier</th><th>Delivery</th><th>Value</th><th>Status</th><th>Approval</th><th></th></tr></thead><tbody>${list.map(x => { const need = poNeedsApproval(x), act = poActualDelivery(x), aq = poQuoteOf(x);
       return `<tr class="${need && !poApproved(x) ? 'po-needs' : ''}"><td><b>${escHtml(x.ref)}</b>${aq ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(qRef(aq))}</div>` : ''}</td><td>${finSrcLink({ t: 'project', id: x.pid, sec: 'materials' }, recordCode(x.pid, 'project'))}</td><td>${escHtml(x.supplierName)}</td><td>${x.deliveryDate ? pwD(x.deliveryDate) : '—'}${act ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">delivered ${escHtml(pwD(act))}</div>` : ''}</td><td class="qb-calc">${qm(poTotals(x).payable)}</td><td>${poPill(x)}${poProject(x) ? dcPtcMark(poProject(x), x.did) : ''}</td>
       <td>${need ? (poApproved(x) ? `<span class="pw-ok">✓ ${escHtml(x.approval.by)}</span>` : '<span class="po-flag">Requires approval</span>') : '<span class="qb-dim">not needed</span>'}</td><td><button type="button" class="btn secondary qb-sm" data-po="open" data-id="${x.id}">Open</button></td></tr>`; }).join('') || '<tr><td colspan="8"><div class="sup-empty">No purchase orders yet.</div></td></tr>'}</tbody></table></div></div>`;
@@ -14584,6 +14630,7 @@ function render(){
   renderAssets();
   try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); renderAgeing(); renderPnl(); renderBalance(); renderReports(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
+  try{ pgStripsRender(); }catch(e){}
   renderSettings();
   renderBranding();
   settingsMenuSync();
@@ -15338,6 +15385,7 @@ function activateTab(name){
   updateScrollCues();
   try{ bttTouch(); }catch(e){}   // tables on the page just shown are measured
   try{ menuSync(); }catch(e){}   // the menus (folding group, rail, bottom bar) follow the current page
+  try{ pgStripsRender(); }catch(e){}   // Stage 7: the headline strips count what is listed now
 }
 document.querySelector('.skip-link').addEventListener('click', (e) => {
   e.preventDefault();
@@ -16527,7 +16575,8 @@ function cxContactsListHtml(){
   const needMig = cxUnmigratedCount() > 0;   // shows again whenever records exist that have a customer name but no contact
   const sel = (id, opts, v, ph) => `<select id="${id}" data-cxq="${id}" aria-label="${escAttr(ph)}"><option value="">${escHtml(ph)}</option>${opts.map(([k, n]) => `<option value="${k}"${v === k ? ' selected' : ''}>${escHtml(n)}</option>`).join('')}</select>`;
   return `<div class="page-head crm-head"><div><h2>Contacts</h2><div class="desc">Everyone you quote, build for or take referrals from: leads, customers and past customers. Every lead, sale, project, quote and invoice links to its contact, so you can see the whole history in one place. Suppliers stay in their own area.</div></div>
-      <div class="btn-row" style="margin:0"><button type="button" class="btn secondary" data-cx="dups">Review duplicates${dups ? ` <span class="tab-count">${dups}</span>` : ''}</button><button type="button" class="btn" data-cx="new-contact">+ New contact</button></div></div>
+      <div class="pg-actions"><button type="button" class="btn secondary" data-cx="dups">Review duplicates${dups ? ` <span class="tab-count">${dups}</span>` : ''}</button><button type="button" class="btn" data-cx="new-contact">+ New contact</button></div></div>
+    <div class="pj-strip pg-strip" data-pgs="contacts"></div>
     ${needMig ? `<div class="card cx-mig"><b>${m.migratedAt ? 'Some records are not linked to a contact yet' : 'Build contacts from your existing records'}</b><p class="q-help" style="margin:4px 0 8px;">${cxUnmigratedCount()} lead, sale, project and quote records have a customer name but no contact yet. This creates a contact (and a company where there is one) for each, links it, and flags likely duplicates for you to review. <b>Nothing is merged automatically</b> and nothing existing is changed or removed.</p><button type="button" class="btn" data-cx="migrate">Build contacts now</button></div>` : ''}
     ${m.report ? (m.reportHidden ? `<div class="cx-showrep"><button type="button" class="link-btn" data-cx="show-report">Show the summary of the last build (${escHtml(dShow(m.migratedAt))})</button></div>` : cxReportHtml(m.report)) : ''}
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quick"><input data-cxqa="first" placeholder="First name" aria-label="First name" autocomplete="off"><input data-cxqa="last" placeholder="Last name" aria-label="Last name" autocomplete="off"><input data-cxqa="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"><input data-cxqa="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
@@ -16629,7 +16678,8 @@ function cxFilteredCompanies(){
 function cxCompaniesListHtml(){
   const list = cxFilteredCompanies();
   const rows = list.map(x => `<tr class="cx-row"><td><button type="button" class="sp-link cx-name" data-nav="company:${escAttr(x.co.id)}">${escHtml(cxCompanyName(x.co))}</button></td><td>${escHtml(x.co.type || '')}</td><td class="cx-hide-s">${lcPillHtml(lcOf('company', x.co))}</td><td class="cx-hide-s">${escHtml(x.co.postcode)}</td><td>${x.people.length}</td><td class="cx-hide-m">${x.deals.filter(d => d.live).length}/${x.deals.length}</td><td class="qb-calc cx-hide-s">${x.won ? qm(x.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
-  return `<div class="page-head crm-head"><div><h2>Companies</h2><div class="desc">Businesses and organisations your customers belong to. A company can have several contacts, and its deals, quotes and invoices roll up here.</div></div><button type="button" class="btn" data-cx="new-company">+ New company</button></div>
+  return `<div class="page-head crm-head"><div><h2>Companies</h2><div class="desc">Businesses and organisations your customers belong to. A company can have several contacts, and its deals, quotes and invoices roll up here.</div></div><div class="pg-actions"><button type="button" class="btn" data-cx="new-company">+ New company</button></div></div>
+    <div class="pj-strip pg-strip" data-pgs="companies"></div>
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quickco"><input data-cxqa="name" placeholder="Company name" aria-label="Company name" autocomplete="off"><select data-cxqa="type" aria-label="Type">${CX_CO_TYPES.map(t => `<option>${t}</option>`).join('')}</select><input data-cxqa="postcode" placeholder="Postcode" aria-label="Postcode" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
     <div class="crm-filters cx-filters"><input type="search" class="crm-search" data-cxq="coq" value="${escAttr(cxUi.coq)}" placeholder="Search companies…" aria-label="Search companies" autocomplete="off">
       <select data-cxq="cotype" aria-label="Type"><option value="">Any type</option>${CX_CO_TYPES.map(t => `<option${cxUi.cotype === t ? ' selected' : ''}>${t}</option>`).join('')}</select>
@@ -16669,7 +16719,7 @@ function cxRender(){
     if(!typing || !kb.querySelector('#cxCoRes')) kb.innerHTML = cxCompaniesListHtml();
     else { const tmp = document.createElement('div'); tmp.innerHTML = cxCompaniesListHtml(); document.getElementById('cxCoRes').innerHTML = tmp.querySelector('#cxCoRes').innerHTML; }
   }
-  try{ rpTabsFitAll(); }catch(e){}
+  try{ rpTabsFitAll(); pgStripsRender(); }catch(e){}
 }
 /* BT:js-crm2 end */
 /* BT:js-crm3 begin */
@@ -17972,6 +18022,25 @@ function rpBarInner(p){
 }
 
 /* ---- centre column ---- */
+/* ---- Stage 7: the page template. Every list and board area has the same frame: a head (title, one line of help, the single primary action on the right), a headline strip,
+   filters, the list or board, and the side panel where there is one. The strips below only count records the page already lists (nothing is calculated, nothing is stored). ---- */
+const pgTile = (k, v, sub) => `<div class="pj-tile"><span class="k">${escHtml(k)}</span><span class="v">${v}</span>${sub ? `<span class="s">${sub}</span>` : ''}</div>`;
+const PG_STRIPS = {
+  contacts: () => pgTile('Contacts', state.contacts.length) + pgTile('Companies', state.companies.length) + pgTile('Possible duplicates', cxDupCount(), 'to review'),
+  companies: () => pgTile('Companies', state.companies.length) + pgTile('Contacts', state.contacts.length) + pgTile('Possible duplicates', cxDupCount(), 'contacts to review'),
+  leads: () => { const l = state.leads.filter(x => !x.lost).length; return pgTile('Leads', l, 'in the pipeline') + pgTile('Closed lost', state.leads.length - l, 'archived below'); },
+  sales: () => { const l = state.pipeline.filter(x => !x.lost).length; return pgTile('Sales deals', l, 'in the pipeline') + pgTile('Closed lost', state.pipeline.length - l, 'archived below'); },
+  quotes: () => { const n = st => state.quotes.filter(q => q.status === st).length; return pgTile('Draft', n('Draft')) + pgTile('Sent', n('Sent')) + pgTile('Accepted', n('Accepted')) + pgTile('All quotes', state.quotes.length); },
+  suppliers: () => { const a = state.suppliers.filter(x => x.status !== 'Inactive').length; return pgTile('Active suppliers', a) + pgTile('Inactive', state.suppliers.length - a, 'kept for their history'); },
+  orders: () => { if(poUi.open) return ''; const L = state.purchaseOrders || [], n = st => L.filter(x => x.status === st).length; return pgTile('Orders', L.length) + pgTile('Draft or approved', n('Draft') + n('Approved'), 'not sent yet') + pgTile('Sent', n('Sent'), 'awaiting delivery') + pgTile('Delivered', n('Delivered') + n('Matched')); },
+  tasks: () => { const t = fmt(new Date()), c = {}; crmFiltered().forEach(x => { const k = taskBucket(x, t); c[k] = (c[k] || 0) + 1; }); return pgTile('Overdue', c.overdue || 0) + pgTile('Due today', c.today || 0) + pgTile('Upcoming', c.upcoming || 0) + pgTile('No date', c.nodate || 0); },
+  projects: () => { if(pwUi.id) return ''; const a = liveProjects().length; return pgTile('Active projects', a) + pgTile('Completed', state.projects.length - a); },
+  supinv: () => { const all = siRows(); return pgTile('Documents', all.length, 'invoices and receipts') + pgTile('Total', qm(all.reduce((a, x) => a + (Number(x.total) || 0), 0)), 'as entered'); }
+};
+function pgStripsRender(){
+  if(!state) return;
+  document.querySelectorAll('[data-pgs]').forEach(el => { let h = ''; try{ h = PG_STRIPS[el.dataset.pgs] ? PG_STRIPS[el.dataset.pgs]() : ''; }catch(e){ h = ''; } if(el.dataset.h !== h){ el.innerHTML = h; el.dataset.h = h; } });
+}
 /* ---- Stage 7: one tab bar for the project, customer, supplier, contact and company pages.
    As many tabs as fit on one line, the rest in a "More" menu (keyboard: Enter, Space or Down opens it; Up, Down, Home, End move; Escape closes; Tab leaves).
    The active tab is always one of the visible ones. Nothing is stored; the tabs and what they show are unchanged. ---- */
