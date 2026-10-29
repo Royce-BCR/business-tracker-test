@@ -2545,6 +2545,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .promote-btn.blocked { opacity: .55; cursor: pointer; filter: grayscale(.4); }
   @media (max-width: 640px) { .qs-head { display: none; } .qs-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .qs-row select { grid-column: 2 / 3; } .lq-row { grid-template-columns: 1fr; } }
   @media (max-width: 640px) { .sl-row { grid-template-columns: 58px minmax(0, 1fr) 34px; } .sl-row .sl-nf { grid-column: 2 / 3; } .sl-row > span:empty { display: none; } #panel-settings .set-content .sl-row input[type=text] { flex: none; width: 100%; } }
+  .attn { cursor: help; }
 
 /* BT:css-selling end */
 </style>
@@ -2792,6 +2793,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="table-scroll" id="pipelineTableWrap"></div>
     <div class="view-pane pane-board" id="pipelineBoardWrap"></div>
     <div class="view-pane pane-gantt" id="pipelineGanttWrap"></div>
+    <div id="salesLostWrap"></div>
   </div>
 
   <!-- PROJECT PIPELINE -->
@@ -2806,6 +2808,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="table-scroll" id="projectsTableWrap"></div>
     <div class="view-pane pane-board" id="projectsBoardWrap"></div>
     <div class="view-pane pane-gantt" id="projectsGanttWrap"></div>
+    <div id="projectLostWrap"></div>
     <div class="pw" id="projectWorkspace" hidden></div>
   </div>
 
@@ -4087,6 +4090,7 @@ function projectRollup(p){
   return { start, end, totalCost, materialsCost, durationDays };
 }
 function effectiveProb(r){
+  if(r.lost) return 0;   // closed lost: counts for nothing in any forecast
   if(r.probOverride !== undefined && r.probOverride !== null && r.probOverride !== '') return Number(r.probOverride);
   const st = stageById('sales', r.stageId);
   return st ? clampPct(st.pct)/100 : 0;
@@ -4348,7 +4352,7 @@ function dashAttentionHtml(today, T){
   groups.push({ title: `Leads with no contact in ${dashPlural(N, 'day')}`, go: ['leads'], items: dashStaleLeads(today).map(x => ({
     attr: `data-dash="open-lead" data-id="${x.l.id}"`, title: boardTitle('lead', x.l),
     meta: `${x.fromCreated ? 'created' : 'last contact'} ${dashPlural(x.age, 'day')} ago` })) });
-  groups.push({ title: 'Sales deals with no open task', go: ['salespipeline'], items: state.pipeline.filter(r => !dashHasOpenTask(r)).map(r => ({
+  groups.push({ title: 'Sales deals with no open task', go: ['salespipeline'], items: state.pipeline.filter(r => !r.lost && !dashHasOpenTask(r)).map(r => ({
     attr: `data-dash="open-sales" data-id="${r.id}"`, title: boardTitle('sales', r), meta: `${stageName('sales', r.stageId)} · ${money(r.quoteValue)}` })) });
   groups.push({ title: 'Projects with something overdue', go: ['projectpipeline'], items: state.projects.map(p => ({ p, o: projEvents(p).filter(e => e.overdue).sort((a, b) => a.date.localeCompare(b.date)) })).filter(x => x.o.length).map(x => ({
     attr: `data-dash="open-proj" data-id="${x.p.id}"`, title: boardTitle('project', x.p), meta: `${x.o[0].title} (${PW_KIND[x.o[0].kind].toLowerCase()}) was due ${fmtDisplay(toDate(x.o[0].date))}${x.o.length > 1 ? ` · +${x.o.length - 1} more` : ''}` })) });
@@ -4368,7 +4372,7 @@ function dashCashHtml(){
   return head + `<div class="db-chart">${dashCashSVG(cf.filter(c => !c.preStart), W)}</div>`;
 }
 function dashPipeRows(mode){
-  const sales = state.pipeline, sum = (recs, f) => recs.reduce((s, r) => s + f(r), 0);
+  const sales = state.pipeline.filter(r => !r.lost), sum = (recs, f) => recs.reduce((s, r) => s + f(r), 0);
   const mk = (label, recs, extra) => Object.assign({ label, count: recs.length, val: sum(recs, r => Number(r.quoteValue) || 0), w: sum(recs, r => (Number(r.quoteValue) || 0) * effectiveProb(r)) }, extra || {});
   const out = [];
   if(mode === 'tier'){
@@ -4381,7 +4385,7 @@ function dashPipeHtml(){
   const mode = dashUi.pipeMode, W = dashWidth('dbPipe', 520);
   const toggle = `<div class="view-toggle" role="group" aria-label="Group the pipeline by"><button type="button" data-dash="pipemode" data-v="stage" aria-pressed="${mode === 'stage'}" class="${mode === 'stage' ? 'active' : ''}">By stage</button><button type="button" data-dash="pipemode" data-v="tier" aria-pressed="${mode === 'tier'}" class="${mode === 'tier' ? 'active' : ''}">By tier</button></div>`;
   const head = dashCardHead('Sales pipeline by ' + mode, 'Total quote value; hover or tap a bar for the weighted figure.', toggle);
-  if(!state.pipeline.length) return head + dashEmpty('No deals in the sales pipeline yet.', ['salespipeline', 'Open Sales Pipeline']);
+  if(!state.pipeline.filter(r => !r.lost).length) return head + dashEmpty('No deals in the sales pipeline yet.', ['salespipeline', 'Open Sales Pipeline']);
   const data = dashPipeRows(mode);
   const rows = data.map(d => ({ label: `${d.label} (${d.count})`, value: d.val, valueText: money(d.val), image: d.image, hatch: d.hatch,
     tip: `${d.label}: ${dashPlural(d.count, 'deal')}, ${money(d.val)} total, ${money(d.w)} weighted` }));
@@ -4448,7 +4452,7 @@ function renderDashboard(){
   document.getElementById('dbDate').textContent = dateLabel(now);
   document.getElementById('dbPeriod').innerHTML = DASH_PERIODS.map(([k, l]) => `<button type="button" data-dash="period" data-v="${k}" aria-pressed="${dashUi.period === k}" class="${dashUi.period === k ? 'active' : ''}">${l}</button>`).join('');
 
-  const sales = state.pipeline, T = dashTasks(today), won = dashWon(range, today), lost = dashLostInPeriod(range);
+  const sales = state.pipeline.filter(r => !r.lost), T = dashTasks(today), won = dashWon(range, today), lost = dashLostInPeriod(range);
   const weighted = sales.reduce((s, r) => s + (Number(r.quoteValue) || 0) * effectiveProb(r), 0), total = sales.reduce((s, r) => s + (Number(r.quoteValue) || 0), 0);
   const projValue = liveProjects().reduce((s, p) => s + (Number(p.agreedValue) || 0), 0);
   const totIn = state.transactions.filter(txCounted).reduce((a, t) => a + (Number(t.moneyIn) || 0), 0), totOut = state.transactions.filter(txCounted).reduce((a, t) => a + (Number(t.moneyOut) || 0), 0);
@@ -4628,6 +4632,7 @@ function renderPipelineTable(){
   const kinds = Object.keys(STAGE_KINDS);
   let html = rtTable('pipelineTableWrap', ['','Code','Project / Client','Type','Tier','Sales Stage','Prob.','Quote (£)','Start','Complete','Cost (£)','']);
   state.pipeline.forEach((r, i) => {
+    if(r.lost) return;   // closed lost: in the Closed lost bar below
     const d = derivePipelineRow(r);
     const roll = d.rollup;
     const flag = r.type === 'real' && (!r.quoteValue || r.tier === 'Needs re-scoping');
@@ -4641,7 +4646,7 @@ function renderPipelineTable(){
         <option value="real"${r.type==='real'?' selected':''}>Real</option>
         <option value="example"${r.type==='example'?' selected':''}>Example</option></select></td>
       <td><select data-tab="pipeline" data-idx="${i}" data-field="tier">${tiers.map(t=>`<option${r.tier===t?' selected':''}>${t}</option>`).join('')}</select></td>
-      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="pipeline" data-idx="${i}" data-field="stageId" style="${chipStyle(SALES_CHIP[r.stageId] || 'neutral')}">${salesStages.map(s=>`<option value="${escHtml(s.id)}"${r.stageId===s.id?' selected':''}>${chipSym(SALES_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(r)}${sfNotFitChip(r)}</div></td>
+      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="pipeline" data-idx="${i}" data-field="stageId" style="${chipStyle(SALES_CHIP[r.stageId] || 'neutral')}">${salesStages.map(s=>`<option value="${escHtml(s.id)}"${r.stageId===s.id?' selected':''}>${chipSym(SALES_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(r)}${sfNotFitChip(r)}${attnChipHtml('sales', r)}</div></td>
       <td class="computed" title="From sales stage">${Math.round(effectiveProb(r)*100)}%${(r.probOverride!==undefined&&r.probOverride!==null&&r.probOverride!=='')?'*':''}</td>
       <td><input type="number" step="1" data-tab="pipeline" data-idx="${i}" data-field="quoteValue" value="${r.quoteValue}"></td>
       <td class="computed">${fmtDisplay(roll.start)}</td>
@@ -4697,15 +4702,16 @@ function stageColor(pl, id){
 /* Won projects stay in the active Project Pipeline until someone presses Mark completed; they then live in the Completed projects view (full record kept) and can be reopened */
 const projUi = { show: 'active', q: '', year: '' };
 function projArchived(p){ return !!(p.completed && p.completed.date); }
-function liveProjects(){ return state.projects.filter(p => !projArchived(p)); }
+function liveProjects(){ return state.projects.filter(p => !projArchived(p) && !p.lost); }
 function projShown(p){
+  if(p.lost) return false;   // closed lost: in the Closed lost bar under the board
   if(projUi.show !== 'completed') return !projArchived(p);
   if(!projArchived(p)) return false;
   if(projUi.year && String(p.completed.date).slice(0, 4) !== projUi.year) return false;
   const q = projUi.q.trim().toLowerCase(); if(q && ![p.name, p.contact, p.company, p.address, recordCode(p.id, 'project')].join(' ').toLowerCase().includes(q)) return false;
   return true;
 }
-function viewRecords(pl){ return pl === 'lead' ? activeLeads() : (pl === 'sales' ? state.pipeline : state.projects.filter(projShown)); }
+function viewRecords(pl){ return pl === 'lead' ? activeLeads() : (pl === 'sales' ? state.pipeline.filter(r => !r.lost) : state.projects.filter(projShown)); }
 function findRec(pl, id){ return (pl === 'project' ? state.projects : viewRecords(pl)).find(r => r.id === id) || null; }
 function hasProbOverride(r){ return r.probOverride !== undefined && r.probOverride !== null && r.probOverride !== ''; }
 function boardTitle(pl, r){
@@ -4753,14 +4759,14 @@ function tileHtml(pl, r, color){
     if(Number(r.estValue) > 0) rows += `<div class="bd-t-row"><span class="k">Ballpark</span><span>${money(r.estValue)}</span></div>`;
     if(sfDays(r)) rows += `<div class="bd-t-row"><span class="k">Duration</span><span>${sfDays(r)} days</span></div>`;
     if(sfIso(r.prefStart) || sfIso(r.deadline)) rows += `<div class="bd-t-row"><span class="k">${sfIso(r.deadline) ? 'Deadline' : 'Start'}</span><span>${dShow(sfIso(r.deadline) || r.prefStart)}</span></div>`;
-    flag = qualBadgeHtml(r) + sfNotFitChip(r);
+    flag = qualBadgeHtml(r) + sfNotFitChip(r) + attnChipHtml('lead', r);
     const last = leadLastContact(r);
     rows += `<div class="bd-t-row"><span class="k">Last contacted</span><span>${last ? fmtDisplay(toDate(last)) : '—'}</span></div>`;
   } else if(pl === 'sales'){
     const roll = projectRollup(r);
     if(hasProbOverride(r)) flag = `<span class="bd-t-flag" title="This deal has its own percentage — moving it between stages does not change it">manual %</span>`;
     rows += `<div class="bd-t-row"><span class="k">Quote · ${Math.round(effectiveProb(r)*100)}%</span><span>${money(r.quoteValue)}</span></div>`;
-    flag += qualBadgeHtml(r) + sfNotFitChip(r);
+    flag += qualBadgeHtml(r) + sfNotFitChip(r) + attnChipHtml('sales', r);
     if(roll.start) rows += `<div class="bd-t-row"><span class="k">Starts</span><span>${fmtDisplay(roll.start)}</span></div>`;
   } else {
     sub = '';
@@ -5509,7 +5515,7 @@ function leadDetailHtml(l, i){
       <span class="lc-code">${recordCode(l.id, 'lead')}</span>${tier ? tierBadgeHtml(tier) : ''}
       <span class="lc-name${l.projectName ? '' : ' empty'}">${escHtml(l.projectName || 'No project name yet')}</span>
       <span class="lc-type">${isCommercial ? 'Commercial' : 'Residential'}</span>
-      <span class="lc-pill" style="${leadStatusStyle(l.stageId)}">${escHtml(leadStageName(l))}</span>${qualBadgeHtml(l)}${sfNotFitChip(l)}
+      <span class="lc-pill" style="${leadStatusStyle(l.stageId)}">${escHtml(leadStageName(l))}</span>${qualBadgeHtml(l)}${sfNotFitChip(l)}${attnChipHtml('lead', l)}
     </div>
     <div class="lc-sum">
       ${block('contact', 'Contact', `${val(l.contact || (isCommercial ? l.company : ''))}${val(l.phone)}${val(l.email)}${extra ? `<span class="v dim">+${extra} additional</span>` : ''}`)}
@@ -5552,7 +5558,7 @@ function renderLeads(){
         : `<input class="computed" disabled value="—" title="Residential — no company">`}</td>
       <td><input class="lead-pc${l.postcodeManual?' manual':''}" data-tab="leads" data-idx="${i}" data-field="postcode" value="${escAttr(l.postcode||'')}" title="${l.postcodeManual?'Set manually — clear this cell to go back to automatic':'Filled automatically from the address — type to override'}"></td>
       <td class="computed" title="Pulled from the latest communication entry">${last?fmtDisplay(toDate(last)):'—'}</td>
-      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(l)}${sfNotFitChip(l)}</div></td>
+      <td><div class="lead-status-cell"><select class="lead-pill" data-tab="leads" data-idx="${i}" data-field="stageId" style="${leadStatusStyle(l.stageId)}">${leadStages.map(s=>`<option value="${escHtml(s.id)}"${l.stageId===s.id?' selected':''}>${chipSym(LEAD_CHIP[s.id] || 'neutral')} ${escHtml(s.name)}</option>`).join('')}</select>${qualBadgeHtml(l)}${sfNotFitChip(l)}${attnChipHtml('lead', l)}</div></td>
       <td><button class="icon-btn" data-action="delete-lead" data-idx="${i}" title="Delete lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
     </tr>`;
     if(isOpen){ html += `<tr class="detail-row${active}"><td colspan="10">${leadDetailHtml(l, i)}</td></tr>`; }
@@ -5561,7 +5567,6 @@ function renderLeads(){
   const wrap = document.getElementById(LEADS_TABLE_ID);
   wrap.innerHTML = html;
   rtApply(wrap);
-  renderLostLeads();
 }
 
 /* ---------- Leads editor panel ----------
@@ -5785,47 +5790,8 @@ document.addEventListener('input', (e) => {
 
 /* ---------- lost leads ---------- */
 function lostReasonName(id){ const r = (state.lostReasons||[]).find(x => x.id === id); return r ? r.name : '—'; }
-function renderLostLeads(){
-  const wrap = document.getElementById('lostLeadsWrap'); if(!wrap) return;
-  const lost = state.leads.filter(l => l.lost);
-  if(!lost.length){ wrap.innerHTML = ''; return; }
-  const open = wrap.dataset.open === '1';
-  const rows = lost.map(l => `<tr>
-      <td class="code-cell" style="width:80px">${recordCode(l.id,'lead')}</td>
-      <td>${escHtml(l.projectName||'—')}</td>
-      <td>${escHtml(l.contact || l.company || '—')}</td>
-      <td title="${escHtml(l.lostNote||'')}">${escHtml(lostReasonName(l.lostReason))}${l.lostNote ? ' <span title="'+escHtml(l.lostNote)+'">·&nbsp;note</span>' : ''}</td>
-      <td style="width:120px">${l.lostDate ? fmtDisplay(toDate(l.lostDate)) : '—'}</td>
-      <td style="width:90px;text-align:right;"><button class="btn secondary" data-action="restore-lead" data-id="${l.id}">Restore</button></td>
-    </tr>`).join('');
-  wrap.innerHTML = `<div class="archived-section lost-section">
-      <div class="archived-toggle${open?' open':''}" data-action="toggle-lost">
-        <span>Lost leads (${lost.length})</span>${CHEV_SVG}
-      </div>
-      <div class="archived-body table-scroll" ${open?'':'hidden'}>
-        <table><thead><tr><th>Code</th><th>Project name</th><th>Contact</th><th>Reason</th><th>Date lost</th><th></th></tr></thead><tbody>${rows}</tbody></table>
-      </div>
-    </div>`;
-}
-async function markLeadLost(id){
-  const l = state.leads.find(x => x.id === id && !x.lost); if(!l) return;
-  if(!state.lostReasons.length){ showToast('Add at least one lost reason in Settings first.', null, 8000); return; }
-  const extra = `<select id="lostReasonSel" required><option value="">Select a reason…</option>${state.lostReasons.map(r=>`<option value="${escHtml(r.id)}">${escHtml(r.name)}</option>`).join('')}</select>
-    <textarea id="lostNoteTxt" placeholder="Optional note"></textarea><div class="modal-err" id="modalExtraErr"></div>`;
-  const ok = await showConfirm('Mark this lead as lost?', `${recordCode(l.id,'lead')} · ${leadPrimaryName(l)} will leave the active Lead Pipeline view and all active counts. You can restore it from the Lost leads bar at the bottom of this tab.`, extra);
-  if(!ok || !_confirmExtraValue) return;
-  l.lostStageId = l.stageId;
-  l.lostReason = _confirmExtraValue; l.lostNote = (_confirmExtraNote || '').trim(); l.lostDate = fmt(new Date());
-  l.lost = true;
-  expandedLeads.delete(l.id);
-  render(); saveState();
-}
-function restoreLead(id){
-  const l = state.leads.find(x => x.id === id && x.lost); if(!l) return;
-  l.stageId = stageById('lead', l.lostStageId) ? l.lostStageId : (stageById('lead', l.stageId) ? l.stageId : firstStageId('lead'));
-  l.lost = false; l.lostReason = ''; l.lostNote = ''; l.lostDate = ''; l.lostStageId = '';
-  render(); saveState();
-}
+async function markLeadLost(id){ selCloseLost('lead', id); }   // Stage 3: one flow for all three boards (default reason Stalled, logged)
+function restoreLead(id){ selReopen('lead', id); }
 /* ---------- resizable columns ----------
    One mechanism for Leads, Sales Pipeline, Project Pipeline and their expandable detail tables (sub-stages, payment lines).
    Each table is a fixed-layout <table data-rt="key"> driven by a <colgroup>; widths are remembered per table key in
@@ -11422,7 +11388,7 @@ function poExtraHtml(po){
 }
 /* the "New order" dialog: orders for the suppliers already on the quote, or a second order for a supplier */
 const po2Ui = { pid: 0, sup: '', date: '', lines: new Set(), err: '' };
-function po2Projects(){ return state.projects.filter(p => !projArchived(p) && projAcceptedQuote(p)); }
+function po2Projects(){ return state.projects.filter(p => !projArchived(p) && !p.lost && projAcceptedQuote(p)); }
 function po2LineChoices(p){
   const wq = projWorkQuote(p); if(!wq) return []; const c = qCalc(wq);
   return wq.lines.filter(l => c.lines[l.id] && !c.lines[l.id].excluded && !(l.kind === 'labour')).map(l => { const dr = l.deliveryDropId ? wq.drops.find(d => d.id === l.deliveryDropId) : null, locked = dr ? !!poForDrop(p.id, dr.id) : false;
@@ -11926,7 +11892,7 @@ function returnToLead(id){
 function returnToSales(id){
   const idx = state.projects.findIndex(p => p.id === id); if(idx < 0) return;
   const p = state.projects[idx];
-  const conf = stageByName(state.pipelineStages.sales, 'Confirmed');
+  const conf = salesWonStage();
   const base = p.salesSnapshot ? jclone(p.salesSnapshot) : { type: p.type || 'real', tier: 'Needs re-scoping', stageId: conf ? conf.id : firstStageId('sales'), probability: 1, quoteValue: 0 };
   const rec = Object.assign(base, { id: p.id, name: p.name, type: p.type || base.type, quoteValue: Number(p.agreedValue) || base.quoteValue || 0, notes: p.notes || '', tierId: p.tierId || base.tierId || '',
     stages: p.stages || [], comms: p.comms || [], contractSigned: (p.milestones || {}).contractSigned || base.contractSigned || '' });
@@ -11964,11 +11930,13 @@ function moveStripHtml(pl, r, i){
     const opts = state.pipelineStages.sales.map(st => `<option value="${escHtml(st.id)}"${r.stageId === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
     return `<div class="move-strip"><label>Sales stage <select data-tab="pipeline" data-idx="${i}" data-field="stageId">${opts}</select></label>
       ${r.contractSigned ? `<button class="promote-btn" data-action="promote-project" data-id="${r.id}">Promote to Project Pipeline →</button>` : `<span class="gate-msg">Set the contract signed date to promote.</span>`}
-      <button class="btn secondary" data-action="return-record" data-pl="sales" data-id="${r.id}">← Return to Lead Pipeline</button></div>`;
+      <button class="btn secondary" data-action="return-record" data-pl="sales" data-id="${r.id}">← Return to Lead Pipeline</button>
+      <button class="btn secondary" data-sel="close-lost" data-pl="sales" data-id="${r.id}">Close as lost</button></div>`;
   }
   const opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${projStageId(r) === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
   return `<div class="move-strip"><label>Project stage <select data-tab="projects" data-idx="${i}" data-field="stageId">${opts}</select></label>
-    <button class="btn secondary" data-action="return-record" data-pl="project" data-id="${r.id}">← Return to Sales Pipeline</button></div>`;
+    <button class="btn secondary" data-action="return-record" data-pl="project" data-id="${r.id}">← Return to Sales Pipeline</button>
+    <button class="btn secondary" data-sel="close-lost" data-pl="project" data-id="${r.id}">Close as lost</button></div>`;
 }
 /* "Original lead info": the lead as it was when promoted (read-only). Older records carry only the copied fields, and say so. */
 function leadInfoHtml(r){
@@ -11989,7 +11957,7 @@ function leadInfoHtml(r){
 }
 /* setting the contract signed date moves the deal to Confirmed at 100% (only when the date is first set; later manual changes are left alone) */
 function applyContractSigned(r){
-  const sales = state.pipelineStages.sales, conf = stageByName(sales, 'Confirmed') || sales.filter(x => clampPct(x.pct) >= 100).pop();
+  const conf = salesWonStage();
   if(!conf) return;
   const moved = r.stageId !== conf.id;
   r.stageId = conf.id;
@@ -13932,7 +13900,7 @@ function pjNextAction(ctx){
 function pjBuildRow(g, shared, today, staleN){
   const recs = g.recs, pl = recs.project ? 'project' : recs.sales ? 'sales' : 'lead', rec = recs[pl], root = rec.id;
   const ctx = { tasks: shared.tasks.get(root) || [], actions: shared.actions.get(root) || [], quotes: shared.quotes.get(root) || [], inv: shared.inv.get(root) || [], pos: shared.pos.get(root) || [], txns: shared.txns.get(root) || [] };
-  const lost = pl === 'lead' && !!rec.lost, completed = cxCompleted(pl, rec), done = lost || completed, p = recs.project || null;
+  const lost = !!rec.lost, completed = cxCompleted(pl, rec), done = lost || completed, p = recs.project || null;
   const na = pjNextAction(ctx), openItems = na.items;
   // value: what applies at this stage, and which number it is
   let value = null, valueLabel = '', qpick = pjPickQuote(ctx.quotes);
@@ -14290,6 +14258,7 @@ function render(){
   cxDirty(); cxSyncAll();   // CRM: deals and draft quotes read their customer details from the contact
   undoBadge(); projSyncValues(); navMetrics();
   renderDashboard();
+  if(typeof renderLostBars === 'function') renderLostBars();
   renderBusinessPlan();
   renderLeads();
   renderSuppliers();
@@ -15984,7 +15953,7 @@ function cxCompleted(pl, rec){   // same rule as the project: sign-off has an ac
   return pl === 'project' ? projIsCompleted(rec) : false;
 }
 function cxDealInfo(pl, rec){
-  const lost = pl === 'lead' && !!rec.lost, completed = cxCompleted(pl, rec);
+  const lost = !!rec.lost, completed = cxCompleted(pl, rec);
   return { pl, rec, root: rec.id, code: recordCode(rec.id, pl), name: boardTitle(pl, rec), lost, completed, live: !lost && !completed, status: lost ? 'Lost' : completed ? 'Completed' : 'Live', stage: pl === 'lead' ? stageName('lead', rec.stageId) : pl === 'sales' ? stageName('sales', rec.stageId) : stageName('project', projStageId(rec)) };
 }
 function cxIndex(){
@@ -17673,7 +17642,7 @@ function rpLeftHtml(p){
       <div class="rp-head-top"><button type="button" class="rp-back" data-pw="back">← All projects</button><button type="button" class="rp-legacy" data-rp="legacy" title="The earlier project page, with every section">Open full workspace</button></div>
       <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(p.name))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(p.name)}</h2><div class="rp-sub">${escHtml(sub)}</div></div></div>
       <div class="rp-pills"><span class="rp-pill ${st.k}">${escHtml(st.t)}</span>${proj6Pill(p)}<span class="rp-pill neu" title="Stored stage">${escHtml(stageName_)}</span>${p.tentative ? '<span class="rp-pill warn">Tentative</span>' : ''}</div>
-      <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rp="q-note">Note</button><button type="button" class="btn secondary qb-sm" data-rp="q-task">Task</button><button type="button" class="btn secondary qb-sm" data-rp="q-time">Log time</button><button type="button" class="btn secondary qb-sm" data-rp="q-call">Call</button></div>
+      <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rp="q-note">Note</button><button type="button" class="btn secondary qb-sm" data-rp="q-task">Task</button><button type="button" class="btn secondary qb-sm" data-rp="q-time">Log time</button><button type="button" class="btn secondary qb-sm" data-rp="q-call">Call</button><button type="button" class="btn secondary qb-sm" data-sel="close-lost" data-pl="project" data-id="${p.id}">Close as lost</button></div>
     </div>
     <div class="rp-lbody">${rpSec('about', 'About this project', about)}${rpSec('dates', 'Dates and workload', dates)}${rpSec('money', 'Money', moneySec)}${rpSec('cust', 'Customer and contact', cust)}${rpSec('site', 'Site', site)}</div>
     <div class="rp-bar" id="rpBar" role="region" aria-label="Unsaved changes"${d && Object.keys(d.f).length ? '' : ' hidden'}>${rpBarInner(p)}</div>`;
@@ -18715,6 +18684,130 @@ document.addEventListener('change', (e) => {
   if(d.qs === 'name') q.name = el.value.trim() || q.name; else if(d.qs === 'weight') q.weight = Math.max(1, Math.min(5, Math.round(Number(el.value)) || 2)); else if(d.qs === 'mode') q.mode = ['gate', 'guide'].includes(el.value) ? el.value : 'default'; else return;
   saveState(); render();
 });
+
+/* =====================================================================
+   STEP 3: PIPELINES AND END STAGES
+   Sales stages: the stored stages (and every card's stage id) are never touched. Settings, Selling shows the proposed list next to the stored
+   one with a button that you press yourself: it renames the stages that already exist and adds the two that are missing; no card moves.
+   Closed lost (all three boards): rec.lost, lostReason (a Lost reasons id, default Stalled), lostNote, lostDate, lostStageId. The record stays where
+   it is, keeps its stage, data and history, and leaves the live board for the Closed lost archive bar, from where Reopen puts it back.
+   ===================================================================== */
+const SEL_SALES_PLAN = [   // the proposed sales pipeline: [id, name, win %, existing stored stage it takes over]
+  ['stg_sales_inquiry', 'Site visit', 10], ['stg_sales_tabled', 'Scoping', 25], ['stg_sales_quoted', 'Quoted', 50],
+  ['stg_sales_negotiation', 'Negotiation', 65], ['stg_sales_commitment', 'Commitment', 85], ['stg_sales_confirmed', 'Won', 100]];
+function ensureSellingModel3(o){
+  const rs = Array.isArray(o.lostReasons) ? o.lostReasons : (o.lostReasons = []);
+  if(!rs.some(r => r.id === 'lr_stalled' || String(r.name).trim().toLowerCase() === 'stalled')){ rs.push({ id: 'lr_stalled', name: 'Stalled' }); renumberStages(rs); }
+  if(typeof ensureSellingModel4 === 'function') ensureSellingModel4(o);
+}
+function stalledReasonId(){ const r = state.lostReasons.find(x => x.id === 'lr_stalled') || stageByName(state.lostReasons, 'Stalled'); return r ? r.id : (state.lostReasons[0] || {}).id || ''; }
+function salesWonStage(){ const l = state.pipelineStages.sales; return stageByName(l, 'Won') || stageByName(l, 'Confirmed') || l.filter(x => clampPct(x.pct) >= 100).pop() || null; }
+function salesPlanState(){   // what the button would do, in words, and whether it is already done
+  const l = state.pipelineStages.sales, ren = [], add = [];
+  SEL_SALES_PLAN.forEach(([id, name]) => { const have = l.find(s => s.id === id); if(!have) add.push(name); else if(have.name !== name) ren.push(`${have.name} → ${name}`); });
+  return { ren, add, done: !ren.length && !add.length };
+}
+function salesPlanApply(){
+  const l = state.pipelineStages.sales;
+  SEL_SALES_PLAN.forEach(([id, name, pct]) => { const have = l.find(s => s.id === id); if(have) have.name = name; });
+  const at = id => l.findIndex(s => s.id === id);
+  [['stg_sales_negotiation', 'Negotiation', 65, 'stg_sales_quoted'], ['stg_sales_commitment', 'Commitment', 85, 'stg_sales_negotiation']].forEach(([id, name, pct, after]) => {
+    if(at(id) >= 0) return; const i = at(after); l.splice(i >= 0 ? i + 1 : l.length, 0, { id, name, pct });
+  });
+  renumberStages(l);
+}
+SEL_SET_CARDS.push(['Sales pipeline stages', () => {
+  const p = salesPlanState(), cur = state.pipelineStages.sales.map(s => `${escHtml(s.name)} <span class="rp-dim">${Math.round(clampPct(s.pct))}%</span>`).join(' → ');
+  return `<p class="q-help" style="margin:0 0 8px;">The proposed stages are <b>${SEL_SALES_PLAN.map(x => x[1]).join(', ')}</b>, then <b>Closed lost</b> (which is the archive, not a stage). Your cards keep their stage: they follow a stage's hidden id, so nothing is remapped or moved.</p>
+    <div class="lp-f"><label>Stored today</label><div class="sf-calc">${cur}</div></div>
+    ${p.done ? '<div class="gate-msg ok">✓ The sales stages already match.</div>' : `<div class="lp-f"><label>What the button does</label><div class="sf-calc">${[p.ren.length ? 'Rename: ' + p.ren.map(escHtml).join(', ') : '', p.add.length ? 'Add: ' + p.add.map(escHtml).join(', ') : ''].filter(Boolean).join('<br>')}</div></div>
+    <button type="button" class="btn" data-sel="plan-apply">Set up the proposed sales stages</button>`}
+    <p class="q-help" style="margin:8px 0 0;">You can also rename, reorder and set percentages yourself in Pipelines, above.</p>`;
+}]);
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-sel]'); if(!b || !state) return; const a = b.dataset.sel;
+  if(a === 'plan-apply'){
+    const p = salesPlanState(); if(!await showConfirmLabel('Set up the proposed sales stages?', `${[p.ren.length ? 'Renames: ' + p.ren.join(', ') + '.' : '', p.add.length ? 'Adds: ' + p.add.join(', ') + '.' : ''].filter(Boolean).join(' ')} Every sales card keeps the stage it is in; no card is moved.`, 'Set up')) return;
+    salesPlanApply(); saveState(); render(); showToast('Sales stages set up. No card was moved.'); return;
+  }
+  if(a === 'close-lost'){ selCloseLost(b.dataset.pl, Number(b.dataset.id)); return; }
+  if(a === 'reopen'){ selReopen(b.dataset.pl, Number(b.dataset.id)); return; }
+  if(a === 'toggle-bar'){ const w = b.closest('[data-lostbar]'); if(w){ w.dataset.open = w.dataset.open === '1' ? '0' : '1'; renderLostBars(); } return; }
+});
+
+/* ---------- the log: an entry on the record's timeline (it shows in the Activity feed) that is not a customer contact ---------- */
+function selLog(rec, note, extra){ rec.comms = Array.isArray(rec.comms) ? rec.comms : []; rec.comms.push(Object.assign({ date: fmt(new Date()), note, created: Date.now(), src: 'move', noContact: true }, extra || {})); }
+function selRecs(pl){ return pl === 'lead' ? state.leads : pl === 'sales' ? state.pipeline : state.projects; }
+function selFind(pl, id){ return selRecs(pl).find(r => r.id === id) || null; }
+const SEL_PL_NAME = { lead: 'Lead Pipeline', sales: 'Sales Pipeline', project: 'Project Pipeline' };
+/* ask for a reason (default Stalled) and close the card as lost */
+async function selCloseLost(pl, id){
+  const r = selFind(pl, id); if(!r || r.lost) return;
+  if(!state.lostReasons.length){ showToast('Add at least one lost reason in Settings first.', null, 8000); return; }
+  const dflt = stalledReasonId();
+  const extra = `<select id="lostReasonSel">${state.lostReasons.map(x => `<option value="${escHtml(x.id)}"${x.id === dflt ? ' selected' : ''}>${escHtml(x.name)}</option>`).join('')}</select><textarea id="lostNoteTxt" placeholder="Optional note (if nobody knows why, leave Stalled)"></textarea><div class="modal-err" id="modalExtraErr"></div>`;
+  return selCloseLostDo(pl, r, extra);
+}
+async function selCloseLostDo(pl, r, extra){
+  const code = recordCode(r.id, pl), what = pl === 'lead' ? leadPrimaryName(r) : (r.name || r.projectName || r.contact || '');
+  const hasMoney = pl === 'project' && ((r.paymentLines || []).some(l => l.invoicedDate || l.paidDate));
+  const ok = await (async () => {
+    const btn = document.querySelector('#modalOverlay [data-modal="confirm"]'), old = btn.textContent; btn.textContent = 'Close as lost';
+    const v = await showConfirm(`Close ${code} as lost?`, `${code} · ${what} leaves the live ${SEL_PL_NAME[pl]} and goes to the Closed lost archive under it. Nothing is deleted: the stage, data and history stay, and Reopen puts it back where it was.${hasMoney ? ' It already has invoices or payments; those records are not touched.' : ''}`, extra);
+    btn.textContent = old; return v;
+  })();
+  if(!ok) return;
+  const reason = _confirmExtraValue || stalledReasonId(), note = (_confirmExtraNote || '').trim();
+  r.lostStageId = pl === 'lead' ? r.stageId : (pl === 'project' ? projStageId(r) : r.stageId);
+  r.lostReason = reason; r.lostNote = note; r.lostDate = fmt(new Date()); r.lost = true;
+  selLog(r, `Closed lost: ${lostReasonName(reason)}${note ? ' (' + note + ')' : ''}. Was in ${pl === 'lead' ? stageName('lead', r.lostStageId) : pl === 'sales' ? stageName('sales', r.lostStageId) : stageName('project', r.lostStageId)}.`);
+  if(pl === 'lead') expandedLeads.delete(r.id); else if(pl === 'sales') expandedProjects.delete(r.id);
+  if(typeof closeDetail === 'function') closeDetail(); if(typeof closeLeadPanel === 'function' && lp) closeLeadPanel();
+  if(pl === 'project' && typeof pwUi !== 'undefined' && pwUi.id === r.id){ pwUi.id = 0; }
+  render(); saveState(); showToast(`${code} closed as lost (${lostReasonName(reason)}). Find it in the Closed lost archive; Reopen puts it back.`, null, 9000);
+}
+function selReopen(pl, id){
+  const r = selFind(pl, id); if(!r || !r.lost) return;
+  const was = lostReasonName(r.lostReason), code = recordCode(r.id, pl);
+  if(pl === 'lead'){ r.stageId = stageById('lead', r.lostStageId) ? r.lostStageId : (stageById('lead', r.stageId) ? r.stageId : firstStageId('lead')); }
+  else if(pl === 'sales'){ if(!stageById('sales', r.stageId)) r.stageId = stageById('sales', r.lostStageId) ? r.lostStageId : firstStageId('sales'); }
+  r.lost = false; r.lostReason = ''; r.lostNote = ''; r.lostDate = ''; r.lostStageId = '';
+  selLog(r, `Reopened from Closed lost (the reason was ${was}). Back in ${pl === 'project' ? stageName('project', projStageId(r)) : stageName(pl, r.stageId)}.`, { reopened: true });
+  render(); saveState(); showToast(`${code} reopened: back in the ${SEL_PL_NAME[pl]}, at ${pl === 'project' ? stageName('project', projStageId(r)) : stageName(pl, r.stageId)}.`);
+}
+/* the archive bar under each board */
+const SEL_BAR = { lead: 'lostLeadsWrap', sales: 'salesLostWrap', project: 'projectLostWrap' };
+function renderLostBars(){
+  Object.keys(SEL_BAR).forEach(pl => {
+    const wrap = document.getElementById(SEL_BAR[pl]); if(!wrap) return;
+    const lost = selRecs(pl).filter(r => r.lost);
+    if(!lost.length){ wrap.innerHTML = ''; return; }
+    const open = wrap.dataset.open === '1';
+    const rows = lost.map(r => `<tr><td class="code-cell" style="width:80px">${recordCode(r.id, pl)}</td><td>${escHtml(pl === 'lead' ? (r.projectName || '—') : (r.name || r.projectName || '—'))}</td><td>${escHtml(r.contact || r.company || '—')}</td>
+      <td title="${escAttr(r.lostNote || '')}">${escHtml(lostReasonName(r.lostReason))}${r.lostNote ? ' <span title="' + escAttr(r.lostNote) + '">· note</span>' : ''}</td><td>${r.lostDate ? dShow(r.lostDate) : '—'}</td><td class="rp-dim">${escHtml(stageName(pl, r.lostStageId || r.stageId))}</td>
+      <td style="width:110px;text-align:right;"><button type="button" class="btn secondary" data-sel="reopen" data-pl="${pl}" data-id="${r.id}">Reopen</button></td></tr>`).join('');
+    wrap.dataset.lostbar = pl;
+    wrap.innerHTML = `<div class="archived-section lost-section"><div class="archived-toggle${open ? ' open' : ''}" data-sel="toggle-bar"><span>Closed lost (${lost.length})</span>${CHEV_SVG}</div>
+      <div class="archived-body table-scroll" ${open ? '' : 'hidden'}><table><thead><tr><th>Code</th><th>Name</th><th>Contact</th><th>Reason</th><th>Closed</th><th>Was in</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  });
+}
+
+/* ---------- needs-attention markers on cards ---------- */
+function quotesOfRec(r){ return state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === r.id)); }
+function quoteHasFollowUp(q){ return state.crmTasks.some(t => t.status === 'open' && Number(t.quoteId) === q.id); }
+function attnReasons(pl, r){
+  if(r.lost || pl === 'project') return [];
+  const out = [], today = fmt(new Date());
+  quotesOfRec(r).forEach(q => { if(q.status === 'Sent' && !quoteHasFollowUp(q)) out.push(`Quote ${qRef(q)} was sent with no follow-up planned`); });
+  if(pl === 'lead'){
+    const i = state.pipelineStages.lead.findIndex(s => s.id === r.stageId), blocked = leadQualMissing(r);
+    if(i >= 1 && blocked.length) out.push(`Qualification gate not answered: ${blocked.join(', ')}`);
+  }
+  const ref = leadLastContact(r) || (typeof leadCreatedDate === 'function' ? leadCreatedDate(r) : '');
+  if(ref){ const n = dashDays(ref, today); if(n >= dashStaleDays()) out.push(`No activity for ${n} days`); }
+  return out;
+}
+function attnChipHtml(pl, r){ const x = attnReasons(pl, r); return x.length ? `<span class="sf-chip warn attn" title="${escAttr(x.join('. '))}">⚠ Needs attention</span>` : ''; }
 
 /* BT:js-selling end */
 
