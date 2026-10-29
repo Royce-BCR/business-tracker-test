@@ -4418,7 +4418,7 @@ function autoProjectStageId(p){   // the furthest stage with a confirmed actual 
    Planning: nothing past the contract / design sign-off is confirmed. Materials: materials ordered (or delivered). On site: on-site start confirmed. Sign-off: build complete (or signed off) and not yet invoiced.
    Invoiced: invoiced (or paid, but not yet signed off). Completed: paid AND signed off (or the project has been completed). Only confirmed dates count, never planned ones. */
 const PROJ_STAGE6 = [['planning', 'Planning'], ['materials', 'Materials'], ['onsite', 'On site'], ['signoff', 'Sign-off'], ['invoiced', 'Invoiced'], ['completed', 'Completed']];
-function projStage6(p){
+function projStage6Calc(p){
   const has = k => !!projMsActual(p, k); let id = 'planning';
   if(has('materialsOrdered') || has('materialsDelivered')) id = 'materials';
   if(has('onSiteStart')) id = 'onsite';
@@ -4427,8 +4427,23 @@ function projStage6(p){
   if((has('paid') && has('signOff')) || projIsCompleted(p)) id = 'completed';
   return { id, name: (PROJ_STAGE6.find(x => x[0] === id) || [])[1] || '', n: PROJ_STAGE6.findIndex(x => x[0] === id) + 1 };
 }
+/* THE one place that says which stage a project is in. Every page (Board, Table, Gantt, Projects list, tiles, toasts, Today, reports, record page) reads this.
+   It is the calculated stage unless someone set it by hand (p.stageHand = { id, base }): a hand-set stage holds only while the calculated stage is still the one it was set against,
+   so confirming a milestone that changes the calculated stage moves the project on. Nothing else is written: dates, payment lines and the old stored stageId are never touched. */
+function projStage6(p){
+  const c = projStage6Calc(p), h = p.stageHand, hi = h ? PROJ_STAGE6.findIndex(x => x[0] === h.id) : -1;
+  if(h && hi >= 0 && h.base === c.id && h.id !== c.id) return { id: h.id, name: PROJ_STAGE6[hi][1], n: hi + 1, hand: true, calc: c.id };
+  return Object.assign({ hand: false, calc: c.id }, c);
+}
+function projSetStageByHand(p, id){
+  const c = projStage6Calc(p);
+  if(id === c.id) delete p.stageHand; else p.stageHand = { id, base: c.id, at: new Date().toISOString(), by: whoName() };
+}
+const projStage6Opts = () => PROJ_STAGE6.map(([id, name]) => ({ id, name }));
+const pipeStages = pl => pl === 'project' ? projStage6Opts() : ((state.pipelineStages || {})[pl] || []);
+const recStageId = (pl, r) => pl === 'project' ? projStage6(r).id : r.stageId;
 const proj6Pill = p => { const s = projStage6(p); return `<span class="rp-pill s6 s6-${s.id}" title="Pipeline stage ${s.n} of ${PROJ_STAGE6.length}, from confirmed dates">${escHtml(s.name)}</span>`; };
-function stageById(pl, id){ return ((state.pipelineStages||{})[pl]||[]).find(s => s.id === id) || null; }
+function stageById(pl, id){ if(pl === 'project'){ const q = PROJ_STAGE6.find(x => x[0] === id); if(q) return { id: q[0], name: q[1] }; } return ((state.pipelineStages||{})[pl]||[]).find(s => s.id === id) || null; }
 function stageName(pl, id){ const s = stageById(pl, id); return s ? s.name : '—'; }
 function firstStageId(pl){ const l = (state.pipelineStages||{})[pl] || []; return l.length ? l[0].id : ''; }
 const activeLeads = () => state.leads.filter(l => !l.lost);
@@ -5012,7 +5027,7 @@ function renderPipelineViews(pl){
 /* one colour per stage, by its position in the Settings order — shared by board columns and Gantt bars */
 const STAGE_PALETTE = ['var(--bt-slate-blue)','#4f7cac','#7a6fa8','var(--bt-oak-500)','#c9822f','#4f8a5b','var(--bt-green-600)','var(--bt-plum)','#2f7f86','#9a5a4a'];   // one colour per stage position (categorical, not status)
 function stageColor(pl, id){
-  const i = ((state.pipelineStages||{})[pl]||[]).findIndex(s => s.id === id);
+  const i = pipeStages(pl).findIndex(s => s.id === id);
   return i < 0 ? 'var(--muted)' : STAGE_PALETTE[i % STAGE_PALETTE.length];
 }
 /* the one place that decides which records a board / Gantt shows (lost leads excluded) — any future filter or search plugs in here */
@@ -5113,15 +5128,15 @@ function renderBoard(pl){
   if(getView(pl) !== 'board'){ wrap.innerHTML = ''; return; }
   const prev = wrap.querySelector('.bd-board'), keepL = prev ? prev.scrollLeft : 0, keepT = {};
   wrap.querySelectorAll('.bd-col').forEach(c => { keepT[c.dataset.stage] = c.querySelector('.bd-col-body').scrollTop; });
-  const stages = state.pipelineStages[pl], by = {}, orphans = [];
+  const stages = pipeStages(pl), by = {}, orphans = [];
   stages.forEach(s => { by[s.id] = []; });
-  viewRecords(pl).forEach(r => (by[pl === 'project' ? projStageId(r) : r.stageId] || orphans).push(r));
+  viewRecords(pl).forEach(r => (by[recStageId(pl, r)] || orphans).push(r));
   const cols = stages.map(s => colHtml(pl, s, by[s.id], false));
   if(orphans.length) cols.push(colHtml(pl, { id: '', name: 'No stage' }, orphans, true));
   const hints = {
     lead: 'Drag a tile to another column to change its stage. Moving a lead never promotes it — Promote stays in the lead\'s detail and still needs every hard-gate qualification question answered. Green edge = Residential, blue = Commercial.',
     sales: 'Drag a tile to another column to change its stage; the stage\'s percentage is applied unless the deal has a manual percentage.',
-    project: 'Drag a tile to another column to change the project\'s stage. Dates and payment lines are never changed by a move.'
+    project: 'The columns are the six pipeline stages, worked out from confirmed milestone dates. Drag a tile to set its stage by hand: it moves on by itself when the next milestone is confirmed. Dates and payment lines are never changed by a move.'
   };
   wrap.innerHTML = `<p class="bd-hint">${hints[pl]} Click a tile to open it. On a touch screen, press and hold a tile to pick it up.</p><div class="bd-board" data-pl="${pl}">${cols.join('')}</div>`;
   const b = wrap.querySelector('.bd-board'); b.scrollLeft = keepL;
@@ -5303,8 +5318,16 @@ setInterval(() => { if(state){ const n = (state.undoLog || []).length; undoPrune
    project dates / payment lines are never touched. */
 function moveRecord(pl, id, stageId){
   const r = findRec(pl, id), st = stageById(pl, stageId);
-  if(!r || !st || (pl === 'project' ? projStageId(r) : r.stageId) === stageId) return;
-  if(pl === 'project') projAdopt(r);   // a stage dragged by hand is kept (the project now follows its own stage)
+  if(!r || !st || recStageId(pl, r) === stageId) return;
+  if(pl === 'project'){   // a project's stage is calculated from confirmed dates; a drag sets it by hand (p.stageHand) and touches nothing else
+    const prevHand = r.stageHand ? Object.assign({}, r.stageHand) : null;
+    projSetStageByHand(r, stageId); touchRec(pl, id); render(); saveState();
+    showToast(`${recordCode(id, pl)} → ${st.name}`, () => {
+      const rr = findRec(pl, id);
+      if(rr && projStage6(rr).id === stageId){ if(prevHand) rr.stageHand = prevHand; else delete rr.stageHand; touchRec(pl, id); render(); saveState(); showToast('Move undone'); }
+    });
+    return;
+  }
   const prev = r.stageId;
   r.stageId = stageId; touchRec(pl, id);
   let msg = `${recordCode(id, pl)} → ${st.name}`;
@@ -5488,7 +5511,7 @@ function ganttRows(pl){
   const sales = pl === 'sales';
   return viewRecords(pl).map(r => {
     const subs = subStageItems(r), phases = sales ? [] : milestonePhases(r), all = phases.concat(subs);
-    const row = { r, id: r.id, code: recordCode(r.id, pl), name: boardTitle(pl, r), stage: stageName(pl, pl === 'project' ? projStageId(r) : r.stageId), color: stageColor(pl, pl === 'project' ? projStageId(r) : r.stageId), phases, subs, kids: (sales || subs.length) ? subs : all, dated: all.length > 0 };   // a project with dated stage lines draws those; milestone dates stay as dots (older projects with only milestones keep their milestone bars)
+    const row = { r, id: r.id, code: recordCode(r.id, pl), name: boardTitle(pl, r), stage: stageName(pl, recStageId(pl, r)), color: stageColor(pl, recStageId(pl, r)), phases, subs, kids: (sales || subs.length) ? subs : all, dated: all.length > 0 };   // a project with dated stage lines draws those; milestone dates stay as dots (older projects with only milestones keep their milestone bars)
     if(row.dated){ row.s = new Date(Math.min(...all.map(x => x.s))); row.e = new Date(Math.max(...all.map(x => x.e))); }
     return row;
   });
@@ -5506,7 +5529,7 @@ function renderGanttView(pl){
   const keep = (prev && ganttSeen[pl] === zoom) ? { l: prev.scrollLeft, t: prev.scrollTop } : null;
   const rows = ganttRows(pl), dated = rows.filter(x => x.dated), undated = rows.filter(x => !x.dated);
   const today = new Date(); today.setHours(0,0,0,0);
-  const controls = `<div class="gantt-controls"><div class="gantt-legend">${state.pipelineStages[pl].map(s => `<span class="lg"><i style="background:${stageColor(pl, s.id)}"></i>${escHtml(s.name)}</span>`).join('')}</div>
+  const controls = `<div class="gantt-controls"><div class="gantt-legend">${pipeStages(pl).map(s => `<span class="lg"><i style="background:${stageColor(pl, s.id)}"></i>${escHtml(s.name)}</span>`).join('')}</div>
     <div class="view-toggle" title="Zoom">${Object.keys(GANTT_ZOOMS).map(z => `<button data-action="gantt-zoom" data-pl="${pl}" data-zoom="${z}" class="${z===zoom?'active':''}">${GANTT_ZOOMS[z].label}</button>`).join('')}</div></div>`;
   const noDates = undated.length ? `<details class="gantt-nodates" data-ndpl="${pl}"${ganttNoDatesOpen[pl] ? ' open' : ''}><summary>No dates set (${undated.length})</summary>
     <ul>${undated.map(x => `<li><button class="link-btn" data-action="open-detail" data-pl="${pl}" data-id="${x.id}">${x.code} · ${escHtml(x.name)}</button> <span style="color:var(--text-muted)">— ${escHtml(x.stage)}</span></li>`).join('')}</ul></details>` : '';
@@ -6787,7 +6810,7 @@ function projNextMs(p){
   const i = projMsInfo(p, open.key);
   return { name: open.name, key: open.key, date: i.planned || '', planned: true, status: i.status };
 }
-function projProgress(p){ const l = state.pipelineStages.project, i = l.findIndex(x => x.id === projStageId(p)); return { i, n: l.length, pct: l.length ? Math.round((i + 1) / l.length * 100) : 0 }; }
+function projProgress(p){ const i = projStage6(p).n - 1, n = PROJ_STAGE6.length; return { i, n, pct: Math.round((i + 1) / n * 100) }; }
 /* money this month, from the same events */
 function projMonthMoney(p){
   const key = fmt(new Date()).slice(0, 7), r = { inDue: 0, inPaid: 0, outDue: 0, outPaid: 0 };
@@ -7039,7 +7062,7 @@ function pwEditOn(p, kind){ const e = pwUi.edit; return !!(e && e.pid === p.id &
 const PW_EDIT_NAME = { timeline: 'timeline', delivery: 'deliveries', materials: 'materials', labour: 'labour', variation: 'variation', schedule: 'invoice schedule' };
 const SCHEDULE_CAUSES = [['customer', 'Customer request'], ['agreed', 'Agreed with the customer'], ['quote', 'Quote changed'], ['correction', 'Correction'], ['other', 'Other']];
 function pwHeaderHtml(p, i){
-  const nm = projNextMs(p), pg = projProgress(p), mg = projMargin(p), ct = projContract(p), cu = projCustomer(p), opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${projStageId(p) === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
+  const nm = projNextMs(p), pg = projProgress(p), mg = projMargin(p), ct = projContract(p), cu = projCustomer(p), opts = PROJ_STAGE6.map(([id, name]) => `<option value="${id}"${projStage6(p).id === id ? ' selected' : ''}>${escHtml(name)}</option>`).join('');
   const custName = [cu.company, cu.name].filter(Boolean).join(' — '), bits = [cu.phone ? `<a href="tel:${escAttr(cu.phone.replace(/\s+/g, ''))}">${escHtml(cu.phone)}</a>` : '', cu.email ? `<a href="mailto:${escAttr(cu.email)}">${escHtml(cu.email)}</a>` : '', cu.address ? escHtml([cu.address, cu.postcode && !cu.address.includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ')) : ''].filter(Boolean);
   const value = ct.live
     ? `<b>${qm(ct.value)}</b><em>${projVariationsValue(p) ? '+ ' + qm(projVariationsValue(p)) + ' variations · ' : ''}ex VAT · live from <button type="button" class="sp-link" data-qba="open-quote" data-id="${ct.q.id}">${escHtml(qRef(ct.q))}</button>${qVatOn() ? ' · ' + qm(ct.inc) + ' inc VAT' : ''}</em>`
@@ -7052,7 +7075,7 @@ function pwHeaderHtml(p, i){
         <div><small>Next milestone</small><b>${nm ? escHtml(nm.name) : 'All confirmed'}</b><em>${nm ? (nm.date ? 'planned ' + pwD(nm.date) + ' · ' + (nm.status === 'overdue' ? '<b class="over">overdue, ' + pwRel(nm.date) + '</b>' : pwRel(nm.date)) : 'no planned date') : ''}</em></div>
         <div><small>Value (agreed)</small>${value}</div>
         <div><small>Margin</small><b>${mg ? qm(mg.now) + ' <span class="qb-dim">' + qpct(mg.nowPct) + '</span>' : '—'}</b><em>${mg ? (mg.hasSold ? 'sold ' + qm(mg.soldAfter) + ' (' + qpct(mg.soldPct) + ')' : 'no as-sold snapshot') : 'needs an accepted quote'}</em></div>
-        <div class="pw-prog"><small>${pg.i >= 0 ? `${escHtml(stageName('project', projStageId(p)))} · stage ${pg.i + 1} of ${pg.n}` : 'Not started'}</small><div class="pw-bar"><i style="width:${Math.max(0, pg.pct)}%"></i></div></div>
+        <div class="pw-prog"><small>${pg.i >= 0 ? `${escHtml(projStage6(p).name)} · stage ${pg.i + 1} of ${pg.n}` : 'Not started'}</small><div class="pw-bar"><i style="width:${Math.max(0, pg.pct)}%"></i></div></div>
       </div>${pwJourneyHtml(p)}${pwUi.edit && pwUi.edit.pid === p.id ? `<div class="pw-editing">✎ Editing ${PW_EDIT_NAME[pwUi.edit.kind] || ''}: changes are a draft until you press Save below.</div>` : ''}</div>
     <nav class="pw-nav" aria-label="Project sections">${PW_SECS.map(([k, n]) => `<button type="button" data-pw="sec" data-sec="${k}" class="${pwUi.sec === k ? 'active' : ''}">${n}</button>`).join('')}</nav></div>`;
 }
@@ -8001,7 +8024,7 @@ const expandedProjectsP = new Set();
 function projectDetailHtml(p, i){
   const m = p.milestones || {}, projStages = state.pipelineStages.project;
       let html = `<div class="detail-box">
-        <div class="detail-head"><span class="detail-code" style="background:var(--green);">${recordCode(p.id,'project')}</span><span>${escAttr(p.name)}</span><span class="detail-meta">Stage: ${escHtml(stageName('project', projStageId(p)))}</span></div>
+        <div class="detail-head"><span class="detail-code" style="background:var(--green);">${recordCode(p.id,'project')}</span><span>${escAttr(p.name)}</span><span class="detail-meta">Stage: ${escHtml(projStage6(p).name)}</span></div>
         ${moveStripHtml('project', p, i)}
         ${recTasksHtml('project', p)}
         ${quoteChipHtml(p.id)}${projStageTimeHtml(p)}
@@ -8045,7 +8068,7 @@ function pvdCheckRows(){   // existing projects: every typed date that used to s
     const rows = [];
     state.pipelineStages.project.forEach(st => { if(!st.key) return; const typed = (p.milestones || {})[st.key]; if(!typed || typed > today) return; const mi = projMsInfo(p, st.key), ex = (p.msActual || {})[st.key];
       rows.push({ key: st.key, name: st.name, typed, kept: !!mi.actual, explicit: !!ex, src: mi.actual ? (ex ? 'confirmed' : mi.actual.src) : '', overdueDays: mi.overdueDays }); });
-    const stored = stageName('project', p.stageId), now = stageName('project', projStageId(p));
+    const stored = stageName('project', p.stageId), now = projStage6(p).name;
     if(rows.length) out.push({ p, rows, stored, now });
   });
   return out;
@@ -8164,7 +8187,7 @@ function renderProjects(){
       <td class="code-cell">${recordCode(p.id,'project')}${tierBadgeSmall(p.id, p)}</td>
       <td><input data-tab="projects" data-idx="${i}" data-field="name" value="${escAttr(p.name)}"></td>
       <td><input type="number" step="1" data-tab="projects" data-idx="${i}" data-field="agreedValue" value="${p.agreedValue||0}"${projAcceptedQuote(p) ? ' readonly title="Live from the accepted quote (ex VAT)"' : ''}></td>
-      <td><select class="lead-pill progress-pill" data-tab="projects" data-idx="${i}" data-field="stageId" title="Project stage">${projStages.map(s=>`<option value="${escHtml(s.id)}"${projStageId(p)===s.id?' selected':''}>${escHtml(s.name)}</option>`).join('')}</select><div style="margin-top:4px;">${proj6Pill(p)}</div></td>
+      <td><select class="lead-pill progress-pill" data-tab="projects" data-idx="${i}" data-field="stageId" title="Project stage">${PROJ_STAGE6.map(([id, name]) => `<option value="${id}"${projStage6(p).id === id ? ' selected' : ''}>${escHtml(name)}</option>`).join('')}</select></td>
       <td>${projArchived(p) ? `<span class="pw-done-pill" style="margin:0;">Completed ${escHtml(dShow(p.completed.date))}</span> <button type="button" class="btn secondary qb-sm" data-pj="reopen" data-id="${p.id}">Reopen</button>` : `<button type="button" class="sp-link" data-pj="open" data-id="${p.id}" title="Open the project">${escHtml(projJourney(p).next.label)}</button>`}</td>
       <td class="${costFlag?'':''}" style="${costFlag?'color:var(--bt-bad-fg);font-weight:600;':''}">${money(p.budgetedCost)} / ${money(p.actualCost)}</td>
       <td><button class="icon-btn" data-action="delete-projrec" data-idx="${i}" title="Delete project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></td>
@@ -12287,7 +12310,7 @@ function moveStripHtml(pl, r, i){
       <button class="btn secondary" data-action="return-record" data-pl="sales" data-id="${r.id}">← Return to Lead Pipeline</button>
       <button class="btn secondary" data-sel="close-lost" data-pl="sales" data-id="${r.id}">Close as lost</button></div>`;
   }
-  const opts = state.pipelineStages.project.map(st => `<option value="${escHtml(st.id)}"${projStageId(r) === st.id ? ' selected' : ''}>${escHtml(st.name)}</option>`).join('');
+  const opts = PROJ_STAGE6.map(([id, name]) => `<option value="${id}"${projStage6(r).id === id ? ' selected' : ''}>${escHtml(name)}</option>`).join('');
   return `<div class="move-strip"><label>Project stage <select data-tab="projects" data-idx="${i}" data-field="stageId">${opts}</select></label>
     <button class="btn secondary" data-action="return-record" data-pl="project" data-id="${r.id}">← Return to Sales Pipeline</button>
     <button class="btn secondary" data-sel="close-lost" data-pl="project" data-id="${r.id}">Close as lost</button></div>`;
@@ -14315,7 +14338,7 @@ function pjBuildRow(g, shared, today, staleN){
     if(pl === 'project'){ const c = projCustomer(p); customer = [c.name, c.company].filter(Boolean).join(' · '); }
     else { const qq = qpick && qpick.q; customer = [rec.contact || (qq && qq.customer) || '', rec.company].filter(Boolean).join(' · '); }
   }catch(e){ customer = [rec.contact, rec.company].filter(Boolean).join(' · '); }
-  const stageText = stageName(pl, pl === 'project' ? projStageId(rec) : rec.stageId);
+  const stageText = stageName(pl, recStageId(pl, rec));
   return { key: g.key, root, pl, rec, recs, ctx, code: recordCode(root, pl), name: boardTitle(pl, rec), customer, stageLabel: PJ_STAGE_NAME[pl], stageText: stageText === '—' ? '' : stageText,
     status, reasons, lost, completed, done, live: !done, inProgress, value, valueLabel, owner, next: na.next, lastTouch, days, overdue, stale, noOpenTask, qpick, deliveries };
 }
@@ -14481,7 +14504,7 @@ function pjHeadlineHtml(r){
     }catch(e){ f = null; }
     if(f){
       S.push(pjStat('Contract value', f.ct.value > 0 ? pjMoney(f.ct.value) : 'Not set', f.ct.value > 0 ? escHtml(r.valueLabel) : ''));
-      if(f.pr.n) S.push(pjStat('Stage progress', Math.max(0, f.pr.i + 1) + ' of ' + f.pr.n, escHtml(stageName('project', projStageId(p)))));
+      if(f.pr.n) S.push(pjStat('Stage progress', Math.max(0, f.pr.i + 1) + ' of ' + f.pr.n, escHtml(projStage6(p).name)));
       if(f.hasInv){ S.push(pjStat('Invoiced', pjMoney(f.invoiced), 'As on the Customer invoices page')); S.push(pjStat('Paid', pjMoney(f.paid))); S.push(pjStat('Outstanding', pjMoney(f.outstanding), '', f.outstanding > 0 && r.overdue.some(o => o.kind === 'Invoice') ? 'bad' : '')); }
       if(f.matBudget !== null) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'of ' + pjMoney(f.matBudget) + ' budget', f.matSpent > f.matBudget + 0.5 ? 'bad' : ''));
       else if(f.matSpent > 0) S.push(pjStat('Materials spent', pjMoney(f.matSpent), 'No budget set'));
@@ -14693,7 +14716,7 @@ function applyFieldChange(el){
     const p = state.projects[Number(el.dataset.idx)];
     projMsPlanChange(p, field, value); return;   // a typed milestone date is the PLANNED date: it never marks anything done or moves the stage, and a change is logged with a reason
   }
-  else if(tab==='projects' && field==='stageId' && state.projects[Number(el.dataset.idx)]){ const p = state.projects[Number(el.dataset.idx)]; p.stageId = value; p.actualsMode = true; }   // a stage chosen by hand is kept
+  else if(tab==='projects' && field==='stageId' && state.projects[Number(el.dataset.idx)]){ const p = state.projects[Number(el.dataset.idx)]; projSetStageByHand(p, value); showToast(`${recordCode(p.id, 'project')} → ${projStage6(p).name}`); }   // a stage chosen by hand is kept until a confirmation moves the calculated stage on
   else if(tab==='payline'){ const p=Number(el.dataset.idx), pl=Number(el.dataset.pli); if(state.projects[p] && state.projects[p].paymentLines[pl]){ const ln = state.projects[p].paymentLines[pl]; ln[field] = value; if(field === 'dueDate' && ln.quoteRowId) ln.dueManual = !!value; } }   // a due date typed on a quote-built line is kept when the quote syncs
   else if(COMMS_TABS[tab]){ const r = state[COMMS_TABS[tab]][Number(el.dataset.idx)], ci = Number(el.dataset.cidx); if(r && r.comms && r.comms[ci]) r.comms[ci][field] = value; }
   else if(tab==='pipeline' && field==='contractSigned' && state.pipeline[Number(el.dataset.idx)]){
@@ -16323,7 +16346,7 @@ function cxCompleted(pl, rec){   // same rule as the project: sign-off has an ac
 }
 function cxDealInfo(pl, rec){
   const lost = !!rec.lost, completed = cxCompleted(pl, rec);
-  return { pl, rec, root: rec.id, code: recordCode(rec.id, pl), name: boardTitle(pl, rec), lost, completed, live: !lost && !completed, status: lost ? 'Lost' : completed ? 'Completed' : 'Live', stage: pl === 'lead' ? stageName('lead', rec.stageId) : pl === 'sales' ? stageName('sales', rec.stageId) : stageName('project', projStageId(rec)) };
+  return { pl, rec, root: rec.id, code: recordCode(rec.id, pl), name: boardTitle(pl, rec), lost, completed, live: !lost && !completed, status: lost ? 'Lost' : completed ? 'Completed' : 'Live', stage: pl === 'lead' ? stageName('lead', rec.stageId) : pl === 'sales' ? stageName('sales', rec.stageId) : projStage6(rec).name };
 }
 function cxIndex(){
   if(cxCache) return cxCache;
@@ -17920,7 +17943,7 @@ function rpDates(p){
 }
 function rpOrig(p){
   const cu = projCustomer(p), s = p.site || {}, d = rpDates(p);
-  return { stageId: projStageId(p), jobType: p.jobType || '', jobTypeId: p.jobTypeId || '', estValue: p.estValue === undefined || p.estValue === '' || p.estValue === null ? '' : String(p.estValue), estDays: p.estDays === undefined || p.estDays === '' || p.estDays === null ? '' : String(p.estDays), prefStart: sfIso(p.prefStart), deadline: sfIso(p.deadline), owner: p.owner || '', source: p.source || cu.source || '', start: d.start, complete: d.complete, dur: d.dur ? String(d.dur) : '',
+  return { stageId: projStage6(p).id, jobType: p.jobType || '', jobTypeId: p.jobTypeId || '', estValue: p.estValue === undefined || p.estValue === '' || p.estValue === null ? '' : String(p.estValue), estDays: p.estDays === undefined || p.estDays === '' || p.estDays === null ? '' : String(p.estDays), prefStart: sfIso(p.prefStart), deadline: sfIso(p.deadline), owner: p.owner || '', source: p.source || cu.source || '', start: d.start, complete: d.complete, dur: d.dur ? String(d.dur) : '',
     address: cu.address || '', postcode: cu.postcode || '', access: s.access || '', services: s.services || '', lastVisited: s.lastVisited || '',
     contact: cu.name || '', company: cu.company || '', phone: cu.phone || '', email: cu.email || '' };
 }
@@ -17936,10 +17959,10 @@ function rpMoney(p){
   const today = fmt(new Date()), L = (p.paymentLines || []).map(l => ({ a: Number(l.amount) || 0, inv: l.invoicedDate, paid: l.paidDate, due: l.dueDate }));
   return { billed: L.filter(l => l.inv).reduce((a, l) => a + l.a, 0), paid: L.filter(l => l.paid).reduce((a, l) => a + l.a, 0), overdue: L.filter(l => !l.paid && l.due && l.due < today && l.a > 0).reduce((a, l) => a + l.a, 0) };
 }
-/* the "Next" field is only shown when the next unconfirmed milestone is the next stage */
+/* the "Next" field: the next milestone nobody has confirmed */
 function rpNextStage(p){
-  const list = state.pipelineStages.project, i = list.findIndex(s => s.id === projStageId(p)), nx = list[i + 1], nm = projNextMs(p);
-  return nx && nm && nm.key === nx.key ? { name: nx.name, date: nm.date } : null;
+  const nm = projNextMs(p);
+  return nm ? { name: nm.name, date: nm.date } : null;
 }
 
 /* ---- field renderers: Locked, Calculated (read-only, says where to change it) and Editable ---- */
@@ -17964,11 +17987,11 @@ function rpSec(key, title, body, tools, scope){
 function rpLeftHtml(p){
   const cu = projCustomer(p), aq = projAcceptedQuote(p), ct = projContract(p), mg = projMargin(p), h = projHours(p), nm = rpNextStage(p), st = rpStatus(p), money = rpMoney(p), code = recordCode(p.id, 'project'), sold = projContractAgreed(p);
   const sub = [code, aq ? qRef(aq) : '', cu.name || cu.company].filter(Boolean).join(' · ');
-  const stageName_ = stageName('project', projStageId(p)), d = rpDraft(p);
+  const stageName_ = projStage6(p).name, d = rpDraft(p);
   const quoteLink = ct.q ? `<button type="button" class="sp-link" data-qba="open-quote" data-id="${ct.q.id}">${escHtml(qRef(ct.q))}</button>` : '';
   const sources = [...new Set(state.leads.concat(state.projects).map(r => r.source).filter(Boolean))];
   const owners = apTeam(), ownerOpts = [['', 'Not set']].concat((p.owner && !owners.includes(p.owner) ? [p.owner] : []).concat(owners).map(n => [n, n]));
-  const stageOpts = state.pipelineStages.project.map(s => [s.id, s.name]);
+  const stageOpts = PROJ_STAGE6.map(([id, name]) => [id, name]);
   const about = `
     <div class="rp-f rp-edit"><label for="rpf_pipeline">Pipeline</label><select id="rpf_pipeline" aria-label="Pipeline"><option>Project Pipeline</option></select></div>
     ${rpEdit(p, 'stageId', { select: stageOpts, hint: 'Moves when a milestone is confirmed. Choose here to set it by hand.' })}
@@ -18222,7 +18245,7 @@ function rpApplyPlain(p, f){
   const done = [];
   Object.keys(f).forEach(k => {
     const v = f[k];
-    if(k === 'stageId'){ p.stageId = v; p.actualsMode = true; }
+    if(k === 'stageId'){ projSetStageByHand(p, v); }
     else if(RP_PLAIN.includes(k)) p[k] = v;
     else if(k === 'estValue' || k === 'estDays'){ const n = parseFloat(v); p[k] = (v === '' || isNaN(n)) ? '' : Math.max(0, k === 'estDays' ? Math.round(n) : n); }
     else if(k === 'access' || k === 'services' || k === 'lastVisited'){ p.site = Object.assign({ access: '', services: '', lastVisited: '' }, p.site || {}); p.site[k] = v; }
@@ -19219,7 +19242,7 @@ async function selCloseLostDo(pl, r, extra){
   })();
   if(!ok) return;
   const reason = _confirmExtraValue || stalledReasonId(), note = (_confirmExtraNote || '').trim();
-  r.lostStageId = pl === 'lead' ? r.stageId : (pl === 'project' ? projStageId(r) : r.stageId);
+  r.lostStageId = pl === 'lead' ? r.stageId : recStageId(pl, r);
   r.lostReason = reason; r.lostNote = note; r.lostDate = fmt(new Date()); r.lost = true;
   selLog(r, `Closed lost: ${lostReasonName(reason)}${note ? ' (' + note + ')' : ''}. Was in ${pl === 'lead' ? stageName('lead', r.lostStageId) : pl === 'sales' ? stageName('sales', r.lostStageId) : stageName('project', r.lostStageId)}.`);
   if(pl === 'lead') expandedLeads.delete(r.id); else if(pl === 'sales') expandedProjects.delete(r.id);
@@ -19233,8 +19256,8 @@ function selReopen(pl, id){
   if(pl === 'lead'){ r.stageId = stageById('lead', r.lostStageId) ? r.lostStageId : (stageById('lead', r.stageId) ? r.stageId : firstStageId('lead')); }
   else if(pl === 'sales'){ if(!stageById('sales', r.stageId)) r.stageId = stageById('sales', r.lostStageId) ? r.lostStageId : firstStageId('sales'); }
   r.lost = false; r.lostReason = ''; r.lostNote = ''; r.lostDate = ''; r.lostStageId = '';
-  selLog(r, `Reopened from Closed lost (the reason was ${was}). Back in ${pl === 'project' ? stageName('project', projStageId(r)) : stageName(pl, r.stageId)}.`, { reopened: true });
-  render(); saveState(); showToast(`${code} reopened: back in the ${SEL_PL_NAME[pl]}, at ${pl === 'project' ? stageName('project', projStageId(r)) : stageName(pl, r.stageId)}.`);
+  selLog(r, `Reopened from Closed lost (the reason was ${was}). Back in ${pl === 'project' ? projStage6(r).name : stageName(pl, r.stageId)}.`, { reopened: true });
+  render(); saveState(); showToast(`${code} reopened: back in the ${SEL_PL_NAME[pl]}, at ${pl === 'project' ? projStage6(r).name : stageName(pl, r.stageId)}.`);
 }
 /* the archive bar under each board */
 const SEL_BAR = { lead: 'lostLeadsWrap', sales: 'salesLostWrap', project: 'projectLostWrap' };
@@ -21090,7 +21113,7 @@ const repUi = { open: '', from: '', to: '', pid: 0, sec: 'summary' };
 navExtra('rep', () => ({ o: repUi.open, f: repUi.from, t: repUi.to, p: repUi.pid, s: repUi.sec }), o => { if(o){ repUi.open = o.o; repUi.from = o.f; repUi.to = o.t; repUi.pid = o.p; repUi.sec = o.s; } });
 const repDefaults = () => { const t = finToday(); if(!repUi.from) repUi.from = t.slice(0, 4) + '-01-01'; if(!repUi.to) repUi.to = t; };
 const repIn = d => !!d && (!repUi.from || d >= repUi.from) && (!repUi.to || d <= repUi.to);
-function jrProject(){ const L = state.projects; return L.find(p => p.id === repUi.pid) || L.slice().sort((a, b) => (projStageId(b) === 'stg_proj_completed') - (projStageId(a) === 'stg_proj_completed') || b.id - a.id)[0] || null; }
+function jrProject(){ const L = state.projects; return L.find(p => p.id === repUi.pid) || L.slice().sort((a, b) => (projStage6(b).id === 'completed') - (projStage6(a).id === 'completed') || b.id - a.id)[0] || null; }
 function jrHtml(p, sec){
   if(!p) return '<div class="sup-empty">There are no projects yet.</div>';
   const sg = v => Math.abs(v) < 0.005 ? '—' : (v > 0 ? '+' : '−') + qm(Math.abs(v)), L = (nav, t) => `<button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(t)}</button>`, pn = 'project:' + p.id, cell = (k, v, sub, cls, nav) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small>${nav ? `<button type="button" class="sp-link" data-nav="${escAttr(nav)}"><b>${v}</b></button>` : `<b>${v}</b>`}${sub ? `<em>${sub}</em>` : ''}</div>`;
@@ -21098,7 +21121,7 @@ function jrHtml(p, sec){
   const txl = t => `<tr><td>${t.date ? pwD(t.date) : '—'}</td><td>${finSrcLink({ t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) }, t.description || 'Transaction')}</td><td>${escHtml(t.projCat || t.category || '')}</td><td class="qb-calc">${qm(t.moneyOut)}</td></tr>`;
   if(sec === 'summary'){
     const ct = projContract(p), vars = projVariationsValue(p), price = r2(ct.value + vars), inv = r2(rows.filter(r => r.invoicedDate).reduce((s, r) => s + r.amount, 0)), paid = r2(rows.reduce((s, r) => s + (r.paidDate ? (r.paidAmount > 0 ? r.paidAmount : r.amount) : (r.paidAmount || 0)), 0)), mg = mnMargin(p), h = projHours(p), c = projCustomer(p);
-    return `<div class="rp-strip">${cell('Project', L(pn, recordCode(p.id, 'project') + ' ' + p.name), escHtml(c.company || c.name || 'no customer') + ' · ' + escHtml(stageName('project', projStageId(p))) + (p.lost ? ' · lost' : ''))}${cell('Job price (ex VAT)', qm(price), 'contract ' + qm(ct.value) + (vars ? ' + variations ' + qm(vars) : ''), '', ct.q ? 'quote:' + ct.q.id : pn + ':money')}${cell('Invoiced', qm(inv), rows.filter(r => r.invoicedDate).length + ' invoice(s)', '', 'invoicing:' + p.id + ':0')}${cell('Paid', qm(paid), 'outstanding ' + qm(r2(inv - paid)), '', pn + ':money')}
+    return `<div class="rp-strip">${cell('Project', L(pn, recordCode(p.id, 'project') + ' ' + p.name), escHtml(c.company || c.name || 'no customer') + ' · ' + escHtml(projStage6(p).name) + (p.lost ? ' · lost' : ''))}${cell('Job price (ex VAT)', qm(price), 'contract ' + qm(ct.value) + (vars ? ' + variations ' + qm(vars) : ''), '', ct.q ? 'quote:' + ct.q.id : pn + ':money')}${cell('Invoiced', qm(inv), rows.filter(r => r.invoicedDate).length + ' invoice(s)', '', 'invoicing:' + p.id + ':0')}${cell('Paid', qm(paid), 'outstanding ' + qm(r2(inv - paid)), '', pn + ':money')}
       ${mg ? cell('Margin as sold', qm(mg.sold), mg.soldPct.toFixed(1) + '%', '', pn + ':plan') + cell('Margin now', qm(mg.now), mg.nowPct.toFixed(1) + '%' + (mg.rv.n ? ' · confirmed prices' : ''), mg.now < mg.sold - 0.005 ? 'bad' : '', pn + ':money') : cell('Margin', '—', 'no accepted quote and Working plan yet')}${cell('Hours', projHours(p).logged.toFixed(1) + ' h logged', 'sold ' + h.sold.toFixed(1) + ' · plan ' + h.plan.toFixed(1), '', pn + ':plan')}</div>
       <p class="q-help">Each figure opens the record behind it. The other sections are one tap away above.</p>`;
   }
