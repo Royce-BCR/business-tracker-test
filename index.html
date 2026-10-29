@@ -2401,6 +2401,22 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .rp-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rp-out, .rp-pair { grid-template-columns: 1fr; }
   .rp .btn { min-height: 44px; } .rp-bar { position: sticky; bottom: 0; z-index: 7; }
 }
+
+.rp-tile { margin-bottom: var(--bt-s4); } .rp-tile-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; } .rp-tile h4 { margin: 0; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.rp-lrow { display: flex; justify-content: space-between; align-items: baseline; gap: var(--bt-s2); padding: 7px 0; border-bottom: 1px solid var(--bt-chalk); font-size: var(--bt-fs-sm); } .rp-lrow:last-child { border-bottom: 0; } .rp-lrow > .sp-link, .rp-lrow > span:first-child { min-width: 0; overflow-wrap: anywhere; text-align: left; } .rp-lmeta { flex: none; max-width: 56%; text-align: right; font-size: var(--bt-fs-xs); color: var(--text-muted); }
+.rp-lempty { font-size: var(--bt-fs-xs); color: var(--text-muted); padding: 4px 0; }
+.rp-tile-h .sp-link { font-size: var(--bt-fs-xs); }
+.rp-kpis { flex: none; padding: var(--bt-s3) var(--bt-s4) 0; } .rp-kpis .kpi-row { margin: 0 0 var(--bt-s3); gap: 8px; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+#panel-suppliers.rs-open > :not(#supplierRecord) { display: none; }
+.rp .sp-check { display: flex; align-items: center; gap: 8px; min-height: 32px; font-size: var(--bt-fs-sm); }
+.rp .lp-contact { margin-bottom: var(--bt-s3); } .rp .cx-assoc { flex-wrap: wrap; } .rp .lp-f > label { color: var(--bt-ink-2); font-weight: 600; }
+.rp .lp-f input, .rp .lp-f select, .rp .lp-f textarea { width: 100%; box-sizing: border-box; }
+
+.rp .rp-f input[type=checkbox], .rp .sp-check input, .rp .q-check input { width: auto; min-height: 0; }
+.rp-kpis .kpi { padding: 8px 10px; } .rp-kpis .kpi .value { font-size: var(--bt-fs-md); } .rp-kpis .kpi .label { font-size: var(--bt-fs-2xs); } .rp-kpis .kpi .fin-sub { font-size: var(--bt-fs-2xs); }
+
+.rp-left .assumptions-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 0; }
+.rp-cscroll .qb-table { min-width: 540px; } .rp-cscroll .qb-scroll { overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -2987,6 +3003,7 @@ create policy "app update" on tracker_data for update using (true) with check (t
     </div>
     <div class="crm-filters"><input type="search" id="supSearch" class="crm-search" placeholder="Search suppliers…" autocomplete="off" aria-label="Search suppliers"><span id="supFilters" class="crm-filters-dyn"></span><span class="sup-count" id="supCount"></span></div>
     <div class="table-scroll" id="suppliersTableWrap"></div>
+    <div class="pw" id="supplierRecord" hidden></div>
   </div>
 
   <!-- SETUP & ADMIN -->
@@ -5785,6 +5802,9 @@ function renderSupFilters(){
 }
 function renderSuppliers(){
   const wrap = document.getElementById('suppliersTableWrap'); if(!wrap) return;
+  const rec = document.getElementById('supplierRecord'), rs = rsUi.id ? supFind(rsUi.id) : null; if(rsUi.id && !rs) rsUi.id = 0;
+  document.getElementById('panel-suppliers').classList.toggle('rs-open', !!rs); if(rec) rec.hidden = !rs;
+  if(rs){ rsRender(rs); return; }
   supUi.cats = new Set([...supUi.cats].filter(id => state.supplyCategories.some(c => c.id === id)));   // a deleted category drops out of the filter
   renderSupFilters();
   const list = supFiltered(), open = supOpenId();
@@ -5899,16 +5919,18 @@ function supHeadHtml(s){
   return `<div class="lp-title${s.name ? '' : ' empty'}">${escHtml(s.name || 'New supplier')}</div><div class="lp-sub">${supStatusHtml(s)}${supPillsHtml(s)}</div>`;
 }
 function supRenderBody(keepScroll){
+  if(rsUi.id){ rsRenderLeft(keepScroll); return; }
   const s = supFind(lp && lp.id); if(!s) return;
   const body = lpEl('lpBody'), top = body.scrollTop;
   body.innerHTML = supBodyHtml(s, state.suppliers.indexOf(s));
   if(keepScroll) body.scrollTop = top;
 }
 function supRenderNotes(){
-  const s = supFind(lp && lp.id), box = lpEl('spNotes'); if(!s || !box) return;
+  const s = supFind(rsUi.id || (lp && lp.id)), box = lpEl('spNotes'); if(!s || !box) return;
   box.innerHTML = supNotesHtml(s, state.suppliers.indexOf(s));
 }
 function openSupplierPanel(id, sec){
+  if(typeof rsOpen === 'function' && supFind(id)){ rsOpen(id, sec); return; }   // a supplier opens as a record page; the old slide-over below is no longer used
   const s = supFind(id); if(!s) return;
   const i = state.suppliers.indexOf(s);
   lpOpen({ kind: 'supplier', id, idx: i }, { cls: 'lc-sup', label: 'Edit supplier', code: supCode(s), chips: SUP_SECTIONS, head: supHeadHtml(s), body: supBodyHtml(s, i), sec, refresh: renderSuppliers });
@@ -5942,7 +5964,7 @@ function newSupplier(){
   const s = { id: state.nextSupplierId++, status: 'Active', name: '', categoryIds: [], address: '', postcode: '', website: '', phone: '', email: '', accountNo: '', paymentTerms: '', vatNo: '', deliveryCharge: '', freeDeliveryOver: '', minOrder: '', leadTimeDays: '', priceValidityDays: 30, callOff: false, pricesIncVat: false, shortCode: '', contacts: [], notes: [] };
   state.suppliers.push(s); render(); saveState();
   openSupplierPanel(s.id, 'details');
-  const n = lpEl('lpBody').querySelector('input[data-field="name"]'); if(n) n.focus();
+  const n = document.querySelector('#rsLeftBody input[data-field="name"], #lpBody input[data-field="name"]'); if(n) n.focus();
 }
 function applySupplierField(el){
   const s = state.suppliers[Number(el.dataset.idx)]; if(!s) return;
@@ -6012,7 +6034,7 @@ document.addEventListener('click', (e) => {
   else if(a === 'add-contact'){
     s.contacts.push({ id: newContactId(), name: '', role: '', phone: '', email: '', primary: s.contacts.length === 0 });
     render(); saveState(); supRenderBody(true);
-    const cards = document.querySelectorAll('#lpBody .lp-contact'), last = cards[cards.length - 1];
+    const cards = document.querySelectorAll('#lpBody .lp-contact, #rsLeftBody .lp-contact'), last = cards[cards.length - 1];
     if(last){ const f = last.querySelector('input'); if(f) f.focus(); }
   }
   else if(a === 'primary'){ s.contacts.forEach(c => { c.primary = (c.id === b.dataset.cid); }); render(); saveState(); supRenderBody(true); }
@@ -6039,8 +6061,8 @@ document.addEventListener('keydown', (e) => {
   else if((e.key === 'Enter' || e.key === ' ') && t.matches && t.matches('tr.sup-row')){ e.preventDefault(); openSupplierPanel(Number(t.dataset.id)); }
 });
 document.addEventListener('input', (e) => {   // the name is required: show the hint straight away while typing
-  const el = e.target; if(!lp || lp.kind !== 'supplier' || !el.dataset || el.dataset.tab !== 'supplier' || el.dataset.field !== 'name') return;
-  const w = lpEl('lpBody').querySelector('[data-qf="name"]'), empty = !el.value.trim();
+  const el = e.target; if(!((lp && lp.kind === 'supplier') || rsUi.id) || !el.dataset || el.dataset.tab !== 'supplier' || el.dataset.field !== 'name') return;
+  const w = (rsUi.id ? lpEl('rsLeftBody') : lpEl('lpBody')).querySelector('[data-qf="name"]'), empty = !el.value.trim();
   if(w){ w.classList.toggle('missing', empty); const h = w.querySelector('.lp-warn'); if(h) h.hidden = !empty; }
 });
 document.addEventListener('change', (e) => {   // leaving the name box empty puts the saved name back
@@ -14803,6 +14825,7 @@ function navLabel(){
   if(tab === 'quotations' && qUi.openId){ const q = qFind(qUi.openId); if(q) return 'quote ' + qRef(q); }
   if(tab === 'contacts'){ if(cxUi.view === 'dups') return 'Review duplicates'; const c = ctFind(cxUi.cid); if(c) return 'contact ' + ctName(c); }
   if(tab === 'companies'){ const c = coFind(cxUi.coid); if(c) return 'company ' + c.name; }
+  if(tab === 'suppliers' && rsUi.id){ const s = supFind(rsUi.id); if(s) return 'supplier ' + (s.name || supCode(s)); }
   return navTabLabel(tab);
 }
 function navSig(){ return [navTabName(), pwUi.id, qUi.openId, detailRef ? detailRef.pl + detailRef.id : '', lp && lp.kind === 'lead' ? 'lp' + lp.id : ''].join('|') + '|' + Object.values(nav.extras).map(x => { try{ return JSON.stringify(x.get()); }catch(e){ return ''; } }).join('|'); }
@@ -14873,6 +14896,7 @@ function navOpen(spec){
   const [kind, id, extra] = String(spec).split(':');
   if(kind === 'quote'){ const q = qFind(Number(id)); if(!q) return; qUi.openId = q.id; qUi.tab = 'quotes'; activateTab('quotations'); renderQuotes(); window.scrollTo(0, 0); }
   else if(kind === 'project'){ if(!state.projects.some(p => p.id === Number(id))) return; openProjectWorkspace(Number(id), false, !!extra); if(extra) setTimeout(() => pwGoSection(extra), 30); }
+  else if(kind === 'supplier'){ if(!supFind(Number(id))){ showToast('That supplier no longer exists'); return; } cxPrepNav(); rsOpen(Number(id)); }
   else if(cxNavOpen(kind, id, extra)) return;
   else if(typeof finNavOpen === 'function') finNavOpen(kind, id, extra);
 }
@@ -15581,16 +15605,7 @@ function cxTimelineHtml(owner, sc, kind){
     <div class="lc-note-add" style="margin-bottom:10px;"><input type="date" id="cxNoteDate" value="${fmt(new Date())}" aria-label="Date"><input type="text" id="cxNoteText" placeholder="Add a note…" maxlength="400" aria-label="Note" autocomplete="off"><button type="button" class="btn" data-cx="note-add" ${at}>Add</button></div>
     <div class="comms-scroll cx-tl">${items.length ? items.map(t => `<div class="comm-entry cx-tl-row"><span class="comm-date q-tl-d">${escHtml(dShow(t.date))}</span><span class="q-tl-n">${escHtml(t.text)}${t.by && t.mine ? ` <span class="qb-dim">· ${escHtml(t.by)}</span>` : ''}</span>${t.tag ? (t.nav ? `<button type="button" class="sp-link cx-tl-tag" data-nav="${escAttr(t.nav)}">${escHtml(t.tag)}</button>` : t.iv ? `<button type="button" class="sp-link cx-tl-tag" data-iv="open" data-id="${escAttr(t.iv)}">${escHtml(t.tag)}</button>` : `<span class="qb-dim cx-tl-tag">${escHtml(t.tag)}</span>`) : '<span></span>'}${t.mine && !t.auto ? `<button type="button" class="icon-btn" data-cx="note-del" ${at} data-nid="${escAttr(t.id)}" title="Delete note" aria-label="Delete note">${X_SVG}</button>` : '<span></span>'}</div>`).join('') : '<div class="lp-empty">Nothing yet.</div>'}</div></div>`;
 }
-function cxContactProfileHtml(c){
-  const sc = cxScopeContact(c), st = cxStats(sc), s = cxContactStatus(c);
-  const dupWith = cxDupPairs().filter(p => p.a.id === c.id || p.b.id === c.id).length;
-  return `<div class="cx-prof"><div id="cxHead"><div class="page-head crm-head"><div>${nav.stack.length ? '' : '<button type="button" class="btn secondary qb-sm" data-cx="close-profile">← All contacts</button>'}
-      <h2 style="margin-top:8px;">${escHtml(ctName(c))} ${cxStatusPill(s)}</h2><div class="desc">${c.tags.map(cxTagHtml).join(' ')} <span class="qb-dim">${[ctPhone(c), ctEmail(c)].filter(Boolean).map(escHtml).join(' · ')}</span></div>${dupWith ? `<div class="cx-dupwarn">⚠ ${dupWith} possible duplicate${dupWith > 1 ? 's' : ''}. <button type="button" class="link-btn" data-cx="dups">Review</button></div>` : ''}</div>
-      <div class="btn-row" style="margin:0"><button type="button" class="btn secondary" data-cx="export" data-cid="${escAttr(c.id)}">Export this contact's data</button><button type="button" class="btn secondary" data-cx="merge-into" data-cid="${escAttr(c.id)}">Merge into another…</button><button type="button" class="btn secondary cx-danger" data-cx="delete-contact" data-cid="${escAttr(c.id)}">Delete contact</button></div></div></div>
-    <div id="cxRest">${cxKpiHtml(st)}</div>
-    <div class="cx-two"><div class="card" id="cxDetails"><div class="qb-sec-h"><h4>Details</h4></div>${cxContactDetailsHtml(c)}</div><div class="card" id="cxAssoc">${cxAssocHtml(c)}</div></div>
-    <div id="cxRelated">${cxDealsHtml(sc, 'contact', c.id)}${cxQuotesHtml(sc)}${cxInvoicesHtml(sc)}${cxPaymentsHtml(sc)}${cxTimelineHtml(c, sc, 'contact')}</div></div>`;
-}
+function cxContactProfileHtml(c){ return rcContactPage(c); }
 
 /* ----- companies ----- */
 function cxFilteredCompanies(){
@@ -15611,17 +15626,7 @@ function cxCompaniesListHtml(){
       <label class="inv-filter">Sort <select data-cxq="cosort" aria-label="Sort"><option value="name"${cxUi.cosort === 'name' ? ' selected' : ''}>Name</option><option value="won"${cxUi.cosort === 'won' ? ' selected' : ''}>Total won</option><option value="created"${cxUi.cosort === 'created' ? ' selected' : ''}>Newest</option></select></label><span class="sup-count">${list.length} of ${state.companies.length}</span></div>
     <div id="cxCoRes" class="card"><div class="qb-scroll"><table class="qb-table cx-table"><thead><tr><th>Company</th><th>Type</th><th class="cx-hide-s">Postcode</th><th>Contacts</th><th class="cx-hide-m">Deals (live/all)</th><th class="cx-hide-s">Total won</th></tr></thead><tbody>${rows || `<tr><td colspan="6"><div class="sup-empty">${state.companies.length ? 'No companies match.' : 'No companies yet.'}</div></td></tr>`}</tbody></table></div></div>`;
 }
-function cxCompanyProfileHtml(co){
-  const sc = cxScopeCompany(co), st = cxStats(sc), people = cxContactsOfCompany(co.id), f = (label, field, val, o) => `<div class="lp-f"><label>${label}</label><input data-cxco="${field}" data-oid="${escAttr(co.id)}" value="${escAttr(val)}" autocomplete="off"${o && o.type ? ` type="${o.type}"` : ''}></div>`;
-  return `<div class="cx-prof"><div id="cxHead"><div class="page-head crm-head"><div>${nav.stack.length ? '' : '<button type="button" class="btn secondary qb-sm" data-cx="close-profile">← All companies</button>'}<h2${nav.stack.length ? '' : ' style="margin-top:8px;"'}>${escHtml(cxCompanyName(co))}</h2><div class="desc">${escHtml(co.type || 'Company')}</div></div>
-      <div class="btn-row" style="margin:0"><button type="button" class="btn secondary cx-danger" data-cx="delete-company" data-oid="${escAttr(co.id)}">Delete company</button></div></div></div>
-    <div id="cxRest">${cxKpiHtml(st)}</div>
-    <div class="cx-two"><div class="card" id="cxDetails"><div class="qb-sec-h"><h4>Details</h4></div><div class="assumptions-grid">${f('Name', 'name', co.name)}<div class="lp-f"><label>Type</label><select data-cxco="type" data-oid="${escAttr(co.id)}"><option value="">—</option>${CX_CO_TYPES.map(t => `<option${co.type === t ? ' selected' : ''}>${t}</option>`).join('')}</select></div>${f('Phone', 'phone', co.phone, { type: 'tel' })}${f('Email', 'email', co.email, { type: 'email' })}${f('Website', 'website', co.website)}${f('Postcode', 'postcode', co.postcode)}</div>
-      <div class="lp-f"><label>Address</label><textarea rows="2" data-cxco="address" data-oid="${escAttr(co.id)}">${escHtml(co.address)}</textarea></div><div class="lp-f"><label>Notes</label><textarea rows="3" data-cxco="notes" data-oid="${escAttr(co.id)}">${escHtml(co.notes)}</textarea></div></div>
-    <div class="card" id="cxAssoc"><div class="qb-sec-h"><h4>Contacts at this company</h4><button type="button" class="btn secondary qb-sm" data-cx="co-link-contact" data-oid="${escAttr(co.id)}">+ Add a contact</button></div>
-      ${people.length ? people.map(x => `<div class="cx-assoc"><button type="button" class="sp-link" data-nav="contact:${escAttr(x.contact.id)}">${escHtml(ctName(x.contact))}</button><span class="qb-dim">${escHtml([ctPhone(x.contact), ctEmail(x.contact)].filter(Boolean).join(' · '))}</span><label class="cx-rel"><span class="qb-dim">role</span><select data-cxrel="${escAttr(x.link.id)}" aria-label="Role">${CX_ROLES.map(r => `<option${x.link.label === r ? ' selected' : ''}>${r}</option>`).join('')}</select></label><button type="button" class="icon-btn" data-cx="unlink" data-lid="${escAttr(x.link.id)}" title="Unlink" aria-label="Unlink">${X_SVG}</button></div>`).join('') : '<div class="lp-empty">No contacts yet.</div>'}</div></div>
-    <div id="cxRelated">${cxDealsHtml(sc, 'company', co.id)}${cxQuotesHtml(sc)}${cxInvoicesHtml(sc)}${cxPaymentsHtml(sc)}${cxTimelineHtml(co, sc, 'company')}</div></div>`;
-}
+function cxCompanyProfileHtml(co){ return rcCompanyPage(co); }
 
 /* ----- rendering ----- */
 function cxRender(){
@@ -15634,7 +15639,7 @@ function cxRender(){
   else if(cxUi.cid && ctFind(cxUi.cid)){
     const c = ctFind(cxUi.cid), a = document.activeElement, inDetails = a && a !== document.body && cb.contains(a) && a.closest && a.closest('#cxDetails');
     if(inDetails && cb.querySelector('#cxDetails')){ const keepD = cb.querySelector('#cxDetails'), tmp = document.createElement('div'); tmp.innerHTML = cxContactProfileHtml(c);
-      ['cxHead', 'cxRest', 'cxAssoc', 'cxRelated'].forEach(id => { const o = cb.querySelector('#' + id), n = tmp.querySelector('#' + id); if(o && n) o.innerHTML = n.innerHTML; }); void keepD; }
+      ['cxHead', 'cxRest', 'cxAssoc', 'cxRelated', 'cxRight'].forEach(id => { const o = cb.querySelector('#' + id), n = tmp.querySelector('#' + id); if(o && n) o.innerHTML = n.innerHTML; }); void keepD; }
     else cb.innerHTML = cxContactProfileHtml(c);
   } else {
     if(cxUi.cid){ cxUi.cid = ''; }
@@ -15645,7 +15650,7 @@ function cxRender(){
   // companies
   if(cxUi.coid && coFind(cxUi.coid)){
     const co = coFind(cxUi.coid), a = document.activeElement, inD = a && a !== document.body && kb.contains(a) && a.closest && a.closest('#cxDetails');
-    if(inD && kb.querySelector('#cxDetails')){ const tmp = document.createElement('div'); tmp.innerHTML = cxCompanyProfileHtml(co); ['cxHead', 'cxRest', 'cxAssoc', 'cxRelated'].forEach(id => { const o = kb.querySelector('#' + id), n = tmp.querySelector('#' + id); if(o && n) o.innerHTML = n.innerHTML; }); }
+    if(inD && kb.querySelector('#cxDetails')){ const tmp = document.createElement('div'); tmp.innerHTML = cxCompanyProfileHtml(co); ['cxHead', 'cxRest', 'cxAssoc', 'cxRelated', 'cxRight'].forEach(id => { const o = kb.querySelector('#' + id), n = tmp.querySelector('#' + id); if(o && n) o.innerHTML = n.innerHTML; }); }
     else kb.innerHTML = cxCompanyProfileHtml(co);
   } else {
     cxUi.coid = '';
@@ -16821,7 +16826,7 @@ lrSchedule(LR_BASE_MS);
    New stored fields, all optional and empty by default: project.jobType, project.owner, project.site { access, services, lastVisited }.
    The existing project workspace is kept whole behind "Open full workspace" until the later stages replace its sections.
    ===================================================================== */
-const rpUi = { pid: 0, tab: 'overview', sec: {}, draft: null };
+const rpUi = { pid: 0, tab: 'overview', sec: {}, secs: {}, draft: null };
 navExtra('rp', () => ({ pid: rpUi.pid, tab: rpUi.tab, sec: Object.assign({}, rpUi.sec) }), v => { if(v){ rpUi.pid = v.pid || 0; rpUi.tab = v.tab || 'overview'; rpUi.sec = v.sec || {}; } });
 const RP_TABS = [['overview', 'Overview'], ['activity', 'Activity'], ['plan', 'Plan']];
 const RP_DATE_KEYS = ['start', 'complete', 'dur'];
@@ -16879,9 +16884,10 @@ function rpEdit(p, k, o){
     : `<input id="${id}" data-rpf="${k}" type="${o.type || 'text'}" value="${escAttr(v)}"${o.list ? ` list="${o.list}"` : ''}${o.ph ? ` placeholder="${escAttr(o.ph)}"` : ''}${o.type === 'number' ? ' min="1" step="1" inputmode="numeric"' : ''}${o.auto ? ` autocomplete="${o.auto}"` : ''}>`;
   return `<div class="rp-f rp-edit${cls}"><label for="${id}">${label}</label>${ctl}${o.hint ? `<div class="rp-hint">${o.hint}</div>` : ''}</div>`;
 }
-function rpSec(key, title, body, tools){
-  const open = rpUi.sec[key] !== false;
-  return `<section class="rp-sec${open ? ' open' : ''}" data-sec="${key}"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-sec="${key}" aria-expanded="${open}">${RP_CHEV}<span>${title}</span></button>${tools || ''}</div><div class="rp-sec-b"${open ? '' : ' hidden'}>${body}</div></section>`;
+const rpSecState = scope => scope && scope !== 'project' ? (rpUi.secs[scope] = rpUi.secs[scope] || {}) : rpUi.sec;
+function rpSec(key, title, body, tools, scope){
+  const open = rpSecState(scope)[key] !== false;
+  return `<section class="rp-sec${open ? ' open' : ''}" data-sec="${key}"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec"${scope ? ` data-scope="${scope}"` : ''} data-sec="${key}" aria-expanded="${open}">${RP_CHEV}<span>${title}</span></button>${tools || ''}</div><div class="rp-sec-b"${open ? '' : ' hidden'}>${body}</div></section>`;
 }
 
 /* ---- left column: the profile ---- */
@@ -16915,11 +16921,20 @@ function rpLeftHtml(p){
   const moneySec = `
     <div class="rp-three"><div class="rp-ro"><small>Billed</small><b>${qm(money.billed)}</b></div><div class="rp-ro"><small>Paid</small><b>${qm(money.paid)}</b></div><div class="rp-ro${money.overdue ? ' rp-bad' : ''}"><small>Overdue</small><b>${qm(money.overdue)}</b></div></div>
     <div class="rp-hint">Read-only, from the invoice schedule. <button type="button" class="sp-link" data-rp="legacy" data-sec="money">Open the schedule</button></div>`;
-  const cust = `
-    <div class="rp-custhead"><span class="rp-av sm" aria-hidden="true">${escHtml(rpInitials(rpVal(p, 'contact') || rpVal(p, 'company')))}</span><span class="rp-custname">${escHtml(rpVal(p, 'contact') || rpVal(p, 'company') || 'No customer recorded')}</span></div>
-    ${rpEdit(p, 'contact', { label: 'Contact', auto: 'off' })}${rpEdit(p, 'company', { label: 'Company' })}${rpEdit(p, 'phone', { label: 'Phone', type: 'tel' })}${rpEdit(p, 'email', { label: 'Email', type: 'email' })}`;
+  const lc = (p.contactIds || []).map(ctFind).filter(Boolean), lco = coFind(p.companyId), lc0 = lc[0] || null;
+  const cLink = lc0 ? `Edit in the contact record: <button type="button" class="sp-link" data-nav="contact:${escAttr(lc0.id)}">${escHtml(ctName(lc0))}</button>` : '';
+  const cust = lc0
+    ? `<div class="rp-custhead"><span class="rp-av sm" aria-hidden="true">${escHtml(rpInitials(ctName(lc0)))}</span><span class="rp-custname">${escHtml(ctName(lc0))}</span></div>
+    ${rpRO('Contact', `<button type="button" class="sp-link" data-nav="contact:${escAttr(lc0.id)}">${escHtml(ctName(lc0))}</button>${lc.length > 1 ? ` <span class="rp-dim">+${lc.length - 1} more</span>` : ''}`, 'Linked contact. Change who it is with Edit under Linked records.')}
+    ${rpRO('Company', lco ? `<button type="button" class="sp-link" data-nav="company:${escAttr(lco.id)}">${escHtml(lco.name)}</button>` : escHtml(rpVal(p, 'company')), lco ? 'Linked company' : cLink)}
+    ${rpRO('Phone', ctPhone(lc0) ? `<a href="tel:${escAttr(ctPhone(lc0).replace(/\s+/g, ''))}">${escHtml(ctPhone(lc0))}</a>` : '', cLink)}
+    ${rpRO('Email', ctEmail(lc0) ? `<a href="mailto:${escAttr(ctEmail(lc0))}">${escHtml(ctEmail(lc0))}</a>` : '', cLink)}`
+    : `<div class="rp-custhead"><span class="rp-av sm" aria-hidden="true">${escHtml(rpInitials(rpVal(p, 'contact') || rpVal(p, 'company')))}</span><span class="rp-custname">${escHtml(rpVal(p, 'contact') || rpVal(p, 'company') || 'No customer recorded')}</span></div>
+    ${rpEdit(p, 'contact', { label: 'Contact', auto: 'off' })}${rpEdit(p, 'company', { label: 'Company' })}${rpEdit(p, 'phone', { label: 'Phone', type: 'tel' })}${rpEdit(p, 'email', { label: 'Email', type: 'email' })}
+    <div class="rp-hint">Not linked to a contact record yet. Use Link a contact under Linked records and these follow the contact.</div>`;
+  const lcAddr = lc0 && ctAddr(lc0) && ctAddr(lc0).v;
   const site = `
-    ${rpEdit(p, 'address', { label: 'Address', area: true })}${rpEdit(p, 'postcode', { label: 'Postcode' })}${rpEdit(p, 'access', { label: 'Access', area: true, ph: 'Gates, parking, who to call' })}${rpEdit(p, 'services', { label: 'Services', area: true, ph: 'Power, water, drainage' })}${rpEdit(p, 'lastVisited', { label: 'Last visited', type: 'date' })}`;
+    ${lcAddr ? rpRO('Address', escHtml(rpVal(p, 'address')).replace(/\n/g, '<br>'), `Follows the contact's address. ${cLink}`) + rpRO('Postcode', escHtml(rpVal(p, 'postcode')), 'Worked out from the address') : rpEdit(p, 'address', { label: 'Address', area: true }) + rpEdit(p, 'postcode', { label: 'Postcode' })}${rpEdit(p, 'access', { label: 'Access', area: true, ph: 'Gates, parking, who to call' })}${rpEdit(p, 'services', { label: 'Services', area: true, ph: 'Power, water, drainage' })}${rpEdit(p, 'lastVisited', { label: 'Last visited', type: 'date' })}`;
   return `<div class="rp-head">
       <div class="rp-head-top"><button type="button" class="rp-back" data-pw="back">← All projects</button><button type="button" class="rp-legacy" data-rp="legacy" title="The earlier project page, with every section">Open full workspace</button></div>
       <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(p.name))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(p.name)}</h2><div class="rp-sub">${escHtml(sub)}</div></div></div>
@@ -17001,7 +17016,6 @@ function rpSchedPanel(p){ return ''; }   // the reschedule review is added with 
 
 /* ---- right column: linked records (filled in by the associations step) ---- */
 function rpRightHtml(p){ return `<div class="rp-rhead"><h3>Linked records</h3></div><div class="rp-rbody" id="rpRight">${rpLinksHtml(p)}</div>`; }
-function rpLinksHtml(p){ return ''; }
 
 /* ---- the frame ---- */
 function rpCentreHtml(p){ return rpTabsHtml() + `<div class="rp-cbody" id="rpCbody">${rpUi.tab === 'overview' ? rpHeadlineHtml(p) : ''}<div class="rp-cscroll">${rpUi.tab === 'overview' ? rpOverviewHtml(p) : rpUi.tab === 'activity' ? rpActivityHtml(p) : rpPlanHtml(p)}</div></div>`; }
@@ -17015,12 +17029,13 @@ function rpRenderProject(p){
   rpFit();
 }
 /* the three columns scroll on their own: the frame is as tall as the space under the brand bar and the Back bar */
-function rpFit(){
-  const rp = document.querySelector('#projectWorkspace .rp'); if(!rp) return;
+function rpFit(){ rpFitEl(document.querySelector('#projectWorkspace .rp')); }
+function rpFitEl(rp){
+  if(!rp) return;
   const top = rp.getBoundingClientRect().top + window.scrollY, h = window.innerHeight - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navtop')) || 0) - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navh')) || 0) - 16;
   rp.style.setProperty('--rp-h', Math.max(420, h) + 'px');
 }
-window.addEventListener('resize', () => { if(pwUi.id) rpFit(); });
+window.addEventListener('resize', () => { document.querySelectorAll('.rp').forEach(rpFitEl); });
 
 /* ---- editing: values wait in a draft until you choose what to do with them ---- */
 function rpSetField(p, k, raw){
@@ -17072,19 +17087,226 @@ document.addEventListener('change', (e) => {
   rpSetField(p, el.dataset.rpf, el.value);
 });
 document.addEventListener('click', (e) => {
-  const b = e.target.closest && e.target.closest('[data-rp]'); if(!b || !state) return; const a = b.dataset.rp, p = rpFind(pwUi.id); if(!p) return;
-  if(a === 'sec'){ const k = b.dataset.sec; rpUi.sec[k] = rpUi.sec[k] === false; const s = b.closest('.rp-sec'); s.classList.toggle('open', rpUi.sec[k] !== false); b.setAttribute('aria-expanded', String(rpUi.sec[k] !== false)); s.querySelector('.rp-sec-b').hidden = rpUi.sec[k] === false; return; }
+  const b = e.target.closest && e.target.closest('[data-rp]'); if(!b || !state) return; const a = b.dataset.rp, p = rpFind(pwUi.id);
+  if(a === 'sec'){ const k = b.dataset.sec, st = rpSecState(b.dataset.scope); st[k] = st[k] === false; const s = b.closest('.rp-sec'); s.classList.toggle('open', st[k] !== false); b.setAttribute('aria-expanded', String(st[k] !== false)); s.querySelector('.rp-sec-b').hidden = st[k] === false; return; }
+  if(!p) return;
   if(a === 'tab'){ rpGoTab(b.dataset.tab); return; }
   if(a === 'legacy'){ pwUi.legacy = !pwUi.legacy; renderProjects(); if(pwUi.legacy && b.dataset.sec) setTimeout(() => pwGoSection(b.dataset.sec), 30); window.scrollTo(0, 0); return; }
   if(a === 'q-note'){ pwQuickOpen('note'); return; }
   if(a === 'q-call'){ pwQuickOpen('note'); const n = document.getElementById('pwqNote'); if(n){ n.value = 'Call: '; n.focus(); } return; }
   if(a === 'q-time'){ if(!(p.stages || []).length){ showToast('Add a stage line in the Plan tab first, then log time against it'); rpGoTab('plan'); return; } pwQuickOpen('time'); return; }
+  if(a === 'q-customer'){ pwQuickOpen('customer'); return; }
   if(a === 'q-task'){ openNewTask(recordCode(p.id, 'project')); return; }
   if(a === 'bar-save'){ rpSave(p); return; }
   if(a === 'bar-cancel'){ rpCancel(p); return; }
   if(a === 'bar-confirm' || a === 'bar-tentative'){ rpBeginSchedule(p, a === 'bar-tentative' ? 'tentative' : 'confirm'); return; }
 });
 function rpBeginSchedule(p, mode){ const d = rpDraft(p); if(!d) return; d.sched = { mode }; rpUi.tab = 'plan'; rpRenderProject(p); }
+
+/* ---- linked records: a view over links that already exist (deal ids, quote links, POs, invoice rows, contact links). Nothing is copied. ---- */
+const rpLrow = (nav, name, meta) => `<div class="rp-lrow">${nav ? `<button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(name)}</button>` : `<span>${escHtml(name)}</span>`}<span class="rp-lmeta">${meta || ''}</span></div>`;
+function rpTile(title, rows, empty, tools){
+  return `<section class="rp-tile"><div class="rp-tile-h"><h4>${title}${rows.length ? ` <span class="db-count">${rows.length}</span>` : ''}</h4>${tools || ''}</div>${rows.length ? rows.join('') : `<div class="rp-lempty">${empty}</div>`}</section>`;
+}
+const rpQPill = q => `<span class="q-st q-st-${qStatusShown(q)}">${escHtml(qStatusShown(q))}</span>`;
+function rpQuoteRows(quotes){ return quotes.map(q => rpLrow('quote:' + q.id, qRef(q) + ' v' + q.version, `${rpQPill(q)} ${rpM(qCalc(q).totalEx)}`)); }
+function rpOrderRows(pos){ return pos.map(o => rpLrow('po:' + o.id, o.ref, `${poPill(o)}${o.deliveryDate ? ' · ' + escHtml(pwD(o.deliveryDate)) : ''}`)); }
+/* invoice rows (the schedule's lines) and issued documents, as the Invoicing page shows them */
+function rpInvoiceRows(sc){
+  const docs = sc.docs.filter(i => i.status !== 'Void').slice().sort((a, b) => b.seq - a.seq).map(i => rpLrow('invoicing:' + i.pid + ':' + i.key, i.number, `${invPill(ivDisplayStatus(i))} ${rpM(Math.abs(i.total))}${i.dueDate ? ' · ' + escHtml(pwD(i.dueDate)) : ''}`));
+  const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : r.uid))).map(r => rpLrow('invoicing:' + r.pid + ':' + (r.vid ? 'v' + r.vid : r.idx), r.desc, `${invPill(r.status)} ${rpM(r.amount)}${r.dueDate ? ' · ' + escHtml(pwD(r.dueDate)) : ''}`));
+  return docs.concat(rest);
+}
+function rpProjScope(p){
+  const d = cxIndex().byRoot[p.id], quotes = state.quotes.filter(q => (q.linkedIds || []).some(c => linkedRoot(c) === p.id)).sort((a, b) => b.version - a.version || b.id - a.id);
+  return cxScope(d ? [d] : [], quotes, p.contactIds || [], p.companyId || '');
+}
+function rpLinksHtml(p){
+  const sc = rpProjScope(p), cs = (p.contactIds || []).map(ctFind).filter(Boolean), co = coFind(p.companyId), cu = projCustomer(p);
+  const cust = cs.map((c, i) => rpLrow('contact:' + c.id, ctName(c), i === 0 ? 'main contact' : 'also linked')).concat(co ? [rpLrow('company:' + co.id, co.name, escHtml(co.type || 'company'))] : []);
+  const custRows = cust.length ? cust : (cu.name || cu.company ? [rpLrow('', cu.name || cu.company, 'not linked to a contact record')] : []);
+  const sup = rpSuppliers(p).map(s => rpLrow(s.id ? 'supplier:' + s.id : '', s.name, `${rpM(s.out)} · ${s.delivered ? 'delivered' : s.date ? escHtml(pwD(s.date)) : 'no date'}`));
+  const pos = (state.purchaseOrders || []).filter(o => o.pid === p.id).sort((a, b) => a.no - b.no);
+  return rpTile('Customer', custRows, 'No customer recorded.', `<button type="button" class="sp-link" data-rp="q-customer">${cust.length ? 'Edit' : 'Link a contact'}</button>`)
+    + rpTile('Suppliers', sup, 'No supplier drops on the quote yet.')
+    + rpTile('Quotes', rpQuoteRows(sc.quotes), 'No quotes linked to this project.')
+    + rpTile('Orders', rpOrderRows(pos), 'No purchase orders yet.')
+    + rpTile('Invoices', rpInvoiceRows(sc), 'No invoice schedule yet.');
+}
+
+/* ======================= SUPPLIER RECORD PAGE =======================
+   The same frame. The supplier's own fields keep saving as you type, exactly as they did in the old slide-over (data-tab="supplier");
+   the page only changes where they sit. Right column: its projects, orders and invoices (supplier payments). */
+const rsUi = { id: 0, tab: 'overview', sec: {} };
+navExtra('rs', () => ({ id: rsUi.id, tab: rsUi.tab }), v => { if(v){ rsUi.id = v.id || 0; rsUi.tab = v.tab || 'overview'; } });
+const RS_TABS = [['overview', 'Overview'], ['activity', 'Activity']];
+function rsOpen(id, sec){
+  const s = supFind(id); if(!s) return;
+  if(rsUi.id !== id){ rsUi.tab = 'overview'; rsUi.sec = {}; }
+  rsUi.id = id; activateTab('suppliers'); renderSuppliers(); window.scrollTo(0, 0);
+  if(sec === 'notes') { rsUi.tab = 'activity'; renderSuppliers(); }
+}
+function rsClose(){ const id = rsUi.id; rsUi.id = 0; supOnClose(id); window.scrollTo(0, 0); }
+/* where the supplier is used: projects (through quotes and orders), orders, and what is owed to it */
+function rsProjects(s){
+  const seen = new Map();
+  const add = (root, why) => { const d = dealRecord(root); if(!d) return; const r = seen.get(root) || { d, root, why: [] }; if(why && !r.why.includes(why)) r.why.push(why); seen.set(root, r); };
+  qSupplierUses(s.id).forEach(u => (u.q.linkedIds || []).forEach(c => add(linkedRoot(c), 'quote')));
+  (state.purchaseOrders || []).filter(o => o.supplierId === s.id).forEach(o => add(o.pid, 'order'));
+  return [...seen.values()].sort((a, b) => a.root - b.root);
+}
+function rsPayments(s){
+  const out = [];
+  state.projects.forEach(p => projDeliveries(p).drops.forEach(x => { if(x.d.supplierId === s.id && x.out > 0 && x.due) out.push({ p, x }); }));
+  return out.sort((a, b) => a.x.due.localeCompare(b.x.due));
+}
+function rsStats(s){
+  const pos = (state.purchaseOrders || []).filter(o => o.supplierId === s.id), pay = rsPayments(s), today = fmt(new Date());
+  const open = pos.filter(o => !['Delivered', 'Cancelled'].includes(o.status) && o.status !== 'Draft');
+  const nextDel = pos.filter(o => o.deliveryDate && o.deliveryDate >= today && !poDelivered(o)).map(o => o.deliveryDate).sort()[0] || '';
+  const owed = pay.filter(r => !r.x.paid).reduce((a, r) => a + r.x.out, 0), overdue = pay.filter(r => !r.x.paid && r.x.due < today).reduce((a, r) => a + r.x.out, 0);
+  return { orders: pos.length, open: open.length, nextDel, owed, overdue, quotes: supRecords(s.id).onProj.length };
+}
+function rsHeadlineHtml(s){
+  const k = rsStats(s), cell = (a, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${a}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  return `<div class="rp-strip">${cell('Open orders', k.open, k.orders + ' in total')}${cell('Live quotes', k.quotes, 'on open projects')}${cell('Next delivery', k.nextDel ? escHtml(pwD(k.nextDel)) : '—', k.nextDel ? escHtml(pwRel(k.nextDel)) : 'none due')}${cell('Owed to them', rpM(k.owed), k.overdue ? rpM(k.overdue) + ' overdue' : 'nothing overdue', k.overdue ? 'bad' : '')}${cell('Terms', escHtml(supTermsText(s) || '—'), s.accountNo ? 'acct ' + escHtml(s.accountNo) : '')}</div>`;
+}
+function rsRightHtml(s){
+  const prj = rsProjects(s).map(r => rpLrow(r.d.pl === 'project' ? 'project:' + r.root : 'deal2:' + r.root, recordCode(r.root, r.d.pl) + ' · ' + (r.d.rec.name || ''), (r.d.pl === 'project' ? 'project' : r.d.pl === 'sales' ? 'sale' : 'lead') + ' · ' + r.why.join(', ')));
+  const pos = (state.purchaseOrders || []).filter(o => o.supplierId === s.id).sort((a, b) => b.no - a.no).map(o => rpLrow('po:' + o.id, o.ref, `${poPill(o)} ${rpM(poTotals(o).payable)}`));
+  const inv = rsPayments(s).map(r => rpLrow('project:' + r.p.id + ':money', recordCode(r.p.id, 'project') + ' · ' + r.x.supplier, `${r.x.paid ? '<span class="pw-ok">paid</span>' : (r.x.due < fmt(new Date()) ? '<b class="over">overdue</b>' : 'due')} ${rpM(r.x.out)} · ${escHtml(pwD(r.x.due))}`));
+  return rpTile('Projects', prj, 'Not used on any project yet.') + rpTile('Orders', pos, 'No purchase orders yet.') + rpTile('Invoices', inv, 'No supplier payments scheduled.');
+}
+function rsFld(s, i, f, label, o){
+  o = o || {}; const v = o.val !== undefined ? o.val : (s[f] == null ? '' : s[f]), id = 'rsf_' + f;
+  const ctl = o.area ? `<textarea id="${id}" rows="${o.rows || 2}" data-tab="supplier" data-idx="${i}" data-field="${f}"${o.ph ? ` placeholder="${escAttr(o.ph)}"` : ''}>${escHtml(v)}</textarea>`
+    : o.select ? `<select id="${id}" data-tab="supplier" data-idx="${i}" data-field="${f}">${o.select.map(([val, name]) => `<option value="${escAttr(val)}"${String(val) === String(v) ? ' selected' : ''}>${escHtml(name)}</option>`).join('')}</select>`
+    : `<input id="${id}" autocomplete="off" data-tab="supplier" data-idx="${i}" data-field="${f}" type="${o.type || 'text'}"${o.num ? ` min="0" step="${o.step || 1}" inputmode="${o.step ? 'decimal' : 'numeric'}"` : ''}${o.inputmode ? ` inputmode="${o.inputmode}"` : ''} value="${escAttr(v)}"${o.ph ? ` placeholder="${escAttr(o.ph)}"` : ''}>`;
+  return `<div class="rp-f rp-edit"${f === 'name' ? ` data-qf="name"` : ''}><label for="${id}">${label}</label>${ctl}${o.hint ? `<div class="rp-hint">${o.hint}</div>` : ''}${f === 'name' ? `<div class="lp-warn"${s.name ? ' hidden' : ''}>A supplier needs a name.</div>` : ''}</div>`;
+}
+function rsLeftBody(s){
+  const i = state.suppliers.indexOf(s), mc = supMainContact(s), sec = (k, t, b) => rpSec(k, t, b, '', 'supplier');
+  const about = `${rpRO('Reference', escHtml(supCode(s)), 'Never changes', 'locked')}
+    ${rsFld(s, i, 'name', 'Supplier name')}
+    ${rsFld(s, i, 'status', 'Status', { select: [['Active', 'Active'], ['Inactive', 'Inactive']], hint: 'Suppliers are made inactive rather than deleted, so their history stays.' })}
+    ${rpRO('Main contact', mc ? escHtml(mc.name || 'Unnamed') + (mc.phone ? ' <span class="rp-dim">' + escHtml(mc.phone) + '</span>' : '') : '', 'Set under Contacts below')}
+    <div class="rp-f"><div class="rp-lab"><span>Categories</span></div>${state.supplyCategories.length ? state.supplyCategories.map(c => `<label class="sp-check"><input type="checkbox" data-sp="cat" data-id="${s.id}" data-cat="${escAttr(c.id)}"${s.categoryIds.includes(c.id) ? ' checked' : ''}> ${escHtml(c.name)}</label>`).join('') : '<div class="rp-hint">No categories yet. Add some under Settings.</div>'}</div>`;
+  const where = `${rsFld(s, i, 'address', 'Address', { area: true, rows: 3 })}${rsFld(s, i, 'postcode', 'Postcode')}${rsFld(s, i, 'website', 'Website', { inputmode: 'url', ph: 'www.example.com' })}${rsFld(s, i, 'phone', 'Main phone', { type: 'tel' })}${rsFld(s, i, 'email', 'General email', { inputmode: 'email', ph: 'name@example.com' })}`;
+  const terms = `${rsFld(s, i, 'accountNo', 'Account number')}${rsFld(s, i, 'paymentTerms', 'Payment terms (days)', { num: true, type: 'number', ph: 'e.g. 30' })}${rsFld(s, i, 'vatNo', 'VAT number', { ph: 'GB…' })}
+    ${rsFld(s, i, 'shortCode', 'Short code', { hint: 'Used on quote column headings.' })}
+    <div class="rp-f"><label class="q-check"><input type="checkbox" data-tab="supplier" data-idx="${i}" data-field="pricesIncVat"${s.pricesIncVat ? ' checked' : ''}> Prices include VAT</label></div>
+    ${rsFld(s, i, 'deliveryCharge', 'Delivery charge (£ per drop)', { num: true, type: 'number', step: '0.01' })}${rsFld(s, i, 'freeDeliveryOver', 'Free-delivery threshold (£)', { num: true, type: 'number', step: '0.01' })}${rsFld(s, i, 'minOrder', 'Minimum order (£)', { num: true, type: 'number', step: '0.01' })}
+    ${rsFld(s, i, 'leadTimeDays', 'Lead time (days)', { num: true, type: 'number' })}${rsFld(s, i, 'priceValidityDays', 'Price validity (days)', { num: true, type: 'number' })}
+    ${rsFld(s, i, 'callOff', 'Call-off allowed', { select: [['no', 'No'], ['yes', 'Yes']], val: s.callOff ? 'yes' : 'no' })}`;
+  const contacts = `${s.contacts.length ? s.contacts.map((c, ci) => supContactHtml(s, i, c, ci)).join('') : '<div class="rp-hint">No contacts yet.</div>'}<button type="button" class="btn secondary qb-sm" data-sp="add-contact" data-id="${s.id}">+ Add contact</button>`;
+  const manage = `<div class="sp-foot"><button type="button" class="sp-link danger" data-sp="delete" data-id="${s.id}">Delete supplier…</button></div>`;
+  return sec('about', 'About this supplier', about) + sec('where', 'Address and contact details', where) + sec('terms', 'Terms and delivery', terms) + sec('contacts', 'Contacts', contacts) + sec('manage', 'Manage', manage);
+}
+function rsHeadHtml(s){
+  const cats = supCatsOf(s);
+  return `<div class="rp-head-top"><button type="button" class="rp-back" data-rs="back">← All suppliers</button></div>
+    <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(s.name || 'S'))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(s.name || 'New supplier')}</h2><div class="rp-sub">${escHtml(supCode(s))}${supEmail(s) ? ' · ' + escHtml(supEmail(s)) : ''}</div></div></div>
+    <div class="rp-pills"><span class="rp-pill ${s.status === 'Active' ? 'ok' : 'neu'}">${escHtml(s.status)}</span>${cats.slice(0, 3).map(c => `<span class="rp-pill neu">${escHtml(c.name)}</span>`).join('')}${cats.length > 3 ? `<span class="rp-pill neu">+${cats.length - 3}</span>` : ''}</div>
+    <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rs="note">Note</button>${supPhone(s) ? `<a class="btn secondary qb-sm" href="tel:${escAttr(String(supPhone(s)).replace(/\s+/g, ''))}">Call</a>` : ''}${supEmail(s) ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(supEmail(s))}">Email</a>` : ''}</div>`;
+}
+function rsCentreBody(s){
+  if(rsUi.tab === 'activity') return `<div class="rp-card"><h4>Notes</h4><div id="spNotes">${supNotesHtml(s, state.suppliers.indexOf(s))}</div></div>`;
+  const r = supRecords(s.id), q = u => rpLrow('quote:' + u.q.id, u.ref, `${rpQPill(u.q)}${u.amount ? ' ' + escHtml(u.amount) : ''}`);
+  return `<div class="rp-card"><h4>Live quotes on open projects ${r.onProj.length ? `<span class="db-count">${r.onProj.length}</span>` : ''}</h4>${r.onProj.length ? r.onProj.map(q).join('') : '<div class="pw-empty">None. A quote counts when it is Draft, Sent or Accepted, has not expired and is linked to a project that is still open.</div>'}</div>
+    <div class="rp-card"><h4>Orders placed ${r.placed.length ? `<span class="db-count">${r.placed.length}</span>` : ''}</h4>${r.placed.length ? rpOrderRows(r.placed).join('') : '<div class="pw-empty">No purchase orders have been sent to this supplier yet.</div>'}</div>
+    ${r.drafts.length ? `<div class="rp-card"><h4>Purchase orders not placed yet <span class="db-count">${r.drafts.length}</span></h4>${rpOrderRows(r.drafts).join('')}</div>` : ''}
+    ${r.other.length ? `<div class="rp-card"><h4>Other live quotes (leads and sales deals) <span class="db-count">${r.other.length}</span></h4>${r.other.map(q).join('')}</div>` : ''}`;
+}
+function rsTabsHtml(){ return `<nav class="rp-tabs" role="tablist" aria-label="Supplier">${RS_TABS.map(([k, n]) => `<button type="button" role="tab" class="${rsUi.tab === k ? 'active' : ''}" aria-selected="${rsUi.tab === k}" data-rs="tab" data-tab="${k}">${n}</button>`).join('')}</nav>`; }
+/* draw: the whole page the first time; while a field on the left is being typed in only the parts that read from it are redrawn */
+function rsRender(s){
+  const host = document.getElementById('supplierRecord'); if(!host) return;
+  const act = document.activeElement, typing = !!(act && host.contains(act) && act.closest('.rp-left') && /^(INPUT|TEXTAREA|SELECT)$/.test(act.tagName));
+  const fresh = !host.querySelector('.rp') || host.dataset.sid !== String(s.id);
+  const scroll = n => { const e = host.querySelector(n); return e ? e.scrollTop : 0; };
+  if(fresh){
+    host.dataset.sid = s.id;
+    host.innerHTML = `<div class="rp" data-kind="supplier"><aside class="rp-left" aria-label="Profile"><div class="rp-head" id="rsHead">${rsHeadHtml(s)}</div><div class="rp-lbody" id="rsLeftBody">${rsLeftBody(s)}</div></aside><main class="rp-centre">${rsTabsHtml()}<div class="rp-cbody"><div id="rsStrip">${rsHeadlineHtml(s)}</div><div class="rp-cscroll" id="rsCentre">${rsCentreBody(s)}</div></div></main><aside class="rp-right" aria-label="Linked records"><div class="rp-rhead"><h3>Linked records</h3></div><div class="rp-rbody" id="rsRight">${rsRightHtml(s)}</div></aside></div>`;
+  } else {
+    const put = (id, html) => { const e = host.querySelector('#' + id); if(e) e.innerHTML = html; };
+    const c = host.querySelector('#rsCentre'), top = c ? c.scrollTop : 0;
+    put('rsHead', rsHeadHtml(s)); put('rsStrip', rsHeadlineHtml(s)); put('rsCentre', rsCentreBody(s)); put('rsRight', rsRightHtml(s));
+    host.querySelector('.rp-tabs').outerHTML = rsTabsHtml(); if(c) host.querySelector('#rsCentre').scrollTop = top;
+    if(!typing) { const l = host.querySelector('#rsLeftBody'), t = l ? l.scrollTop : 0; put('rsLeftBody', rsLeftBody(s)); if(l) l.scrollTop = t; }
+  }
+  rpFitEl(host.querySelector('.rp'));
+}
+function rsRenderLeft(keep){ const s = supFind(rsUi.id), l = document.getElementById('rsLeftBody'); if(!s || !l) return; const t = l.scrollTop; l.innerHTML = rsLeftBody(s); if(keep) l.scrollTop = t; }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-rs]'); if(!b || !state) return; const a = b.dataset.rs, s = supFind(rsUi.id); if(!s) return;
+  if(a === 'back'){ rsClose(); return; }
+  if(a === 'tab'){ rsUi.tab = b.dataset.tab; rsRender(s); return; }
+  if(a === 'note'){ rsUi.tab = 'activity'; rsRender(s); const n = document.querySelector('#spNotes [data-sc="note"]'); if(n) n.focus(); return; }
+});
+navExtra('rssec', () => rsUi.sec, v => { if(v) rsUi.sec = v; });
+
+/* ======================= CUSTOMER RECORD PAGES (contact and company) =======================
+   The existing profile, cards and timeline are kept; they now sit in the frame: profile and fields left, tabs in the centre, linked records right.
+   Fields keep saving as you type (data-cxf / data-cxco), as before. */
+const cxPg = { key: '', tab: 'overview' };
+navExtra('cxpg', () => ({ k: cxPg.key, t: cxPg.tab }), v => { if(v){ cxPg.key = v.k || ''; cxPg.tab = v.t || 'overview'; } });
+const RC_TABS = [['overview', 'Overview'], ['activity', 'Activity']];
+function rcTabsHtml(){ return `<nav class="rp-tabs" role="tablist" aria-label="Customer">${RC_TABS.map(([k, n]) => `<button type="button" role="tab" class="${cxPg.tab === k ? 'active' : ''}" aria-selected="${cxPg.tab === k}" data-rc="tab" data-tab="${k}">${n}</button>`).join('')}</nav>`; }
+function rcTouch(key){ if(cxPg.key !== key){ cxPg.key = key; cxPg.tab = 'overview'; } }
+function rcFrame(kind, o){
+  return `<div class="rp cx-prof" data-kind="${kind}"><aside class="rp-left" aria-label="Profile"><div class="rp-head" id="cxHead">${o.head}</div><div class="rp-lbody" id="cxLeft">${o.left}</div></aside>
+    <main class="rp-centre">${rcTabsHtml()}<div class="rp-cbody"><div id="cxRest" class="rp-kpis">${o.kpi}</div><div class="rp-cscroll" id="cxRelated">${o.body}</div></div></main>
+    <aside class="rp-right" aria-label="Linked records"><div class="rp-rhead"><h3>Linked records</h3></div><div class="rp-rbody" id="cxRight">${o.right}</div></aside></div>`;
+}
+function rcDealRows(sc){
+  return sc.deals.slice().sort((a, b) => (b.live - a.live) || String(b.rec.createdAt || '').localeCompare(String(a.rec.createdAt || ''))).map(d => rpLrow('deal2:' + d.root, d.code + ' · ' + d.name, `${d.pl === 'lead' ? 'lead' : d.pl === 'sales' ? 'sale' : 'project'} · <span class="cx-st cx-st-${d.live ? 'live' : d.completed ? 'past' : 'lost'}">${escHtml(d.status)}</span>`));
+}
+function rcRight(sc, extraTiles){
+  const projects = sc.deals.filter(d => d.pl === 'project');
+  return (extraTiles || '') + rpTile('Projects', rcDealRows({ deals: projects }), 'No projects yet.') + rpTile('Leads and sales', rcDealRows({ deals: sc.deals.filter(d => d.pl !== 'project') }), 'None.')
+    + rpTile('Quotes', rpQuoteRows(sc.quotes), 'No quotes yet.') + rpTile('Invoices', rpInvoiceRows(sc), 'No invoices yet.');
+}
+function rcBody(sc, owner, kind){ return cxPg.tab === 'activity' ? cxTimelineHtml(owner, sc, kind) : cxDealsHtml(sc, kind, owner.id) + cxQuotesHtml(sc) + cxInvoicesHtml(sc) + cxPaymentsHtml(sc); }
+function rcSec(k, t, b){ return rpSec(k, t, b, '', 'cx'); }
+function rcContactPage(c){
+  rcTouch('c:' + c.id);
+  const sc = cxScopeContact(c), st = cxStats(sc), s = cxContactStatus(c), dupWith = cxDupPairs().filter(p => p.a.id === c.id || p.b.id === c.id).length, L = cxLinksOfContact(c.id);
+  const head = `<div class="rp-head-top">${nav.stack.length ? '<span></span>' : '<button type="button" class="rp-back" data-cx="close-profile">← All contacts</button>'}</div>
+    <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(ctName(c)))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(ctName(c))}</h2><div class="rp-sub">${[ctPhone(c), ctEmail(c)].filter(Boolean).map(escHtml).join(' · ')}</div></div></div>
+    <div class="rp-pills">${cxStatusPill(s)}${c.tags.map(cxTagHtml).join('')}${L.companies.length ? `<span class="rp-pill neu">${escHtml(L.companies[0].company.name)}</span>` : ''}</div>
+    ${dupWith ? `<div class="cx-dupwarn">⚠ ${dupWith} possible duplicate${dupWith > 1 ? 's' : ''}. <button type="button" class="sp-link" data-cx="dups">Review</button></div>` : ''}
+    <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rc="note">Note</button>${ctPhone(c) ? `<a class="btn secondary qb-sm" href="tel:${escAttr(ctPhone(c).replace(/\s+/g, ''))}">Call</a>` : ''}${ctEmail(c) ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(ctEmail(c))}">Email</a>` : ''}</div>`;
+  const about = rpRO('Status', cxStatusPill(s), 'Worked out from this person\'s deals');
+  const manage = `<div class="btn-row" style="margin:0"><button type="button" class="btn secondary qb-sm" data-cx="export" data-cid="${escAttr(c.id)}">Export this contact's data</button><button type="button" class="btn secondary qb-sm" data-cx="merge-into" data-cid="${escAttr(c.id)}">Merge into another…</button><button type="button" class="btn secondary qb-sm cx-danger" data-cx="delete-contact" data-cid="${escAttr(c.id)}">Delete contact</button></div>`;
+  const left = rcSec('about', 'About this contact', about) + `<section class="rp-sec open" data-sec="details"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="details" aria-expanded="true">${RP_CHEV}<span>Details</span></button></div><div class="rp-sec-b card-less" id="cxDetails">${cxContactDetailsHtml(c)}</div></section>`
+    + `<section class="rp-sec open" data-sec="assoc"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="assoc" aria-expanded="true">${RP_CHEV}<span>People and company</span></button></div><div class="rp-sec-b" id="cxAssoc">${cxAssocHtml(c)}</div></section>` + rcSec('manage', 'Manage', manage);
+  return rcFrame('contact', { head, left, kpi: cxKpiHtml(st), body: rcBody(sc, c, 'contact'), right: rcRight(sc, rpTile('People', L.contacts.map(x => rpLrow('contact:' + x.other.id, ctName(x.other), escHtml(x.link.label || '')))
+    .concat(L.companies.map(x => rpLrow('company:' + x.company.id, x.company.name, escHtml(x.link.label || 'company')))), 'Not linked to anyone yet.')) });
+}
+function rcCompanyPage(co){
+  rcTouch('o:' + co.id);
+  const sc = cxScopeCompany(co), st = cxStats(sc), people = cxContactsOfCompany(co.id), f = (label, field, val, o) => `<div class="lp-f"><label>${label}</label><input data-cxco="${field}" data-oid="${escAttr(co.id)}" value="${escAttr(val)}" autocomplete="off"${o && o.type ? ` type="${o.type}"` : ''}></div>`;
+  const head = `<div class="rp-head-top">${nav.stack.length ? '<span></span>' : '<button type="button" class="rp-back" data-cx="close-profile">← All companies</button>'}</div>
+    <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(cxCompanyName(co)))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(cxCompanyName(co))}</h2><div class="rp-sub">${escHtml(co.type || 'Company')}${co.postcode ? ' · ' + escHtml(co.postcode) : ''}</div></div></div>
+    <div class="rp-pills"><span class="rp-pill neu">${people.length} contact${people.length === 1 ? '' : 's'}</span><span class="rp-pill neu">${sc.deals.filter(d => d.live).length} live deal${sc.deals.filter(d => d.live).length === 1 ? '' : 's'}</span></div>
+    <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rc="note">Note</button>${co.phone ? `<a class="btn secondary qb-sm" href="tel:${escAttr(String(co.phone).replace(/\s+/g, ''))}">Call</a>` : ''}${co.email ? `<a class="btn secondary qb-sm" href="mailto:${escAttr(co.email)}">Email</a>` : ''}</div>`;
+  const about = `${rpRO('Created', escHtml(dShow(co.created)), 'Never changes', 'locked')}${rpRO('People', String(people.length), 'Listed under People below')}`;
+  const details = `<div class="assumptions-grid">${f('Name', 'name', co.name)}<div class="lp-f"><label>Type</label><select data-cxco="type" data-oid="${escAttr(co.id)}"><option value="">—</option>${CX_CO_TYPES.map(t => `<option${co.type === t ? ' selected' : ''}>${t}</option>`).join('')}</select></div></div>
+    ${f('Phone', 'phone', co.phone, { type: 'tel' })}${f('Email', 'email', co.email, { type: 'email' })}${f('Website', 'website', co.website)}
+    <div class="lp-f"><label>Address</label><textarea rows="2" data-cxco="address" data-oid="${escAttr(co.id)}">${escHtml(co.address)}</textarea></div>${f('Postcode', 'postcode', co.postcode)}
+    <div class="lp-f"><label>Notes</label><textarea rows="3" data-cxco="notes" data-oid="${escAttr(co.id)}">${escHtml(co.notes)}</textarea></div>`;
+  const assoc = `<div class="qb-sec-h"><h4>People at this company</h4><button type="button" class="btn secondary qb-sm" data-cx="co-link-contact" data-oid="${escAttr(co.id)}">+ Add a contact</button></div>`
+    + (people.length ? people.map(x => `<div class="cx-assoc"><button type="button" class="sp-link" data-nav="contact:${escAttr(x.contact.id)}">${escHtml(ctName(x.contact))}</button><span class="qb-dim">${escHtml([ctPhone(x.contact), ctEmail(x.contact)].filter(Boolean).join(' · '))}</span><label class="cx-rel"><span class="qb-dim">role</span><select data-cxrel="${escAttr(x.link.id)}" aria-label="Role">${CX_ROLES.map(r => `<option${x.link.label === r ? ' selected' : ''}>${r}</option>`).join('')}</select></label><button type="button" class="icon-btn" data-cx="unlink" data-lid="${escAttr(x.link.id)}" title="Unlink" aria-label="Unlink">${X_SVG}</button></div>`).join('') : '<div class="lp-empty">No contacts yet.</div>');
+  const manage = `<div class="btn-row" style="margin:0"><button type="button" class="btn secondary qb-sm cx-danger" data-cx="delete-company" data-oid="${escAttr(co.id)}">Delete company</button></div>`;
+  const left = rcSec('about', 'About this company', about) + `<section class="rp-sec open" data-sec="details"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="details" aria-expanded="true">${RP_CHEV}<span>Details</span></button></div><div class="rp-sec-b" id="cxDetails">${details}</div></section>`
+    + `<section class="rp-sec open" data-sec="assoc"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="assoc" aria-expanded="true">${RP_CHEV}<span>People</span></button></div><div class="rp-sec-b" id="cxAssoc">${assoc}</div></section>` + rcSec('manage', 'Manage', manage);
+  return rcFrame('company', { head, left, kpi: cxKpiHtml(st), body: rcBody(sc, co, 'company'), right: rcRight(sc, rpTile('People', people.map(x => rpLrow('contact:' + x.contact.id, ctName(x.contact), escHtml(x.link.label || ''))), 'No contacts yet.')) });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-rc]'); if(!b || !state) return; const a = b.dataset.rc;
+  if(a === 'tab'){ cxPg.tab = b.dataset.tab; cxRender(); return; }
+  if(a === 'note'){ cxPg.tab = 'activity'; cxRender(); const n = document.getElementById('cxNoteText'); if(n) n.focus(); return; }
+});
 /* BT:js-records end */
 
 /* ---------- init ---------- */
