@@ -2444,6 +2444,16 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 
 .rp-fc-task > span { flex: 1; min-width: 0; text-align: left; } .rp-fc-task .cbx { flex: none; margin: 0; }
 .rp-compose input[type=date] { width: 150px; flex: none; }
+
+.td-nav { display: flex; align-items: center; gap: var(--bt-s2); margin-top: var(--bt-s2); flex-wrap: wrap; } .td-nav input[type=date] { min-height: var(--bt-control); padding: 4px 10px; border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-btn); font: inherit; background: var(--bt-card); }
+.td-step { min-width: var(--bt-control); font-size: 22px; line-height: 1; padding: 0 12px; } .td-rel { font-size: var(--bt-fs-sm); font-family: var(--bt-font-sans); color: var(--text-muted); margin-left: 8px; font-weight: 500; }
+.td-crit { margin-bottom: var(--bt-s4); border-left: 4px solid var(--bt-bad-fg); } .td-crit-h { display: flex; align-items: baseline; gap: var(--bt-s3); flex-wrap: wrap; margin-bottom: var(--bt-s2); } .td-crit-h h3 { margin: 0; font-size: var(--bt-fs-md); } .td-crit-s { font-size: var(--bt-fs-xs); color: var(--text-muted); }
+.td-crit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--bt-s5); }
+.td-grp-h { font-size: var(--bt-fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); padding: 8px 0 2px; display: flex; gap: 8px; } .td-grp.over .td-grp-h { color: var(--bt-bad-fg); } .td-grp-h .n { font-weight: 600; }
+.td-adds { margin-left: auto; display: inline-flex; gap: 6px; flex-wrap: wrap; } .td-more { margin-top: var(--bt-s2); min-height: 36px; }
+@media (max-width: 700px) { .td-step, .td-nav .btn { min-height: 44px; } .td-crit-grid { grid-template-columns: 1fr; } }
+
+.td-nav input[type=date] { width: 168px; flex: none; }
 </style>
 </head>
 <body>
@@ -2583,18 +2593,16 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="page-head crm-head">
       <div>
         <h2 id="todayDate"></h2>
+        <div class="td-nav" id="todayNav" role="group" aria-label="Choose the day"></div>
       </div>
       <div class="view-toggle" id="todayScope" title="Whose items"></div>
     </div>
+    <section class="td-card td-crit" id="todayCritical" aria-label="Time-critical"></section>
     <div class="today-grid">
-      <section class="td-card" id="todayCrm"></section>
-      <section class="td-card" id="todayActions"></section>
-      <section class="td-card" id="todayInvoices"></section>
-      <section class="td-card" id="todayDeliveries"></section>
-      <section class="td-card" id="todayOrders"></section>
-      <section class="td-card" id="todayReady"></section>
+      <section class="td-card" id="todayJob"></section>
+      <section class="td-card" id="todayBiz"></section>
       <section class="td-card" id="todayProjects" style="grid-column:1 / -1;"></section>
-      <section class="td-card" id="todayRfq" style="grid-column:1 / -1;" hidden></section>
+      <section class="td-card" id="todayReady" style="grid-column:1 / -1;"></section>
     </div>
   </div>
 
@@ -12551,7 +12559,7 @@ document.addEventListener('click', (e) => {
    Actions have no id, so the panel holds the action object itself. They also already have a free-text `notes` column, so the new
    note thread is stored in `noteLog` (same shape as a task's notes) and the links in `linkedIds`. Neither is added to existing
    actions: both are read defensively and only written when used. */
-const todayUi = { scope: 'mine', od: { crm: false, act: false, proj: false, inv: false, del: false, ord: false }, key: '' };
+const todayUi = { scope: 'mine', od: { crm: false, act: false, proj: false, inv: false, del: false, ord: false }, key: '', date: '', more: {}, und: {} };
 const actUi = { colsOpen: false };
 function todayScopeKey(){ return STORAGE_PREFIX + 'business-tracker-today-scope:' + meName(); }
 function loadTodayScope(){ try{ todayUi.scope = localStorage.getItem(todayScopeKey()) === 'all' ? 'all' : 'mine'; }catch(e){ todayUi.scope = 'mine'; } }
@@ -12605,9 +12613,10 @@ function todayTaskRow(t, over){
       <div class="cbx${done ? ' checked' : ''}" data-crm="tick" data-id="${t.id}" title="${done ? 'Completed' : 'Mark done'}">${CHECK_SVG}</div>
       <span class="td-title" title="${escAttr(t.id + ' · ' + t.title)}">${escHtml(t.title)}</span>
       <span class="td-meta">${typeIcon(t.typeId)}${prioPill(t.priorityId)}
-        ${linkSummaryHtml(t, `data-crm="rec" data-id="${t.id}"`)}
+        ${linkSummaryHtml(t, `data-crm="rec" data-id="${t.id}"`) || taskRefsSummary(t)}
+        ${t.recur ? `<span title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}
         ${todayUi.scope === 'all' ? `<span>${escHtml(t.owner || 'Unassigned')}</span>` : ''}
-        ${over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(t.dueDate)))}</span>` : ''}</span></div>`;
+        ${over && t.dueDate ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(t.dueDate)))}</span>` : ''}</span></div>`;
 }
 function todayActionRow(x, over){
   const r = x.r, arch = archiving.has(r);
@@ -12616,7 +12625,7 @@ function todayActionRow(x, over){
       <span class="td-title">${escHtml(r.action || '(untitled action)')}</span>
       <span class="td-meta"><span>${escHtml(r.owner || 'No owner')}</span>
         ${linkSummaryHtml(r, `data-today="act-rec" data-idx="${x.i}"`)}
-        ${over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(r.deadline)))}</span>` : ''}</span></div>`;
+        ${over && r.deadline ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(r.deadline)))}</span>` : ''}</span></div>`;
 }
 function todaySection(key, title, addLabel, addAction, emptyLabel, main, over, rowFn, live){
   const open = todayUi.od[key];
@@ -12731,37 +12740,98 @@ function updateGreeting(){
   const h = londonHour(), n = greetFirstName(), t = n ? (h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening') + ', ' + n : 'Hello';
   if(el.textContent !== t) el.textContent = t;   // only the text changes: nothing is re-rendered and focus never moves
 }
+const TD_WEEKDAY = d => d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+function todayDayLabel(sel, real){
+  const n = daysBetween(real, sel), rel = n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : n === -1 ? 'Yesterday' : '';
+  return TD_WEEKDAY(toDate(sel)) + (rel ? '' : '') + (rel ? ` <span class="td-rel">${rel}</span>` : '');
+}
+function todayNavHtml(sel, real){
+  return `<button type="button" class="btn secondary td-step" data-today="day-prev" aria-label="Previous day" title="Previous day">‹</button>
+    <input type="date" id="todayPick" value="${sel}" aria-label="Jump to a date">
+    <button type="button" class="btn secondary td-step" data-today="day-next" aria-label="Next day" title="Next day">›</button>
+    <button type="button" class="btn secondary" data-today="day-today"${sel === real ? ' disabled' : ''}>Today</button>`;
+}
+/* an action tile: overdue first (red), then the day, then Undated; at most the Settings limit, with See more */
+function todayTile(key, title, adds, groups, rowFn, live){
+  const limit = (state.settings && state.settings.todayLimit) || 10, more = !!todayUi.more[key];
+  const all = []; groups.forEach(g => g.items.forEach(it => all.push({ g, it })));
+  const total = all.filter(x => live(x.it)).length, shown = more ? all : all.slice(0, limit), hidden = all.length - shown.length;
+  const order = [], byG = new Map(); shown.forEach(x => { if(!byG.has(x.g.k)){ byG.set(x.g.k, { g: x.g, rows: [] }); order.push(x.g.k); } byG.get(x.g.k).rows.push(x.it); });
+  const body = order.map(k => { const { g, rows } = byG.get(k), full = groups.find(y => y.k === k).items.length;
+    return `<div class="td-grp ${g.cls}"><div class="td-grp-h">${g.label}<span class="n">${full}</span></div>${rows.map(r => rowFn(r, g.over)).join('')}</div>`; }).join('');
+  return `<div class="td-head"><h3>${title}</h3><span class="n">${total}</span><span class="td-adds">${adds}</span></div>
+    ${body || '<div class="td-empty">Nothing due.</div>'}
+    ${hidden > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">See more (${hidden})</button>` : (more && all.length > limit ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">Show fewer</button>` : '')}`;
+}
+function todayGroupsFor(dated, undated, sel, label){
+  return [{ k: 'over', cls: 'over', over: true, label: 'Overdue', items: dated.filter(x => x.d < sel) }, { k: 'day', cls: 'day', over: false, label, items: dated.filter(x => x.d === sel) }, { k: 'und', cls: 'und', over: false, label: 'Undated', items: undated }].filter(g => g.items.length);
+}
 function renderToday(){
   if(!state) return;
-  const now = new Date(), today = fmt(now);
-  todayUi.key = today;
-  const d = todayData(today);
-  const inv = todayInvoiceData(today), dl = todayDeliveryData(today), ord = todayOrderData(today), ready = todayReadyData();
-  const dueNow = d.crmToday.filter(t => t.status === 'open').length + d.actToday.filter(x => x.r.status !== 'Done').length + inv.main.length + dl.main.length + ord.main.length;
-  const overNow = d.crmOver.filter(t => t.status === 'open').length + d.actOver.filter(x => x.r.status !== 'Done').length + inv.over.length + dl.over.length + ord.over.length;   // the Ready-to-turn-into-a-job list is not counted
+  const now = new Date(), real = fmt(now), sel = isoOk(todayUi.date) || real, isToday = sel === real, ownBiz = canSeeBusiness();
+  todayUi.key = real;
+  const dReal = todayData(real), dSel = isToday ? dReal : todayData(sel);
+  const inv = todayInvoiceData(sel), dl = todayDeliveryData(sel), ord = todayOrderData(sel), ready = todayReadyData();
+  const invR = isToday ? inv : todayInvoiceData(real), dlR = isToday ? dl : todayDeliveryData(real), ordR = isToday ? ord : todayOrderData(real);
+  const dueNow = dReal.crmToday.filter(t => t.status === 'open').length + dReal.actToday.filter(x => x.r.status !== 'Done').length + invR.main.length + dlR.main.length + ordR.main.length;
+  const overNow = dReal.crmOver.filter(t => t.status === 'open').length + dReal.actOver.filter(x => x.r.status !== 'Done').length + invR.over.length + dlR.over.length + ordR.over.length;   // the Ready-to-turn-into-a-job list is not counted
   const badge = document.getElementById('todayBadge');
   if(badge){ badge.textContent = dueNow + overNow; badge.hidden = !(dueNow + overNow); badge.classList.toggle('over', overNow > 0); badge.title = dueNow + ' due today, ' + overNow + ' overdue'; }
-  const crm = document.getElementById('todayCrm'); if(!crm) return;
-  document.getElementById('todayDate').textContent = dateLabel(now);
-  document.getElementById('todaySummary').textContent = dueNow + ' due today, ' + overNow + ' overdue';
+  const crit = document.getElementById('todayCritical'); if(!crit) return;
+  document.getElementById('todayDate').innerHTML = todayDayLabel(sel, real);
+  const nav = document.getElementById('todayNav');
+  if(nav){ if(!nav.querySelector('#todayPick')) nav.innerHTML = todayNavHtml(sel, real);
+    else { const pk = nav.querySelector('#todayPick'); if(pk.value !== sel && document.activeElement !== pk) pk.value = sel; nav.querySelector('[data-today="day-today"]').disabled = sel === real; } }   // updated in place so the picker keeps its focus
+  const dueSel = dSel.crmToday.filter(t => t.status === 'open').length + dSel.actToday.filter(x => x.r.status !== 'Done').length + inv.main.length + dl.main.length + ord.main.length;
+  const overSel = dSel.crmOver.filter(t => t.status === 'open').length + dSel.actOver.filter(x => x.r.status !== 'Done').length + inv.over.length + dl.over.length + ord.over.length;
+  document.getElementById('todaySummary').textContent = isToday ? dueSel + ' due today, ' + overSel + ' overdue' : dueSel + ' due ' + (daysBetween(real, sel) > 0 ? 'then' : 'that day') + ', ' + overSel + ' overdue by then';
   document.getElementById('todayScope').innerHTML = `<button data-today="scope" data-v="mine" class="${todayUi.scope === 'mine' ? 'active' : ''}">My items</button><button data-today="scope" data-v="all" class="${todayUi.scope === 'all' ? 'active' : ''}">Everyone</button>`;
-  crm.innerHTML = todaySection('crm', 'CRM tasks', '+ Add', 'add-task', '+ New task', d.crmToday, d.crmOver, todayTaskRow, t => t.status === 'open');
   updateGreeting();
-  const secs = [['todayInvoices', () => todayDatedSection('inv', 'Invoices', inv, todayInvoiceRow, 'Nothing due today')], ['todayDeliveries', () => todayDatedSection('del', 'Deliveries', dl, todayDeliveryRow, 'Nothing due today')],
-    ['todayOrders', () => todayDatedSection('ord', 'Orders', ord, todayOrderRow, 'Nothing due today')], ['todayReady', () => todayReadySection(ready)]];
-  secs.forEach(([id, fn]) => { const el = document.getElementById(id); if(el) el.innerHTML = fn(); });
-  document.getElementById('todayActions').innerHTML = todaySection('act', 'Actions', '+ Add', 'add-action', '+ New action', d.actToday, d.actOver, todayActionRow, x => x.r.status !== 'Done');
-  const pe = todayProjectEvents(today), pr = document.getElementById('todayProjects');
+  /* time-critical: deliveries to sign off, invoices and orders due, prices to confirm (supplier quotes awaiting a reply sit beside them) */
+  const priceRows = (state.purchaseOrders || []).filter(po => po.status === 'Delivered' && !po.match).sort((a, b) => cmpText(a.deliveredAt || '', b.deliveredAt || ''));
+  const lim = state.settings.todayLimit || 10;
+  const sub = (key, title, d, rowFn, empty) => {
+    const rows = d.over.map(x => ({ x, over: true })).concat(d.main.map(x => ({ x, over: false })));
+    const more = !!todayUi.more[key], shown = more ? rows : rows.slice(0, lim), hid = rows.length - shown.length;
+    return `<div class="td-sub-blk"><div class="td-head"><h3>${title}</h3><span class="n">${rows.length}</span></div>${shown.length ? shown.map(r => rowFn(r.x, r.over)).join('') : `<div class="td-empty">${empty}</div>`}${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">See more (${hid})</button>` : ''}</div>`; };
+  const priceBlk = `<div class="td-sub-blk"><div class="td-head"><h3>Prices to confirm</h3><span class="n">${priceRows.length}</span></div>${priceRows.length ? priceRows.slice(0, todayUi.more.price ? 999 : lim).map(po => `<div class="td-row" data-today="nav" data-spec="po:${po.id}"><span class="td-title">${escHtml(po.ref)} · ${escHtml(po.supplierName || '')}<span class="td-sub">${escHtml((state.projects.find(x => x.id === po.pid) || {}).name || '')}</span></span><span class="td-meta"><span>Delivered, check the price</span><span>${qm(poTotals(po).payable)}</span></span></div>`).join('') : '<div class="td-empty">Nothing to check.</div>'}${priceRows.length > lim && !todayUi.more.price ? `<button type="button" class="link-btn td-more" data-today="more" data-k="price">See more (${priceRows.length - lim})</button>` : ''}</div>`;
+  crit.innerHTML = `<div class="td-crit-h"><h3>Time-critical</h3><span class="td-crit-s">${dl.main.length + dl.over.length} to sign off · ${inv.main.length + inv.over.length} invoices · ${ord.main.length + ord.over.length} orders${isToday ? '' : ' · for ' + escHtml(fmtDisplay(toDate(sel)))}</span></div>
+    <div class="td-crit-grid">${sub('del', 'Deliveries to sign off', dl, todayDeliveryRow, 'Nothing waiting for sign-off.')}${sub('ord', 'Orders to place', ord, todayOrderRow, 'No orders waiting.')}${sub('inv', 'Invoices to raise', inv, todayInvoiceRow, 'No invoices to raise.')}${priceBlk}<div class="td-sub-blk" id="todayRfq" hidden></div></div>`;
+  /* action tiles: job actions, then business actions (only for the people Settings allows) */
+  const me = meName(), mine = todayUi.scope === 'mine' && !!me;
+  const undatedTasks = scope => state.crmTasks.filter(t => t.status === 'open' && !t.dueDate && t.scope === scope && taskVisible(t) && !(taskOnLostLead(t)) && !(mine && t.owner !== me));
+  const jobDated = dSel.crmToday.concat(dSel.crmOver).filter(t => t.scope !== 'business').map(t => ({ t, d: t.dueDate }));
+  const taskRow = (x, over) => todayTaskRow(x.t || x, over);
+  const jobGroups = todayGroupsFor(jobDated, undatedTasks('job').map(t => ({ t, d: '' })), sel, isToday ? 'Due today' : 'Due ' + escHtml(fmtDisplay(toDate(sel))));
+  const jobEl = document.getElementById('todayJob');
+  jobEl.innerHTML = todayTile('job', 'Job actions', '<button class="btn secondary" data-today="add-task">+ Add</button>', jobGroups, taskRow, x => x.t.status === 'open');
+  const bizEl = document.getElementById('todayBiz'); bizEl.hidden = !ownBiz;
+  if(ownBiz){
+    const bizTasks = dSel.crmToday.concat(dSel.crmOver).filter(t => t.scope === 'business').map(t => ({ t, d: t.dueDate, kind: 'task' }));
+    const acts = dSel.actToday.concat(dSel.actOver).map(x => ({ x, d: x.r.deadline, kind: 'act' }));
+    const undAct = state.actions.map((r, i) => ({ r, i })).filter(({ r }) => !r.deadline && r.status !== 'Done' && !archiving.has(r) && !(mine && !sameUser(r.owner, me))).map(x => ({ x, d: '', kind: 'act' }));
+    const bizUnd = undatedTasks('business').map(t => ({ t, d: '', kind: 'task' }));
+    const rowFn = (it, over) => it.kind === 'task' ? todayTaskRow(it.t, over) : todayActionRow(it.x, over);
+    const live = it => it.kind === 'task' ? it.t.status === 'open' : it.x.r.status !== 'Done';
+    const sortD = (a, b) => cmpText(a.d, b.d);
+    bizEl.innerHTML = todayTile('biz', 'Business actions', '<button class="btn secondary" data-today="add-biz-task">+ Task</button><button class="btn secondary" data-today="add-action">+ Action</button>', todayGroupsFor(bizTasks.concat(acts).sort(sortD), bizUnd.concat(undAct), sel, isToday ? 'Due today' : 'Due ' + escHtml(fmtDisplay(toDate(sel)))), rowFn, live);
+  } else bizEl.innerHTML = '';
+  const readyEl = document.getElementById('todayReady'); readyEl.hidden = !isToday || !ready.length; if(isToday) readyEl.innerHTML = todayReadySection(ready);
+  const pe = todayProjectEvents(sel), pr = document.getElementById('todayProjects');
   if(pr){ const open = todayUi.od.proj;
-    pr.innerHTML = `<div class="td-head"><h3>Projects</h3><span class="n">${pe.today.length}</span></div>
+    pr.innerHTML = `<div class="td-head"><h3>${isToday ? 'Projects today' : 'Projects on ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${pe.today.length}</span></div>
       ${pe.over.length ? `<button class="td-od${open ? ' open' : ''}" data-today="od" data-k="proj">Overdue (${pe.over.length})${CHEV_SVG}</button><div class="td-od-list"${open ? '' : ' hidden'}>${pe.over.map(x => todayProjectRow(x, true)).join('')}</div>` : ''}
-      ${pe.today.length ? pe.today.map(x => todayProjectRow(x, false)).join('') : '<div class="td-empty">No project stages, deliveries or payments dated today.</div>'}`; }
+      ${pe.today.length ? pe.today.map(x => todayProjectRow(x, false)).join('') : '<div class="td-empty">No project stages, deliveries or payments dated ' + (isToday ? 'today' : 'that day') + '.</div>'}`; }
   refreshActionPanel();
 }
 /* roll over at midnight and when the tab or window regains focus, so the lists never show yesterday's "today" */
 function checkTodayRollover(){ updateGreeting(); if(state && todayUi.key && todayUi.key !== fmt(new Date())) render(); }   // every 30 seconds: the greeting text is re-checked in place, the page only re-renders at midnight
 setInterval(checkTodayRollover, 30000);
 document.addEventListener('visibilitychange', () => { if(!document.hidden) checkTodayRollover(); });
+document.addEventListener('change', (e) => {   // the date picker: jump to a day
+  if(e.target.id !== 'todayPick' || !state) return;
+  const v = isoOk(e.target.value), real = fmt(new Date()); todayUi.date = !v || v === real ? '' : v; todayUi.more = {}; renderToday();
+});
 window.addEventListener('focus', checkTodayRollover);
 
 document.addEventListener('change', (e) => {   // Action panel fields (title, status, priority, owner, due date, …)
@@ -12799,6 +12869,12 @@ document.addEventListener('click', (e) => {
   if(a === 'scope') setTodayScope(b.dataset.v);
   else if(a === 'od'){ todayUi.od[b.dataset.k] = !todayUi.od[b.dataset.k]; renderToday(); }
   else if(a === 'add-task') openNewTask('');
+  else if(a === 'add-biz-task') openNewTask('', { scope: 'business' });
+  else if(a === 'more'){ todayUi.more[b.dataset.k] = !todayUi.more[b.dataset.k]; renderToday(); }
+  else if(a === 'day-prev' || a === 'day-next' || a === 'day-today'){
+    const real = fmt(new Date()), cur = isoOk(todayUi.date) || real;
+    todayUi.date = a === 'day-today' ? '' : addDaysIso(cur, a === 'day-prev' ? -1 : 1); if(todayUi.date === real) todayUi.date = ''; todayUi.more = {}; renderToday();
+  }
   else if(a === 'add-action') openNewAction();
   else if(a === 'proj-open'){ openProjectWorkspace(Number(b.dataset.id)); }
   else if(a === 'nav'){ const inner = e.target.closest('input,select,textarea,button,.cbx,a'); if(inner && inner !== b) return; navGo(() => navOpen(b.dataset.spec)); }
