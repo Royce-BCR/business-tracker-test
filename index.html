@@ -2688,6 +2688,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 /* BT:css-finance begin */
   .f6-lostp { border-top: 1px solid var(--line); padding: var(--bt-s3) 0; } .f6-lostp-h { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .f6-lostl { margin: 6px 0 8px 18px; padding: 0; font-size: var(--bt-fs-sm); }
   .f6-dupg { border: 1px solid var(--line); border-radius: var(--bt-r-md, 8px); padding: var(--bt-s3); margin-bottom: var(--bt-s3); }
+  .f6-acts { display: flex; gap: 4px; flex-wrap: wrap; } .f6-in { color: var(--bt-ok-fg); } .f6-weeks td, .f6-weeks th { white-space: nowrap; } .f6-low { background: var(--bt-warn-bg); } .f6-wklist { margin-top: var(--bt-s3); }
+  .f6-ul { margin: 4px 0 10px 16px; padding: 0; font-size: var(--bt-fs-sm); } .f6-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s4); margin-top: var(--bt-s3); } .f6-cand { display: block; margin: 6px 0; }
 /* BT:css-finance end */
 </style>
 </head>
@@ -3038,12 +3040,16 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <h2>Cash Flow Forecast</h2>
       <div class="desc">Money in from committed project payment lines (real due dates) plus weighted pipeline (sales × probability), less materials and fixed overhead, giving a running closing balance. Terms are set in Settings.</div>
     </div>
+    <div id="cfViewToggle"></div>
+    <div id="cfReview"></div>
+    <div id="cfForecast">
     <div id="cashflowTotals"></div>
     <div id="cashflowLost"></div>
     <div class="card"><div class="assumptions-grid two" id="cashflowAssumptionsGrid"></div></div>
     <div class="table-scroll" id="cashflowTableWrap"></div>
     <div id="cashflowLines"></div>
     <div id="cashflowQuoteBox"></div>
+    </div>
   </div>
 
   <!-- PURCHASE ORDERS -->
@@ -6728,7 +6734,7 @@ function projOnQuoteAccepted(q){   // a quote linked to a project has just been 
    settledDate, supplierId (actually used), plannedAmount (the quote / Working plan, kept as the budget), variance, lines[{ desc, qtyQuoted, priceQuoted, qtyFinal, priceFinal, reason }], file }.
    A trade-account purchase is a payable: cost counts on the project when bought, but it is not a cash movement until it is settled (settledDate). */
 const spUi = { pid: 0, did: '', items: [], base: [], po: null };
-function spTx(p, did){ return (state.transactions || []).find(t => t.srcKey === 'sp:' + p.id + ':' + did) || null; }
+function spTx(p, did){ const st = p.dropState && p.dropState[did]; return (state.transactions || []).find(t => t.srcKey === 'sp:' + p.id + ':' + did) || (st && st.paidTxn ? txById(st.paidTxn) : null) || null; }
 function txUnsettledTrade(t){ return t.payMode === 'trade' && !t.settledDate; }
 function txCashDate(t){ return t.payMode === 'trade' ? (t.settledDate || '') : (t.date || ''); }   // the day the money actually moved ('' while a trade-account purchase is unpaid)
 function spTotals(items, f){
@@ -11263,7 +11269,7 @@ function finReceiptTargets(p){
 function finEnsureReceipts(){
   if(!state || !Array.isArray(state.transactions)) return;
   (state.projects || []).forEach(p => finReceiptTargets(p).forEach(t => {
-    const l = t.l, has = state.transactions.find(x => (l.uid && x.lineUid === l.uid) || x.srcKey === t.key), auto = has && has.origin === 'receipt-sync' ? has : null;
+    const l = t.l, has = state.transactions.find(x => (l.uid && x.lineUid === l.uid) || x.srcKey === t.key) || (l.landedTxn ? { landed: true } : null), auto = has && has.origin === 'receipt-sync' ? has : null;
     if(auto && !l.paidDate){ state.transactions.splice(state.transactions.indexOf(auto), 1); return; }   // un-paid again: the receipt it made goes
     if(auto && l.paidDate && (auto.date !== l.paidDate)){ if(!reconLockedTx(auto)) auto.date = l.paidDate; return; }
     if(has || !l.paidDate || finLegacyPaid.has(l)) return;
@@ -11278,7 +11284,7 @@ function reconGuardQuiet(dateIso){ return !!dateIso && reconLockedMonth(MAIN_ACC
 function finUnrecorded(){
   const out = [], sd = bankStartDate();
   (state.projects || []).forEach(p => {
-    finReceiptTargets(p).forEach(t => { const l = t.l; if(!l.paidDate || l.paidDate < sd) return; if(state.transactions.some(x => (l.uid && x.lineUid === l.uid) || x.srcKey === t.key)) return; const amt = Number(l.paidAmount) || Number(l.amount) || 0; if(amt > 0) out.push({ kind: 'in', p, key: t.key, label: t.label, code: t.code, date: l.paidDate, amount: amt, line: l }); });
+    finReceiptTargets(p).forEach(t => { const l = t.l; if(!l.paidDate || l.paidDate < sd) return; if(l.landedTxn || state.transactions.some(x => (l.uid && x.lineUid === l.uid) || x.srcKey === t.key)) return; const amt = Number(l.paidAmount) || Number(l.amount) || 0; if(amt > 0) out.push({ kind: 'in', p, key: t.key, label: t.label, code: t.code, date: l.paidDate, amount: amt, line: l }); });
     Object.keys(p.dropState || {}).forEach(did => { const st = p.dropState[did]; if(!st || !st.paid || st.paid < sd || spTx(p, did)) return; const x = projDeliveries(p).drops.find(d => d.d.id === did); if(x && x.out > 0) out.push({ kind: 'out', p, key: 'sp:' + p.id + ':' + did, label: x.supplier, code: recordCode(p.id, 'project'), date: st.paid, amount: x.out, did }); });
   });
   return out;
@@ -14490,7 +14496,7 @@ function render(){
   renderRecon();
   renderInvoicing();
   renderAssets();
-  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); }catch(e){ console.error(e); }
+  try{ renderClassify(); renderBusinessCosts(); renderLostEffect(); renderDupTasks(); renderWeeklyReview(); }catch(e){ console.error(e); }
   renderPOs(); renderSupInvoices();
   renderSettings();
   renderBranding();
@@ -20490,6 +20496,159 @@ document.addEventListener('click', async (e) => {
   list.forEach(t => { const ix = state.crmTasks.indexOf(t); if(ix >= 0){ state.crmTasks.splice(ix, 1); undoDeleted('Task deleted: ' + t.id, ['crmTasks'], ix, t, null, true); } });
   dupUi.sel = new Set(); saveState(); render(); showToast(list.length + ' duplicate task' + (list.length === 1 ? '' : 's') + ' deleted (see Undo history)');
 });
+/* ---- shared reads: money owed to me, money I owe, and the weekly expected items. Ageing, the weekly review, the reports and the monthly summary all read these. ---- */
+const finToday = () => fmt(new Date());
+const FIN_BUCKETS = [['cur', 'Current'], ['b1', '1 to 30 days'], ['b2', '31 to 60 days'], ['b3', 'Over 60 days']];
+const finBucket = d => d <= 0 ? 'cur' : d <= 30 ? 'b1' : d <= 60 ? 'b2' : 'b3';
+const rvTxId = t => t.uid || rcTxKey(t);
+function txById(id){ return id ? (state.transactions || []).find(t => rvTxId(t) === id) || null : null; }
+/* customer invoices raised and not paid (a write-off removes a line) */
+function owedToMe(){
+  const today = finToday();
+  return invRows().filter(r => r.invoicedDate && !r.wo && r.status !== 'Paid').map(r => {
+    const owed = r2(r.amount - (r.paidAmount || 0)), late = r.dueDate ? daysBetween(r.dueDate, today) : 0, p = state.projects.find(x => x.id === r.pid), c = p ? projCustomer(p) : {}, key = r.vid ? 'v' + r.vid : String(r.idx);
+    return { kind: 'cust', pid: r.pid, pname: r.pname, code: r.code, who: c.company || c.name || '(no customer)', label: r.desc, owed, due: r.dueDate || '', late, bucket: finBucket(late), nav: 'invoicing:' + r.pid + ':' + key, queried: r.queried, key };
+  }).filter(x => x.owed > 0.004);
+}
+/* supplier payments not yet paid (cancelled orders on lost projects are already out) and the next due date of each business cost */
+function iOwe(){
+  const today = finToday(), out = [];
+  finLines().filter(x => x.kind === 'supPay' && !x.done).forEach(x => { const late = x.date ? daysBetween(x.date, today) : 0; out.push({ kind: 'sup', pid: x.pid, pname: x.pname, code: x.code, who: String(x.label).replace(/ \((trade account|date typed)\)$/, ''), label: x.label, owed: x.amount, due: x.date || '', late, bucket: finBucket(late), src: x.src, nav: 'project:' + x.pid + ':materials', key: x.key }); });
+  (state.businessCosts || []).forEach(c => { if(!c.nextDue || c.done || !(bcAmt(c) > 0)) return; const late = daysBetween(c.nextDue, today); out.push({ kind: 'biz', pid: 0, pname: '', code: '', who: c.name || 'Business cost', label: c.name || 'Business cost', owed: bcAmt(c), due: c.nextDue, late, bucket: finBucket(late), nav: 'bcost:' + c.id, key: 'bc:' + c.id + ':' + c.nextDue }); });
+  return out;
+}
+const finSum = a => r2(a.reduce((s, x) => s + x.owed, 0));
+/* every dated item still to come (customer payments, supplier payments, business costs) up to a date; an overdue one counts as due now */
+function rvItems(upTo){
+  const today = finToday(), items = [], lastKey = upTo.slice(0, 7);
+  finLines().filter(x => x.kind === 'custPay' && !x.done && x.date && x.date <= upTo).forEach(x => items.push({ kind: 'cust', dir: 'in', key: x.key, date: x.date, amount: x.amount, label: x.label, pid: x.pid, pname: x.pname, src: x.src }));
+  finLines().filter(x => x.kind === 'supPay' && !x.done && x.date && x.date <= upTo).forEach(x => items.push({ kind: 'sup', dir: 'out', key: x.key, date: x.date, amount: x.amount, label: x.label, pid: x.pid, pname: x.pname, src: x.src, did: x.did }));
+  bcForecastItems(lastKey).filter(x => x.date <= upTo).forEach(x => items.push({ kind: 'biz', dir: 'out', key: 'bc:' + x.id + ':' + x.date, date: x.date, amount: x.amount, label: x.name, pid: 0, pname: '', src: { t: 'bcost', id: x.id }, bcId: x.id }));
+  return items.sort((a, b) => a.date.localeCompare(b.date));
+}
+function rvWeek(){ const t = toDate(finToday()), dow = (t.getDay() + 6) % 7, s = new Date(t); s.setDate(t.getDate() - dow); const e = new Date(s); e.setDate(s.getDate() + 6); return { start: fmt(s), end: fmt(e) }; }
+/* the bank balance now, then week by week for eight weeks: unsettled dated items only (no weighted pipeline, no "if won" quotes); an estimate for the evenly spread overhead is added when the Pricing Model lines are used */
+function rvProjection(weeks){
+  const today = finToday(), n = weeks || 8, bal0 = bankBalance(), end = addDaysIso(today, n * 7 - 1), items = rvItems(end), est = r2(bcFixedMonthly() * 12 / 52); let bal = bal0;
+  const out = [];
+  for(let w = 0; w < n; w++){
+    const a = addDaysIso(today, w * 7), b = addDaysIso(today, w * 7 + 6), its = items.filter(x => (w === 0 ? x.date <= b : x.date >= a && x.date <= b)), inn = r2(its.filter(x => x.dir === 'in').reduce((s, x) => s + x.amount, 0)), outc = r2(its.filter(x => x.dir === 'out').reduce((s, x) => s + x.amount, 0));
+    bal = r2(bal + inn - outc - est); out.push({ w, a, b, items: its, inn, out: outc, est, close: bal });
+  }
+  const low = out.reduce((m, x) => x.close < m.close ? x : m, out[0]);
+  return { start: bal0, weeks: out, low };
+}
+const rvMarks = () => (state.reviewMarks = state.reviewMarks && typeof state.reviewMarks === 'object' ? state.reviewMarks : {});
+function rvMark(key, o){ rvMarks()[key] = Object.assign({ at: new Date().toISOString(), by: meName() }, o); }
+function rvCandidates(dir, amount, date){
+  const used = new Set(); state.projects.forEach(p => { (p.paymentLines || []).concat(p.variations || []).forEach(l => { if(l.landedTxn) used.add(l.landedTxn); }); Object.values(p.dropState || {}).forEach(s => { if(s && s.paidTxn) used.add(s.paidTxn); }); });
+  const bc = bcMatchedKeys(), f = dir === 'in' ? 'moneyIn' : 'moneyOut', today = finToday();
+  return state.transactions.filter(t => { const a = Number(t[f]) || 0; if(!(a > 0) || !t.date || t.srcKey || t.lineUid || used.has(rvTxId(t)) || bc.has(bcTxnKey(t)) || txUnsettledTrade(t)) return false; if(Math.abs(a - amount) > Math.max(0.5, amount * 0.03)) return false; const d = daysBetween(date || today, t.date); return d >= -21 && d <= 45 || (date && t.date >= addDaysIso(date, -21)); })
+    .map(t => ({ t, diff: Math.abs((Number(t[f]) || 0) - amount), dd: Math.abs(daysBetween(date || today, t.date)) })).sort((a, b) => a.diff - b.diff || a.dd - b.dd).slice(0, 5);
+}
+function rvFind(key){ return rvItems(addDaysIso(finToday(), 120)).find(x => x.key === key) || null; }
+/* ---- the weekly review ---- */
+const rvUi = { week: -1 };
+function cfView(){ return cfUi.view === 'forecast' ? 'forecast' : 'review'; }
+function rvLink(src, text){ return finSrcLink(src, text); }
+function rvRowHtml(x, today){
+  const mk = rvMarks()[x.key], late = x.date < today, chips = [];
+  if(late) chips.push(`<span class="qb-flag bad">${daysBetween(x.date, today)} day${daysBetween(x.date, today) === 1 ? '' : 's'} late</span>`);
+  if(mk && mk.status === 'late') chips.push(`<span class="qb-flag bad" title="Marked late ${escAttr(dShow((mk.at || '').slice(0, 10)))}">marked late</span>`);
+  if(mk && mk.status === 'moved') chips.push(`<span class="qb-flag manual" title="Moved from ${escAttr(mk.from || '')}">moved ${escHtml(dShow(mk.from))} → ${escHtml(dShow(mk.to))}</span>`);
+  let landed = `<button type="button" class="btn qb-sm" data-f6="rv-landed" data-key="${escAttr(x.key)}">Landed</button>`;
+  if(x.kind === 'biz'){ const c = state.businessCosts.find(y => y.id === x.bcId), m = c && c.nextDue === x.date ? bcSuggest(c) : null; landed = m ? `<button type="button" class="btn qb-sm" data-bc-a="match" data-bc-id="${escAttr(x.bcId)}">Landed</button>` : `<button type="button" class="btn secondary qb-sm" data-f6="rv-nobc" title="No matching transaction yet">Landed</button>`; }
+  return `<tr><td>${pwD(x.date)}</td><td>${x.dir === 'in' ? 'Customer pays' : x.kind === 'sup' ? 'Pay supplier' : 'Business cost'}</td><td>${rvLink(x.src, x.label)}${x.pname ? `<div class="qb-dim">${escHtml(x.pname)}</div>` : ''} ${chips.join(' ')}</td><td class="qb-calc ${x.dir === 'in' ? 'f6-in' : ''}">${x.dir === 'in' ? '' : '−'}${qm(x.amount)}</td>
+    <td><div class="f6-acts">${landed}<button type="button" class="btn secondary qb-sm" data-f6="rv-late" data-key="${escAttr(x.key)}">Late</button><button type="button" class="btn secondary qb-sm" data-f6="rv-moved" data-key="${escAttr(x.key)}">Moved</button></div></td></tr>`;
+}
+function rvHtml(){
+  const today = finToday(), wk = rvWeek(), pr = rvProjection(8), tot = owedToMe(), owe = iOwe(), kpi = (l, v, s, a, extra) => `<div class="kpi" style="--accent:${a}"><div class="label">${l}</div><div class="value ${extra || ''}">${v}</div><div class="fin-sub">${s}</div></div>`;
+  const overdue = tot.filter(x => x.late > 0), oldest = overdue.reduce((m, x) => Math.max(m, x.late), 0);
+  const nextCust = finLines().filter(x => x.kind === 'custPay' && !x.done && x.date && x.date >= today).map(x => x.date).sort()[0] || '', before = owe.filter(x => x.due && nextCust && x.due <= nextCust);
+  const items = rvItems(wk.end), inWeek = items.filter(x => x.date <= wk.end), sc = s => rvMarks()[s];
+  const wkLines = finLines().filter(x => (x.kind === 'custPay' || x.kind === 'supPay') && (x.paidDate || x.date) && (x.date >= wk.start && x.date <= wk.end)), bcDone = (state.businessCosts || []).flatMap(c => (c.paid || []).filter(x => x.due >= wk.start && x.due <= wk.end).map(x => ({ id: c.id, name: c.name, amount: x.amount, date: x.due })));
+  const expIn = wkLines.filter(x => x.kind === 'custPay'), expOut = wkLines.filter(x => x.kind === 'supPay'), bcWk = bcForecastItems(wk.end.slice(0, 7)).filter(x => x.date >= wk.start && x.date <= wk.end).concat(bcDone);
+  const txs = state.transactions.filter(t => { const d = txCashDate(t); return d && d >= wk.start && d <= wk.end; }), actIn = r2(txs.reduce((s, t) => s + (Number(t.moneyIn) || 0), 0)), actOut = r2(txs.reduce((s, t) => s + (Number(t.moneyOut) || 0), 0)), eIn = r2(expIn.reduce((s, x) => s + x.amount, 0)), eOut = r2(expOut.reduce((s, x) => s + x.amount, 0) + bcWk.reduce((s, x) => s + x.amount, 0));
+  const dl = (arr, f) => arr.length ? `<ul class="f6-ul">${arr.map(f).join('')}</ul>` : '<div class="qb-dim">Nothing.</div>';
+  const quotes = state.quotes.filter(q => q.status === 'Sent' && qLive().includes(q)).map(q => ({ q, days: quoteDaysSince(q), val: qCalc(q).totalEx, task: fuTaskOf(q) })).sort((a, b) => (b.days || 0) - (a.days || 0));
+  const lowBad = pr.low.close < 0;
+  return `<div class="kpi-row">
+    ${kpi('Cash in the bank today', qm(pr.start), '<button type="button" class="sp-link" data-nav-tab="reconciliation">Bank Reconciliation →</button>', 'var(--oak)', pr.start < 0 ? 'over' : '')}
+    ${kpi('Lowest point, next 8 weeks', qm(pr.low.close), `week of ${escHtml(pwD(pr.low.a))} · <button type="button" class="sp-link" data-f6="cfview" data-v="forecast">full forecast →</button>`, 'var(--plum)', lowBad ? 'over' : '')}
+    ${kpi('Owed to me', qm(finSum(tot)), `${overdue.length ? '<b class="over">' + qm(finSum(overdue)) + ' overdue</b>, oldest ' + oldest + ' days · ' : 'none overdue · '}<button type="button" class="sp-link" data-f6="ageing" data-v="me">Ageing →</button>`, 'var(--green)')}
+    ${kpi('I owe', qm(finSum(owe)), `${nextCust ? qm(finSum(before)) + ' falls due before the next customer payment (' + escHtml(pwD(nextCust)) + ')' : 'no customer payment is dated'} · <button type="button" class="sp-link" data-f6="ageing" data-v="owe">Ageing →</button>`, 'var(--bt-plum)')}</div>
+  <div class="card"><div class="qb-sec-h"><h4>The next eight weeks</h4></div><div class="qb-scroll"><table class="qb-table f6-weeks"><thead><tr><th></th>${pr.weeks.map(w => `<th>${escHtml(pwD(w.a).replace(/ \d{4}$/, ''))}</th>`).join('')}</tr></thead><tbody>
+    <tr><td>In</td>${pr.weeks.map(w => `<td class="qb-calc">${w.inn ? `<button type="button" class="cf-n" data-f6="rv-wk" data-w="${w.w}">${qm(w.inn)}</button>` : '—'}</td>`).join('')}</tr>
+    <tr><td>Out</td>${pr.weeks.map(w => `<td class="qb-calc">${w.out ? `<button type="button" class="cf-n" data-f6="rv-wk" data-w="${w.w}">−${qm(w.out)}</button>` : '—'}</td>`).join('')}</tr>
+    ${pr.weeks[0].est ? `<tr><td>Spread overhead <span class="qb-dim">(estimate)</span></td>${pr.weeks.map(w => `<td class="qb-calc">−${qm(w.est)}</td>`).join('')}</tr>` : ''}
+    <tr><td><b>Closing</b></td>${pr.weeks.map(w => `<td class="qb-calc ${w.close < 0 ? 'over' : ''}${w === pr.low ? ' f6-low' : ''}"><b>${qm(w.close)}</b></td>`).join('')}</tr></tbody></table></div>
+    <p class="q-help">Starts from the actual bank balance. Only dated, unsettled items count: customer payments, supplier payments and business costs. The weighted pipeline and quotes not yet won are left out. Overdue items count in the first week. Click In or Out to see the lines.</p>
+    ${rvUi.week >= 0 && pr.weeks[rvUi.week] ? `<div class="f6-wklist"><b>Week of ${escHtml(pwD(pr.weeks[rvUi.week].a))}</b><table class="qb-table qb-narrow"><tbody>${pr.weeks[rvUi.week].items.map(x => `<tr><td>${pwD(x.date)}</td><td>${rvLink(x.src, x.label)}</td><td>${escHtml(x.pname)}</td><td class="qb-calc">${x.dir === 'in' ? '' : '−'}${qm(x.amount)}</td></tr>`).join('')}</tbody></table></div>` : ''}</div>
+  <div class="card"><div class="qb-sec-h"><h4>Expected this week and anything late <span class="db-count">${inWeek.length}</span> <span class="qb-dim">${escHtml(pwD(wk.start))} to ${escHtml(pwD(wk.end))}</span></h4></div>
+    <p class="q-help">Landed: the money moved (you confirm the matching transaction). Late: a customer payment gets a chase task; anything late stays on this list. Moved: pick the new date.</p>
+    <div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>Date</th><th>What</th><th>Item</th><th>Amount</th><th></th></tr></thead><tbody>${inWeek.map(x => rvRowHtml(x, today)).join('') || '<tr><td colspan="5"><div class="sup-empty">Nothing is expected this week.</div></td></tr>'}</tbody></table></div></div>
+  <div class="card"><div class="qb-sec-h"><h4>Expected against actual, this week</h4></div>
+    <div class="kpi-row"><div class="kpi" style="--accent:var(--green)"><div class="label">Money in</div><div class="value">${qm(actIn)}</div><div class="fin-sub">expected ${qm(eIn)} · ${actIn - eIn >= 0 ? '+' : '−'}${qm(Math.abs(actIn - eIn))}</div></div>
+    <div class="kpi" style="--accent:var(--oak)"><div class="label">Money out</div><div class="value">${qm(actOut)}</div><div class="fin-sub">expected ${qm(eOut)} · ${actOut - eOut >= 0 ? '+' : '−'}${qm(Math.abs(actOut - eOut))}</div></div></div>
+    <details><summary>Show the lines</summary><div class="f6-cols"><div><b>Expected in</b>${dl(expIn, x => `<li>${rvLink(x.src, x.label)} ${escHtml(x.pname)} ${qm(x.amount)} ${x.done ? '✓ paid' : ''}</li>`)}<b>Expected out</b>${dl(expOut.map(x => ({ x })).concat(bcWk.map(x => ({ b: x }))), o => o.x ? `<li>${rvLink(o.x.src, o.x.label)} ${escHtml(o.x.pname)} ${qm(o.x.amount)} ${o.x.done ? '✓ paid' : ''}</li>` : `<li>${rvLink({ t: 'bcost', id: o.b.id }, o.b.name)} ${qm(o.b.amount)}</li>`)}</div>
+      <div><b>Actual (Transactions)</b>${dl(txs, t => `<li>${finSrcLink({ t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) }, (t.description || 'Transaction'))} ${Number(t.moneyIn) > 0 ? '+' + qm(t.moneyIn) : '−' + qm(t.moneyOut)} <span class="qb-dim">${escHtml(dShow(txCashDate(t)))}</span></li>`)}</div></div></details></div>
+  <div class="card"><div class="qb-sec-h"><h4>Quotes out <span class="db-count">${quotes.length}</span></h4></div>
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Quote</th><th>Customer</th><th>Value (ex VAT)</th><th>Sent</th><th>Days since contact</th><th>Follow-up</th></tr></thead><tbody>${quotes.map(x => `<tr><td><button type="button" class="sp-link" data-nav="quote:${x.q.id}">${escHtml(qRef(x.q))}</button></td><td>${escHtml(x.q.customer || '')}</td><td class="qb-calc">${qm(x.val)}</td><td>${x.q.sentAt ? escHtml(dShow(String(x.q.sentAt).slice(0, 10))) : '—'}</td><td>${x.days === null ? '—' : x.days + ' working days'} ${noContactChipHtml(x.days)}</td><td>${x.task ? `<button type="button" class="sp-link" data-crm="open" data-id="${escAttr(x.task.id)}">${escHtml(x.task.id)} due ${escHtml(dShow(x.task.dueDate))}</button>` : '<span class="qb-dim">none open</span>'}</td></tr>`).join('') || '<tr><td colspan="6"><div class="sup-empty">No quotes are waiting for an answer.</div></td></tr>'}</tbody></table></div></div>`;
+}
+function renderWeeklyReview(){
+  const el = document.getElementById('cfReview'), fc = document.getElementById('cfForecast'), tg = document.getElementById('cfViewToggle'); if(!el || !fc || !state) return;
+  const v = cfView(); el.hidden = v !== 'review'; fc.hidden = v !== 'forecast';
+  tg.innerHTML = `<div class="view-toggle" role="group" aria-label="Cash flow views">${[['review', 'Weekly review'], ['forecast', 'Forecast']].map(([k, n]) => `<button type="button" data-f6="cfview" data-v="${k}" class="${v === k ? 'active' : ''}">${n}</button>`).join('')}</div>`;
+  if(v === 'review') el.innerHTML = rvHtml();
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-f6^="rv-"], [data-f6="cfview"], [data-f6="ageing"]'); if(!b || !state) return; const a = b.dataset.f6;
+  if(a === 'cfview'){ cfUi.view = b.dataset.v; if(!document.getElementById('panel-cashflow').classList.contains('active')) activateTab('cashflow'); render(); return; }
+  if(a === 'ageing'){ if(typeof ageUi !== 'undefined') ageUi.tab = b.dataset.v; navGo(() => { activateTab('ageing'); window.scrollTo(0, 0); }); return; }
+  if(a === 'rv-wk'){ rvUi.week = rvUi.week === Number(b.dataset.w) ? -1 : Number(b.dataset.w); renderWeeklyReview(); return; }
+  if(a === 'rv-nobc'){ showToast('No transaction matches this cost yet. Record it in Transactions (a business cost) and it will be suggested here.', null, 7000); return; }
+  const x = rvFind(b.dataset.key); if(!x){ showToast('That item is no longer on the list.'); return; }
+  const today = finToday();
+  if(a === 'rv-late'){
+    if(x.kind === 'cust'){
+      const p = state.projects.find(y => y.id === x.pid), ak = 'chase:' + x.key, ex = state.crmTasks.find(t => t.status === 'open' && t.autoKey === ak);
+      if(!ex){ const t = createTask({ title: 'Chase payment: ' + (p ? p.name : '') + ', ' + x.label + ' ' + qm(x.amount), dueDate: today, scope: 'job', owner: meName(), linkedIds: p ? [recordCode(p.id, 'project')] : [], description: 'The payment due ' + dShow(x.date) + ' has not landed. Contact the customer and note what they say.' }); t.autoKey = ak; }
+      rvMark(x.key, { status: 'late', date: x.date }); saveState(); render(); showToast(ex ? 'Marked late. A chase task is already open for it.' : 'Marked late. A chase task is on Today.');
+    } else { rvMark(x.key, { status: 'late', date: x.date }); saveState(); render(); showToast('Marked late. It stays on this list.'); }
+    return;
+  }
+  if(a === 'rv-moved'){
+    const ok = await showConfirm('Moved: new date', `${x.label} ${qm(x.amount)} was due ${dShow(x.date)}. Pick the new date.`, `<input type="date" id="rvNewDate" value="${escAttr(x.date < today ? today : x.date)}">`); if(!ok) return; const d = isoOk(_confirmExtraNote || '');
+    if(!d){ showToast('Pick a date. Nothing was changed.'); return; }
+    if(x.kind === 'cust'){ const t = finLineTarget(x.pid, x.key.split(':')[0] === 'vp' ? 'v' + x.key.split(':')[2] : x.key.split(':')[2]); if(!t) return; const r = t.row; if(r && ivRowDoc(r)){ showToast('This line has an invoice document, so its due date is locked. Void the invoice to change it.', null, 8000); return; } t.tgt.dueDate = d; if(x.key.startsWith('cp:')) t.tgt.dueManual = true; }
+    else if(x.kind === 'sup'){ const p = state.projects.find(y => y.id === x.pid), dr = p && p.plan && (p.plan.drops || []).find(y => y.id === x.did); if(!dr){ showToast('Change this payment date on the project Working plan (Materials).', null, 8000); return; } dr.paymentDueDate = d; dr.dueManual = true; }
+    else { const c = state.businessCosts.find(y => y.id === x.bcId); if(!c) return; c.nextDue = d; }
+    rvMark(x.key, { status: 'moved', from: x.date, to: d }); saveState(); render(); showToast('Moved to ' + dShow(d)); return;
+  }
+  if(a === 'rv-landed'){
+    const cands = rvCandidates(x.dir, x.amount, x.date);
+    const row = (c, i) => `<label class="q-check f6-cand"><input type="radio" name="rvCand" value="${escAttr(rvTxId(c.t))}"${i === 0 ? ' checked' : ''}> ${escHtml(dShow(c.t.date))} · ${escHtml(c.t.description || '')} · <b>${qm(c.t.moneyIn || c.t.moneyOut)}</b>${c.diff > 0.004 ? ' <span class="qb-dim">(' + qm(c.diff) + ' from the expected amount)</span>' : ''}</label>`;
+    const fin = x.kind === 'cust' ? `<button class="btn secondary" type="button" data-f6="rv-record" data-key="${escAttr(x.key)}">None of these: record the receipt</button>` : `<button class="btn secondary" type="button" data-f6="rv-record" data-key="${escAttr(x.key)}">None of these: confirm the payment</button>`;
+    finOpen('Landed: ' + x.label, `<p class="q-help" style="margin:0 0 8px;">${escHtml(x.pname)} · expected ${qm(x.amount)} on ${escHtml(pwD(x.date))}.${cands.length ? ' Is it one of these transactions already in the books? Nothing in the transaction is changed.' : ' No matching transaction is in the books yet.'}</p>${cands.map(row).join('')}
+      <div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Cancel</button>${fin}${cands.length ? `<button class="btn" type="button" data-f6="rv-pick" data-key="${escAttr(x.key)}">Yes, this one</button>` : ''}</div>`);
+    return;
+  }
+  if(a === 'rv-record'){ finClose(); if(x.kind === 'cust') txnOpenComplete(x.key); else spOpen(x.pid, x.did); return; }
+  if(a === 'rv-pick'){
+    const id = (document.querySelector('input[name="rvCand"]:checked') || {}).value, t = txById(id); if(!t){ finClose(); return; }
+    const d = txCashDate(t) || t.date;
+    if(x.kind === 'cust'){
+      const k = x.key.split(':'), tg = finLineTarget(x.pid, k[0] === 'vp' ? 'v' + k[2] : k[2]); if(!tg) return; const l = tg.tgt, got = Number(t.moneyIn) || 0;
+      if(!l.uid && k[0] === 'cp') l.uid = qRand('pl_'); l.landedTxn = id; l.paidAmount = (Number(l.paidAmount) || 0) + got; if(!l.invoicedDate) l.invoicedDate = d;
+      if(Number(l.paidAmount) >= (Number(tg.row.amount) || 0) - 0.005) l.paidDate = d;
+      try{ ivOnPayment(tg.p, k[0], l, got, d); }catch(err){}
+    } else if(x.kind === 'sup'){
+      const p = state.projects.find(y => y.id === x.pid); if(!p) return; p.dropState = p.dropState || {}; const st = p.dropState[x.did] = p.dropState[x.did] || {}; st.paid = d; st.paidTxn = id; if(!st.ordered) st.ordered = d;
+    }
+    rvMark(x.key, { status: 'landed', txn: id }); finClose(); saveState(); render(); showToast('Landed: ticked off against ' + (t.description || 'the transaction')); return;
+  }
+});
+/* a line matched to an existing transaction (not made by "Mark paid") must not get a second receipt made for it */
 /* BT:js-finance end */
 
 /* ---------- init ---------- */
