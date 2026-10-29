@@ -65,3 +65,15 @@ Added on the test site, all optional and defaulting safely so existing data load
 - **Plan tab**: a date change in the profile opens a review of every linked date; Confirm schedule, Keep as tentative, or Cancel changes.
 
 New stored fields, all optional: `project.jobType`, `project.owner`, `project.site`, `project.tentative`; `task.scope`, `task.refs`, `task.recur`, `task.spawnedId`; `settings.bizAccess`, `settings.todayLimit`. Existing data loads unchanged.
+
+## Buying, orders, deliveries and the invoice check (Stage 2, test site)
+
+- **Project stages**: six stages (Planning, Materials, On site, Sign-off, Invoiced, Completed) are worked out from confirmed milestone dates and shown on the board, profile and list. Nothing is stored: the nine stored stages and each project's `stageId` are untouched.
+- **Orders and deliveries** (Operations): one order per supplier from the accepted quote, plus a second order for the same supplier (a second delivery on the Working plan with the chosen lines moved onto it). The order page shows project, quote, supplier, planned and actual delivery, tasks and the delivery check. It opens to the same record from the project, the supplier and the menu.
+- **Delivery checklist**: marking a delivery complete (Today, order, project) opens the lines as received, short, substituted or damaged, with notes and photos. Today has a one-tap "All received". Short or substituted marks the delivery "price to confirm".
+- **Confirm prices**: after a delivery, now or later (later makes a task on Today and the order). Upload or photograph the invoice or receipt and enter final quantities and prices per line. Quote and order prices never change; a confirmed supplier payment starts from the confirmed figures and the same file.
+- **Variance and hire**: differences carry a cause (price, quantity, substitution, delivery charge, error, other) and are flagged above **Settings > Quotes > Supplier price variance** (default 0%, so everything is flagged). By-cause tables on the order, project Overview and the Orders and deliveries page. Any quote, plan or order line can be marked **hire** with a hire supplier; it counts as a supplier cost and shows as its own row on the project.
+- **Materials and deliveries tab** on the project: planned against actual graph (hollow planned, filled actual, late in red, today line) and a date-ordered list with one confirm button per row.
+- **Supplier invoices** (Operations): receipts and invoices linked to their orders, projects and suppliers.
+
+New stored fields, all optional and empty by default: `project.dropState[drop].check` and `.ptc`; `order.pc`, `order.receipts`, `order.items[].hire`; `quote line.hire` and `.hireSupplierId`; `task.autoKey`; `settings.varianceThresholdPct`.
