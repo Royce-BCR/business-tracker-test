@@ -2397,6 +2397,16 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-bar-t { font-size: var(--bt-fs-xs); } .rp-bar-b { display: flex; flex-wrap: wrap; gap: 6px; }
 .rp-tabs { flex: none; display: flex; gap: var(--bt-s5); overflow-x: auto; padding: 0 var(--bt-s4); border-bottom: 1px solid var(--line); scrollbar-width: thin; background: var(--bt-card); } .rp-tabs::-webkit-scrollbar { height: 6px; } .rp-tabs::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
 .rp-tabs button { flex: none; min-height: var(--bt-control); padding: 0 2px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; font: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+.rp-tabs-fit { display: flex; align-items: stretch; gap: var(--bt-s3); overflow: visible; position: relative; }
+.rp-tabs-fit .rp-tablist { display: flex; gap: var(--bt-s5); min-width: 0; flex: 0 1 auto; overflow: hidden; }
+.rp-tabs-fit [hidden] { display: none !important; }
+.rp-tabs-fit .rp-more { position: relative; flex: none; margin-left: auto; display: flex; }
+.rp-more-btn { display: inline-flex; align-items: center; gap: 4px; }
+.rp-more-menu { position: absolute; right: 0; top: 100%; z-index: 40; min-width: 200px; max-width: min(86vw, 320px); margin-top: 2px; padding: var(--bt-s1); background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-ctl, 8px); box-shadow: 0 10px 30px color-mix(in srgb, var(--bt-ink) 22%, transparent); display: flex; flex-direction: column; }
+.rp-more-menu[hidden] { display: none; }
+.rp-tabs .rp-more-menu .rp-more-item { flex: none; width: 100%; min-height: var(--bt-control); padding: 0 var(--bt-s3); border: 0; border-radius: var(--bt-r-ctl, 8px); margin: 0; background: none; text-align: left; font: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-ink); cursor: pointer; white-space: nowrap; }
+.rp-tabs .rp-more-menu .rp-more-item:hover, .rp-tabs .rp-more-menu .rp-more-item:focus-visible { background: var(--bt-brand-soft); outline: 2px solid transparent; }
+.rp-tabs .rp-more-menu .rp-more-item:focus-visible { outline-color: var(--bt-focus); }
 .rp-tabs button:hover { color: var(--bt-ink); } .rp-tabs button.active { color: var(--bt-ink); border-bottom-color: var(--bt-brand-2); }
 .rp-cbody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .rp-strip { flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
@@ -16659,6 +16669,7 @@ function cxRender(){
     if(!typing || !kb.querySelector('#cxCoRes')) kb.innerHTML = cxCompaniesListHtml();
     else { const tmp = document.createElement('div'); tmp.innerHTML = cxCompaniesListHtml(); document.getElementById('cxCoRes').innerHTML = tmp.querySelector('#cxCoRes').innerHTML; }
   }
+  try{ rpTabsFitAll(); }catch(e){}
 }
 /* BT:js-crm2 end */
 /* BT:js-crm3 begin */
@@ -17961,7 +17972,61 @@ function rpBarInner(p){
 }
 
 /* ---- centre column ---- */
-function rpTabsHtml(){ return `<nav class="rp-tabs" role="tablist" aria-label="Project">${RP_TABS.map(([k, n]) => `<button type="button" role="tab" class="${rpUi.tab === k ? 'active' : ''}" aria-selected="${rpUi.tab === k}" data-rp="tab" data-tab="${k}">${n}</button>`).join('')}</nav>`; }
+/* ---- Stage 7: one tab bar for the project, customer, supplier, contact and company pages.
+   As many tabs as fit on one line, the rest in a "More" menu (keyboard: Enter, Space or Down opens it; Up, Down, Home, End move; Escape closes; Tab leaves).
+   The active tab is always one of the visible ones. Nothing is stored; the tabs and what they show are unchanged. ---- */
+function rpBarHtml(label, tabs, active, attr){
+  const btn = ([k, n]) => `<button type="button" role="tab" class="${active === k ? 'active' : ''}" aria-selected="${active === k}" data-${attr}="tab" data-tab="${k}">${n}</button>`;
+  return `<nav class="rp-tabs rp-tabs-fit" aria-label="${label} pages"><div class="rp-tablist" role="tablist" aria-label="${label}">${tabs.map(btn).join('')}</div><div class="rp-more" hidden><button type="button" class="rp-more-btn" aria-haspopup="menu" aria-expanded="false">More<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="rp-more-menu" role="menu" aria-label="More ${label.toLowerCase()} tabs" hidden></div></div></nav>`;
+}
+const rpTabsRO = (typeof ResizeObserver === 'function') ? new ResizeObserver(es => es.forEach(e => rpTabsFit(e.target))) : null, rpTabsSeen = new WeakSet();
+function rpTabsFit(nav){
+  const list = nav && nav.querySelector('.rp-tablist'), more = nav && nav.querySelector('.rp-more'), menu = nav && nav.querySelector('.rp-more-menu'); if(!list || !more || !menu || !nav.offsetWidth) return;
+  const tabs = [...list.querySelectorAll('[role="tab"]')], cs = getComputedStyle(nav), gap = parseFloat(getComputedStyle(list).columnGap) || 0, avail = nav.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+  tabs.forEach(t => { t.hidden = false; }); more.hidden = true;
+  const w = tabs.map(t => t.offsetWidth), total = w.reduce((a, b) => a + b, 0) + gap * Math.max(0, tabs.length - 1);
+  const was = menu.hidden === false; let keep = new Set(tabs.map((t, i) => i));
+  if(total > avail){
+    more.hidden = false; let room = avail - more.offsetWidth - (parseFloat(getComputedStyle(nav).columnGap) || gap); keep = new Set();
+    const act = tabs.findIndex(t => t.classList.contains('active')); if(act >= 0){ keep.add(act); room -= w[act] + gap; }
+    for(let i = 0; i < tabs.length; i++){ if(keep.has(i)) continue; if(w[i] + gap <= room){ keep.add(i); room -= w[i] + gap; } else break; }
+  }
+  tabs.forEach((t, i) => { t.hidden = !keep.has(i); });
+  const rest = tabs.filter((t, i) => !keep.has(i));
+  const sig = rest.map(t => t.dataset.tab).join(',');
+  if(menu.dataset.sig !== sig){
+    menu.dataset.sig = sig;
+    menu.innerHTML = rest.map(t => { const b = t.cloneNode(true); b.removeAttribute('aria-selected'); b.removeAttribute('hidden'); b.className = 'rp-more-item'; b.setAttribute('role', 'menuitem'); b.setAttribute('tabindex', '-1'); return b.outerHTML; }).join('');
+  }
+  if(!rest.length || !was) rpMoreClose(nav, false);
+}
+function rpTabsFitAll(){
+  document.querySelectorAll('.rp-tabs-fit').forEach(n => { if(rpTabsRO && !rpTabsSeen.has(n)){ rpTabsSeen.add(n); rpTabsRO.observe(n); } rpTabsFit(n); });
+  if(rpMoreFocus){ rpMoreFocus = false; const a = document.querySelector('.rp-tablist [role="tab"][aria-selected="true"]:not([hidden])'); if(a) a.focus(); }
+}
+let rpMoreFocus = false;
+function rpMoreClose(nav, ret){ const m = nav && nav.querySelector('.rp-more-menu'), b = nav && nav.querySelector('.rp-more-btn'); if(!m || m.hidden) return; m.hidden = true; if(b){ b.setAttribute('aria-expanded', 'false'); if(ret) b.focus(); } }
+function rpMoreOpen(nav, focusFirst){ const m = nav.querySelector('.rp-more-menu'), b = nav.querySelector('.rp-more-btn'); if(!m || !b) return; document.querySelectorAll('.rp-tabs-fit').forEach(n => { if(n !== nav) rpMoreClose(n, false); }); m.hidden = false; b.setAttribute('aria-expanded', 'true'); if(focusFirst){ const f = m.querySelector('[role="menuitem"]'); if(f) f.focus(); } }
+document.addEventListener('click', (e) => {
+  const t = e.target; if(!t || !t.closest) return;
+  const btn = t.closest('.rp-more-btn'); if(btn){ const nav = btn.closest('.rp-tabs-fit'), m = nav.querySelector('.rp-more-menu'); if(m.hidden) rpMoreOpen(nav, false); else rpMoreClose(nav, false); return; }
+  const it = t.closest('.rp-more-item'); if(it){ rpMoreFocus = true; setTimeout(() => { rpMoreFocus = false; }, 400); const nav = it.closest('.rp-tabs-fit'); if(nav) rpMoreClose(nav, false); return; }
+  document.querySelectorAll('.rp-tabs-fit').forEach(n => rpMoreClose(n, false));
+}, true);
+document.addEventListener('keydown', (e) => {
+  const t = e.target; if(!t || !t.closest) return; const nav = t.closest('.rp-tabs-fit'); if(!nav) return;
+  const btn = nav.querySelector('.rp-more-btn'), m = nav.querySelector('.rp-more-menu'), items = [...m.querySelectorAll('[role="menuitem"]')];
+  if(t === btn){ if(e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){ e.preventDefault(); rpMoreOpen(nav, true); } else if(e.key === 'Escape' && !m.hidden){ e.preventDefault(); rpMoreClose(nav, true); } return; }
+  if(!t.closest('.rp-more-menu')) return;
+  const i = items.indexOf(t);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); items[(i + 1) % items.length].focus(); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+  else if(e.key === 'Home'){ e.preventDefault(); items[0].focus(); }
+  else if(e.key === 'End'){ e.preventDefault(); items[items.length - 1].focus(); }
+  else if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); rpMoreClose(nav, true); }
+  else if(e.key === 'Tab'){ rpMoreClose(nav, false); }
+}, true);
+function rpTabsHtml(){ return rpBarHtml('Project', RP_TABS, rpUi.tab, 'rp'); }
 function rpNextInvoice(p){
   const ls = (p.paymentLines || []).filter(l => !l.invoicedDate && l.dueDate && (Number(l.amount) || 0) > 0).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   return ls[0] || null;
@@ -18034,7 +18099,7 @@ function rpRenderProject(p){
   ['.rp-left .rp-lbody', '.rp-centre .rp-cscroll', '.rp-right .rp-rbody'].forEach(s => { const n = el.querySelector(s); if(n) prev[s] = n.scrollTop; });
   el.innerHTML = `<div class="rp" data-kind="project"><aside class="rp-left" aria-label="Profile">${rpLeftHtml(p)}</aside><main class="rp-centre">${rpCentreHtml(p)}</main><aside class="rp-right" aria-label="Linked records">${rpRightHtml(p)}</aside></div>`;
   Object.keys(prev).forEach(s => { const n = el.querySelector(s); if(n) n.scrollTop = prev[s]; });
-  try{ const at = el.querySelector('.rp-tabs button.active'), bar = at && at.parentNode; if(bar && at.offsetLeft + at.offsetWidth > bar.clientWidth + bar.scrollLeft) bar.scrollLeft = at.offsetLeft + at.offsetWidth - bar.clientWidth + 16; }catch(e){}   // a tab that is off the edge (Money) is brought into view
+  try{ rpTabsFitAll(); }catch(e){}   // Stage 7: tabs that do not fit go into More; the active tab stays visible
   try{ pwStick(); }catch(e){}
   rpFit(); try{ gtFocus(); }catch(e){}
 }
@@ -18230,7 +18295,7 @@ function rsCentreBody(s){
     ${r.drafts.length ? `<div class="rp-card"><h4>Purchase orders not placed yet <span class="db-count">${r.drafts.length}</span></h4>${rpOrderRows(r.drafts).join('')}</div>` : ''}
     ${r.other.length ? `<div class="rp-card"><h4>Other live quotes (leads and sales deals) <span class="db-count">${r.other.length}</span></h4>${r.other.map(q).join('')}</div>` : ''}`;
 }
-function rsTabsHtml(){ return `<nav class="rp-tabs" role="tablist" aria-label="Supplier">${RS_TABS.map(([k, n]) => `<button type="button" role="tab" class="${rsUi.tab === k ? 'active' : ''}" aria-selected="${rsUi.tab === k}" data-rs="tab" data-tab="${k}">${n}</button>`).join('')}</nav>`; }
+function rsTabsHtml(){ return rpBarHtml('Supplier', RS_TABS, rsUi.tab, 'rs'); }
 /* draw: the whole page the first time; while a field on the left is being typed in only the parts that read from it are redrawn */
 function rsRender(s){
   const host = document.getElementById('supplierRecord'); if(!host) return;
@@ -18248,6 +18313,7 @@ function rsRender(s){
     if(!typing) { const l = host.querySelector('#rsLeftBody'), t = l ? l.scrollTop : 0; put('rsLeftBody', rsLeftBody(s)); if(l) l.scrollTop = t; }
   }
   rpFitEl(host.querySelector('.rp'));
+  try{ rpTabsFitAll(); }catch(e){}
 }
 function rsRenderLeft(keep){ const s = supFind(rsUi.id), l = document.getElementById('rsLeftBody'); if(!s || !l) return; const t = l.scrollTop; l.innerHTML = rsLeftBody(s); if(keep) l.scrollTop = t; }
 document.addEventListener('click', (e) => {
@@ -18264,7 +18330,7 @@ navExtra('rssec', () => rsUi.sec, v => { if(v) rsUi.sec = v; });
 const cxPg = { key: '', tab: 'overview' };
 navExtra('cxpg', () => ({ k: cxPg.key, t: cxPg.tab }), v => { if(v){ cxPg.key = v.k || ''; cxPg.tab = v.t || 'overview'; } });
 const RC_TABS = [['overview', 'Overview'], ['activity', 'Activity']];
-function rcTabsHtml(){ return `<nav class="rp-tabs" role="tablist" aria-label="Customer">${RC_TABS.map(([k, n]) => `<button type="button" role="tab" class="${cxPg.tab === k ? 'active' : ''}" aria-selected="${cxPg.tab === k}" data-rc="tab" data-tab="${k}">${n}</button>`).join('')}</nav>`; }
+function rcTabsHtml(){ return rpBarHtml('Customer', RC_TABS, cxPg.tab, 'rc'); }
 function rcTouch(key){ if(cxPg.key !== key){ cxPg.key = key; cxPg.tab = 'overview'; } }
 function rcFrame(kind, o){
   return `<div class="rp cx-prof" data-kind="${kind}"><aside class="rp-left" aria-label="Profile"><div class="rp-head" id="cxHead">${o.head}</div><div class="rp-lbody" id="cxLeft">${o.left}</div></aside>
