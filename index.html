@@ -2527,6 +2527,13 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .ph-row .ph-sub .q-check { min-height: 0; font-size: var(--bt-fs-xs); }
   .cls-act { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .cls-act select { max-width: 190px; }
+  .bh-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--bt-s3); }
+  .bh-card { border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3); background: var(--bt-card); }
+  .bh-sides { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-s3); margin: var(--bt-s2) 0; }
+  .bh-side { background: var(--bt-neu-bg); border-radius: var(--bt-r-btn); padding: var(--bt-s2) var(--bt-s3); }
+  .bh-side small { display: block; font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--bt-text-muted); }
+  .bh-side b { font-size: var(--bt-fs-md); } .bh-side em { display: block; font-size: var(--bt-fs-xs); color: var(--bt-text-muted); font-style: normal; }
+  .bh-be, .bh-at { font-size: var(--bt-fs-sm); margin-top: 4px; }
   .cap-row input:not([type=checkbox]), .hd-row input:not([type=checkbox]), .hd-row select, .ph-row input:not([type=checkbox]), .pt-row input[type=text], .pt-row input[type=number] { border: 1px solid var(--line); background: var(--bt-card); padding: 6px var(--bt-s2); border-radius: var(--bt-r-btn); min-width: 0; width: 100%; }
   .ph-row input[type=checkbox], .pt-row input[type=checkbox] { width: auto; }
   .ph-row.ph-stack { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px; }
@@ -8113,6 +8120,7 @@ function renderSettings(){
      <div class="fin-help">Taken off project profit for every labour hour (sold, planned and logged) to give <b>retained profit</b>. This is separate from “Labour profit share (%)” in Quote settings: that percentage is the profit built into the labour <em>price</em> (labour cost = price ÷ (1 + %)) and is already inside project profit; the hourly figure is then deducted from it. Set one or the other to what you intend, so the same share is not taken twice.</div>
      ${POT_BUCKETS.map(b => `<div><label>Retained pot: ${b[1]} (%)</label><input type="number" step="1" min="0" data-tab="settings" data-field="${b[0]}" value="${potPct(b[0])}"></div>`).join('')}
      ${potSettingsHtml()}
+     ${toolSettingHtml()}
      <div class="fin-help">Each pot is a percentage of retained profit (the default) or a fixed amount put aside every month. Percentage pots share what is left of retained profit after any fixed amounts.</div>
      <div class="fin-help">The four buckets share the retained profit pot${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) === 100 ? '.' : ` (they add up to ${POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0)}%, so they are scaled to 100% on the Dashboard).`}</div>
      <div><label>Invoice warning after (days overdue)</label><input type="number" step="1" min="0" data-tab="settings" data-field="invoiceWarnDays" value="${s.invoiceWarnDays === undefined || s.invoiceWarnDays === '' ? 14 : s.invoiceWarnDays}"></div>
@@ -11325,13 +11333,13 @@ function assetRegisterHtml(){
     const due = k => a[k] && a[k] < today ? ' class="over"' : '';
     return `<tr class="${assetUi.flash === a.id ? 'inv-flash' : ''}${a.status === 'Retired' ? ' pw-removed' : ''}"><td>${f('name')}</td><td>${f('category')}</td><td>${f('supplier')}</td><td>${f('purchased', 'date')}</td><td>${f('cost', 'number')}</td><td>${f('life', 'number', 'style="width:64px"')}</td><td>${f('residual', 'number')}</td>
       <td><select ${at} data-f="status">${ASSET_STATUS.map(s => `<option${a.status === s ? ' selected' : ''}>${s}</option>`).join('')}</select></td><td>${f('serial')}</td><td><span${due('serviceDue')}>${f('serviceDue', 'date')}</span></td><td><span${due('insuranceDue')}>${f('insuranceDue', 'date')}</span></td>
-      <td class="qb-calc">${qm(d.book)}</td><td class="qb-calc">${qm(d.yearly)}</td><td>${tx >= 0 ? finSrcLink({ t: 'txn', id: a.txnUid }, 'transaction →') : ''}${a.planId ? '<div class="qb-dim">from plan</div>' : ''}</td><td><button type="button" class="icon-btn" data-asset-a="del" ${at} aria-label="Delete asset">${X_SVG}</button></td></tr>`;
+      <td class="qb-calc">${qm(d.book)}</td><td class="qb-calc">${qm(d.yearly)}</td>${toolCostOn() ? `<td>${f('usageCharge', 'number')}</td><td>${f('usageAfter', 'number')}</td><td class="qb-calc">${qm(assetRecovered(a))}${assetToRecover(a) > 0 ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">of ${qm(assetToRecover(a))}${assetRecovered(a) >= assetToRecover(a) ? ' · recovered' : ''}</div>` : ''}</td>` : ''}<td>${tx >= 0 ? finSrcLink({ t: 'txn', id: a.txnUid }, 'transaction →') : ''}${a.planId ? '<div class="qb-dim">from plan</div>' : ''}</td><td><button type="button" class="icon-btn" data-asset-a="del" ${at} aria-label="Delete asset">${X_SVG}</button></td></tr>`;
   }).join('');
   const t = state.assets.filter(a => a.status === 'Owned').reduce((s, a) => { const d = assetDep(a); s.cost += Number(a.cost) || 0; s.book += d.book; s.yr += d.yearly; return s; }, { cost: 0, book: 0, yr: 0 });
   return `<div class="kpi-row"><div class="kpi" style="--accent:var(--oak)"><div class="label">Cost of owned assets</div><div class="value">${qm(t.cost)}</div><div class="fin-sub">ex VAT</div></div><div class="kpi" style="--accent:var(--green)"><div class="label">Book value</div><div class="value">${qm(t.book)}</div><div class="fin-sub">after straight-line depreciation</div></div><div class="kpi" style="--accent:var(--slate)"><div class="label">Replacement set-aside per year</div><div class="value">${qm(t.yr)}</div><div class="fin-sub">(cost − residual) ÷ expected life, owned assets</div></div></div>
     <div class="btn-row"><button type="button" class="btn" data-asset-a="add">+ Add asset</button></div>
-    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Name</th><th>Category</th><th>Supplier</th><th>Purchased</th><th>Cost ex VAT</th><th>Life (yrs)</th><th>Residual</th><th>Status</th><th>Serial</th><th>Service due</th><th>Insurance due</th><th>Book value</th><th>Replacement / yr</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="15"><div class="sup-empty">No assets yet. Add one, or buy an item from the Asset plan.</div></td></tr>'}</tbody>
-      ${state.assets.length ? `<tfoot><tr class="qb-foot"><td><b>Totals (owned)</b></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.cost)}</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.book)}</b></td><td class="qb-calc"><b>${qm(t.yr)}</b></td><td></td><td></td></tr></tfoot>` : ''}</table></div></div>`;
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Name</th><th>Category</th><th>Supplier</th><th>Purchased</th><th>Cost ex VAT</th><th>Life (yrs)</th><th>Residual</th><th>Status</th><th>Serial</th><th>Service due</th><th>Insurance due</th><th>Book value</th><th>Replacement / yr</th>${toolCostOn() ? '<th>Charge per use</th><th>Charge once recovered</th><th>Recovered</th>' : ''}<th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="15"><div class="sup-empty">No assets yet. Add one, or buy an item from the Asset plan.</div></td></tr>'}</tbody>
+      ${state.assets.length ? `<tfoot><tr class="qb-foot"><td><b>Totals (owned)</b></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.cost)}</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(t.book)}</b></td><td class="qb-calc"><b>${qm(t.yr)}</b></td>${toolCostOn() ? '<td></td><td></td><td></td>' : ''}<td></td><td></td></tr></tfoot>` : ''}</table></div></div>`;
 }
 function assetPlanHtml(){
   const rt = retainedTotals(), items = state.assetPlan.slice().sort((a, b) => String(a.neededBy || '9999').localeCompare(String(b.neededBy || '9999'))), aPct = potPct('potAssetsPct') / (POT_BUCKETS.reduce((s, b) => s + potPct(b[0]), 0) || 1);
@@ -11340,7 +11348,7 @@ function assetPlanHtml(){
   const rows = state.assetPlan.map(a => {
     const at = `data-asset-plan="${a.id}"`, f = (k, type) => `<input ${type === 'number' ? 'type="number" step="any" min="0" class="qb-n"' : (type === 'date' ? 'type="date"' : '')} ${at} data-f="${k}" value="${escAttr(a[k] === undefined ? '' : a[k])}">`, sel = (k, opts) => `<select ${at} data-f="${k}">${opts.map(o => { const [v, n] = Array.isArray(o) ? o : [o, o]; return `<option value="${escAttr(v)}"${String(a[k]) === String(v) ? ' selected' : ''}>${escHtml(n)}</option>`; }).join('')}</select>`;
     const af = aff[a.id], bought = a.status === 'Bought', ev = af ? (af.head >= 0 ? `<span class="qb-flag ok">affordable</span> <span class="qb-dim">headroom ${qm(af.head)}</span>` : `<span class="qb-flag bad">short ${qm(-af.head)}</span>`) + `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">cumulative ${qm(af.cum)} vs retained ${qm(af.avail)} by then · assets bucket ${af.bucket >= 0 ? 'ok' : 'short ' + qm(-af.bucket)}</div>` : '<span class="qb-dim">not funded from retained profit</span>';
-    return `<tr class="${assetUi.flash === a.id ? 'inv-flash' : ''}"><td>${f('item')}</td><td>${f('reason')}</td><td>${f('neededBy', 'date')}</td><td>${f('cost', 'number')}</td><td>${sel('priority', PLAN_PRIORITY)}</td><td>${sel('status', PLAN_STATUS)}</td>
+    return `<tr class="${assetUi.flash === a.id ? 'inv-flash' : ''}"><td>${f('item')}</td><td>${f('reason')}</td><td>${f('neededBy', 'date')}</td><td>${f('cost', 'number')}</td><td>${f('hireCost', 'number')}</td><td>${f('uses', 'number')}</td><td>${sel('priority', PLAN_PRIORITY)}</td><td>${sel('status', PLAN_STATUS)}</td>
       <td>${sel('projectId', [['', '— none —']].concat(state.projects.map(p => [String(p.id), recordCode(p.id, 'project') + ' ' + p.name])))}</td><td>${sel('funding', FUNDING)}</td><td>${ev}</td>
       <td>${bought ? (a.assetId ? finSrcLink({ t: 'asset', id: a.assetId }, 'in register →') : '') + (a.txnUid ? ' ' + finSrcLink({ t: 'txn', id: a.txnUid }, 'transaction →') : '') : `<button type="button" class="btn qb-sm" data-asset-a="buy" ${at.replace('data-asset-plan', 'data-pid')}>Mark bought…</button>`}</td><td><button type="button" class="icon-btn" data-asset-a="plan-del" ${at.replace('data-asset-plan', 'data-pid')} aria-label="Delete plan item">${X_SVG}</button></td></tr>`;
   }).join('');
@@ -11348,8 +11356,8 @@ function assetPlanHtml(){
   const byProj = rt.rows.map(({ p, r }) => `<tr><td>${finSrcLink({ t: 'project', id: p.id, sec: 'plan' }, recordCode(p.id, 'project') + ' ' + p.name)}</td><td class="qb-calc">${qm(r.plan.profit)}</td><td class="qb-calc">${r.plan.hours ? r.plan.hours.toFixed(1) + ' h' : '—'}</td><td class="qb-calc">−${qm(r.plan.share)}</td><td class="qb-calc"><b>${qm(r.plan.retained)}</b></td><td class="qb-calc">${Math.round(r.frac * 100)}%</td><td class="qb-calc">${qm(r.toDate)}</td></tr>`).join('');
   return `<div class="kpi-row"><div class="kpi" style="--accent:var(--green)"><div class="label">Retained profit to date</div><div class="value">${qm(rt.toDate)}</div><div class="fin-sub">forecast over the jobs ${qm(rt.plan)}</div></div><div class="kpi" style="--accent:var(--oak)"><div class="label">Committed to the plan</div><div class="value">${qm(committed)}</div><div class="fin-sub">approved, ordered or bought, funded from retained profit</div></div><div class="kpi" style="--accent:var(--slate)"><div class="label">Unallocated</div><div class="value ${rt.toDate - committed < 0 ? 'flag' : ''}">${qm(rt.toDate - committed)}</div><div class="fin-sub">retained to date − committed</div></div></div>
     <div class="btn-row"><button type="button" class="btn" data-asset-a="plan-add">+ Add plan item</button></div>
-    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Item</th><th>Reason</th><th>Needed by</th><th>Est. cost ex VAT</th><th>Priority</th><th>Status</th><th>Project</th><th>Funding</th><th>Affordability against retained profit</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="11"><div class="sup-empty">Nothing planned. Add the kit you will need; approved items go into the cash flow forecast on their needed-by date.</div></td></tr>'}</tbody></table></div>
-      <p class="q-help">Affordability adds up every item funded from retained profit in needed-by order and compares it with the retained profit expected by that date (each job's retained profit, in proportion to its invoices dated by then). Approved and ordered items appear in the Cash Flow Forecast as money out on the needed-by date.</p></div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Item</th><th>Reason</th><th>Needed by</th><th>Est. cost ex VAT</th><th>Hire cost each time</th><th>Expected uses</th><th>Priority</th><th>Status</th><th>Project</th><th>Funding</th><th>Affordability against retained profit</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="13"><div class="sup-empty">Nothing planned. Add the kit you will need; approved items go into the cash flow forecast on their needed-by date.</div></td></tr>'}</tbody></table></div>
+      <p class="q-help">Affordability adds up every item funded from retained profit in needed-by order and compares it with the retained profit expected by that date (each job's retained profit, in proportion to its invoices dated by then). Approved and ordered items appear in the Cash Flow Forecast as money out on the needed-by date. A hire cost and the expected number of uses compare buying with hiring below.</p></div>${planBuyHireHtml()}
     <details class="card" style="margin-top:14px;"><summary><b>Retained profit by project</b> <span class="qb-dim">(project profit minus profit share)</span></summary><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Project</th><th>Profit (plan)</th><th>Hours</th><th>Profit share</th><th>Retained</th><th>Invoiced</th><th>To date</th></tr></thead><tbody>${byProj || '<tr><td colspan="7"><div class="sup-empty">No projects.</div></td></tr>'}</tbody><tfoot><tr class="qb-foot"><td><b>Total</b></td><td class="qb-calc"><b>${qm(rt.profit)}</b></td><td></td><td class="qb-calc"><b>−${qm(rt.share)}</b></td><td class="qb-calc"><b>${qm(rt.plan)}</b></td><td></td><td class="qb-calc"><b>${qm(rt.toDate)}</b></td></tr></tfoot></table></div></details>`;
 }
 function renderAssets(){
@@ -11395,7 +11403,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('change', (e) => {
   const el = e.target; if(!el.dataset || !el.dataset.f) return;
   const reg = el.dataset.asset ? state.assets.find(x => x.id === el.dataset.asset) : null, pl = el.dataset.assetPlan ? state.assetPlan.find(x => x.id === el.dataset.assetPlan) : null, o = reg || pl; if(!o) return;
-  const f = el.dataset.f, numeric = ['cost', 'life', 'residual'].includes(f); o[f] = numeric ? Math.max(0, Number(el.value) || 0) : (el.type === 'date' ? isoOk(el.value) : el.value);
+  const f = el.dataset.f, numeric = ['cost', 'life', 'residual'].includes(f), optNum = ['usageCharge', 'usageAfter', 'hireCost', 'uses'].includes(f); o[f] = numeric ? Math.max(0, Number(el.value) || 0) : optNum ? (el.value === '' ? '' : Math.max(0, Number(el.value) || 0)) : (el.type === 'date' ? isoOk(el.value) : el.value);
   if(reg && f === 'status' && el.value === 'Retired' && !reg.retiredDate) reg.retiredDate = fmt(new Date());
   if(pl && f === 'status' && el.value === 'Bought' && !pl.assetId){ o.status = 'Approved'; saveState(); assetOpenBuy(pl.id); return; }
   saveState(); clearTimeout(window._assetLazy); window._assetLazy = setTimeout(render, 350);
@@ -17899,7 +17907,7 @@ function rpQualTile(p){
   return `<div class="rp-card"><h4>Qualification ${has ? qualBadgeHtml(p) : ''}</h4>${qualRowsHtml(p)}<div class="rp-hint">Carried from the lead stage. The questions and their weights are in Settings, Selling.</div></div>`;
 }
 function rpOverviewHtml(p){
-  return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${varProjectCard(p)}${rpQualTile(p)}</div>`;
+  return `<div class="rp-tiles">${rpOutstanding(p)}<div class="rp-pair">${rpSuppliersTile(p)}${rpInvoicesTile(p)}</div>${toolJobCardHtml(p)}${varProjectCard(p)}${rpQualTile(p)}</div>`;
 }
 const rpPlanCtx = { on: false };   // true while the Plan tab builds the old timeline: the new Gantt above replaces its chart
 function rpPlanHtml(p){
@@ -20215,6 +20223,55 @@ function potAssetsAt(avail, date){
   if(pp.allPct) return avail * potPct('potAssetsPct') / (POT_BUCKETS.reduce((s, b) => s + potPct(b[0]), 0) || 1);
   return pp.rows[0].amt;
 }
+
+
+/* =====================================================================
+   Step 5: ASSETS, TOOL COST ON JOBS, BUY OR HIRE
+   Optional new fields: asset.usageCharge (GBP per use on a job), asset.usageAfter (a smaller charge once the cost is recovered, empty = stop charging),
+   plan item.hireCost (GBP per hire) and plan item.uses (expected number of uses), project.toolUse [{ id, assetId, uses, charge, date }] (charge is the rate at the time it was added).
+   settings.toolCostOnJobs ('on' | anything else = off) is the switch, off by default. While it is off nothing is shown or changed on any job and the register and plan
+   look as before apart from the new empty hire boxes on the plan. Tool cost is recorded and shown; it does not feed any job's margin, retained profit or the pots.
+   ===================================================================== */
+const toolCostOn = () => !!(state && state.settings && state.settings.toolCostOnJobs === 'on');
+function assetRecovered(a){ return r2(state.projects.reduce((s, p) => s + (p.toolUse || []).filter(u => u.assetId === a.id).reduce((t, u) => t + (Number(u.uses) || 0) * (Number(u.charge) || 0), 0), 0)); }
+function assetToRecover(a){ return Math.max(0, (Number(a.cost) || 0) - Math.min(Number(a.cost) || 0, Math.max(0, Number(a.residual) || 0))); }
+function assetChargeNow(a){ const c = Number(a.usageCharge) || 0, after = Number(a.usageAfter) || 0; return c > 0 && assetRecovered(a) >= assetToRecover(a) && assetToRecover(a) > 0 ? after : c; }
+function projToolCost(p){ return r2((p.toolUse || []).reduce((s, u) => s + (Number(u.uses) || 0) * (Number(u.charge) || 0), 0)); }
+function toolSettingHtml(){ return `<div><label>Tool cost on jobs</label><select data-tab="settings" data-field="toolCostOnJobs"><option value="off"${toolCostOn() ? '' : ' selected'}>Off</option><option value="on"${toolCostOn() ? ' selected' : ''}>On</option></select><div class="q-help">Off: nothing changes on any job. On: a job can record the tools it used, charged per use from the asset register.</div></div>`; }
+/* buy against hire for a plan item: where buying starts to be cheaper, and what each costs at the expected number of uses */
+function planBuyHire(a){
+  const cost = Number(a.cost) || 0, h = Number(a.hireCost) || 0, u = Number(a.uses) || 0; if(!(cost > 0) || !(h > 0)) return null;
+  const be = cost / h, hireTotal = r2(h * u), diff = r2(hireTotal - cost);
+  return { cost, h, u, be, beUses: Math.ceil(be - 1e-9), hireTotal, diff, verdict: !(u > 0) ? '' : diff > 0.005 ? 'buy' : diff < -0.005 ? 'hire' : 'even' };
+}
+function planBuyHireHtml(){
+  const rows = state.assetPlan.map(a => ({ a, c: planBuyHire(a) })).filter(x => x.c); if(!rows.length) return '';
+  return `<div class="card" style="margin-top:14px;"><div class="qb-sec-h"><h4>Buy or hire <span class="qb-dim">(plan items with a hire cost)</span></h4></div><div class="bh-grid">${rows.map(({ a, c }) => `<div class="bh-card"><b>${escHtml(a.item || 'Item')}</b>
+    <div class="bh-sides"><div class="bh-side"><small>Buy</small><b>${qm(c.cost)}</b><em>once, ex VAT</em></div><div class="bh-side"><small>Hire</small><b>${qm(c.h)}</b><em>each time</em></div></div>
+    <div class="bh-be">Buying is cheaper after <b>${c.beUses} use${c.beUses === 1 ? '' : 's'}</b> <span class="qb-dim">(${qm(c.cost)} ÷ ${qm(c.h)} = ${c.be.toFixed(1)})</span></div>
+    ${c.verdict ? `<div class="bh-at">At ${c.u} expected use${c.u === 1 ? '' : 's'}: hire costs ${qm(c.hireTotal)}, buying ${qm(c.cost)}: <b>${c.verdict === 'buy' ? 'buying saves ' + qm(c.diff) : c.verdict === 'hire' ? 'hiring saves ' + qm(-c.diff) : 'the same either way'}</b></div>` : '<div class="bh-at qb-dim">Enter the expected number of uses to compare the totals.</div>'}</div>`).join('')}</div></div>`;
+}
+/* the card on a project's Overview, only while the switch is on */
+function toolJobCardHtml(p){
+  if(!toolCostOn()) return '';
+  const rows = (p.toolUse || []), assets = state.assets.filter(a => a.status === 'Owned' && Number(a.usageCharge) > 0), at = `data-tool-pid="${p.id}"`;
+  return `<div class="rp-card" id="rpTools"><h4>Tools used on this job <span class="qb-dim">${qm(projToolCost(p))}</span></h4>
+    ${rows.length ? `<table class="qb-table qb-narrow"><thead><tr><th>Tool</th><th>Uses</th><th>Per use</th><th>Cost</th><th></th></tr></thead><tbody>${rows.map(u => { const a = state.assets.find(x => x.id === u.assetId);
+      return `<tr><td>${escHtml(a ? a.name : '(asset removed)')}</td><td><input type="number" min="0" step="1" class="qb-n" data-tool="uses" ${at} data-uid="${escAttr(u.id)}" value="${u.uses}" aria-label="Uses"></td><td class="qb-calc">${qm(u.charge)}</td><td class="qb-calc">${qm((Number(u.uses) || 0) * (Number(u.charge) || 0))}</td><td><button type="button" class="icon-btn" data-tool="del" ${at} data-uid="${escAttr(u.id)}" aria-label="Remove">${X_SVG}</button></td></tr>`; }).join('')}</tbody></table>` : '<div class="sup-empty">No tools recorded on this job.</div>'}
+    ${assets.length ? `<div class="q-inline" style="gap:8px;margin-top:8px;"><select data-tool="pick" ${at} aria-label="Tool">${assets.map(a => `<option value="${escAttr(a.id)}">${escHtml(a.name)} · ${qm(assetChargeNow(a))} a use</option>`).join('')}</select><button type="button" class="btn secondary qb-sm" data-tool="add" ${at}>+ Add tool use</button></div>` : '<p class="q-help">No asset has a charge per use yet. Set one in the Asset register.</p>'}
+    <p class="q-help">Recorded against the job and counted as recovered on the asset. It does not change this job's margin, retained profit or the pots.</p></div>`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('button[data-tool]'); if(!b || !state) return; const p = state.projects.find(x => x.id === Number(b.dataset.toolPid)); if(!p) return; p.toolUse = Array.isArray(p.toolUse) ? p.toolUse : [];
+  if(b.dataset.tool === 'add'){ const sel = b.parentNode.querySelector('select[data-tool="pick"]'), a = sel && state.assets.find(x => x.id === sel.value); if(!a) return; const ex = p.toolUse.find(u => u.assetId === a.id);
+    if(ex) ex.uses = (Number(ex.uses) || 0) + 1; else p.toolUse.push({ id: 'tu_' + Math.random().toString(36).slice(2, 8), assetId: a.id, uses: 1, charge: assetChargeNow(a), date: fmt(new Date()) }); }
+  else if(b.dataset.tool === 'del'){ p.toolUse = p.toolUse.filter(u => u.id !== b.dataset.uid); } else return;
+  saveState(); render();
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; if(!el || !el.dataset || el.dataset.tool !== 'uses' || !state) return; const p = state.projects.find(x => x.id === Number(el.dataset.toolPid)), u = p && (p.toolUse || []).find(x => x.id === el.dataset.uid); if(!u) return;
+  u.uses = Math.max(0, Math.round(Number(el.value) || 0)); saveState(); render();
+});
 
 /* BT:js-money end */
 
