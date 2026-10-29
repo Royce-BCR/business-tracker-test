@@ -1584,6 +1584,7 @@
   .pw-mk.milestone.ms-done { background: var(--bt-ok-fg); } .pw-mk.milestone.ms-soon { background: var(--bt-warn-fg); } .pw-mk.milestone.ms-overdue { background: var(--bt-bad-fg); } .pw-mk.milestone.ms-future { background: var(--bt-slate-blue); }
   .pw-mk.milestone.planned { background: var(--bt-card); border: 2px solid currentColor; box-sizing: border-box; } .pw-mk.milestone.planned.ms-overdue { color: var(--bt-bad-fg); }
   .pw-dia { display: inline-block; width: 9px; height: 9px; transform: rotate(45deg); border-radius: 2px; background: var(--bt-slate-blue); flex: none; }
+  .ms-unconfirmed .pw-dia { background: transparent; border: 1.5px solid var(--bt-muted, var(--muted)); } .pw-ms-chip.ms-unconfirmed, .pw-ev.milestone.ms-unconfirmed .pw-ev-s { color: var(--muted); } .pw-mk.milestone.ms-unconfirmed { background: var(--bt-card); border: 2px solid var(--muted); box-sizing: border-box; }
   .ms-done .pw-dia, .pw-ms-chip.ms-done .pw-dia { background: var(--bt-ok-fg); } .ms-soon .pw-dia { background: var(--bt-warn-fg); } .ms-overdue .pw-dia { background: var(--bt-bad-fg); } .ms-future .pw-dia { background: var(--bt-slate-blue); }
   .pw-ev.milestone.ms-done .ic { stroke: var(--bt-ok-fg); } .pw-ev.milestone.ms-soon .ic { stroke: var(--bt-warn-fg); } .pw-ev.milestone.ms-overdue .ic { stroke: var(--bt-bad-fg); } .pw-ev.milestone.ms-future .ic { stroke: var(--bt-slate-blue); }
   .pw-ms-chip { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; margin: 2px var(--bt-s1) 2px 0; font-size: 11.5px; font-weight: 600; background: var(--bt-paper); border-radius: var(--bt-r-pill); padding: 1px var(--bt-s2) 1px 7px; }
@@ -4442,6 +4443,7 @@ function projSetStageByHand(p, id){
 const projStage6Opts = () => PROJ_STAGE6.map(([id, name]) => ({ id, name }));
 const pipeStages = pl => pl === 'project' ? projStage6Opts() : ((state.pipelineStages || {})[pl] || []);
 const recStageId = (pl, r) => pl === 'project' ? projStage6(r).id : r.stageId;
+const projPaidPill = p => projIsPaid(p) ? '<span class="rp-pill ok" title="Paid in full: shown as a status, not a pipeline stage">Paid</span>' : '';
 const proj6Pill = p => { const s = projStage6(p); return `<span class="rp-pill s6 s6-${s.id}" title="Pipeline stage ${s.n} of ${PROJ_STAGE6.length}, from confirmed dates">${escHtml(s.name)}</span>`; };
 function stageById(pl, id){ if(pl === 'project'){ const q = PROJ_STAGE6.find(x => x[0] === id); if(q) return { id: q[0], name: q[1] }; } return ((state.pipelineStages||{})[pl]||[]).find(s => s.id === id) || null; }
 function stageName(pl, id){ const s = stageById(pl, id); return s ? s.name : '—'; }
@@ -5102,7 +5104,7 @@ function tileHtml(pl, r, color){
     if(roll.start) rows += `<div class="bd-t-row"><span class="k">Starts</span><span>${fmtDisplay(roll.start)}</span></div>`;
   } else {
     sub = '';
-    rows += `<div class="bd-t-row"><span class="k">Stage</span><span>${proj6Pill(r)}</span></div>`;
+    rows += `<div class="bd-t-row"><span class="k">Stage</span><span>${proj6Pill(r)} ${projPaidPill(r)}</span></div>`;
     rows += `<div class="bd-t-row"><span class="k">Agreed value</span><span>${money(r.agreedValue)}</span></div>`;
     const nm = nextMilestone(r);
     rows += `<div class="bd-t-row"><span class="k">${nm ? (nm.next ? 'Next' : 'Last') + ': ' + escHtml(nm.label) : 'Next milestone'}</span><span>${nm ? fmtDisplay(nm.d) : '—'}</span></div>`;
@@ -6661,7 +6663,7 @@ function pwMsStatus(date, done){
   const today = fmt(new Date()); if(date < today) return 'overdue';
   return Math.round((toDate(date) - toDate(today)) / 86400000) <= 7 ? 'soon' : 'future';
 }
-const PW_MS_LABEL = { done: 'Done', soon: 'Due soon', overdue: 'Overdue', future: 'Future' };
+const PW_MS_LABEL = { done: 'Done', soon: 'Due soon', overdue: 'Overdue', future: 'Future', unconfirmed: 'Not confirmed' };
 
 /* ---------- Planned vs actual dates ----------
    p.milestones[key] is the PLANNED date (set in the quote and sales steps, changeable). p.msActual[key] { date, at, by, src } is set only by "Mark done".
@@ -6701,10 +6703,14 @@ function projMsActual(p, key){
   const x = (p.msActual || {})[key]; if(x && x.date) return { date: x.date, at: x.at || '', by: x.by || '', src: x.src || 'Marked done', evidence: false };
   const e = projMsEvidence(p, key); return e ? { date: e.date, at: '', by: '', src: e.src, evidence: true } : null;
 }
+/* the job has reached invoicing (invoiced or paid is confirmed, or it is completed): earlier unconfirmed milestones are "not confirmed", not overdue */
+function projWrapUp(p){ return !!(projMsActual(p, 'invoiced') || projMsActual(p, 'paid') || projIsCompleted(p)); }
+const projIsPaid = p => !!projMsActual(p, 'paid');
 function projMsInfo(p, key){
   const today = fmt(new Date()), pl = projMsPlanned(p, key), ac = projMsActual(p, key), diff = ac && pl.date ? daysBetween(pl.date, ac.date) : null;
   let status;
   if(ac) status = 'done'; else if(!pl.date) status = 'future'; else if(pl.date < today) status = 'overdue'; else status = daysBetween(today, pl.date) <= 7 ? 'soon' : 'future';
+  if(status === 'overdue' && key !== 'paid' && projWrapUp(p)) status = 'unconfirmed';   // display only: an invoiced or paid job is not "behind" on earlier milestones nobody confirmed (stored dates are untouched)
   return { key, planned: pl.date, typed: pl.typed, actual: ac, diff, status, late: diff !== null && diff > 0, overdueDays: status === 'overdue' ? daysBetween(pl.date, today) : 0 };
 }
 /* a stage line: planned start / end (s.start, s.end), actual start / end, status and days late */
@@ -7093,7 +7099,7 @@ function pwEventRow(e){
   const msc = e.kind === 'milestone' ? ' ms-' + e.ms : '';
   const also = (e.msList || []).map(m => `<span class="pw-ms-chip ms-${m.st}" title="Milestone: ${PW_MS_LABEL[m.st]}"><i class="pw-dia"></i>${escHtml(m.title)}${m.done ? '' : ` <button type="button" class="sp-link" data-pw="ms-done" data-key="${m.mkey}">mark done</button>`}</span>`).join(' ');
   return `<div class="pw-ev ${e.kind}${msc}${e.overdue ? ' over' : ''}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${PW_ICON[e.kind]}</svg>
-    <div class="pw-ev-m"><div class="pw-ev-t">${escHtml(e.title)}${e.kind === 'milestone' ? (e.isPlan ? ' <span class="qb-flag">planned</span>' : ' <span class="qb-flag ok">actual</span>') : ''}${e.late ? ` <span class="pw-slip late">${escHtml(diffText(e.diff))}</span>` : ''}${e.sl && e.sl.status === 'overdue' ? ' <span class="pw-slip late">overdue</span>' : ''}${e.sl && e.sl.late ? ` <span class="pw-slip late">${escHtml(diffText(e.sl.ed !== null ? e.sl.ed : e.sl.sd))}</span>` : ''} ${also} ${flags}</div>
+    <div class="pw-ev-m"><div class="pw-ev-t">${escHtml(e.title)}${e.kind === 'milestone' ? (e.ms === 'unconfirmed' ? ' <span class="qb-flag">not confirmed</span>' : e.isPlan ? ' <span class="qb-flag">planned</span>' : ' <span class="qb-flag ok">actual</span>') : ''}${e.late ? ` <span class="pw-slip late">${escHtml(diffText(e.diff))}</span>` : ''}${e.sl && e.sl.status === 'overdue' ? ' <span class="pw-slip late">overdue</span>' : ''}${e.sl && e.sl.late ? ` <span class="pw-slip late">${escHtml(diffText(e.sl.ed !== null ? e.sl.ed : e.sl.sd))}</span>` : ''} ${also} ${flags}</div>
       <div class="pw-ev-s">${PW_KIND[e.kind]} · ${e.pa ? escHtml(e.pa) : when} · ${e.overdue ? '<b class="over">overdue, ' + pwRel(e.date) + '</b>' : (e.done ? '' : pwRel(e.date))}${e.pa ? '' : (e.sub ? ' · ' + escHtml(String(e.sub).slice(0, 90)) : '')}</div></div>${amt}<div class="pw-ev-a">${pwEventActions(e)}</div></div>`;
 }
 function pwEditBar(p, kind, extra){
@@ -17987,15 +17993,14 @@ function rpSec(key, title, body, tools, scope){
 function rpLeftHtml(p){
   const cu = projCustomer(p), aq = projAcceptedQuote(p), ct = projContract(p), mg = projMargin(p), h = projHours(p), nm = rpNextStage(p), st = rpStatus(p), money = rpMoney(p), code = recordCode(p.id, 'project'), sold = projContractAgreed(p);
   const sub = [code, aq ? qRef(aq) : '', cu.name || cu.company].filter(Boolean).join(' · ');
-  const stageName_ = projStage6(p).name, d = rpDraft(p);
+  const d = rpDraft(p);
   const quoteLink = ct.q ? `<button type="button" class="sp-link" data-qba="open-quote" data-id="${ct.q.id}">${escHtml(qRef(ct.q))}</button>` : '';
   const sources = [...new Set(state.leads.concat(state.projects).map(r => r.source).filter(Boolean))];
   const owners = apTeam(), ownerOpts = [['', 'Not set']].concat((p.owner && !owners.includes(p.owner) ? [p.owner] : []).concat(owners).map(n => [n, n]));
   const stageOpts = PROJ_STAGE6.map(([id, name]) => [id, name]);
   const about = `
     <div class="rp-f rp-edit"><label for="rpf_pipeline">Pipeline</label><select id="rpf_pipeline" aria-label="Pipeline"><option>Project Pipeline</option></select></div>
-    ${rpEdit(p, 'stageId', { select: stageOpts, hint: 'Moves when a milestone is confirmed. Choose here to set it by hand.' })}
-    ${rpRO('Pipeline stage', proj6Pill(p), 'Worked out from confirmed milestone dates: it moves when you confirm one', 'calc')}
+    ${rpEdit(p, 'stageId', { select: stageOpts, hint: projStage6(p).hand ? 'Set by hand. It moves on when a milestone is confirmed.' : 'Worked out from confirmed milestones and moves when you confirm one. Choose here to set it by hand.' })}
     ${rpRO('Reference', escHtml(code), 'Never changes', 'locked')}
     ${rpEdit(p, 'jobTypeId', { select: [['', 'Not set']].concat(state.jobTypes.map(j => [j.id, j.name + (j.notFit ? ' (not a fit)' : '')])), hint: jobNotFit(Object.assign({}, p, { jobTypeId: rpVal(p, 'jobTypeId') })) ? 'Marked as not a fit in Settings.' : 'The kind of job. The list is in Settings, Selling.' })}
     ${rpEdit(p, 'jobType', { label: 'Job detail', ph: 'e.g. Oak pergola' })}
@@ -18036,7 +18041,7 @@ function rpLeftHtml(p){
   return `<div class="rp-head">
       <div class="rp-head-top"><button type="button" class="rp-back" data-pw="back">← All projects</button><button type="button" class="rp-legacy" data-rp="legacy" title="The earlier project page, with every section">Open full workspace</button></div>
       <div class="rp-id"><span class="rp-av" aria-hidden="true">${escHtml(rpInitials(p.name))}</span><div class="rp-id-t"><h2 class="rp-name">${escHtml(p.name)}</h2><div class="rp-sub">${escHtml(sub)}</div></div></div>
-      <div class="rp-pills"><span class="rp-pill ${st.k}">${escHtml(st.t)}</span>${proj6Pill(p)}<span class="rp-pill neu" title="Stored stage">${escHtml(stageName_)}</span>${p.tentative ? '<span class="rp-pill warn">Tentative</span>' : ''}</div>
+      <div class="rp-pills"><span class="rp-pill ${st.k}">${escHtml(st.t)}</span>${proj6Pill(p)}${projPaidPill(p)}${p.tentative ? '<span class="rp-pill warn">Tentative</span>' : ''}</div>
       <div class="rp-quick" role="group" aria-label="Quick actions"><button type="button" class="btn secondary qb-sm" data-rp="q-note">Note</button><button type="button" class="btn secondary qb-sm" data-rp="q-task">Task</button><button type="button" class="btn secondary qb-sm" data-rp="q-time">Log time</button><button type="button" class="btn secondary qb-sm" data-rp="q-call">Call</button><button type="button" class="btn secondary qb-sm" data-sel="close-lost" data-pl="project" data-id="${p.id}">Close as lost</button></div>
     </div>
     <div class="rp-lbody">${rpSec('about', 'About this project', about)}${rpSec('dates', 'Dates and workload', dates)}${rpSec('money', 'Money', moneySec)}${rpSec('cust', 'Customer and contact', cust)}${rpSec('site', 'Site', site)}</div>
@@ -18134,7 +18139,7 @@ function rpNextInvoice(p){
 function rpHeadlineHtml(p){
   const ct = projContract(p), st = rpStatus(p), d = rpDates(p), onsite = projMsActual(p, 'onSiteStart'), mo = rpMoney(p), ni = rpNextInvoice(p);
   const cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
-  return `<div class="rp-strip">${cell('Sales value', rpM(ct.value), 'ex VAT')}${cell('Status', escHtml(st.t), escHtml(st.s), st.k)}${cell('Next on site', onsite ? 'On site' : (d.start ? escHtml(pwD(d.start)) : '—'), onsite ? 'since ' + escHtml(pwD(onsite.date)) : (d.start ? escHtml(pwRel(d.start)) : 'no planned date'))}${cell('Overdue', rpM(mo.overdue), 'invoices', mo.overdue ? 'bad' : '')}${cell('Next invoice', ni ? escHtml(pwD(ni.dueDate)) : '—', ni ? rpM(ni.amount) : 'none to raise')}</div>`;
+  return `<div class="rp-strip">${cell('Sales value', rpM(ct.value), 'ex VAT')}${cell('Status', escHtml(st.t), escHtml(st.s), st.k)}${!onsite && projWrapUp(p) ? cell('On site', 'Not confirmed', d.start ? 'planned ' + escHtml(pwD(d.start)) : '') : cell('Next on site', onsite ? 'On site' : (d.start ? escHtml(pwD(d.start)) : '—'), onsite ? 'since ' + escHtml(pwD(onsite.date)) : (d.start ? escHtml(pwRel(d.start)) : 'no planned date'))}${cell('Overdue', rpM(mo.overdue), 'invoices', mo.overdue ? 'bad' : '')}${cell('Next invoice', ni ? escHtml(pwD(ni.dueDate)) : '—', ni ? rpM(ni.amount) : 'none to raise')}</div>`;
 }
 /* Outstanding: what is waiting on us, and what is waiting on others */
 function rpOutstanding(p){
