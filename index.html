@@ -1738,6 +1738,7 @@
   /* ---------------- Purchase orders ---------------- */
   .po-st { display: inline-block; padding: 2px 10px; border-radius: var(--bt-r-pill); font-size: 11.5px; font-weight: 700; } .po-st-Draft { background: var(--bt-neu-bg); color: var(--bt-neu-fg); } .po-st-Approved { background: var(--bt-info-bg); color: var(--bt-info-fg); } .po-st-Sent { background: var(--bt-info-bg); color: var(--bt-info-fg); } .po-st-Delivered { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .po-st-Matched { background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
   .po-needs td { background: var(--bt-bad-bg); } .po-needs td:first-child { box-shadow: inset 4px 0 0 var(--bt-bad-fg); } .po-flag { display: inline-block; background: var(--bt-bad-fg); color: var(--bt-on-dark); border-radius: var(--bt-r-pill); padding: 2px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .po-tools { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; margin-bottom: var(--bt-s3); } .po-hero { margin: var(--bt-s2) 0 var(--bt-s3); } .po-trace { display: flex; flex-wrap: wrap; gap: var(--bt-s2) var(--bt-s4); align-items: baseline; margin-bottom: var(--bt-s2); } .po-trace small { display: block; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; } .po-bigref { font-size: 20px; letter-spacing: .01em; } .po-extra { margin-top: var(--bt-s3); }
   .po-note { font-size: 12.5px; color: var(--slate); margin-bottom: var(--bt-s3); } .po-steps { display: flex; gap: var(--bt-s2); align-items: center; margin: var(--bt-s1) 0 var(--bt-s3); font-size: 12.5px; color: var(--text-muted); } .po-steps span.done { color: var(--bt-ok-fg); font-weight: 600; } .po-steps span.cur { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--ink); } .po-steps i { font-style: normal; }
   /* ---------------- Q4: thumb-sized controls on phones and touch screens (desktop with a mouse is unchanged) ---------------- */
   @media (max-width: 700px), (pointer: coarse) {
@@ -2537,7 +2538,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-operations" role="group" aria-labelledby="gh-operations">
       <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
       <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
-      <button type="button" class="tab g-operations" data-tab="purchaseorders">Purchase Orders</button>
+      <button type="button" class="tab g-operations" data-tab="purchaseorders">Orders and deliveries</button>
       <button type="button" class="tab g-operations" data-tab="assets">Assets</button>
     </div>
   </div>
@@ -2821,8 +2822,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <!-- PURCHASE ORDERS -->
   <div class="panel" id="panel-purchaseorders">
     <div class="page-head">
-      <h2>Purchase Orders</h2>
-      <div class="desc">Optional orders raised from a project's delivery drops: supplier, items, agreed prices, delivery date and address. Draft, Approved, Sent, Delivered, Matched (to the supplier's invoice in Transactions).</div>
+      <h2>Orders and deliveries</h2>
+      <div class="desc">One order per supplier, raised from a project's delivery drops (and a second order for the same supplier when a job needs one): supplier, items, agreed prices, planned and actual delivery. Draft, Approved, Sent, Delivered, Matched (to the supplier's invoice in Transactions).</div>
     </div>
     <div id="poBody"></div>
   </div>
@@ -11194,12 +11195,16 @@ function poSnapshot(p, did){
   return { supplierId: d.supplierId || '', supplierName: d.supplierId ? qbSupName(d.supplierId) : (d.label || 'Supplier'), items, deliveryDate: d.date || '', method: d.method,
     address: d.method === 'collect' ? '' : [cu.address, cu.postcode && !String(cu.address).includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ') };
 }
-function poCreate(pid, did){
-  const p = state.projects.find(x => x.id === pid); if(!p) return; const ex = poForDrop(pid, did); if(ex){ navGo(() => poOpen(ex.id)); return; }
-  const snap = poSnapshot(p, did); if(!snap) return;
+function poMake(pid, did){   // makes the order (a Draft) and returns it; the caller saves and redraws
+  const p = state.projects.find(x => x.id === pid); if(!p) return null; const ex = poForDrop(pid, did); if(ex) return ex;
+  const snap = poSnapshot(p, did); if(!snap) return null;
   const no = Math.max(Number(state.poNextNo) || 1, (state.purchaseOrders || []).reduce((m, x) => Math.max(m, x.no), 0) + 1); state.poNextNo = no + 1;
   const po = Object.assign({ id: no, no, ref: poPrefixText() + String(no).padStart(4, '0'), pid, did, notes: '', status: 'Draft', createdBy: whoName(), createdAt: fmt(new Date()), approval: null, sentAt: '', deliveredAt: '', match: null }, snap);
-  state.purchaseOrders = state.purchaseOrders || []; state.purchaseOrders.push(po); saveState(); render(); navGo(() => poOpen(po.id)); showToast(po.ref + ' created as a Draft');
+  state.purchaseOrders = state.purchaseOrders || []; state.purchaseOrders.push(po); return po;
+}
+function poCreate(pid, did){
+  const ex = poForDrop(pid, did); if(ex){ navGo(() => poOpen(ex.id)); return; }
+  const po = poMake(pid, did); if(!po) return; saveState(); render(); navGo(() => poOpen(po.id)); showToast(po.ref + ' created as a Draft');
 }
 function poOpen(id){ poUi.open = id; activateTab('purchaseorders'); renderPOs(); window.scrollTo(0, 0); }
 function poPill(po){ const s = po.status; return `<span class="po-st po-st-${s}">${s}</span>`; }
@@ -11210,8 +11215,9 @@ function renderPOs(){
   if(po) { el.innerHTML = poDetailHtml(po); return; }
   const list = (state.purchaseOrders || []).slice().sort((a, b) => b.no - a.no), me = whoAmI().name;
   el.innerHTML = `<div class="po-note">${state.settings.poApprovalOn ? `Approval is <b>on</b>: POs of <b>${qm(state.settings.poApprovalThreshold)}</b> or more are flagged and cannot be sent until approved${poViaApprovals() ? ' (through the Approvals process)' : ''}.` : 'PO approval is off (Settings &gt; Quotes &gt; Purchase orders).'} Create a PO from a delivery drop in a project's Materials and deliveries section.</div>
-    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>PO</th><th>Project</th><th>Supplier</th><th>Delivery</th><th>Value</th><th>Status</th><th>Approval</th><th></th></tr></thead><tbody>${list.map(x => { const need = poNeedsApproval(x);
-      return `<tr class="${need && !poApproved(x) ? 'po-needs' : ''}"><td><b>${escHtml(x.ref)}</b></td><td>${finSrcLink({ t: 'project', id: x.pid, sec: 'materials' }, recordCode(x.pid, 'project'))}</td><td>${escHtml(x.supplierName)}</td><td>${x.deliveryDate ? pwD(x.deliveryDate) : '—'}</td><td class="qb-calc">${qm(poTotals(x).payable)}</td><td>${poPill(x)}</td>
+    <div class="po-tools"><button type="button" class="btn qb-sm" data-po2="open">+ New order</button><span class="qb-dim">Create the orders for a project's suppliers, or add a second order for the same supplier.</span></div>
+    <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>PO</th><th>Project</th><th>Supplier</th><th>Delivery</th><th>Value</th><th>Status</th><th>Approval</th><th></th></tr></thead><tbody>${list.map(x => { const need = poNeedsApproval(x), act = poActualDelivery(x), aq = poQuoteOf(x);
+      return `<tr class="${need && !poApproved(x) ? 'po-needs' : ''}"><td><b>${escHtml(x.ref)}</b>${aq ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(qRef(aq))}</div>` : ''}</td><td>${finSrcLink({ t: 'project', id: x.pid, sec: 'materials' }, recordCode(x.pid, 'project'))}</td><td>${escHtml(x.supplierName)}</td><td>${x.deliveryDate ? pwD(x.deliveryDate) : '—'}${act ? `<div class="qb-dim" style="font-size:var(--bt-fs-xs);">delivered ${escHtml(pwD(act))}</div>` : ''}</td><td class="qb-calc">${qm(poTotals(x).payable)}</td><td>${poPill(x)}</td>
       <td>${need ? (poApproved(x) ? `<span class="pw-ok">✓ ${escHtml(x.approval.by)}</span>` : '<span class="po-flag">Requires approval</span>') : '<span class="qb-dim">not needed</span>'}</td><td><button type="button" class="btn secondary qb-sm" data-po="open" data-id="${x.id}">Open</button></td></tr>`; }).join('') || '<tr><td colspan="8"><div class="sup-empty">No purchase orders yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function poDetailHtml(po){
@@ -11224,9 +11230,11 @@ function poDetailHtml(po){
   if(po.status === 'Sent') acts.push(`<button type="button" class="btn qb-sm" data-po="delivered" data-id="${po.id}">Mark delivered</button>`);
   if(po.status !== 'Draft' && po.status !== 'Matched') acts.push(`<button type="button" class="btn qb-sm" data-spay="confirm" data-pid="${po.pid}" data-did="${escAttr(po.did)}">Confirm supplier payment</button>`);
   else if(po.status === 'Matched') acts.push(`<button type="button" class="btn secondary qb-sm" data-spay="confirm" data-pid="${po.pid}" data-did="${escAttr(po.did)}">View the payment</button>`);
+  if(draft) acts.push(`<button type="button" class="btn secondary qb-sm" data-po="item-add" data-id="${po.id}">+ Add item</button>`);
   if(draft) acts.push(`<button type="button" class="btn secondary qb-sm" data-po="refresh" data-id="${po.id}" title="Re-copy items, prices and dates from the Working plan">Refresh from plan</button><button type="button" class="btn secondary qb-sm" data-po="del" data-id="${po.id}">Delete</button>`);
   acts.push(`<button type="button" class="btn secondary qb-sm" data-po="print" data-id="${po.id}">Print / save as PDF</button><button type="button" class="btn secondary qb-sm" data-po="email" data-id="${po.id}">Email to supplier</button>`);
-  return `<div class="card"><div class="qb-sec-h"><h4><button type="button" class="btn secondary qb-sm" data-po="list">← All POs</button> &nbsp;${escHtml(po.ref)} ${poPill(po)}</h4><div class="qb-sec-tools">${finSrcLink({ t: 'project', id: po.pid, sec: 'materials' }, 'Project ' + recordCode(po.pid, 'project') + ' →')}</div></div>
+  return `<div class="card"><div class="qb-sec-h"><h4><button type="button" class="btn secondary qb-sm" data-po="list">← All orders</button> &nbsp;${escHtml(po.ref)} ${poPill(po)}</h4><div class="qb-sec-tools">${finSrcLink({ t: 'project', id: po.pid, sec: 'materials' }, 'Project ' + recordCode(po.pid, 'project') + ' →')}</div></div>
+    ${poHeroHtml(po)}
     <div class="po-steps">${PO_STATUS.map((s, i) => `<span class="${i < step ? 'done' : i === step ? 'cur' : ''}">${s}</span>`).join('<i>›</i>')}</div>
     ${need ? `<div class="pw-qbar pw-alert-bar po-flagbar">${appr ? `✓ Approved by <b>${escHtml(po.approval.by)}</b> on ${pwD(po.approval.at)}.` : `⚠ <b>Requires approval</b>: ${qm(t.payable)} is at or above the ${qm(state.settings.poApprovalThreshold)} threshold, so it cannot be sent until approved.${poViaApprovals() ? ' It is also waiting in the Approvals page.' : ''}${can.ok ? '' : ' ' + escHtml(can.why) + '.'}`}</div>` : ''}
     <div class="qual-grid"><div class="qual-field"><label>Supplier</label><input value="${escAttr(po.supplierName)}" disabled>${sup ? `<div class="q-help">${escHtml([sup.address, sup.postcode].filter(Boolean).join(', '))}${supEmail(sup) ? ' · ' + escHtml(supEmail(sup)) : ''}</div>` : ''}</div>
@@ -11236,7 +11244,8 @@ function poDetailHtml(po){
     <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Item</th><th>Quantity</th><th>Agreed price ex VAT</th><th>Amount</th>${draft ? '<th></th>' : ''}</tr></thead><tbody>${items}</tbody><tfoot><tr class="qb-foot"><td colspan="3" style="text-align:right;">Total ex VAT</td><td class="qb-calc"><b>${qm(t.ex)}</b></td>${draft ? '<td></td>' : ''}</tr>${qVatOn() ? `<tr class="qb-foot"><td colspan="3" style="text-align:right;">VAT</td><td class="qb-calc">${qm(t.vat)}</td>${draft ? '<td></td>' : ''}</tr><tr class="qb-foot"><td colspan="3" style="text-align:right;">Total inc VAT</td><td class="qb-calc"><b>${qm(t.inc)}</b></td>${draft ? '<td></td>' : ''}</tr>` : ''}</tfoot></table></div>
     ${po.match ? `<div class="pw-qbar" style="display:block;margin-top:10px;">✓ Matched to an invoice of <b>${qm(po.match.invoice)}</b> on ${pwD(po.match.at)}: difference ${Math.abs(po.match.diff) < 0.005 ? 'none' : (po.match.diff > 0 ? '+' : '−') + qm(Math.abs(po.match.diff))}${po.match.reason ? ' (' + escHtml(po.match.reason) + ')' : ''} ${po.match.txnUid ? finSrcLink({ t: 'txn', id: po.match.txnUid }, 'transaction →') : ''}</div>` : ''}
     <div class="lp-f" style="margin-top:10px;"><label>Notes for the supplier</label><textarea rows="2" data-po-f="notes"${po.status === 'Matched' ? ' disabled' : ''}>${escHtml(po.notes)}</textarea></div>
-    <div class="pw-var-a">${acts.join('')}</div></div>`;
+    <div class="pw-var-a">${acts.join('')}</div></div>
+    ${poExtraHtml(po)}`;
 }
 function poPrintHtml(po){
   const t = poTotals(po), b = qBrand(), st = state.settings, sup = po.supplierId ? supFind(po.supplierId) : null, p = state.projects.find(x => x.id === po.pid), e = escHtml;
@@ -11280,6 +11289,7 @@ document.addEventListener('click', (e) => {
   else if(a === 'delivered'){ po.status = 'Delivered'; po.deliveredAt = fmt(new Date()); const p = state.projects.find(x => x.id === po.pid); if(p){ p.dropState[po.did] = p.dropState[po.did] || {}; if(!p.dropState[po.did].delivered) p.dropState[po.did].delivered = fmt(new Date()); } }
   else if(a === 'del'){ const ix = state.purchaseOrders.indexOf(po); state.purchaseOrders.splice(ix, 1); undoDeleted('Purchase order deleted: ' + po.ref, ['purchaseOrders'], ix, po); poUi.open = 0; }
   else if(a === 'refresh'){ const p = state.projects.find(x => x.id === po.pid), snap = p && poSnapshot(p, po.did); if(snap) Object.assign(po, snap); }
+  else if(a === 'item-add'){ po.items.push({ lineId: qRand('x_'), desc: 'New item', qty: 1, unit: '', price: 0, vatRate: Number(state.settings.vatRate) || 0 }); }
   else if(a === 'item-del'){ po.items.splice(Number(b.dataset.i), 1); }
   else if(a === 'print'){ const w = window.open('', '_blank'); if(!w){ showToast('Allow pop-ups to print the PO'); return; } w.document.open(); w.document.write(poPrintHtml(po)); w.document.close(); return; }
   else if(a === 'email'){ const sup = po.supplierId ? supFind(po.supplierId) : null, em = sup ? supEmail(sup) : '', t = poTotals(po); window.location.href = `mailto:${encodeURIComponent(em || '')}?subject=${encodeURIComponent('Purchase order ' + po.ref + ' - ' + recordCode(po.pid, 'project'))}&body=${encodeURIComponent('Hello,\n\nPlease find purchase order ' + po.ref + ' (' + qm(t.ex) + ' ex VAT) for delivery on ' + (po.deliveryDate ? pwD(po.deliveryDate) : 'a date to be agreed') + '. Please quote the PO number on your delivery note and invoice.\n\n(Attach the PDF saved from "Print / save as PDF".)\n\nKind regards,\n' + (qBrand().name || ''))}`; return; }
@@ -11291,6 +11301,78 @@ document.addEventListener('change', (e) => {
   else if(el.dataset.poF){ po[el.dataset.poF] = el.dataset.poF === 'deliveryDate' ? isoOk(el.value) : el.value.trim(); }
   else return;
   saveState(); clearTimeout(window._poLazy); window._poLazy = setTimeout(render, 350);
+});
+
+/* ---------- Stage 2: Orders and deliveries hub ----------
+   An order is still one Purchase order per delivery drop on the project's Working plan (nothing reshaped). A second order for the same supplier is a second drop on the plan with the
+   chosen lines moved onto it; lines already on an order stay where they are. New optional fields on an order default empty: see the Stage 2 notes below. */
+function poProject(po){ return state.projects.find(x => x.id === po.pid) || null; }
+function poQuoteOf(po){ const p = poProject(po); return p ? projAcceptedQuote(p) : null; }
+function poActualDelivery(po){ const p = poProject(po), ds = p && p.dropState ? p.dropState[po.did] : null; return (ds && ds.delivered) || po.deliveredAt || ''; }
+function poPlannedDate(po){ const p = poProject(po), wq = p ? projWorkQuote(p) : null, d = wq ? wq.drops.find(x => x.id === po.did) : null; return po.deliveryDate || (d && d.date) || ''; }
+function poLateDays(po){ const pl = poPlannedDate(po), ac = poActualDelivery(po), end = ac || fmt(new Date()); if(!pl || end <= pl) return 0; return Math.round((toDate(end) - toDate(pl)) / 86400000); }
+function poHeroHtml(po){
+  const p = poProject(po), aq = poQuoteOf(po), sup = po.supplierId ? supFind(po.supplierId) : null, pl = poPlannedDate(po), ac = poActualDelivery(po), late = poLateDays(po), ds = p && p.dropState ? (p.dropState[po.did] || {}) : {};
+  const wq = p ? projWorkQuote(p) : null, drop = wq ? wq.drops.find(x => x.id === po.did) : null, moved = drop && drop.date && po.deliveryDate && drop.date !== po.deliveryDate;
+  const cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  return `<div class="po-hero"><div class="po-trace">
+      <span><small>Order</small> <b class="po-bigref">${escHtml(po.ref)}</b></span>
+      <span><small>Project</small> ${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}">${escHtml(recordCode(p.id, 'project'))} · ${escHtml(p.name)}</button>` : '—'}</span>
+      <span><small>Quote</small> ${aq ? `<button type="button" class="sp-link" data-nav="quote:${aq.id}">${escHtml(qRef(aq))} v${aq.version}</button>` : '<span class="qb-dim">no accepted quote</span>'}</span>
+      <span><small>Supplier</small> ${sup ? `<button type="button" class="sp-link" data-nav="supplier:${sup.id}">${escHtml(sup.name)}</button>` : escHtml(po.supplierName || '—')}</span></div>
+    <div class="rp-strip">${cell('Planned delivery', pl ? escHtml(pwD(pl)) : '—', moved ? 'the plan now says ' + escHtml(pwD(drop.date)) : (pl ? escHtml(pwRel(pl)) : 'no date'))}${cell('Actual delivery', ac ? escHtml(pwD(ac)) : '—', ac ? (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' late</b>' : 'on time') : (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' overdue</b>' : 'not yet'), late ? 'bad' : '')}${cell('Ordered', ds.ordered || po.sentAt ? escHtml(pwD(ds.ordered || po.sentAt)) : '—', ds.ordered || po.sentAt ? '' : 'not yet')}${cell('Status', escHtml(po.status), '')}${cell('Value', qm(poTotals(po).payable), qVatOn() ? 'inc VAT' : '')}</div></div>`;
+}
+function poExtraHtml(po){
+  return `<div class="po-extra">${rpRefTasksHtml('po', po.id)}</div>`;
+}
+/* the "New order" dialog: orders for the suppliers already on the quote, or a second order for a supplier */
+const po2Ui = { pid: 0, sup: '', date: '', lines: new Set(), err: '' };
+function po2Projects(){ return state.projects.filter(p => !projArchived(p) && projAcceptedQuote(p)); }
+function po2LineChoices(p){
+  const wq = projWorkQuote(p); if(!wq) return []; const c = qCalc(wq);
+  return wq.lines.filter(l => c.lines[l.id] && !c.lines[l.id].excluded && !(l.kind === 'labour')).map(l => { const dr = l.deliveryDropId ? wq.drops.find(d => d.id === l.deliveryDropId) : null, locked = dr ? !!poForDrop(p.id, dr.id) : false;
+    return { l, drop: dr, locked, supplier: dr ? (dr.supplierId ? qbSupName(dr.supplierId) : (dr.label || 'drop')) : '' }; });
+}
+function po2Open(pid){
+  const ps = po2Projects(); if(!ps.length){ showToast('No project has an accepted quote to order from yet'); return; }
+  if(pid && ps.some(p => p.id === pid)) po2Ui.pid = pid; else if(!ps.some(p => p.id === po2Ui.pid)) po2Ui.pid = ps[0].id;
+  po2Ui.sup = ''; po2Ui.date = ''; po2Ui.lines = new Set(); po2Ui.err = ''; finUi.mode = 'po2'; po2Draw(true);
+}
+function po2Draw(open){
+  const p = state.projects.find(x => x.id === po2Ui.pid); if(!p) return finClose(); projEnsure(p);
+  const drops = projDeliveries(p).drops, sups = state.suppliers.filter(s => s.status !== 'Inactive'), choices = po2LineChoices(p), made = (state.purchaseOrders || []).filter(o => o.pid === p.id).length;
+  const rows = drops.map(x => { const po = poForDrop(p.id, x.d.id), info = poCreateInfo(p, x); return `<div class="rp-lrow"><span>${escHtml(x.supplier)}${x.date ? ' <span class="qb-dim">' + escHtml(pwD(x.date)) + '</span>' : ''}</span><span class="rp-lmeta">${po ? `<b>${escHtml(po.ref)}</b> ${poPill(po)}` : (info.ok ? '<span class="qb-dim">no order yet</span>' : `<span class="qb-dim">${escHtml(info.why)}</span>`)}</span></div>`; }).join('');
+  const toMake = drops.filter(x => poCreateInfo(p, x).ok).length;
+  const body = `<div class="lp-f"><label>Project</label><select id="po2Proj">${po2Projects().map(q => `<option value="${q.id}"${q.id === p.id ? ' selected' : ''}>${escHtml(recordCode(q.id, 'project') + ' · ' + q.name)}</option>`).join('')}</select></div>
+    <h4 style="margin:10px 0 4px;">Suppliers on the quote</h4>${rows || '<div class="qb-dim">No delivery drops on this project yet.</div>'}
+    <div class="pw-var-a" style="margin-top:8px;"><button type="button" class="btn qb-sm" data-po2="all"${toMake ? '' : ' disabled'}>Create ${toMake ? toMake + ' order' + (toMake === 1 ? '' : 's') : 'orders'} (one per supplier)</button></div>
+    <h4 style="margin:14px 0 4px;">Add another order for a supplier</h4>
+    <p class="q-help" style="margin:0 0 6px;">Makes a second delivery on the Working plan and an order for it. Tick the lines it covers; lines already on an order are not offered.${made ? '' : ''}</p>
+    <div class="q-inline" style="gap:10px;"><div class="lp-f"><label>Supplier</label><select id="po2Sup"><option value="">Choose…</option>${sups.map(s => `<option value="${s.id}"${String(s.id) === String(po2Ui.sup) ? ' selected' : ''}>${escHtml(s.name)}</option>`).join('')}</select></div><div class="lp-f"><label>Delivery date</label><input type="date" id="po2Date" value="${escAttr(po2Ui.date)}"></div></div>
+    <div class="qb-scroll" style="max-height:180px;"><table class="qb-table qb-narrow"><thead><tr><th></th><th>Line</th><th>Qty</th><th>Now on</th></tr></thead><tbody>${choices.filter(c => !c.locked).map(c => `<tr><td><input type="checkbox" data-po2l="${escAttr(c.l.id)}"${po2Ui.lines.has(c.l.id) ? ' checked' : ''} aria-label="${escAttr(c.l.description || 'line')}"></td><td>${escHtml(c.l.description || 'Item')}</td><td class="qb-calc">${c.l.qty} ${escHtml(qUnitName(c.l))}</td><td class="qb-dim">${escHtml(c.supplier || 'no delivery')}</td></tr>`).join('') || '<tr><td colspan="4"><div class="qb-dim">Every line is already on an order. You can still make an empty second order and add its items by hand.</div></td></tr>'}</tbody></table></div>
+    <div class="chg-err" id="po2Err">${escHtml(po2Ui.err)}</div><div class="modal-actions"><button class="btn secondary" type="button" data-fin="cancel">Close</button><button class="btn" type="button" data-po2="second">Create the second order</button></div>`;
+  if(open) finOpen('New order', body, true); else document.getElementById('finBody').innerHTML = body;
+}
+function po2Second(){
+  const p = state.projects.find(x => x.id === po2Ui.pid); if(!p) return; const plan = projPlanEnsure(p), sup = Number(po2Ui.sup);
+  if(!plan){ po2Ui.err = 'Accept the quote first.'; return po2Draw(); } if(!sup){ po2Ui.err = 'Choose the supplier.'; return po2Draw(); }
+  const same = plan.drops.filter(d => String(d.supplierId) === String(sup)).length, id = qRand('dr_'), ch = [`Second delivery added for ${qbSupName(sup)}`];
+  plan.drops.push({ id, label: qbSupName(sup) + ' (order ' + (same + 1) + ')', supplierId: sup, date: po2Ui.date || '', method: 'delivered', charge: 0, chargeManual: false, paymentDueDate: '', dueManual: false });
+  plan.lines.forEach(l => { if(po2Ui.lines.has(l.id)){ ch.push(`${l.description || 'Item'}: moved to the new delivery`); l.deliveryDropId = id; } });
+  qAutoDrops(projWorkQuote(p)); chgLog(p, 'delivery', { cause: 'other', reason: 'Second order for the same supplier' }, ch);
+  const po = poMake(p.id, id); saveState(); render(); finClose(); if(po){ navGo(() => poOpen(po.id)); showToast(po.ref + ' created as a Draft (second order for ' + qbSupName(sup) + ')'); }
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-po2]'); if(!b || !state) return; const a = b.dataset.po2;
+  if(a === 'open') po2Open(Number(b.dataset.pid) || 0);
+  else if(a === 'all'){ const p = state.projects.find(x => x.id === po2Ui.pid); if(!p) return; projEnsure(p); const made = []; projDeliveries(p).drops.forEach(x => { if(poCreateInfo(p, x).ok){ const po = poMake(p.id, x.d.id); if(po) made.push(po.ref); } }); saveState(); render(); po2Draw(); showToast(made.length ? made.join(', ') + ' created as Drafts' : 'Nothing to create'); }
+  else if(a === 'second') po2Second();
+});
+document.addEventListener('change', (e) => {
+  if(finUi.mode !== 'po2') return; const t = e.target;
+  if(t.id === 'po2Proj'){ po2Ui.pid = Number(t.value); po2Ui.lines = new Set(); po2Ui.err = ''; po2Draw(); }
+  else if(t.id === 'po2Sup') po2Ui.sup = t.value; else if(t.id === 'po2Date') po2Ui.date = isoOk(t.value) || '';
+  else if(t.dataset && t.dataset.po2l){ if(t.checked) po2Ui.lines.add(t.dataset.po2l); else po2Ui.lines.delete(t.dataset.po2l); }
 });
 
 /* ---------- moving a record between the three pipelines ----------
@@ -14187,7 +14269,7 @@ const BTT_SPECS = [
   { k: 'suppliersTableWrap', label: 'Suppliers', sort: 1, cards: { code: ['code'], title: ['supplier'], status: ['status'], value: ['live quotes'], date: ['orders placed'], next: ['main contact'] }, pri: { 'live quotes': 'e', 'orders placed': 'e', 'categories': 'n', 'phone': 'n', 'email': 'x', 'payment terms': 'x', 'delivery': 'x', 'lead time': 'x' } },
   { k: 'transactionsTableWrap', label: 'Transactions', sort: 1, cards: { title: ['description'], date: ['date'], value: ['in (£)', 'out (£)'], status: ['category'] }, pri: { 'linked code': 'x', 'invoice / variation': 'x', 'project': 'n' } },
   { k: 'panel-invoicing:project-invoice', label: 'Invoices', sort: 1, cards: { code: ['invoice'], title: ['project'], status: ['status'], value: ['amount'], date: ['due'], next: ['raise by'] }, pri: { 'sent': 'x', 'paid': 'x' } },
-  { k: 'panel-purchaseorders:po-project', label: 'Purchase orders', sort: 1, cards: { code: ['po'], title: ['supplier'], status: ['status'], value: ['value'], date: ['delivery'], next: ['project'] }, pri: { 'approval': 'n' } },
+  { k: 'panel-purchaseorders:po-project', label: 'Orders and deliveries', sort: 1, cards: { code: ['po'], title: ['supplier'], status: ['status'], value: ['value'], date: ['delivery'], next: ['project'] }, pri: { 'approval': 'n' } },
   { k: 'panel-quotations:reference-customer', label: 'Quotes', sort: 1 },
   { k: 'panel-contacts:name-phone', label: 'Contacts', sort: 1 },
   { k: 'panel-companies:company-type', label: 'Companies', sort: 1 },
@@ -17325,7 +17407,7 @@ function rpLinksHtml(p){
   return rpTile('Customer', custRows, 'No customer recorded.', `<button type="button" class="sp-link" data-rp="q-customer">${cust.length ? 'Edit' : 'Link a contact'}</button>`)
     + rpTile('Suppliers', sup, 'No supplier drops on the quote yet.')
     + rpTile('Quotes', rpQuoteRows(sc.quotes), 'No quotes linked to this project.')
-    + rpTile('Orders', rpOrderRows(pos), 'No purchase orders yet.')
+    + rpTile('Orders', rpOrderRows(pos), 'No orders yet.', projAcceptedQuote(p) ? `<button type="button" class="sp-link" data-po2="open" data-pid="${p.id}">+ New order</button>` : '')
     + rpTile('Invoices', rpInvoiceRows(sc), 'No invoice schedule yet.');
 }
 
@@ -17370,7 +17452,7 @@ function rsRightHtml(s){
   const prj = rsProjects(s).map(r => rpLrow(r.d.pl === 'project' ? 'project:' + r.root : 'deal2:' + r.root, recordCode(r.root, r.d.pl) + ' · ' + (r.d.rec.name || ''), (r.d.pl === 'project' ? 'project' : r.d.pl === 'sales' ? 'sale' : 'lead') + ' · ' + r.why.join(', ')));
   const pos = (state.purchaseOrders || []).filter(o => o.supplierId === s.id).sort((a, b) => b.no - a.no).map(o => rpLrow('po:' + o.id, o.ref, `${poPill(o)} ${rpM(poTotals(o).payable)}`));
   const inv = rsPayments(s).map(r => rpLrow('project:' + r.p.id + ':money', recordCode(r.p.id, 'project') + ' · ' + r.x.supplier, `${r.x.paid ? '<span class="pw-ok">paid</span>' : (r.x.due < fmt(new Date()) ? '<b class="over">overdue</b>' : 'due')} ${rpM(r.x.out)} · ${escHtml(pwD(r.x.due))}`));
-  return rpTile('Projects', prj, 'Not used on any project yet.') + rpTile('Orders', pos, 'No purchase orders yet.') + rpTile('Invoices', inv, 'No supplier payments scheduled.');
+  return rpTile('Projects', prj, 'Not used on any project yet.') + rpTile('Orders', pos, 'No orders yet.') + rpTile('Invoices', inv, 'No supplier payments scheduled.');
 }
 function rsFld(s, i, f, label, o){
   o = o || {}; const v = o.val !== undefined ? o.val : (s[f] == null ? '' : s[f]), id = 'rsf_' + f;
