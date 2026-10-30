@@ -1971,6 +1971,7 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
 .nav-group.open .grp-count { display: none; }
 .nav-items { display: none; padding: 2px 0 6px; }
 .td-greet-link, .db-date-link { margin-top: var(--bt-s1); font-size: var(--bt-fs-sm); }
+.nav-direct { text-align: left; } .nav-direct[aria-current="page"] { color: var(--bt-on-dark); background: color-mix(in srgb, var(--bt-on-dark) 10%, transparent); }
 .nav-sep { height: 1px; margin: var(--bt-s2) var(--bt-s3); background: color-mix(in srgb, var(--bt-on-dark) 14%, transparent); }
 .ms-sep { grid-column: 1 / -1; height: 1px; margin: var(--bt-s1) 0; background: var(--bt-line); }
 .nav-group.open .nav-items { display: block; }
@@ -2787,7 +2788,6 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-command" role="group" aria-labelledby="gh-command">
       <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
       <button type="button" class="tab g-command" data-tab="capacity">Calendar and capacity</button>
-      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
       <button type="button" class="tab g-command" data-tab="reports">Reports</button>
     </div>
@@ -2798,13 +2798,12 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-crm" role="group" aria-labelledby="gh-crm">
       <button type="button" class="tab g-crm" data-tab="contacts">Contacts <span class="tab-count" id="dupBadge" hidden></span></button>
       <button type="button" class="tab g-crm" data-tab="companies">Companies</button>
-      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-crm" data-tab="crmprojects">Projects</button>
       <button type="button" class="tab g-crm" data-tab="crm">Tasks</button>
     </div>
   </div>
 
-  <div class="nav-group g-commercial" data-group="commercial" data-label="Commercial" data-short="Selling">
+  <div class="nav-group g-commercial" data-group="commercial" data-label="Commercial" data-short="Commercial">
     <button type="button" class="nav-label nav-gbtn" id="gh-commercial" aria-expanded="false" aria-controls="gp-commercial"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Commercial</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-commercial" role="group" aria-labelledby="gh-commercial">
       <button type="button" class="tab g-commercial" data-tab="leads">Lead Pipeline</button>
@@ -2814,15 +2813,13 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     </div>
   </div>
 
-  <div class="nav-group g-operations" data-group="operations" data-label="Operations" data-short="Ops">
+  <div class="nav-group g-operations" data-group="operations" data-label="Operations" data-short="Operations">
     <button type="button" class="nav-label nav-gbtn" id="gh-operations" aria-expanded="false" aria-controls="gp-operations"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Operations</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-operations" role="group" aria-labelledby="gh-operations">
       <button type="button" class="tab g-operations" data-tab="projectpipeline">Project Pipeline</button>
-      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-operations" data-tab="suppliers">Suppliers</button>
       <button type="button" class="tab g-operations" data-tab="purchaseorders">Orders and deliveries</button>
       <button type="button" class="tab g-operations" data-tab="supplierinvoices">Supplier invoices</button>
-      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-operations" data-tab="assets">Assets</button>
     </div>
   </div>
@@ -2833,12 +2830,10 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
       <button type="button" class="tab g-finance" data-tab="cashflow">Cash flow</button>
       <button type="button" class="tab g-finance" data-tab="transactions">Transactions</button>
       <button type="button" class="tab g-finance" data-tab="reconciliation">Bank Reconciliation</button>
-      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-finance" data-tab="pnl">Profit and loss</button>
       <button type="button" class="tab g-finance" data-tab="balance">Balance sheet</button>
       <button type="button" class="tab g-finance" data-tab="revenue">Budget and forecast</button>
       <button type="button" class="tab g-finance" data-tab="ageing">Ageing</button>
-      <div class="nav-sep" role="separator"></div>
       <button type="button" class="tab g-finance" data-tab="classify">Classify</button>
       <button type="button" class="tab g-finance" data-tab="pricing">Pricing Model</button>
     </div>
@@ -2854,8 +2849,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   </div>
 
   <div class="nav-group g-settings" data-group="settings" data-label="Settings" data-short="Settings">
-    <button type="button" class="nav-label nav-gbtn" id="gh-settings" aria-expanded="false" aria-controls="gp-settings"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Settings</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
-    <div class="nav-items" id="gp-settings" role="group" aria-labelledby="gh-settings">
+    <button type="button" class="nav-label nav-gbtn nav-direct" id="gh-settings" data-go="settings"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Settings</span></button>
+    <div class="nav-items" id="gp-settings" hidden style="display:none">
       <button type="button" class="tab g-settings" data-tab="settings">Settings</button>
     </div>
   </div>
@@ -3172,7 +3167,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="panel" id="panel-assets">
     <div class="page-head">
       <h2>Assets</h2>
-      <div class="desc">The kit the business owns (register) and the kit it plans to buy (plan). Approved plan items go into the Cash Flow Forecast; buying one turns it into a register entry and a transaction. Retained profit funds the plan.</div>
+      <div class="desc">The kit the business owns (register) and the kit it plans to buy (plan). Approved plan items go into the Cash flow; buying one turns it into a register entry and a transaction. Retained profit funds the plan.</div>
     </div>
     <div id="assetsBody"></div>
   </div>
@@ -3208,7 +3203,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="panel" id="panel-businesscosts">
     <div class="page-head">
       <h2>Business costs</h2>
-      <div class="desc">What the business pays whether or not a job is running: insurance, accountancy, subscriptions, phone. Each has an amount, how often it recurs and when it is next due. Dated costs go into the Cash Flow Forecast, and a matching transaction ticks a cost off as paid once you confirm it.</div>
+      <div class="desc">What the business pays whether or not a job is running: insurance, accountancy, subscriptions, phone. Each has an amount, how often it recurs and when it is next due. Dated costs go into the Cash flow, and a matching transaction ticks a cost off as paid once you confirm it.</div>
     </div>
     <div id="bcBody"></div>
   </div>
@@ -9840,7 +9835,7 @@ function qbCashHtml(q, c){
   const items = qCashItems(q, c), months = qMonthly(items); if(!items.length) return '';
   let cum = 0;
   return `<div class="card"><div class="qb-sec-h"><h3>Cash by month (this project)</h3></div>
-    <p class="q-help" style="margin:0 0 8px;">${q.status === 'Accepted' ? 'This quote is Accepted, so these movements are in the Cash Flow Forecast.' : q.status === 'Sent' ? 'This quote is Sent, so these movements show in the Cash Flow Forecast as “if won”.' : 'Preview only: ' + q.status + ' quotes do not appear in the Cash Flow Forecast.'} Outflows are paid on each drop's payment due date${qVatOn() ? ', with VAT' : ''}.</p>
+    <p class="q-help" style="margin:0 0 8px;">${q.status === 'Accepted' ? 'This quote is Accepted, so these movements are in the Cash flow.' : q.status === 'Sent' ? 'This quote is Sent, so these movements show in the Cash flow as “if won”.' : 'Preview only: ' + q.status + ' quotes do not appear in the Cash flow.'} Outflows are paid on each drop's payment due date${qVatOn() ? ', with VAT' : ''}.</p>
     <div class="qb-scroll"><table class="qb-table qb-narrow" data-flip="qcash-m"><thead><tr><th>Month</th><th>In</th><th>Out</th><th>Net</th><th>Running net</th></tr></thead><tbody>
     ${months.map(m => { const net = m.inn - m.out; cum += net; return `<tr><td>${monthLabel(toDate(m.key + '-01'))}</td><td class="qb-calc">${qm(m.inn)}</td><td class="qb-calc">${qm(m.out)}</td><td class="qb-calc${net < 0 ? ' q-over' : ''}"><b>${net < 0 ? '−' : ''}${qm(Math.abs(net))}</b></td><td class="qb-calc">${cum < 0 ? '−' : ''}${qm(Math.abs(cum))}</td></tr>`; }).join('')}
     </tbody></table></div>
@@ -11580,7 +11575,7 @@ function assetPlanHtml(){
   return `<div class="kpi-row"><div class="kpi" style="--accent:var(--green)"><div class="label">Retained profit to date</div><div class="value">${qm(rt.toDate)}</div><div class="fin-sub">forecast over the jobs ${qm(rt.plan)}</div></div><div class="kpi" style="--accent:var(--oak)"><div class="label">Committed to the plan</div><div class="value">${qm(committed)}</div><div class="fin-sub">approved, ordered or bought, funded from retained profit</div></div><div class="kpi" style="--accent:var(--slate)"><div class="label">Unallocated</div><div class="value ${rt.toDate - committed < 0 ? 'flag' : ''}">${qm(rt.toDate - committed)}</div><div class="fin-sub">retained to date − committed</div></div></div>
     <div class="btn-row"><button type="button" class="btn" data-asset-a="plan-add">+ Add plan item</button></div>
     <div class="card"><div class="qb-scroll"><table class="qb-table inv-table asset-table"><thead><tr><th>Item</th><th>Reason</th><th>Needed by</th><th>Est. cost ex VAT</th><th>Hire cost each time</th><th>Expected uses</th><th>Priority</th><th>Status</th><th>Project</th><th>Funding</th><th>Affordability against retained profit</th><th></th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="13"><div class="sup-empty">Nothing planned. Add the kit you will need; approved items go into the cash flow forecast on their needed-by date.</div></td></tr>'}</tbody></table></div>
-      <p class="q-help">Affordability adds up every item funded from retained profit in needed-by order and compares it with the retained profit expected by that date (each job's retained profit, in proportion to its invoices dated by then). Approved and ordered items appear in the Cash Flow Forecast as money out on the needed-by date. A hire cost and the expected number of uses compare buying with hiring below.</p></div>${planBuyHireHtml()}
+      <p class="q-help">Affordability adds up every item funded from retained profit in needed-by order and compares it with the retained profit expected by that date (each job's retained profit, in proportion to its invoices dated by then). Approved and ordered items appear in the Cash flow as money out on the needed-by date. A hire cost and the expected number of uses compare buying with hiring below.</p></div>${planBuyHireHtml()}
     <details class="card" style="margin-top:14px;"><summary><b>Retained profit by project</b> <span class="qb-dim">(project profit minus profit share)</span></summary><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Project</th><th>Profit (plan)</th><th>Hours</th><th>Profit share</th><th>Retained</th><th>Invoiced</th><th>To date</th></tr></thead><tbody>${byProj || '<tr><td colspan="7"><div class="sup-empty">No projects.</div></td></tr>'}</tbody><tfoot><tr class="qb-foot"><td><b>Total</b></td><td class="qb-calc"><b>${qm(rt.profit)}</b></td><td></td><td class="qb-calc"><b>−${qm(rt.share)}</b></td><td class="qb-calc"><b>${qm(rt.plan)}</b></td><td></td><td class="qb-calc"><b>${qm(rt.toDate)}</b></td></tr></tfoot></table></div></details>`;
 }
 function renderAssets(){
@@ -11702,7 +11697,7 @@ function poDetailHtml(po){
   return `<div class="card"><div class="qb-sec-h"><h4><button type="button" class="btn secondary qb-sm" data-po="list">← All orders</button> &nbsp;${escHtml(po.ref)} ${poPill(po)}</h4><div class="qb-sec-tools">${finSrcLink({ t: 'project', id: po.pid, sec: 'materials' }, 'Project ' + recordCode(po.pid, 'project') + ' →')}</div></div>
     ${poHeroHtml(po)}
     <div class="po-steps">${PO_STATUS.map((s, i) => `<span class="${i < step ? 'done' : i === step ? 'cur' : ''}">${s}</span>`).join('<i>›</i>')}</div>
-    ${need ? `<div class="pw-qbar pw-alert-bar po-flagbar">${appr ? `✓ Approved by <b>${escHtml(po.approval.by)}</b> on ${pwD(po.approval.at)}.` : `⚠ <b>Requires approval</b>: ${qm(t.payable)} is at or above the ${qm(state.settings.poApprovalThreshold)} threshold, so it cannot be sent until approved.${poViaApprovals() ? ' It is also waiting in the Approvals page.' : ''}${can.ok ? '' : ' ' + escHtml(can.why) + '.'}`}</div>` : ''}
+    ${need ? `<div class="pw-qbar pw-alert-bar po-flagbar">${appr ? `✓ Approved by <b>${escHtml(po.approval.by)}</b> on ${pwD(po.approval.at)}.` : `⚠ <b>Requires approval</b>: ${qm(t.payable)} is at or above the ${qm(state.settings.poApprovalThreshold)} threshold, so it cannot be sent until approved.${poViaApprovals() ? ' It is also waiting in the Review tab on Quotes.' : ''}${can.ok ? '' : ' ' + escHtml(can.why) + '.'}`}</div>` : ''}
     <div class="qual-grid"><div class="qual-field"><label>Supplier</label><input value="${escAttr(po.supplierName)}" disabled>${sup ? `<div class="q-help">${escHtml([sup.address, sup.postcode].filter(Boolean).join(', '))}${supEmail(sup) ? ' · ' + escHtml(supEmail(sup)) : ''}</div>` : ''}</div>
       <div class="qual-field"><label>Project reference</label><input value="${escAttr(recordCode(po.pid, 'project') + (p ? ' · ' + p.name : ''))}" disabled></div>
       <div class="qual-field"><label>Delivery date</label><input type="date" data-po-f="deliveryDate" value="${escAttr(po.deliveryDate)}"${draft ? '' : ' disabled'}></div>
@@ -15509,7 +15504,7 @@ const MENU_ICONS = {
 };
 const MENU_FAV_MAX = 5;
 const MENU_GROUP_ICON = { crm: 'contacts', commercial: 'revenue', business: 'organisation', settings: 'settings' };
-const menuPrefs = { mode: '', open: [], phone: 'bottom', bottom: MENU_BOTTOM_DEFAULT.slice(), fav: [] };
+const menuPrefs = { mode: '', open: [], phone: 'bottom', bottom: MENU_BOTTOM_DEFAULT.slice(), fav: [], fold: true };   // fold: moving to another page folds the other groups (on by default)
 const menuMQ = window.matchMedia('(max-width: 700px)');
 const menuUi = { sig: '', pop: null, hoverT: 0, sheetFrom: null, built: false };
 const menuEl = id => document.getElementById(id);
@@ -15537,6 +15532,7 @@ function menuLoad(){
       if(Array.isArray(o.fav)) menuPrefs.fav = o.fav.map(String);
       if(['bottom', 'top', 'burger'].includes(o.phone)) menuPrefs.phone = o.phone;
       if(Array.isArray(o.bottom)) menuPrefs.bottom = o.bottom;
+      if(typeof o.fold === 'boolean') menuPrefs.fold = o.fold;
     }
   }catch(e){}
   menuPrefs.bottom = menuCleanBottom(menuPrefs.bottom);
@@ -15575,7 +15571,7 @@ function menuRenderOpen(){
   document.querySelectorAll('#sidebar .nav-group').forEach(g => {
     const on = menuPrefs.open.includes(g.dataset.group), b = g.querySelector('.nav-gbtn');
     g.classList.toggle('open', on);
-    if(b) b.setAttribute('aria-expanded', String(on));
+    if(b && !b.classList.contains('nav-direct')) b.setAttribute('aria-expanded', String(on));
   });
 }
 function menuToggleGroup(id){
@@ -15627,10 +15623,14 @@ function menuSync(){
   if(!menuUi.built) return;
   const cur = menuCurrent(), grp = menuGroupOf(cur), inBar = menuPrefs.bottom.includes(cur);
   document.querySelectorAll('#sidebar .nav-group').forEach(g => g.classList.toggle('has-current', g.dataset.group === grp));
-  if(menuUi.synced !== cur && grp && !menuPrefs.open.includes(grp)){ menuPrefs.open.push(grp); menuSave(); }   // arriving on a new page opens its group once; it can then be folded
+  if(menuUi.synced !== cur && grp){   // arriving on a new page opens its group; with "fold other groups" on, the others fold; either way a group can still be folded by hand
+    if(menuPrefs.fold){ if(menuPrefs.open.length !== 1 || menuPrefs.open[0] !== grp){ menuPrefs.open = [grp]; menuSave(); } }
+    else if(!menuPrefs.open.includes(grp)){ menuPrefs.open.push(grp); menuSave(); }
+  }
   menuUi.synced = cur; menuRenderOpen(); menuFavStar();
   document.querySelectorAll('.fav-item[data-go], .rail-fav[data-go]').forEach(b => { if(b.dataset.go === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   document.querySelectorAll('.rail-btn[data-mgroup]').forEach(b => b.classList.toggle('has-current', b.dataset.mgroup === grp));
+  document.querySelectorAll('#sidebar .nav-direct').forEach(b => { if(b.dataset.go === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   document.querySelectorAll('#bottomBar .bb-btn[data-go]').forEach(b => { if(b.dataset.go === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   const more = document.querySelector('#bottomBar .bb-more'); if(more) more.classList.toggle('has-current', !inBar);
   const t = document.querySelector('#mobileBar .title'); if(t && cur && document.body.classList.contains('pm-bottom')) t.textContent = menuLabel(cur);
@@ -15730,12 +15730,14 @@ document.addEventListener('click', (e) => {
   if(act && act.closest('#rail, #topMenu, #menuPop, #bottomBar, #moreSheet') && !act.dataset.mgroup){ menuAct(act.dataset.mact); return; }
   const gb = t.closest('[data-mgroup]');
   if(gb && gb.closest('#rail, #topMenu')){
+    const g1 = menuCatalog().find(x => x.id === gb.dataset.mgroup); if(g1 && g1.tabs.length === 1){ menuPopClose(false); menuGo(g1.tabs[0].tab, gb); return; }   // one page: no flyout
     const top = !!gb.closest('#topMenu'), p = menuUi.pop, keyboard = e.detail === 0;
     if(p && p.btn === gb){ if(p.sticky && !keyboard) menuPopClose(false); else if(p.sticky) menuPopClose(true); else { p.sticky = true; if(keyboard){ const f = menuEl('menuPop').querySelector('.mp-item'); if(f) f.focus(); } } }
     else menuPopOpen(gb.dataset.mgroup, gb, { sticky: true, focus: keyboard, top });
     return;
   }
   const gh = t.closest('#sidebar .nav-gbtn');
+  if(gh && gh.dataset.go){ menuGo(gh.dataset.go, gh); return; }   // a group with one page (Settings) is a direct link
   if(gh){ menuToggleGroup(gh.closest('.nav-group').dataset.group); return; }
   if(t.closest('#menuCollapseBtn')){ menuAct('collapse'); return; }
   if(t.closest('#sheetBackdrop')){ menuSheetClose(true); return; }
@@ -15815,6 +15817,7 @@ function menuSettingsRender(){
       ${opt('pmPhone', 'top', menuPrefs.phone, 'Top bar menu', 'Group tabs across the top, each with a drop-down list of pages.')}
       ${opt('pmPhone', 'burger', menuPrefs.phone, 'Hamburger icon only', 'The menu icon opens the folding menu as a drawer.')}
     </fieldset>
+    <label class="pm-opt"><input type="checkbox" id="pmFold"${menuPrefs.fold ? ' checked' : ''}><span>Fold other groups when I move to another page<small>On: only the group you are in stays open. Off: groups stay as you leave them.</small></span></label>
     <fieldset class="pm-opts"><legend>Laptop and tablet menu (700px and wider)</legend>
       ${opt('pmLap', '', menuPrefs.mode, 'Automatic', 'Icon rail on tablets such as a Surface Pro, pinned menu on a laptop.')}
       ${opt('pmLap', 'pinned', menuPrefs.mode, 'Pinned folding menu', 'Group headings fold open one at a time.')}
@@ -15832,7 +15835,8 @@ function menuSettingsRender(){
 (function(){
   const card = menuEl('phoneMenuCard'); if(!card) return;
   card.addEventListener('change', (e) => {
-    const t = e.target; if(t.name === 'pmPhone'){ menuPrefs.phone = t.value; menuSave(); menuApply(true); }
+    const t = e.target; if(t.id === 'pmFold'){ menuPrefs.fold = t.checked; if(t.checked){ const g = menuGroupOf(menuCurrent()); menuPrefs.open = g ? [g] : []; } menuSave(); menuRenderOpen(); }
+    else if(t.name === 'pmPhone'){ menuPrefs.phone = t.value; menuSave(); menuApply(true); }
     else if(t.name === 'pmLap'){ menuPrefs.mode = t.value; menuSave(); menuApply(true); }
   });
   card.addEventListener('click', (e) => {
@@ -17539,7 +17543,7 @@ document.addEventListener('click', (e) => {
 /* BT:js-invoice begin */
 /* =====================================================================
    PHASE 3: INVOICE CREATION AND SENDING
-   There is no accounting software: the tracker makes the invoice. The Invoicing page keeps working from the projects' payment schedule and approved variations;
+   There is no accounting software: the tracker makes the invoice. The Customer invoices page keeps working from the projects' payment schedule and approved variations;
    this adds a locked invoice DOCUMENT for a schedule line or a variation.
    state.invoices[] = { id, number, seq, kind 'invoice'|'credit', status 'Issued'|'Sent'|'Void', pid, key ('v'+variationId | payment line uid), lineUid, vid, desc,
      issueDate, termsDays, dueDate, customer{ contactId, name, company, address, email }, contactIds[], companyId, projectRef, projectName, siteAddress,
@@ -17631,7 +17635,7 @@ function ivSpec(inv, draft){
 function ivLog(inv, text, contact){
   tlHist(inv, text); tlDeal(inv.pid, `${inv.kind === 'credit' ? 'Credit note' : 'Invoice'} ${inv.number} · ${text}`, { src: 'invoice', contact: !!contact });
 }
-/* ---------- the Invoicing page hooks ---------- */
+/* ---------- the Customer invoices page hooks ---------- */
 function ivRowBtns(r){
   const key = r.vid ? 'v' + r.vid : r.uid, doc = r.uid || r.vid ? ivActive(r.pid, key) : null, at = `data-iv-pid="${r.pid}" data-iv-k="${escAttr(r.vid ? 'v' + r.vid : String(r.idx))}"`, out = [];
   if(doc) out.push(`<button type="button" class="btn secondary qb-sm" data-iv="open" data-id="${escAttr(doc.id)}" title="Open the invoice">${escHtml(doc.number)}</button>`);
@@ -17730,7 +17734,7 @@ function ivView(id){
 }
 function ivSentDialog(inv){
   const cu = inv.customer || {};
-  btModal('Mark ' + inv.number + ' as sent', `<p class="q-help" style="margin-top:0">Confirm only once you have actually sent it. Marking it sent starts the due and overdue clock on the Invoicing page (due ${escHtml(dShow(inv.dueDate))}). This app has not sent anything.</p>
+  btModal('Mark ' + inv.number + ' as sent', `<p class="q-help" style="margin-top:0">Confirm only once you have actually sent it. Marking it sent starts the due and overdue clock on the Customer invoices page (due ${escHtml(dShow(inv.dueDate))}). This app has not sent anything.</p>
     <div class="lp-f"><label>Date sent</label><input type="date" id="ivSentDate" value="${fmt(new Date())}"></div><div class="lp-f"><label>Sent to (optional)</label><input type="email" id="ivSentTo" value="${escAttr(cu.email || '')}" autocomplete="off"></div>
     <div class="modal-actions"><button type="button" class="btn secondary" data-bt="close2">Cancel</button><button type="button" class="btn" data-iv="sent-ok" data-id="${escAttr(inv.id)}">Mark as sent</button></div>`, { layer: 2, narrow: true });
 }
@@ -18356,7 +18360,7 @@ const rpQPill = q => `<span class="q-st q-st-${qStatusShown(q)}">${escHtml(qStat
 const ltQuoteTone = q => { const s = qStatusShown(q); return /accept/i.test(s) ? 'ok' : /reject|declin|lost|expired/i.test(s) ? 'bad' : /sent|chas/i.test(s) ? 'warn' : ''; };
 function rpQuoteRows(quotes){ return quotes.map(q => rpLrow('quote:' + q.id, qRef(q) + ' v' + q.version, rpM(qCalc(q).totalEx), { pill: rpQPill(q), tone: ltQuoteTone(q) })); }
 function rpOrderRows(pos){ return pos.map(o => rpLrow('po:' + o.id, o.ref, o.deliveryDate ? 'delivery ' + escHtml(pwD(o.deliveryDate)) : '', { pill: poPill(o) })); }
-/* invoice rows (the schedule's lines) and issued documents, as the Invoicing page shows them */
+/* invoice rows (the schedule's lines) and issued documents, as the Customer invoices page shows them */
 const ltInvTone = st => /paid|settled/i.test(st) ? 'ok' : /overdue|late|lost|written/i.test(st) ? 'bad' : /sent|part/i.test(st) ? 'warn' : '';
 function rpInvoiceRows(sc){
   const docs = sc.docs.filter(i => i.status !== 'Void').slice().sort((a, b) => b.seq - a.seq).map(i => rpLrow('invoicing:' + i.pid + ':' + i.key, i.number, `${rpM(Math.abs(i.total))}${i.dueDate ? ' · due ' + escHtml(pwD(i.dueDate)) : ''}`, { pill: invPill(ivDisplayStatus(i)), tone: ltInvTone(ivDisplayStatus(i)) }));
@@ -20489,7 +20493,7 @@ function renderBusinessCosts(){
       ${useOn ? '<button type="button" class="btn secondary" data-bc-a="use-off">Stop using this list for the Pricing Model overheads</button>' : '<button type="button" class="btn secondary" data-bc-a="use-on">Use this list for the Pricing Model overheads</button>'}</div>
     <div class="card"><div class="qb-scroll"><table class="qb-table inv-table" data-rt="bc-list"><thead><tr><th>Name</th><th>Amount (£)</th><th>How often</th><th>Next due</th><th>Category</th><th>Notes</th><th>Per month</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="8"><div class="sup-empty">No business costs yet. Add one, or start from the five yearly overhead lines in the Pricing Model.</div></td></tr>'}</tbody>
       ${list.length ? `<tfoot><tr class="qb-foot"><td><b>Total per month</b></td><td></td><td></td><td></td><td></td><td></td><td class="qb-calc"><b>${qm(mo)}</b></td><td></td></tr></tfoot>` : ''}</table></div></div>
-    <p class="q-help">Dated costs go into the Cash Flow Forecast on their due dates, row “Cash out: business costs”. The forecast still spreads the five yearly Pricing Model overhead lines evenly (${qm(bcFixedMonthly())} a month now); a cost started from one of those lines, once it has a date, takes that line's share out of the spread so it is not counted twice. Break-even is the sales a month needed for the margin on jobs to cover these costs. The profit share is not a business cost here: it is taken from each job's profit.</p>
+    <p class="q-help">Dated costs go into the Cash flow on their due dates, row “Cash out: business costs”. The forecast still spreads the five yearly Pricing Model overhead lines evenly (${qm(bcFixedMonthly())} a month now); a cost started from one of those lines, once it has a date, takes that line's share out of the spread so it is not counted twice. Break-even is the sales a month needed for the margin on jobs to cover these costs. The profit share is not a business cost here: it is taken from each job's profit.</p>
     <p class="q-help">Pricing Model overheads are ${useOn ? '<b>using this list</b> (' + qm(bcYearly()) + ' a year)' : '<b>unchanged</b> (' + qm(bcOhLinesTotal()) + ' a year from the five lines)'}. ${useOn ? '' : 'Nothing changes there unless you press “Use this list for the Pricing Model overheads” and confirm.'}</p>`;
 }
 document.addEventListener('click', async (e) => {
@@ -20500,7 +20504,7 @@ document.addEventListener('click', async (e) => {
     add.forEach(o => state.businessCosts.push({ id: 'bc_' + o[0], name: o[1], amount: Number(state.assumptions[o[0]]) || 0, freq: 'yearly', nextDue: '', category: o[2], notes: 'Started from the Pricing Model overhead line. Set the date it is next due.', fromOh: o[0], done: false, paid: [], dismissed: [] }));
     saveState(); render(); showToast(add.length + ' cost' + (add.length === 1 ? '' : 's') + ' started from the overhead lines. The Pricing Model lines are unchanged.'); return; }
   if(a === 'use-on'){
-    const ok = await showConfirm('Use this list for the Pricing Model overheads?', `The Pricing Model's total overhead would become ${qm(bcYearly())} a year from this list, instead of ${qm(bcOhLinesTotal())} from the five lines, and every price and overhead per day that follows from it would move. The five lines are kept and can be switched back at any time. The Cash Flow Forecast would stop spreading the five lines and use the dated list instead.`);
+    const ok = await showConfirm('Use this list for the Pricing Model overheads?', `The Pricing Model's total overhead would become ${qm(bcYearly())} a year from this list, instead of ${qm(bcOhLinesTotal())} from the five lines, and every price and overhead per day that follows from it would move. The five lines are kept and can be switched back at any time. The Cash flow would stop spreading the five lines and use the dated list instead.`);
     if(!ok) return; state.settings.bizCostsForOverheads = true; saveState(); render(); showToast('The Pricing Model now uses this list'); return; }
   if(a === 'use-off'){ state.settings.bizCostsForOverheads = false; saveState(); render(); showToast('The Pricing Model is back on the five overhead lines'); return; }
   if(!c) return;
