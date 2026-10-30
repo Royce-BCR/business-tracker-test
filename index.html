@@ -1563,6 +1563,10 @@
   .td-meta .link-btn.dim { color: var(--text-muted); }
   .td-due { color: var(--bt-bad-fg); font-weight: 600; }
   .td-row.archiving { opacity: 0.38; transition: opacity 1.8s ease; pointer-events: none; }
+  .td-none { padding: var(--bt-s2) 0; color: var(--text-muted); font-size: var(--bt-fs-sm); display: flex; align-items: center; gap: var(--bt-s3); }
+  .td-sub-none { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; } .td-sub-none .td-head { margin: 0; } .td-sub-none .td-none { padding: 0; }
+  .td-card:has(> .td-none:only-of-type, > .td-head + .td-none) { padding-top: var(--bt-s3); padding-bottom: var(--bt-s3); }
+  @media (max-width: 700px) { #panel-today.active { display: flex; flex-direction: column; } #panel-today > .td-greet { order: 0; } #panel-today > .page-head { order: 1; } #panel-today > .today-grid { order: 2; } #panel-today > .td-crit { order: 3; margin-top: var(--bt-s4); } }   /* on a phone the tasks come first, then the time-critical lists */
   .td-empty { padding: var(--bt-s6) var(--bt-s4); color: var(--text-muted); text-align: center; font-size: var(--bt-fs-sm); }
   .td-empty .link-btn { display: block; margin: 6px auto 0; font-size: var(--bt-fs-xs); }
   .td-od { width: 100%; display: flex; align-items: center; gap: var(--bt-s2); background: var(--bt-bad-bg); color: var(--bt-bad-fg); border: none; border-radius: var(--bt-r-btn); padding: 7px var(--bt-s3); font: inherit; font-size: var(--bt-fs-xs); font-weight: 600; cursor: pointer; margin: 2px 0 6px; text-align: left; }
@@ -1831,11 +1835,9 @@
     .table-scroll:has(tr.detail-row) { -webkit-mask-image: none; mask-image: none; }   /* no edge fade while a row is opened */
   }
   /* ---------------- Q6: long page intros are shortened to two lines on phones, with an "About this page" button to read the rest ---------------- */
-  .desc-more { display: none; }
-  @media (max-width: 700px) {
-    .page-head .desc.has-more:not(.open) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .desc-more { display: inline-flex; margin: 2px 0 6px; font-size: 12.5px; }
-  }
+  .desc-about { margin-top: 4px; } .desc-about > summary { display: inline-flex; align-items: center; min-height: 26px; padding: 2px 10px; border: 1px solid var(--line); border-radius: var(--bt-r-btn); background: var(--bt-card); font-size: var(--bt-fs-xs); font-weight: 600; color: var(--ink); cursor: pointer; list-style: none; } .desc-about > summary::-webkit-details-marker { display: none; } .desc-about > summary:hover { background: var(--bt-neu-bg); }
+  .desc-about > p { margin: 6px 0 0; max-width: 70ch; }
+  @media (max-width: 700px) { .desc-about > summary { min-height: 44px; padding: 6px 12px; } }
   /* ---------------- Q8: money inputs show a £ sign and thousands separators when not being edited (the stored value is untouched) ---------------- */
   .money-wrap { display: grid; max-width: 100%; position: relative; }
   .money-wrap.inl { display: inline-grid; vertical-align: middle; }
@@ -2638,13 +2640,13 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .cv-sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--muted); } .cv-sw.oak { background: var(--bt-oak-600); } .cv-sw.slate { background: var(--slate); } .cv-sw.green { background: var(--bt-green-600); } .cv-sw.bad { background: var(--bt-bad-fg); } .cv-sw.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 3px, transparent 3px 6px); } .cv-sw.deliveries { background: var(--bt-card); border: 1.5px solid var(--bt-oak-500); } .cv-sw.tasks { background: var(--bt-info-fg); border-radius: 50%; }
   .cv-nav { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; } .cv-go { display: inline-flex; align-items: center; gap: 6px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin: 0; } .cv-go input, .cv-go select { width: auto; }
   .cv-leg { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin: 0 0 8px; } .cv-leg span { display: inline-flex; align-items: center; gap: 5px; } .cv-capsw { display: inline-block; width: 16px; border-top: 2px dashed var(--bt-ink); }
-  .cv-wk { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bt-card); padding: 8px 10px; margin-bottom: 8px; } .cv-wk.cur { border-color: var(--bt-oak-500); } .cv-wk.over { background: color-mix(in srgb, var(--bt-bad-fg) 7%, var(--bt-card)); border-color: var(--bt-bad-bd); }
+  .cv-wk { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bt-card); padding: 4px 10px; margin-bottom: 4px; } .cv-wk.cur { border-color: var(--bt-oak-500); } .cv-wk.over { background: color-mix(in srgb, var(--bt-bad-fg) 7%, var(--bt-card)); border-color: var(--bt-bad-bd); }
   .cv-wh { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 10px 14px; align-items: center; }
-  .cv-wl { text-align: left; background: none; border: 0; padding: 4px 0; cursor: pointer; font: inherit; display: flex; flex-direction: column; min-height: 36px; justify-content: center; } .cv-wl b { font-size: 13px; text-decoration: underline; text-decoration-color: var(--line); } .cv-wl span { font-size: var(--bt-fs-2xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
-  .cv-bar { min-width: 0; } .cv-track { position: relative; height: 18px; background: var(--bt-surface-2); border-radius: 4px; overflow: visible; display: flex; } .cv-seg { display: block; height: 100%; flex: none; } .cv-seg:first-child { border-radius: 4px 0 0 4px; } .cv-seg.project { background: var(--bt-oak-600); } .cv-seg.sales { background: var(--slate); } .cv-seg.lead { background: var(--bt-green-600); } .cv-seg.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 4px, transparent 4px 8px); }
+  .cv-wl { text-align: left; background: none; border: 0; padding: 2px 0; cursor: pointer; font: inherit; display: flex; flex-direction: column; min-height: 28px; justify-content: center; } .cv-wl b { font-size: 13px; } .cv-wl span { font-size: var(--bt-fs-2xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+  .cv-bar { min-width: 0; } .cv-track { position: relative; height: 12px; background: var(--bt-surface-2); border-radius: 4px; overflow: visible; display: flex; } .cv-seg { display: block; height: 100%; flex: none; } .cv-seg:first-child { border-radius: 4px 0 0 4px; } .cv-seg.project { background: var(--bt-oak-600); } .cv-seg.sales { background: var(--slate); } .cv-seg.lead { background: var(--bt-green-600); } .cv-seg.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 4px, transparent 4px 8px); }
   .cv-cap { position: absolute; top: -3px; bottom: -3px; border-left: 2px dashed var(--bt-ink); } .cv-num { font-size: 12px; font-variant-numeric: tabular-nums; display: inline-block; margin-top: 3px; } .cv-num.bad { color: var(--bt-bad-fg); font-weight: 700; }
   .cv-days { display: grid; grid-template-columns: repeat(7, 40px); gap: 3px; }
-  .cv-d { display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 4px; background: var(--bt-card); padding: 2px 0; min-height: 46px; cursor: pointer; font: inherit; color: var(--ink); } .cv-d:hover { border-color: var(--bt-oak-500); }
+  .cv-d { display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 4px; background: var(--bt-card); padding: 1px 0; min-height: 34px; cursor: pointer; font: inherit; color: var(--ink); } .cv-d:hover { border-color: var(--bt-oak-500); }
   .cv-d.off { background: var(--bt-surface-2); color: var(--text-muted); } .cv-d.hol { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--bt-warn-fg) 18%, transparent) 0 3px, transparent 3px 6px); } .cv-d.hot { border-color: var(--bt-bad-fg); background: var(--bt-bad-bg); } .cv-d.today { outline: 2px solid var(--bt-bad-fg); outline-offset: -1px; }
   .cv-dn { font-size: 9.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--text-muted); } .cv-dh { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 14px; } .cv-de { display: flex; gap: 2px; min-height: 12px; align-items: center; }
   .cv-ic { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; } .cv-ic.del svg { width: 12px; height: 12px; color: var(--bt-oak-700); } .cv-ic.tsk { background: var(--bt-info-fg); color: var(--bt-on-dark); border-radius: 50%; font-size: 8px; font-style: normal; }
@@ -2653,6 +2655,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .cv-ck { width: 10px; height: 10px; border-radius: 2px; background: var(--muted); flex: none; } .cv-ck.project { background: var(--bt-oak-600); } .cv-ck.sales { background: var(--slate); } .cv-ck.lead { background: var(--bt-green-600); } .cv-ck.del { background: var(--bt-card); border: 1.5px solid var(--bt-oak-500); }
   .cv-unp { margin-top: var(--bt-s4); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; background: var(--bt-card); } .cv-unp h4 { margin: 0 0 4px; }
   .db-mini.bad b { color: var(--bt-bad-fg); }
+  .pot-setup { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: var(--bt-s3); padding: var(--bt-s2) var(--bt-s3); border: 1px solid var(--bt-warn-bd); background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-radius: var(--bt-r-btn); font-size: var(--bt-fs-sm); }
   @media (max-width: 860px) { .cv-wh { grid-template-columns: minmax(0, 1fr); } .cv-days { grid-template-columns: repeat(7, minmax(0, 1fr)); } .cv-wl { flex-direction: row; gap: 8px; align-items: baseline; justify-content: flex-start; } }
   .ph-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .ph-tbl input { width: 100%; min-width: 0; } .ph-tbl td:nth-child(2) input, .ph-tbl td:nth-child(3) input { width: 72px; }
@@ -11519,9 +11522,10 @@ function dbPotHtml(){
   const rt = retainedTotals(), committed = assetCommitted(), un = r2(rt.toDate - committed), cash = cashPosition(), sum = POT_BUCKETS.reduce((a, b) => a + potPct(b[0]), 0) || 1;
   const pp = potPositions(rt.toDate), pos = {}; pp.rows.forEach(r => { pos[r.b[0]] = r; });
   const bucket = b => { const r = pos[b[0]], amt = r.method === 'fixed' ? r.amt : r2((pp.allPct ? pp.pool : Math.max(0, pp.pool)) * r.pct / pp.sum); return `<div class="pot-b"><small>${b[1]} · ${r.method === 'fixed' ? money(r.perMonth) + ' a month' : Math.round(r.pct / pp.sum * 100) + '%'}</small><b>${money(amt)}</b>${b[0] === 'potAssetsPct' ? `<em>${money(committed)} committed</em>` : ''}${r.method === 'fixed' ? `<em>fixed: ${r.months} month${r.months === 1 ? '' : 's'} so far</em>` : ''}</div>`; };
-  return `<div class="pot"><div class="pot-main"><div class="db-card-h"><h3>Retained profit</h3><span class="pot-sub">project profit minus profit share (default ${escHtml(psMethodName(psDefault().method))}: ${psDefault().method === 'pct' ? (psDefault().pct ? psDefault().pct + '%' : 'not set') : (psDefault().hour ? '£' + psDefault().hour + '/h' : 'not set')}), recognised as invoices are raised</span></div>
+  return `<div class="pot"><div class="pot-main"><div class="db-card-h"><h3>Retained profit</h3><span class="pot-sub">project profit minus profit share, recognised as invoices are raised</span></div>
       <div class="pot-fig"><div><small>Retained profit to date</small><b>${money(rt.toDate)}</b></div><div><small>Committed to the asset plan</small><b>${money(committed)}</b></div><div><small>Unallocated</small><b class="${un < 0 ? 'over' : ''}">${money(un)}</b></div></div>
       <div class="pot-buckets">${POT_BUCKETS.map(bucket).join('')}</div>${pp.allPct ? '' : `<div class="pot-sub" style="margin-top:6px;">Fixed pots take ${money(pp.fixedSum)} to date; the percentage pots share the other ${money(pp.pool)}${pp.short ? ' (retained profit to date does not yet cover the fixed amounts)' : ''}.</div>`}
+      ${(psDefault().method === 'pct' ? !psDefault().pct : !psDefault().hour) ? `<div class="pot-setup"><b>Finish setting up</b><span>The default ${psDefault().method === 'pct' ? 'profit share (%)' : '£ per labour hour'} is not set.</span><button type="button" class="sp-link" data-nav-tab="settings">Open Settings</button></div>` : ''}
       <div class="pot-links"><button type="button" class="sp-link" data-dash="go" data-tab="assets">Asset plan &amp; register →</button> <span class="pot-sub">Whole-job retained profit forecast: ${money(rt.plan)}</span></div></div>
     <div class="pot-cash"><small>Cash position</small><b class="${cash < 0 ? 'over' : ''}">${money(cash)}</b><em>starting cash plus actual transactions. Profit is not cash: retained profit is earned on the jobs, cash is what is in the bank.</em></div></div>`;
 }
@@ -13568,7 +13572,7 @@ function todaySection(key, title, addLabel, addAction, emptyLabel, main, over, r
   return `<div class="td-head"><h3>${title}</h3><span class="n">${main.filter(live).length}</span><button class="btn secondary" data-today="${addAction}">${addLabel}</button></div>
     ${over.length ? `<button class="td-od${open ? ' open' : ''}" data-today="od" data-k="${key}">Overdue (${over.filter(live).length})${CHEV_SVG}</button>
       <div class="td-od-list"${open ? '' : ' hidden'}>${over.map(x => rowFn(x, true)).join('')}</div>` : ''}
-    ${main.length ? main.map(x => rowFn(x, false)).join('') : `<div class="td-empty">Nothing due today<button class="link-btn" data-today="${addAction}">${emptyLabel}</button></div>`}`;
+    ${main.length ? main.map(x => rowFn(x, false)).join('') : `<div class="td-none">Nothing waiting<button class="link-btn" data-today="${addAction}">${emptyLabel}</button></div>`}`;
 }
 /* project events for today: dated stages starting, deliveries, payments and milestones, from the same timeline as everything else */
 function todayProjectEvents(today){
@@ -13655,7 +13659,7 @@ function todayDatedSection(key, title, d, rowFn, emptyText){
   const open = todayUi.od[key];
   return `<div class="td-head"><h3>${title}</h3><span class="n">${d.main.length}</span></div>
     ${d.over.length ? `<button type="button" class="td-od${open ? ' open' : ''}" data-today="od" data-k="${key}" aria-expanded="${open}">Overdue (${d.over.length})${CHEV_SVG}</button><div class="td-od-list"${open ? '' : ' hidden'}>${d.over.map(x => rowFn(x, true)).join('')}</div>` : ''}
-    ${d.main.length ? d.main.map(x => rowFn(x, false)).join('') : `<div class="td-empty">${emptyText}</div>`}`;
+    ${d.main.length ? d.main.map(x => rowFn(x, false)).join('') : `<div class="td-none">Nothing waiting</div>`}`;
 }
 function todayReadySection(list){
   return `<div class="td-head"><h3>Ready to turn into a job</h3><span class="n">${list.length}</span></div>
@@ -13696,7 +13700,7 @@ function todayTile(key, title, adds, groups, rowFn, live){
   const body = order.map(k => { const { g, rows } = byG.get(k), full = groups.find(y => y.k === k).items.length;
     return `<div class="td-grp ${g.cls}"><div class="td-grp-h">${g.label}<span class="n">${full}</span></div>${rows.map(r => rowFn(r, g.over)).join('')}</div>`; }).join('');
   return `<div class="td-head"><h3>${title}</h3><span class="n">${total}</span><span class="td-adds">${adds}</span></div>
-    ${body || '<div class="td-empty">Nothing due.</div>'}
+    ${body || '<div class="td-none">Nothing waiting</div>'}
     ${hidden > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">See more (${hidden})</button>` : (more && all.length > limit ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">Show fewer</button>` : '')}`;
 }
 function todayGroupsFor(dated, undated, sel, label){
@@ -13729,8 +13733,8 @@ function renderToday(){
   const sub = (key, title, d, rowFn, empty) => {
     const rows = d.over.map(x => ({ x, over: true })).concat(d.main.map(x => ({ x, over: false })));
     const more = !!todayUi.more[key], shown = more ? rows : rows.slice(0, lim), hid = rows.length - shown.length;
-    return `<div class="td-sub-blk"><div class="td-head"><h3>${title}</h3><span class="n">${rows.length}</span></div>${shown.length ? shown.map(r => rowFn(r.x, r.over)).join('') : `<div class="td-empty">${empty}</div>`}${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">See more (${hid})</button>` : ''}</div>`; };
-  const priceBlk = `<div class="td-sub-blk"><div class="td-head"><h3>Prices to confirm</h3><span class="n">${priceRows.length}</span></div>${priceRows.length ? priceRows.slice(0, todayUi.more.price ? 999 : lim).map(po => `<div class="td-row" data-today="nav" data-spec="po:${po.id}"><span class="td-title">${escHtml(po.ref)} · ${escHtml(po.supplierName || '')}<span class="td-sub">${escHtml((state.projects.find(x => x.id === po.pid) || {}).name || '')}</span></span><span class="td-meta"><span>Delivered ${escHtml(pwD(poActualDelivery(po)))}${(poProject(po) && dcPtcMark(poProject(po), po.did)) || ''}</span><span>${qm(poTotals(po).payable)}</span><button type="button" class="btn qb-sm" data-pc="open" data-id="${po.id}">Confirm prices</button></span></div>`).join('') : '<div class="td-empty">Nothing to check.</div>'}${priceRows.length > lim && !todayUi.more.price ? `<button type="button" class="link-btn td-more" data-today="more" data-k="price">See more (${priceRows.length - lim})</button>` : ''}</div>`;
+    return `<div class="td-sub-blk${rows.length ? '' : ' td-sub-none'}"><div class="td-head"><h3>${title}</h3><span class="n">${rows.length}</span></div>${shown.length ? shown.map(r => rowFn(r.x, r.over)).join('') : `<div class="td-none">Nothing waiting</div>`}${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">See more (${hid})</button>` : ''}</div>`; };
+  const priceBlk = `<div class="td-sub-blk${priceRows.length ? '' : ' td-sub-none'}"><div class="td-head"><h3>Prices to confirm</h3><span class="n">${priceRows.length}</span></div>${priceRows.length ? priceRows.slice(0, todayUi.more.price ? 999 : lim).map(po => `<div class="td-row" data-today="nav" data-spec="po:${po.id}"><span class="td-title">${escHtml(po.ref)} · ${escHtml(po.supplierName || '')}<span class="td-sub">${escHtml((state.projects.find(x => x.id === po.pid) || {}).name || '')}</span></span><span class="td-meta"><span>Delivered ${escHtml(pwD(poActualDelivery(po)))}${(poProject(po) && dcPtcMark(poProject(po), po.did)) || ''}</span><span>${qm(poTotals(po).payable)}</span><button type="button" class="btn qb-sm" data-pc="open" data-id="${po.id}">Confirm prices</button></span></div>`).join('') : '<div class="td-empty">Nothing waiting</div>'}${priceRows.length > lim && !todayUi.more.price ? `<button type="button" class="link-btn td-more" data-today="more" data-k="price">See more (${priceRows.length - lim})</button>` : ''}</div>`;
   crit.innerHTML = `<div class="td-crit-h"><h3>Time-critical</h3><span class="td-crit-s">${dl.main.length + dl.over.length} to sign off · ${inv.main.length + inv.over.length} invoices · ${ord.main.length + ord.over.length} orders${isToday ? '' : ' · for ' + escHtml(fmtDisplay(toDate(sel)))}</span></div>
     <div class="td-crit-grid">${sub('del', 'Deliveries to sign off', dl, todayDeliveryRow, 'Nothing waiting for sign-off.')}${sub('ord', 'Orders to place', ord, todayOrderRow, 'No orders waiting.')}${sub('inv', 'Invoices to raise', inv, todayInvoiceRow, 'No invoices to raise.')}${priceBlk}<div class="td-sub-blk" id="todayRfq" hidden></div></div>`;
   /* action tiles: job actions, then business actions (only for the people Settings allows) */
@@ -13757,7 +13761,7 @@ function renderToday(){
   if(pr){ const open = todayUi.od.proj;
     pr.innerHTML = `<div class="td-head"><h3>${isToday ? 'Projects today' : 'Projects on ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${pe.today.length}</span></div>
       ${pe.over.length ? `<button class="td-od${open ? ' open' : ''}" data-today="od" data-k="proj">Overdue (${pe.over.length})${CHEV_SVG}</button><div class="td-od-list"${open ? '' : ' hidden'}>${pe.over.map(x => todayProjectRow(x, true)).join('')}</div>` : ''}
-      ${pe.today.length ? pe.today.map(x => todayProjectRow(x, false)).join('') : '<div class="td-empty">No project stages, deliveries or payments dated ' + (isToday ? 'today' : 'that day') + '.</div>'}`; }
+      ${pe.today.length ? pe.today.map(x => todayProjectRow(x, false)).join('') : '<div class="td-none">Nothing waiting</div>'}`; }
   if(typeof renderTodayPhases === 'function') renderTodayPhases(sel, real);
   refreshActionPanel();
 }
@@ -14365,7 +14369,7 @@ function pjBuildRow(g, shared, today, staleN){
   }catch(e){ customer = [rec.contact, rec.company].filter(Boolean).join(' · '); }
   const stageText = stageName(pl, recStageId(pl, rec));
   return { key: g.key, root, pl, rec, recs, ctx, code: recordCode(root, pl), name: boardTitle(pl, rec), customer, stageLabel: PJ_STAGE_NAME[pl], stageText: stageText === '—' ? '' : stageText,
-    status, reasons, lost, completed, done, live: !done, inProgress, value, valueLabel, owner, next: na.next, lastTouch, days, overdue, stale, noOpenTask, qpick, deliveries };
+    status, reasons, why: reasons.filter(x => !/^not touched/.test(x)), lost, completed, done, live: !done, inProgress, value, valueLabel, owner, next: na.next, lastTouch, days, overdue, stale, noOpenTask, qpick, deliveries };
 }
 function pjRows(){
   if(!state) return [];
@@ -14419,21 +14423,23 @@ function pjNextHtml(r){
 const pjDaysText = r => r.days === null ? '—' : r.days === 0 ? 'Today' : r.days + (r.days === 1 ? ' day' : ' days');
 const pjProgText = r => r.inProgress === null ? '—' : r.inProgress ? 'Yes' : 'No';
 function pjTableHtml(list){
-  const head = `<thead><tr><th scope="col" class="pj-c-code">Code</th><th scope="col">Name</th><th scope="col" class="pj-c-cust">Customer</th><th scope="col">Stage</th><th scope="col">Status</th><th scope="col" class="pj-c-prog">In progress?</th><th scope="col" class="pj-r">Value</th><th scope="col" class="pj-c-owner">Owner</th><th scope="col">Next action</th><th scope="col" class="pj-r">Last touched</th></tr></thead>`;
+  const showNext = list.some(r => r.next);   // the Next action column only appears when at least one job has one
+  const head = `<thead><tr><th scope="col" class="pj-c-code">Code</th><th scope="col">Name</th><th scope="col" class="pj-c-cust">Customer</th><th scope="col">Stage</th><th scope="col">Status</th><th scope="col" class="pj-c-prog">In progress?</th><th scope="col" class="pj-r">Value</th><th scope="col" class="pj-c-owner">Owner</th>${showNext ? '<th scope="col">Next action</th>' : ''}<th scope="col" class="pj-r">Last touched</th></tr></thead>`;
   const rows = list.map(r => `<tr class="pj-row${r.done ? ' pj-done' : ''}" data-pj-row="${escAttr(r.key)}">
     <td class="pj-c-code"><span class="pj-code">${escHtml(r.code)}</span></td>
     <td class="pj-name">${ltChip(null, r.name, { attrs: `data-pj="open" data-key="${escAttr(r.key)}" data-pj-key="${escAttr(r.key)}"`, kind: r.pl === 'project' ? 'project' : 'deal', cls: 'pj-open' })}<span class="pj-sub pj-sub-c">${r.customer === r.name ? '' : escHtml(r.customer)}</span><span class="pj-sub pj-sub-o">${[r.inProgress ? 'In progress' : '', r.owner ? 'Owner ' + escHtml(r.owner) : ''].filter(Boolean).join(' · ')}</span></td>
     <td class="pj-c-cust">${escHtml(r.customer) || '<span class="qb-dim">—</span>'}</td>
     <td>${pjStageChip(r)}${r.stageText ? `<span class="pj-sub">${escHtml(r.stageText)}</span>` : ''}</td>
-    <td>${pjStChip(r.status)}${r.reasons.length ? `<span class="pj-sub">${escHtml(r.reasons.join(', '))}</span>` : ''}</td>
+    <td>${pjStChip(r.status)}${r.why.length ? `<span class="pj-sub">${escHtml(r.why.join(', '))}</span>` : ''}</td>
     <td class="pj-c-prog">${pjProgText(r)}</td>
     <td class="pj-r">${r.value !== null ? `<b>${pjMoney(r.value)}</b><span class="pj-sub">${escHtml(r.valueLabel)}</span>` : '<span class="qb-dim">—</span>'}</td>
     <td class="pj-c-owner">${r.owner ? escHtml(r.owner) : '<span class="qb-dim">Unassigned</span>'}</td>
-    <td class="pj-next">${pjNextHtml(r)}</td>
+    ${showNext ? `<td class="pj-next">${pjNextHtml(r)}</td>` : ''}
     <td class="pj-r">${pjDaysText(r)}</td></tr>`).join('');
   return `<div class="pj-tablewrap"><table class="pj-table">${head}<tbody>${rows}</tbody></table></div>`;
 }
 function pjCardsHtml(list){
+  const showNext = list.some(r => r.next);
   return `<div class="pj-cards">${list.map(r => `<button type="button" class="pj-card${r.done ? ' pj-done' : ''}" data-pj="open" data-key="${escAttr(r.key)}" data-pj-key="${escAttr(r.key)}">
     <span class="pj-card-top"><span class="pj-code">${escHtml(r.code)}</span>${pjStageChip(r)}${pjStChip(r.status)}</span>
     <span class="pj-card-name">${escHtml(r.name)}</span>
@@ -14443,8 +14449,8 @@ function pjCardsHtml(list){
       <span><i>In progress?</i>${pjProgText(r)}</span>
       <span><i>Owner</i>${r.owner ? escHtml(r.owner) : 'Unassigned'}</span>
       <span><i>Last touched</i>${pjDaysText(r)}</span></span>
-    <span class="pj-card-next"><i>Next action</i>${pjNextHtml(r)}</span>
-    ${r.reasons.length ? `<span class="pj-card-why">${escHtml(r.reasons.join(', '))}</span>` : ''}</button>`).join('')}</div>`;
+    ${showNext ? `<span class="pj-card-next"><i>Next action</i>${pjNextHtml(r)}</span>` : ''}
+    ${r.why.length ? `<span class="pj-card-why">${escHtml(r.why.join(', '))}</span>` : ''}</button>`).join('')}</div>`;
 }
 function pjStripHtml(rows){
   const live = rows.filter(r => r.live), tile = (pl, label) => { const l = live.filter(r => r.pl === pl), v = l.reduce((a, r) => a + (r.value || 0), 0), att = l.filter(r => r.status === 'Needs attention' || r.status === 'Stalled').length;
@@ -15036,19 +15042,27 @@ new MutationObserver((recs) => {
 }).observe(document.getElementById('projectWorkspace'), { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
 /* the sidebar label tells the truth about which copy this is (reads ENV_LABEL from the settings block at the top of this script) */
 (function(){ const el = document.getElementById('envSub'); if(el) el.textContent = ENV_LABEL === 'TEST' ? 'Test system' : 'Live system'; })();
-/* phones: shorten each long page intro to two lines (full text stays in the page for screen readers) with an "About this page" button */
+/* page introductions: one short line, with the rest folded into an "About this page" disclosure (every screen size). The text is only moved, never changed. */
+function descSplit(html){
+  const plain = h => h.replace(/<[^>]*>/g, ''), bal = h => (h.match(/<[a-z]/g) || []).length === (h.match(/<\/[a-z]/g) || []).length && (h.match(/\(/g) || []).length === (h.match(/\)/g) || []).length;
+  const find = (re, lo, hi) => { let m; re.lastIndex = 0; while((m = re.exec(html))){ const cut = re === SENT ? m.index + 1 : m.index, n = plain(html.slice(0, cut)).length; if(n >= lo && n <= hi && bal(html.slice(0, cut))) return cut; } return -1; };
+  const SENT = /[.!?](?=\s+[A-Z<])/g, CLAUSE = /(?:\s[—–-]\s|[:;,]\s)/g;
+  let cut = find(SENT, 14, 110), clause = false;
+  if(cut < 0){ cut = find(CLAUSE, 40, 120); clause = cut >= 0; }
+  if(cut < 0) cut = find(SENT, 14, 400);
+  if(cut < 0) return null;
+  const head = html.slice(0, cut).replace(/[,;:\s]+$/, ''), rest = html.slice(cut).replace(/^[.!?]?\s*[—–:;,-]?\s*/, '');
+  return [head + (clause ? '.' : (/[.!?]$/.test(head) ? '' : '.')), rest.replace(/^./, c => c.toUpperCase())];
+}
 function initDescToggles(){
   document.querySelectorAll('.page-head .desc').forEach((d, i) => {
-    if(d.id === 'todaySummary' || d.textContent.trim().length < 110 || d.classList.contains('has-more')) return;
+    if(d.id === 'todaySummary' || d.classList.contains('has-more') || plainLen(d) < 90) return;
+    const parts = descSplit(d.innerHTML.trim()); if(!parts || !parts[1]) return;
     d.classList.add('has-more');
-    if(!d.id) d.id = 'pageDesc' + i;
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'link-btn desc-more'; b.textContent = 'About this page';
-    b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', d.id);
-    b.addEventListener('click', () => { const open = d.classList.toggle('open'); b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'Show less' : 'About this page'; });
-    d.insertAdjacentElement('afterend', b);
+    d.innerHTML = `<span class="desc-one">${parts[0]}</span><details class="desc-about"><summary>About this page</summary><p>${parts[1]}</p></details>`;
   });
 }
+const plainLen = el => el.textContent.trim().length;
 initDescToggles();
 /* scroll cues: a soft fade on the right edge of any strip that still has more to scroll to (the fade itself is phone-only CSS) */
 function updateScrollCue(el){
@@ -16791,7 +16805,8 @@ function cxCompaniesListHtml(){
 function cxCompanyProfileHtml(co){ return rcCompanyPage(co); }
 
 /* ----- rendering ----- */
-function cxRender(){
+function cxRender(){ cxRenderInner(); try{ initDescToggles(); }catch(e){} }
+function cxRenderInner(){
   if(!state) return; cxDirty(); cxSyncAll();
   { const n = cxDupCount(), bd = document.getElementById('dupBadge'); if(bd){ bd.textContent = n; bd.hidden = !n; bd.title = n + ' possible duplicate contact' + (n === 1 ? '' : 's'); } }
   const cb = document.getElementById('contactsBody'), kb = document.getElementById('companiesBody'); if(!cb || !kb) return;
@@ -19884,7 +19899,7 @@ function renderTodayPhases(sel){
   const rows = phDue(sel), real = fmt(new Date()), isToday = sel === real, lim = (state.settings && state.settings.todayLimit) || 10, more = !!todayUi.more.ph;
   const over = rows.filter(x => x.d < sel), main = rows.filter(x => x.d === sel), all = over.map(x => ({ x, o: true })).concat(main.map(x => ({ x, o: false }))), shown = more ? all : all.slice(0, lim), hid = all.length - shown.length;
   el.innerHTML = `<div class="td-head"><h3>${isToday ? 'Phases due' : 'Phases due by ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${rows.length}</span></div>
-    ${shown.length ? shown.map(r => phTodayRow(r.x, r.o)).join('') : '<div class="td-empty">No dated phases are due. Phases with a start or end date show here when they come up.</div>'}
+    ${shown.length ? shown.map(r => phTodayRow(r.x, r.o)).join('') : '<div class="td-none">Nothing waiting</div>'}
     ${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="ph">See more (${hid})</button>` : (more && all.length > lim ? `<button type="button" class="link-btn td-more" data-today="more" data-k="ph">Show fewer</button>` : '')}`;
 }
 /* the labour rate used for selling time: the hourly rate in Settings, else the day rate over the hours in a day */
@@ -20176,7 +20191,7 @@ document.addEventListener('click', (e) => {
    ===================================================================== */
 const CV_KEY = STORAGE_PREFIX + 'business-tracker-capacity-view';
 const CV_LAYERS = [['projects', 'Confirmed projects', 'oak'], ['sales', 'Sales opportunities (weighted)', 'slate'], ['leads', 'Leads (weighted)', 'green'], ['deliveries', 'Deliveries', ''], ['tasks', 'Business tasks', '']];
-const capUi = { layers: { projects: true, sales: true, leads: true, deliveries: true, tasks: false }, start: '', weeks: 12, open: {} };
+const capUi = { layers: { projects: true, sales: true, leads: true, deliveries: true, tasks: false }, start: '', weeks: 8, open: {} };
 (function(){ try{ const o = JSON.parse(localStorage.getItem(CV_KEY) || 'null'); if(o && typeof o === 'object'){ CV_LAYERS.forEach(([k]) => { if(typeof (o.layers || {})[k] === 'boolean') capUi.layers[k] = o.layers[k]; }); if([8, 12, 26].includes(o.weeks)) capUi.weeks = o.weeks; } }catch(e){} })();
 function capSave(){ try{ localStorage.setItem(CV_KEY, JSON.stringify({ layers: capUi.layers, weeks: capUi.weeks })); }catch(e){} }
 navExtra('cap', () => ({ s: capUi.start, o: Object.keys(capUi.open) }), v => { capUi.start = (v && v.s) || ''; capUi.open = {}; ((v && v.o) || []).forEach(k => { capUi.open[k] = true; }); });
@@ -20243,7 +20258,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('change', (e) => {
   const el = e.target, a = el.dataset && el.dataset.cv; if(!a || !state) return;
   if(a === 'goto'){ if(isoOk(el.value)) capUi.start = capWeekStart(el.value); }
-  else if(a === 'weeks'){ capUi.weeks = [8, 12, 26].includes(Number(el.value)) ? Number(el.value) : 12; capSave(); }
+  else if(a === 'weeks'){ capUi.weeks = [8, 12, 26].includes(Number(el.value)) ? Number(el.value) : 8; capSave(); }
   else return;
   renderCapacity();
 });
