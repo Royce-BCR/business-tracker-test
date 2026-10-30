@@ -334,7 +334,6 @@
   .rt-table { table-layout: fixed; }
   .rt-table th { overflow: hidden; text-overflow: ellipsis; }
   .rt-table td { overflow: hidden; }
-  .link-btn { background: none; border: none; padding: 0; font-family: inherit; font-size: var(--bt-fs-xs); color: var(--text-muted); text-decoration: underline; cursor: pointer; }
   .link-btn:hover { color: var(--bt-brand-text); }
 
   input, select, textarea {
@@ -614,8 +613,28 @@
   @media (max-width: 700px) { #suppliersTableWrap.fitmode > table { min-width: 1060px !important; } }   /* phones: keep the columns readable and scroll sideways */
   .sup-empty { padding: var(--bt-s6) var(--bt-s4); text-align: center; color: var(--text-muted); font-size: var(--bt-fs-sm); }   /* one empty-state look: .sup-empty, .crm-empty, .td-empty */
   .lp-contact-top .sp-primary { font-size: var(--bt-fs-xs); font-weight: 600; color: var(--bt-ok-fg); background: var(--bt-ok-bg); border: 1px solid var(--bt-ok-bd); padding: 1px 9px; border-radius: var(--bt-r-pill); }
-  .sp-link { background: none; border: none; padding: 0; font-family: inherit; font-size: var(--bt-fs-xs); font-weight: 500; color: var(--slate); text-decoration: underline; cursor: pointer; }
-  .sp-link:hover { color: var(--bt-brand-text); }
+  /* link tiles (see lt() in the script): one component, two sizes */
+  .lt { --lt-c: var(--bt-neu-fg); display: inline-flex; align-items: center; gap: 8px; max-width: 100%; box-sizing: border-box; font-family: inherit; font-size: var(--bt-fs-sm); line-height: 1.3; color: var(--ink); text-align: left; text-decoration: none; background: var(--bt-card); border: 1px solid var(--line); border-left: 3px solid var(--lt-c); border-radius: var(--bt-r-btn); cursor: pointer; vertical-align: middle; -webkit-tap-highlight-color: transparent; transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease, border-color .15s ease; }
+  .lt:hover { transform: translateY(-2px); box-shadow: 0 4px 12px color-mix(in srgb, var(--bt-ink) 12%, transparent); border-color: var(--stone-deep); border-left-color: var(--lt-c); }
+  .lt:active { transform: translateY(0) scale(.985); box-shadow: none; background: var(--bt-neu-bg); }
+  .lt:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+  .lt.lt-static { cursor: default; } .lt.lt-static:hover { transform: none; box-shadow: none; }
+  .lt-ic { width: 16px; height: 16px; flex: none; color: var(--lt-c); } .lt-n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .lt-chip { padding: 2px 9px 2px 7px; min-height: 26px; } .lt-chip .lt-n { font-weight: 500; }
+  .lt-full { display: flex; width: 100%; padding: 9px 12px; min-height: 52px; margin: 0 0 8px; } .lt-full .lt-ic { width: 20px; height: 20px; }
+  .lt-main { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; gap: 1px; } .lt-full .lt-n { white-space: normal; overflow-wrap: anywhere; font-weight: 700; } .lt-line { font-size: var(--bt-fs-xs); color: var(--text-muted); } .lt-pill { flex: none; margin-left: auto; }
+  .lt-k-project { --lt-c: var(--bt-green-600); } .lt-k-quote { --lt-c: var(--bt-slate-blue); } .lt-k-order { --lt-c: var(--bt-oak-500); } .lt-k-invoice { --lt-c: var(--bt-plum); } .lt-k-supplier { --lt-c: var(--bt-oak-500); } .lt-k-contact, .lt-k-company { --lt-c: var(--slate); }
+  .lt.lt-ok { --lt-c: var(--bt-ok-fg); } .lt.lt-warn { --lt-c: var(--bt-warn-fg); } .lt.lt-bad { --lt-c: var(--bt-bad-fg); }
+  .lt-add { justify-content: center; background: transparent; border: 1px dashed var(--stone-deep); color: var(--text-muted); min-height: 44px; } .lt-add:hover { background: var(--bt-card); border-color: var(--bt-focus); color: var(--ink); } .lt-add .lt-n { font-weight: 600; } .lt-plus { font-size: 18px; line-height: 1; color: var(--text-muted); }
+  .lt-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  @media (max-width: 700px), (pointer: coarse) { .lt { min-height: 44px; } .lt-chip { padding: 6px 12px 6px 9px; } }
+  @media (prefers-reduced-motion: reduce) { .lt { transition: none; } .lt:hover, .lt:active { transform: none; } }
+  /* actions that are not record links (Open full workspace, View all, undo, mark done…): a small button, never underlined text. Underlined text is for external links only. */
+  .sp-link, .link-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-btn); padding: 2px 10px; min-height: 26px; box-sizing: border-box; font-family: inherit; font-size: var(--bt-fs-xs); font-weight: 600; line-height: 1.3; color: var(--ink); text-decoration: none; cursor: pointer; text-align: left; transition: background-color .15s ease, border-color .15s ease; }
+  .sp-link:hover, .link-btn:hover { background: var(--bt-neu-bg); border-color: var(--stone-deep); color: var(--bt-brand-text); }
+  .sp-link:active, .link-btn:active { background: var(--stone); }
+  @media (max-width: 700px), (pointer: coarse) { .sp-link, .link-btn { min-height: 44px; padding: 6px 12px; } }
+  @media (prefers-reduced-motion: reduce) { .sp-link, .link-btn { transition: none; } }
   .sp-link.danger { color: var(--bt-bad-fg); }
   .lp-contact-top .sp-ctl { display: flex; align-items: center; gap: var(--bt-s2); }
   .sp-check { display: flex; align-items: center; gap: 9px; font-size: 13px; padding: 5px var(--bt-s2) 5px 0; cursor: pointer; width: fit-content; max-width: 100%; }
@@ -717,7 +736,8 @@
   .db-group-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: var(--bt-s1); }
   .db-group-head h4 { margin: 0; font-size: var(--bt-fs-sm); font-weight: 600; }
   .db-count { font-size: 12.5px; color: var(--text-muted); }
-  .db-viewall, .db-more { margin-left: auto; background: none; border: none; padding: 2px 0; font-family: inherit; font-size: 12.5px; color: var(--slate); text-decoration: underline; cursor: pointer; }
+  .db-viewall, .db-more { margin-left: auto; display: inline-flex; align-items: center; min-height: 26px; background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-btn); padding: 2px 10px; font-family: inherit; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--ink); cursor: pointer; }
+  .db-viewall:hover, .db-more:hover { background: var(--bt-neu-bg); border-color: var(--stone-deep); }
   .db-viewall:hover, .db-more:hover { color: var(--ink); }
   .db-more { display: block; margin: 10px 0 0; }
   .db-row { display: flex; align-items: center; gap: var(--bt-s3); width: calc(100% + 20px); margin: 0 -10px; text-align: left; background: none; border: none; border-radius: var(--bt-r-btn); padding: 9px 10px; font-family: inherit; font-size: 13.5px; color: var(--ink); cursor: pointer; }
@@ -806,7 +826,7 @@
   .logout-bar:empty { display: none; }
   .logout-bar .who { font-size: var(--bt-fs-xs); color: var(--bt-on-dark-muted); }
   .logout-bar .role { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--bt-on-dark-dim); border: 1px solid var(--bt-ink-2); padding: 1px 6px; border-radius: var(--bt-r-pill); margin-left: 6px; }
-  .logout-bar .logout-link { background: none; border: none; color: var(--bt-on-dark-dim); font-size: var(--bt-fs-xs); cursor: pointer; text-decoration: underline; font-family: inherit; padding: 0; }
+  .logout-bar .logout-link { background: none; border: 1px solid var(--bt-on-dark-dim); border-radius: var(--bt-r-btn); color: var(--bt-on-dark-muted); font-size: var(--bt-fs-xs); cursor: pointer; font-family: inherit; padding: 2px 10px; min-height: 26px; }
   .logout-bar .logout-link:hover { color: var(--bt-on-dark); }
 
 
@@ -908,7 +928,7 @@
   .gantt-headrow { display: flex; border-bottom: 1.5px solid var(--stone-deep); background: var(--bt-surface-2); position: sticky; top: 0; z-index: 6; }
   .gantt-label { width: var(--lw); padding: 0 10px 0 6px; font-size: 12.5px; flex: 0 0 var(--lw); border-right: 1px solid var(--line); display: flex; align-items: center; gap: 6px; position: sticky; left: 0; z-index: 4; background: var(--card); min-height: 40px; overflow: hidden; }
   .gantt-label .gantt-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; min-width: 0; }
-  .gantt-label .gantt-name:hover { text-decoration: underline; }
+  .gantt-label .gantt-name:hover { color: var(--bt-brand-text); }
   .gantt-label .icon-btn { width: 24px; height: 24px; flex-shrink: 0; }
   .gantt-label .gantt-nochev { width: 24px; flex-shrink: 0; }
   .gantt-label.head { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--bt-text-muted); font-weight: 600; background: var(--bt-surface-2); z-index: 7; padding-left: 14px; }
@@ -1345,8 +1365,7 @@
   .pj-sub { display: block; font-size: var(--bt-fs-xs); color: var(--text-muted); font-weight: 400; white-space: normal; }
   .pj-sub-c, .pj-sub-o { display: none; } .pj-sub-c:empty { display: none !important; }
   .pj-code { font-size: var(--bt-fs-2xs); font-weight: 700; color: var(--slate); background: var(--bt-neu-bg); border-radius: var(--bt-r-pill); padding: 2px var(--bt-s2); white-space: nowrap; display: inline-block; }
-  .pj-open { font-family: inherit; font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-brand-text); background: none; border: none; padding: 0; text-align: left; cursor: pointer; min-height: var(--bt-control); display: inline-flex; align-items: center; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; }
-  .pj-open:hover { text-decoration-color: currentColor; }
+  .lt.pj-open { max-width: 100%; }
   .pj-st, .pj-stage { display: inline-block; padding: 2px 9px; border-radius: var(--bt-r-pill); font-size: var(--bt-fs-xs); font-weight: 600; white-space: nowrap; background: var(--bt-neu-bg); color: var(--bt-neu-fg); }
   .pj-st-ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); } .pj-st-warn { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .pj-st-bad { background: var(--bt-bad-bg); color: var(--bt-bad-fg); }
   .pj-stage-lead { background: var(--bt-info-bg); color: var(--bt-info-fg); } .pj-stage-sales { background: var(--bt-warn-bg); color: var(--bt-warn-fg); } .pj-stage-project { background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
@@ -1421,7 +1440,7 @@
   .crm-due { min-width: 0 !important; padding: 3px var(--bt-s1); }
   .crm-due.over { color: var(--bt-bad-fg); font-weight: 600; }
   .crm-link { text-align: left; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--bt-fs-xs); color: var(--slate); text-decoration: none; }
-  .crm-link:hover { color: var(--bt-brand-text); text-decoration: underline; }
+  .crm-link:hover { color: var(--bt-brand-text); }
   .crm-link.dim { color: var(--text-muted); }
   .tk-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
   .tk-pill { display: inline-block; font-size: var(--bt-fs-xs); font-weight: 700; padding: 2px 9px; border-radius: var(--bt-r-pill); white-space: nowrap; }
@@ -1439,7 +1458,7 @@
   .tkr-row:last-child { border-bottom: none; }
   .tkr-row .cbx { margin: 0; flex-shrink: 0; }
   .tkr-title { flex: 1; min-width: 0; text-align: left; background: none; border: none; font-family: inherit; font-size: 12.5px; color: var(--ink); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0; }
-  .tkr-title:hover { text-decoration: underline; }
+  .lt.tkr-title { flex: 0 1 auto; min-width: 0; }
   .tkr-code { font-size: var(--bt-fs-2xs); font-weight: 700; color: var(--slate); background: var(--bt-neu-bg); border-radius: var(--bt-r-pill); padding: 2px var(--bt-s2); white-space: nowrap; }
   .tkr-due { font-size: var(--bt-fs-xs); color: var(--slate); white-space: nowrap; min-width: 78px; text-align: right; }
   .tkr-due.over { color: var(--bt-bad-fg); font-weight: 600; }
@@ -1472,13 +1491,12 @@
   .tk-props select:hover, .tk-props input:hover { border-color: var(--stone-deep); }
   .tk-linkrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--bt-s2) 10px; }
   .tk-linkbtn { background: none; border: none; padding: 2px 0; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--bt-info-fg); cursor: pointer; text-decoration: none; }
-  .tk-linkbtn:hover { text-decoration: underline; }
+  .tk-linkbtn:hover { background: var(--bt-neu-bg); }
   .tk-linkbtn .chev { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-left: 3px; transition: transform 0.15s; }
   .tk-linkbtn[aria-expanded="true"] .chev { transform: rotate(90deg); }
   .tk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tk-chip { display: inline-flex; align-items: center; max-width: 100%; border: 1px solid var(--line); background: var(--bt-paper); border-radius: var(--bt-r-pill); font-size: var(--bt-fs-xs); line-height: 1.3; color: var(--slate); }
+  .tk-chip { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; font-size: var(--bt-fs-xs); line-height: 1.3; color: var(--slate); }
   .tk-chip .open { background: none; border: none; font: inherit; color: inherit; cursor: pointer; padding: 3px var(--bt-s1) 3px 10px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tk-chip .open:hover { color: var(--ink); text-decoration: underline; }
   .tk-chip .open b { font-weight: 700; color: var(--ink); margin-right: var(--bt-s1); }
   .tk-chip .x { background: none; border: none; font: inherit; font-size: var(--bt-fs-sm); line-height: 1; color: var(--text-muted); cursor: pointer; padding: 3px var(--bt-s2) 3px 2px; }
   .tk-chip .x:hover { color: var(--bt-bad-fg); }
@@ -1500,7 +1518,7 @@
   .tk-desc:hover { border-color: var(--stone-deep); }
   .tk-desc:focus { border-color: var(--oak); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bt-warn-fg) 12%, transparent); }
   .tk-addnote-link { background: none; border: none; padding: 2px 0; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--bt-info-fg); cursor: pointer; }
-  .tk-addnote-link:hover { text-decoration: underline; }
+  .tk-addnote-link:hover { background: var(--bt-neu-bg); }
   .tk-noteform { display: flex; flex-direction: column; gap: var(--bt-s2); margin-top: var(--bt-s2); padding: 10px; border: 1px solid var(--line); border-radius: var(--bt-r-btn); background: var(--bt-surface-2); }
   .tk-noteform[hidden] { display: none; }
   .tk-noteform .row { display: flex; flex-wrap: wrap; gap: var(--bt-s2); align-items: center; }
@@ -1512,7 +1530,7 @@
   .tk-note:last-child { border-bottom: none; }
   .tk-note .meta { display: block; font-size: var(--bt-fs-xs); color: var(--text-muted); margin-bottom: 1px; white-space: normal; }
   .tk-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px var(--bt-s3); margin-top: var(--bt-s1); padding-top: 14px; border-top: 1px solid var(--line); font-size: var(--bt-fs-xs); color: var(--text-muted); }
-  .tk-foot .del { background: none; border: none; padding: 0; font: inherit; color: var(--bt-bad-fg); cursor: pointer; text-decoration: underline; }
+  .tk-foot .del { display: inline-flex; align-items: center; min-height: 26px; padding: 2px 10px; background: var(--bt-card); border: 1px solid var(--bt-bad-bd); border-radius: var(--bt-r-btn); font: inherit; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--bt-bad-fg); cursor: pointer; }
   .tk-foot .del:hover { color: var(--bt-bad-fg); }
   .tk-dyn { display: flex; flex-direction: column; gap: 18px; }
   .tk-more-n { font-size: var(--bt-fs-xs); color: var(--text-muted); margin-left: var(--bt-s1); white-space: nowrap; }
@@ -1536,7 +1554,7 @@
   .td-head .btn { margin-left: auto; padding: 5px var(--bt-s3); font-size: var(--bt-fs-xs); }
   .td-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--bt-s1) 10px; padding: 9px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
   .td-row:last-child { border-bottom: none; }
-  .td-row:hover .td-title { text-decoration: underline; }
+  .td-row:hover .td-title { color: var(--bt-brand-text); }
   .td-row .cbx { margin: 0; flex-shrink: 0; }
   .td-title { flex: 1 1 160px; min-width: 0; font-weight: 500; font-size: 13px; overflow-wrap: anywhere; }
   .td-meta { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--bt-s1) 10px; font-size: var(--bt-fs-xs); color: var(--slate); }
@@ -1703,7 +1721,7 @@
   /* ---------------- Finance: totals, cash-flow lines, invoicing, pending transactions ---------------- */
   .fin-sub { font-size: var(--bt-fs-xs); color: var(--text-muted); margin-top: 3px; } .fin-note { font-size: var(--bt-fs-xs); color: var(--text-muted); margin: -4px 0 14px; }
   .kpi-row.fin-totals { margin-bottom: var(--bt-s2); }
-  .cf-n { border: 0; background: none; padding: 2px 6px; border-radius: var(--bt-r-chip); font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; } .cf-n:hover, .cf-n.sel { background: var(--bt-neu-bg); } .cf-n.sel { font-weight: 700; }
+  .cf-n { border: 1px solid transparent; background: var(--bt-neu-bg); padding: 2px 6px; border-radius: var(--bt-r-chip); font: inherit; color: inherit; cursor: pointer; text-decoration: none; transition: border-color .15s ease; } .cf-n:hover { border-color: var(--stone-deep); } .cf-n:hover, .cf-n.sel { background: var(--bt-neu-bg); } .cf-n.sel { font-weight: 700; }
   .cf-memo td { color: var(--text-muted); font-style: italic; } .cf-lines { margin-top: 14px; }
   .inv-st { display: inline-block; padding: 2px 10px; border-radius: var(--bt-r-pill); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
   .inv-st-Unconfirmed { background: var(--bt-neu-bg); color: var(--bt-neu-fg); } .inv-st-Pending { background: var(--bt-info-bg); color: var(--bt-info-fg); } .inv-st-Sent { background: var(--bt-info-bg); color: var(--bt-info-fg); } .inv-st-Due { background: var(--bt-warn-bg); color: var(--bt-warn-fg); }
@@ -1858,9 +1876,9 @@
 /* BT:css begin */
 /* ===== CRM, documents and email ===== */
 .cx-locked { background: var(--bt-neu-bg) !important; color: var(--bt-neu-fg); cursor: not-allowed; }
-.cx-chip { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 3px 10px; border-radius: var(--bt-r-pill); background: var(--bt-neu-bg); color: var(--bt-neu-fg); font-size: var(--bt-fs-sm); }
+.cx-chip { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; color: var(--bt-neu-fg); font-size: var(--bt-fs-sm); }
 .cx-chip em { font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--bt-ok-fg); font-weight: 600; }
-.cx-chip.primary { background: var(--bt-ok-bg); }
+.cx-chip.primary .lt { --lt-c: var(--bt-ok-fg); }
 .cx-cust { border: 1px solid var(--bt-line); border-radius: var(--bt-r-btn); padding: var(--bt-s3); margin: 0 0 var(--bt-s3); background: var(--bt-card); }
 .cx-cust-h { font-weight: 600; font-size: var(--bt-fs-sm); margin-bottom: var(--bt-s2); }
 .cx-cust-row { margin: 4px 0; }
@@ -2295,7 +2313,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .qbs-sec.closed > .qb-sec-h .qb-sec-tools, .qbs-sec.closed > .qb-sec-h > .btn { display: none; }
 .qbs-body[hidden] { display: none; }
 .qbs-how { margin: 0 0 var(--bt-s3); }
-.qbs-how > summary { cursor: pointer; display: inline-flex; align-items: center; min-height: var(--bt-control); font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-brand-text); text-decoration: underline; text-underline-offset: 2px; }
+.qbs-how > summary { cursor: pointer; display: inline-flex; align-items: center; min-height: 28px; padding: 2px 10px; border: 1px solid var(--line); border-radius: var(--bt-r-btn); background: var(--bt-card); font-size: var(--bt-fs-xs); font-weight: 600; color: var(--ink); }
 .qbs-how > summary:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; border-radius: 4px; }
 .qbs-how[open] > summary { margin-bottom: var(--bt-s1); }
 .qbs-how-body { background: var(--bt-surface-2); border: 1px solid var(--line); border-radius: var(--bt-r-btn); padding: var(--bt-s2) var(--bt-s3); }
@@ -2354,7 +2372,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-left, .rp-centre, .rp-right { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); box-shadow: var(--shadow); overflow: hidden; }
 .rp-head { flex: none; padding: var(--bt-s3) var(--bt-s4); border-bottom: 1px solid var(--line); background: var(--bt-card); }
 .rp-head-top { display: flex; justify-content: space-between; align-items: center; gap: var(--bt-s2); margin-bottom: var(--bt-s2); }
-.rp-back, .rp-legacy { border: 0; background: none; padding: 4px 0; min-height: 32px; font: inherit; font-size: var(--bt-fs-xs); color: var(--text-muted); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.rp-back, .rp-legacy { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); background: var(--bt-card); border-radius: var(--bt-r-btn); padding: 2px 10px; min-height: 28px; font: inherit; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--ink); cursor: pointer; }
+.rp-back:hover, .rp-legacy:hover { background: var(--bt-neu-bg); border-color: var(--stone-deep); }
 .rp-back:hover, .rp-legacy:hover { color: var(--bt-ink); }
 .rp-id { display: flex; align-items: center; gap: var(--bt-s3); }
 .rp-av { flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--bt-brand-soft); color: var(--bt-brand-text); display: grid; place-items: center; font-weight: 700; font-size: var(--bt-fs-sm); letter-spacing: .02em; }
@@ -6338,8 +6357,8 @@ function supCountCells(s){
   return cell(r.onProj.length, 'quotes', 'Live quotes on open projects: open the list') + cell(r.placed.length, 'quotes', 'Purchase orders placed: open the list');
 }
 function supQuotesHtml(s){
-  const r = supRecords(s.id), q = u => `<div class="sp-q-row"><span><button type="button" class="sp-link" data-nav="quote:${u.q.id}">${escHtml(u.ref)}</button> <span class="q-st q-st-${qStatusShown(u.q)}">${escHtml(qStatusShown(u.q))}</span>${u.detail ? ` <span class="k">${escHtml(u.detail)}</span>` : ''}</span><span>${escHtml(u.amount || '')}</span></div>`;
-  const po = o => `<div class="sp-q-row"><span><button type="button" class="sp-link" data-nav="po:${o.id}">${escHtml(o.ref)}</button> ${poPill(o)} <span class="k">${escHtml(recordCode(o.pid, 'project'))}${(state.projects.find(x => x.id === o.pid) || {}).name ? ' · ' + escHtml(state.projects.find(x => x.id === o.pid).name) : ''}</span></span><span>${qm(poTotals(o).payable)}</span></div>`;
+  const r = supRecords(s.id), q = u => `<div class="sp-q-row"><span>${ltChip(`quote:${u.q.id}`, u.ref)} <span class="q-st q-st-${qStatusShown(u.q)}">${escHtml(qStatusShown(u.q))}</span>${u.detail ? ` <span class="k">${escHtml(u.detail)}</span>` : ''}</span><span>${escHtml(u.amount || '')}</span></div>`;
+  const po = o => `<div class="sp-q-row"><span>${ltChip(`po:${o.id}`, o.ref)} ${poPill(o)} <span class="k">${escHtml(recordCode(o.pid, 'project'))}${(state.projects.find(x => x.id === o.pid) || {}).name ? ' · ' + escHtml(state.projects.find(x => x.id === o.pid).name) : ''}</span></span><span>${qm(poTotals(o).payable)}</span></div>`;
   const block = (title, n, rows, empty) => `<div class="sp-q-block"><b>${title} (${n})</b>${n ? rows : `<div class="sp-q-empty">${empty}</div>`}</div>`;
   return block('Live quotes on open projects', r.onProj.length, r.onProj.map(q).join(''), 'None. A quote counts when it is Draft, Sent or Accepted, has not expired and is linked to a project that is still open.')
     + block('Orders placed', r.placed.length, r.placed.map(po).join(''), 'No purchase orders have been sent to this supplier yet.')
@@ -7072,7 +7091,7 @@ function pwHeaderHtml(p, i){
   const nm = projNextMs(p), pg = projProgress(p), mg = projMargin(p), ct = projContract(p), cu = projCustomer(p), opts = PROJ_STAGE6.map(([id, name]) => `<option value="${id}"${projStage6(p).id === id ? ' selected' : ''}>${escHtml(name)}</option>`).join('');
   const custName = [cu.company, cu.name].filter(Boolean).join(' — '), bits = [cu.phone ? `<a href="tel:${escAttr(cu.phone.replace(/\s+/g, ''))}">${escHtml(cu.phone)}</a>` : '', cu.email ? `<a href="mailto:${escAttr(cu.email)}">${escHtml(cu.email)}</a>` : '', cu.address ? escHtml([cu.address, cu.postcode && !cu.address.includes(cu.postcode) ? cu.postcode : ''].filter(Boolean).join(', ')) : ''].filter(Boolean);
   const value = ct.live
-    ? `<b>${qm(ct.value)}</b><em>${projVariationsValue(p) ? '+ ' + qm(projVariationsValue(p)) + ' variations · ' : ''}ex VAT · live from <button type="button" class="sp-link" data-qba="open-quote" data-id="${ct.q.id}">${escHtml(qRef(ct.q))}</button>${qVatOn() ? ' · ' + qm(ct.inc) + ' inc VAT' : ''}</em>`
+    ? `<b>${qm(ct.value)}</b><em>${projVariationsValue(p) ? '+ ' + qm(projVariationsValue(p)) + ' variations · ' : ''}ex VAT · live from ${ltChip(null, qRef(ct.q), { attrs: `data-qba="open-quote" data-id="${ct.q.id}"`, kind: 'quote' })}${qVatOn() ? ' · ' + qm(ct.inc) + ' inc VAT' : ''}</em>`
     : `<input class="pw-val" type="number" step="1" data-tab="projects" data-idx="${i}" data-field="agreedValue" value="${p.agreedValue || 0}" aria-label="Agreed value ex VAT"><em>typed (no accepted quote yet)</em>`;
   return `<div class="pw-sticky"><div class="pw-top">
       <div class="pw-title"><button type="button" class="btn secondary qb-sm" data-pw="back">← All projects</button><span class="detail-code" style="background:var(--green);">${recordCode(p.id, 'project')}</span>
@@ -7218,7 +7237,7 @@ function pwSpActualCell(p, x){
 }
 function pwPoCell(p, x, plan){
   const po = poForDrop(p.id, x.d.id);
-  if(po) return `<button type="button" class="sp-link" data-po="open" data-id="${po.id}">${escHtml(po.ref)}</button> ${poPill(po)}${poNeedsApproval(po) && !poApproved(po) ? ' <span class="po-flag">Requires approval</span>' : ''}`;
+  if(po) return `${ltChip(null, po.ref, { attrs: `data-po="open" data-id="${po.id}"`, kind: 'order' })} ${poPill(po)}${poNeedsApproval(po) && !poApproved(po) ? ' <span class="po-flag">Requires approval</span>' : ''}`;
   const info = poCreateInfo(p, x); if(!info.ok) return `<span class="qb-dim pw-sm">${escHtml(info.why)}</span>`;
   return `<button type="button" class="btn secondary qb-sm" data-po="create" data-pid="${p.id}" data-did="${escAttr(x.d.id)}">Create PO</button>`;
 }
@@ -8161,13 +8180,14 @@ function pwJourneyHtml(p){
   const j = projJourney(p);
   return `<div class="pw-journey" aria-label="Project journey">${j.steps.map(s => `<span class="pw-j ${s.state}">${s.state === 'done' ? '✓ ' : ''}${escHtml(s.label)}</span>`).join('<i>›</i>')}${j.next.act ? `<button type="button" class="btn pw-next" data-pw="next" title="The one thing needed now">Next step: ${escHtml(j.next.label)} →</button>` : `<span class="pw-ok">${escHtml(j.next.label)}</span>`}</div>`;
 }
+function pwNewQuoteFor(p){ const before = state.quotes.length; navGo(() => { activateTab('quotations'); qCreate(); const nq = state.quotes[state.quotes.length - 1]; if(state.quotes.length > before){ const cu = projCustomer(p); nq.customer = cu.name; nq.address = cu.address; nq.project = cu.projectName || p.name; nq.linkedIds = [recordCode(p.id, 'project')]; saveState(); qbRender(); } }); }
 function pwNextStep(p){
   const n = projJourney(p).next, today = fmt(new Date());
   if(n.act === 'quick') pwQuickOpen(n.q, '');
   else if(n.act === 'ms') pwQuickOpen('milestone', n.key);
   else if(n.act === 'complete') pwMarkCompleted(p);
   else if(n.act === 'quote-open'){ const q = projAcceptedQuote(p) || qLatestForRoot(p.id); if(q) navGo(() => { qUi.openId = q.id; qUi.tab = 'quotes'; activateTab('quotations'); renderQuotes(); window.scrollTo(0, 0); }); }
-  else if(n.act === 'quote-new'){ const before = state.quotes.length; navGo(() => { activateTab('quotations'); qCreate(); const nq = state.quotes[state.quotes.length - 1]; if(state.quotes.length > before){ const cu = projCustomer(p); nq.customer = cu.name; nq.address = cu.address; nq.project = cu.projectName || p.name; nq.linkedIds = [recordCode(p.id, 'project')]; saveState(); qbRender(); } }); }
+  else if(n.act === 'quote-new') pwNewQuoteFor(p);
   else if(n.act === 'po-open') navGo(() => poOpen(n.po));
   else if(n.act === 'po-create') poCreate(p.id, n.did);
   else if(n.act === 'ord'){ const st = p.dropState[n.did] = p.dropState[n.did] || {}; st.ordered = today; saveState(); render(); showToast('Marked ordered', () => { st.ordered = ''; saveState(); render(); }); }
@@ -9692,10 +9712,10 @@ function qStaleCount(q){ let n = 0; q.lines.forEach(l => (l.prices || []).forEac
 function qbBannerHtml(q){
   const nv = q.supersededBy ? qFind(q.supersededBy) : null, vu = qValidUntilSet(q);
   const newVer = `<button class="btn" data-qba="new-version">Make a new version to change this</button>`;
-  if(q.status === 'Superseded') return `<div class="qb-banner"><b>Superseded.</b> This version is kept exactly as it was and cannot be changed.${nv ? ` It was replaced by <button type="button" class="sp-link" data-qba="open-version" data-id="${nv.id}">${escHtml(qRef(nv))}</button> (${escHtml(qStatusShown(nv))}).` : ''}</div>`;
+  if(q.status === 'Superseded') return `<div class="qb-banner"><b>Superseded.</b> This version is kept exactly as it was and cannot be changed.${nv ? ` It was replaced by ${ltChip(null, qRef(nv), { attrs: `data-qba="open-version" data-id="${nv.id}"`, kind: 'quote' })} (${escHtml(qStatusShown(nv))}).` : ''}</div>`;
   if(qIsExpired(q)) return `<div class="qb-banner warn"><b>Expired${vu ? ' on ' + escHtml(qDocDate(vu)) : ''}.</b> The validity has passed, so its prices and date may be out of date. <span class="qb-banner-btns"><button class="btn" data-qba="q-update" title="A new version dated today; you are asked to refresh any stale supplier prices">Update quote</button><button class="btn secondary" data-qba="q-new" title="A new quote for the same customer and project, with no lines">New quote</button></span></div>`;
   if(q.status === 'Sent') return `<div class="qb-banner"><b>This quote is Sent and locked.</b> It is what the customer has${vu ? ' (valid until ' + escHtml(qDocDate(vu)) + ')' : ''}, so it cannot be edited. <span class="qb-banner-btns">${newVer}</span></div>`;
-  if(q.status === 'Accepted') return `<div class="qb-banner"><b>This quote is Accepted and locked.</b> The as-sold figures cannot be changed.${nv && nv.status !== 'Accepted' ? ` A new version is being prepared: <button type="button" class="sp-link" data-qba="open-version" data-id="${nv.id}">${escHtml(qRef(nv))}</button> (${escHtml(nv.status)}). The project keeps running on this quote until that one is Accepted.` : ''} <span class="qb-banner-btns">${nv && nv.status === 'Draft' ? '' : newVer}</span></div>`;
+  if(q.status === 'Accepted') return `<div class="qb-banner"><b>This quote is Accepted and locked.</b> The as-sold figures cannot be changed.${nv && nv.status !== 'Accepted' ? ` A new version is being prepared: ${ltChip(null, qRef(nv), { attrs: `data-qba="open-version" data-id="${nv.id}"`, kind: 'quote' })} (${escHtml(nv.status)}). The project keeps running on this quote until that one is Accepted.` : ''} <span class="qb-banner-btns">${nv && nv.status === 'Draft' ? '' : newVer}</span></div>`;
   return '';
 }
 /* what differs between two versions, in plain words (used before a new version is accepted) */
@@ -10873,7 +10893,8 @@ function finTotalsHtml(){
 /* a link to wherever a line came from; the global back button returns here */
 function finSrcLink(src, text){
   if(!src) return '';
-  const t = escHtml(text || ''), d = s => `<button type="button" class="sp-link" data-nav="${escAttr(s)}">${t}</button>`;
+  const KL = { quote: 'Quote', project: 'Project', invoice: 'Invoice', txn: 'Transaction', po: 'Order', deal: 'Deal', asset: 'Asset', bcost: 'Business cost' };
+  const lab = (!text || /^source\b/i.test(text)) ? (KL[src.t] || 'Open') : String(text).replace(/\s*→\s*$/, ''), t = lab, d = s => ltChip(s, lab);
   if(src.t === 'quote') return d('quote:' + src.id);
   if(src.t === 'project') return d('project:' + src.id + ':' + (src.sec || 'overview'));
   if(src.t === 'invoice') return d('invoicing:' + src.pid + ':' + (src.vid ? 'v' + src.vid : src.idx));
@@ -10882,7 +10903,7 @@ function finSrcLink(src, text){
   if(src.t === 'deal') return d('deal:' + src.id);
   if(src.t === 'asset') return d('asset:' + src.id);
   if(src.t === 'bcost') return d('bcost:' + src.id);
-  return t;
+  return escHtml(t);
 }
 function finNavOpen(kind, id, extra){
   if(kind === 'invoicing'){ invUi.view = 'all'; invUi.flash = id + ':' + extra; activateTab('invoicing'); renderInvoicing(); window.scrollTo(0, 0); setTimeout(() => { const el = document.querySelector('#invoicingBody tr.inv-flash'); if(el) el.scrollIntoView({ block: 'center' }); }, 30); }
@@ -11146,7 +11167,7 @@ function invRowHtml(r, i){
   }
   const inp = (f, val, type) => `<input type="${type || 'date'}" ${at} data-inv="${f}" value="${escAttr(val === 0 && type === 'number' ? 0 : (val || ''))}"${type === 'number' ? ' step="any" min="0" class="qb-n"' : ''}${r.blocked || ((f === 'amount' || f === 'dueDate') && ivRowDoc(r)) ? ' disabled title="Locked: this line has an invoice. Void the invoice to change it."' : ''}>`;
   const flash = invUi.flash === r.pid + ':' + key;
-  return `<tr class="inv-row inv-${r.status.replace(/\s+/g, '')}${r.kind === 'variation' ? ' inv-var' : ''}${flash ? ' inv-flash' : ''}"><td><button type="button" class="sp-link" data-nav="project:${r.pid}:money">${escHtml(r.code)}</button><div class="qb-dim">${escHtml(r.pname)}</div></td>
+  return `<tr class="inv-row inv-${r.status.replace(/\s+/g, '')}${r.kind === 'variation' ? ' inv-var' : ''}${flash ? ' inv-flash' : ''}"><td>${ltChip(`project:${r.pid}:money`, r.code)}<div class="qb-dim">${escHtml(r.pname)}</div></td>
     <td>${r.kind === 'variation' ? '<span class="qb-flag manual">scope addition</span> ' : ''}${escHtml(r.desc)}${r.kind === 'contract' ? `<div class="qb-dim">${r.seq} of ${r.of}</div>` : ''}${r.queried && r.queryNote ? `<div class="qb-warn">Query: ${escHtml(r.queryNote)}</div>` : ''}</td>
     <td class="qb-calc">${r.raiseBy ? pwD(r.raiseBy) : '—'}</td><td>${r.kind === 'contract' ? inp('dueDate', r.dueDate) : inp('dueDate', r.dueDate)}</td>
     <td>${r.kind === 'contract' ? inp('amount', r.amount, 'number') : `<b>${qm(r.amount)}</b>`}</td>
@@ -11171,7 +11192,7 @@ function renderInvoicing(){
   if(invUi.view === 'project'){
     const byP = {}; all.forEach(r => (byP[r.pid] = byP[r.pid] || []).push(r));
     body = Object.keys(byP).map(id => { const p = state.projects.find(x => x.id === Number(id)), rows = byP[id].filter(f); if(!p || (invUi.status !== 'all' && !rows.length)) return '';
-      return `<div class="card inv-proj"><div class="qb-sec-h"><h4><button type="button" class="sp-link" data-nav="project:${p.id}:money">${escHtml(recordCode(p.id, 'project'))}</button> ${escHtml(p.name)}</h4></div>${invStrip(p, byP[id])}<div class="qb-scroll"><table class="qb-table inv-table">${INV_HEAD}<tbody>${ivRowsHtml(rows)}</tbody></table></div></div>`; }).join('') || '<div class="sup-empty">No projects with invoices yet.</div>';
+      return `<div class="card inv-proj"><div class="qb-sec-h"><h4>${ltChip(`project:${p.id}:money`, recordCode(p.id, 'project'))} ${escHtml(p.name)}</h4></div>${invStrip(p, byP[id])}<div class="qb-scroll"><table class="qb-table inv-table">${INV_HEAD}<tbody>${ivRowsHtml(rows)}</tbody></table></div></div>`; }).join('') || '<div class="sup-empty">No projects with invoices yet.</div>';
   } else if(invUi.view === 'docs'){ body = ivDocsHtml();
   } else {
     let rows = all.filter(f); if(invUi.view === 'live') rows = rows.filter(r => INV_LIVE.includes(r.status)); else if(invUi.view === 'pending') rows = rows.filter(r => r.status === 'Unconfirmed' || r.status === 'Pending');
@@ -11245,7 +11266,7 @@ function renderTransactions(){
       <td><input type="date" data-tab="transactions" data-idx="${i}" data-field="date" value="${t.date||''}"></td>
       <td><input data-tab="transactions" data-idx="${i}" data-field="description" value="${escAttr(t.description||'')}"></td>
       <td><select data-tab="transactions" data-idx="${i}" data-field="category">${cats.map(c=>`<option${t.category===c?' selected':''}>${escHtml(c)}</option>`).join('')}</select>${typeof clsBadge === 'function' ? '<div style="margin-top:4px;">' + clsBadge(t) + '</div>' : ''}</td>
-      <td>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button><div class="qb-dim">${escHtml(t.projCat || '')} ${t.planned === false || (t.projectId && !t.planned) ? '<span class="qb-flag bad">unplanned</span>' : '<span class="qb-flag ok">planned</span>'}${t.payMode === 'trade' ? (t.settledDate ? ' <span class="qb-flag ok">trade · settled ' + pwD(t.settledDate) + '</span>' : ' <span class="qb-flag bad">on account · due ' + pwD(t.tradeDue) + '</span> <button type="button" class="sp-link" data-spay="settle" data-uid="' + escAttr(t.uid) + '">settle…</button>') : ''}${t.origin === 'supplier-payment' ? ' <span class="qb-flag">confirmed payment</span>' : ''}</div>` : '<span class="qb-dim">—</span>'}</td>
+      <td>${p ? `${ltChip(`project:${p.id}:plan`, recordCode(p.id, 'project'))}<div class="qb-dim">${escHtml(t.projCat || '')} ${t.planned === false || (t.projectId && !t.planned) ? '<span class="qb-flag bad">unplanned</span>' : '<span class="qb-flag ok">planned</span>'}${t.payMode === 'trade' ? (t.settledDate ? ' <span class="qb-flag ok">trade · settled ' + pwD(t.settledDate) + '</span>' : ' <span class="qb-flag bad">on account · due ' + pwD(t.tradeDue) + '</span> <button type="button" class="sp-link" data-spay="settle" data-uid="' + escAttr(t.uid) + '">settle…</button>') : ''}${t.origin === 'supplier-payment' ? ' <span class="qb-flag">confirmed payment</span>' : ''}</div>` : '<span class="qb-dim">—</span>'}</td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyIn" value="${t.moneyIn||0}"></td>
       <td><input type="number" step="1" data-tab="transactions" data-idx="${i}" data-field="moneyOut" value="${t.moneyOut||0}"></td>
       <td><input data-tab="transactions" data-idx="${i}" data-field="linkedCode" value="${escAttr(t.linkedCode||'')}" placeholder="e.g. P-201-INV1"></td>
@@ -11764,9 +11785,9 @@ function poHeroHtml(po){
   const cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
   return `<div class="po-hero"><div class="po-trace">
       <span><small>Order</small> <b class="po-bigref">${escHtml(po.ref)}</b></span>
-      <span><small>Project</small> ${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}">${escHtml(recordCode(p.id, 'project'))} · ${escHtml(p.name)}</button>` : '—'}</span>
-      <span><small>Quote</small> ${aq ? `<button type="button" class="sp-link" data-nav="quote:${aq.id}">${escHtml(qRef(aq))} v${aq.version}</button>` : '<span class="qb-dim">no accepted quote</span>'}</span>
-      <span><small>Supplier</small> ${sup ? `<button type="button" class="sp-link" data-nav="supplier:${sup.id}">${escHtml(sup.name)}</button>` : escHtml(po.supplierName || '—')}</span></div>
+      <span><small>Project</small> ${p ? ltChip(`project:${p.id}`, recordCode(p.id, 'project') + ' · ' + p.name) : '—'}</span>
+      <span><small>Quote</small> ${aq ? ltChip(`quote:${aq.id}`, qRef(aq) + ' v' + aq.version) : '<span class="qb-dim">no accepted quote</span>'}</span>
+      <span><small>Supplier</small> ${sup ? `${ltChip(`supplier:${sup.id}`, sup.name)}` : escHtml(po.supplierName || '—')}</span></div>
     <div class="rp-strip">${cell('Planned delivery', pl ? escHtml(pwD(pl)) : '—', moved ? 'the plan now says ' + escHtml(pwD(drop.date)) : (pl ? escHtml(pwRel(pl)) : 'no date'))}${cell('Actual delivery', ac ? escHtml(pwD(ac)) : '—', ac ? (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' late</b>' : 'on time') : (late ? '<b class="over">' + late + ' day' + (late === 1 ? '' : 's') + ' overdue</b>' : 'not yet'), late ? 'bad' : '')}${cell('Ordered', ds.ordered || po.sentAt ? escHtml(pwD(ds.ordered || po.sentAt)) : '—', ds.ordered || po.sentAt ? '' : 'not yet')}${cell('Status', escHtml(po.status), p && dcPtcMark(p, po.did) ? dcPtcMark(p, po.did) : '')}${cell('Value', qm(poTotals(po).payable), qVatOn() ? 'inc VAT' : '')}</div></div>`;
 }
 function poExtraHtml(po){
@@ -12042,7 +12063,7 @@ function varByCauseHtml(rows, o){
   const by = {}; rows.forEach(r => { const g = by[r.l.cause] = by[r.l.cause] || { rows: [], up: 0, down: 0 }; g.rows.push(r); if(r.d > 0) g.up += r.d; else g.down += r.d; });
   const tot = rows.reduce((a, r) => a + r.d, 0), rev = rows.filter(r => r.review).length;
   const sgn = v => Math.abs(v) < 0.005 ? '—' : `<b class="${v > 0 ? 'over' : 'under'}">${v > 0 ? '+' : '−'}${qm(Math.abs(v))}</b>`;
-  return `<div class="qb-scroll"><table class="qb-table qb-narrow var-table"><thead><tr><th>Cause</th><th>Lines</th><th class="r">Dearer (+)</th><th class="r">Cheaper (−)</th><th class="r">Net</th></tr></thead><tbody>${VAR_CAUSES.filter(([k]) => by[k]).map(([k, n]) => { const g = by[k]; return `<tr><td><details><summary>${escHtml(n)}</summary><div class="var-list">${g.rows.map(r => `<div class="rp-lrow"><span>${r.po ? `<button type="button" class="sp-link" data-nav="po:${r.po.id}">${escHtml(r.po.ref)}</button>` : ''}${r.p && !o.noProject ? ` · <button type="button" class="sp-link" data-nav="project:${r.p.id}">${escHtml(recordCode(r.p.id, 'project'))}</button>` : ''} · ${escHtml(r.l.desc)}${r.l.note ? `<span class="rp-dim"> · ${escHtml(r.l.note)}</span>` : ''}${r.review ? ' <span class="dc-ptc">review</span>' : ''}</span><span class="rp-lmeta">${sgn(r.d)}</span></div>`).join('')}</div></details></td><td>${g.rows.length}</td><td class="r">${sgn(g.up)}</td><td class="r">${sgn(g.down)}</td><td class="r">${sgn(g.up + g.down)}</td></tr>`; }).join('')}</tbody><tfoot><tr class="qb-foot"><td colspan="4" style="text-align:right;">Net variance ex VAT</td><td class="r">${sgn(tot)}</td></tr></tfoot></table></div>
+  return `<div class="qb-scroll"><table class="qb-table qb-narrow var-table"><thead><tr><th>Cause</th><th>Lines</th><th class="r">Dearer (+)</th><th class="r">Cheaper (−)</th><th class="r">Net</th></tr></thead><tbody>${VAR_CAUSES.filter(([k]) => by[k]).map(([k, n]) => { const g = by[k]; return `<tr><td><details><summary>${escHtml(n)}</summary><div class="var-list">${g.rows.map(r => `<div class="rp-lrow"><span>${r.po ? `${ltChip(`po:${r.po.id}`, r.po.ref)}` : ''}${r.p && !o.noProject ? ` · ${ltChip(`project:${r.p.id}`, recordCode(r.p.id, 'project'))}` : ''} · ${escHtml(r.l.desc)}${r.l.note ? `<span class="rp-dim"> · ${escHtml(r.l.note)}</span>` : ''}${r.review ? ' <span class="dc-ptc">review</span>' : ''}</span><span class="rp-lmeta">${sgn(r.d)}</span></div>`).join('')}</div></details></td><td>${g.rows.length}</td><td class="r">${sgn(g.up)}</td><td class="r">${sgn(g.down)}</td><td class="r">${sgn(g.up + g.down)}</td></tr>`; }).join('')}</tbody><tfoot><tr class="qb-foot"><td colspan="4" style="text-align:right;">Net variance ex VAT</td><td class="r">${sgn(tot)}</td></tr></tfoot></table></div>
     <div class="rp-hint">${rev} of ${rows.length} line${rows.length === 1 ? '' : 's'} flagged for review (threshold ${varThresholdPct()}%, set under Settings &gt; Quotes).</div>`;
 }
 function varProjectCard(p){
@@ -12090,7 +12111,7 @@ function mgGraphHtml(R, today){
 function rpMaterialsHtml(p){
   const R = mgRows(p), today = fmt(new Date()), sorted = R.slice().sort((a, b) => (a.pl || '9999').localeCompare(b.pl || '9999') || a.supplier.localeCompare(b.supplier)), canNew = !!projAcceptedQuote(p);
   const step = (label, d, done, due) => `<span class="mg-step ${done ? 'done' : due ? 'due' : ''}"><small>${label}</small>${done ? '✓ ' + escHtml(pwD(d)) : (d ? escHtml(pwD(d)) : '—')}</span>`;
-  const list = sorted.map(r => `<div class="mg-item${r.late ? ' late' : ''}"><div class="mg-i-main"><b>${r.po ? `<button type="button" class="sp-link" data-nav="po:${r.po.id}">${escHtml(r.po.ref)}</button> · ` : ''}${escHtml(r.supplier)}</b>${r.hire ? ' <span class="dc-ptc">hire</span>' : ''}${r.po && r.x.d.supplierId ? '' : ''}<span class="rp-dim"> ${qm(r.value)}${r.x.items.length ? ' · ' + escHtml(r.x.items.slice(0, 3).join(', ')) + (r.x.items.length > 3 ? '…' : '') : ''}</span>${r.late ? `<div class="mg-flag">${r.late} day${r.late === 1 ? '' : 's'} late${r.ac ? '' : ' so far'}</div>` : ''}${r.po && r.x.d.supplierId && (p.dropState[r.did] || {}).ptc ? ' <span class="dc-ptc">price to confirm</span>' : ''}</div>
+  const list = sorted.map(r => `<div class="mg-item${r.late ? ' late' : ''}"><div class="mg-i-main"><b>${r.po ? `${ltChip(`po:${r.po.id}`, r.po.ref)} · ` : ''}${escHtml(r.supplier)}</b>${r.hire ? ' <span class="dc-ptc">hire</span>' : ''}${r.po && r.x.d.supplierId ? '' : ''}<span class="rp-dim"> ${qm(r.value)}${r.x.items.length ? ' · ' + escHtml(r.x.items.slice(0, 3).join(', ')) + (r.x.items.length > 3 ? '…' : '') : ''}</span>${r.late ? `<div class="mg-flag">${r.late} day${r.late === 1 ? '' : 's'} late${r.ac ? '' : ' so far'}</div>` : ''}${r.po && r.x.d.supplierId && (p.dropState[r.did] || {}).ptc ? ' <span class="dc-ptc">price to confirm</span>' : ''}</div>
       <div class="mg-i-steps">${step('Ordered', r.ord, !!r.ord, !r.ord && r.pl && r.pl <= addDaysIso(today, 3))}${step('Delivery', r.ac || r.pl, !!r.ac, !r.ac && r.pl && r.pl <= today)}${step('Prices', r.conf ? (r.po.pc ? r.po.pc.date : '') : '', r.conf, !!r.ac && !r.conf)}</div>
       <div class="mg-i-act">${r.next ? `<button type="button" class="btn qb-sm" data-mg="${r.next}" data-pid="${p.id}" data-did="${escAttr(r.did)}">${MG_BTN[r.next]}</button>` : '<span class="pw-ok">✓ Complete</span>'}</div></div>`).join('');
   return `<div class="mg-wrap"><div class="rp-card"><div class="rp-card-h"><h4>Planned against actual delivery</h4>${canNew ? `<button type="button" class="btn secondary qb-sm" data-po2="open" data-pid="${p.id}">+ New order</button>` : ''}</div>${mgGraphHtml(R, today)}</div>
@@ -12134,9 +12155,9 @@ function renderSupInvoices(){
   el.innerHTML = `<div class="po-tools"><input type="search" id="siQ" placeholder="Search order, supplier, project or number" value="${escAttr(siUi.q)}" aria-label="Search supplier invoices" style="max-width:320px;"><select id="siSup" aria-label="Supplier"><option value="">All suppliers</option>${sups.map(n => `<option${siUi.sup === n ? ' selected' : ''}>${escHtml(n)}</option>`).join('')}</select><span class="qb-dim">${list.length} document${list.length === 1 ? '' : 's'} · ${qm(tot)}</span></div>
     <div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>Date</th><th>Supplier</th><th>Order</th><th>Project</th><th>Number</th><th>Total</th><th>Variance</th><th>File</th></tr></thead><tbody>${list.map(x => {
       const v = x.po && x.po.pc ? x.po.pc.variance : null;
-      return `<tr><td>${x.date ? escHtml(pwD(x.date)) : '—'}</td><td>${x.po && x.po.supplierId ? `<button type="button" class="sp-link" data-nav="supplier:${x.po.supplierId}">${escHtml(x.po.supplierName)}</button>` : escHtml(x.po ? x.po.supplierName : '—')}</td>
-        <td>${x.po ? `<button type="button" class="sp-link" data-nav="po:${x.po.id}">${escHtml(x.po.ref)}</button>` : '<span class="qb-dim">not on an order</span>'}${x.src === 'payment' ? '<div class="qb-dim" style="font-size:var(--bt-fs-xs);">with a supplier payment</div>' : ''}</td>
-        <td>${x.p ? `<button type="button" class="sp-link" data-nav="project:${x.p.id}:materials">${escHtml(recordCode(x.p.id, 'project'))}</button>` : '—'}</td><td>${escHtml(x.ref || '—')}</td><td class="qb-calc">${qm(x.total)}</td>
+      return `<tr><td>${x.date ? escHtml(pwD(x.date)) : '—'}</td><td>${x.po && x.po.supplierId ? `${ltChip(`supplier:${x.po.supplierId}`, x.po.supplierName)}` : escHtml(x.po ? x.po.supplierName : '—')}</td>
+        <td>${x.po ? `${ltChip(`po:${x.po.id}`, x.po.ref)}` : '<span class="qb-dim">not on an order</span>'}${x.src === 'payment' ? '<div class="qb-dim" style="font-size:var(--bt-fs-xs);">with a supplier payment</div>' : ''}</td>
+        <td>${x.p ? `${ltChip(`project:${x.p.id}:materials`, recordCode(x.p.id, 'project'))}` : '—'}</td><td>${escHtml(x.ref || '—')}</td><td class="qb-calc">${qm(x.total)}</td>
         <td>${v == null ? '<span class="qb-dim">prices not confirmed</span>' : (Math.abs(v) < 0.005 ? 'none' : `<b class="${v > 0 ? 'over' : 'under'}">${v > 0 ? '+' : '−'}${qm(Math.abs(v))}</b>`)}</td>
         <td>${x.file ? `<a href="${escAttr(x.file.data)}" target="_blank" rel="noopener" download="${escAttr(x.file.name)}">${escHtml(x.file.name)}</a>` : '<span class="qb-dim">no file</span>'}</td></tr>`; }).join('') || '<tr><td colspan="8"><div class="sup-empty">No supplier invoices yet. They appear here when you confirm prices after a delivery and attach the invoice or receipt.</div></td></tr>'}</tbody></table></div></div>`;
 }
@@ -12781,7 +12802,7 @@ function openTaskRecord(t){ const l = linkedInfos(t).find(i => i.d && !i.lost); 
 function linkSummaryHtml(o, attrs, cls){
   const infos = linkedInfos(o); if(!infos.length) return '';
   const i = infos[0], more = infos.length - 1;
-  return `<button class="link-btn${cls ? ' ' + cls : ''}${i.missing || i.lost ? ' dim' : ''}" ${attrs} title="${escAttr(linkedText(o))}">${escHtml(infoText(i))}</button>${more ? `<span class="tk-more-n" title="${escAttr(linkedText(o))}">+${more}</span>` : ''}`;
+  return ltChip(null, infoText(i), { attrs: `${attrs} title="${escAttr(linkedText(o))}"`, kind: /^P-/i.test(i.code) ? 'project' : 'deal', tone: i.missing || i.lost ? 'bad' : '', cls: cls || '' }) + (more ? `<span class="tk-more-n" title="${escAttr(linkedText(o))}">+${more}</span>` : '');
 }
 
 /* ---- users (owner dropdown): the app's logins when they can be read, else whoever is already known ---- */
@@ -12906,7 +12927,7 @@ function recTasksHtml(pl, rec, opts){
     return `<div class="tkr-row${fadingTasks.has(t.id) ? ' fade-row' : ''}">
       <div class="cbx${t.status === 'done' ? ' checked' : ''}" data-crm="tick" data-id="${t.id}" title="Mark done">${CHECK_SVG}</div>
       ${typeIcon(t.typeId)}
-      <button class="tkr-title" data-crm="open" data-id="${t.id}" title="${escAttr(t.title)}">${escHtml(t.title)}</button>
+      ${ltChip(null, t.title, { attrs: `data-crm="open" data-id="${t.id}" title="${escAttr(t.title)}"`, kind: 'task', cls: 'tkr-title' })}
       ${opts.compact ? '' : `<span class="tkr-code" title="${escAttr(linkedText(t))}">${escHtml(recLinks(t)[0] || '')}${recLinks(t).length > 1 ? ' +' + (recLinks(t).length - 1) : ''}</span>`}
       <span class="tkr-due${over ? ' over' : ''}">${t.dueDate ? fmtDisplay(toDate(t.dueDate)) : 'No date'}</span>
       ${prioPill(t.priorityId)}${chasedBtnHtml(t)}</div>`;
@@ -13208,7 +13229,7 @@ function refreshActionPanel(){ if(actionPanel) tkRefresh(); }
 function tkLinksHtml(){
   const infos = linkedInfos(tkObj()), refs = taskPanel ? (tkObj().refs || []) : [];
   return `<button type="button" class="tk-linkbtn" data-tk="pick-toggle" aria-expanded="${tkUi.pickOpen ? 'true' : 'false'}">Linked records (${infos.length + refs.length})${CHEV_SVG}</button>
-    <span class="tk-chips">${refs.map(r => { const i = refInfo(r); return `<span class="tk-chip${i.missing ? ' dim' : ''}"><button type="button" class="open" data-tk="ref-open" data-kind="${escAttr(r.kind)}" data-id="${escAttr(r.id)}" title="${escAttr(i.kind + ' · ' + i.name)}"><b>${escHtml(i.kind)}</b>${escHtml(i.name)}</button><button type="button" class="x" data-tk="ref-x" data-kind="${escAttr(r.kind)}" data-id="${escAttr(r.id)}" aria-label="Remove link to ${escAttr(i.name)}" title="Remove link">×</button></span>`; }).join('')}${infos.map(i => `<span class="tk-chip${i.missing || i.lost ? ' dim' : ''}"><button type="button" class="open" data-tk="chip-open" data-code="${escAttr(i.code)}" title="${escAttr(infoText(i))}"><b>${escHtml(i.code)}</b>${escHtml(i.name)}${i.lost ? ' (lost)' : ''}</button><button type="button" class="x" data-tk="chip-x" data-code="${escAttr(i.code)}" aria-label="Remove link to ${escAttr(i.code)}" title="Remove link">×</button></span>`).join('')}</span>`;
+    <span class="tk-chips">${refs.map(r => { const i = refInfo(r); return `<span class="tk-chip${i.missing ? ' dim' : ''}">${ltChip(null, i.kind + ' · ' + i.name, { attrs: `data-tk="ref-open" data-kind="${escAttr(r.kind)}" data-id="${escAttr(r.id)}" title="${escAttr(i.kind + ' · ' + i.name)}"`, kind: ltKindOf(r.kind), tone: i.missing ? 'bad' : '' })}<button type="button" class="x" data-tk="ref-x" data-kind="${escAttr(r.kind)}" data-id="${escAttr(r.id)}" aria-label="Remove link to ${escAttr(i.name)}" title="Remove link">×</button></span>`; }).join('')}${infos.map(i => `<span class="tk-chip${i.missing || i.lost ? ' dim' : ''}">${ltChip(null, i.code + (i.name ? ' · ' + i.name : '') + (i.lost ? ' (lost)' : ''), { attrs: `data-tk="chip-open" data-code="${escAttr(i.code)}" title="${escAttr(infoText(i))}"`, kind: /^P-/i.test(i.code) ? 'project' : 'deal', tone: i.missing || i.lost ? 'bad' : '' })}<button type="button" class="x" data-tk="chip-x" data-code="${escAttr(i.code)}" aria-label="Remove link to ${escAttr(i.code)}" title="Remove link">×</button></span>`).join('')}</span>`;
 }
 function tkPickRows(){
   const q = tkUi.pickQ.trim().toLowerCase();
@@ -13643,7 +13664,7 @@ function todayDatedSection(key, title, d, rowFn, emptyText){
 }
 function todayReadySection(list){
   return `<div class="td-head"><h3>Ready to turn into a job</h3><span class="n">${list.length}</span></div>
-    ${list.length ? list.map(q => `<div class="td-row" data-today="nav" data-spec="quote:${q.id}"><span class="td-title">${escHtml(qRef(q))} · ${escHtml(q.customer || '—')}${q.project ? `<span class="td-sub">${escHtml(q.project)}</span>` : ''}</span><span class="td-meta"><span>Accepted, no job yet</span><button type="button" class="link-btn" data-today="nav" data-spec="quote:${q.id}">Open quote</button></span></div>`).join('') : '<div class="td-empty">No accepted quotes are waiting for a job.</div>'}`;
+    ${list.length ? list.map(q => `<div class="td-row" data-today="nav" data-spec="quote:${q.id}"><span class="td-title">${escHtml(qRef(q))} · ${escHtml(q.customer || '—')}${q.project ? `<span class="td-sub">${escHtml(q.project)}</span>` : ''}</span><span class="td-meta"><span>Accepted, no job yet</span>${ltChip(null, qRef(q), { attrs: `data-today="nav" data-spec="quote:${q.id}"`, kind: 'quote' })}</span></div>`).join('') : '<div class="td-empty">No accepted quotes are waiting for a job.</div>'}`;
 }
 /* greeting: London time, first name from the login / who-picker */
 function londonHour(d){
@@ -14406,7 +14427,7 @@ function pjTableHtml(list){
   const head = `<thead><tr><th scope="col" class="pj-c-code">Code</th><th scope="col">Name</th><th scope="col" class="pj-c-cust">Customer</th><th scope="col">Stage</th><th scope="col">Status</th><th scope="col" class="pj-c-prog">In progress?</th><th scope="col" class="pj-r">Value</th><th scope="col" class="pj-c-owner">Owner</th><th scope="col">Next action</th><th scope="col" class="pj-r">Last touched</th></tr></thead>`;
   const rows = list.map(r => `<tr class="pj-row${r.done ? ' pj-done' : ''}" data-pj-row="${escAttr(r.key)}">
     <td class="pj-c-code"><span class="pj-code">${escHtml(r.code)}</span></td>
-    <td class="pj-name"><button type="button" class="pj-open" data-pj="open" data-key="${escAttr(r.key)}" data-pj-key="${escAttr(r.key)}">${escHtml(r.name)}</button><span class="pj-sub pj-sub-c">${r.customer === r.name ? '' : escHtml(r.customer)}</span><span class="pj-sub pj-sub-o">${[r.inProgress ? 'In progress' : '', r.owner ? 'Owner ' + escHtml(r.owner) : ''].filter(Boolean).join(' · ')}</span></td>
+    <td class="pj-name">${ltChip(null, r.name, { attrs: `data-pj="open" data-key="${escAttr(r.key)}" data-pj-key="${escAttr(r.key)}"`, kind: r.pl === 'project' ? 'project' : 'deal', cls: 'pj-open' })}<span class="pj-sub pj-sub-c">${r.customer === r.name ? '' : escHtml(r.customer)}</span><span class="pj-sub pj-sub-o">${[r.inProgress ? 'In progress' : '', r.owner ? 'Owner ' + escHtml(r.owner) : ''].filter(Boolean).join(' · ')}</span></td>
     <td class="pj-c-cust">${escHtml(r.customer) || '<span class="qb-dim">—</span>'}</td>
     <td>${pjStageChip(r)}${r.stageText ? `<span class="pj-sub">${escHtml(r.stageText)}</span>` : ''}</td>
     <td>${pjStChip(r.status)}${r.reasons.length ? `<span class="pj-sub">${escHtml(r.reasons.join(', '))}</span>` : ''}</td>
@@ -14473,7 +14494,7 @@ function pjRender(){
 }
 /* ---------- the side panel (full-screen sheet on a phone) ---------- */
 function pjStat(k, v, sub, cls){ return `<div class="pj-stat${cls ? ' ' + cls : ''}"><span class="k">${escHtml(k)}</span><span class="v">${v}</span>${sub ? `<span class="s">${sub}</span>` : ''}</div>`; }
-function pjLink(nav, text, sub){ return `<div class="pj-assoc"><button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(text)}</button>${sub ? `<span class="qb-dim">${sub}</span>` : ''}</div>`; }
+function pjLink(nav, text, sub){ return `<div class="pj-assoc">${ltChip(nav, text)}${sub ? `<span class="qb-dim">${sub}</span>` : ''}</div>`; }
 function pjSection(title, inner, n){ return `<section class="pj-sec"><h4>${escHtml(title)}${n !== undefined ? ` <span class="pj-n">${n}</span>` : ''}</h4>${inner}</section>`; }
 function pjHeadlineHtml(r){
   const today = fmt(new Date()), rec = r.rec, S = [];
@@ -14535,10 +14556,10 @@ function pjAssocHtml(r){
   out.push(pjSection('Contacts', cts.length ? cts.map(c => pjLink('contact:' + c.id, ctName(c), escHtml([ctPhone(c), ctEmail(c)].filter(Boolean).join(' · ')))).join('') : (rec.contact ? `<div class="pj-assoc">${escHtml(rec.contact)} <span class="qb-dim">(not linked to a contact record)</span></div>` : '<div class="lp-empty">None.</div>'), cts.length));
   // tasks and actions
   const openT = ctx.tasks.filter(t => t.status === 'open').sort((a, b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999')), doneT = ctx.tasks.length - openT.length, today = fmt(new Date());
-  out.push(pjSection('Tasks', (openT.length ? openT.slice(0, 8).map(t => `<div class="pj-assoc"><button type="button" class="sp-link" data-pj="task" data-id="${escAttr(t.id)}">${escHtml(t.title)}</button><span class="qb-dim${t.dueDate && t.dueDate < today ? ' pj-over' : ''}">${t.dueDate ? escHtml(dShow(t.dueDate)) : 'No date'}${t.owner ? ' · ' + escHtml(t.owner) : ''}</span></div>`).join('') + (openT.length > 8 ? `<div class="qb-dim">and ${openT.length - 8} more</div>` : '') : '<div class="lp-empty">No open tasks.</div>')
+  out.push(pjSection('Tasks', (openT.length ? openT.slice(0, 8).map(t => `<div class="pj-assoc">${ltChip(null, t.title, { attrs: `data-pj="task" data-id="${escAttr(t.id)}"`, kind: 'task' })}<span class="qb-dim${t.dueDate && t.dueDate < today ? ' pj-over' : ''}">${t.dueDate ? escHtml(dShow(t.dueDate)) : 'No date'}${t.owner ? ' · ' + escHtml(t.owner) : ''}</span></div>`).join('') + (openT.length > 8 ? `<div class="qb-dim">and ${openT.length - 8} more</div>` : '') : '<div class="lp-empty">No open tasks.</div>')
     + `<div class="pj-more"><button type="button" class="link-btn" data-pj="tasks-all" data-root="${root}">All tasks for this job${doneT ? ' (' + doneT + ' done)' : ''}</button></div>`, openT.length));
   const openA = ctx.actions.filter(a => a.status !== 'Done');
-  out.push(pjSection('Actions', openA.length ? openA.slice(0, 6).map(a => `<div class="pj-assoc"><button type="button" class="sp-link" data-pj="action" data-i="${state.actions.indexOf(a)}">${escHtml(a.action || 'Action')}</button><span class="qb-dim${a.deadline && a.deadline < today ? ' pj-over' : ''}">${a.deadline ? escHtml(dShow(a.deadline)) : 'No deadline'}${a.owner && a.owner !== 'TBC' ? ' · ' + escHtml(a.owner) : ''}</span></div>`).join('') : '<div class="lp-empty">No open actions.</div>', openA.length));
+  out.push(pjSection('Actions', openA.length ? openA.slice(0, 6).map(a => `<div class="pj-assoc">${ltChip(null, a.action || 'Action', { attrs: `data-pj="action" data-i="${state.actions.indexOf(a)}"`, kind: 'task' })}<span class="qb-dim${a.deadline && a.deadline < today ? ' pj-over' : ''}">${a.deadline ? escHtml(dShow(a.deadline)) : 'No deadline'}${a.owner && a.owner !== 'TBC' ? ' · ' + escHtml(a.owner) : ''}</span></div>`).join('') : '<div class="lp-empty">No open actions.</div>', openA.length));
   // money
   const qs = ctx.quotes.slice().sort((a, b) => b.version - a.version || b.id - a.id);
   out.push(pjSection('Quotes', qs.length ? qs.map(q => { let t = ''; try{ t = qm(qCalc(q).totalEx) + ' ex VAT'; }catch(e){} return pjLink('quote:' + q.id, qRef(q), `<span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span> ${escHtml(t)}`); }).join('') : '<div class="lp-empty">None.</div>', qs.length));
@@ -14546,7 +14567,7 @@ function pjAssocHtml(r){
   const pos = ctx.pos.slice().sort((a, b) => a.no - b.no);
   out.push(pjSection('Purchase orders', pos.length ? pos.map(po => pjLink('po:' + po.id, po.ref, escHtml(po.supplierName || '') + ' ' + poPill(po))).join('') : '<div class="lp-empty">None.</div>', pos.length));
   const supIds = [...new Set(pos.map(po => po.supplierId).concat((r.recs.project ? (r.deliveries || []).map(x => x.d.supplierId) : []).filter(Boolean)).filter(Boolean))].filter(id => supFind(id));
-  out.push(pjSection('Suppliers', supIds.length ? supIds.map(id => `<div class="pj-assoc"><button type="button" class="sp-link" data-pj="supplier" data-id="${escAttr(id)}">${escHtml(supFind(id).name || supCode(supFind(id)))}</button></div>`).join('') : '<div class="lp-empty">None.</div>', supIds.length));
+  out.push(pjSection('Suppliers', supIds.length ? supIds.map(id => `<div class="pj-assoc">${ltChip(null, supFind(id).name || supCode(supFind(id)), { attrs: `data-pj="supplier" data-id="${escAttr(id)}"`, kind: 'supplier' })}</div>`).join('') : '<div class="lp-empty">None.</div>', supIds.length));
   const tx = ctx.txns.map(t => ({ t, ix: state.transactions.indexOf(t) })).sort((a, b) => String(b.t.date || '').localeCompare(String(a.t.date || '')));
   out.push(pjSection('Transactions', tx.length ? tx.slice(0, 6).map(({ t, ix }) => pjLink('txn:' + (t.uid || ix), t.description || 'Transaction', escHtml(dShow(t.date)) + ' · ' + (Number(t.moneyIn) > 0 ? '+' + qm(t.moneyIn) : '−' + qm(t.moneyOut)))).join('') + (tx.length > 6 ? `<div class="qb-dim">and ${tx.length - 6} more on the Transactions page</div>` : '') : '<div class="lp-empty">None.</div>', tx.length));
   const as = (state.assetPlan || []).filter(a => Number(a.projectId) === root);
@@ -15999,6 +16020,42 @@ document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-nav]'); if(!b) return; e.preventDefault(); navOpen(b.dataset.nav);
 });
 
+/* ---------- link tiles: the ONE component for "this record links to that record" ----------
+   Two sizes: a full tile (name, one line of status or date, status pill or colour mark) for side panels and record-page sections, and a compact chip
+   (icon, name, status colour) for tables, lists, Today, activity cards and sentences. The whole tile is one button; it goes through data-nav (or the
+   page's own open handler passed as attrs), so the nav stack saves the way back first and Back returns to the same place.
+   lt({ nav | attrs, name, line, pill, tone, kind, size: 'full' | 'chip', title }). tone: ok | warn | bad (the colour mark); no tone = the record's own colour. */
+const LT_ICONS = {
+  project: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  contact: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  company: '<path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 9h5a1 1 0 0 1 1 1v11M8 8h2M8 12h2M8 16h2M3 21h18"/>',
+  supplier: '<path d="M2 6h12v10H2zM14 9h4l3 3v4h-7"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/>',
+  quote: '<path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/>',
+  order: '<path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/>',
+  invoice: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',
+  task: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5L16 9.5"/>',
+  deal: '<path d="M5 21V4M5 4h12l-2 4 2 4H5"/>',
+  asset: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z"/>',
+  txn: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>',
+  page: '<path d="M5 12h14M13 6l6 6-6 6"/>'
+};
+const LT_KIND = { project: 'project', quote: 'quote', po: 'order', order: 'order', supplier: 'supplier', contact: 'contact', company: 'company', deal2: 'deal', deal: 'deal', lead: 'deal', sales: 'deal', invoicing: 'invoice', invoice: 'invoice', iv: 'invoice', txn: 'txn', asset: 'asset', task: 'task' };
+function lt(o){
+  const kind = o.kind || LT_KIND[String(o.nav || '').split(':')[0]] || 'page', full = o.size === 'full', live = !!(o.nav || o.attrs);
+  const attrs = (o.nav ? ` data-nav="${escAttr(o.nav)}"` : '') + (o.attrs ? ' ' + o.attrs : '') + (o.title ? ` title="${escAttr(o.title)}"` : '');
+  const cls = `lt lt-${full ? 'full' : 'chip'} lt-k-${kind}${o.tone ? ' lt-' + o.tone : ''}${live ? '' : ' lt-static'}${o.cls ? ' ' + o.cls : ''}`;
+  const ic = `<svg class="lt-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${LT_ICONS[kind] || LT_ICONS.page}</svg>`;
+  const body = full
+    ? `${ic}<span class="lt-main"><b class="lt-n">${escHtml(o.name)}</b>${o.line ? `<span class="lt-line">${o.line}</span>` : ''}</span>${o.pill ? `<span class="lt-pill">${o.pill}</span>` : ''}`
+    : `${ic}<span class="lt-n">${escHtml(o.name)}</span>`;
+  return live ? `<button type="button" class="${cls}"${attrs}>${body}</button>` : `<span class="${cls}"${o.title ? ` title="${escAttr(o.title)}"` : ''}>${body}</span>`;
+}
+const ltKindOf = txt => { const k = String(txt || '').toLowerCase(); return LT_KIND[k] || (/^p-/.test(k) ? 'project' : /^[ls]-/.test(k) ? 'deal' : /purchase|order/.test(k) ? 'order' : 'page'); };
+const ltChip = (nav, name, o) => lt(Object.assign({ nav, name, size: 'chip' }, o));
+const ltTile = o => lt(Object.assign({ size: 'full' }, o));
+/* the dashed tile that ends a section: add or link another record (attrs = the data-* that make the existing handler run) */
+const ltAdd = (label, attrs, title) => `<button type="button" class="lt lt-full lt-add" ${attrs}${title ? ` title="${escAttr(title)}"` : ''}><span class="lt-plus" aria-hidden="true">+</span><span class="lt-n">${escHtml(label)}</span></button>`;
+
 /* BT:js-foundation begin */
 /* =====================================================================
    SHARED FOUNDATION: email + document templates, sendEmail(), the document renderer and the timeline helper.
@@ -16545,7 +16602,7 @@ function cxUnlinkFromRec(kind, rec, cid){
   rec.contactIds = (rec.contactIds || []).filter(x => x !== cid); cxAfterLinkChange('Contact unlinked from this record. What it showed stays as typed text.');
 }
 function cxMakePrimary(kind, rec, cid){ rec.contactIds = [cid].concat((rec.contactIds || []).filter(x => x !== cid)); cxAfterLinkChange('Primary contact changed.'); }
-function cxChip(c, o){ return `<span class="cx-chip${o && o.primary ? ' primary' : ''}"><button type="button" class="sp-link" data-nav="contact:${escAttr(c.id)}">${escHtml(ctName(c))}</button>${o && o.primary ? '<em>primary</em>' : ''}${[ctPhone(c), ctEmail(c)].filter(Boolean).length ? `<span class="qb-dim"> ${escHtml([ctPhone(c), ctEmail(c)].filter(Boolean).join(' · '))}</span>` : ''}${o && o.acts ? o.acts : ''}</span>`; }
+function cxChip(c, o){ return `<span class="cx-chip${o && o.primary ? ' primary' : ''}">${ltChip(`contact:${c.id}`, ctName(c))}${o && o.primary ? '<em>primary</em>' : ''}${[ctPhone(c), ctEmail(c)].filter(Boolean).length ? `<span class="qb-dim"> ${escHtml([ctPhone(c), ctEmail(c)].filter(Boolean).join(' · '))}</span>` : ''}${o && o.acts ? o.acts : ''}</span>`; }
 /* the "Customer" block shown on a lead, sale, project and quote: who the customer is, from Contacts */
 function cxCustomerHtml(kind, rec){
   const isQ = kind === 'quote', own = (rec.contactIds || []).filter(id => ctFind(id)), inherited = isQ && !own.length ? cxQuoteContactIds(rec).filter(id => ctFind(id)) : [], ids = own.length ? own : inherited, co = coFind(rec.companyId);
@@ -16555,7 +16612,7 @@ function cxCustomerHtml(kind, rec){
   return `<div class="cx-cust" data-cx-cust="${kind}:${escAttr(rec.id)}"><div class="cx-cust-h">Customer <span class="qb-dim">(from Contacts)</span></div>
     ${rows || (co ? '' : '<div class="cx-cust-none qb-dim">No contact linked yet. Pick one so the name, phone, email and address stay in one place.</div>')}
     ${inherited.length ? '<div class="q-help">Taken from the linked deal. Pick a contact here to give this quote its own.</div>' : ''}
-    ${co ? `<div class="cx-cust-row"><span class="cx-chip"><button type="button" class="sp-link" data-nav="company:${escAttr(co.id)}">${escHtml(co.name)}</button><em>company</em>${kind !== 'quote' || live ? `<button type="button" class="link-btn" data-cx="rec-unco" ${at}>Remove</button>` : ''}</span></div>` : ''}
+    ${co ? `<div class="cx-cust-row"><span class="cx-chip">${ltChip(`company:${co.id}`, co.name)}<em>company</em>${kind !== 'quote' || live ? `<button type="button" class="link-btn" data-cx="rec-unco" ${at}>Remove</button>` : ''}</span></div>` : ''}
     ${sentLine}
     ${live ? `<div class="cx-cust-acts"><button type="button" class="btn secondary qb-sm" data-cx="rec-pick" ${at}>${ids.length ? 'Change main contact' : 'Choose a contact'}</button>${ids.length ? `<button type="button" class="btn secondary qb-sm" data-cx="rec-add" ${at}>+ Another contact</button>` : ''}${co ? '' : `<button type="button" class="btn secondary qb-sm" data-cx="rec-co" ${at}>+ Company</button>`}</div>` : ''}</div>`;
 }
@@ -16601,7 +16658,7 @@ function cxFilteredContacts(){
 function cxListRowsHtml(){
   const list = cxFilteredContacts();
   const rows = list.map(({ c, s, st }) => `<tr class="cx-row" data-cx-row="${escAttr(c.id)}">
-    <td><button type="button" class="sp-link cx-name" data-nav="contact:${escAttr(c.id)}">${escHtml(ctName(c))}</button></td>
+    <td>${ltChip(`contact:${c.id}`, ctName(c), { cls: 'cx-name' })}</td>
     <td class="cx-hide-s">${escHtml(ctPhone(c))}</td><td class="cx-hide-s">${escHtml(ctEmail(c))}</td>
     <td class="cx-hide-m">${escHtml(cxCompanyNamesOf(c))}</td>
     <td>${cxStatusPill(st)} ${c.tags.filter(t => !(t === 'past' && st === 'past')).map(cxTagHtml).join(' ')}</td>
@@ -16629,7 +16686,7 @@ function cxContactsListHtml(){
 }
 function cxReportHtml(r){
   return `<div class="card cx-mig ok"><b>Contacts built from existing records</b> <span class="qb-dim">(${escHtml(dShow(state.cx.migratedAt))})</span><div class="cx-report">${[['Contacts created', r.contacts], ['Companies created', r.companies], ['Deals linked', r.deals], ['Quotes linked', r.quotes], ['Extra people from leads', r.extra], ['Records with no customer name (skipped)', r.skipped], ['Likely duplicates flagged', r.flagged]].map(([l, n]) => `<div><b>${n || 0}</b><span>${l}</span></div>`).join('')}</div>
-    ${(r.skippedList || []).length ? `<details class="cx-skipped"><summary>${r.skippedList.length} record${r.skippedList.length === 1 ? '' : 's'} had no customer name, so no contact was made. Open one to link a contact by hand.</summary>${r.skippedList.map(x => `<div><button type="button" class="sp-link" data-nav="deal2:${x.root}">${escHtml(x.code)}</button> ${escHtml(x.name)}</div>`).join('')}</details>` : ''}<div class="btn-row" style="margin:8px 0 0"><button type="button" class="btn secondary qb-sm" data-cx="dups">Review duplicates</button><button type="button" class="btn secondary qb-sm" data-cx="hide-report">Hide this summary</button></div></div>`;
+    ${(r.skippedList || []).length ? `<details class="cx-skipped"><summary>${r.skippedList.length} record${r.skippedList.length === 1 ? '' : 's'} had no customer name, so no contact was made. Open one to link a contact by hand.</summary>${r.skippedList.map(x => `<div>${ltChip(`deal2:${x.root}`, x.code)} ${escHtml(x.name)}</div>`).join('')}</details>` : ''}<div class="btn-row" style="margin:8px 0 0"><button type="button" class="btn secondary qb-sm" data-cx="dups">Review duplicates</button><button type="button" class="btn secondary qb-sm" data-cx="hide-report">Hide this summary</button></div></div>`;
 }
 
 /* ----- a contact's page ----- */
@@ -16649,11 +16706,11 @@ function cxContactDetailsHtml(c){
 function cxAssocHtml(c){
   const L = cxLinksOfContact(c.id);
   return `<div class="qb-sec-h"><h4>Linked contacts</h4><button type="button" class="btn secondary qb-sm" data-cx="link-contact" data-cid="${escAttr(c.id)}">+ Link a contact</button></div>
-    ${L.contacts.length ? L.contacts.map(x => `<div class="cx-assoc"><button type="button" class="sp-link" data-nav="contact:${escAttr(x.other.id)}">${escHtml(ctName(x.other))}</button><span class="qb-dim">${escHtml([ctPhone(x.other), ctEmail(x.other)].filter(Boolean).join(' · '))}</span>
+    ${L.contacts.length ? L.contacts.map(x => `<div class="cx-assoc">${ltChip(`contact:${x.other.id}`, ctName(x.other))}<span class="qb-dim">${escHtml([ctPhone(x.other), ctEmail(x.other)].filter(Boolean).join(' · '))}</span>
       <label class="cx-rel"><span class="qb-dim">is their</span><select data-cxrel="${escAttr(x.link.id)}" aria-label="Relationship">${CX_REL.map(r => `<option${x.link.label === r ? ' selected' : ''}>${r}</option>`).join('')}</select></label>${x.link.label === 'referrer' ? `<span class="qb-dim">(${escHtml(x.rel)})</span>` : ''}
       <button type="button" class="icon-btn" data-cx="unlink" data-lid="${escAttr(x.link.id)}" title="Unlink" aria-label="Unlink">${X_SVG}</button></div>`).join('') : '<div class="lp-empty">Not linked to anyone yet. Link partners, family or neighbours, for example Marcus and Helen Fairlie.</div>'}
     <div class="qb-sec-h" style="margin-top:14px;"><h4>Linked company</h4><button type="button" class="btn secondary qb-sm" data-cx="link-company" data-cid="${escAttr(c.id)}">+ Link a company</button></div>
-    ${L.companies.length ? L.companies.map(x => `<div class="cx-assoc"><button type="button" class="sp-link" data-nav="company:${escAttr(x.company.id)}">${escHtml(x.company.name)}</button><span class="qb-dim">${escHtml(x.company.type || '')}</span>
+    ${L.companies.length ? L.companies.map(x => `<div class="cx-assoc">${ltChip(`company:${x.company.id}`, x.company.name)}<span class="qb-dim">${escHtml(x.company.type || '')}</span>
       <label class="cx-rel"><span class="qb-dim">role</span><select data-cxrel="${escAttr(x.link.id)}" aria-label="Role">${CX_ROLES.map(r => `<option${x.link.label === r ? ' selected' : ''}>${r}</option>`).join('')}</select></label>
       <button type="button" class="icon-btn" data-cx="unlink" data-lid="${escAttr(x.link.id)}" title="Unlink" aria-label="Unlink">${X_SVG}</button></div>`).join('') : '<div class="lp-empty">No company. A contact does not need one.</div>'}`;
 }
@@ -16667,22 +16724,22 @@ function cxDealsHtml(sc, ownerKind, ownerId){
   const rows = sc.deals.slice().sort((a, b) => (b.live - a.live) || String(b.rec.createdAt || '').localeCompare(String(a.rec.createdAt || ''))).map(d => {
     const primary = ownerKind === 'contact' ? (d.rec.contactIds || [])[0] === ownerId : false;
     const val = d.pl === 'project' ? projContract(d.rec).value : d.pl === 'sales' ? Number(d.rec.quoteValue) || 0 : Number(d.rec.estValue) || 0;
-    return `<tr><td><button type="button" class="sp-link" data-nav="deal2:${d.root}">${escHtml(d.code)}</button></td><td>${escHtml(d.name)}${primary ? ' <span class="qb-flag ok">main contact</span>' : (ownerKind === 'contact' ? ' <span class="qb-dim">also linked</span>' : '')}</td><td>${d.pl === 'lead' ? 'Lead' : d.pl === 'sales' ? 'Sales' : 'Project'} · ${escHtml(d.stage)}</td>
+    return `<tr><td>${ltChip(`deal2:${d.root}`, d.code)}</td><td>${escHtml(d.name)}${primary ? ' <span class="qb-flag ok">main contact</span>' : (ownerKind === 'contact' ? ' <span class="qb-dim">also linked</span>' : '')}</td><td>${d.pl === 'lead' ? 'Lead' : d.pl === 'sales' ? 'Sales' : 'Project'} · ${escHtml(d.stage)}</td>
       <td><span class="cx-st cx-st-${d.live ? 'live' : d.completed ? 'past' : 'lost'}">${d.status}</span></td><td class="qb-calc">${val ? qm(val) : '—'}</td>${ownerKind === 'contact' ? `<td><button type="button" class="icon-btn" data-cx="deal-unlink" data-cid="${escAttr(ownerId)}" data-root="${d.root}" title="Unlink from this deal" aria-label="Unlink from this deal">${X_SVG}</button></td>` : '<td></td>'}</tr>`; }).join('');
   return `<div class="card"><div class="qb-sec-h"><h4>Deals <span class="qb-dim">(live and completed; lost ones stay here too)</span></h4>${ownerKind === 'contact' ? `<button type="button" class="btn secondary qb-sm" data-cx="link-deal" data-cid="${escAttr(ownerId)}">+ Link to a deal</button>` : ''}</div>
     <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Code</th><th>Deal</th><th>Pipeline · stage</th><th>Status</th><th>Value</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="6"><div class="sup-empty">No deals linked yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function cxQuotesHtml(sc){
-  const rows = sc.quotes.map(q => { const c = qCalc(q); return `<tr><td><button type="button" class="sp-link" data-nav="quote:${q.id}">${escHtml(qRef(q))}</button></td><td>${escHtml(q.project || '')}</td><td>v${q.version}</td><td><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span></td><td class="qb-calc">${qm(c.totalEx)}${qVatOn() ? `<div class="qb-dim">${qm(c.totalInc)} inc VAT</div>` : ''}</td><td>${escHtml(dShow(q.date))}</td></tr>`; }).join('');
+  const rows = sc.quotes.map(q => { const c = qCalc(q); return `<tr><td>${ltChip(`quote:${q.id}`, qRef(q))}</td><td>${escHtml(q.project || '')}</td><td>v${q.version}</td><td><span class="q-st q-st-${qStatusShown(q)}">${qStatusShown(q)}</span></td><td class="qb-calc">${qm(c.totalEx)}${qVatOn() ? `<div class="qb-dim">${qm(c.totalInc)} inc VAT</div>` : ''}</td><td>${escHtml(dShow(q.date))}</td></tr>`; }).join('');
   return `<div class="card"><div class="qb-sec-h"><h4>Quotes <span class="qb-dim">(every version)</span></h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Quote</th><th>Project</th><th>Version</th><th>Status</th><th>Total ex VAT</th><th>Date</th></tr></thead><tbody>${rows || '<tr><td colspan="6"><div class="sup-empty">No quotes yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function cxInvoicesHtml(sc){
-  const docs = sc.docs.slice().sort((a, b) => b.seq - a.seq).map(i => { const st = ivDisplayStatus(i); return `<tr><td><button type="button" class="sp-link" data-iv="open" data-id="${escAttr(i.id)}">${escHtml(i.number)}</button></td><td>${escHtml(i.desc || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(Math.abs(i.total))}</td><td>${invPill(st)}</td></tr>`; }).join('');
-  const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : r.uid))).map(r => `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${r.vid ? 'v' + r.vid : r.idx}">${escHtml(r.code)}</button></td><td>${escHtml(r.desc)}</td><td>${r.invoicedDate ? escHtml(dShow(r.invoicedDate)) : '—'}</td><td>${r.dueDate ? escHtml(dShow(r.dueDate)) : '—'}</td><td class="qb-calc">${qm(r.amount)}</td><td>${invPill(r.status)}</td></tr>`).join('');
+  const docs = sc.docs.slice().sort((a, b) => b.seq - a.seq).map(i => { const st = ivDisplayStatus(i); return `<tr><td>${ltChip(null, i.number, { attrs: `data-iv="open" data-id="${escAttr(i.id)}"`, kind: 'invoice' })}</td><td>${escHtml(i.desc || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(Math.abs(i.total))}</td><td>${invPill(st)}</td></tr>`; }).join('');
+  const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : r.uid))).map(r => `<tr><td>${ltChip(`invoicing:${r.pid}:${r.vid ? 'v' + r.vid : r.idx}`, r.code)}</td><td>${escHtml(r.desc)}</td><td>${r.invoicedDate ? escHtml(dShow(r.invoicedDate)) : '—'}</td><td>${r.dueDate ? escHtml(dShow(r.dueDate)) : '—'}</td><td class="qb-calc">${qm(r.amount)}</td><td>${invPill(r.status)}</td></tr>`).join('');
   return `<div class="card"><div class="qb-sec-h"><h4>Invoices <span class="qb-dim">(status colours as on the Customer invoices page${qVatOn() ? '; amounts inc VAT' : ''})</span></h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Invoice</th><th>For</th><th>Issued / sent</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${docs}${rest || ''}${docs || rest ? '' : '<tr><td colspan="6"><div class="sup-empty">No invoices yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function cxPaymentsHtml(sc){
-  const rows = sc.payments.map(({ t, ix }) => `<tr><td>${escHtml(dShow(t.date))}</td><td>${escHtml(t.description || '')}</td><td class="qb-calc">${qm(t.moneyIn)}</td><td><button type="button" class="sp-link" data-nav="txn:${escAttr(t.uid || ix)}">Open →</button></td></tr>`).join('');
+  const rows = sc.payments.map(({ t, ix }) => `<tr><td>${escHtml(dShow(t.date))}</td><td>${escHtml(t.description || '')}</td><td class="qb-calc">${qm(t.moneyIn)}</td><td>${ltChip(`txn:${t.uid || ix}`, 'Transaction')}</td></tr>`).join('');
   return `<div class="card"><div class="qb-sec-h"><h4>Payments received</h4><span class="qb-dim">${qm(sc.payments.reduce((a, x) => a + Number(x.t.moneyIn), 0))} in total</span></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="4"><div class="sup-empty">No payments received yet.</div></td></tr>'}</tbody></table></div></div>`;
 }
 /* the timeline: your own notes, plus what the system recorded on this person's deals, quotes and invoices */
@@ -16701,7 +16758,7 @@ function cxTimelineHtml(owner, sc, kind){
   const items = cxTimeline(owner, sc), at = `data-kind="${kind}" data-oid="${escAttr(owner.id)}"`;
   return `<div class="card"><div class="qb-sec-h"><h4>Timeline and notes</h4></div>
     <div class="lc-note-add" style="margin-bottom:10px;"><input type="date" id="cxNoteDate" value="${fmt(new Date())}" aria-label="Date"><input type="text" id="cxNoteText" placeholder="Add a note…" maxlength="400" aria-label="Note" autocomplete="off"><button type="button" class="btn" data-cx="note-add" ${at}>Add</button></div>
-    <div class="comms-scroll cx-tl">${items.length ? items.map(t => `<div class="comm-entry cx-tl-row"><span class="comm-date q-tl-d">${escHtml(dShow(t.date))}</span><span class="q-tl-n">${escHtml(t.text)}${t.by && t.mine ? ` <span class="qb-dim">· ${escHtml(t.by)}</span>` : ''}</span>${t.tag ? (t.nav ? `<button type="button" class="sp-link cx-tl-tag" data-nav="${escAttr(t.nav)}">${escHtml(t.tag)}</button>` : t.iv ? `<button type="button" class="sp-link cx-tl-tag" data-iv="open" data-id="${escAttr(t.iv)}">${escHtml(t.tag)}</button>` : `<span class="qb-dim cx-tl-tag">${escHtml(t.tag)}</span>`) : '<span></span>'}${t.mine && !t.auto ? `<button type="button" class="icon-btn" data-cx="note-del" ${at} data-nid="${escAttr(t.id)}" title="Delete note" aria-label="Delete note">${X_SVG}</button>` : '<span></span>'}</div>`).join('') : '<div class="lp-empty">Nothing yet.</div>'}</div></div>`;
+    <div class="comms-scroll cx-tl">${items.length ? items.map(t => `<div class="comm-entry cx-tl-row"><span class="comm-date q-tl-d">${escHtml(dShow(t.date))}</span><span class="q-tl-n">${escHtml(t.text)}${t.by && t.mine ? ` <span class="qb-dim">· ${escHtml(t.by)}</span>` : ''}</span>${t.tag ? (t.nav ? `${ltChip(t.nav, t.tag, { cls: 'cx-tl-tag' })}` : t.iv ? `${ltChip(null, t.tag, { attrs: `data-iv="open" data-id="${escAttr(t.iv)}"`, kind: 'invoice', cls: 'cx-tl-tag' })}` : `<span class="qb-dim cx-tl-tag">${escHtml(t.tag)}</span>`) : '<span></span>'}${t.mine && !t.auto ? `<button type="button" class="icon-btn" data-cx="note-del" ${at} data-nid="${escAttr(t.id)}" title="Delete note" aria-label="Delete note">${X_SVG}</button>` : '<span></span>'}</div>`).join('') : '<div class="lp-empty">Nothing yet.</div>'}</div></div>`;
 }
 function cxContactProfileHtml(c){ return rcContactPage(c); }
 
@@ -16717,7 +16774,7 @@ function cxFilteredCompanies(){
 }
 function cxCompaniesListHtml(){
   const list = cxFilteredCompanies();
-  const rows = list.map(x => `<tr class="cx-row"><td><button type="button" class="sp-link cx-name" data-nav="company:${escAttr(x.co.id)}">${escHtml(cxCompanyName(x.co))}</button></td><td>${escHtml(x.co.type || '')}</td><td class="cx-hide-s">${lcPillHtml(lcOf('company', x.co))}</td><td class="cx-hide-s">${escHtml(x.co.postcode)}</td><td>${x.people.length}</td><td class="cx-hide-m">${x.deals.filter(d => d.live).length}/${x.deals.length}</td><td class="qb-calc cx-hide-s">${x.won ? qm(x.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
+  const rows = list.map(x => `<tr class="cx-row"><td>${ltChip(`company:${x.co.id}`, cxCompanyName(x.co), { cls: 'cx-name' })}</td><td>${escHtml(x.co.type || '')}</td><td class="cx-hide-s">${lcPillHtml(lcOf('company', x.co))}</td><td class="cx-hide-s">${escHtml(x.co.postcode)}</td><td>${x.people.length}</td><td class="cx-hide-m">${x.deals.filter(d => d.live).length}/${x.deals.length}</td><td class="qb-calc cx-hide-s">${x.won ? qm(x.won) : '<span class="qb-dim">—</span>'}</td></tr>`).join('');
   return `<div class="page-head crm-head"><div><h2>Companies</h2><div class="desc">Businesses and organisations your customers belong to. A company can have several contacts, and its deals, quotes and invoices roll up here.</div></div><div class="pg-actions"><button type="button" class="btn" data-cx="new-company">+ New company</button></div></div>
     <div class="pj-strip pg-strip" data-pgs="companies"></div>
     <div class="card cx-quick"><div class="qb-sec-h"><h4>Quick add</h4></div><form class="cx-qa" data-cx-form="quickco"><input data-cxqa="name" placeholder="Company name" aria-label="Company name" autocomplete="off"><select data-cxqa="type" aria-label="Type">${CX_CO_TYPES.map(t => `<option>${t}</option>`).join('')}</select><input data-cxqa="postcode" placeholder="Postcode" aria-label="Postcode" autocomplete="off"><button type="submit" class="btn">Add</button></form></div>
@@ -16790,7 +16847,7 @@ function cxDupPairs(){
 }
 function cxDupCardHtml(p){
   const side = c => { const d = cxDealsOfContact(c.id), q = cxQuotesOfContacts([c.id], d).length;
-    return `<div class="cx-dup-side"><b><button type="button" class="sp-link" data-nav="contact:${escAttr(c.id)}">${escHtml(ctName(c))}</button></b>
+    return `<div class="cx-dup-side"><b>${ltChip(`contact:${c.id}`, ctName(c))}</b>
       <div class="qb-dim">${[ctPhone(c), ctEmail(c)].filter(Boolean).map(escHtml).join(' · ') || 'no phone or email'}</div><div class="qb-dim">${escHtml(c.addresses.map(a => [a.v.replace(/\n/g, ', '), a.postcode].filter(Boolean).join(' ')).join(' | ') || 'no address')}</div>
       <div class="qb-dim">${d.length} deal${d.length === 1 ? '' : 's'} · ${q} quote${q === 1 ? '' : 's'} · created ${escHtml(dShow(c.created))}${c.source ? ' · ' + escHtml(c.source) : ''}</div></div>`; };
   return `<div class="card cx-dup${cxUi.dupFlash === p.key ? ' inv-flash' : ''}" data-dup="${escAttr(p.key)}"><div class="cx-dup-why">${p.reasons.map(r => `<span class="qb-flag ${CX_DUP_W[r] > 1 ? 'bad' : ''}">${CX_DUP_WORDS[r]}</span>`).join(' ')}${p.reasons.length === 1 && p.reasons[0] === 'postcode' ? ' <span class="qb-dim">(could be a household: keep separate and link them)</span>' : ''}</div>
@@ -16851,7 +16908,7 @@ function cxUndoApply(x){   // called from undoApplyExtra for merges and deletes
 async function cxDeleteContact(c){
   const deals = cxDealsOfContact(c.id), live = deals.filter(d => d.live);
   if(live.length){
-    btModal('Cannot delete yet', `<p><b>${escHtml(ctName(c))}</b> still has ${live.length} live deal${live.length === 1 ? '' : 's'}. A contact cannot be deleted while a deal is open. Finish, lose or unlink these first:</p><ul>${live.map(d => `<li><button type="button" class="sp-link" data-nav="deal2:${d.root}" data-bt="close">${escHtml(d.code + ' · ' + d.name)}</button> <span class="qb-dim">${escHtml(d.stage)}</span></li>`).join('')}</ul>`, { narrow: true }); return;
+    btModal('Cannot delete yet', `<p><b>${escHtml(ctName(c))}</b> still has ${live.length} live deal${live.length === 1 ? '' : 's'}. A contact cannot be deleted while a deal is open. Finish, lose or unlink these first:</p><ul>${live.map(d => `<li>${ltChip(`deal2:${d.root}`, d.code + ' · ' + d.name, { attrs: `data-bt="close"` })} <span class="qb-dim">${escHtml(d.stage)}</span></li>`).join('')}</ul>`, { narrow: true }); return;
   }
   const nq = cxQuotesOfContacts([c.id], deals).length;
   if(!(await showConfirm('Delete this contact?', `${ctName(c)} is linked to ${deals.length} completed or lost deal${deals.length === 1 ? '' : 's'} and ${nq} quote${nq === 1 ? '' : 's'}. Deleting removes the contact and its links. Quotes and invoices that have already gone out keep their own frozen name and address. You can undo this from Undo history for 24 hours.`))) return;
@@ -17466,7 +17523,7 @@ function rfqRenderToday(){
   const over = list.filter(x => x.r.replyBy < today).length;
   const badge = document.getElementById('todayBadge'); if(badge && list.length){ const cur = Number(badge.textContent) || 0; badge.textContent = cur + list.length; badge.hidden = false; if(over) badge.classList.add('over'); }
   const sum = document.getElementById('todaySummary'); if(sum && list.length) sum.textContent += ', ' + list.length + ' supplier ' + (list.length === 1 ? 'quote' : 'quotes') + ' chased';
-  el.innerHTML = list.length ? `<div class="td-head"><h3>Supplier quotes awaiting a reply</h3><span class="n">${list.length}</span></div>${list.map(({ q, r }) => `<div class="td-row"><span class="td-title">${escHtml(r.number)} · ${escHtml(rfqSupplierName(r.supplierId))} <span class="qb-dim">for ${escHtml(r.ref)}</span></span><span class="td-meta"><span class="${r.replyBy < today ? 'td-due' : ''}">${r.replyBy < today ? 'Reply was due ' : 'Reply due '}${escHtml(fmtDisplay(toDate(r.replyBy)))}</span><button type="button" class="link-btn" data-nav="quote:${q.id}">Open quote ${escHtml(qRef(q))}</button><button type="button" class="link-btn" data-rf="today-received" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Mark received</button><button type="button" class="link-btn" data-rf="today-email" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Chase by email</button></span></div>`).join('')}` : '';
+  el.innerHTML = list.length ? `<div class="td-head"><h3>Supplier quotes awaiting a reply</h3><span class="n">${list.length}</span></div>${list.map(({ q, r }) => `<div class="td-row"><span class="td-title">${escHtml(r.number)} · ${escHtml(rfqSupplierName(r.supplierId))} <span class="qb-dim">for ${escHtml(r.ref)}</span></span><span class="td-meta"><span class="${r.replyBy < today ? 'td-due' : ''}">${r.replyBy < today ? 'Reply was due ' : 'Reply due '}${escHtml(fmtDisplay(toDate(r.replyBy)))}</span>${ltChip(`quote:${q.id}`, qRef(q))}<button type="button" class="link-btn" data-rf="today-received" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Mark received</button><button type="button" class="link-btn" data-rf="today-email" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Chase by email</button></span></div>`).join('')}` : '';
   el.hidden = !list.length;
 }
 (function(){ const o = renderToday; renderToday = function(){ const r = o.apply(this, arguments); try{ rfqRenderToday(); }catch(e){} return r; }; })();
@@ -17656,11 +17713,11 @@ function ivView(id){
   const replaced = inv.replacedBy ? ivFind(inv.replacedBy) : null, replaces = inv.replaces ? ivFind(inv.replaces) : null;
   btModal(`${credit ? 'Credit note' : 'Invoice'} ${inv.number}`, `<div class="iv-two"><div>
       <div class="fin-var"><b>${qm(inv.total)}</b>${inv.vatOn ? ` <span class="qb-dim">inc ${qm(inv.vat)} VAT</span>` : ''} · ${invPill(st)}</div>
-      <div class="q-help" style="margin:6px 0">${escHtml(inv.customer.name || '')} · issued ${escHtml(dShow(inv.issueDate))}${credit ? '' : ' · due ' + escHtml(dShow(inv.dueDate))}${inv.sentDate ? ' · sent ' + escHtml(dShow(inv.sentDate)) + (inv.sentTo ? ' to ' + escHtml(inv.sentTo) : '') : ''}<br>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:money" data-bt="close">${escHtml(recordCode(p.id, 'project') + ' ' + p.name)}</button>` : ''}${inv.customer.contactId && ctFind(inv.customer.contactId) ? ` · <button type="button" class="sp-link" data-nav="contact:${escAttr(inv.customer.contactId)}" data-bt="close">${escHtml(ctName(ctFind(inv.customer.contactId)))}</button>` : ''}</div>
-      ${inv.status === 'Void' ? `<div class="pw-qbar pw-alert-bar">Voided ${escHtml(dShow(inv.voidedAt))} by ${escHtml(inv.voidedBy || '')}: ${escHtml(inv.voidReason || '')}.${replaced ? ` Replaced by <button type="button" class="sp-link" data-iv="open" data-id="${escAttr(replaced.id)}">${escHtml(replaced.number)}</button>.` : ''}</div>` : ''}
-      ${inv.creditedBy && ivFind(inv.creditedBy) ? `<div class="pw-qbar pw-alert-bar">Credited by <button type="button" class="sp-link" data-iv="open" data-id="${escAttr(inv.creditedBy)}">${escHtml(ivFind(inv.creditedBy).number)}</button>.</div>` : ''}
-      ${replaces ? `<div class="q-help">Replaces <button type="button" class="sp-link" data-iv="open" data-id="${escAttr(replaces.id)}">${escHtml(replaces.number)}</button>.</div>` : ''}
-      ${credit && ivFind(inv.creditFor) ? `<div class="q-help">Credits <button type="button" class="sp-link" data-iv="open" data-id="${escAttr(inv.creditFor)}">${escHtml(ivFind(inv.creditFor).number)}</button>.</div>` : ''}
+      <div class="q-help" style="margin:6px 0">${escHtml(inv.customer.name || '')} · issued ${escHtml(dShow(inv.issueDate))}${credit ? '' : ' · due ' + escHtml(dShow(inv.dueDate))}${inv.sentDate ? ' · sent ' + escHtml(dShow(inv.sentDate)) + (inv.sentTo ? ' to ' + escHtml(inv.sentTo) : '') : ''}<br>${p ? `${ltChip(`project:${p.id}:money`, recordCode(p.id, 'project') + ' ' + p.name, { attrs: `data-bt="close"` })}` : ''}${inv.customer.contactId && ctFind(inv.customer.contactId) ? ` · ${ltChip(`contact:${inv.customer.contactId}`, ctName(ctFind(inv.customer.contactId)), { attrs: `data-bt="close"` })}` : ''}</div>
+      ${inv.status === 'Void' ? `<div class="pw-qbar pw-alert-bar">Voided ${escHtml(dShow(inv.voidedAt))} by ${escHtml(inv.voidedBy || '')}: ${escHtml(inv.voidReason || '')}.${replaced ? ` Replaced by ${ltChip(null, replaced.number, { attrs: `data-iv="open" data-id="${escAttr(replaced.id)}"`, kind: 'invoice' })}.` : ''}</div>` : ''}
+      ${inv.creditedBy && ivFind(inv.creditedBy) ? `<div class="pw-qbar pw-alert-bar">Credited by ${ltChip(null, ivFind(inv.creditedBy).number, { attrs: `data-iv="open" data-id="${escAttr(inv.creditedBy)}"`, kind: 'invoice' })}.</div>` : ''}
+      ${replaces ? `<div class="q-help">Replaces ${ltChip(null, replaces.number, { attrs: `data-iv="open" data-id="${escAttr(replaces.id)}"`, kind: 'invoice' })}.</div>` : ''}
+      ${credit && ivFind(inv.creditFor) ? `<div class="q-help">Credits ${ltChip(null, ivFind(inv.creditFor).number, { attrs: `data-iv="open" data-id="${escAttr(inv.creditFor)}"`, kind: 'invoice' })}.</div>` : ''}
       <div class="iv-acts"><button type="button" class="btn secondary qb-sm" data-iv="pdf" ${at}>Download PDF</button><button type="button" class="btn secondary qb-sm" data-iv="print" ${at}>Print</button>
         ${live ? `<button type="button" class="btn qb-sm" data-iv="send" ${at}>Send…</button>` : ''}${live && inv.status === 'Issued' ? `<button type="button" class="btn secondary qb-sm" data-iv="marksent" ${at}>Mark as sent</button>` : ''}
         ${live && od ? `<button type="button" class="btn secondary qb-sm" data-iv="reminder" ${at}>Create reminder</button>` : ''}
@@ -17752,7 +17809,7 @@ function ivRowsHtml(rows){
 }
 function ivDocsHtml(){
   const docs = (state.invoices || []).slice().sort((a, b) => b.createdAt - a.createdAt || b.seq - a.seq);
-  return `<div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>Number</th><th>Customer</th><th>Project</th><th>Issued</th><th>Due</th><th>Total</th><th>Status</th></tr></thead><tbody>${docs.map(i => `<tr><td><button type="button" class="sp-link" data-iv="open" data-id="${escAttr(i.id)}">${escHtml(i.number)}</button></td><td>${escHtml(i.customer.name || '')}</td><td>${escHtml(i.projectRef || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(i.total)}</td><td>${invPill(ivDisplayStatus(i))}</td></tr>`).join('') || '<tr><td colspan="7"><div class="sup-empty">No invoices made in the tracker yet. Use “Create invoice” on a pending line.</div></td></tr>'}</tbody></table></div></div>`;
+  return `<div class="card"><div class="qb-scroll"><table class="qb-table inv-table"><thead><tr><th>Number</th><th>Customer</th><th>Project</th><th>Issued</th><th>Due</th><th>Total</th><th>Status</th></tr></thead><tbody>${docs.map(i => `<tr><td>${ltChip(null, i.number, { attrs: `data-iv="open" data-id="${escAttr(i.id)}"`, kind: 'invoice' })}</td><td>${escHtml(i.customer.name || '')}</td><td>${escHtml(i.projectRef || '')}</td><td>${escHtml(dShow(i.issueDate))}</td><td>${i.dueDate ? escHtml(dShow(i.dueDate)) : '—'}</td><td class="qb-calc">${i.kind === 'credit' ? '−' : ''}${qm(i.total)}</td><td>${invPill(ivDisplayStatus(i))}</td></tr>`).join('') || '<tr><td colspan="7"><div class="sup-empty">No invoices made in the tracker yet. Use “Create invoice” on a pending line.</div></td></tr>'}</tbody></table></div></div>`;
 }
 /* BT:js-invoice end */
 /* BT:js-liverefresh begin */
@@ -17997,7 +18054,7 @@ function rpLeftHtml(p){
   const cu = projCustomer(p), aq = projAcceptedQuote(p), ct = projContract(p), mg = projMargin(p), h = projHours(p), nm = rpNextStage(p), st = rpStatus(p), money = rpMoney(p), code = recordCode(p.id, 'project'), sold = projContractAgreed(p);
   const sub = [code, aq ? qRef(aq) : '', cu.name || cu.company].filter(Boolean).join(' · ');
   const d = rpDraft(p);
-  const quoteLink = ct.q ? `<button type="button" class="sp-link" data-qba="open-quote" data-id="${ct.q.id}">${escHtml(qRef(ct.q))}</button>` : '';
+  const quoteLink = ct.q ? `${ltChip(null, qRef(ct.q), { attrs: `data-qba="open-quote" data-id="${ct.q.id}"`, kind: 'quote' })}` : '';
   const sources = [...new Set(state.leads.concat(state.projects).map(r => r.source).filter(Boolean))];
   const owners = apTeam(), ownerOpts = [['', 'Not set']].concat((p.owner && !owners.includes(p.owner) ? [p.owner] : []).concat(owners).map(n => [n, n]));
   const stageOpts = PROJ_STAGE6.map(([id, name]) => [id, name]);
@@ -18028,11 +18085,11 @@ function rpLeftHtml(p){
     <div class="rp-three"><div class="rp-ro"><small>Billed</small><b>${qm(money.billed)}</b></div><div class="rp-ro"><small>Paid</small><b>${qm(money.paid)}</b></div><div class="rp-ro${money.overdue ? ' rp-bad' : ''}"><small>Overdue</small><b>${qm(money.overdue)}</b></div></div>
     <div class="rp-hint">Read-only, from the invoice schedule. <button type="button" class="sp-link" data-rp="legacy" data-sec="money">Open the schedule</button></div>`;
   const lc = (p.contactIds || []).map(ctFind).filter(Boolean), lco = coFind(p.companyId), lc0 = lc[0] || null;
-  const cLink = lc0 ? `Edit in the contact record: <button type="button" class="sp-link" data-nav="contact:${escAttr(lc0.id)}">${escHtml(ctName(lc0))}</button>` : '';
+  const cLink = lc0 ? `Edit in the contact record: ${ltChip(`contact:${lc0.id}`, ctName(lc0))}` : '';
   const cust = lc0
     ? `<div class="rp-custhead"><span class="rp-av sm" aria-hidden="true">${escHtml(rpInitials(ctName(lc0)))}</span><span class="rp-custname">${escHtml(ctName(lc0))}</span></div>
-    ${rpRO('Contact', `<button type="button" class="sp-link" data-nav="contact:${escAttr(lc0.id)}">${escHtml(ctName(lc0))}</button>${lc.length > 1 ? ` <span class="rp-dim">+${lc.length - 1} more</span>` : ''}`, 'Linked contact. Change who it is with Edit under Linked records.')}
-    ${rpRO('Company', lco ? `<button type="button" class="sp-link" data-nav="company:${escAttr(lco.id)}">${escHtml(lco.name)}</button>` : escHtml(rpVal(p, 'company')), lco ? 'Linked company' : cLink)}
+    ${rpRO('Contact', `${ltChip(`contact:${lc0.id}`, ctName(lc0))}${lc.length > 1 ? ` <span class="rp-dim">+${lc.length - 1} more</span>` : ''}`, 'Linked contact. Change who it is with Edit under Linked records.')}
+    ${rpRO('Company', lco ? `${ltChip(`company:${lco.id}`, lco.name)}` : escHtml(rpVal(p, 'company')), lco ? 'Linked company' : cLink)}
     ${rpRO('Phone', ctPhone(lc0) ? `<a href="tel:${escAttr(ctPhone(lc0).replace(/\s+/g, ''))}">${escHtml(ctPhone(lc0))}</a>` : '', cLink)}
     ${rpRO('Email', ctEmail(lc0) ? `<a href="mailto:${escAttr(ctEmail(lc0))}">${escHtml(ctEmail(lc0))}</a>` : '', cLink)}`
     : `<div class="rp-custhead"><span class="rp-av sm" aria-hidden="true">${escHtml(rpInitials(rpVal(p, 'contact') || rpVal(p, 'company')))}</span><span class="rp-custname">${escHtml(rpVal(p, 'contact') || rpVal(p, 'company') || 'No customer recorded')}</span></div>
@@ -18154,7 +18211,7 @@ function rpOutstanding(p){
   });
   recordTasks(p).forEach(t => { if(t.dueDate && t.dueDate <= today) us.push({ t: t.title, s: 'Task · ' + (t.dueDate < today ? 'overdue, ' + pwRel(t.dueDate) : 'due today') + (t.owner ? ' · ' + t.owner : ''), over: t.dueDate < today, task: t.id }); });
   (p.variations || []).filter(v => v.status === 'Proposed').forEach(v => them.push({ t: v.ref + ' · ' + (v.desc || 'Variation'), s: 'Customer approval · ' + qm(v.price) }));
-  const row = x => `<li class="${x.over ? 'over' : ''}">${x.task ? `<button type="button" class="sp-link" data-crm="open" data-id="${escAttr(x.task)}">${escHtml(x.t)}</button>` : escHtml(x.t)}<span>${escHtml(x.s)}</span></li>`;
+  const row = x => `<li class="${x.over ? 'over' : ''}">${x.task ? `${ltChip(null, x.t, { attrs: `data-crm="open" data-id="${escAttr(x.task)}"`, kind: 'task' })}` : escHtml(x.t)}<span>${escHtml(x.s)}</span></li>`;
   const col = (h, l, none) => `<div class="rp-out-c"><h5>${h}${l.length ? ` <span class="db-count">${l.length}</span>` : ''}</h5>${l.length ? `<ul>${l.slice(0, 8).map(row).join('')}</ul>` : `<div class="pw-ok-big">✓ ${none}</div>`}</div>`;
   return `<div class="rp-card"><h4>Outstanding</h4><div class="rp-out">${col('Waiting on us', us, 'Nothing waiting on us')}${col('Waiting on others', them, 'Nothing waiting on others')}</div></div>`;
 }
@@ -18173,7 +18230,7 @@ function rpSuppliers(p){
 }
 function rpSuppliersTile(p){
   const L = rpSuppliers(p);
-  const row = s => `<div class="rp-row"><span>${s.id ? `<button type="button" class="sp-link" data-nav="supplier:${s.id}">${escHtml(s.name)}</button>` : escHtml(s.name)}${s.hire ? ' <span class="dc-ptc">hire</span>' : ''}</span><span class="rp-dim">${qm(s.out)} · ${s.delivered ? 'delivered' : s.date ? escHtml(pwD(s.date)) : 'no date'}</span></div>`;
+  const row = s => `<div class="rp-row"><span>${s.id ? `${ltChip(`supplier:${s.id}`, s.name)}` : escHtml(s.name)}${s.hire ? ' <span class="dc-ptc">hire</span>' : ''}</span><span class="rp-dim">${qm(s.out)} · ${s.delivered ? 'delivered' : s.date ? escHtml(pwD(s.date)) : 'no date'}</span></div>`;
   return `<div class="rp-card"><h4>Suppliers</h4>${L.length ? L.map(row).join('') : '<div class="pw-empty">No supplier drops on the quote yet.</div>'}</div>`;
 }
 function rpInvoicesTile(p){
@@ -18283,23 +18340,27 @@ document.addEventListener('click', (e) => {
   if(a === 'q-time'){ if(!(p.stages || []).length){ showToast('Add a stage line in the Plan tab first, then log time against it'); rpGoTab('plan'); return; } pwQuickOpen('time'); return; }
   if(a === 'q-customer'){ pwQuickOpen('customer'); return; }
   if(a === 'q-task'){ openNewTask(recordCode(p.id, 'project')); return; }
+  if(a === 'q-newquote'){ pwNewQuoteFor(p); return; }
   if(a === 'bar-save'){ rpSave(p); return; }
   if(a === 'bar-cancel'){ rpCancel(p); return; }
   if(a === 'bar-confirm' || a === 'bar-tentative'){ rpBeginSchedule(p, a === 'bar-tentative' ? 'tentative' : 'confirm'); return; }
 });
 
 /* ---- linked records: a view over links that already exist (deal ids, quote links, POs, invoice rows, contact links). Nothing is copied. ---- */
-const rpLrow = (nav, name, meta) => `<div class="rp-lrow">${nav ? `<button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(name)}</button>` : `<span>${escHtml(name)}</span>`}<span class="rp-lmeta">${meta || ''}</span></div>`;
-function rpTile(title, rows, empty, tools){
-  return `<section class="rp-tile"><div class="rp-tile-h"><h4>${title}${rows.length ? ` <span class="db-count">${rows.length}</span>` : ''}</h4>${tools || ''}</div>${rows.length ? rows.join('') : `<div class="rp-lempty">${empty}</div>`}</section>`;
+const rpLrow = (nav, name, line, o) => ltTile(Object.assign({ nav, name, line }, o));
+/* a section of linked records: every record as a full tile, then the dashed Add / Link tile; tools = small buttons beside the heading */
+function rpTile(title, rows, empty, tools, add){
+  return `<section class="rp-tile"><div class="rp-tile-h"><h4>${title}${rows.length ? ` <span class="db-count">${rows.length}</span>` : ''}</h4>${tools || ''}</div>${rows.length ? rows.join('') : `<div class="rp-lempty">${empty}</div>`}${add || ''}</section>`;
 }
 const rpQPill = q => `<span class="q-st q-st-${qStatusShown(q)}">${escHtml(qStatusShown(q))}</span>`;
-function rpQuoteRows(quotes){ return quotes.map(q => rpLrow('quote:' + q.id, qRef(q) + ' v' + q.version, `${rpQPill(q)} ${rpM(qCalc(q).totalEx)}`)); }
-function rpOrderRows(pos){ return pos.map(o => rpLrow('po:' + o.id, o.ref, `${poPill(o)}${o.deliveryDate ? ' · ' + escHtml(pwD(o.deliveryDate)) : ''}`)); }
+const ltQuoteTone = q => { const s = qStatusShown(q); return /accept/i.test(s) ? 'ok' : /reject|declin|lost|expired/i.test(s) ? 'bad' : /sent|chas/i.test(s) ? 'warn' : ''; };
+function rpQuoteRows(quotes){ return quotes.map(q => rpLrow('quote:' + q.id, qRef(q) + ' v' + q.version, rpM(qCalc(q).totalEx), { pill: rpQPill(q), tone: ltQuoteTone(q) })); }
+function rpOrderRows(pos){ return pos.map(o => rpLrow('po:' + o.id, o.ref, o.deliveryDate ? 'delivery ' + escHtml(pwD(o.deliveryDate)) : '', { pill: poPill(o) })); }
 /* invoice rows (the schedule's lines) and issued documents, as the Invoicing page shows them */
+const ltInvTone = st => /paid|settled/i.test(st) ? 'ok' : /overdue|late|lost|written/i.test(st) ? 'bad' : /sent|part/i.test(st) ? 'warn' : '';
 function rpInvoiceRows(sc){
-  const docs = sc.docs.filter(i => i.status !== 'Void').slice().sort((a, b) => b.seq - a.seq).map(i => rpLrow('invoicing:' + i.pid + ':' + i.key, i.number, `${invPill(ivDisplayStatus(i))} ${rpM(Math.abs(i.total))}${i.dueDate ? ' · ' + escHtml(pwD(i.dueDate)) : ''}`));
-  const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : r.uid))).map(r => rpLrow('invoicing:' + r.pid + ':' + (r.vid ? 'v' + r.vid : r.idx), r.desc, `${invPill(r.status)} ${rpM(r.amount)}${r.dueDate ? ' · ' + escHtml(pwD(r.dueDate)) : ''}`));
+  const docs = sc.docs.filter(i => i.status !== 'Void').slice().sort((a, b) => b.seq - a.seq).map(i => rpLrow('invoicing:' + i.pid + ':' + i.key, i.number, `${rpM(Math.abs(i.total))}${i.dueDate ? ' · due ' + escHtml(pwD(i.dueDate)) : ''}`, { pill: invPill(ivDisplayStatus(i)), tone: ltInvTone(ivDisplayStatus(i)) }));
+  const rest = sc.rows.filter(r => !sc.docKeys.has(r.pid + ':' + (r.vid ? 'v' + r.vid : r.uid))).map(r => rpLrow('invoicing:' + r.pid + ':' + (r.vid ? 'v' + r.vid : r.idx), r.desc, `${rpM(r.amount)}${r.dueDate ? ' · due ' + escHtml(pwD(r.dueDate)) : ''}`, { pill: invPill(r.status), tone: ltInvTone(r.status) }));
   return docs.concat(rest);
 }
 function rpProjScope(p){
@@ -18309,14 +18370,14 @@ function rpProjScope(p){
 function rpLinksHtml(p){
   const sc = rpProjScope(p), cs = (p.contactIds || []).map(ctFind).filter(Boolean), co = coFind(p.companyId), cu = projCustomer(p);
   const cust = cs.map((c, i) => rpLrow('contact:' + c.id, ctName(c), i === 0 ? 'main contact' : 'also linked')).concat(co ? [rpLrow('company:' + co.id, co.name, escHtml(co.type || 'company'))] : []);
-  const custRows = cust.length ? cust : (cu.name || cu.company ? [rpLrow('', cu.name || cu.company, 'not linked to a contact record')] : []);
-  const sup = rpSuppliers(p).map(s => rpLrow(s.id ? 'supplier:' + s.id : '', s.name, `${rpM(s.out)} · ${s.delivered ? 'delivered' : s.date ? escHtml(pwD(s.date)) : 'no date'}`));
+  const custRows = cust.length ? cust : (cu.name || cu.company ? [rpLrow('', cu.name || cu.company, 'not linked to a contact record', { kind: 'contact' })] : []);
+  const sup = rpSuppliers(p).map(s => rpLrow(s.id ? 'supplier:' + s.id : '', s.name, `${rpM(s.out)} · ${s.delivered ? 'delivered' : s.date ? escHtml(pwD(s.date)) : 'no date'}`, { kind: 'supplier', pill: s.hire ? '<span class="dc-ptc">hire</span>' : '', tone: s.delivered ? 'ok' : '' }));
   const pos = (state.purchaseOrders || []).filter(o => o.pid === p.id).sort((a, b) => a.no - b.no);
-  return rpTile('Customer', custRows, 'No customer recorded.', `<button type="button" class="sp-link" data-rp="q-customer">${cust.length ? 'Edit' : 'Link a contact'}</button>`)
-    + rpTile('Suppliers', sup, 'No supplier drops on the quote yet.')
-    + rpTile('Quotes', rpQuoteRows(sc.quotes), 'No quotes linked to this project.')
-    + rpTile('Orders', rpOrderRows(pos), 'No orders yet.', projAcceptedQuote(p) ? `<button type="button" class="sp-link" data-po2="open" data-pid="${p.id}">+ New order</button>` : '')
-    + rpTile('Invoices', rpInvoiceRows(sc), 'No invoice schedule yet.');
+  return rpTile('Customer', custRows, 'No customer recorded.', cust.length ? `<button type="button" class="btn secondary qb-sm" data-rp="q-customer">Edit</button>` : '', ltAdd('Link a contact', 'data-rp="q-customer"'))
+    + rpTile('Suppliers', sup, 'No supplier drops on the quote yet.', '', ltAdd('Plan a delivery', `data-nav="project:${p.id}:materials"`, 'Opens Materials and deliveries'))
+    + rpTile('Quotes', rpQuoteRows(sc.quotes), 'No quotes linked to this project.', '', ltAdd('New quote', 'data-rp="q-newquote"'))
+    + rpTile('Orders', rpOrderRows(pos), 'No orders yet.', '', projAcceptedQuote(p) ? ltAdd('New order', `data-po2="open" data-pid="${p.id}"`) : '')
+    + rpTile('Invoices', rpInvoiceRows(sc), 'No invoice schedule yet.', '', ltAdd('Raise an invoice', `data-nav="project:${p.id}:money"`));
 }
 
 /* ======================= SUPPLIER RECORD PAGE =======================
@@ -18357,9 +18418,9 @@ function rsHeadlineHtml(s){
   return `<div class="rp-strip">${cell('Open orders', k.open, k.orders + ' in total')}${cell('Live quotes', k.quotes, 'on open projects')}${cell('Next delivery', k.nextDel ? escHtml(pwD(k.nextDel)) : '—', k.nextDel ? escHtml(pwRel(k.nextDel)) : 'none due')}${cell('Owed to them', rpM(k.owed), k.overdue ? rpM(k.overdue) + ' overdue' : 'nothing overdue', k.overdue ? 'bad' : '')}${cell('Terms', escHtml(supTermsText(s) || '—'), s.accountNo ? 'acct ' + escHtml(s.accountNo) : '')}</div>`;
 }
 function rsRightHtml(s){
-  const prj = rsProjects(s).map(r => rpLrow(r.d.pl === 'project' ? 'project:' + r.root : 'deal2:' + r.root, recordCode(r.root, r.d.pl) + ' · ' + (r.d.rec.name || ''), (r.d.pl === 'project' ? 'project' : r.d.pl === 'sales' ? 'sale' : 'lead') + ' · ' + r.why.join(', ')));
-  const pos = (state.purchaseOrders || []).filter(o => o.supplierId === s.id).sort((a, b) => b.no - a.no).map(o => rpLrow('po:' + o.id, o.ref, `${poPill(o)} ${rpM(poTotals(o).payable)}`));
-  const inv = rsPayments(s).map(r => rpLrow('project:' + r.p.id + ':money', recordCode(r.p.id, 'project') + ' · ' + r.x.supplier, `${r.x.paid ? '<span class="pw-ok">paid</span>' : (r.x.due < fmt(new Date()) ? '<b class="over">overdue</b>' : 'due')} ${rpM(r.x.out)} · ${escHtml(pwD(r.x.due))}`));
+  const prj = rsProjects(s).map(r => rpLrow(r.d.pl === 'project' ? 'project:' + r.root : 'deal2:' + r.root, recordCode(r.root, r.d.pl) + ' · ' + (r.d.rec.name || ''), (r.d.pl === 'project' ? 'project' : r.d.pl === 'sales' ? 'sale' : 'lead') + ' · ' + r.why.join(', '), { kind: r.d.pl === 'project' ? 'project' : 'deal' }));
+  const pos = (state.purchaseOrders || []).filter(o => o.supplierId === s.id).sort((a, b) => b.no - a.no).map(o => rpLrow('po:' + o.id, o.ref, rpM(poTotals(o).payable), { pill: poPill(o) }));
+  const inv = rsPayments(s).map(r => { const late = !r.x.paid && r.x.due < fmt(new Date()); return rpLrow('project:' + r.p.id + ':money', recordCode(r.p.id, 'project') + ' · ' + r.x.supplier, `${rpM(r.x.out)} · due ${escHtml(pwD(r.x.due))}`, { kind: 'invoice', pill: r.x.paid ? '<span class="rp-pill ok">Paid</span>' : late ? '<span class="rp-pill bad">Overdue</span>' : '<span class="rp-pill neu">Due</span>', tone: r.x.paid ? 'ok' : late ? 'bad' : '' }); });
   return rpTile('Projects', prj, 'Not used on any project yet.') + rpTile('Orders', pos, 'No orders yet.') + rpTile('Invoices', inv, 'No supplier payments scheduled.');
 }
 function rsFld(s, i, f, label, o){
@@ -18445,11 +18506,11 @@ function rcFrame(kind, o){
     <aside class="rp-right" aria-label="Linked records"><div class="rp-rhead"><h3>Linked records</h3></div><div class="rp-rbody" id="cxRight">${o.right}</div></aside></div>`;
 }
 function rcDealRows(sc){
-  return sc.deals.slice().sort((a, b) => (b.live - a.live) || String(b.rec.createdAt || '').localeCompare(String(a.rec.createdAt || ''))).map(d => rpLrow('deal2:' + d.root, d.code + ' · ' + d.name, `${d.pl === 'lead' ? 'lead' : d.pl === 'sales' ? 'sale' : 'project'} · <span class="cx-st cx-st-${d.live ? 'live' : d.completed ? 'past' : 'lost'}">${escHtml(d.status)}</span>`));
+  return sc.deals.slice().sort((a, b) => (b.live - a.live) || String(b.rec.createdAt || '').localeCompare(String(a.rec.createdAt || ''))).map(d => rpLrow('deal2:' + d.root, d.code + ' · ' + d.name, d.pl === 'lead' ? 'lead' : d.pl === 'sales' ? 'sale' : 'project', { kind: d.pl === 'project' ? 'project' : 'deal', pill: `<span class="cx-st cx-st-${d.live ? 'live' : d.completed ? 'past' : 'lost'}">${escHtml(d.status)}</span>`, tone: d.live ? 'ok' : d.completed ? '' : 'bad' }));
 }
-function rcRight(sc, extraTiles){
+function rcRight(sc, extraTiles, contactId){
   const projects = sc.deals.filter(d => d.pl === 'project');
-  return (extraTiles || '') + rpTile('Projects', rcDealRows({ deals: projects }), 'No projects yet.') + rpTile('Leads and sales', rcDealRows({ deals: sc.deals.filter(d => d.pl !== 'project') }), 'None.')
+  return (extraTiles || '') + rpTile('Projects', rcDealRows({ deals: projects }), 'No projects yet.', '', contactId ? ltAdd('Link to a deal', `data-cx="link-deal" data-cid="${escAttr(contactId)}"`) : '') + rpTile('Leads and sales', rcDealRows({ deals: sc.deals.filter(d => d.pl !== 'project') }), 'None.')
     + rpTile('Quotes', rpQuoteRows(sc.quotes), 'No quotes yet.') + rpTile('Invoices', rpInvoiceRows(sc), 'No invoices yet.');
 }
 function rcBody(sc, owner, kind){ return cxPg.tab === 'activity' ? rcActivityHtml(owner, kind, sc) : cxDealsHtml(sc, kind, owner.id) + cxQuotesHtml(sc) + cxInvoicesHtml(sc) + cxPaymentsHtml(sc); }
@@ -18467,7 +18528,7 @@ function rcContactPage(c){
   const left = rcSec('about', 'About this contact', about) + `<section class="rp-sec open" data-sec="details"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="details" aria-expanded="true">${RP_CHEV}<span>Details</span></button></div><div class="rp-sec-b card-less" id="cxDetails">${cxContactDetailsHtml(c)}</div></section>`
     + `<section class="rp-sec open" data-sec="assoc"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="assoc" aria-expanded="true">${RP_CHEV}<span>People and company</span></button></div><div class="rp-sec-b" id="cxAssoc">${cxAssocHtml(c)}</div></section>` + rcSec('manage', 'Manage', manage);
   return rcFrame('contact', { head, left, kpi: cxKpiHtml(st), body: rcBody(sc, c, 'contact'), right: rcRight(sc, rpTile('People', L.contacts.map(x => rpLrow('contact:' + x.other.id, ctName(x.other), escHtml(x.link.label || '')))
-    .concat(L.companies.map(x => rpLrow('company:' + x.company.id, x.company.name, escHtml(x.link.label || 'company')))), 'Not linked to anyone yet.')) });
+    .concat(L.companies.map(x => rpLrow('company:' + x.company.id, x.company.name, escHtml(x.link.label || 'company')))), 'Not linked to anyone yet.', '', ltAdd('Link a contact', `data-cx="link-contact" data-cid="${escAttr(c.id)}"`) + ltAdd('Link a company', `data-cx="link-company" data-cid="${escAttr(c.id)}"`)), c.id) });
 }
 function rcCompanyPage(co){
   rcTouch('o:' + co.id);
@@ -18482,11 +18543,11 @@ function rcCompanyPage(co){
     <div class="lp-f"><label>Address</label><textarea rows="2" data-cxco="address" data-oid="${escAttr(co.id)}">${escHtml(co.address)}</textarea></div>${f('Postcode', 'postcode', co.postcode)}
     <div class="lp-f"><label>Notes</label><textarea rows="3" data-cxco="notes" data-oid="${escAttr(co.id)}">${escHtml(co.notes)}</textarea></div>`;
   const assoc = `<div class="qb-sec-h"><h4>People at this company</h4><button type="button" class="btn secondary qb-sm" data-cx="co-link-contact" data-oid="${escAttr(co.id)}">+ Add a contact</button></div>`
-    + (people.length ? people.map(x => `<div class="cx-assoc"><button type="button" class="sp-link" data-nav="contact:${escAttr(x.contact.id)}">${escHtml(ctName(x.contact))}</button><span class="qb-dim">${escHtml([ctPhone(x.contact), ctEmail(x.contact)].filter(Boolean).join(' · '))}</span><label class="cx-rel"><span class="qb-dim">role</span><select data-cxrel="${escAttr(x.link.id)}" aria-label="Role">${CX_ROLES.map(r => `<option${x.link.label === r ? ' selected' : ''}>${r}</option>`).join('')}</select></label><button type="button" class="icon-btn" data-cx="unlink" data-lid="${escAttr(x.link.id)}" title="Unlink" aria-label="Unlink">${X_SVG}</button></div>`).join('') : '<div class="lp-empty">No contacts yet.</div>');
+    + (people.length ? people.map(x => `<div class="cx-assoc">${ltChip(`contact:${x.contact.id}`, ctName(x.contact))}<span class="qb-dim">${escHtml([ctPhone(x.contact), ctEmail(x.contact)].filter(Boolean).join(' · '))}</span><label class="cx-rel"><span class="qb-dim">role</span><select data-cxrel="${escAttr(x.link.id)}" aria-label="Role">${CX_ROLES.map(r => `<option${x.link.label === r ? ' selected' : ''}>${r}</option>`).join('')}</select></label><button type="button" class="icon-btn" data-cx="unlink" data-lid="${escAttr(x.link.id)}" title="Unlink" aria-label="Unlink">${X_SVG}</button></div>`).join('') : '<div class="lp-empty">No contacts yet.</div>');
   const manage = `<div class="btn-row" style="margin:0"><button type="button" class="btn secondary qb-sm cx-danger" data-cx="delete-company" data-oid="${escAttr(co.id)}">Delete company</button></div>`;
   const left = rcSec('about', 'About this company', about) + `<section class="rp-sec open" data-sec="details"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="details" aria-expanded="true">${RP_CHEV}<span>Details</span></button></div><div class="rp-sec-b" id="cxDetails">${details}</div></section>`
     + `<section class="rp-sec open" data-sec="assoc"><div class="rp-sec-h"><button type="button" class="rp-sec-t" data-rp="sec" data-scope="cx" data-sec="assoc" aria-expanded="true">${RP_CHEV}<span>People</span></button></div><div class="rp-sec-b" id="cxAssoc">${assoc}</div></section>` + rcSec('manage', 'Manage', manage);
-  return rcFrame('company', { head, left, kpi: cxKpiHtml(st), body: rcBody(sc, co, 'company'), right: rcRight(sc, rpTile('People', people.map(x => rpLrow('contact:' + x.contact.id, ctName(x.contact), escHtml(x.link.label || ''))), 'No contacts yet.')) });
+  return rcFrame('company', { head, left, kpi: cxKpiHtml(st), body: rcBody(sc, co, 'company'), right: rcRight(sc, rpTile('People', people.map(x => rpLrow('contact:' + x.contact.id, ctName(x.contact), escHtml(x.link.label || ''))), 'No contacts yet.', '', ltAdd('Add a contact', `data-cx="co-link-contact" data-oid="${escAttr(co.id)}"`))) });
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-rc]'); if(!b || !state) return; const a = b.dataset.rc;
@@ -18545,7 +18606,7 @@ document.addEventListener('click', (e) => {
 function rpTaskRow(t){
   const over = t.status === 'open' && t.dueDate && t.dueDate < fmt(new Date());
   return `<div class="tkr-row${fadingTasks.has(t.id) ? ' fade-row' : ''}"><div class="cbx${t.status === 'done' ? ' checked' : ''}" data-crm="tick" data-id="${t.id}" title="Mark done">${CHECK_SVG}</div>${typeIcon(t.typeId)}
-    <button class="tkr-title" data-crm="open" data-id="${t.id}" title="${escAttr(t.title)}">${escHtml(t.title)}</button>${t.recur ? `<span class="rp-dim" title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}
+    ${ltChip(null, t.title, { attrs: `data-crm="open" data-id="${t.id}" title="${escAttr(t.title)}"`, kind: 'task', cls: 'tkr-title' })}${t.recur ? `<span class="rp-dim" title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}
     <span class="tkr-due${over ? ' over' : ''}">${t.dueDate ? fmtDisplay(toDate(t.dueDate)) : 'No date'}</span><span class="rp-dim">${escHtml(t.owner || '')}</span></div>`;
 }
 function refTasks(kind, id){ return state.crmTasks.filter(t => (t.refs || []).some(r => r.kind === kind && r.id === String(id)) && (t.status === 'open' || fadingTasks.has(t.id)) && taskVisible(t)).sort(taskCmp('due', 'asc')); }
@@ -18572,7 +18633,7 @@ function taskCustomerOptions(sel){
 function taskRefsSummary(t){
   const refs = (t.refs || []); if(!refs.length) return '';
   const i = refInfo(refs[0]);
-  return `<button class="link-btn crm-link${i.missing ? ' dim' : ''}" data-tk-ref="${escAttr(refNavSpec(refs[0]))}" title="${escAttr(refs.map(r => refInfo(r).kind + ' · ' + refInfo(r).name).join(', '))}">${escHtml(i.kind + ' · ' + i.name)}</button>${refs.length > 1 ? `<span class="tk-more-n">+${refs.length - 1}</span>` : ''}`;
+  return ltChip(null, i.kind + ' · ' + i.name, { attrs: `data-tk-ref="${escAttr(refNavSpec(refs[0]))}" title="${escAttr(refs.map(r => refInfo(r).kind + ' · ' + refInfo(r).name).join(', '))}"`, kind: ltKindOf(refs[0].kind), tone: i.missing ? 'bad' : '' }) + (refs.length > 1 ? `<span class="tk-more-n">+${refs.length - 1}</span>` : '');
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-tk-ref]'); if(!b || !state) return; e.stopPropagation();
@@ -18652,7 +18713,7 @@ function rpDayShow(v){ const d = rpDay(v); return d ? pwD(d) : ''; }
 function rpCardHtml(c){
   return `<article class="rp-fc ${c.tone || ''}"><div class="rp-fc-h"><span class="rp-fc-t">${escHtml(c.type)}</span><span class="rp-fc-d">${escHtml(rpDayShow(c.date))}</span>${c.by ? `<span class="rp-fc-o">${escHtml(c.by)}</span>` : ''}</div><div class="rp-fc-b">${c.html}</div>${c.foot ? `<div class="rp-fc-f">${c.foot}</div>` : ''}</article>`;
 }
-const rpLink = (nav, text) => `<button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(text)}</button>`;
+const rpLink = (nav, text) => `${ltChip(nav, text)}`;
 /* tasks */
 function rpOpenTaskCard(t){
   const today = fmt(new Date()), over = t.dueDate && t.dueDate < today;
@@ -19383,10 +19444,10 @@ document.addEventListener('change', (e) => {
 /* ---------- the quotes list columns ---------- */
 function qlistCells(q){
   const d = qDeal(q), ds = quoteDaysSince(q), t = fuTaskOf(q), cid = (q.contactIds || [])[0];
-  const cust = q.customer ? (cid && ctFind(cid) ? `<button type="button" class="sp-link" data-nav="contact:${escAttr(cid)}">${escHtml(q.customer)}</button>` : escHtml(q.customer)) : '—';
-  const proj = q.project ? (d ? `<button type="button" class="sp-link" data-nav="deal2:${d.rec.id}">${escHtml(q.project)}</button>` : escHtml(q.project)) : (d ? `<button type="button" class="sp-link" data-nav="deal2:${d.rec.id}">${escHtml(recordCode(d.rec.id, d.pl))}</button>` : '—');
+  const cust = q.customer ? (cid && ctFind(cid) ? `${ltChip(`contact:${cid}`, q.customer)}` : escHtml(q.customer)) : '—';
+  const proj = q.project ? (d ? `${ltChip(`deal2:${d.rec.id}`, q.project)}` : escHtml(q.project)) : (d ? `${ltChip(`deal2:${d.rec.id}`, recordCode(d.rec.id, d.pl))}` : '—');
   const since = ds === null ? '<span class="qb-dim">—</span>' : (noContactChipHtml(ds) || `${ds} working day${ds === 1 ? '' : 's'}`);
-  const next = t ? `<button type="button" class="sp-link" data-sel-task="${escAttr(t.id)}" title="Open the follow-up task">${escHtml(dShow(t.dueDate))}</button>${t.dueDate < fmt(new Date()) ? ' <span class="sf-chip bad">overdue</span>' : ''}` : (q.status === 'Sent' ? '<span class="sf-chip warn">none planned</span>' : '<span class="qb-dim">—</span>');
+  const next = t ? `${ltChip(null, dShow(t.dueDate), { attrs: `data-sel-task="${escAttr(t.id)}" title="Open the follow-up task"`, kind: 'task' })}${t.dueDate < fmt(new Date()) ? ' <span class="sf-chip bad">overdue</span>' : ''}` : (q.status === 'Sent' ? '<span class="sf-chip warn">none planned</span>' : '<span class="qb-dim">—</span>');
   return { cust, proj, since, next };
 }
 
@@ -19811,7 +19872,7 @@ function phDue(sel){
 function phTodayRow(x, over){
   const at = `data-kind="${x.kind}" data-rid="${x.r.id}" data-pid="${escAttr(x.p.id)}"`, b = phNum(x.p.hours);
   return `<div class="td-row"><div class="cbx" data-ph="tick" ${at} title="Mark done: you can confirm the hours next">${CHECK_SVG}</div>
-    <span class="td-title">${escHtml(x.p.name || 'Phase')} · <button type="button" class="sp-link" data-nav="deal2:${x.r.id}">${escHtml(boardTitle(x.kind, x.r))}</button></span>
+    <span class="td-title">${escHtml(x.p.name || 'Phase')} · ${ltChip(`deal2:${x.r.id}`, boardTitle(x.kind, x.r))}</span>
     <span class="td-meta"><span>${PH_KIND[x.kind]}</span>${x.p.selling ? '<span class="sf-chip">Selling time</span>' : ''}<span>${b > 0 ? escHtml(phFmtH(b)) + ' budget' : 'no budget'}</span>${over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(x.d)))}</span>` : ''}</span></div>`;
 }
 function renderTodayPhases(sel){
@@ -19854,7 +19915,7 @@ function dashSellingHtml(){
   const tile = (k, v, sub) => `<div class="db-mini"><span class="k">${k}</span><b>${v}</b>${sub ? `<span class="s">${sub}</span>` : ''}</div>`;
   const money = v => rate > 0 ? qm(v) : '—';
   return head + `<div class="db-minis">${tile('Selling time', hrs(hours), `${phMarkHtml(conf, ass)}`)}${tile('Cost of selling', money(cost), rate > 0 ? 'at ' + qm(rate) + ' an hour' : 'set the labour rate')}${tile('On lost deals', money(lostC), hrs(lostH))}${tile('Won value', qm(won), rate > 0 && won > 0 ? (Math.round(cost / won * 1000) / 10) + '% spent on selling' : '')}${tile('Per deal', money(cost / rows.length), 'across ' + rows.length + ' deal' + (rows.length === 1 ? '' : 's'))}</div>
-    <div class="table-scroll"><table class="db-tbl sell-tbl"><thead><tr><th>Deal</th><th class="num">Selling time</th><th class="num">Cost</th></tr></thead><tbody>${rows.map(x => `<tr><td><button type="button" class="sp-link" data-nav="deal2:${x.r.id}">${escHtml(x.name)}</button> ${x.lost ? '<span class="sf-chip bad">Lost</span>' : '<span class="qb-dim">' + escHtml(PH_KIND[x.kind]) + '</span>'}</td><td class="num">${hrs(x.hours)} ${phMarkHtml(x.conf, x.ass)}</td><td class="num">${money(x.cost)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="table-scroll"><table class="db-tbl sell-tbl"><thead><tr><th>Deal</th><th class="num">Selling time</th><th class="num">Cost</th></tr></thead><tbody>${rows.map(x => `<tr><td>${ltChip(`deal2:${x.r.id}`, x.name)} ${x.lost ? '<span class="sf-chip bad">Lost</span>' : '<span class="qb-dim">' + escHtml(PH_KIND[x.kind]) + '</span>'}</td><td class="num">${hrs(x.hours)} ${phMarkHtml(x.conf, x.ass)}</td><td class="num">${money(x.cost)}</td></tr>`).join('')}</tbody></table></div>
     <p class="q-help" style="margin:8px 0 0;">${rate > 0 ? 'Costed at ' + basis + '.' : 'No labour rate is set, so only the hours are shown.'} The same hours count towards Hours logged on a project once it exists.</p>`;
 }
 
@@ -20151,15 +20212,15 @@ function renderCapacity(){
   const body = rows.map(r => {
     const parts = { project: 0, sales: 0, lead: 0 }, tent = r.parts.filter(q => q.item.tentative).reduce((a, q) => a + q.hours, 0); r.parts.forEach(q => { parts[q.item.kind] += q.hours; }); parts.project -= tent;
     const isOver = over(r), open = isOver || capUi.open[r.mon], days = [0, 1, 2, 3, 4, 5, 6].map(i => addDaysIso(r.mon, i)), dels = days.reduce((a, d) => a + (ev.del[d] || []).length, 0), tks = days.reduce((a, d) => a + (ev.tasks[d] || []).length, 0), cur = r.mon === capWeekStart(real);
-    const list = r.parts.length ? capOverNames(r).map(it => { const h = r.parts.find(q => q.item === it).hours; return `<div class="cv-c"><span class="cv-ck ${it.kind}"></span><button type="button" class="sp-link" data-nav="deal2:${it.id}">${escHtml(it.name)}</button><span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span>${it.tentative ? '<span class="sf-chip warn">Tentative</span>' : ''}<span class="cv-cw">${escHtml(capWhy(it))}</span><b>${capH(h)}</b></div>`; }).join('') : '<div class="qb-dim">Nothing is planned in this week.</div>';
-    const dl = days.flatMap(d => (ev.del[d] || []).map(x => `<div class="cv-c"><span class="cv-ck del"></span><span>Delivery · ${escHtml(x.x.supplier)}</span><button type="button" class="sp-link" data-nav="deal2:${x.p.id}">${escHtml(boardTitle('project', x.p))}</button><span class="cv-cw">${escHtml(pwD(d))}</span></div>`)).join('');
+    const list = r.parts.length ? capOverNames(r).map(it => { const h = r.parts.find(q => q.item === it).hours; return `<div class="cv-c"><span class="cv-ck ${it.kind}"></span>${ltChip(`deal2:${it.id}`, it.name)}<span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span>${it.tentative ? '<span class="sf-chip warn">Tentative</span>' : ''}<span class="cv-cw">${escHtml(capWhy(it))}</span><b>${capH(h)}</b></div>`; }).join('') : '<div class="qb-dim">Nothing is planned in this week.</div>';
+    const dl = days.flatMap(d => (ev.del[d] || []).map(x => `<div class="cv-c"><span class="cv-ck del"></span><span>Delivery · ${escHtml(x.x.supplier)}</span>${ltChip(`deal2:${x.p.id}`, boardTitle('project', x.p))}<span class="cv-cw">${escHtml(pwD(d))}</span></div>`)).join('');
     return `<div class="cv-wk${isOver ? ' over' : ''}${cur ? ' cur' : ''}"><div class="cv-wh"><button type="button" class="cv-wl" data-cv="day" data-d="${r.mon}" title="Open Monday ${escAttr(pwD(r.mon))} on Today"><b>${escHtml(pwD(r.mon))}</b><span>${r.cap < full - 0.01 ? 'reduced week' : 'week'}</span></button>
         <div class="cv-bar" title="${escAttr(capH(r.total) + ' planned of ' + capH(r.cap) + ' available')}"><div class="cv-track">${seg(parts.project, 'project')}${seg(tent, 'project tent')}${seg(parts.sales, 'sales')}${seg(parts.lead, 'lead')}<i class="cv-cap" style="left:${r.cap / scale * 100}%"></i></div><span class="cv-num${isOver ? ' bad' : ''}">${Math.round(r.total * 10) / 10} / ${Math.round(r.cap * 10) / 10} h${isOver ? ' · over by ' + (Math.round((r.total - r.cap) * 10) / 10) : ''}${tent > 0.05 ? ` <span class="sf-chip warn" title="Tentative project hours, counted in full">${capH(tent)} tentative</span>` : ''}</span></div>
         <div class="cv-days">${days.map(d => dayCell(d, r)).join('')}</div></div>
       ${(r.parts.length || dels) ? `<div class="cv-more"><button type="button" class="link-btn" data-cv="open" data-mon="${r.mon}" aria-expanded="${!!open}">${open ? 'Hide' : 'Show'} what makes up this week (${r.parts.length}${dels ? ' · ' + dels + ' deliver' + (dels === 1 ? 'y' : 'ies') : ''}${tks ? ' · ' + tks + ' task' + (tks === 1 ? '' : 's') : ''})</button>${open ? `<div class="cv-list">${list}${dl}</div>` : ''}</div>` : ''}</div>`;
   }).join('');
   document.getElementById('cvBody').innerHTML = `<div class="cv-leg"><span><i class="cv-sw oak"></i>Projects</span><span><i class="cv-sw slate"></i>Sales (weighted)</span><span><i class="cv-sw green"></i>Leads (weighted)</span><span><i class="cv-sw oak tent"></i>Tentative project</span><span><i class="cv-capsw"></i>Capacity that week</span><span><i class="cv-sw bad"></i>Over capacity</span></div>${body}
-    ${unp.length ? `<div class="cv-unp"><h4>Not placed on the calendar</h4><p class="q-help" style="margin:0 0 6px;">These have hours or a duration but nothing to place them by: give them a preferred start, a deadline or phase dates.</p>${unp.map(it => `<div class="cv-c"><span class="cv-ck ${it.kind}"></span><button type="button" class="sp-link" data-nav="deal2:${it.id}">${escHtml(it.name)}</button><span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span><span class="cv-cw">${escHtml(it.unplaced.what || 'no preferred start or deadline')}</span><b>${capH(it.unplaced.hours || sfDays(it.r) * hpd())}</b></div>`).join('')}</div>` : ''}`;
+    ${unp.length ? `<div class="cv-unp"><h4>Not placed on the calendar</h4><p class="q-help" style="margin:0 0 6px;">These have hours or a duration but nothing to place them by: give them a preferred start, a deadline or phase dates.</p>${unp.map(it => `<div class="cv-c"><span class="cv-ck ${it.kind}"></span>${ltChip(`deal2:${it.id}`, it.name)}<span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span><span class="cv-cw">${escHtml(it.unplaced.what || 'no preferred start or deadline')}</span><b>${capH(it.unplaced.hours || sfDays(it.r) * hpd())}</b></div>`).join('')}</div>` : ''}`;
 }
 function capOpenDay(iso){
   navGo(() => { todayUi.date = iso === fmt(new Date()) ? '' : iso; todayUi.more = {}; activateTab('today'); render(); window.scrollTo(0, 0); });
@@ -20286,7 +20347,7 @@ function renderClassify(){
   const row = ({ t, i }) => {
     const s = clsSuggest(t), d = clsUi.draft[i] || {}, cls = d.cls !== undefined ? d.cls : '', pid = d.pid !== undefined ? d.pid : (t.projectId || ''), p = t.projectId ? state.projects.find(x => x.id === t.projectId) : null;
     return `<tr class="${clsUi.flash === i ? 'inv-flash' : ''}"><td>${t.date ? pwD(t.date) : '—'}</td><td>${escHtml(t.description || '')}</td><td>${escHtml(t.category || '')}</td><td class="qb-calc">${qm(t.moneyOut)}</td>
-      <td>${p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button>` : '<span class="qb-dim">—</span>'}</td>
+      <td>${p ? `${ltChip(`project:${p.id}:plan`, recordCode(p.id, 'project'))}` : '<span class="qb-dim">—</span>'}</td>
       <td>${s ? `<span class="qb-flag ok">${CLS_LABELS[s.cls]}</span><div class="qb-dim" style="font-size:var(--bt-fs-xs);">${escHtml(s.why)}</div>` : '<span class="qb-dim">No rule matches: left for you</span>'}</td>
       <td><div class="cls-act">${s ? `<button type="button" class="btn qb-sm" data-cls="accept" data-idx="${i}">Accept ${escHtml(CLS_LABELS[s.cls].toLowerCase())}</button>` : ''}
         <select data-cls-sel="${i}" aria-label="Class"><option value="">Choose…</option>${Object.keys(CLS_LABELS).map(k => `<option value="${k}"${cls === k ? ' selected' : ''}>${CLS_LABELS[k]}</option>`).join('')}</select>
@@ -20297,7 +20358,7 @@ function renderClassify(){
     const c = clsOf(t), p = t.projectId ? state.projects.find(x => x.id === t.projectId) : null;
     return `<tr><td>${t.date ? pwD(t.date) : '—'}</td><td>${escHtml(t.description || '')}</td><td class="qb-calc">${qm(t.moneyOut)}</td>
       <td><select data-cls-edit="${i}" aria-label="Class">${Object.keys(CLS_LABELS).map(k => `<option value="${k}"${c === k ? ' selected' : ''}>${CLS_LABELS[k]}</option>`).join('')}</select></td>
-      <td>${c === 'job' ? (p ? `<button type="button" class="sp-link" data-nav="project:${p.id}:plan">${escHtml(recordCode(p.id, 'project'))}</button>` : `<select data-cls-editpid="${i}" aria-label="Project">${clsProjOptions(t.costProjectId)}</select>`) : '<span class="qb-dim">—</span>'}</td>
+      <td>${c === 'job' ? (p ? `${ltChip(`project:${p.id}:plan`, recordCode(p.id, 'project'))}` : `<select data-cls-editpid="${i}" aria-label="Project">${clsProjOptions(t.costProjectId)}</select>`) : '<span class="qb-dim">—</span>'}</td>
       <td class="qb-dim">${t.classHow === 'suggestion' ? 'accepted suggestion' : 'chosen'}${t.classBy ? ' · ' + escHtml(t.classBy) : ''}</td><td><button type="button" class="btn secondary qb-sm" data-cls="clear" data-idx="${i}">Clear</button></td></tr>`;
   };
   el.innerHTML = `<div class="kpi-row">${kpi('Waiting', waiting.length, 'costs with no class yet', 'var(--oak)')}${kpi('With a suggestion', sug.length, 'the rule matched the category', 'var(--green)')}${kpi('Classified', done.length, cnt('job') + ' job · ' + cnt('business') + ' business · ' + cnt('asset') + ' asset', 'var(--slate)')}${kpi('Job costs with no project', noProj.length, 'pick the job they belong to', 'var(--bt-plum)')}</div>
@@ -20674,16 +20735,16 @@ function finLostHtml(){
   const d = finLostData(); if(!d.length) return '';
   const ef = finLostEffect(), sg = v => (v < 0 ? '-' : '') + qm(Math.abs(v)), dif = ef.withRule.end - ef.without.end;
   const line = r => { const key = r.vid ? 'v' + r.vid : String(r.idx);
-    return `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${escAttr(key)}">${escHtml(r.desc)}</button></td><td>${r.dueDate ? pwD(r.dueDate) : '—'}${r.dueDate && r.dueDate < fmt(new Date()) ? ' <span class="qb-flag bad">' + daysBetween(r.dueDate, fmt(new Date())) + ' days late</span>' : ''}</td><td class="qb-calc">${qm(r.amount - (r.paidAmount || 0))}</td>
+    return `<tr><td>${ltChip(`invoicing:${r.pid}:${key}`, r.desc)}</td><td>${r.dueDate ? pwD(r.dueDate) : '—'}${r.dueDate && r.dueDate < fmt(new Date()) ? ' <span class="qb-flag bad">' + daysBetween(r.dueDate, fmt(new Date())) + ' days late</span>' : ''}</td><td class="qb-calc">${qm(r.amount - (r.paidAmount || 0))}</td>
       <td><button type="button" class="btn secondary qb-sm" data-f6="wo" data-pid="${r.pid}" data-k="${escAttr(key)}">Write off…</button></td></tr>`; };
   const wline = r => { const key = r.vid ? 'v' + r.vid : String(r.idx);
-    return `<tr><td><button type="button" class="sp-link" data-nav="invoicing:${r.pid}:${escAttr(key)}">${escHtml(r.desc)}</button></td><td colspan="2" class="qb-dim">written off ${escHtml(dShow(r.wo.date))}: ${escHtml(r.wo.reason)} (${escHtml(r.wo.by || '')})</td><td class="qb-calc">${qm(r.wo.amount)}</td>
+    return `<tr><td>${ltChip(`invoicing:${r.pid}:${key}`, r.desc)}</td><td colspan="2" class="qb-dim">written off ${escHtml(dShow(r.wo.date))}: ${escHtml(r.wo.reason)} (${escHtml(r.wo.by || '')})</td><td class="qb-calc">${qm(r.wo.amount)}</td>
       <td><button type="button" class="btn secondary qb-sm" data-f6="wo-undo" data-pid="${r.pid}" data-k="${escAttr(key)}">Reverse…</button></td></tr>`; };
   return `<div class="card f6-lost"><div class="qb-sec-h"><h4>Lost projects and the forecast <span class="db-count">${d.length}</span></h4></div>
     <p class="q-help">A project closed as lost leaves the forecast: planned lines that were never invoiced are not counted. Invoices already raised and not paid stay as money owed until you write them off here. Unpaid supplier payments stay until their order is cancelled. Paid lines stay as actuals. Nothing is written off for you.</p>
     <div class="kpi-row"><div class="kpi" style="--accent:var(--oak)"><div class="label">Forecast end balance</div><div class="value">${sg(ef.withRule.end)}</div><div class="fin-sub">${dif === 0 ? 'no difference from the rule' : (dif < 0 ? sg(Math.abs(dif)) + ' lower' : sg(dif) + ' higher') + ' than if the lost lines still counted (' + sg(ef.without.end) + ')'}</div></div>
       <div class="kpi" style="--accent:var(--plum)"><div class="label">Lowest point</div><div class="value">${sg(ef.withRule.low.v)}</div><div class="fin-sub">${escHtml(ef.withRule.low.label)}${ef.without.low.v !== ef.withRule.low.v ? ' · would be ' + sg(ef.without.low.v) + ' without the rule' : ''}</div></div></div>
-    ${d.map(x => `<div class="f6-lostp"><div class="f6-lostp-h"><button type="button" class="sp-link" data-nav="project:${x.p.id}:money"><b>${escHtml(recordCode(x.p.id, 'project'))}</b> ${escHtml(x.p.name)}</button> <span class="qb-flag bad">Lost project</span> <span class="qb-dim">${x.p.lostDate ? 'closed ' + escHtml(dShow(x.p.lostDate)) : ''}${x.p.lostReason ? ' · ' + escHtml(lostReasonName(x.p.lostReason)) : ''}</span></div>
+    ${d.map(x => `<div class="f6-lostp"><div class="f6-lostp-h">${ltChip(`project:${x.p.id}:money`, recordCode(x.p.id, 'project') + ' ' + x.p.name)} <span class="qb-flag bad">Lost project</span> <span class="qb-dim">${x.p.lostDate ? 'closed ' + escHtml(dShow(x.p.lostDate)) : ''}${x.p.lostReason ? ' · ' + escHtml(lostReasonName(x.p.lostReason)) : ''}</span></div>
       <ul class="f6-lostl"><li><b>${qm(x.removedTotal)}</b> planned and not invoiced: ${x.removed.length} line${x.removed.length === 1 ? '' : 's'} not in the forecast</li><li><b>${qm(x.staysTotal)}</b> raised and still owed: stays as money owed until written off</li><li><b>${qm(x.writtenTotal)}</b> written off</li><li><b>${qm(x.supTotal)}</b> supplier payments still to pay${x.cancelled.length ? ' (' + x.cancelled.length + ' cancelled order' + (x.cancelled.length === 1 ? '' : 's') + ' not counted)' : ': cancel the order to remove one'}</li></ul>
       ${x.stays.length || x.written.length ? `<div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Invoice</th><th>Due</th><th>Amount</th><th></th></tr></thead><tbody>${x.stays.map(line).join('')}${x.written.map(wline).join('')}</tbody></table></div>` : ''}</div>`).join('')}</div>`;
 }
@@ -20737,7 +20798,7 @@ function renderDupTasks(){
   const nSel = dupUi.sel.size;
   el.innerHTML = !g.length ? '<div class="sup-empty">No duplicate automatic tasks. Two open tasks made by the same automatic rule for the same record would be listed here.</div>'
     : `<p class="q-help">Each group below has the same task more than once. The task marked Keep is the one with notes, then the one with an automatic key, then the oldest. Tick the ones to delete. Nothing is deleted until you press the button and confirm; a deleted task goes to Undo history.</p>
-      ${g.map(x => `<div class="f6-dupg"><div class="qb-dim">${escHtml(x.why)}</div><table class="qb-table qb-narrow"><thead><tr><th></th><th>Task</th><th>Title</th><th>Due</th><th>Linked</th><th>Notes</th></tr></thead><tbody>${x.tasks.map(t => `<tr><td>${t === x.keep ? '<span class="qb-flag ok">Keep</span>' : `<input type="checkbox" data-f6="dup" data-id="${escAttr(t.id)}" aria-label="Delete ${escAttr(t.id)}"${dupUi.sel.has(t.id) ? ' checked' : ''}>`}</td><td><button type="button" class="sp-link" data-crm="open" data-id="${escAttr(t.id)}">${escHtml(t.id)}</button></td><td>${escHtml(t.title)}${t.autoKey ? ' <span class="qb-dim">(' + escHtml(t.autoKey) + ')</span>' : ''}</td><td>${t.dueDate ? pwD(t.dueDate) : '—'}</td><td>${taskRefsSummary(t) || escHtml((t.linkedIds || []).join(', ')) || '—'}</td><td>${t.notes.length ? t.notes.length + ' note' + (t.notes.length === 1 ? '' : 's') : '—'}</td></tr>`).join('')}</tbody></table></div>`).join('')}
+      ${g.map(x => `<div class="f6-dupg"><div class="qb-dim">${escHtml(x.why)}</div><table class="qb-table qb-narrow"><thead><tr><th></th><th>Task</th><th>Title</th><th>Due</th><th>Linked</th><th>Notes</th></tr></thead><tbody>${x.tasks.map(t => `<tr><td>${t === x.keep ? '<span class="qb-flag ok">Keep</span>' : `<input type="checkbox" data-f6="dup" data-id="${escAttr(t.id)}" aria-label="Delete ${escAttr(t.id)}"${dupUi.sel.has(t.id) ? ' checked' : ''}>`}</td><td>${ltChip(null, t.id, { attrs: `data-crm="open" data-id="${escAttr(t.id)}"`, kind: 'task' })}</td><td>${escHtml(t.title)}${t.autoKey ? ' <span class="qb-dim">(' + escHtml(t.autoKey) + ')</span>' : ''}</td><td>${t.dueDate ? pwD(t.dueDate) : '—'}</td><td>${taskRefsSummary(t) || escHtml((t.linkedIds || []).join(', ')) || '—'}</td><td>${t.notes.length ? t.notes.length + ' note' + (t.notes.length === 1 ? '' : 's') : '—'}</td></tr>`).join('')}</tbody></table></div>`).join('')}
       <div class="btn-row"><button type="button" class="btn" data-f6="dup-del"${nSel ? '' : ' disabled'}>Delete the ${nSel} ticked task${nSel === 1 ? '' : 's'}…</button></div>`;
   const c = document.getElementById('dupTasksCount'); if(c){ c.textContent = g.reduce((a, x) => a + x.extra.length, 0); c.hidden = !g.length; }
 }
@@ -20846,7 +20907,7 @@ function rvHtml(){
     <details><summary>Show the lines</summary><div class="f6-cols"><div><b>Expected in</b>${dl(expIn, x => `<li>${rvLink(x.src, x.label)} ${escHtml(x.pname)} ${qm(x.amount)} ${x.done ? '✓ paid' : ''}</li>`)}<b>Expected out</b>${dl(expOut.map(x => ({ x })).concat(bcWk.map(x => ({ b: x }))), o => o.x ? `<li>${rvLink(o.x.src, o.x.label)} ${escHtml(o.x.pname)} ${qm(o.x.amount)} ${o.x.done ? '✓ paid' : ''}</li>` : `<li>${rvLink({ t: 'bcost', id: o.b.id }, o.b.name)} ${qm(o.b.amount)}</li>`)}</div>
       <div><b>Actual (Transactions)</b>${dl(txs, t => `<li>${finSrcLink({ t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) }, (t.description || 'Transaction'))} ${Number(t.moneyIn) > 0 ? '+' + qm(t.moneyIn) : '−' + qm(t.moneyOut)} <span class="qb-dim">${escHtml(dShow(txCashDate(t)))}</span></li>`)}</div></div></details></div>
   <div class="card"><div class="qb-sec-h"><h4>Quotes out <span class="db-count">${quotes.length}</span></h4></div>
-    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Quote</th><th>Customer</th><th>Value (ex VAT)</th><th>Sent</th><th>Days since contact</th><th>Follow-up</th></tr></thead><tbody>${quotes.map(x => `<tr><td><button type="button" class="sp-link" data-nav="quote:${x.q.id}">${escHtml(qRef(x.q))}</button></td><td>${escHtml(x.q.customer || '')}</td><td class="qb-calc">${qm(x.val)}</td><td>${x.q.sentAt ? escHtml(dShow(String(x.q.sentAt).slice(0, 10))) : '—'}</td><td>${x.days === null ? '—' : x.days + ' working days'} ${noContactChipHtml(x.days)}</td><td>${x.task ? `<button type="button" class="sp-link" data-crm="open" data-id="${escAttr(x.task.id)}">${escHtml(x.task.id)} due ${escHtml(dShow(x.task.dueDate))}</button>` : '<span class="qb-dim">none open</span>'}</td></tr>`).join('') || '<tr><td colspan="6"><div class="sup-empty">No quotes are waiting for an answer.</div></td></tr>'}</tbody></table></div></div>`;
+    <div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Quote</th><th>Customer</th><th>Value (ex VAT)</th><th>Sent</th><th>Days since contact</th><th>Follow-up</th></tr></thead><tbody>${quotes.map(x => `<tr><td>${ltChip(`quote:${x.q.id}`, qRef(x.q))}</td><td>${escHtml(x.q.customer || '')}</td><td class="qb-calc">${qm(x.val)}</td><td>${x.q.sentAt ? escHtml(dShow(String(x.q.sentAt).slice(0, 10))) : '—'}</td><td>${x.days === null ? '—' : x.days + ' working days'} ${noContactChipHtml(x.days)}</td><td>${x.task ? `<button type="button" class="sp-link" data-crm="open" data-id="${escAttr(x.task.id)}">${escHtml(x.task.id)} due ${escHtml(dShow(x.task.dueDate))}</button>` : '<span class="qb-dim">none open</span>'}</td></tr>`).join('') || '<tr><td colspan="6"><div class="sup-empty">No quotes are waiting for an answer.</div></td></tr>'}</tbody></table></div></div>`;
 }
 function renderWeeklyReview(){
   const el = document.getElementById('cfReview'), fc = document.getElementById('cfForecast'), tg = document.getElementById('cfViewToggle'); if(!el || !fc || !state) return;
@@ -20907,7 +20968,7 @@ const ageUi = { tab: 'me', by: 'who', bucket: '' };
 navExtra('age', () => ({ t: ageUi.tab, b: ageUi.by, k: ageUi.bucket }), o => { if(o){ ageUi.tab = o.t; ageUi.by = o.b; ageUi.bucket = o.k; } });
 function ageLineHtml(x){
   const kind = x.kind === 'cust' ? 'Invoice' : x.kind === 'sup' ? 'Supplier payment' : 'Business cost';
-  return `<tr><td>${x.kind === 'biz' ? '' : `<button type="button" class="sp-link" data-nav="project:${x.pid}:money">${escHtml(x.code)}</button> `}${escHtml(x.pname)}</td><td><button type="button" class="sp-link" data-nav="${escAttr(x.nav)}">${escHtml(x.label)}</button><div class="qb-dim">${kind}${x.queried ? ' · queried' : ''}</div></td><td>${x.due ? pwD(x.due) : '<span class="qb-dim">no date</span>'}</td><td>${x.late > 0 ? `<b class="over">${x.late} day${x.late === 1 ? '' : 's'}</b>` : (x.due ? '<span class="qb-dim">not yet due</span>' : '—')}</td><td class="qb-calc">${qm(x.owed)}</td></tr>`;
+  return `<tr><td>${x.kind === 'biz' ? '' : `${ltChip(`project:${x.pid}:money`, x.code)} `}${escHtml(x.pname)}</td><td>${ltChip(x.nav, x.label)}<div class="qb-dim">${kind}${x.queried ? ' · queried' : ''}</div></td><td>${x.due ? pwD(x.due) : '<span class="qb-dim">no date</span>'}</td><td>${x.late > 0 ? `<b class="over">${x.late} day${x.late === 1 ? '' : 's'}</b>` : (x.due ? '<span class="qb-dim">not yet due</span>' : '—')}</td><td class="qb-calc">${qm(x.owed)}</td></tr>`;
 }
 function ageHtml(){
   const me = ageUi.tab === 'me', all = me ? owedToMe() : iOwe(), shown = ageUi.bucket ? all.filter(x => x.bucket === ageUi.bucket) : all, overdue = all.filter(x => x.late > 0);
@@ -20948,7 +21009,7 @@ function dqStripHtml(from, to){
     ass: c.ass.map(x => ({ t: boardTitle(x.kind, x.r) + ': ' + (x.ph.name || 'phase') + ' ' + phFmtH(x.ph.done.hours), nav: dqNavFor(x.kind, x.r) })), mon: c.mon.map(k => ({ t: monthLabel(new Date(k + '-01T00:00:00')) + ' not reconciled', nav: 'recon:' + k })), miss: c.miss.map(t => ({ t: (t.description || 'Transaction') + (clsOf(t) === 'job' && !clsProjectId(t) ? ' (job cost, no project)' : ' (no category)'), nav: 'txn:' + (t.uid || state.transactions.indexOf(t)) })) };
   const page = { uncl: ['classify', 'Open Classify'], pos: ['purchaseorders', 'Open Orders and deliveries'], ass: ['today', 'Open Today'], mon: ['reconciliation', 'Open Bank Reconciliation'], miss: ['transactions', 'Open Transactions'] };
   return `<div class="f6-dqs" role="group" aria-label="Data quality"><span class="f6-dqt">Data quality</span>${chip('uncl', c.uncl.length, 'unclassified transactions', '', 'Money out with no job, business or asset class')}${chip('pos', c.pos.length, 'unconfirmed prices', '', 'Delivered orders whose receipt prices are not confirmed')}${chip('ass', c.ass.length, 'assumed hours', '', 'Phases ticked done with the budget accepted, not confirmed')}${chip('mon', c.mon.length, 'unreconciled months', '', 'Past months not reconciled to the bank')}${chip('miss', c.miss.length, 'missing categories', '', 'No category, or a job cost with no project')}
-    ${dqUi.open && lines[dqUi.open] ? `<div class="f6-dql"><ul class="f6-ul">${lines[dqUi.open].slice(0, 40).map(l => `<li><button type="button" class="sp-link" data-nav="${escAttr(l.nav)}">${escHtml(l.t)}</button></li>`).join('') || '<li class="qb-dim">Nothing to fix.</li>'}${lines[dqUi.open].length > 40 ? `<li class="qb-dim">and ${lines[dqUi.open].length - 40} more: open the page.</li>` : ''}</ul><button type="button" class="btn secondary qb-sm" data-nav-tab="${page[dqUi.open][0]}">${page[dqUi.open][1]} →</button></div>` : ''}</div>`;
+    ${dqUi.open && lines[dqUi.open] ? `<div class="f6-dql"><ul class="f6-ul">${lines[dqUi.open].slice(0, 40).map(l => `<li>${ltChip(l.nav, l.t)}</li>`).join('') || '<li class="qb-dim">Nothing to fix.</li>'}${lines[dqUi.open].length > 40 ? `<li class="qb-dim">and ${lines[dqUi.open].length - 40} more: open the page.</li>` : ''}</ul><button type="button" class="btn secondary qb-sm" data-nav-tab="${page[dqUi.open][0]}">${page[dqUi.open][1]} →</button></div>` : ''}</div>`;
 }
 document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-f6="dq"]'); if(!b || !state) return; dqUi.open = dqUi.open === b.dataset.k ? '' : b.dataset.k; render(); });
 /* the reconciliation page opens at a month when a data-quality line asks for it */
@@ -21123,7 +21184,7 @@ const repIn = d => !!d && (!repUi.from || d >= repUi.from) && (!repUi.to || d <=
 function jrProject(){ const L = state.projects; return L.find(p => p.id === repUi.pid) || L.slice().sort((a, b) => (projStage6(b).id === 'completed') - (projStage6(a).id === 'completed') || b.id - a.id)[0] || null; }
 function jrHtml(p, sec){
   if(!p) return '<div class="sup-empty">There are no projects yet.</div>';
-  const sg = v => Math.abs(v) < 0.005 ? '—' : (v > 0 ? '+' : '−') + qm(Math.abs(v)), L = (nav, t) => `<button type="button" class="sp-link" data-nav="${escAttr(nav)}">${escHtml(t)}</button>`, pn = 'project:' + p.id, cell = (k, v, sub, cls, nav) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small>${nav ? `<button type="button" class="sp-link" data-nav="${escAttr(nav)}"><b>${v}</b></button>` : `<b>${v}</b>`}${sub ? `<em>${sub}</em>` : ''}</div>`;
+  const sg = v => Math.abs(v) < 0.005 ? '—' : (v > 0 ? '+' : '−') + qm(Math.abs(v)), L = (nav, t) => `${ltChip(nav, t)}`, pn = 'project:' + p.id, cell = (k, v, sub, cls, nav) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small>${nav ? ltChip(nav, String(v).replace(/<[^>]*>/g, '')) : `<b>${v}</b>`}${sub ? `<em>${sub}</em>` : ''}</div>`;
   const rows = invRows().filter(r => r.pid === p.id), txs = state.transactions.filter(t => (t.projectId === p.id || (clsOf(t) === 'job' && clsProjectId(t) === p.id)) && Number(t.moneyOut) > 0 && repIn(txCashDate(t) || t.date));
   const txl = t => `<tr><td>${t.date ? pwD(t.date) : '—'}</td><td>${finSrcLink({ t: 'txn', id: t.uid || String(state.transactions.indexOf(t)) }, t.description || 'Transaction')}</td><td>${escHtml(t.projCat || t.category || '')}</td><td class="qb-calc">${qm(t.moneyOut)}</td></tr>`;
   if(sec === 'summary'){
@@ -21176,11 +21237,11 @@ function repPipeHtml(){
     <div class="card"><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th></th>${d.months.map(k => `<th>${escHtml(monthLabel(new Date(k + '-01T00:00:00')))}</th>`).join('')}<th>No date</th></tr></thead><tbody><tr><td>Weighted pipeline expected to invoice</td>${d.months.map(k => `<td class="qb-calc">${d.by[k] ? qm(d.by[k]) : '—'}</td>`).join('')}<td class="qb-calc">${d.und ? qm(d.und) : '—'}</td></tr>
       <tr><td>Break-even</td>${d.months.map(() => `<td class="qb-calc">${d.be ? qm(d.be) : '—'}</td>`).join('')}<td></td></tr>
       <tr><td><b>Against break-even</b></td>${d.months.map(k => { const v = r2((d.by[k] || 0) - d.be); return `<td class="qb-calc ${d.be && v < 0 ? 'over' : ''}"><b>${d.be ? (v < 0 ? '−' : '+') + qm(Math.abs(v)) : '—'}</b></td>`; }).join('')}<td></td></tr></tbody></table></div></div>
-    <div class="card"><div class="qb-sec-h"><h4>The deals</h4></div><table class="qb-table qb-narrow"><tbody>${d.list.sort((a, b) => b.a - a.a).map(x => `<tr><td><button type="button" class="sp-link" data-nav="deal2:${x.r.id}">${escHtml(boardTitle('sales', x.r))}</button></td><td>${x.k ? escHtml(monthLabel(new Date(x.k + '-01T00:00:00'))) : '<span class="qb-dim">no date</span>'}</td><td>${Math.round(effectiveProb(x.r) * 100)}%</td><td class="qb-calc">${qm(x.a)}</td></tr>`).join('') || '<tr><td><span class="qb-dim">No open deals.</span></td></tr>'}</tbody></table></div>`;
+    <div class="card"><div class="qb-sec-h"><h4>The deals</h4></div><table class="qb-table qb-narrow"><tbody>${d.list.sort((a, b) => b.a - a.a).map(x => `<tr><td>${ltChip(`deal2:${x.r.id}`, boardTitle('sales', x.r))}</td><td>${x.k ? escHtml(monthLabel(new Date(x.k + '-01T00:00:00'))) : '<span class="qb-dim">no date</span>'}</td><td>${Math.round(effectiveProb(x.r) * 100)}%</td><td class="qb-calc">${qm(x.a)}</td></tr>`).join('') || '<tr><td><span class="qb-dim">No open deals.</span></td></tr>'}</tbody></table></div>`;
 }
 function repCapHtml(){
   const rows = capWeekRows(capItems(), repUi.from, repUi.to).filter(r => r.total > 0 || r.cap > 0);
-  return `<div class="card"><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Week of</th><th>Wanted</th><th>Available</th><th>Left</th><th>Biggest</th></tr></thead><tbody>${rows.map(r => { const left = r.cap - r.total, big = r.parts.slice().sort((a, b) => b.hours - a.hours)[0]; return `<tr><td><button type="button" class="sp-link" data-nav-tab="capacity">${escHtml(pwD(r.mon))}</button></td><td class="qb-calc">${capH(r.total)}</td><td class="qb-calc">${capH(r.cap)}</td><td class="qb-calc ${left < 0 ? 'over' : ''}">${left < 0 ? '−' : ''}${capH(Math.abs(left))}</td><td>${big ? `<button type="button" class="sp-link" data-nav="${big.item.kind === 'project' ? 'project:' + big.item.id + ':plan' : 'deal2:' + big.item.id}">${escHtml(big.item.name)}</button>` : '—'}</td></tr>`; }).join('') || '<tr><td colspan="5"><span class="qb-dim">Nothing is dated in this range.</span></td></tr>'}</tbody></table></div></div><p class="q-help">Wanted hours come from dated phases, weighted for sales and leads; the page that works them out is <button type="button" class="sp-link" data-nav-tab="capacity">Calendar and capacity →</button></p>`;
+  return `<div class="card"><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Week of</th><th>Wanted</th><th>Available</th><th>Left</th><th>Biggest</th></tr></thead><tbody>${rows.map(r => { const left = r.cap - r.total, big = r.parts.slice().sort((a, b) => b.hours - a.hours)[0]; return `<tr><td><button type="button" class="sp-link" data-nav-tab="capacity">${escHtml(pwD(r.mon))}</button></td><td class="qb-calc">${capH(r.total)}</td><td class="qb-calc">${capH(r.cap)}</td><td class="qb-calc ${left < 0 ? 'over' : ''}">${left < 0 ? '−' : ''}${capH(Math.abs(left))}</td><td>${big ? `${ltChip(`${big.item.kind === 'project' ? 'project:' + big.item.id + ':plan' : 'deal2:' + big.item.id}`, big.item.name)}` : '—'}</td></tr>`; }).join('') || '<tr><td colspan="5"><span class="qb-dim">Nothing is dated in this range.</span></td></tr>'}</tbody></table></div></div><p class="q-help">Wanted hours come from dated phases, weighted for sales and leads; the page that works them out is <button type="button" class="sp-link" data-nav-tab="capacity">Calendar and capacity →</button></p>`;
 }
 function repBody(k){
   const m0 = repUi.from.slice(0, 7), m1 = repUi.to.slice(0, 7);
@@ -21231,7 +21292,7 @@ function msHtml(key){
   return `<div class="kpi-row">${kpi('Lowest cash point, next 8 weeks', qm(pr.low.close), 'week of ' + escHtml(pwD(pr.low.a)) + ' · <button type="button" class="sp-link" data-f6="cfview" data-v="review">Weekly review →</button>', 'var(--plum)', pr.low.close < 0 ? 'over' : '')}
     ${kpi('Overdue money owed to me', qm(finSum(od)), od.length + ' invoice' + (od.length === 1 ? '' : 's') + (od2.length ? ' · I owe ' + qm(finSum(od2)) + ' overdue' : '') + ' · <button type="button" class="sp-link" data-f6="ageing" data-v="me">Ageing →</button>', 'var(--bt-bad-fg)', od.length ? 'over' : '')}
     ${kpi('Margin per job', avg.n ? avg.pct.toFixed(1) + '%' : '—', avg.n ? 'average now across ' + avg.n + ' job' + (avg.n === 1 ? '' : 's') + (jobs.length ? ', lowest ' + jobs[0].mg.nowPct.toFixed(1) + '% (' + escHtml(jobs[0].p.name) + ')' : '') : 'no job has an accepted quote and plan yet', 'var(--green)')}</div>
-    <div class="card"><div class="qb-sec-h"><h4>Margin per job</h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Job</th><th>Price (ex VAT)</th><th>As sold</th><th>Now</th><th>Now %</th></tr></thead><tbody>${jobs.map(({ p, mg }) => `<tr><td><button type="button" class="sp-link" data-nav="project:${p.id}:money">${escHtml(recordCode(p.id, 'project') + ' ' + p.name)}</button></td><td class="qb-calc">${qm(mg.rev)}</td><td class="qb-calc">${qm(mg.sold)}</td><td class="qb-calc ${mg.now < mg.sold - 0.005 ? 'over' : ''}">${qm(mg.now)}</td><td class="qb-calc">${mg.nowPct.toFixed(1)}%</td></tr>`).join('') || '<tr><td colspan="5"><span class="qb-dim">No job has an accepted quote and Working plan yet.</span></td></tr>'}</tbody></table></div></div>
+    <div class="card"><div class="qb-sec-h"><h4>Margin per job</h4></div><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Job</th><th>Price (ex VAT)</th><th>As sold</th><th>Now</th><th>Now %</th></tr></thead><tbody>${jobs.map(({ p, mg }) => `<tr><td>${ltChip(`project:${p.id}:money`, recordCode(p.id, 'project') + ' ' + p.name)}</td><td class="qb-calc">${qm(mg.rev)}</td><td class="qb-calc">${qm(mg.sold)}</td><td class="qb-calc ${mg.now < mg.sold - 0.005 ? 'over' : ''}">${qm(mg.now)}</td><td class="qb-calc">${mg.nowPct.toFixed(1)}%</td></tr>`).join('') || '<tr><td colspan="5"><span class="qb-dim">No job has an accepted quote and Working plan yet.</span></td></tr>'}</tbody></table></div></div>
     <h4 style="margin:14px 0 6px;">The month's waterfall</h4>${wfHtml(key)}
     <h4 style="margin:14px 0 6px;">Pipeline against break-even</h4>${repPipeHtml()}`;
 }
