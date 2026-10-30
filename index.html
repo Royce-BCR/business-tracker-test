@@ -1240,6 +1240,7 @@
   .bd-tile.bd-placeholder { opacity: 0.35; border-style: dashed; box-shadow: none; }
   .bd-ghost { position: fixed; z-index: 120; pointer-events: none; margin: 0; opacity: 0.95; transform: rotate(1.5deg); box-shadow: 0 10px 28px color-mix(in srgb, var(--bt-ink) 28%, transparent); cursor: grabbing; }
   body.dnd-active .bd-board { scroll-snap-type: none; }
+  @media (min-width: 1200px) { .bd-col { flex: 1 1 0; min-width: 0; max-width: none; } }   /* desktop: all six columns fit side by side; tablet and phone keep the sideways scroll */
   body.dnd-active, body.dnd-active * { cursor: grabbing !important; user-select: none !important; -webkit-user-select: none !important; }
   @media (max-width: 860px) {
     .bd-col { flex-basis: 78vw; min-width: 220px; max-width: 320px; max-height: max(360px, calc(100vh - 240px)); }
@@ -2443,8 +2444,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-tabs .rp-more-menu .rp-more-item:focus-visible { outline-color: var(--bt-focus); }
 .rp-tabs button:hover { color: var(--bt-ink); } .rp-tabs button.active { color: var(--bt-ink); border-bottom-color: var(--bt-brand-2); }
 .rp-cbody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.rp-strip { flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
-.rp-hl { background: var(--bt-surface-2); padding: var(--bt-s2) var(--bt-s3); min-width: 0; } .rp-hl small { display: block; font-size: var(--bt-fs-2xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; } .rp-hl b { display: block; font-size: var(--bt-fs-base); line-height: 1.25; overflow-wrap: anywhere; } .rp-hl em { display: block; font-style: normal; font-size: var(--bt-fs-2xs); color: var(--text-muted); }
+.rp-strip { flex: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 0; background: var(--bt-surface-2); border-bottom: 1px solid var(--line); }
+.rp-hl { background: var(--bt-surface-2); border-right: 1px solid var(--line); border-top: 1px solid var(--line); margin-bottom: -1px; padding: var(--bt-s2) var(--bt-s3); min-width: 0; } .rp-hl small { display: block; font-size: var(--bt-fs-2xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; } .rp-hl b { display: block; font-size: var(--bt-fs-base); line-height: 1.25; overflow-wrap: normal; word-break: normal; hyphens: none; } .rp-hl em { display: block; font-style: normal; font-size: var(--bt-fs-2xs); color: var(--text-muted); }
 .rp-hl.bad b { color: var(--bt-bad-fg); } .rp-hl.ok b { color: var(--bt-ok-fg); }
 .rp-cscroll { flex: 1; min-height: 0; overflow-y: auto; padding: var(--bt-s4); overscroll-behavior: contain; }
 .rp-card { background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--bt-r-card); padding: var(--bt-s3) var(--bt-s4); margin-bottom: var(--bt-s3); } .rp-card h4 { margin: 0 0 var(--bt-s2); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -6817,9 +6818,11 @@ function projEventsUnique(p){
 
 function projNextMs(p){
   const l = state.pipelineStages.project.filter(s => s.key);
-  const open = l.find(s => !projMsActual(p, s.key)); if(!open) return null;   // the first milestone nobody has confirmed
+  const wrap = projWrapUp(p);
+  let from = 0; if(wrap){ l.forEach((s, ix) => { if(projMsActual(p, s.key)) from = ix + 1; }); }   // display only: a finished job (invoiced, paid or completed) skips old unconfirmed milestones and looks ahead from the last confirmed one
+  const open = l.slice(from).find(s => !projMsActual(p, s.key)); if(!open) return null;   // the first milestone nobody has confirmed
   const i = projMsInfo(p, open.key);
-  return { name: open.name, key: open.key, date: i.planned || '', planned: true, status: i.status };
+  return { name: wrap && open.key === 'paid' ? 'Payment due' : open.name, key: open.key, date: i.planned || '', planned: true, status: i.status };
 }
 function projProgress(p){ const i = projStage6(p).n - 1, n = PROJ_STAGE6.length; return { i, n, pct: Math.round((i + 1) / n * 100) }; }
 /* money this month, from the same events */
@@ -18175,7 +18178,7 @@ function rpNextInvoice(p){
 function rpHeadlineHtml(p){
   const ct = projContract(p), st = rpStatus(p), d = rpDates(p), onsite = projMsActual(p, 'onSiteStart'), mo = rpMoney(p), ni = rpNextInvoice(p);
   const cell = (k, v, sub, cls) => `<div class="rp-hl${cls ? ' ' + cls : ''}"><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
-  return `<div class="rp-strip">${cell('Sales value', rpM(ct.value), 'ex VAT')}${cell('Status', escHtml(st.t), escHtml(st.s), st.k)}${!onsite && projWrapUp(p) ? cell('On site', 'Not confirmed', d.start ? 'planned ' + escHtml(pwD(d.start)) : '') : cell('Next on site', onsite ? 'On site' : (d.start ? escHtml(pwD(d.start)) : '—'), onsite ? 'since ' + escHtml(pwD(onsite.date)) : (d.start ? escHtml(pwRel(d.start)) : 'no planned date'))}${cell('Overdue', rpM(mo.overdue), 'invoices', mo.overdue ? 'bad' : '')}${cell('Next invoice', ni ? escHtml(pwD(ni.dueDate)) : '—', ni ? rpM(ni.amount) : 'none to raise')}</div>`;
+  return `<div class="rp-strip">${cell('Sales value', rpM(ct.value), 'ex VAT')}${cell('Status', escHtml(st.t), escHtml(st.s), st.k)}${!onsite && projWrapUp(p) ? cell('On site', 'Unconfirmed', d.start ? 'planned ' + escHtml(pwD(d.start)) : '') : cell('Next on site', onsite ? 'On site' : (d.start ? escHtml(pwD(d.start)) : '—'), onsite ? 'since ' + escHtml(pwD(onsite.date)) : (d.start ? escHtml(pwRel(d.start)) : 'no planned date'))}${cell('Overdue', rpM(mo.overdue), 'invoices', mo.overdue ? 'bad' : '')}${cell('Next invoice', ni ? escHtml(pwD(ni.dueDate)) : '—', ni ? rpM(ni.amount) : 'none to raise')}</div>`;
 }
 /* Outstanding: what is waiting on us, and what is waiting on others */
 function rpOutstanding(p){
