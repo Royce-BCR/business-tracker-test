@@ -3317,8 +3317,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="section-label">Who can see business tasks and costs</div>
     <div class="card" id="bizAccessCard"></div>
 
-    <div class="section-label">Today</div>
-    <div class="card" id="todayLimitCard"></div>
+    <div class="section-label">Task defaults</div>
+    <div class="card" id="taskDefaultsCard"></div>
         </section>
 
         <section class="set-sec" data-sec="suppliers">
@@ -12548,7 +12548,7 @@ function renderActions(){
     const rowClass = [overdue?'flag-row':'', isArchiving?'archiving':''].filter(Boolean).join(' ');
     html += `<tr${rowClass?` class="${rowClass}"`:''}>
       <td><div class="cbx${isArchiving?' checked':''}" data-action="toggle-done" data-idx="${i}" title="Complete &amp; archive">${CHECK_SVG}</div></td>
-      <td><input type="date" data-tab="actions" data-idx="${i}" data-field="dateRaised" value="${r.dateRaised||''}"></td>
+      <td class="act-raised" title="Date raised is set automatically and cannot be edited">${r.dateRaised ? escHtml(fmtDisplay(toDate(r.dateRaised))) : ''}</td>
       <td><input class="acc-action-text" data-tab="actions" data-idx="${i}" data-field="action" value="${escAttr(r.action)}"></td>
       <td><input list="ownersList" data-tab="actions" data-idx="${i}" data-field="owner" value="${escAttr(r.owner||'')}"></td>
       <td><input list="ownersList" data-tab="actions" data-idx="${i}" data-field="owner2" value="${escAttr(r.owner2||'')}" placeholder="optional"></td>
@@ -12707,6 +12707,8 @@ function ensureTaskModel(o){
     quoteId: Number(t.quoteId) > 0 ? Number(t.quoteId) : 0,
     description: iso(t.description), notesMigrated: !!t.notesMigrated, descNoteIds: Array.isArray(t.descNoteIds) ? t.descNoteIds.map(String) : [],
     createdAt: iso(t.createdAt), createdBy: iso(t.createdBy),
+    ...(taskRaisedOf(t) ? { dateRaised: taskRaisedOf(t) } : {}),   // Stage 9: stamped when the task is made; older tasks are filled from their created time, an existing value is never replaced
+    ...(validTime(t.dueTime) ? { dueTime: t.dueTime } : {}), ...(Math.floor(Number(t.durationMins)) > 0 && Math.floor(Number(t.durationMins)) <= 1440 ? { durationMins: Math.floor(Number(t.durationMins)) } : {}),   // Stage 9: optional, absent unless set
     scope: t.scope === 'business' ? 'business' : 'job',   // a job task belongs with a customer's work; a business task with running the business
     refs: (Array.isArray(t.refs) ? t.refs : []).filter(r => r && typeof r === 'object' && TASK_REF_KINDS.includes(r.kind) && r.id !== undefined && r.id !== '').map(r => ({ kind: r.kind, id: String(r.id) })),
     recur: normRecur(t.recur), spawnedId: iso(t.spawnedId),
@@ -12722,7 +12724,7 @@ function ensureTaskModel(o){
   o.nextTaskNo = Math.max(Number(o.nextTaskNo) || 0, maxNo + 1);
   { const st = (o.settings && typeof o.settings === 'object') ? o.settings : (o.settings = {});
     st.bizAccess = Array.isArray(st.bizAccess) ? st.bizAccess.map(x => String(x).trim()).filter(Boolean) : ['Lynton', 'Royce'];   // who can see business tasks and costs
-    const tl = Math.floor(Number(st.todayLimit)); st.todayLimit = tl >= 1 && tl <= 200 ? tl : 10; }
+    st.taskDefaultTime = validTime(st.taskDefaultTime) ? st.taskDefaultTime : '00:00'; st.taskDefaultDuration = [0, 15, 30, 60].includes(Number(st.taskDefaultDuration)) ? Number(st.taskDefaultDuration) : 0; }   // Stage 9: Settings > CRM & tasks > Task defaults
   const pr = (o.crmPrefs && typeof o.crmPrefs === 'object') ? o.crmPrefs : {};
   o.crmPrefs = { hiddenCols: (Array.isArray(pr.hiddenCols) ? pr.hiddenCols : []).filter(x => typeof x === 'string') };
   const ap = (o.actionPrefs && typeof o.actionPrefs === 'object') ? o.actionPrefs : {};   // optional Actions columns that are switched on (none by default)
@@ -12816,6 +12818,31 @@ function taskUsers(extra){
 }
 function userOptions(sel){ return '<option value="">Unassigned</option>' + taskUsers(sel).map(u => `<option value="${escAttr(u)}"${u === sel ? ' selected' : ''}>${escHtml(u)}</option>`).join(''); }
 
+/* ---- Stage 9: due time, duration and date raised ----
+   dueTime 'HH:MM' and durationMins are optional keys on a task or action (absent until set). A task with a date but no time is stored at the default task time
+   (Settings) and is shown as "Any time": a time equal to the default counts as untimed, so nothing ever sits at midnight on the schedule. A blank duration is drawn as 30
+   minutes on the schedule only and never saved. dateRaised is stamped once when the task is created and is read-only everywhere. */
+const validTime = v => /^([01]\d|2[0-3]):[0-5]\d$/.test(v || '');
+const taskDefaultTime = () => { const v = state && state.settings && state.settings.taskDefaultTime; return validTime(v) ? v : '00:00'; };
+const taskDefaultDuration = () => { const v = Number(state && state.settings && state.settings.taskDefaultDuration); return [15, 30, 60].includes(v) ? v : 0; };
+function taskRaisedOf(t){
+  if(/^\d{4}-\d{2}-\d{2}$/.test(t.dateRaised || '')) return t.dateRaised;
+  const c = typeof t.createdAt === 'string' ? Date.parse(t.createdAt) : NaN; return isNaN(c) ? '' : fmt(new Date(c));
+}
+function raisedLine(iso){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return 'Not recorded';
+  const n = daysBetween(iso, fmt(new Date())); return fmtDisplay(toDate(iso)) + ' · ' + (n <= 0 ? 'raised today' : n + (n === 1 ? ' day old' : ' days old'));
+}
+const LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const lockedField = (label, text) => `<div class="tk-lockf"><label>${label}</label><div class="tk-locked" role="textbox" aria-readonly="true" aria-label="${escAttr(label + ': ' + text + ', read only')}">${LOCK_SVG}<span>${escHtml(text)}</span><em>read only</em></div></div>`;
+/* the time a task is scheduled at: '' when it has none (blank, or the default time) */
+function timeOf(o){ const v = o && o.dueTime; return validTime(v) && v !== taskDefaultTime() ? v : ''; }
+function durOf(o){ const n = Math.floor(Number(o && o.durationMins)); return n > 0 ? n : 0; }
+const DUR_OPTS = [0, 15, 30, 45, 60, 90, 120];
+const durLabel = m => !m ? 'None' : m < 60 ? m + ' minutes' : m === 60 ? '1 hour' : (m % 60 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : (m / 60) + ' hours');
+const durShort = m => !m ? '' : m < 60 ? m + ' min' : (m % 60 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : (m / 60) + ' h');
+const durSelect = (cur, attrs) => `<select ${attrs}>${DUR_OPTS.concat(cur && !DUR_OPTS.includes(cur) ? [cur] : []).sort((a, b) => a - b).map(m => `<option value="${m}"${m === cur ? ' selected' : ''}>${durLabel(m)}</option>`).join('')}</select>`;
+
 /* ---- create / complete / notes ---- */
 function createTask(f){
   const t = {
@@ -12827,6 +12854,9 @@ function createTask(f){
   };
   t.linkedIds = migrateLinkedIds({ linkedIds: Array.isArray(f.linkedIds) ? f.linkedIds : (f.linkedId ? [f.linkedId] : []) });
   t.linkedId = t.linkedIds[0] || '';   // the old single field, kept in step only when the task is created (safety net)
+  t.dateRaised = fmt(new Date());   // Stage 9: stamped here, never edited
+  if(validTime(f.dueTime)) t.dueTime = f.dueTime; else if(t.dueDate) t.dueTime = taskDefaultTime();
+  const du = f.durationMins === undefined || f.durationMins === '' ? taskDefaultDuration() : Math.floor(Number(f.durationMins)); if(du > 0 && du <= 1440) t.durationMins = du;
   state.crmTasks.push(t); return t;
 }
 /* A note is kept on the task and also written to the timeline of EVERY record the task is linked to (one entry per deal, even if two
@@ -12889,7 +12919,7 @@ function taskSpawnNext(t){
   if(!t.recur) return null; let d = t.dueDate || fmt(new Date()), n = 0; const today = fmt(new Date());
   do { d = recurAdd(d, t.recur); n++; } while(d && d < today && n < 400);
   if(!d) return null;
-  const nx = createTask({ title: t.title, dueDate: d, priorityId: t.priorityId, typeId: t.typeId, owner: t.owner, linkedIds: t.linkedIds, description: t.description, quoteId: t.quoteId, scope: t.scope, refs: t.refs, recur: t.recur });
+  const nx = createTask({ title: t.title, dueDate: d, priorityId: t.priorityId, typeId: t.typeId, owner: t.owner, linkedIds: t.linkedIds, description: t.description, quoteId: t.quoteId, scope: t.scope, refs: t.refs, recur: t.recur, dueTime: t.dueTime, durationMins: t.durationMins === undefined ? 0 : t.durationMins });
   t.spawnedId = nx.id; return nx;
 }
 const RECUR_OPTS = [['', 'Does not repeat'], ['day1', 'Every day'], ['week1', 'Every week'], ['week2', 'Every 2 weeks'], ['month1', 'Every month'], ['month3', 'Every 3 months'], ['year1', 'Every year']];
@@ -12937,6 +12967,8 @@ function taskFormHtml(pl, rec){
   return `<div class="tkr-form" data-key="${key}" data-pl="${pl}" data-id="${rec.id}">
     <div class="tkf-wide"><label>Title</label><input class="tk-input" data-tkf="title" value="${escAttr(d.title || '')}" placeholder="What needs doing?"></div>
     <div><label>Due date</label><input type="date" class="tk-input" data-tkf="dueDate" value="${d.dueDate !== undefined ? d.dueDate : fmt(new Date())}"></div>
+    <div><label>Due time</label><input type="time" class="tk-input" data-tkf="dueTime" value="${escAttr(d.dueTime || '')}" title="Optional. Left blank, the task is saved at the default task time and shown as Any time."></div>
+    <div><label>Duration</label>${durSelect(d.durationMins !== undefined ? Number(d.durationMins) : taskDefaultDuration(), 'class="tk-input" data-tkf="durationMins"')}</div>
     <div><label>Priority</label><select class="tk-input" data-tkf="priorityId">${optionsHtml(prioList(), d.priorityId || defaultPrioId())}</select></div>
     <div><label>Type</label><select class="tk-input" data-tkf="typeId">${optionsHtml(typeList(), d.typeId || defaultTypeId())}</select></div>
     <div><label>Owner</label><select class="tk-input" data-tkf="owner">${userOptions(own)}</select></div>
@@ -12959,7 +12991,7 @@ function submitRecordTaskForm(form){
   const title = val('title').trim(), err = form.querySelector('.tkf-err');
   if(!title){ err.textContent = 'Give the task a title.'; form.querySelector('[data-tkf="title"]').focus(); return; }
   const pl = form.dataset.pl, id = Number(form.dataset.id);
-  createTask({ title, dueDate: val('dueDate'), priorityId: val('priorityId'), typeId: val('typeId'), owner: val('owner'), linkedId: recordCode(id, pl) });
+  createTask({ title, dueDate: val('dueDate'), dueTime: val('dueTime'), durationMins: val('durationMins'), priorityId: val('priorityId'), typeId: val('typeId'), owner: val('owner'), linkedId: recordCode(id, pl) });
   delete taskForms[form.dataset.key]; delete taskDrafts[form.dataset.key];
   render(); saveState();
 }
@@ -13142,13 +13174,13 @@ function actionPanelValid(){ return !!actionPanel && (actionPanel.isNew || state
 function openTaskPanel(id){ if(!findTask(id)) return; actionPanel = null; taskPanel = { mode: 'edit', id }; tkReset(); renderTaskPanel(); }
 function openNewTask(linked, o){
   o = o || {}; actionPanel = null; tkReset();
-  taskPanel = { mode: 'new', draft: { title: '', dueDate: o.undated ? '' : fmt(new Date()), priorityId: defaultPrioId(), typeId: defaultTypeId(), owner: meName(), linkedIds: linked ? [linked] : [], description: '', scope: o.scope === 'business' ? 'business' : 'job', refs: (o.refs || []).slice(), recur: null } };
+  taskPanel = { mode: 'new', draft: { title: '', dueDate: o.undated ? '' : fmt(new Date()), priorityId: defaultPrioId(), typeId: defaultTypeId(), owner: meName(), linkedIds: linked ? [linked] : [], description: '', scope: o.scope === 'business' ? 'business' : 'job', refs: (o.refs || []).slice(), recur: null, dueTime: '', durationMins: taskDefaultDuration() } };
   renderTaskPanel(); setTimeout(() => { const el = document.getElementById('tkTitle'); if(el) el.focus(); }, 30);
 }
 function openActionPanel(ref){ if(!ref || !state.actions.includes(ref)) return; taskPanel = null; tkReset(); actionPanel = { ref, isNew: false }; renderActionPanel(); }
 function openNewAction(){
   taskPanel = null; tkReset();
-  const ref = Object.assign(newRowFor('actions'), { action: '', owner: meName() || 'TBC', deadline: fmt(new Date()) });   // due today by default
+  const ref = Object.assign(newRowFor('actions'), { action: '', owner: meName() || 'TBC', deadline: fmt(new Date()), dueTime: taskDefaultTime() }, taskDefaultDuration() ? { durationMins: taskDefaultDuration() } : {});   // due today by default
   actionPanel = { ref, isNew: true }; renderActionPanel();
   setTimeout(() => { const el = document.getElementById('tkTitle'); if(el) el.focus(); }, 30);
 }
@@ -13181,18 +13213,24 @@ function tkPropsHtml(){
       <div><label for="tkpPrio">Priority</label><select id="tkpPrio" data-tf="priorityId">${optionsHtml(prioList(), o.priorityId)}</select></div>
       <div><label for="tkpOwner">Assigned to</label><select id="tkpOwner" data-tf="owner">${userOptions(o.owner)}</select></div>
       <div><label for="tkpDue">Due date</label><input id="tkpDue" type="date" data-tf="dueDate" value="${escAttr(o.dueDate)}"></div>
+      <div><label for="tkpTime">Due time</label><input id="tkpTime" type="time" data-tf="dueTime" value="${escAttr(timeOf(o))}" title="Optional. Left blank, the task is saved at the default task time and shown as Any time."></div>
+      <div><label for="tkpDur">Duration</label>${durSelect(durOf(o), 'id="tkpDur" data-tf="durationMins"')}</div>
       <div><label for="tkpScope">Job or business</label><select id="tkpScope" data-tf="scope"><option value="job"${o.scope === 'business' ? '' : ' selected'}>Job (a customer's work)</option>${canSeeBusiness() || o.scope === 'business' ? `<option value="business"${o.scope === 'business' ? ' selected' : ''}>Business (running the company)</option>` : ''}</select></div>
       <div><label for="tkpRecur">Repeats</label><select id="tkpRecur" data-tf="recurKey">${RECUR_OPTS.map(([k, n]) => `<option value="${k}"${recurKey(o.recur) === k ? ' selected' : ''}>${n}</option>`).join('')}${o.recur && !RECUR_OPTS.some(x => x[0] === recurKey(o.recur)) ? `<option value="${recurKey(o.recur)}" selected>${escHtml(recurLabel(o.recur))}</option>` : ''}</select></div>
+      ${lockedField('Date raised', taskPanel.mode === 'new' ? 'Set automatically when the task is created' : raisedLine(o.dateRaised))}
     </div>`;
   return `<div class="tk-props">
       <div><label for="tkpStatus">Status</label><select id="tkpStatus" data-af="status">${['Not Started', 'In Progress', 'Waiting', 'Done'].map(x => `<option${o.status === x ? ' selected' : ''}>${x}</option>`).join('')}</select></div>
       <div><label for="tkpPrio">Priority</label><select id="tkpPrio" data-af="priority">${[0, 1, 2, 3].map(x => `<option value="${x}"${Number(o.priority) === x ? ' selected' : ''}>${x}</option>`).join('')}</select></div>
       <div><label for="tkpOwner">Owner</label><input id="tkpOwner" list="ownersList" data-af="owner" value="${escAttr(o.owner || '')}"></div>
       <div><label for="tkpDue">Due date</label><input id="tkpDue" type="date" data-af="deadline" value="${escAttr(o.deadline || '')}"></div>
+      <div><label for="tkpTime">Due time</label><input id="tkpTime" type="time" data-af="dueTime" value="${escAttr(timeOf(o))}" title="Optional. Left blank, the action is saved at the default task time and shown as Any time."></div>
+      <div><label for="tkpDur">Duration</label>${durSelect(durOf(o), 'id="tkpDur" data-af="durationMins"')}</div>
+      ${lockedField('Date raised', actionPanel && actionPanel.isNew ? 'Set automatically when the action is created' : raisedLine(o.dateRaised))}
     </div>
     <details class="tk-more"><summary>More details</summary><div class="tk-props">
       <div><label for="tkpOwner2">+ Owner</label><input id="tkpOwner2" list="ownersList" data-af="owner2" value="${escAttr(o.owner2 || '')}" placeholder="optional"></div>
-      <div><label for="tkpRaised">Date raised</label><input id="tkpRaised" type="date" data-af="dateRaised" value="${escAttr(o.dateRaised || '')}"></div></div></details>`;
+      </div></details>`;
 }
 function tkFormHtml(){
   const o = tkObj();
@@ -13380,7 +13418,11 @@ function panelFieldChange(el){
   const f = el.dataset.tf, isNew = taskPanel.mode === 'new', t = panelTask(); if(!t) return;
   let v = el.value;
   if(f === 'title'){ v = v.trim(); if(!v && !isNew){ el.value = t.title; autosizeTa(el); return; } el.value = v; autosizeTa(el); }
-  if(f === 'recurKey') t.recur = recurFromKey(v); else t[f] = v;
+  if(f === 'dateRaised') return;   // Stage 9: locked
+  if(f === 'recurKey') t.recur = recurFromKey(v);
+  else if(f === 'dueTime'){ if(validTime(v)) t.dueTime = v; else if(isNew) t.dueTime = ''; else if(t.dueDate) t.dueTime = taskDefaultTime(); else delete t.dueTime; }
+  else if(f === 'durationMins'){ const n = Math.floor(Number(v)); if(n > 0) t.durationMins = n; else if(isNew) t.durationMins = 0; else delete t.durationMins; }
+  else{ t[f] = v; if(f === 'dueDate' && !isNew && v && !validTime(t.dueTime)) t.dueTime = taskDefaultTime(); }   // a date with no time is stored at the default time and shown as Any time
   tkAfterChange();
 }
 document.addEventListener('change', (e) => { if(e.target.dataset && e.target.dataset.tf && taskPanel) panelFieldChange(e.target); });
@@ -13761,7 +13803,10 @@ document.addEventListener('change', (e) => {   // Action panel fields (title, st
   let v = el.value;
   if(f === 'action'){ v = v.trim(); if(!v && !isNew){ el.value = r.action; autosizeTa(el); return; } el.value = v; autosizeTa(el); }
   if(f === 'priority') v = Number(v);
-  r[f] = v;
+  if(f === 'dateRaised') return;   // Stage 9: locked
+  if(f === 'dueTime'){ if(validTime(v)) r.dueTime = v; else if(r.deadline) r.dueTime = taskDefaultTime(); else delete r.dueTime; }
+  else if(f === 'durationMins'){ const n = Math.floor(Number(v)); if(n > 0) r.durationMins = n; else delete r.durationMins; }
+  else{ r[f] = v; if(f === 'deadline' && v && !validTime(r.dueTime)) r.dueTime = taskDefaultTime(); }
   tkAfterChange();
 });
 
@@ -14683,7 +14728,7 @@ function render(){
   cxRender();
   pjRender();
   renderToday();
-  renderTaskOptions(); renderBizAccess(); renderTodayLimit();
+  renderTaskOptions(); renderBizAccess(); renderTaskDefaults();
   applyResizable();
 }
 
@@ -14708,6 +14753,7 @@ function newRowFor(tab){
 function applyFieldChange(el){
   const tab = el.dataset.tab; if(!tab) return;
   const field = el.dataset.field; let value = el.value;
+  if(tab === 'actions' && field === 'dateRaised') return;   // Stage 9: date raised is locked
   touchFromEl(el);
   if(tab === 'transactions'){ const tx0 = state.transactions[Number(el.dataset.idx)]; if(tx0 && (reconLockedTx(tx0) || (field === 'date' && value && reconGuardDate(value, txAccId(tx0))))){ if(reconLockedTx(tx0)) showToast('This transaction is in a reconciled month. Unlock the month in Bank Reconciliation (with a reason) to change it.', null, 9000); render(); return; } }
   if(el.type === 'number') value = value==='' ? 0 : Number(value);
@@ -18665,15 +18711,21 @@ document.addEventListener('change', (e) => {
   const n = el.dataset.bizAccess, cur = state.settings.bizAccess.filter(h => h.toLowerCase() !== n.toLowerCase());
   if(el.checked) cur.push(n); state.settings.bizAccess = cur; saveState(); render(); showToast(el.checked ? n + ' can now see business tasks' : n + ' can no longer see business tasks');
 });
-function renderTodayLimit(){
-  const el = document.getElementById('todayLimitCard'); if(!el || !state) return;
-  if(el.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
-  el.innerHTML = `<p style="font-size:12.5px;color:var(--text-muted);margin:0 0 10px;line-height:1.55;max-width:760px;">How many items each action tile on Today shows before a “See more” link. Everything else stays one click away.</p>
-    <div class="assumptions-grid" style="grid-template-columns:minmax(160px,220px);"><div><label for="todayLimitIn">Items per tile on Today</label><input id="todayLimitIn" type="number" min="1" max="200" step="1" inputmode="numeric" data-today-limit value="${state.settings.todayLimit}"></div></div>`;
+function renderTaskDefaults(){
+  const el = document.getElementById('taskDefaultsCard'); if(!el || !state) return;
+  if(el.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName)) return;
+  const dd = taskDefaultDuration();
+  el.innerHTML = `<div class="assumptions-grid" style="grid-template-columns:minmax(160px,240px) minmax(160px,300px);align-items:start;">
+      <div><label for="tdTime">Default due time</label><input id="tdTime" type="time" data-taskdef="time" value="${escAttr(taskDefaultTime())}"><div class="q-help">Used when a task has a date but no time. Starts at 00:00. Tasks at this time are listed under “Any time” on Today, never on the schedule.</div></div>
+      <div><label for="tdDur">Default duration</label><select id="tdDur" data-taskdef="dur">${[0, 15, 30, 60].map(m => `<option value="${m}"${m === dd ? ' selected' : ''}>${m ? (m === 60 ? '1 hour' : m + ' minutes') : 'None'}</option>`).join('')}</select><div class="q-help">Optional. Given to each new task; any task can change it. None means blank, drawn as 30 minutes on the schedule only.</div></div>
+    </div>
+    <div class="q-help" style="margin-top:10px">Date raised is stamped when a task is created and cannot be edited.</div>`;
 }
 document.addEventListener('change', (e) => {
-  const el = e.target; if(!el.dataset || el.dataset.todayLimit === undefined || !state) return;
-  const n = Math.floor(Number(el.value)); state.settings.todayLimit = n >= 1 && n <= 200 ? n : state.settings.todayLimit; el.value = state.settings.todayLimit; saveState(); render();
+  const el = e.target; if(!el.dataset || el.dataset.taskdef === undefined || !state) return;
+  if(el.dataset.taskdef === 'time'){ if(validTime(el.value)) state.settings.taskDefaultTime = el.value; else el.value = taskDefaultTime(); }
+  else state.settings.taskDefaultDuration = [15, 30, 60].includes(Number(el.value)) ? Number(el.value) : 0;
+  saveState(); render();
 });
 /* hide the Business tasks page from anyone not allowed, wherever the menu is drawn */
 function bizSyncMenu(){
