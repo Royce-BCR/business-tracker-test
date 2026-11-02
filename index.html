@@ -603,7 +603,7 @@
   .suppliers-table tr.sup-active td:first-child { box-shadow: inset 0 2px 0 var(--bt-bronze), inset 0 -2px 0 var(--bt-bronze), inset 2px 0 0 var(--bt-bronze); }
   .suppliers-table tr.sup-active td:last-child { box-shadow: inset 0 2px 0 var(--bt-bronze), inset 0 -2px 0 var(--bt-bronze), inset -2px 0 0 var(--bt-bronze); }
   @media (max-width: 700px) { #suppliersTableWrap.fitmode > table { min-width: 1060px !important; } }   /* phones: keep the columns readable and scroll sideways */
-  .sup-empty { padding: var(--bt-s6) var(--bt-s4); text-align: center; color: var(--text-muted); font-size: var(--bt-fs-sm); }   /* one empty-state look: .sup-empty, .crm-empty, .td-empty */
+  .sup-empty { padding: var(--bt-s6) var(--bt-s4); text-align: center; color: var(--text-muted); font-size: var(--bt-fs-sm); }   /* one empty-state look: .sup-empty, .crm-empty */
   .lp-contact-top .sp-primary { font-size: var(--bt-fs-xs); font-weight: 600; color: var(--bt-ok-fg); background: var(--bt-ok-bg); border: 1px solid var(--bt-ok-bd); padding: 1px 9px; border-radius: var(--bt-r-pill); }
   /* utility classes: inline styles that were repeated 3 or more times (!important keeps them as strong as the inline style they replaced) */
   .u-font-size-var-v-bt-fs-xs { font-size:var(--bt-fs-xs) !important; }
@@ -1564,38 +1564,150 @@
   .tab-count { font-size: var(--bt-fs-2xs); font-weight: 700; line-height: 1; padding: 3px 7px; border-radius: var(--bt-r-pill); background: color-mix(in srgb, var(--bt-on-dark) 14%, transparent); color: var(--bt-on-dark); }
   .tab-count.over { background: var(--bt-bad-fg); }
   .tab-count[hidden] { display: none; }
-  .today-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
-  @media (max-width: 900px){ .today-grid { grid-template-columns: 1fr; } }
-  .td-card { background: var(--bt-card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px var(--bt-s4) var(--bt-s2); box-shadow: var(--shadow); min-width: 0; }
-  .td-head { display: flex; align-items: center; gap: var(--bt-s2); margin-bottom: 6px; }
-  .td-head h3 { margin: 0; font-size: var(--bt-fs-sm); font-weight: 600; }
-  .td-head .n { font-size: var(--bt-fs-xs); font-weight: 700; background: var(--bt-neu-bg); color: var(--slate); border-radius: var(--bt-r-pill); padding: 1px var(--bt-s2); }
-  .td-head .btn { margin-left: auto; padding: 5px var(--bt-s3); font-size: var(--bt-fs-xs); }
-  .td-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--bt-s1) 10px; padding: 9px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
-  .td-row:last-child { border-bottom: none; }
-  .td-row:hover .td-title { color: var(--bt-brand-text); }
-  .td-row .cbx { margin: 0; flex-shrink: 0; }
-  .td-title { flex: 1 1 160px; min-width: 0; font-weight: 500; font-size: 13px; overflow-wrap: anywhere; }
-  .td-meta { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--bt-s1) 10px; font-size: var(--bt-fs-xs); color: var(--slate); }
-  .td-meta .link-btn { font-size: var(--bt-fs-xs); text-decoration: none; color: var(--slate); max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .td-meta .link-btn:hover { text-decoration: underline; color: var(--bt-brand-text); }
-  .td-meta .link-btn.dim { color: var(--text-muted); }
-  .td-due { color: var(--bt-bad-fg); font-weight: 600; }
-  .td-row.archiving { opacity: 0.38; transition: opacity 1.8s ease; pointer-events: none; }
-  .td-none { padding: var(--bt-s2) 0; color: var(--text-muted); font-size: var(--bt-fs-sm); display: flex; align-items: center; gap: var(--bt-s3); }
-  .td-sub-none { display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; } .td-sub-none .td-head { margin: 0; } .td-sub-none .td-none { padding: 0; }
-  .td-card:has(> .td-none:only-of-type, > .td-head + .td-none) { padding-top: var(--bt-s3); padding-bottom: var(--bt-s3); }
-  @media (max-width: 700px) { #panel-today.active { display: flex; flex-direction: column; } #panel-today > .td-greet { order: 0; } #panel-today > .page-head { order: 1; } #panel-today > .today-grid { order: 2; } #panel-today > .td-crit { order: 3; margin-top: var(--bt-s4); } }   /* on a phone the tasks come first, then the time-critical lists */
-  .td-empty { padding: var(--bt-s6) var(--bt-s4); color: var(--text-muted); text-align: center; font-size: var(--bt-fs-sm); }
-  .td-empty .link-btn { display: block; margin: 6px auto 0; font-size: var(--bt-fs-xs); }
-  .td-od { width: 100%; display: flex; align-items: center; gap: var(--bt-s2); background: var(--bt-bad-bg); color: var(--bt-bad-fg); border: none; border-radius: var(--bt-r-btn); padding: 7px var(--bt-s3); font: inherit; font-size: var(--bt-fs-xs); font-weight: 600; cursor: pointer; margin: 2px 0 6px; text-align: left; }
-  .td-od:hover { background: var(--bt-oak-100); }
-  .td-od .chev { width: 14px; height: 14px; margin-left: auto; transition: transform 0.15s; }
-  .td-od.open .chev { transform: rotate(90deg); }
-  .td-od-list { background: var(--bt-surface-2); border-radius: var(--bt-r-btn); padding: 0 var(--bt-s3); margin-bottom: 6px; }
-  .td-od-list[hidden] { display: none; }
   .stage-row input[type=checkbox], .stage-row .pct-wrap input { width: auto; }
   .modal-extra input { border: 1px solid var(--line); background: var(--bt-card); padding: var(--bt-s2); }
+
+  /* ---------------- Today page (Stage 9): tokens map onto the app's own, so a theme change follows ---------------- */
+  #panel-today { --td-bg: var(--paper); --td-surface: var(--bt-card); --td-sunk: var(--bt-neu-bg); --td-ink: var(--bt-ink); --td-muted: var(--bt-text-muted); --td-line: var(--bt-line);
+    --td-oak: var(--bt-oak-600); --td-oak-bg: var(--bt-oak-100); --td-green: var(--bt-ok-fg); --td-green-bg: var(--bt-ok-bg); --td-red: var(--bt-bad-fg); --td-red-bg: var(--bt-bad-bg);
+    --td-amber: var(--bt-warn-fg); --td-amber-bg: var(--bt-warn-bg); --td-slate: var(--bt-info-fg); --td-slate-bg: var(--bt-info-bg); --td-bar: color-mix(in srgb, var(--paper) 97%, transparent); }
+  .tdp { container-type: inline-size; container-name: tdp; }
+  .tdp-hero { padding: 48px 0 18px; display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; }
+  .tdp-greet { font-family: var(--serif); font-weight: 600; font-size: 44px; line-height: 1.05; margin: 0; text-wrap: balance; color: var(--bt-brand-text); }
+  .tdp-subl { color: var(--td-muted); font-size: 16px; margin: 0; max-width: 54ch; }
+  .tdp-sent { height: 1px; }
+  .tdp-ctl { position: sticky; top: calc(var(--navtop, 44px) + var(--navh, 0px)); z-index: 6; display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; padding: 12px var(--px); margin: 0 calc(-1 * var(--px)); border-bottom: 1px solid transparent; transition: padding .2s, background .2s, border-color .2s; }
+  .tdp-ctl.stuck { padding-block: 8px; background: var(--td-bar); border-bottom-color: var(--td-line); }
+  .tdp-left { justify-self: start; display: flex; gap: 8px; align-items: center; }
+  .tdp-right { justify-self: end; display: flex; gap: 8px; align-items: center; position: relative; }
+  .tdp-ib { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--td-line); background: var(--td-surface); color: var(--td-ink); cursor: pointer; font: inherit; font-size: 18px; display: inline-grid; place-items: center; flex: none; padding: 0; }
+  .tdp-ib:hover { background: var(--td-sunk); }
+  .tdp-ib[aria-pressed="true"] { background: var(--td-ink); color: var(--td-bg); border-color: var(--td-ink); }
+  .tdp-vs { display: inline-flex; background: var(--td-sunk); border-radius: 8px; padding: 2px; gap: 2px; }
+  .tdp-vs button { font: inherit; font-size: 13px; border: 0; background: none; color: var(--td-muted); padding: 6px 12px; border-radius: 6px; cursor: pointer; min-height: 32px; }
+  .tdp-vs button[aria-pressed="true"] { background: var(--td-surface); color: var(--td-ink); box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+  .tdp-fbtn { font: inherit; font-size: 13.5px; font-weight: 500; border: 0; background: var(--td-ink); color: var(--td-bg); padding: 7px 14px; border-radius: 8px; cursor: pointer; min-height: 36px; white-space: nowrap; }
+  .tdp-fbtn b { font-weight: 600; margin-left: 6px; opacity: .8; }
+  .tdp-fbtn[disabled] { opacity: .45; cursor: default; }
+  .tdp-dzone { display: flex; align-items: center; gap: 6px; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .tdp-dbtn { border: 0; background: none; font: inherit; cursor: grab; text-align: center; color: var(--td-ink); padding: 2px 10px; border-radius: 10px; min-width: 170px; }
+  .tdp-dbtn:active { cursor: grabbing; }
+  .tdp-dbtn .wk { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--td-muted); line-height: 1.2; font-variant: small-caps; text-transform: none; font-weight: 600; }
+  .tdp-dbtn .dt { display: block; font-size: 18px; font-weight: 600; line-height: 1.25; white-space: nowrap; }
+  .tdp-dbtn .dt .s { display: none; }
+  .tdp-tdy { display: inline-block; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; background: var(--td-oak-bg); color: var(--td-oak); padding: 1px 7px; border-radius: 99px; margin-left: 6px; vertical-align: 2px; font-weight: 600; }
+  .tdp-ctl.stuck .tdp-dbtn .wk { display: none; } .tdp-ctl.stuck .tdp-dbtn .dt { font-size: 15px; } .tdp-ctl.stuck .tdp-dbtn { min-width: 0; }
+  .tdp-ctl.stuck .tdp-dbtn .dt .f { display: none; } .tdp-ctl.stuck .tdp-dbtn .dt .s { display: inline; }
+  .tdp-ctl.stuck .tdp-ib { width: 32px; height: 32px; } .tdp-ctl.stuck .tdp-fbtn { min-height: 32px; padding: 5px 12px; }
+  @keyframes tdpInL { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+  @keyframes tdpInR { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+  .tdp-dbtn.sl { animation: tdpInL .2s; } .tdp-dbtn.sr { animation: tdpInR .2s; }
+  .tdp-sw { display: none; font-size: 11px; color: var(--td-muted); text-align: center; margin-top: -2px; }
+  .tdp-more { position: relative; display: inline-flex; }
+  .tdp-menu { position: absolute; right: 0; top: calc(100% + 6px); min-width: 180px; background: var(--td-surface); border: 1px solid var(--td-line); border-radius: 10px; box-shadow: var(--shadow-lift); padding: 4px; z-index: 30; display: flex; flex-direction: column; }
+  .tdp-menu button { font: inherit; font-size: 13.5px; text-align: left; border: 0; background: none; color: var(--td-ink); padding: 10px 12px; border-radius: 8px; cursor: pointer; min-height: 40px; }
+  .tdp-menu button:hover, .tdp-menu button:focus-visible { background: var(--td-sunk); }
+  .tdp-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 6px 0 44px; }
+  .tdp-body.po { grid-template-columns: minmax(0, 1fr) 310px; }
+  .tdp-main-pane { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .tdp-sec { display: flex; align-items: baseline; gap: 8px; margin: 4px 0 0; }
+  .tdp-sec h3 { margin: 0; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; font-weight: 600; color: var(--td-muted); font-family: var(--sans); }
+  .tdp-sec .n { font-size: 12px; color: var(--td-muted); } .tdp-sec.red h3 { color: var(--td-red); }
+  .tdp-panel { background: var(--td-surface); border: 1px solid var(--td-line); border-radius: 10px; }
+  .tdp-rows { display: flex; flex-direction: column; }
+  .tdp-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 12px 14px; border-top: 1px solid var(--td-line); transition: background .12s, opacity .25s; }
+  .tdp-row:first-child, .tdp-mrow:first-child { border-top: 0; }
+  .tdp-row:hover { background: color-mix(in srgb, var(--td-sunk) 55%, transparent); }
+  .tdp-tick { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--td-muted); background: none; cursor: pointer; margin-top: 1px; display: grid; place-items: center; color: transparent; padding: 0; }
+  .tdp-tick svg { width: 12px; height: 12px; } .tdp-tick:hover { border-color: var(--td-green); }
+  .tdp-row.done .tdp-tick { background: var(--td-green); border-color: var(--td-green); color: #fff; }
+  .tdp-row.done .tdp-ttl { text-decoration: line-through; color: var(--td-muted); } .tdp-row.done { opacity: .55; }
+  .tdp-main { min-width: 0; }
+  .tdp-ttl { font-weight: 500; font-size: 14.5px; overflow-wrap: anywhere; background: none; border: 0; padding: 0; text-align: left; font-family: inherit; color: var(--td-ink); cursor: pointer; display: block; }
+  .tdp-ttl:hover { text-decoration: underline; text-decoration-color: var(--td-line); } .tdp-static { cursor: default; } .tdp-static:hover { text-decoration: none; }
+  .tdp-sub { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 5px; }
+  .tdp-sub2 { font-size: 12.5px; color: var(--td-muted); margin-top: 4px; overflow-wrap: anywhere; }
+  .tdp-acts { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .tdp-acts.hov { opacity: 0; transition: opacity .12s; } .tdp-row:hover .tdp-acts.hov, .tdp-row:focus-within .tdp-acts.hov { opacity: 1; }
+  @media (hover: none) { .tdp-acts.hov { opacity: 1; } }
+  .tdp-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 2px 9px; border-radius: 99px; background: var(--td-sunk); color: var(--td-muted); white-space: nowrap; }
+  .tdp-pill.red { background: var(--td-red-bg); color: var(--td-red); } .tdp-pill.oak { background: var(--td-oak-bg); color: var(--td-oak); } .tdp-pill.slate { background: var(--td-slate-bg); color: var(--td-slate); }
+  .tdp-late { color: var(--td-red); font-weight: 500; font-size: 12.5px; white-space: nowrap; }
+  .tdp-btn { font: inherit; font-size: 13px; font-weight: 500; border: 1px solid var(--td-line); background: var(--td-surface); color: var(--td-ink); padding: 6px 12px; border-radius: 8px; cursor: pointer; min-height: 34px; white-space: nowrap; }
+  .tdp-btn:hover { background: var(--td-sunk); } .tdp-btn.pri { background: var(--td-green); border-color: var(--td-green); color: #fff; } .tdp-btn.big { min-height: 46px; font-size: 15px; padding: 10px 18px; } .tdp-btn.sm { min-height: 30px; padding: 4px 10px; font-size: 12.5px; }
+  .tdp-link { font: inherit; border: 0; background: none; color: var(--td-oak); text-decoration: underline; cursor: pointer; padding: 0; }
+  .tdp-empty { padding: 16px 14px; display: flex; flex-direction: column; gap: 3px; color: var(--td-muted); font-size: 14px; } .tdp-empty b { color: var(--td-ink); font-weight: 500; }
+  .tdp-fold { width: 100%; text-align: left; font: inherit; background: var(--td-surface); border: 1px dashed var(--td-line); border-radius: 10px; padding: 11px 14px; display: flex; justify-content: space-between; color: var(--td-muted); cursor: pointer; min-height: 42px; }
+  .tdp-fh { width: 100%; display: flex; align-items: center; gap: 8px; font: inherit; background: none; border: 0; padding: 6px 2px; cursor: pointer; color: var(--td-ink); text-align: left; margin-top: 4px; min-height: 36px; }
+  .tdp-chev { width: 14px; color: var(--td-muted); } .tdp-ft { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; font-weight: 600; color: var(--td-muted); }
+  .tdp-fh.red .tdp-ft { color: var(--td-red); } .tdp-cnt { font-size: 12px; font-weight: 600; background: var(--td-sunk); padding: 1px 8px; border-radius: 99px; } .tdp-fh.red .tdp-cnt { background: var(--td-red-bg); color: var(--td-red); } .tdp-hint { font-size: 12px; color: var(--td-muted); }
+  .tdp-mrow { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--td-line); }
+  .tdp-mtype { justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 8px; white-space: nowrap; background: var(--td-sunk); color: var(--td-muted); }
+  .tdp-mtype::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .tdp-mtype.order { background: var(--td-amber-bg); color: var(--td-amber); } .tdp-mtype.del { background: var(--td-slate-bg); color: var(--td-slate); } .tdp-mtype.site { background: var(--td-green-bg); color: var(--td-green); } .tdp-mtype.sign { background: var(--td-oak-bg); color: var(--td-oak); } .tdp-mtype.inv { background: var(--td-red-bg); color: var(--td-red); }
+  @container tdp (max-width: 560px) { .tdp-mrow { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; } .tdp-mrow .tdp-mtype { grid-column: 1 / -1; } }
+  .tdp-boardgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; align-items: start; } .tdp-stack { display: flex; flex-direction: column; gap: 8px; }
+  .tdp-card { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; } .tdp-cardtop { display: flex; justify-content: space-between; gap: 8px; }
+  .tdp-av { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10px; font-weight: 600; color: #fff; background: var(--td-slate); }
+  .tdp-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .tdp-card2 { background: var(--td-surface); border: 1px solid var(--td-line); border-radius: 10px; }
+  .tdp-ch { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 14px 4px; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; font-weight: 600; color: var(--td-muted); }
+  .tdp-ch button { font: inherit; font-size: 12px; letter-spacing: 0; text-transform: none; font-weight: 500; color: var(--td-oak); background: none; border: 0; cursor: pointer; padding: 4px 0; text-decoration: underline; }
+  .tdp-cb { padding: 6px 14px 14px; }
+  .tdp-week { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+  .tdp-wd { font: inherit; border: 1px solid transparent; background: none; border-radius: 10px; padding: 6px 0 7px; cursor: pointer; color: var(--td-ink); text-align: center; min-height: 58px; }
+  .tdp-wd span { display: block; font-size: 11px; color: var(--td-muted); } .tdp-wd b { display: block; font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .tdp-wd:hover { background: var(--td-sunk); } .tdp-wd.now b { color: var(--td-oak); }
+  .tdp-wd[aria-pressed="true"] { background: var(--td-ink); color: var(--td-bg); } .tdp-wd[aria-pressed="true"] span, .tdp-wd[aria-pressed="true"] b { color: var(--td-bg); }
+  .tdp-dots { display: flex !important; gap: 3px; justify-content: center; margin-top: 3px; min-height: 6px; } .tdp-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--td-oak); } .tdp-dots i.r { background: var(--td-red); }
+  .tdp-wd[aria-pressed="true"] .tdp-dots i { background: var(--td-bg); } .tdp-wd[aria-pressed="true"] .tdp-dots i.r { background: var(--bt-bad-bd); }
+  .tdp-sched { position: relative; margin-top: 6px; } .tdp-hr { position: relative; height: 44px; border-top: 1px solid var(--td-line); font-size: 11px; color: var(--td-muted); } .tdp-hr span { position: absolute; top: 2px; left: 0; width: 38px; }
+  .tdp-blk { position: absolute; border-radius: 7px; background: var(--td-oak-bg); border: 0; border-left: 3px solid var(--td-oak); padding: 3px 7px; font-size: 12px; line-height: 1.25; overflow: hidden; cursor: pointer; color: var(--td-ink); text-align: left; font-family: inherit; }
+  .tdp-blk.bus { background: var(--td-slate-bg); border-left-color: var(--td-slate); } .tdp-blk b { font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .tdp-blk small { display: block; color: var(--td-muted); font-size: 11px; } .tdp-blk:hover { box-shadow: 0 2px 8px rgba(0,0,0,.14); }
+  .tdp-any { display: flex; flex-direction: column; gap: 6px; padding: 8px; background: var(--td-sunk); border-radius: 8px; margin-bottom: 6px; } .tdp-any h6 { margin: 0; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--td-muted); font-weight: 600; }
+  .tdp-ai { display: flex; gap: 6px; align-items: center; justify-content: space-between; font-size: 12.5px; } .tdp-ai > span { min-width: 0; overflow-wrap: anywhere; }
+  .tdp-ai select { font: inherit; font-size: 12px; border: 1px solid var(--td-line); background: var(--td-surface); color: var(--td-ink); border-radius: 6px; padding: 3px 4px; min-height: 30px; flex: none; }
+  .tdp .tdp-ttl, .tdp .tdp-tick, .tdp .tdp-link, .tdp .tdp-ch button, .tdp .tdp-blk, .tdp .tdp-cal button, .tdp .tdp-chev { min-height: 0; min-width: 0; }
+  .tdp .tdp-ai select { width: auto; max-width: 55%; min-width: 0; } .tdp .tdp-ai > span { flex: 1; }
+  .tdp .tdp-wd { min-width: 0; } .tdp .tdp-cal button { aspect-ratio: 1; }
+  .tdp-rl { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; } .tdp-dim { color: var(--td-muted); font-size: 13px; }
+  .tdp-big { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tdp-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 12px; } .tdp-cal .h { color: var(--td-muted); font-size: 10.5px; padding: 2px 0; }
+  .tdp-cal button { font: inherit; font-size: 12px; border: 0; background: none; color: var(--td-ink); border-radius: 50%; aspect-ratio: 1; cursor: pointer; padding: 0; min-width: 0; } .tdp-cal button:hover { background: var(--td-sunk); }
+  .tdp-cal .o { color: var(--td-muted); opacity: .55; } .tdp-cal .t { background: var(--td-oak); color: #fff; font-weight: 600; opacity: 1; } .tdp-cal .s { outline: 2px solid var(--td-ink); outline-offset: -2px; }
+  .tdp-qtop { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; } .tdp-qhint { font-size: 12px; color: var(--td-muted); }
+  .tdp-prog { height: 6px; background: var(--td-sunk); border-radius: 99px; overflow: hidden; } .tdp-prog i { display: block; height: 100%; background: var(--td-green); transition: width .3s; }
+  .tdp-fgrid { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 14px; } .tdp-fq { display: flex; flex-direction: column; gap: 4px; }
+  .tdp-qi { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid transparent; font-size: 13px; color: var(--td-muted); overflow-wrap: anywhere; }
+  .tdp-qi.cur { background: var(--td-surface); border-color: var(--td-line); color: var(--td-ink); } .tdp-qi.done { opacity: .5; text-decoration: line-through; }
+  .tdp-focus { padding: 20px; display: flex; flex-direction: column; gap: 14px; } .tdp-focus h4 { margin: 0; font-size: 22px; line-height: 1.25; font-weight: 600; overflow-wrap: anywhere; }
+  .tdp-fmeta { display: flex; flex-wrap: wrap; gap: 8px; } .tdp-lines { font-size: 13.5px; color: var(--td-muted); border-left: 2px solid var(--td-line); padding-left: 12px; } .tdp-fbtns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tdp-allclear { padding: 34px 20px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; } .tdp-allclear h4 { font-family: var(--serif); font-size: 30px; margin: 0; }
+  .tdp-drawer { position: fixed; inset: 0; z-index: 66; display: flex; justify-content: flex-end; } .tdp-drawer[hidden] { display: none; }
+  .tdp-dback { position: absolute; inset: 0; background: rgba(0,0,0,.35); }
+  .tdp-dpanel { position: relative; width: min(400px, 100%); background: var(--td-surface); height: 100%; overflow: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; border-left: 1px solid var(--td-line); animation: drIn .18s ease; }
+  .tdp-dhead { display: flex; justify-content: space-between; align-items: center; } .tdp-dhead h4 { margin: 0; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--td-muted); }
+  .tdp-d-ttl { font-size: 18px; font-weight: 600; overflow-wrap: anywhere; } .tdp-f { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--td-muted); } .tdp-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tdp-lk { background: var(--td-sunk); border-radius: 8px; padding: 9px 10px; color: var(--td-ink); font-size: 14px; } .tdp-dfoot { display: flex; gap: 8px; margin-top: auto; flex-wrap: wrap; }
+  @media (max-width: 560px) { .tdp-drawer { align-items: flex-end; } .tdp-dpanel { width: 100%; max-height: 92%; height: auto; border-left: 0; border-radius: 14px 14px 0 0; } }
+  .rp-ms.tdp-flash { animation: tdpFlash 2.4s ease; } @keyframes tdpFlash { 0%, 60% { background: var(--bt-oak-100); } 100% { background: transparent; } }
+  .tk-lockf label { display: block; } .tk-locked { display: flex; align-items: center; gap: 8px; min-height: var(--bt-control); padding: 6px 10px; background: var(--bt-neu-bg); border: 1px dashed var(--bt-border-strong); border-radius: var(--bt-r-btn); color: var(--bt-text-muted); font-size: var(--bt-fs-sm); }
+  .tk-locked svg { width: 14px; height: 14px; flex: none; } .tk-locked em { font-style: normal; font-size: 11px; margin-left: auto; text-transform: uppercase; letter-spacing: .05em; } .act-raised { white-space: nowrap; color: var(--text-muted); }
+  @container tdp (max-width: 900px) { .tdp-body.po { grid-template-columns: minmax(0, 1fr); } }
+  @container tdp (max-width: 700px) { .tdp-fgrid { grid-template-columns: minmax(0, 1fr); } .tdp-fq { display: none; } .tdp-qhint { display: none; } }
+  @container tdp (max-width: 560px) {
+    .tdp-hero { padding: 30px 0 12px; } .tdp-greet { font-size: 34px; } .tdp-subl { font-size: 14.5px; }
+    .tdp-ctl { grid-template-columns: 1fr auto; grid-template-areas: "mid mid" "left right"; padding: 10px var(--px); row-gap: 8px; }
+    .tdp-mid { grid-area: mid; justify-self: stretch; } .tdp-left { grid-area: left; } .tdp-right { grid-area: right; }
+    .tdp-dzone { justify-content: space-between; width: 100%; } .tdp-dbtn { flex: 1; min-width: 0; } .tdp-dbtn .wk { font-size: 12px; } .tdp-dbtn .dt { font-size: 24px; }
+    .tdp-dzone .tdp-ib { width: 42px; height: 42px; font-size: 20px; } .tdp-ib, .tdp-fbtn, .tdp-vs button, .tdp-btn { min-height: 42px; } .tdp-ib { min-width: 42px; }
+    .tdp-ctl.stuck { grid-template-columns: auto 1fr auto; grid-template-areas: "left mid right"; padding: 6px 10px; }
+    .tdp-ctl.stuck .tdp-tdy { display: none; } .tdp-ctl.stuck .tdp-mid, .tdp-ctl.stuck .tdp-dzone { min-width: 0; } .tdp-ctl.stuck .tdp-right { gap: 6px; } .tdp-ctl.stuck .tdp-left { gap: 4px; }
+    .tdp-ctl.stuck .tdp-dzone { width: auto; } .tdp-ctl.stuck .tdp-dbtn .dt { font-size: 15px; } .tdp-ctl.stuck .tdp-dzone .tdp-ib { width: 34px; height: 34px; min-height: 34px; font-size: 14px; min-width: 34px; }
+    .tdp-ctl.stuck .tdp-vs button { padding: 6px 8px; min-height: 34px; } .tdp-ctl.stuck .tdp-more { display: none; } .tdp-sw { display: block; } .tdp-ctl.stuck .tdp-sw { display: none; }
+    .tdp-row { grid-template-columns: 26px minmax(0, 1fr); } .tdp-acts { grid-column: 2; justify-content: flex-start; } .tdp-acts.hov { opacity: 1; } .tdp .tdp-tick { width: 26px; height: 26px; }
+    .tdp .tdp-wd { min-height: 62px; } .tdp .tdp-cal button { min-height: 38px; aspect-ratio: auto; } .tdp-fold, .tdp-fh { min-height: 46px; }
+  }
 
   /* ---------------- Linked navigation: back bar ---------------- */
   .navbar { position: sticky; top: var(--navtop, 44px); z-index: 11; display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; background: var(--paper); margin: -4px calc(-1 * var(--px)) 6px; padding: var(--bt-s1) var(--px) 6px; }
@@ -1786,7 +1898,7 @@
   .dc-b.on.dc-b-received { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); } .dc-b.on.dc-b-short, .dc-b.on.dc-b-substituted { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); } .dc-b.on.dc-b-damaged { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
   .dc-ph { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; } .dc-thumb { position: relative; display: inline-block; } .dc-thumb img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); display: block; } .dc-x { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; min-width: 24px; min-height: 24px; border-radius: 50%; border: 0; background: var(--bt-bad-fg); color: #fff; cursor: pointer; line-height: 1; }
   .dc-mini img { width: 28px; height: 28px; object-fit: cover; border-radius: 4px; margin-left: 6px; vertical-align: middle; border: 1px solid var(--line); }
-  .dc-ptc { display: inline-block; background: var(--bt-warn-bg); color: var(--bt-warn-fg); border: 1px solid var(--bt-warn-bd); border-radius: var(--bt-r-pill); padding: 1px 8px; font-size: 11px; font-weight: 700; } .dc-st { font-weight: 700; } .dc-st-short, .dc-st-substituted { color: var(--bt-warn-fg); } .dc-st-damaged { color: var(--bt-bad-fg); } .dc-st-received { color: var(--bt-ok-fg); } .td-allrec { white-space: nowrap; }
+  .dc-ptc { display: inline-block; background: var(--bt-warn-bg); color: var(--bt-warn-fg); border: 1px solid var(--bt-warn-bd); border-radius: var(--bt-r-pill); padding: 1px 8px; font-size: 11px; font-weight: 700; } .dc-st { font-weight: 700; } .dc-st-short, .dc-st-substituted { color: var(--bt-warn-fg); } .dc-st-damaged { color: var(--bt-bad-fg); } .dc-st-received { color: var(--bt-ok-fg); }
   .rp-strip.mg-strip { grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); } .mg-wrap { display: grid; gap: var(--bt-s3); container-type: inline-size; } .mg-graph { --lab: 150px; position: relative; } .mg-axis, .mg-row { display: grid; grid-template-columns: var(--lab) 1fr; align-items: center; } .mg-lab { font-size: 12.5px; padding-right: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mg-ticks { position: relative; height: 20px; border-bottom: 1px solid var(--line); font-size: 11px; color: var(--text-muted); } .mg-ticks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; } .mg-ticks span:first-child { transform: none; } .mg-ticks span.end { transform: translateX(-100%); }
   .mg-rows { position: relative; } .mg-row { height: 34px; border-bottom: 1px dashed var(--line); } .mg-track { position: relative; height: 100%; }
@@ -1987,7 +2099,6 @@ body.lp-open .navbar .nav-trail, body.dr-open .navbar .nav-trail { display: none
 .nav-gbtn #revBadge { display: none; }
 .nav-group.open .grp-count { display: none; }
 .nav-items { display: none; padding: 2px 0 6px; }
-.td-greet-link, .db-date-link { margin-top: var(--bt-s1); font-size: var(--bt-fs-sm); }
 .nav-direct { text-align: left; } .nav-direct[aria-current="page"] { color: var(--bt-on-dark); background: color-mix(in srgb, var(--bt-on-dark) 10%, transparent); }
 .nav-sep { height: 1px; margin: var(--bt-s2) var(--bt-s3); background: color-mix(in srgb, var(--bt-on-dark) 14%, transparent); }
 .ms-sep { grid-column: 1 / -1; height: 1px; margin: var(--bt-s1) 0; background: var(--bt-line); }
@@ -2077,13 +2188,6 @@ body.sheet-open { overflow: hidden; }
 .bbe-add select { flex: 1 1 200px; max-width: 320px; }
 .bbe-count { font-size: var(--bt-fs-xs); color: var(--bt-text-muted); margin: 0 0 var(--bt-s2); }
 /* Today: greeting tile and the extra sections */
-.td-greet { background: var(--bt-card); border: 1px solid var(--line); border-left: 4px solid var(--bt-brand-2-text); border-radius: var(--radius); padding: var(--bt-s4) var(--bt-s5); margin-bottom: var(--bt-s4); box-shadow: var(--shadow); }
-.td-greeting { margin: 0; font-family: var(--serif); font-weight: 600; font-size: var(--bt-fs-xl); line-height: 1.2; color: var(--bt-brand-text); }
-.td-greet-sum { margin-top: var(--bt-s1); font-size: var(--bt-fs-sm); color: var(--slate); }
-.td-tick { flex: none; display: inline-grid; place-items: center; min-width: var(--bt-control); min-height: var(--bt-control); margin: calc(-1 * var(--bt-s2)) -8px calc(-1 * var(--bt-s2)) calc(-1 * var(--bt-s2)); padding: 0; background: none; border: 0; cursor: pointer; border-radius: var(--bt-r-btn); }
-.td-tick .cbx { pointer-events: none; }
-.td-tick:hover .cbx { border-color: var(--green); }
-.td-sub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: var(--bt-fs-xs); color: var(--text-muted); font-weight: 400; }
 .rail-btn.g-command, .bb-btn.g-command, .ms-item.g-command, .menu-pop.g-command, .ms-group.g-command { --accent: var(--g-command); }
 .rail-btn.g-growth, .bb-btn.g-growth, .ms-item.g-growth, .menu-pop.g-growth, .ms-group.g-growth { --accent: var(--g-growth); }
 .rail-btn.g-finance, .bb-btn.g-finance, .ms-item.g-finance, .menu-pop.g-finance, .ms-group.g-finance { --accent: var(--g-finance); }
@@ -2135,7 +2239,7 @@ body.logged-out .fav-btn { display: none; }
 
 /* ===== Batch 3: brand font, brand marks, Settings preview ===== */
 /* the brand font: business name, app title and page headings. Body text stays the app UI font (Inter). */
-.brand h1, .mobile-bar .title, .page-head h2, .db-head h2, .td-greeting, .placeholder h3, .ms-head h2 { font-family: var(--bt-font-brand); font-weight: var(--bt-font-brand-w); }
+.brand h1, .mobile-bar .title, .page-head h2, .db-head h2, .tdp-greet, .placeholder h3, .ms-head h2 { font-family: var(--bt-font-brand); font-weight: var(--bt-font-brand-w); }
 .db-head h2 { color: var(--bt-brand-text); }
 .brand-mark { display: flex; align-items: center; flex-wrap: wrap; gap: var(--bt-s2); min-width: 0; max-width: 100%; margin: 0 0 var(--bt-s3); color: var(--bt-on-dark); }
 .brand-mark:empty, .rail-mark:empty { display: none; }
@@ -2534,15 +2638,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 .rp-fc-task > span { flex: 1; min-width: 0; text-align: left; } .rp-fc-task .cbx { flex: none; margin: 0; }
 .rp-compose input[type=date] { width: 150px; flex: none; }
 
-.td-nav { display: flex; align-items: center; gap: var(--bt-s2); margin-top: var(--bt-s2); flex-wrap: wrap; } .td-nav input[type=date] { min-height: var(--bt-control); padding: 4px 10px; border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-btn); font: inherit; background: var(--bt-card); }
-.td-step { min-width: var(--bt-control); font-size: 22px; line-height: 1; padding: 0 12px; } .td-rel { font-size: var(--bt-fs-sm); font-family: var(--bt-font-sans); color: var(--text-muted); margin-left: 8px; font-weight: 500; }
-.td-crit { margin-bottom: var(--bt-s4); border-left: 4px solid var(--bt-bad-fg); } .td-crit-h { display: flex; align-items: baseline; gap: var(--bt-s3); flex-wrap: wrap; margin-bottom: var(--bt-s2); } .td-crit-h h3 { margin: 0; font-size: var(--bt-fs-md); } .td-crit-s { font-size: var(--bt-fs-xs); color: var(--text-muted); }
-.td-crit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--bt-s5); }
-.td-grp-h { font-size: var(--bt-fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); padding: 8px 0 2px; display: flex; gap: 8px; } .td-grp.over .td-grp-h { color: var(--bt-bad-fg); } .td-grp-h .n { font-weight: 600; }
-.td-adds { margin-left: auto; display: inline-flex; gap: 6px; flex-wrap: wrap; } .td-more { margin-top: var(--bt-s2); min-height: 36px; }
-@media (max-width: 700px) { .td-step, .td-nav .btn { min-height: 44px; } .td-crit-grid { grid-template-columns: 1fr; } }
 
-.td-nav input[type=date] { width: 168px; flex: none; }
 
 .rp-sched { background: var(--bt-card); border: 1px solid var(--bt-brand-2); border-radius: var(--bt-r-card); padding: var(--bt-s3) var(--bt-s4); margin-bottom: var(--bt-s4); }
 .rp-sched-h h3 { margin: 0 0 4px; font-size: var(--bt-fs-md); } .rp-sched-h p { margin: 0 0 var(--bt-s3); font-size: var(--bt-fs-sm); color: var(--bt-ink-2); } .rp-sched-h s { color: var(--text-muted); }
@@ -2935,26 +3031,20 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 
   <!-- TODAY -->
   <div class="panel active" id="panel-today">
-    <section class="td-greet" id="todayGreet" aria-label="Greeting">
-      <h2 class="td-greeting" id="todayGreeting">Hello</h2>
-      <div class="td-greet-sum" id="todaySummary"></div>
-      <div class="td-greet-link"><button type="button" class="sp-link" data-f6="rep-open-nav" data-k="biz:monthly">Monthly summary →</button></div>
-    </section>
-    <div class="page-head crm-head">
-      <div>
-        <h2 id="todayDate"></h2>
-        <div class="td-nav" id="todayNav" role="group" aria-label="Choose the day"></div>
+    <div class="tdp" id="tdp">
+      <header class="tdp-hero"><h2 class="tdp-greet" id="todayGreeting">Hello</h2><p class="tdp-subl" id="todaySummary"></p></header>
+      <div class="tdp-sent" id="tdpSent" aria-hidden="true"></div>
+      <div class="tdp-ctl" id="tdpCtl">
+        <div class="tdp-left" id="tdpLeft"></div>
+        <div class="tdp-mid">
+          <div class="tdp-dzone" id="tdpDzone" role="group" aria-label="Choose the day"><button class="tdp-ib" type="button" id="tdpPrev" aria-label="Previous day">‹</button><button class="tdp-dbtn" type="button" id="tdpDate"></button><button class="tdp-ib" type="button" id="tdpNext" aria-label="Next day">›</button></div>
+          <div class="tdp-sw" aria-hidden="true">‹ swipe the date ›</div>
+        </div>
+        <div class="tdp-right" id="tdpRight"></div>
       </div>
-      <div class="view-toggle" id="todayScope" title="Whose items"></div>
+      <div class="tdp-body" id="tdpBody"></div>
     </div>
-    <section class="td-card td-crit" id="todayCritical" aria-label="Time-critical"></section>
-    <div class="today-grid">
-      <section class="td-card" id="todayJob"></section>
-      <section class="td-card" id="todayBiz"></section>
-      <section class="td-card u-grid-column-1-1" id="todayProjects" ></section>
-      <section class="td-card u-grid-column-1-1" id="todayPhases" ></section>
-      <section class="td-card u-grid-column-1-1" id="todayReady" ></section>
-    </div>
+    <div class="tdp-drawer" id="tdpDrawer" hidden></div>
   </div>
 
   <!-- DASHBOARD -->
@@ -4889,7 +4979,7 @@ document.addEventListener('click', (e) => {
   const go = (tab) => { activateTab(tab); window.scrollTo(0, 0); };
   if(a === 'go') go(b.dataset.tab);
   else if(a === 'viewall'){
-    if(b.dataset.od){ todayUi.od.crm = true; todayUi.od.act = true; renderToday(); }
+    if(b.dataset.od){ todayUi.fold.over = true; tdSavePrefs(); renderToday(); }
     go(b.dataset.tab);
   }
   else if(a === 'period'){ dashUi.period = b.dataset.v; dashSavePref(DASH_PERIOD_KEY, dashUi.period); renderDashboard(); }
@@ -13716,18 +13806,9 @@ document.addEventListener('click', (e) => {
   else if(a === 'opt-del') deleteTaskOption(b.dataset.kind, id);
 });
 
-/* ---------- Today tab ----------
-   Two separate lists of what is due today: CRM tasks (state.crmTasks) and Actions (state.actions). The stores are never merged and
-   every behaviour is the existing one: ticking calls completeTask() / the Actions "toggle-done" handler, a CRM row opens the task
-   side panel, an Action row opens the same panel in action mode.
-   Actions have no id, so the panel holds the action object itself. They also already have a free-text `notes` column, so the new
-   note thread is stored in `noteLog` (same shape as a task's notes) and the links in `linkedIds`. Neither is added to existing
-   actions: both are read defensively and only written when used. */
-const todayUi = { scope: 'mine', od: { crm: false, act: false, proj: false, inv: false, del: false, ord: false }, key: '', date: '', more: {}, und: {} };
 const actUi = { colsOpen: false };
 function todayScopeKey(){ return STORAGE_PREFIX + 'business-tracker-today-scope:' + meName(); }
 function loadTodayScope(){ try{ todayUi.scope = localStorage.getItem(todayScopeKey()) === 'all' ? 'all' : 'mine'; }catch(e){ todayUi.scope = 'mine'; } }
-function setTodayScope(v){ todayUi.scope = v === 'all' ? 'all' : 'mine'; try{ localStorage.setItem(todayScopeKey(), todayUi.scope); }catch(e){} renderToday(); }
 function sameUser(a, b){ return String(a == null ? '' : a).trim().toLowerCase() === String(b == null ? '' : b).trim().toLowerCase(); }
 function actLinks(r){ return recLinks(r); }
 function actNotes(r){ return Array.isArray(r.noteLog) ? r.noteLog : []; }
@@ -13771,42 +13852,6 @@ function todayData(today){
   };
 }
 
-function todayTaskRow(t, over){
-  const done = t.status === 'done';
-  return `<div class="td-row${fadingTasks.has(t.id) ? ' fade-row' : ''}" data-crm="open" data-id="${t.id}">
-      <div class="cbx${done ? ' checked' : ''}" data-crm="tick" data-id="${t.id}" title="${done ? 'Completed' : 'Mark done'}">${CHECK_SVG}</div>
-      <span class="td-title" title="${escAttr(t.id + ' · ' + t.title)}">${escHtml(t.title)}</span>
-      <span class="td-meta">${typeIcon(t.typeId)}${prioPill(t.priorityId)}
-        ${linkSummaryHtml(t, `data-crm="rec" data-id="${t.id}"`) || taskRefsSummary(t)}
-        ${t.recur ? `<span title="${escAttr(recurLabel(t.recur))}">↻</span>` : ''}
-        ${todayUi.scope === 'all' ? `<span>${escHtml(t.owner || 'Unassigned')}</span>` : ''}
-        ${over && t.dueDate ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(t.dueDate)))}</span>` : ''}${chasedBtnHtml(t)}</span></div>`;
-}
-function todayActionRow(x, over){
-  const r = x.r, arch = archiving.has(r);
-  return `<div class="td-row${arch ? ' archiving' : ''}" data-today="act-open" data-idx="${x.i}">
-      <div class="cbx${arch ? ' checked' : ''}" data-action="toggle-done" data-idx="${x.i}" title="Complete &amp; archive">${CHECK_SVG}</div>
-      <span class="td-title">${escHtml(r.action || '(untitled action)')}</span>
-      <span class="td-meta"><span>${escHtml(r.owner || 'No owner')}</span>
-        ${linkSummaryHtml(r, `data-today="act-rec" data-idx="${x.i}"`)}
-        ${over && r.deadline ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(r.deadline)))}</span>` : ''}</span></div>`;
-}
-/* project events for today: dated stages starting, deliveries, payments and milestones, from the same timeline as everything else */
-function todayProjectEvents(today){
-  const mine = [], over = [];
-  liveProjects().forEach(p => projEventsUnique(p).forEach(e => {
-    if(e.planned || e.done || e.kind === 'delivery' || (e.kind === 'in' && !e.invoiced)) return; const row = { p, e };   // deliveries and invoices still to be raised have their own lists (todayDeliveryData, todayInvoiceData), so nothing shows twice
-    if(e.overdue) over.push(row); else if(e.date === today) mine.push(row);
-  }));
-  const srt = (a, b) => a.e.date.localeCompare(b.e.date) || cmpText(a.p.name, b.p.name);
-  return { today: mine.sort(srt), over: over.sort(srt) };
-}
-function todayProjectRow(x, over){
-  const e = x.e;
-  return `<div class="td-row" data-today="proj-open" data-id="${x.p.id}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;flex-shrink:0;fill:none;stroke:var(--slate);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round">${PW_ICON[e.kind]}</svg>
-    <span class="td-title">${escHtml(x.p.name)} · ${escHtml(e.title)}</span><span class="td-meta"><span>${PW_KIND[e.kind]}</span>${e.amount !== undefined ? `<span>${e.kind === 'out' ? '−' : ''}${qm(e.amount)}</span>` : ''}${over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(e.date)))}</span>` : ''}</span></div>`;
-}
-
 /* ---------- Today: invoices, deliveries, orders, and accepted quotes waiting to become a job ----------
    No new fields: every list is read from existing data and every tick writes to an existing field.
    Invoices    payment lines / approved variations not yet invoiced, whose raise-by date (due date less payment terms) or due date is today or earlier.   Tick = the Invoicing "Mark sent" action (invoicedDate).
@@ -13846,37 +13891,107 @@ function todayOrderData(today){
   const srt = (a, b) => a.d.localeCompare(b.d) || a.po.no - b.po.no;
   return { main: main.sort(srt), over: over.sort(srt) };
 }
-function todayReadyData(){
-  const hasProject = q => (q.linkedIds || []).some(c => state.projects.some(p => p.id === linkedRoot(c)));
-  const jobs = new Map();
-  state.quotes.forEach(q => { const j = jobs.get(q.jobNumber) || { linked: false, best: null }; if(hasProject(q)) j.linked = true; if(q.status === 'Accepted' && (!j.best || q.version > j.best.version)) j.best = q; jobs.set(q.jobNumber, j); });
-  return [...jobs.values()].filter(j => j.best && !j.linked).map(j => j.best).sort((a, b) => b.id - a.id);
+
+/* ---------- Today page (Stage 9) ----------
+   One calm daily hub. Every row is read from the records that already exist: CRM tasks (state.crmTasks), Actions (state.actions), delivery sign-offs, orders to place,
+   invoices to raise, prices to confirm, due phases and supplier quote chasers. Nothing new is stored for the list itself; ticking, snoozing and the buttons call the
+   existing actions. Milestones come from the project milestone dates the project pages and Calendar read (projMsInfo).
+   Only per-device display choices are kept, in localStorage (STORAGE_PREFIX aware): List/Board, the right panel, and which sections are folded. */
+const todayUi = { scope: 'mine', date: '', key: '', view: 'list', panel: null, fold: { over: true, today: true, backlog: false }, focus: false, fkeys: [], fi: 0, menu: false, ms: null, stuck: false, dir: 0 };
+const TD_PREF_KEY = STORAGE_PREFIX + 'business-tracker-today-ui';
+(function tdLoadPrefs(){
+  try{
+    const o = JSON.parse(localStorage.getItem(TD_PREF_KEY) || 'null'); if(!o || typeof o !== 'object') return;
+    if(o.view === 'board' || o.view === 'list') todayUi.view = o.view;
+    if(typeof o.panel === 'boolean') todayUi.panel = o.panel;
+    ['over', 'today', 'backlog'].forEach(k => { if(typeof (o.fold || {})[k] === 'boolean') todayUi.fold[k] = o.fold[k]; });
+  }catch(e){}
+})();
+function tdSavePrefs(){ try{ localStorage.setItem(TD_PREF_KEY, JSON.stringify({ view: todayUi.view, panel: todayUi.panel, fold: todayUi.fold })); }catch(e){} }
+const tdPanelOpen = () => todayUi.panel === null ? window.matchMedia('(min-width: 1100px)').matches : todayUi.panel;   // hidden by default on phone and tablet
+const tdReal = () => fmt(new Date());
+const tdSel = () => isoOk(todayUi.date) || tdReal();
+const TD_WD = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], TD_MO = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const tdShort = k => { const d = toDate(k); return TD_WD[d.getDay()].slice(0, 3) + ' ' + d.getDate() + ' ' + TD_MO[d.getMonth()].slice(0, 3); };
+const tdPlural = (n, a, b) => n + ' ' + (n === 1 ? a : b);
+const tdLateTxt = d => { const n = daysBetween(d, tdReal()); return n + (n === 1 ? ' day late' : ' days late'); };
+const tdMonday = k => { const d = toDate(k); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return fmt(d); };
+
+/* ---- the items ----
+   { key, kind, title, short, date, time ('' = any time), dur, biz, owner, lines, rec (tile html), tick {attrs,label}, primary {label, attrs}|null, snooze (tasks and actions only), ref } */
+function tdTaskItem(t){
+  const open = t.status === 'open';
+  return { key: 't:' + t.id, kind: 'task', label: 'Task', title: t.title, short: t.title, date: t.dueDate, time: timeOf(t), dur: durOf(t), biz: t.scope === 'business', owner: t.owner || 'Unassigned', lines: '', done: !open, snooze: true, ref: t, id: t.id,
+    rec: linkSummaryHtml(t, `data-crm="rec" data-id="${escAttr(t.id)}"`) || (typeof taskRefsSummary === 'function' ? taskRefsSummary(t) : ''),
+    tick: { attrs: `data-td="tick" data-id="${escAttr(t.id)}"`, label: 'Mark done: ' + t.title }, primary: { label: 'Mark done', attrs: `data-td="tick" data-id="${escAttr(t.id)}"` }, open: `data-td="task-open" data-id="${escAttr(t.id)}"` };
 }
-const todayTick = (attrs, label) => `<button type="button" class="td-tick" ${attrs} role="checkbox" aria-checked="false" aria-label="${escAttr(label)}" title="${escAttr(label)}"><span class="cbx">${CHECK_SVG}</span></button>`;
-const todayDue = (d, over) => over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(d)))}</span>` : '';
-function todayInvoiceRow(x, over){
-  const r = x.r, key = r.vid ? 'v' + r.vid : String(r.idx);
-  return `<div class="td-row" data-today="nav" data-spec="invoicing:${r.pid}:${escAttr(key)}">${todayTick(`data-inv-a="sent" data-inv-pid="${r.pid}" data-inv-k="${escAttr(key)}"`, 'Mark invoice sent: ' + r.pname + ' · ' + r.desc)}
-      <span class="td-title">${escHtml(r.pname)} · ${escHtml(r.desc)}</span>
-      <span class="td-meta"><span>Invoice to raise</span><span>${qm(r.amount)}</span>${todayDue(x.d, over)}</span></div>`;
+function tdActionItem(r, i){
+  const arch = archiving.has(r);
+  return { key: 'a:' + i, kind: 'action', label: 'Action', title: r.action || '(untitled action)', short: r.action || '(untitled action)', date: r.deadline, time: timeOf(r), dur: durOf(r), biz: true, owner: r.owner || 'No owner', lines: '', done: arch, snooze: true, ref: r, idx: i,
+    rec: linkSummaryHtml(r, `data-today="act-rec" data-idx="${i}"`),
+    tick: { attrs: `data-action="toggle-done" data-idx="${i}"`, label: 'Complete and archive: ' + (r.action || 'action') }, primary: { label: 'Mark done', attrs: `data-action="toggle-done" data-idx="${i}"` }, open: `data-td="act-open" data-idx="${i}"` };
 }
-function todayDeliveryRow(y, over){
-  const x = y.x, collect = x.method === 'collect';
-  return `<div class="td-row" data-today="nav" data-spec="project:${y.p.id}:materials">${todayTick(`data-today="tick-del" data-pid="${y.p.id}" data-did="${escAttr(x.d.id)}"`, 'Mark ' + (collect ? 'collected' : 'delivered') + ': ' + y.p.name + ' · ' + x.supplier)}
-      <span class="td-title">${escHtml(y.p.name)} · ${collect ? 'Collection' : 'Delivery'}: ${escHtml(x.supplier)}${x.items.length ? `<span class="td-sub">${escHtml(x.items.join(', '))}</span>` : ''}</span>
-      <span class="td-meta"><span>${collect ? 'Collection' : 'Delivery'}${dcPtcMark(y.p, x.d.id)}</span>${todayDue(y.d, over)}<button type="button" class="btn qb-sm td-allrec" data-today="all-del" data-pid="${y.p.id}" data-did="${escAttr(x.d.id)}" title="Everything came as ordered: sign off now">All received</button></span></div>`;
+const tdProjTile = p => ltChip(`deal2:${p.id}`, boardTitle('project', p));
+function tdOtherItems(day){
+  const out = [], push = (x, over) => out.push(x);
+  const dl = todayDeliveryData(day), ord = todayOrderData(day), inv = todayInvoiceData(day);
+  dl.main.concat(dl.over).forEach(y => { const x = y.x, collect = x.method === 'collect';
+    out.push({ key: 'd:' + y.p.id + ':' + x.d.id, kind: 'delivery', label: 'Delivery to sign off', title: (collect ? 'Collect: ' : 'Sign off delivery: ') + x.supplier, short: x.supplier, date: y.d, time: '', dur: 0, biz: false, owner: '', lines: x.items.join(' · '), snooze: false, rec: tdProjTile(y.p),
+      tick: { attrs: `data-td="del-open" data-pid="${y.p.id}" data-did="${escAttr(x.d.id)}"`, label: 'Open the delivery checklist: ' + y.p.name + ' · ' + x.supplier }, primary: { label: 'All received', attrs: `data-td="del-all" data-pid="${y.p.id}" data-did="${escAttr(x.d.id)}"` }, ptc: dcPtcMark(y.p, x.d.id) }); });
+  ord.main.concat(ord.over).forEach(y => { const po = y.po;
+    out.push({ key: 'o:' + po.id, kind: 'order', label: 'Order to place', title: 'Place order ' + po.ref + ' · ' + po.supplierName, short: po.ref + ' · ' + po.supplierName, date: y.d, time: '', dur: 0, biz: false, owner: '', lines: poNeedsApproval(po) && !poApproved(po) ? 'Needs approval before it can be placed' : '', snooze: false, rec: y.p ? tdProjTile(y.p) : '',
+      tick: { attrs: `data-po="sent" data-id="${po.id}"`, label: 'Mark order placed: ' + po.ref }, primary: { label: 'Mark placed', attrs: `data-po="sent" data-id="${po.id}"` } }); });
+  inv.main.concat(inv.over).forEach(x => { const r = x.r, key = r.vid ? 'v' + r.vid : String(r.idx), pr = state.projects.find(p => p.id === r.pid), at = `data-inv-a="sent" data-inv-pid="${r.pid}" data-inv-k="${escAttr(key)}"`;
+    out.push({ key: 'i:' + r.pid + ':' + key, kind: 'invoice', label: 'Invoice to raise', title: 'Raise invoice: ' + r.desc + ' · ' + qm(r.amount), short: r.desc, date: x.d, time: '', dur: 0, biz: false, owner: '', lines: '', snooze: false, rec: pr ? tdProjTile(pr) : escHtml(r.pname || ''),
+      tick: { attrs: at, label: 'Mark invoice sent: ' + r.desc }, primary: { label: 'Mark sent', attrs: at } }); });
+  phDue(day).forEach(x => { const at = `data-ph="tick" data-kind="${x.kind}" data-rid="${x.r.id}" data-pid="${escAttr(x.p.id)}"`;
+    out.push({ key: 'p:' + x.kind + ':' + x.r.id + ':' + x.p.id, kind: 'phase', label: 'Phase due', title: (x.p.name || 'Phase'), short: x.p.name || 'Phase', date: x.d, time: '', dur: 0, biz: false, owner: '', lines: '', snooze: false, rec: ltChip(`deal2:${x.r.id}`, boardTitle(x.kind, x.r)),
+      tick: { attrs: at, label: 'Mark phase done: ' + (x.p.name || '') }, primary: { label: 'Mark done', attrs: at } }); });
+  (state.purchaseOrders || []).filter(po => poNeedsPrices(po)).forEach(po => { const d = poActualDelivery(po) || tdReal(), at = `data-pc="open" data-id="${po.id}"`;
+    if(d > day) return;
+    out.push({ key: 'c:' + po.id, kind: 'price', label: 'Prices to confirm', title: 'Confirm prices: ' + po.ref + ' · ' + (po.supplierName || ''), short: po.ref + ' · ' + (po.supplierName || ''), date: d, time: '', dur: 0, biz: false, owner: '', lines: '', snooze: false, rec: poProject(po) ? tdProjTile(poProject(po)) : '',
+      tick: { attrs: at, label: 'Confirm prices: ' + po.ref }, primary: { label: 'Confirm prices', attrs: at } }); });
+  rfqDue(day).forEach(({ q, r }) => { const at = `data-rf="today-received" data-qid="${q.id}" data-rid="${escAttr(r.id)}"`;
+    out.push({ key: 'f:' + q.id + ':' + r.id, kind: 'rfq', label: 'Supplier quote awaiting a reply', title: 'Chase ' + r.number + ' · ' + rfqSupplierName(r.supplierId), short: r.number + ' · ' + rfqSupplierName(r.supplierId), date: r.replyBy, time: '', dur: 0, biz: false, owner: '', lines: 'for ' + r.ref, snooze: false, rec: ltChip(`quote:${q.id}`, qRef(q)),
+      tick: { attrs: at, label: 'Quote received: ' + r.number }, primary: { label: 'Received', attrs: at }, extra: { label: 'Chase by email', attrs: `data-rf="today-email" data-qid="${q.id}" data-rid="${escAttr(r.id)}"` } }); });
+  return out;
 }
-function todayOrderRow(y, over){
-  const po = y.po, need = poNeedsApproval(po) && !poApproved(po);
-  return `<div class="td-row" data-today="nav" data-spec="po:${po.id}">${todayTick(`data-po="sent" data-id="${po.id}"`, 'Mark order placed: ' + po.ref + ' · ' + po.supplierName)}
-      <span class="td-title">${escHtml(po.ref)} · ${escHtml(po.supplierName)}<span class="td-sub">${escHtml(y.p ? y.p.name : '')}</span></span>
-      <span class="td-meta"><span>${po.status === 'Draft' ? 'Order to place' : 'Approved, to place'}</span>${need ? '<span class="td-due">Needs approval</span>' : ''}<span>${qm(poTotals(po).payable)}</span>${todayDue(y.d, over)}</span></div>`;
+/* all items dated on or before `day` (tasks, actions and the others), open ones plus rows still fading out */
+function tdAll(day){
+  const items = [];
+  state.crmTasks.forEach(t => {
+    const open = t.status === 'open';
+    if(!open && !fadingTasks.has(t.id)) return;
+    if(open && taskOnLostLead(t)) return;
+    if(!taskVisible(t) || !t.dueDate || t.dueDate > day) return;
+    items.push(tdTaskItem(t));
+  });
+  if(canSeeBusiness()) state.actions.forEach((r, i) => { if(r.status === 'Done' && !archiving.has(r)) return; if(!r.deadline || r.deadline > day) return; items.push(tdActionItem(r, i)); });
+  return items.concat(tdOtherItems(day));
 }
-function todayReadySection(list){
-  return `<div class="td-head"><h3>Ready to turn into a job</h3><span class="n">${list.length}</span></div>
-    ${list.length ? list.map(q => `<div class="td-row" data-today="nav" data-spec="quote:${q.id}"><span class="td-title">${escHtml(qRef(q))} · ${escHtml(q.customer || '—')}${q.project ? `<span class="td-sub">${escHtml(q.project)}</span>` : ''}</span><span class="td-meta"><span>Accepted, no job yet</span>${ltChip(null, qRef(q), { attrs: `data-today="nav" data-spec="quote:${q.id}"`, kind: 'quote' })}</span></div>`).join('') : '<div class="td-empty">No accepted quotes are waiting for a job.</div>'}`;
+const tdByTime = (a, b) => (a.time ? 0 : 1) - (b.time ? 0 : 1) || cmpText(a.time, b.time) || cmpText(a.title, b.title);
+function tdLate(){ const real = tdReal(); return tdAll(real).filter(x => x.date < real && !x.done).sort((a, b) => cmpText(a.date, b.date) || tdByTime(a, b)); }
+function tdOn(day){ return tdAll(day).filter(x => x.date === day).sort(tdByTime); }
+function tdBacklog(){
+  const out = [];
+  state.crmTasks.forEach(t => { if(t.status === 'open' && !t.dueDate && !taskOnLostLead(t) && taskVisible(t)) out.push(tdTaskItem(t)); });
+  if(canSeeBusiness()) state.actions.forEach((r, i) => { if(r.status !== 'Done' && !r.deadline) out.push(tdActionItem(r, i)); });
+  return out.sort((a, b) => cmpText(a.title, b.title));
 }
-/* greeting: London time, first name from the login / who-picker */
+/* milestones that fall on a day: the nine key milestones of live client projects, from the same dates the project pages and Calendar read */
+const TD_MS_TYPE = { materialsOrdered: ['order', 'Order'], materialsDelivered: ['del', 'Delivery'], onSiteStart: ['site', 'On site'], buildComplete: ['site', 'On site'], signOff: ['sign', 'Sign-off'], invoiced: ['inv', 'Invoice'], contractSigned: ['', 'Contract'], designSigned: ['', 'Design'], paid: ['', 'Paid'] };
+function tdMilestones(day){
+  const out = [];
+  liveProjects().forEach(p => RP_MS.forEach(([k, n]) => {
+    const i = projMsInfo(p, k), d = i.actual ? i.actual.date : i.planned; if(d !== day) return;
+    const ty = TD_MS_TYPE[k] || ['', n];
+    out.push({ id: p.id + ':' + k, p, key: k, name: n, cls: ty[0], type: ty[1], date: d, done: !!i.actual, info: i });
+  }));
+  return out.sort((a, b) => cmpText(boardTitle('project', a.p), boardTitle('project', b.p)) || cmpText(a.name, b.name));
+}
+const tdMsFind = id => { const [pid, k] = String(id).split(':'); const p = state.projects.find(x => x.id === Number(pid)); return p ? tdMilestones(tdSel()).find(m => m.p === p && m.key === k) || null : null; };
+
+/* ---- greeting and summary ---- */
 function londonHour(d){
   try{ const h = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: 'numeric', hourCycle: 'h23' }).formatToParts(d || new Date()).find(x => x.type === 'hour'), n = h ? Number(h.value) : NaN; if(!isNaN(n)) return n % 24; }catch(e){}
   return (d || new Date()).getHours();
@@ -13886,105 +14001,305 @@ function greetFirstName(){
   n = String(n).trim().split(/[\s._@-]+/)[0] || '';
   return n && n === n.toLowerCase() ? n.charAt(0).toUpperCase() + n.slice(1) : n;
 }
+function tdGreetWord(h){ return h >= 5 && h < 11 ? 'Good morning' : h === 11 ? 'Hello' : h >= 12 && h < 17 ? 'Good afternoon' : h >= 17 && h < 22 ? 'Good evening' : 'Working late'; }
 function updateGreeting(){
   const el = document.getElementById('todayGreeting'); if(!el) return;
-  const h = londonHour(), n = greetFirstName(), t = n ? (h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening') + ', ' + n : 'Hello';
+  const n = greetFirstName(), t = tdGreetWord(londonHour()) + (n ? ', ' + n : '');
   if(el.textContent !== t) el.textContent = t;   // only the text changes: nothing is re-rendered and focus never moves
 }
-const TD_WEEKDAY = d => d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-function todayDayLabel(sel, real){
-  const n = daysBetween(real, sel), rel = n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : n === -1 ? 'Yesterday' : '';
-  return TD_WEEKDAY(toDate(sel)) + (rel ? '' : '') + (rel ? ` <span class="td-rel">${rel}</span>` : '');
+function tdSummary(sel, real, late, today){
+  if(sel !== real){ const n = tdOn(sel).length; return n ? tdPlural(n, 'thing is', 'things are') + ' planned for ' + tdShort(sel) + '.' : 'Nothing is planned for ' + tdShort(sel) + '.'; }
+  const n = late.length + today.filter(x => !x.done).length, D = late.concat(today).filter(x => x.kind === 'delivery' && !x.done).length, h = londonHour(), evening = h >= 17 || h < 5;
+  if(!n) return 'A clear day.';
+  const words = { 2: 'Two', 3: 'Three', 4: 'Four', 5: 'Five' };
+  let s = evening ? tdPlural(n, 'thing is', 'things are') + ' still open. They will keep until morning.' : tdPlural(n, 'thing needs', 'things need') + ' you today.';
+  if(D) s += ' ' + (words[D] || D) + (D === 1 ? ' delivery is' : ' deliveries are') + ' waiting for sign-off.';
+  return s;
 }
-function todayNavHtml(sel, real){
-  return `<button type="button" class="btn secondary td-step" data-today="day-prev" aria-label="Previous day" title="Previous day">‹</button>
-    <input type="date" id="todayPick" value="${sel}" aria-label="Jump to a date">
-    <button type="button" class="btn secondary td-step" data-today="day-next" aria-label="Next day" title="Next day">›</button>
-    <button type="button" class="btn secondary" data-today="day-today"${sel === real ? ' disabled' : ''}>Today</button>`;
+
+/* ---- rows ---- */
+function tdRow(it, ctx){
+  const late = it.date && it.date < tdReal() && !it.done, ts = it.kind === 'task' || it.kind === 'action';
+  const when = !it.date ? '<span class="tdp-pill">No date</span>' : late ? `<span class="tdp-late">${tdLateTxt(it.date)}</span>` : (it.time ? `<span class="tdp-pill oak">${escHtml(it.time)}</span>` : '<span class="tdp-pill">Any time</span>');
+  const jb = ts ? `<span class="tdp-pill ${it.biz ? 'slate' : 'oak'}">${it.biz ? 'Business' : 'Job'}</span>` : '<span class="tdp-pill oak">Job</span>';
+  const title = it.open ? `<button class="tdp-ttl" type="button" ${it.open}>${escHtml(it.title)}</button>` : `<div class="tdp-ttl tdp-static">${escHtml(it.title)}</div>`;
+  const acts = it.done ? '' : (ts ? `<button class="tdp-btn" type="button" data-td="snooze" data-key="${escAttr(it.key)}" title="Move to the next working day">Snooze</button><button class="tdp-btn" type="button" data-td="resched" data-key="${escAttr(it.key)}">Reschedule</button>` : '')
+    + (!ts && it.extra ? `<button class="tdp-btn" type="button" ${it.extra.attrs}>${it.extra.label}</button>` : '') + (!ts && it.primary ? `<button class="tdp-btn pri" type="button" ${it.primary.attrs}>${escHtml(it.primary.label)}</button>` : '');
+  return `<div class="tdp-row${it.done ? ' done' : ''}"><button class="tdp-tick" type="button" ${it.tick.attrs} aria-label="${escAttr(it.tick.label)}" title="${escAttr(it.tick.label)}">${CHECK_SVG}</button>
+    <div class="tdp-main">${title}<div class="tdp-sub">${it.rec || ''}${when}${jb}${it.ptc || ''}</div>
+      ${it.lines ? `<div class="tdp-sub2">${escHtml(it.lines)}</div>` : ''}${ts ? `<div class="tdp-sub2">${escHtml('Owner ' + it.owner + (it.dur ? ' · Duration ' + durShort(it.dur) : ''))}</div>` : ''}</div>
+    <div class="tdp-acts${ts && !it.done ? ' hov' : ''}">${acts}</div></div>`;
 }
-/* an action tile: overdue first (red), then the day, then Undated; at most the Settings limit, with See more */
-function todayTile(key, title, adds, groups, rowFn, live){
-  const limit = (state.settings && state.settings.todayLimit) || 10, more = !!todayUi.more[key];
-  const all = []; groups.forEach(g => g.items.forEach(it => all.push({ g, it })));
-  const total = all.filter(x => live(x.it)).length, shown = more ? all : all.slice(0, limit), hidden = all.length - shown.length;
-  const order = [], byG = new Map(); shown.forEach(x => { if(!byG.has(x.g.k)){ byG.set(x.g.k, { g: x.g, rows: [] }); order.push(x.g.k); } byG.get(x.g.k).rows.push(x.it); });
-  const body = order.map(k => { const { g, rows } = byG.get(k), full = groups.find(y => y.k === k).items.length;
-    return `<div class="td-grp ${g.cls}"><div class="td-grp-h">${g.label}<span class="n">${full}</span></div>${rows.map(r => rowFn(r, g.over)).join('')}</div>`; }).join('');
-  return `<div class="td-head"><h3>${title}</h3><span class="n">${total}</span><span class="td-adds">${adds}</span></div>
-    ${body || '<div class="td-none">Nothing waiting</div>'}
-    ${hidden > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">See more (${hidden})</button>` : (more && all.length > limit ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">Show fewer</button>` : '')}`;
+const tdFoldHead = (k, title, n, hint, cls) => { const open = todayUi.fold[k];
+  return `<button class="tdp-fh${cls ? ' ' + cls : ''}" type="button" data-td="fold" data-k="${k}" aria-expanded="${open}"><span class="tdp-chev" aria-hidden="true">${open ? '▾' : '▸'}</span><span class="tdp-ft">${title}</span><span class="tdp-cnt">${n}</span><span class="tdp-hint">${open ? hint : (n ? tdPlural(n, 'item', 'items') + ' hidden' : 'none')}</span></button>`; };
+function tdMsHtml(sel, real){
+  const ms = tdMilestones(sel); if(!ms.length) return '';
+  return `<div class="tdp-sec"><h3>Milestones</h3><span class="n">key dates ${sel === real ? 'today' : 'on ' + escHtml(tdShort(sel))}</span></div><div class="tdp-panel tdp-rows">${ms.map(m => `<div class="tdp-mrow"><span class="tdp-mtype ${m.cls}">${escHtml(m.type)}</span>
+    <div class="tdp-main"><button class="tdp-ttl" type="button" data-td="ms" data-id="${escAttr(m.id)}"${m.done ? ' style="color:var(--td-muted)"' : ''}>${escHtml(m.name)}</button><div class="tdp-sub">${tdProjTile(m.p)}</div></div>
+    <button class="tdp-btn sm" type="button" data-td="ms" data-id="${escAttr(m.id)}" aria-label="Open milestone ${escAttr(m.name)}">Open</button></div>`).join('')}</div>`;
 }
-function todayGroupsFor(dated, undated, sel, label){
-  return [{ k: 'over', cls: 'over', over: true, label: 'Overdue', items: dated.filter(x => x.d < sel) }, { k: 'day', cls: 'day', over: false, label, items: dated.filter(x => x.d === sel) }, { k: 'und', cls: 'und', over: false, label: 'Undated', items: undated }].filter(g => g.items.length);
+function tdListHtml(sel, real, late, today){
+  let h = tdMsHtml(sel, real);
+  if(sel === real){
+    h += tdFoldHead('over', 'Overdue', late.length, 'oldest first', 'red');
+    if(todayUi.fold.over) h += late.length ? `<div class="tdp-panel tdp-rows">${late.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>All clear.</b><span>Nothing is overdue.</span></div>';
+    h += tdFoldHead('today', 'Today', today.length, '', '');
+    if(todayUi.fold.today) h += today.length ? `<div class="tdp-panel tdp-rows">${today.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing is scheduled for today.</b></div>';
+    const bl = tdBacklog();
+    h += `<button class="tdp-fold" type="button" data-td="fold" data-k="backlog" aria-expanded="${todayUi.fold.backlog}"><span>Backlog · ${tdPlural(bl.length, 'task', 'tasks')} with no date</span><span>${todayUi.fold.backlog ? 'Hide ‹' : 'Show ›'}</span></button>`;
+    if(todayUi.fold.backlog) h += bl.length ? `<div class="tdp-panel tdp-rows">${bl.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing without a date.</b></div>';
+  } else {
+    const n = today.length;
+    h += `<div class="tdp-sec"><h3>${escHtml(tdShort(sel))}</h3><span class="n">${tdPlural(n, 'item', 'items')}</span></div>` + (n ? `<div class="tdp-panel tdp-rows">${today.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing is planned for this day.</b><span>Give a task this date from its details, or from Focus.</span></div>');
+  }
+  return h;
+}
+function tdBoardHtml(sel, real, late, today){
+  const card = it => { const ts = it.kind === 'task' || it.kind === 'action', lt = it.date < real && !it.done;
+    return `<div class="tdp-panel tdp-card" style="border-left:3px solid var(${it.biz ? '--td-slate' : '--td-oak'})"><div class="tdp-cardtop">${lt ? `<span class="tdp-pill red">${tdLateTxt(it.date)}</span>` : `<span class="tdp-pill${it.time ? ' oak' : ''}">${escHtml(it.time || 'Any time')}</span>`}<span class="tdp-pill ${it.biz ? 'slate' : 'oak'}">${ts ? (it.biz ? 'Business' : 'Job') : 'Job'}</span></div>
+      ${it.open ? `<button class="tdp-ttl" type="button" ${it.open}>${escHtml(it.short)}</button>` : `<div class="tdp-ttl tdp-static">${escHtml(it.short)}</div>`}<div class="tdp-sub" style="margin:0">${it.rec || ''}${ts ? `<span class="tdp-av" title="${escAttr(it.owner)}">${escHtml(String(it.owner).charAt(0).toUpperCase())}</span>` : ''}</div></div>`; };
+  const col = (title, cls, list, empty) => `<div><div class="tdp-sec ${cls}" style="margin-bottom:8px"><h3>${title}</h3><span class="n">${list.length}</span></div><div class="tdp-stack">${list.map(card).join('') || `<div class="tdp-empty">${empty}</div>`}</div></div>`;
+  return tdMsHtml(sel, real) + `<div class="tdp-boardgrid">${sel === real ? col('Overdue', 'red', late, 'All clear.') : ''}${col(sel === real ? 'Today' : escHtml(tdShort(sel)), '', today, 'Nothing planned.')}</div>`;
+}
+
+/* ---- right panel ---- */
+function tdWeekHtml(sel, real){
+  const m = tdMonday(sel), lateN = sel === real || true ? 0 : 0; let h = '<div class="tdp-week">';
+  const lateCount = tdLate().length;
+  for(let i = 0; i < 5; i++){
+    const k = addDaysIso(m, i), d = toDate(k), isT = k === real, lateDay = isT && lateCount > 0, n = tdOn(k).filter(x => !x.done).length + (isT ? lateCount : 0), dn = n === 0 ? 0 : n <= 2 ? 1 : n <= 5 ? 2 : 3;
+    const txt = TD_WD[d.getDay()].slice(0, 3) + ' ' + d.getDate() + ': ' + tdPlural(n, 'item', 'items') + (lateDay ? ', includes late work' : '');
+    h += `<button class="tdp-wd${isT ? ' now' : ''}" type="button" data-td="day" data-day="${k}" aria-pressed="${k === sel}" title="${escAttr(txt)}" aria-label="${escAttr(txt)}"><span>${TD_WD[d.getDay()].slice(0, 3)}</span><b>${d.getDate()}</b><span class="tdp-dots">${('<i class="' + (lateDay ? 'r' : '') + '"></i>').repeat(dn)}</span></button>`;
+  }
+  return h + '</div>';
+}
+function tdSchedHtml(sel, real){
+  const items = tdOn(sel).filter(x => (x.kind === 'task' || x.kind === 'action') && !x.done), timed = items.filter(x => x.time), any = items.filter(x => !x.time);
+  const H = 44, mins = t => { const p = t.split(':'); return +p[0] * 60 + +p[1]; };
+  let s0 = 8, e0 = 18; timed.forEach(x => { s0 = Math.min(s0, Math.floor(mins(x.time) / 60)); e0 = Math.max(e0, Math.ceil((mins(x.time) + (x.dur || 30)) / 60)); });
+  let h = '';
+  if(any.length){
+    let opts = '<option value="">Set time</option>'; for(let m = 7 * 60; m <= 19 * 60; m += 30){ const t = pad2(Math.floor(m / 60)) + ':' + pad2(m % 60); opts += `<option value="${t}">${t}</option>`; }
+    h += `<div class="tdp-any"><h6>Any time</h6>${any.map(x => `<div class="tdp-ai"><span>${escHtml(x.short)}${x.dur ? ' · ' + durShort(x.dur) : ''}</span><select data-td-set="${escAttr(x.key)}" aria-label="Set a time for ${escAttr(x.short)}">${opts}</select></div>`).join('')}</div>`;
+  }
+  if(!items.length) h += '<div class="tdp-dim">Nothing planned for this day.</div>';
+  else if(timed.length || true){
+    h += `<div class="tdp-sched" style="height:${(e0 - s0) * H}px">`;
+    for(let x = s0; x < e0; x++) h += `<div class="tdp-hr"><span>${pad2(x)}:00</span></div>`;
+    const srt = timed.slice().sort((a, b) => mins(a.time) - mins(b.time)), lanes = [];   // blocks that overlap in time sit side by side
+    srt.forEach(x => { const st = mins(x.time), en = st + (x.dur || 30); let l = lanes.findIndex(e => e <= st); if(l < 0){ l = lanes.length; lanes.push(0); } lanes[l] = en; x._l = l; x._st = st; x._en = en; });
+    srt.forEach(x => { const grp = srt.filter(y => y._st < x._en && y._en > x._st), n = Math.max(...grp.map(y => y._l)) + 1, top = (x._st / 60 - s0) * H, hh = Math.max(((x.dur || 30) / 60) * H - 2, 24), w = `calc((100% - 46px) / ${n})`;
+      h += `<button class="tdp-blk${x.biz ? ' bus' : ''}" type="button" ${x.open} style="top:${top}px;height:${hh}px;left:calc(44px + ${x._l} * ${w});width:calc(${w} - 2px)" title="${escAttr(x.short + ' · ' + x.time + (x.dur ? ' · ' + durShort(x.dur) : ''))}"><b>${escHtml(x.short)}</b><small>${x.time}${x.dur ? ' · ' + durShort(x.dur) : ''}</small></button>`; });
+    h += '</div>';
+  }
+  const n = sel === real ? tdLate().length : 0;
+  if(n) h += `<div class="tdp-dim" style="margin-top:8px">${tdPlural(n, 'late item is', 'late items are')} not scheduled. Use <button class="tdp-link" type="button" data-td="focus">Focus</button> to deal with them.</div>`;
+  return h;
+}
+const pad2 = n => (n < 10 ? '0' : '') + n;
+function tdBehind(){ return liveProjects().filter(p => rpStatus(p).t === 'Behind'); }
+function tdCalHtml(sel, real){
+  const d = toDate(sel), y = d.getFullYear(), mo = d.getMonth(), first = new Date(y, mo, 1).getDay(), dim = new Date(y, mo + 1, 0).getDate(), rows = Math.ceil((first + dim) / 7);
+  let h = '<div class="tdp-cal">' + ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(x => `<div class="h">${x}</div>`).join('');
+  for(let i = 0; i < rows * 7; i++){
+    const dt = new Date(y, mo, 1 - first + i), k = fmt(dt), out = dt.getMonth() !== mo;
+    h += `<button type="button" data-td="day" data-day="${k}" class="${out ? 'o ' : ''}${k === real ? 't' : (k === sel ? 's' : '')}" aria-label="${dt.getDate()} ${TD_MO[dt.getMonth()]}"${k === sel ? ' aria-current="date"' : ''}>${dt.getDate()}</button>`;
+  }
+  return h + '</div>';
+}
+function tdSideHtml(sel, real){
+  const beh = tdBehind(), mk = typeof msumMonthKey === 'function' ? msumMonthKey() : '', cash = cashPosition(), lastRec = reconLast(MAIN_ACC), d = toDate(sel);
+  return `<aside class="tdp-side" aria-label="Week, schedule and summary">
+    <div class="tdp-card2"><div class="tdp-ch"><span>This week</span></div><div class="tdp-cb">${tdWeekHtml(sel, real)}</div></div>
+    <div class="tdp-card2"><div class="tdp-ch"><span>Schedule · ${escHtml(tdShort(sel))}</span></div><div class="tdp-cb">${tdSchedHtml(sel, real)}</div></div>
+    <div class="tdp-card2"><div class="tdp-ch"><span>Jobs behind · ${beh.length}</span><button type="button" data-td="jobs">Open jobs</button></div><div class="tdp-cb tdp-rl">${beh.length ? beh.slice(0, 3).map(tdProjTile).join('') + (beh.length > 3 ? `<span class="tdp-dim">${beh.length - 3} more</span>` : '') : '<span class="tdp-dim">No jobs are behind plan.</span>'}</div></div>
+    <div class="tdp-card2"><div class="tdp-ch"><span>Cash today</span></div><div class="tdp-cb"><div class="tdp-big">${money(cash)}</div><div class="tdp-dim">${lastRec ? 'in the bank, reconciled to ' + escHtml(monthLabel(new Date(lastRec + '-01T00:00:00'))) : 'in the bank, not yet reconciled'}</div></div></div>
+    ${mk ? `<div class="tdp-card2"><div class="tdp-ch"><span>${escHtml(msumLabel(mk))} summary</span><button type="button" data-td="summary">Open summary</button></div><div class="tdp-cb">${msumCardHtml(mk)}</div></div>` : ''}
+    <div class="tdp-card2"><div class="tdp-ch"><span>${TD_MO[d.getMonth()]} ${d.getFullYear()}</span><button type="button" data-td="calendar">Open calendar</button></div><div class="tdp-cb">${tdCalHtml(sel, real)}</div></div></aside>`;
+}
+
+/* ---- Focus: walk through the overdue items one at a time ---- */
+function tdFocusHtml(real){
+  const keys = todayUi.fkeys, nowLate = tdLate(), still = new Set(nowLate.map(x => x.key)), dealt = keys.filter(k => !still.has(k)).length, total = keys.length;
+  const top = `<div class="tdp-qtop"><div style="display:flex;gap:10px;align-items:baseline"><b>Focus</b><span class="tdp-dim">${dealt} of ${total} dealt with</span></div><span class="tdp-qhint">Enter done · S snooze · → skip · Esc leave</span></div><div class="tdp-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${dealt}"><i style="width:${total ? dealt / total * 100 : 0}%"></i></div>`;
+  if(!nowLate.length) return `<div class="tdp-main-pane">${top}<div class="tdp-panel tdp-allclear"><h4>All clear</h4><p class="tdp-dim">Nothing is late.</p><button class="tdp-btn" type="button" data-td="exitfocus">Back to today</button></div></div>`;
+  const it = nowLate[todayUi.fi % nowLate.length], ts = it.kind === 'task' || it.kind === 'action';
+  const q = `<div class="tdp-fq">${keys.map(k => { const x = nowLate.find(y => y.key === k); return `<div class="tdp-qi${x === it ? ' cur' : ''}${x ? '' : ' done'}"><span>${x ? '' : '✓'}</span><span>${escHtml(x ? x.short : (k.startsWith('t:') ? (findTask(k.slice(2)) || {}).title || k : 'Done'))}</span></div>`; }).join('')}</div>`;
+  const card = `<div class="tdp-panel tdp-focus"><div class="tdp-fmeta"><span class="tdp-pill ${it.biz ? 'slate' : 'oak'}">${escHtml(it.label)}</span><span class="tdp-pill red">${tdLateTxt(it.date)}</span></div><h4>${escHtml(it.title.replace(/^Sign off delivery: /, ''))}</h4>
+    ${it.lines ? `<div class="tdp-lines">${escHtml(it.lines)}</div>` : ''}<div class="tdp-sub2" style="margin:0">${ts ? escHtml('Owner ' + it.owner + (it.dur ? ' · Duration ' + durShort(it.dur) : '')) + ' · ' : ''}Due ${escHtml(tdShort(it.date))}</div>${it.rec ? `<div class="tdp-fmeta">${it.rec}</div>` : ''}
+    <div class="tdp-fbtns"><button class="tdp-btn pri big" type="button" ${it.primary.attrs}>${escHtml(it.primary.label)}</button>${ts ? `<button class="tdp-btn big" type="button" data-td="snooze" data-key="${escAttr(it.key)}">Snooze</button>` : ''}<button class="tdp-btn big" type="button" data-td="skip">Skip</button></div></div>`;
+  return `<div class="tdp-main-pane">${top}<div class="tdp-fgrid">${q}${card}</div></div>`;
+}
+
+/* ---- milestone side view ---- */
+function tdMsDrawer(){
+  const el = document.getElementById('tdpDrawer'); if(!el) return;
+  const m = todayUi.ms ? tdMsFind(todayUi.ms) : null;
+  if(!m){ if(!el.hidden){ el.hidden = true; el.innerHTML = ''; } return; }
+  if(el.dataset.id === todayUi.ms && !el.hidden) return;
+  const p = m.p, log = (p.msPlanLog || []).filter(x => x.key === m.key).slice(-1)[0], note = m.done ? 'Confirmed ' + pwD(m.info.actual.date) + (m.info.actual.src ? ' (' + m.info.actual.src + ')' : '') : (log && log.reason ? log.reason : '');
+  el.dataset.id = todayUi.ms; el.hidden = false;
+  el.innerHTML = `<div class="tdp-dback" data-td="closems"></div><div class="tdp-dpanel" role="dialog" aria-modal="true" aria-label="Milestone: ${escAttr(m.name)}"><div class="tdp-dhead"><h4>Milestone</h4><button class="tdp-btn sm" type="button" data-td="closems" id="tdpDClose">Close</button></div>
+    <div><span class="tdp-mtype ${m.cls}">${escHtml(m.type)}</span></div><div class="tdp-d-ttl">${escHtml(m.name)}</div>
+    <div class="tdp-f"><span>Project</span><div>${tdProjTile(p)}</div></div>
+    <div class="tdp-two"><div class="tdp-f"><span>Date</span><div class="tdp-lk">${escHtml(tdShort(m.date))}</div></div><div class="tdp-f"><span>Stage</span><div class="tdp-lk">${escHtml(projStage6(p).name || '')}</div></div></div>
+    <div class="tdp-f"><span>Owner</span><div class="tdp-lk">${escHtml(p.owner || 'Not set')}</div></div>${note ? `<div class="tdp-dim">${escHtml(note)}</div>` : ''}
+    <div class="tdp-dfoot"><button class="tdp-btn pri" type="button" data-td="ms-open" data-id="${escAttr(todayUi.ms)}">Open in project</button><button class="tdp-btn" type="button" data-td="closems">Close</button></div></div>`;
+  setTimeout(() => { const c = document.getElementById('tdpDClose'); if(c) c.focus(); }, 20);
+}
+function tdCloseMs(){ todayUi.ms = null; const el = document.getElementById('tdpDrawer'); if(el){ el.hidden = true; el.innerHTML = ''; el.dataset.id = ''; } if(todayUi.msFrom && document.contains(todayUi.msFrom)) todayUi.msFrom.focus(); }
+
+/* ---- render ---- */
+function tdControls(sel, real, lateN){
+  const L = document.getElementById('tdpLeft'), R = document.getElementById('tdpRight'); if(!L || !R) return;
+  L.innerHTML = todayUi.focus ? '' : `<div class="tdp-vs" role="group" aria-label="View"><button type="button" data-td="view" data-v="list" aria-pressed="${todayUi.view === 'list'}">List</button><button type="button" data-td="view" data-v="board" aria-pressed="${todayUi.view === 'board'}">Board</button></div>`;
+  const open = tdPanelOpen();
+  R.innerHTML = (todayUi.focus ? '' : `<button class="tdp-ib" type="button" data-td="panel" aria-pressed="${open}" aria-expanded="${open}" aria-label="${open ? 'Hide' : 'Show'} the side panel" title="Week, schedule and summary"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>`)
+    + `<button class="tdp-fbtn" type="button" data-td="${todayUi.focus ? 'exitfocus' : 'focus'}"${!todayUi.focus && !lateN ? ' disabled' : ''}>${todayUi.focus ? 'Exit Focus' : 'Focus<b>' + lateN + '</b>'}</button>`
+    + (todayUi.focus ? '' : `<span class="tdp-more"><button class="tdp-ib" type="button" data-td="more" aria-haspopup="menu" aria-expanded="${todayUi.menu}" aria-label="More" title="More"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>${todayUi.menu ? '<div class="tdp-menu" role="menu"><button type="button" role="menuitem" data-td="summary">Monthly summary</button><button type="button" role="menuitem" data-td="settings">Task settings</button></div>' : ''}</span>`);
+  const d = toDate(sel), b = document.getElementById('tdpDate');
+  if(b){
+    b.innerHTML = `<span class="wk">${TD_WD[d.getDay()]}</span><span class="dt"><span class="f">${d.getDate()} ${TD_MO[d.getMonth()]}</span><span class="s">${TD_WD[d.getDay()].slice(0, 3)} ${d.getDate()} ${TD_MO[d.getMonth()].slice(0, 3)}</span>${sel === real ? '<span class="tdp-tdy">Today</span>' : ''}</span>`;
+    b.setAttribute('aria-label', 'Selected date: ' + TD_WD[d.getDay()] + ' ' + d.getDate() + ' ' + TD_MO[d.getMonth()] + ' ' + d.getFullYear() + (sel === real ? ', today' : '') + '. Click to go to today. Swipe or use the arrows to change day.');
+  }
 }
 function renderToday(){
   if(!state) return;
-  const now = new Date(), real = fmt(now), sel = isoOk(todayUi.date) || real, isToday = sel === real, ownBiz = canSeeBusiness();
-  todayUi.key = real;
-  const dReal = todayData(real), dSel = isToday ? dReal : todayData(sel);
-  const inv = todayInvoiceData(sel), dl = todayDeliveryData(sel), ord = todayOrderData(sel), ready = todayReadyData();
-  const invR = isToday ? inv : todayInvoiceData(real), dlR = isToday ? dl : todayDeliveryData(real), ordR = isToday ? ord : todayOrderData(real);
-  const dueNow = dReal.crmToday.filter(t => t.status === 'open').length + dReal.actToday.filter(x => x.r.status !== 'Done').length + invR.main.length + dlR.main.length + ordR.main.length;
-  const overNow = dReal.crmOver.filter(t => t.status === 'open').length + dReal.actOver.filter(x => x.r.status !== 'Done').length + invR.over.length + dlR.over.length + ordR.over.length;   // the Ready-to-turn-into-a-job list is not counted
+  const real = tdReal(), sel = tdSel(), tp = document.getElementById('tdp'); todayUi.key = real;
+  const late = tdLate(), todayItems = tdOn(sel), dueNow = tdOn(real).filter(x => !x.done).length;
   const badge = document.getElementById('todayBadge');
-  if(badge){ badge.textContent = dueNow + overNow; badge.hidden = !(dueNow + overNow); badge.classList.toggle('over', overNow > 0); badge.title = dueNow + ' due today, ' + overNow + ' overdue'; }
-  const crit = document.getElementById('todayCritical'); if(!crit) return;
-  document.getElementById('todayDate').innerHTML = todayDayLabel(sel, real);
-  const nav = document.getElementById('todayNav');
-  if(nav){ if(!nav.querySelector('#todayPick')) nav.innerHTML = todayNavHtml(sel, real);
-    else { const pk = nav.querySelector('#todayPick'); if(pk.value !== sel && document.activeElement !== pk) pk.value = sel; nav.querySelector('[data-today="day-today"]').disabled = sel === real; } }   // updated in place so the picker keeps its focus
-  const dueSel = dSel.crmToday.filter(t => t.status === 'open').length + dSel.actToday.filter(x => x.r.status !== 'Done').length + inv.main.length + dl.main.length + ord.main.length;
-  const overSel = dSel.crmOver.filter(t => t.status === 'open').length + dSel.actOver.filter(x => x.r.status !== 'Done').length + inv.over.length + dl.over.length + ord.over.length;
-  document.getElementById('todaySummary').textContent = isToday ? dueSel + ' due today, ' + overSel + ' overdue' : dueSel + ' due ' + (daysBetween(real, sel) > 0 ? 'then' : 'that day') + ', ' + overSel + ' overdue by then';
-  document.getElementById('todayScope').innerHTML = `<button data-today="scope" data-v="mine" class="${todayUi.scope === 'mine' ? 'active' : ''}">My items</button><button data-today="scope" data-v="all" class="${todayUi.scope === 'all' ? 'active' : ''}">Everyone</button>`;
+  if(badge){ badge.textContent = dueNow + late.length; badge.hidden = !(dueNow + late.length); badge.classList.toggle('over', late.length > 0); badge.title = dueNow + ' due today, ' + late.length + ' overdue'; }
+  if(!tp) return;
+  if(todayUi.focus && !late.length && !todayUi.fkeys.length) todayUi.focus = false;
   updateGreeting();
-  /* time-critical: deliveries to sign off, invoices and orders due, prices to confirm (supplier quotes awaiting a reply sit beside them) */
-  const priceRows = (state.purchaseOrders || []).filter(po => poNeedsPrices(po)).sort((a, b) => cmpText(poActualDelivery(a), poActualDelivery(b)));
-  const lim = state.settings.todayLimit || 10;
-  const sub = (key, title, d, rowFn, empty) => {
-    const rows = d.over.map(x => ({ x, over: true })).concat(d.main.map(x => ({ x, over: false })));
-    const more = !!todayUi.more[key], shown = more ? rows : rows.slice(0, lim), hid = rows.length - shown.length;
-    return `<div class="td-sub-blk${rows.length ? '' : ' td-sub-none'}"><div class="td-head"><h3>${title}</h3><span class="n">${rows.length}</span></div>${shown.length ? shown.map(r => rowFn(r.x, r.over)).join('') : `<div class="td-none">Nothing waiting</div>`}${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="${key}">See more (${hid})</button>` : ''}</div>`; };
-  const priceBlk = `<div class="td-sub-blk${priceRows.length ? '' : ' td-sub-none'}"><div class="td-head"><h3>Prices to confirm</h3><span class="n">${priceRows.length}</span></div>${priceRows.length ? priceRows.slice(0, todayUi.more.price ? 999 : lim).map(po => `<div class="td-row" data-today="nav" data-spec="po:${po.id}"><span class="td-title">${escHtml(po.ref)} · ${escHtml(po.supplierName || '')}<span class="td-sub">${escHtml((state.projects.find(x => x.id === po.pid) || {}).name || '')}</span></span><span class="td-meta"><span>Delivered ${escHtml(pwD(poActualDelivery(po)))}${(poProject(po) && dcPtcMark(poProject(po), po.did)) || ''}</span><span>${qm(poTotals(po).payable)}</span><button type="button" class="btn qb-sm" data-pc="open" data-id="${po.id}">Confirm prices</button></span></div>`).join('') : '<div class="td-empty">Nothing waiting</div>'}${priceRows.length > lim && !todayUi.more.price ? `<button type="button" class="link-btn td-more" data-today="more" data-k="price">See more (${priceRows.length - lim})</button>` : ''}</div>`;
-  crit.innerHTML = `<div class="td-crit-h"><h3>Time-critical</h3><span class="td-crit-s">${dl.main.length + dl.over.length} to sign off · ${inv.main.length + inv.over.length} invoices · ${ord.main.length + ord.over.length} orders${isToday ? '' : ' · for ' + escHtml(fmtDisplay(toDate(sel)))}</span></div>
-    <div class="td-crit-grid">${sub('del', 'Deliveries to sign off', dl, todayDeliveryRow, 'Nothing waiting for sign-off.')}${sub('ord', 'Orders to place', ord, todayOrderRow, 'No orders waiting.')}${sub('inv', 'Invoices to raise', inv, todayInvoiceRow, 'No invoices to raise.')}${priceBlk}<div class="td-sub-blk" id="todayRfq" hidden></div></div>`;
-  /* action tiles: job actions, then business actions (only for the people Settings allows) */
-  const me = meName(), mine = todayUi.scope === 'mine' && !!me;
-  const undatedTasks = scope => state.crmTasks.filter(t => t.status === 'open' && !t.dueDate && t.scope === scope && taskVisible(t) && !(taskOnLostLead(t)) && !(mine && t.owner !== me));
-  const jobDated = dSel.crmToday.concat(dSel.crmOver).filter(t => t.scope !== 'business').map(t => ({ t, d: t.dueDate }));
-  const taskRow = (x, over) => todayTaskRow(x.t || x, over);
-  const jobGroups = todayGroupsFor(jobDated, undatedTasks('job').map(t => ({ t, d: '' })), sel, isToday ? 'Due today' : 'Due ' + escHtml(fmtDisplay(toDate(sel))));
-  const jobEl = document.getElementById('todayJob');
-  jobEl.innerHTML = todayTile('job', 'Job actions', '<button class="btn secondary" data-today="add-task">+ Add</button>', jobGroups, taskRow, x => x.t.status === 'open');
-  const bizEl = document.getElementById('todayBiz'); bizEl.hidden = !ownBiz;
-  if(ownBiz){
-    const bizTasks = dSel.crmToday.concat(dSel.crmOver).filter(t => t.scope === 'business').map(t => ({ t, d: t.dueDate, kind: 'task' }));
-    const acts = dSel.actToday.concat(dSel.actOver).map(x => ({ x, d: x.r.deadline, kind: 'act' }));
-    const undAct = state.actions.map((r, i) => ({ r, i })).filter(({ r }) => !r.deadline && r.status !== 'Done' && !archiving.has(r) && !(mine && !sameUser(r.owner, me))).map(x => ({ x, d: '', kind: 'act' }));
-    const bizUnd = undatedTasks('business').map(t => ({ t, d: '', kind: 'task' }));
-    const rowFn = (it, over) => it.kind === 'task' ? todayTaskRow(it.t, over) : todayActionRow(it.x, over);
-    const live = it => it.kind === 'task' ? it.t.status === 'open' : it.x.r.status !== 'Done';
-    const sortD = (a, b) => cmpText(a.d, b.d);
-    bizEl.innerHTML = todayTile('biz', 'Business actions', '<button class="btn secondary" data-today="add-biz-task">+ Task</button><button class="btn secondary" data-today="add-action">+ Action</button>', todayGroupsFor(bizTasks.concat(acts).sort(sortD), bizUnd.concat(undAct), sel, isToday ? 'Due today' : 'Due ' + escHtml(fmtDisplay(toDate(sel)))), rowFn, live);
-  } else bizEl.innerHTML = '';
-  const readyEl = document.getElementById('todayReady'); readyEl.hidden = !isToday || !ready.length; if(isToday) readyEl.innerHTML = todayReadySection(ready);
-  const pe = todayProjectEvents(sel), pr = document.getElementById('todayProjects');
-  if(pr){ const open = todayUi.od.proj;
-    pr.innerHTML = `<div class="td-head"><h3>${isToday ? 'Projects today' : 'Projects on ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${pe.today.length}</span></div>
-      ${pe.over.length ? `<button class="td-od${open ? ' open' : ''}" data-today="od" data-k="proj">Overdue (${pe.over.length})${CHEV_SVG}</button><div class="td-od-list"${open ? '' : ' hidden'}>${pe.over.map(x => todayProjectRow(x, true)).join('')}</div>` : ''}
-      ${pe.today.length ? pe.today.map(x => todayProjectRow(x, false)).join('') : '<div class="td-none">Nothing waiting</div>'}`; }
-  if(typeof renderTodayPhases === 'function') renderTodayPhases(sel, real);
+  const sum = document.getElementById('todaySummary'); if(sum) sum.textContent = tdSummary(sel, real, late, sel === real ? todayItems : []);
+  tdControls(sel, real, late.length);
+  tp.classList.toggle('tdp-focusmode', todayUi.focus);
+  const open = tdPanelOpen() && !todayUi.focus, body = document.getElementById('tdpBody');
+  body.classList.toggle('po', open);
+  const sc = { x: window.scrollX, y: window.scrollY };
+  body.innerHTML = todayUi.focus ? tdFocusHtml(real) : `<div class="tdp-main-pane">${todayUi.view === 'board' ? tdBoardHtml(sel, real, late, todayItems) : tdListHtml(sel, real, late, todayItems)}</div>${open ? tdSideHtml(sel, real) : ''}`;
+  if(window.scrollY !== sc.y) window.scrollTo(sc.x, sc.y);
+  tdMsDrawer(); tdStick();
   refreshActionPanel();
 }
+/* the controls row collapses to a compact bar once the page is scrolled past the greeting */
+function tdStick(){
+  const s = document.getElementById('tdpSent'), c = document.getElementById('tdpCtl'); if(!s || !c) return;
+  const top = (parseFloat(getComputedStyle(c).top) || 0), stuck = s.getBoundingClientRect().top <= top + 1;
+  if(stuck !== todayUi.stuck){ todayUi.stuck = stuck; c.classList.toggle('stuck', stuck); }
+}
+window.addEventListener('scroll', () => { if(document.getElementById('panel-today').classList.contains('active')) tdStick(); }, { passive: true });
+window.addEventListener('resize', () => { if(state && document.getElementById('panel-today').classList.contains('active')) renderToday(); });
 /* roll over at midnight and when the tab or window regains focus, so the lists never show yesterday's "today" */
 function checkTodayRollover(){ updateGreeting(); if(state && todayUi.key && todayUi.key !== fmt(new Date())) render(); }   // every 30 seconds: the greeting text is re-checked in place, the page only re-renders at midnight
 setInterval(checkTodayRollover, 30000);
 document.addEventListener('visibilitychange', () => { if(!document.hidden) checkTodayRollover(); });
-document.addEventListener('change', (e) => {   // the date picker: jump to a day
-  if(e.target.id !== 'todayPick' || !state) return;
-  const v = isoOk(e.target.value), real = fmt(new Date()); todayUi.date = !v || v === real ? '' : v; todayUi.more = {}; renderToday();
-});
 window.addEventListener('focus', checkTodayRollover);
+
+/* ---- actions ---- */
+function tdSetDay(k, dir){
+  todayUi.date = k === tdReal() ? '' : k; todayUi.dir = dir || 0; renderToday();
+  const b = document.getElementById('tdpDate'); if(b && dir){ b.classList.remove('sl', 'sr'); void b.offsetWidth; b.classList.add(dir > 0 ? 'sl' : 'sr'); }
+}
+function tdItemByKey(key){
+  if(key.startsWith('t:')){ const t = findTask(key.slice(2)); return t ? { kind: 'task', o: t } : null; }
+  if(key.startsWith('a:')){ const r = state.actions[Number(key.slice(2))]; return r ? { kind: 'action', o: r } : null; }
+  return null;
+}
+function tdMoveTo(key, date, time, say){
+  const x = tdItemByKey(key); if(!x) return;
+  const f = x.kind === 'task' ? 'dueDate' : 'deadline', before = { d: x.o[f], t: x.o.dueTime, has: 'dueTime' in x.o }, title = x.kind === 'task' ? x.o.title : x.o.action;
+  x.o[f] = date; if(time !== undefined){ if(time) x.o.dueTime = time; else if(!validTime(x.o.dueTime)) x.o.dueTime = taskDefaultTime(); }
+  render(); saveState();
+  showToast(say + ': ' + title, () => { x.o[f] = before.d; if(before.has) x.o.dueTime = before.t; else delete x.o.dueTime; render(); saveState(); });
+}
+function tdSnooze(key){
+  const x = tdItemByKey(key); if(!x) return; const cur = x.kind === 'task' ? x.o.dueDate : x.o.deadline, real = tdReal(), base = cur && cur > real ? cur : real;
+  const to = wdAdd(base, 1); tdMoveTo(key, to, '', 'Snoozed to ' + tdShort(to));
+}
+function tdSetTime(key, time){
+  const x = tdItemByKey(key); if(!x || !validTime(time)) return; const before = { t: x.o.dueTime, has: 'dueTime' in x.o }, title = x.kind === 'task' ? x.o.title : x.o.action;
+  x.o.dueTime = time; render(); saveState();
+  showToast('Scheduled at ' + time + ': ' + title, () => { if(before.has) x.o.dueTime = before.t; else delete x.o.dueTime; render(); saveState(); });
+}
+function tdStartFocus(){
+  const late = tdLate(); if(!late.length) return;
+  todayUi.fkeys = late.map(x => x.key); todayUi.fi = 0; todayUi.focus = true; todayUi.menu = false; renderToday(); window.scrollTo(0, 0);
+}
+function tdExitFocus(){ todayUi.focus = false; todayUi.fkeys = []; todayUi.fi = 0; renderToday(); }
+function tdOpenMsInProject(id){
+  const m = tdMsFind(id); if(!m) return; const p = m.p, key = m.key;
+  tdCloseMs();
+  navGo(() => {
+    openProjectWorkspace(p.id, false, false); rpUi.pid = p.id; rpUi.tab = 'activity';
+    const pp = rpFind(p.id); if(pp) rpRenderProject(pp); window.scrollTo(0, 0);
+    setTimeout(() => { const li = document.querySelector(`#projectWorkspace .rp-ms[data-mk="${key}"]`); if(li){ li.scrollIntoView({ block: 'center' }); li.classList.add('tdp-flash'); setTimeout(() => li.classList.remove('tdp-flash'), 2400); } }, 80);
+  });
+}
+document.getElementById('panel-today').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-td]'); if(!b || !state) return; const a = b.dataset.td;
+  if(a === 'view'){ todayUi.view = b.dataset.v === 'board' ? 'board' : 'list'; tdSavePrefs(); renderToday(); }
+  else if(a === 'panel'){ todayUi.panel = !tdPanelOpen(); tdSavePrefs(); renderToday(); }
+  else if(a === 'fold'){ todayUi.fold[b.dataset.k] = !todayUi.fold[b.dataset.k]; tdSavePrefs(); renderToday(); }
+  else if(a === 'day') tdSetDay(b.dataset.day, 0);
+  else if(a === 'focus') tdStartFocus();
+  else if(a === 'exitfocus') tdExitFocus();
+  else if(a === 'skip'){ todayUi.fi++; renderToday(); }
+  else if(a === 'snooze') tdSnooze(b.dataset.key);
+  else if(a === 'resched'){ const x = tdItemByKey(b.dataset.key); if(!x) return; if(x.kind === 'task') openTaskPanel(x.o.id); else openActionPanel(x.o); setTimeout(() => { const f = document.getElementById('tkpDue'); if(f) f.focus(); }, 40); }
+  else if(a === 'tick'){ toggleTaskTick(b.dataset.id); }
+  else if(a === 'task-open') openTaskPanel(b.dataset.id);
+  else if(a === 'act-open') openActionPanel(state.actions[Number(b.dataset.idx)]);
+  else if(a === 'del-open') dcOpen(Number(b.dataset.pid), b.dataset.did);
+  else if(a === 'del-all') dcQuick(Number(b.dataset.pid), b.dataset.did);
+  else if(a === 'ms'){ todayUi.ms = b.dataset.id; todayUi.msFrom = b; const el = document.getElementById('tdpDrawer'); if(el) el.dataset.id = ''; tdMsDrawer(); }
+  else if(a === 'closems') tdCloseMs();
+  else if(a === 'ms-open') tdOpenMsInProject(b.dataset.id);
+  else if(a === 'more'){ todayUi.menu = !todayUi.menu; renderToday(); if(todayUi.menu){ const f = document.querySelector('.tdp-menu button'); if(f) f.focus(); } }
+  else if(a === 'summary'){ todayUi.menu = false; renderToday(); if(typeof msumOpen === 'function') msumOpen(); }
+  else if(a === 'settings'){ todayUi.menu = false; navGo(() => { activateTab('settings'); settingsShow('crm', true); setTimeout(() => { const c = document.getElementById('taskDefaultsCard'); if(c) c.scrollIntoView({ block: 'start' }); }, 30); }); }
+  else if(a === 'jobs') navGo(() => { activateTab('projectpipeline'); window.scrollTo(0, 0); });
+  else if(a === 'calendar') navGo(() => { activateTab('capacity'); window.scrollTo(0, 0); });
+});
+document.addEventListener('click', (e) => {
+  if(todayUi.menu && !e.target.closest('.tdp-more')){ todayUi.menu = false; if(state) renderToday(); }
+  const b = e.target.closest('[data-today]'); if(!b) return;
+  const a = b.dataset.today;
+  if(a === 'act-open'){ const inner = e.target.closest('input,select,textarea,button,.cbx,a'); if(inner && inner !== b) return; openActionPanel(state.actions[Number(b.dataset.idx)]); }   // Actions table: the linked-record tile
+  else if(a === 'act-rec' || a === 'act-rec-panel'){
+    const r = a === 'act-rec' ? state.actions[Number(b.dataset.idx)] : (actionPanel && actionPanel.ref);
+    const l = r && linkedInfos(r).find(i => i.d && !i.lost); if(l) openRecordByCode(l.code);
+  }
+  else if(a === 'act-cols'){ actUi.colsOpen = !actUi.colsOpen; renderActions(); }
+});
+document.addEventListener('click', (e) => { if(actUi.colsOpen && !e.target.closest('#actColsWrap')){ actUi.colsOpen = false; renderActions(); } });
+document.getElementById('panel-today').addEventListener('change', (e) => { const s = e.target.closest('[data-td-set]'); if(s && s.value) tdSetTime(s.dataset.tdSet, s.value); });
+/* the date block: previous / next / today, swipe (this block only) and the arrow keys when it has focus */
+(function(){
+  const z = document.getElementById('tdpDzone'); let x0 = null, id = null;
+  document.getElementById('tdpPrev').addEventListener('click', () => tdSetDay(addDaysIso(tdSel(), -1), -1));
+  document.getElementById('tdpNext').addEventListener('click', () => tdSetDay(addDaysIso(tdSel(), 1), 1));
+  document.getElementById('tdpDate').addEventListener('click', () => tdSetDay(tdReal(), 1));
+  z.addEventListener('pointerdown', (e) => { if(e.target.closest('.tdp-ib')) return; x0 = e.clientX; id = e.pointerId; try{ z.setPointerCapture(id); }catch(_){} });
+  z.addEventListener('pointerup', (e) => { if(x0 === null) return; const dx = e.clientX - x0; x0 = null; if(Math.abs(dx) > 40){ const dir = dx < 0 ? 1 : -1; tdSetDay(addDaysIso(tdSel(), dir), dir); } });
+  z.addEventListener('pointercancel', () => { x0 = null; });
+  z.addEventListener('keydown', (e) => { if(e.key === 'ArrowLeft'){ e.preventDefault(); tdSetDay(addDaysIso(tdSel(), -1), -1); } else if(e.key === 'ArrowRight'){ e.preventDefault(); tdSetDay(addDaysIso(tdSel(), 1), 1); } });
+})();
+document.addEventListener('keydown', (e) => {
+  if(!state || !document.getElementById('panel-today').classList.contains('active')) return;
+  if(e.key === 'Escape'){
+    if(todayUi.ms){ tdCloseMs(); e.preventDefault(); return; }
+    if(todayUi.menu){ todayUi.menu = false; renderToday(); const m = document.querySelector('[data-td="more"]'); if(m) m.focus(); return; }
+  }
+  if(!todayUi.focus || (taskPanel || actionPanel) || !document.getElementById('modalOverlay').hidden) return;
+  if(e.target.closest && e.target.closest('input,select,textarea')) return;
+  if(e.key === 'Escape'){ tdExitFocus(); }
+  else if(e.key === 'Enter' && !(e.target.closest && e.target.closest('button'))){ const b = document.querySelector('.tdp-fbtns .pri'); if(b){ e.preventDefault(); b.click(); } }
+  else if(e.key === 's' || e.key === 'S'){ const b = document.querySelector('.tdp-fbtns [data-td="snooze"]'); if(b) b.click(); }
+  else if(e.key === 'ArrowRight'){ todayUi.fi++; renderToday(); }
+});
+
 
 document.addEventListener('change', (e) => {   // Action panel fields (title, status, priority, owner, due date, …)
   const el = e.target, f = el.dataset && el.dataset.af; if(!f || !actionPanel) return;
@@ -14014,33 +14329,6 @@ document.addEventListener('change', (e) => {
     const s = new Set(state.actionPrefs.shownCols); if(el.checked) s.add(d.acol); else s.delete(d.acol);
     state.actionPrefs.shownCols = [...s]; renderActions(); saveState();
   }
-});
-
-/* ---- Today events ---- */
-document.addEventListener('click', (e) => {
-  if(actUi.colsOpen && !e.target.closest('#actColsWrap')){ actUi.colsOpen = false; renderActions(); }
-  const b = e.target.closest('[data-today]'); if(!b) return;
-  const a = b.dataset.today;
-  if(a === 'scope') setTodayScope(b.dataset.v);
-  else if(a === 'od'){ todayUi.od[b.dataset.k] = !todayUi.od[b.dataset.k]; renderToday(); }
-  else if(a === 'add-task') openNewTask('');
-  else if(a === 'add-biz-task') openNewTask('', { scope: 'business' });
-  else if(a === 'more'){ todayUi.more[b.dataset.k] = !todayUi.more[b.dataset.k]; renderToday(); }
-  else if(a === 'day-prev' || a === 'day-next' || a === 'day-today'){
-    const real = fmt(new Date()), cur = isoOk(todayUi.date) || real;
-    todayUi.date = a === 'day-today' ? '' : addDaysIso(cur, a === 'day-prev' ? -1 : 1); if(todayUi.date === real) todayUi.date = ''; todayUi.more = {}; renderToday();
-  }
-  else if(a === 'add-action') openNewAction();
-  else if(a === 'proj-open'){ openProjectWorkspace(Number(b.dataset.id)); }
-  else if(a === 'nav'){ const inner = e.target.closest('input,select,textarea,button,.cbx,a'); if(inner && inner !== b) return; navGo(() => navOpen(b.dataset.spec)); }
-  else if(a === 'tick-del') dcOpen(Number(b.dataset.pid), b.dataset.did);
-  else if(a === 'all-del') dcQuick(Number(b.dataset.pid), b.dataset.did);
-  else if(a === 'act-open'){ const inner = e.target.closest('input,select,textarea,button,.cbx,a'); if(inner && inner !== b) return; openActionPanel(state.actions[Number(b.dataset.idx)]); }
-  else if(a === 'act-rec' || a === 'act-rec-panel'){
-    const r = a === 'act-rec' ? state.actions[Number(b.dataset.idx)] : (actionPanel && actionPanel.ref);
-    const l = r && linkedInfos(r).find(i => i.d && !i.lost); if(l) openRecordByCode(l.code);
-  }
-  else if(a === 'act-cols'){ actUi.colsOpen = !actUi.colsOpen; renderActions(); }
 });
 
 /* ---------- branding (Settings → General): display mode, name, font, logos, colours; shown in the brand pill and on the login screen ---------- */
@@ -17741,19 +18029,10 @@ document.addEventListener('input', (e) => { const d = e.target.dataset; if(d && 
 
 /* ---------- reminders on the Today view: a supplier has not replied by the reply-by date ---------- */
 function rfqDue(today){
-  const me = meName(), mine = todayUi.scope === 'mine' && !!me, out = [];
-  state.quotes.forEach(q => (q.rfqs || []).forEach(r => { if(r.status === 'Sent' && r.replyBy && r.replyBy <= today && (!mine || sameUser(r.createdBy, me) || sameUser(r.createdBy, whoName()))) out.push({ q, r }); }));
+  const out = [];
+  state.quotes.forEach(q => (q.rfqs || []).forEach(r => { if(r.status === 'Sent' && r.replyBy && r.replyBy <= today) out.push({ q, r }); }));
   return out.sort((a, b) => a.r.replyBy.localeCompare(b.r.replyBy));
 }
-function rfqRenderToday(){
-  const el = document.getElementById('todayRfq'); if(!el || !state) return; const today = fmt(new Date()), list = rfqDue(today);
-  const over = list.filter(x => x.r.replyBy < today).length;
-  const badge = document.getElementById('todayBadge'); if(badge && list.length){ const cur = Number(badge.textContent) || 0; badge.textContent = cur + list.length; badge.hidden = false; if(over) badge.classList.add('over'); }
-  const sum = document.getElementById('todaySummary'); if(sum && list.length) sum.textContent += ', ' + list.length + ' supplier ' + (list.length === 1 ? 'quote' : 'quotes') + ' chased';
-  el.innerHTML = list.length ? `<div class="td-head"><h3>Supplier quotes awaiting a reply</h3><span class="n">${list.length}</span></div>${list.map(({ q, r }) => `<div class="td-row"><span class="td-title">${escHtml(r.number)} · ${escHtml(rfqSupplierName(r.supplierId))} <span class="qb-dim">for ${escHtml(r.ref)}</span></span><span class="td-meta"><span class="${r.replyBy < today ? 'td-due' : ''}">${r.replyBy < today ? 'Reply was due ' : 'Reply due '}${escHtml(fmtDisplay(toDate(r.replyBy)))}</span>${ltChip(`quote:${q.id}`, qRef(q))}<button type="button" class="link-btn" data-rf="today-received" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Mark received</button><button type="button" class="link-btn" data-rf="today-email" data-qid="${q.id}" data-rid="${escAttr(r.id)}">Chase by email</button></span></div>`).join('')}` : '';
-  el.hidden = !list.length;
-}
-(function(){ const o = renderToday; renderToday = function(){ const r = o.apply(this, arguments); try{ rfqRenderToday(); }catch(e){} return r; }; })();
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-rf^="today-"]'); if(!b || !state) return; const q = qFind(Number(b.dataset.qid)), r = q && rfqOf(q, b.dataset.rid); if(!r) return;
   if(b.dataset.rf === 'today-received') rfqSetStatus(q, r, 'Received', `quote received from ${rfqSupplierName(r.supplierId)}`);
@@ -18936,7 +19215,7 @@ function rpMilestoneStrip(p, label){
   const items = RP_MS.map(([k, n]) => {
     const i = projMsInfo(p, k), done = !!i.actual, isNext = !done && next && next.key === k, d = done ? i.actual.date : i.planned;
     const st = done ? 'done' : isNext ? 'next' : 'later', over = isNext && i.planned && i.planned < today;
-    return `<li class="rp-ms ${st}${over ? ' over' : ''}" title="${escAttr(n + ': ' + (done ? 'confirmed ' + pwD(d) : d ? 'planned ' + pwD(d) : 'no date yet'))}"><span class="rp-ms-dot" aria-hidden="true">${done ? '✓' : ''}</span><span class="rp-ms-n">${escHtml(n)}</span><span class="rp-ms-d">${done ? escHtml(pwD(d)) : d ? '<i>' + escHtml(pwD(d)) + '</i>' : ''}</span><span class="rp-ms-s">${done ? 'done' : isNext ? (over ? 'next, overdue' : 'next') : 'to come'}</span></li>`;
+    return `<li class="rp-ms ${st}${over ? ' over' : ''}" data-mk="${k}" title="${escAttr(n + ': ' + (done ? 'confirmed ' + pwD(d) : d ? 'planned ' + pwD(d) : 'no date yet'))}"><span class="rp-ms-dot" aria-hidden="true">${done ? '✓' : ''}</span><span class="rp-ms-n">${escHtml(n)}</span><span class="rp-ms-d">${done ? escHtml(pwD(d)) : d ? '<i>' + escHtml(pwD(d)) + '</i>' : ''}</span><span class="rp-ms-s">${done ? 'done' : isNext ? (over ? 'next, overdue' : 'next') : 'to come'}</span></li>`;
   }).join('');
   return `<div class="rp-msbar" role="group" aria-label="Key milestones">${label ? `<div class="rp-ms-l">${label}</div>` : ''}<ol class="rp-mss">${items}</ol></div>`;
 }
@@ -20095,26 +20374,12 @@ document.addEventListener('click', (e) => {
 });
 /* Today: the phases that are due (their end date, or start date when there is no end, is today or earlier) */
 function phDue(sel){
-  const me = meName(), mine = todayUi.scope === 'mine' && !!me, live = new Set(liveProjects()), out = [];
+  const live = new Set(liveProjects()), out = [];
   phRecords().forEach(({ kind, r }) => {
-    if(r.lost || (kind === 'project' && !live.has(r)) || (mine && r.owner && r.owner !== me)) return;
+    if(r.lost || (kind === 'project' && !live.has(r))) return;
     sfPhases(r).forEach(p => { if(phIsDone(p)) return; const d = sfIso(p.end) || sfIso(p.start); if(d && d <= sel) out.push({ kind, r, p, d }); });
   });
   return out.sort((a, b) => a.d.localeCompare(b.d) || String(a.p.name).localeCompare(String(b.p.name)));
-}
-function phTodayRow(x, over){
-  const at = `data-kind="${x.kind}" data-rid="${x.r.id}" data-pid="${escAttr(x.p.id)}"`, b = phNum(x.p.hours);
-  return `<div class="td-row"><div class="cbx" data-ph="tick" ${at} title="Mark done: you can confirm the hours next">${CHECK_SVG}</div>
-    <span class="td-title">${escHtml(x.p.name || 'Phase')} · ${ltChip(`deal2:${x.r.id}`, boardTitle(x.kind, x.r))}</span>
-    <span class="td-meta"><span>${PH_KIND[x.kind]}</span>${x.p.selling ? '<span class="sf-chip">Selling time</span>' : ''}<span>${b > 0 ? escHtml(phFmtH(b)) + ' budget' : 'no budget'}</span>${over ? `<span class="td-due">Due ${escHtml(fmtDisplay(toDate(x.d)))}</span>` : ''}</span></div>`;
-}
-function renderTodayPhases(sel){
-  const el = document.getElementById('todayPhases'); if(!el) return;
-  const rows = phDue(sel), real = fmt(new Date()), isToday = sel === real, lim = (state.settings && state.settings.todayLimit) || 10, more = !!todayUi.more.ph;
-  const over = rows.filter(x => x.d < sel), main = rows.filter(x => x.d === sel), all = over.map(x => ({ x, o: true })).concat(main.map(x => ({ x, o: false }))), shown = more ? all : all.slice(0, lim), hid = all.length - shown.length;
-  el.innerHTML = `<div class="td-head"><h3>${isToday ? 'Phases due' : 'Phases due by ' + escHtml(fmtDisplay(toDate(sel)))}</h3><span class="n">${rows.length}</span></div>
-    ${shown.length ? shown.map(r => phTodayRow(r.x, r.o)).join('') : '<div class="td-none">Nothing waiting</div>'}
-    ${hid > 0 ? `<button type="button" class="link-btn td-more" data-today="more" data-k="ph">See more (${hid})</button>` : (more && all.length > lim ? `<button type="button" class="link-btn td-more" data-today="more" data-k="ph">Show fewer</button>` : '')}`;
 }
 /* the labour rate used for selling time: the hourly rate in Settings, else the day rate over the hours in a day */
 function sellRate(){
@@ -20456,7 +20721,7 @@ function renderCapacity(){
     ${unp.length ? `<div class="cv-unp"><h4>Not placed on the calendar</h4><p class="q-help u-margin-0-0-6px" >These have hours or a duration but nothing to place them by: give them a preferred start, a deadline or phase dates.</p>${unp.map(it => `<div class="cv-c"><span class="cv-ck ${it.kind}"></span>${ltChip(`deal2:${it.id}`, it.name)}<span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span><span class="cv-cw">${escHtml(it.unplaced.what || 'no preferred start or deadline')}</span><b>${capH(it.unplaced.hours || sfDays(it.r) * hpd())}</b></div>`).join('')}</div>` : ''}`;
 }
 function capOpenDay(iso){
-  navGo(() => { todayUi.date = iso === fmt(new Date()) ? '' : iso; todayUi.more = {}; activateTab('today'); render(); window.scrollTo(0, 0); });
+  navGo(() => { todayUi.date = iso === fmt(new Date()) ? '' : iso; activateTab('today'); render(); window.scrollTo(0, 0); });
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-cv]'); if(!b || !state || b.tagName === 'INPUT' || b.tagName === 'SELECT') return; const a = b.dataset.cv;
