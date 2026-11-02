@@ -3408,51 +3408,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     </div>
         </section>
 
-        <section class="set-sec" data-sec="admin">
-    <div data-admin-only>
-    <div class="section-label">Cloud database — multi-device sync</div>
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
-        <span id="cloudStatus"></span>
-      </div>
-      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Connect to your Supabase database so the tracker syncs across devices and is backed up server-side, instead of living only in this browser. <strong>First-time setup:</strong> run the SQL below once in Supabase, then paste your Project URL and publishable key and hit Connect. (Logins come in the next step — for now, keep the link private.)</p>
-      <div class="assumptions-grid two" style="max-width:640px;">
-        <div><label>Project URL</label><input id="cloudUrl" placeholder="https://xxxx.supabase.co"></div>
-        <div><label>Publishable key (sb_publishable_…)</label><input id="cloudKey" type="password" placeholder="sb_publishable_…"></div>
-      </div>
-      <div class="btn-row" style="margin-top:12px;margin-bottom:8px;">
-        <button class="btn" data-action="cloud-connect">Connect &amp; sync</button>
-        <button class="btn secondary" data-action="cloud-test">Test connection</button>
-        <button class="btn secondary" data-action="cloud-reload">Reload from cloud</button>
-        <button class="btn secondary" data-action="cloud-disconnect" style="margin-left:auto;">Disconnect</button>
-      </div>
-      <div id="cloudMsg" class="cloud-msg"></div>
-      <details class="u-margin-top-14px">
-        <summary style="cursor:pointer;font-size:12px;font-weight:600;color:var(--slate);">Show one-time setup SQL</summary>
-        <p style="font-size:12px;color:var(--text-muted);margin:8px 0;">In Supabase: left sidebar → <strong>SQL Editor</strong> → <strong>New query</strong> → paste this → <strong>Run</strong>. You only do this once.</p>
-        <pre class="sql-block" id="setupSql">create table if not exists tracker_data (
-  id int primary key default 1,
-  doc jsonb not null default '{}'::jsonb,
-  updated_at timestamptz not null default now(),
-  constraint single_row check (id = 1)
-);
-insert into tracker_data (id, doc) values (1, '{}'::jsonb)
-  on conflict (id) do nothing;
-alter table tracker_data enable row level security;
-create policy "app read"   on tracker_data for select using (true);
-create policy "app insert" on tracker_data for insert with check (true);
-create policy "app update" on tracker_data for update using (true) with check (true);</pre>
-        <button class="btn secondary u-margin-top-8px" data-action="copy-sql" >Copy SQL</button>
-      </details>
-    </div>
-
-    <div class="section-label">User accounts</div>
-    <div class="card">
-      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Add team members, reset passwords, or remove access. Each person logs in with their own username and password. (Only admins see this panel.)</p>
-      <div id="usersWrap"></div>
-    </div>
-    </div><!-- /admin-only -->
-        </section>
+        <section class="set-sec" data-sec="admin" id="setAdminSec"></section>   <!-- Stage 9: filled in by renderAdminSection() for an admin only; nothing is written here for anyone else -->
       </div>
     </div>
   </div>
@@ -4321,14 +4277,71 @@ async function attemptLogin(){
 function logout(){ clearSession(); showLogin(); }
 function showLogin(){ const o = document.getElementById('loginOverlay'); if(o) o.classList.remove('hidden'); document.body.classList.add('logged-out'); const lu = document.getElementById('loginUser'); if(lu) setTimeout(()=>lu.focus(), 50); }
 function hideLoginShowApp(){ const o = document.getElementById('loginOverlay'); if(o) o.classList.add('hidden'); document.body.classList.remove('logged-out'); }
+/* Stage 9: the Admin settings section (cloud connection details, API key, user accounts) is built only when the signed-in role is admin.
+   For anyone else the section stays an empty element: no heading, fields, placeholders or buttons, and no key or URL is ever written to the page. */
+function adminSectionHtml(){
+  return `
+    <div class="section-label">Cloud database — multi-device sync</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+        <span id="cloudStatus"></span>
+      </div>
+      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Connect to your Supabase database so the tracker syncs across devices and is backed up server-side, instead of living only in this browser. <strong>First-time setup:</strong> run the SQL below once in Supabase, then paste your Project URL and publishable key and hit Connect. (Logins come in the next step — for now, keep the link private.)</p>
+      <div class="assumptions-grid two" style="max-width:640px;">
+        <div><label>Project URL</label><input id="cloudUrl" placeholder="https://xxxx.supabase.co"></div>
+        <div><label>Publishable key (sb_publishable_…)</label><input id="cloudKey" type="password" placeholder="sb_publishable_…"></div>
+      </div>
+      <div class="btn-row" style="margin-top:12px;margin-bottom:8px;">
+        <button class="btn" data-action="cloud-connect">Connect &amp; sync</button>
+        <button class="btn secondary" data-action="cloud-test">Test connection</button>
+        <button class="btn secondary" data-action="cloud-reload">Reload from cloud</button>
+        <button class="btn secondary" data-action="cloud-disconnect" style="margin-left:auto;">Disconnect</button>
+      </div>
+      <div id="cloudMsg" class="cloud-msg"></div>
+      <details class="u-margin-top-14px">
+        <summary style="cursor:pointer;font-size:12px;font-weight:600;color:var(--slate);">Show one-time setup SQL</summary>
+        <p style="font-size:12px;color:var(--text-muted);margin:8px 0;">In Supabase: left sidebar → <strong>SQL Editor</strong> → <strong>New query</strong> → paste this → <strong>Run</strong>. You only do this once.</p>
+        <pre class="sql-block" id="setupSql">create table if not exists tracker_data (
+  id int primary key default 1,
+  doc jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now(),
+  constraint single_row check (id = 1)
+);
+insert into tracker_data (id, doc) values (1, '{}'::jsonb)
+  on conflict (id) do nothing;
+alter table tracker_data enable row level security;
+create policy "app read"   on tracker_data for select using (true);
+create policy "app insert" on tracker_data for insert with check (true);
+create policy "app update" on tracker_data for update using (true) with check (true);</pre>
+        <button class="btn secondary u-margin-top-8px" data-action="copy-sql" >Copy SQL</button>
+      </details>
+    </div>
+
+    <div class="section-label">User accounts</div>
+    <div class="card">
+      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Add team members, reset passwords, or remove access. Each person logs in with their own username and password. (Only admins see this panel.)</p>
+      <div id="usersWrap"></div>
+    </div>
+    `;
+}
+function renderAdminSection(){
+  const el = document.getElementById('setAdminSec'); if(!el) return;
+  if(!isAdmin()){ if(el.firstChild) el.innerHTML = ''; return; }
+  if(!el.firstChild){
+    el.innerHTML = adminSectionHtml();
+    const cu = document.getElementById('cloudUrl'), ck = document.getElementById('cloudKey');
+    if(cu) cu.value = cloud.url || '';
+    if(ck) ck.value = cloud.key || '';
+    renderCloudStatus();
+  }
+  renderUsers();
+}
 function renderAuthUI(){
   const lb = document.getElementById('logoutBar');
   if(lb) lb.innerHTML = session
     ? `<div class="who">${escAttr(session.username)}<span class="role">${session.role==='admin'?'admin':(session.role==='approver'?'approver':'user')}</span></div><button class="logout-link" data-action="logout">Log out</button>`
     : '';
-  const admin = isAdmin();
-  document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = admin ? '' : 'none'; });
-  if(admin) renderUsers();
+  renderAdminSection();
 }
 async function renderUsers(){
   const wrap = document.getElementById('usersWrap'); if(!wrap || !isAdmin()) return;
@@ -4365,10 +4378,6 @@ async function startApp(){
   activateTab('today');   // Today is the landing page after every login
   qHashOpen();
   navResume();   // after a refresh: back to the view you were on, with the way back still there
-  const cu = document.getElementById('cloudUrl'), ck = document.getElementById('cloudKey');
-  if(cu) cu.value = cloud.url || '';
-  if(ck) ck.value = cloud.key || '';
-  renderCloudStatus();
   if(!window._tablesInit){ initTableControls(); window._tablesInit = true; }
   renderAuthUI();
 }
@@ -14885,6 +14894,7 @@ document.addEventListener('click', (e) => {
   }
   else if(action === 'export-data'){ exportData(); }
   else if(action === 'import-data'){ document.getElementById('importFile').click(); }
+  else if(action.startsWith('cloud-') && !isAdmin()){ /* Stage 9: the connection details are admin only */ }
   else if(action === 'cloud-connect'){ connectCloud(); }
   else if(action === 'cloud-test'){ testCloud(); }
   else if(action === 'cloud-reload'){ reloadFromCloud(); }
