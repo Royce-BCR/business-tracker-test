@@ -1048,6 +1048,8 @@
   .ql-price { border: 1px solid var(--line); border-radius: var(--bt-r-btn); padding: var(--bt-s2) 10px; margin-bottom: var(--bt-s2); } .ql-pr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: var(--bt-s1) 0; }
   @media (max-width: 700px) { .qb-grid, .qb-grid.qb-compact { grid-template-columns: 1fr; } .qb-grid .qb-wide, .qb-grid.qb-compact .qb-wide, .qb-grid.qb-compact .qb-addr { grid-column: span 1; } }
   .qb-banner { background: var(--bt-ok-bg); border: 1px solid var(--bt-ok-bd); border-radius: var(--bt-r-btn); padding: 10px 14px; margin-bottom: var(--bt-s3); font-size: 13px; display: flex; align-items: center; gap: var(--bt-s3); flex-wrap: wrap; }
+  .qb-lastedit { font-size: 12px; color: var(--text-muted); margin: -4px 0 8px; }
+  .qb-cl { margin-top: var(--bt-s3); } .qb-cl h3 { font-size: 14px; color: var(--text-muted); font-weight: 600; } .qb-cl-e { border-top: 1px solid var(--line); padding: 8px 0; font-size: 13px; } .qb-cl-e:first-of-type { border-top: 0; } .qb-cl-e ul { margin: 4px 0 4px 18px; padding: 0; } .qb-cl-h { color: var(--text-muted); font-size: 12px; }
   .qb-banner.warn { background: var(--bt-warn-bg); border-color: var(--bt-warn-bd); } .qb-banner-btns { margin-left: auto; display: flex; gap: var(--bt-s2); }
   .qb-locked .qb-table input:disabled, .qb-locked .qb-table select:disabled { background: var(--bt-paper); color: var(--ink); opacity: 0.85; }
   .qb-deal { margin-top: 6px; font-size: 13px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -8629,6 +8631,7 @@ function ensureQuoteDocModel(o, seed){
       q.sentTo = str(q.sentTo); q.sentAt = iso(q.sentAt);
       q.viewMode = ['A', 'B', 'C', 'D'].includes(q.viewMode) ? q.viewMode : '';
       q.sentSnapshot = (q.sentSnapshot && typeof q.sentSnapshot === 'object' && q.sentSnapshot.docs && q.sentSnapshot.terms) ? q.sentSnapshot : null;
+      qcNormalise(q);   // optional admin-edit keys: changeLog[], lastEdited, editBase (absent unless the quote has been edited)
       q.acceptedDate = iso(q.acceptedDate); q.asSold = (q.asSold && typeof q.asSold === 'object') ? q.asSold : null;
       q.payments = Array.isArray(q.payments) ? q.payments.filter(r => r && typeof r === 'object').map(r => ({ id: str(r.id) || qRand('pm_'), label: str(r.label), mode: r.mode === 'amount' ? 'amount' : 'percent', value: qNumOr(r.value, 0),
         dueMode: ['afterEnd', 'completion', 'acceptance', 'date'].includes(r.dueMode) ? r.dueMode : 'afterEnd', date: iso(r.date), days: (r.days === '' || r.days == null || isNaN(Number(r.days)) || Number(r.days) < 0) ? '' : Math.round(Number(r.days)),
@@ -8847,8 +8850,10 @@ function qbHeaderHtml(q){
       <button type="button" class="btn secondary" data-qba="back">← All quotes</button>
       <div class="qb-ref">${pill}<span class="qb-mode ${q.mode}" title="${q.mode === 'template' ? 'Reproduces the Excel exactly' : 'The new, tidier rules'}">${q.mode === 'template' ? 'Template rules (matches the Excel)' : 'New rules'}</span></div>
       <div class="qb-acts">${q.mode === 'template' ? '<button type="button" class="btn secondary" data-qba="use-new">Use new rules</button>' : ''}
-        ${qLocked(q) ? '' : `<button type="button" class="btn secondary" data-qba="new-version" title="Copy this quote as the next version (a Draft)">New version</button>`}
+        ${isAdmin() && !q.editBase ? `<button type="button" class="btn" data-qba="qe-start" title="Admin only: change this quotation. Every save is recorded in the change log">Edit quotation</button>` : ''}
+        ${qLocked(q) || q.editBase ? '' : `<button type="button" class="btn secondary" data-qba="new-version" title="Copy this quote as the next version (a Draft)">New version</button>`}
         <button type="button" class="btn secondary" data-qba="del-quote" style="color:var(--bt-bad-fg);border-color:var(--bt-bad-bd);">Delete quote</button></div></div>
+    ${q.lastEdited ? `<div class="qb-lastedit" id="qbLastEdit">Last edited by ${escHtml(q.lastEdited.by)}, ${escHtml(dShow(qcDay(q.lastEdited.at)))}</div>` : ''}
     <div class="qb-grid qb-compact">
       ${f('Status', qbSel('hdr', '', 'status', qbOpts(qStatusOptions(q).map(s => [s, s]), q.status)))}
       ${f('Quote date', `<input type="date" data-qb="hdr" data-f="date" value="${escAttr(q.date)}">`)}
@@ -8990,7 +8995,7 @@ function qbRender(){
   const ae = document.activeElement; if(ae && box.contains(ae) && ae.blur) ae.blur();   // commit a half-finished edit before the page is rebuilt
   const sc = box.querySelector('.qb-scroll'), sl = sc ? sc.scrollLeft : 0, sy = window.scrollY;
   qAutoDrops(q);
-  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbOptionalHtml(q) + qbMaterialsHtml(q) + qbCompareHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + '<div class="qb-pair">' + qAsSoldHtml(q) + '<div id="qbActual"></div></div><datalist id="qbGroupsList"></datalist><div id="qbCash"></div>' + qbTimelineHtml(q);
+  box.innerHTML = qbBannerHtml(q) + '<div id="qbFlags" class="ap-flags"></div>' + qbHeaderHtml(q) + '<div id="qbAppr"></div>' + qbTilesHtml() + qbOptionalHtml(q) + qbMaterialsHtml(q) + qbCompareHtml(q) + qbLabourHtml(q) + qbDeliveryHtml(q) + qbPaymentsHtml(q) + qbSummaryHtml(q) + qbCustomerHtml(q) + '<div class="qb-pair">' + qAsSoldHtml(q) + '<div id="qbActual"></div></div><datalist id="qbGroupsList"></datalist><div id="qbCash"></div>' + qbTimelineHtml(q) + qbChangeLogHtml(q);
   const ns = box.querySelector('.qb-scroll'); if(ns) ns.scrollLeft = sl;
   box.querySelectorAll('[data-f="customerGroup"]').forEach(i => i.setAttribute('list', 'qbGroupsList'));
   qbRefresh(); window.scrollTo(0, sy);
@@ -9087,7 +9092,7 @@ function qCreate(){
 function qNewVersion(q, quiet){
   const c = JSON.parse(JSON.stringify(q)), today = fmt(new Date());
   c.id = state.nextQuoteId++; c.version = q.version + 1; c.status = 'Draft'; c.refOverride = ''; c.date = today; c.asSold = null; c.acceptedDate = ''; c.sentSnapshot = null; c.supersededBy = 0;   // a new version is not sold yet
-  c.firstAcceptedDate = q.firstAcceptedDate || q.acceptedDate || ''; c.prevVersionId = q.id; delete c.customerSnap;
+  c.firstAcceptedDate = q.firstAcceptedDate || q.acceptedDate || ''; c.prevVersionId = q.id; delete c.customerSnap; delete c.changeLog; delete c.lastEdited; delete c.editBase;
   // line, labour and drop ids are kept on purpose: the Working plan, delivery states, transactions and POs match the next version by them
   c.timeline = [{ date: today, note: `Created as version ${c.version} from ${qRef(q)}`, created: Date.now(), kind: 'version' }];
   q.timeline.push({ date: today, note: `Superseded by version ${c.version} (${qRef(c)})`, created: Date.now(), kind: 'superseded' });
@@ -9112,6 +9117,7 @@ function qbChange(el){
   const q = qFind(qUi.openId); if(!q) return;
   const k = el.dataset.qb, f = el.dataset.f, id = el.dataset.id, v = el.type === 'checkbox' ? el.checked : el.value;
   let rebuild = false;
+  if(qEditOpen(q) && k === 'hdr' && ['status', 'refOverride', 'jobNumber', 'date'].includes(f)){ showToast('Status, reference and created date do not change while you edit a quotation.'); qbRender(); return; }
   if(qLocked(q) && !(k === 'hdr' && ['status', 'viewMode', 'openVersion'].includes(f))){ showToast('This quote is locked. Make a new version to change it.'); qbRender(); return; }   // no edit path round the lock
   if(k === 'hdr'){
     if(f === 'openVersion'){ const t = qFind(Number(v)); if(t){ qUi.openId = t.id; renderQuotes(); window.scrollTo(0, 0); } return; }
@@ -9276,6 +9282,9 @@ function qbAction(a, b){
     q.timeline.push({ date: d.value || fmt(new Date()), note: n.value.trim(), created: Date.now(), kind: 'note' }); saveState(); qbRender(); return;
   }
   if(a === 'new-version'){ qNewVersion(q); return; }
+  if(a === 'qe-start'){ qeStart(q); return; }
+  if(a === 'qe-save'){ qeSave(q); return; }
+  if(a === 'qe-cancel'){ qeCancel(q); return; }
   if(a === 'edit-hdr'){ qUi.moreHdr.add(q.id); qbRender(); return; }
   if(a === 'pay-ov-reset'){ const r = q.payments.find(x => x.id === id); if(r){ r.dueOverride = ''; qbTouch(q, true); } return; }
   if(a === 'use-new'){
@@ -9681,7 +9690,7 @@ function qSeedLink(o){
    every line, labour row and drop id (so the project's Working plan, delivery states, transactions and POs still match), the original is kept untouched, and a Sent original is
    marked Superseded. An Accepted original stays Accepted (the project runs on it) until the new version is Accepted, which carries the project across (planCarry). */
 const Q_LOCKED = ['Sent', 'Accepted', 'Superseded', 'Expired'];
-function qLocked(q){ return Q_LOCKED.includes(q.status); }
+function qLocked(q){ if(q.editBase) return !isAdmin(); return Q_LOCKED.includes(q.status); }   // an open admin edit session unlocks the quote for admins only; for everyone else a quote mid-edit stays read-only
 function qValidUntilSet(q){ if(q.sentSnapshot && q.sentSnapshot.validUntil) return q.sentSnapshot.validUntil; const n = Number(state.settings.quoteValidityDays) || 0; return n > 0 ? addDaysIso(q.date, n) : ''; }
 function qIsExpired(q){ if(q.status === 'Expired') return true; const vu = q.status === 'Sent' ? qValidUntilSet(q) : ''; return !!vu && vu < fmt(new Date()); }
 function qStatusShown(q){ return qIsExpired(q) ? 'Expired' : q.status; }
@@ -9694,6 +9703,8 @@ function qStatusOptions(q){
 }
 function qStaleCount(q){ let n = 0; q.lines.forEach(l => (l.prices || []).forEach(p => { if(qPriceStale(p)) n++; })); return n; }
 function qbBannerHtml(q){
+  if(qEditOpen(q)) return qeBarHtml(q);
+  if(q.editBase) return `<div class="qb-banner warn"><b>An administrator is editing this quotation.</b> It is read-only until they save or cancel.</div>`;
   const nv = q.supersededBy ? qFind(q.supersededBy) : null, vu = qValidUntilSet(q);
   const newVer = `<button class="btn" data-qba="new-version">Make a new version to change this</button>`;
   if(q.status === 'Superseded') return `<div class="qb-banner"><b>Superseded.</b> This version is kept exactly as it was and cannot be changed.${nv ? ` It was replaced by ${ltChip(null, qRef(nv), { attrs: `data-qba="open-version" data-id="${nv.id}"`, kind: 'quote' })} (${escHtml(qStatusShown(nv))}).` : ''}</div>`;
@@ -9701,6 +9712,160 @@ function qbBannerHtml(q){
   if(q.status === 'Sent') return `<div class="qb-banner"><b>This quote is Sent and locked.</b> It is what the customer has${vu ? ' (valid until ' + escHtml(qDocDate(vu)) + ')' : ''}, so it cannot be edited. <span class="qb-banner-btns">${newVer}</span></div>`;
   if(q.status === 'Accepted') return `<div class="qb-banner"><b>This quote is Accepted and locked.</b> The as-sold figures cannot be changed.${nv && nv.status !== 'Accepted' ? ` A new version is being prepared: ${ltChip(null, qRef(nv), { attrs: `data-qba="open-version" data-id="${nv.id}"`, kind: 'quote' })} (${escHtml(nv.status)}). The project keeps running on this quote until that one is Accepted.` : ''} <span class="qb-banner-btns">${nv && nv.status === 'Draft' ? '' : newVer}</span></div>`;
   return '';
+}
+/* ---- Admin edit of a quotation, with a change log ----
+   Only isAdmin() users get "Edit quotation". It opens an edit session: a deep snapshot of the quote is kept on the quote as q.editBase (so a reload resumes the session and an
+   abandoned session cannot change a quote without a log entry), the builder is unlocked for admins only, and the admin chooses Save changes (diff vs the snapshot, reason when the
+   quote was sent / accepted / invoiced, ONE change-log entry + ONE timeline note, q.lastEdited) or Cancel (the snapshot is put back into the same quote object).
+   Optional keys on a quote: changeLog[{ id, at, by, reason, issued, changes[], before{exVat,incVat}, after{exVat,incVat} }] (append-only, no UI edits or deletes it), lastEdited{by,at}, editBase. */
+function qEditOpen(q){ return !!(q && q.editBase && isAdmin()); }
+function qcNormalise(q){
+  const str = v => v == null ? '' : String(v), num = v => Number(v) || 0;
+  if(Array.isArray(q.changeLog)) q.changeLog = q.changeLog.filter(e => e && typeof e === 'object' && Array.isArray(e.changes)).map(e => ({ id: str(e.id) || qRand('cl_'), at: str(e.at), by: str(e.by), reason: str(e.reason), issued: str(e.issued),
+    changes: e.changes.map(str), before: { exVat: num(e.before && e.before.exVat), incVat: num(e.before && e.before.incVat) }, after: { exVat: num(e.after && e.after.exVat), incVat: num(e.after && e.after.incVat) } }));
+  if(!Array.isArray(q.changeLog) || !q.changeLog.length) delete q.changeLog;
+  if(q.lastEdited && typeof q.lastEdited === 'object' && q.lastEdited.at) q.lastEdited = { by: str(q.lastEdited.by), at: str(q.lastEdited.at) }; else delete q.lastEdited;
+  if(!(q.editBase && typeof q.editBase === 'object' && Array.isArray(q.editBase.lines))) delete q.editBase;
+}
+function qcDay(iso){ const d = new Date(iso); return isNaN(d) ? '' : fmt(d); }
+function qcWhen(iso){ const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+function qcSnap(q){ return JSON.parse(JSON.stringify(q, (k, v) => k === 'editBase' ? undefined : v)); }
+function qcInvoiced(q){ return (state.projects || []).some(p => (p.paymentLines || []).some(l => l.quoteId === q.id && (l.invoicedDate || l.paidDate))); }
+/* which of sent / accepted / invoiced apply (they decide the warning and whether a reason is needed) */
+function qcIssued(q){
+  const out = [];
+  if(q.status !== 'Draft' || q.sentSnapshot) out.push('sent');
+  if(q.status === 'Accepted' || q.asSold || q.acceptedDate) out.push('accepted');
+  if(qcInvoiced(q)) out.push('invoiced');
+  return out;
+}
+function qcList(a){ return a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0] || ''; }
+function qeBarHtml(q){
+  const iss = qcIssued(q);
+  return `<div class="qb-banner warn qb-editbar"><b>Editing this quotation.</b> ${iss.length ? `It has been ${qcList(iss)}: a reason is asked for when you save. ` : ''}Every save is recorded in the change log.
+    <span class="qb-banner-btns"><button class="btn" type="button" data-qba="qe-save">Save changes</button><button class="btn secondary" type="button" data-qba="qe-cancel">Cancel (discard changes)</button></span></div>`;
+}
+async function qeStart(q){
+  if(!isAdmin() || q.editBase) return;
+  const iss = qcIssued(q);
+  if(iss.length){
+    const ok = await showConfirmLabel('Edit this quotation?', `This quotation has been ${qcList(iss)}. Changes will not update documents already issued. You will be asked for a reason before saving.`, 'Edit quotation');
+    if(!ok) return;
+  }
+  qAutoDrops(q); q.editBase = qcSnap(q); saveState(); qbRender();
+}
+/* plain-English differ: header, lines (matched by id), labour, drops, payment rows, then a generic line for any other changed key */
+const QC_LABELS = { customer: 'Customer', address: 'Customer address', project: 'Project', notes: 'Notes', date: 'Quote date', mode: 'Calculation rules', viewMode: 'Customer document view', recoverUnpaid: 'Recover unpaid time',
+  unpaidOverride: 'Unpaid time override (hours)', vatMode: 'VAT mode', description: 'description', qty: 'quantity', wastagePct: 'wastage', markupPct: 'markup', vatRate: 'VAT rate', customerGroup: 'customer group', showOnQuote: 'show on quote',
+  optGroup: 'optional group', hire: 'hire instead of buy', unitName: 'unit', deliverDate: 'delivery date', stageId: 'stage', deliverStageId: 'delivery stage', basis: 'basis', rate: 'rate', helperQty: 'helper quantity',
+  label: 'name', method: 'method', charge: 'charge', paymentDueDate: 'payment due date', supplierId: 'supplier', value: 'amount', dueMode: 'due', days: 'days', dueOverride: 'due date (typed)' };
+const QC_PCT = ['wastagePct', 'markupPct', 'vatRate'], QC_GBP = ['rate', 'charge', 'costOverride'];
+function qcWords(k){ return QC_LABELS[k] || String(k).replace(/([A-Z])/g, ' $1').toLowerCase(); }
+function qcEmpty(v){ return v == null || v === '' || v === false || (Array.isArray(v) && !v.length); }   // a flag that is off and a flag that is absent are the same thing
+function qcV(k, v, o){
+  if(typeof v === 'boolean') return v ? 'Yes' : 'No'; if(qcEmpty(v)) return 'blank';
+  if(QC_GBP.includes(k) || (k === 'value' && o && o.mode === 'amount')) return qm(v); if(QC_PCT.includes(k) || (k === 'value' && o)) return qpct(v);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(String(v))) return dShow(v);
+  if(typeof v === 'object') return 'changed';
+  if(k === 'supplierId' || k === 'hireSupplierId') return qbSupName(v);
+  const t = String(v); if(t.length > 80) return '“' + t.slice(0, 77) + '…”';
+  return /[a-z]/i.test(t) && !['basis', 'method', 'dueMode', 'mode', 'viewMode'].includes(k) ? '“' + t + '”' : t;
+}
+function qcObjDiff(prefix, x, y, skip, out){
+  new Set(Object.keys(x).concat(Object.keys(y))).forEach(k => {
+    if(skip.includes(k)) return; const a = x[k], b = y[k]; if(qcEmpty(a) && qcEmpty(b)) return; if(JSON.stringify(a) === JSON.stringify(b)) return;
+    let lbl = qcWords(k); if(prefix && k === 'date') lbl = 'date'; if(k === 'mode' && prefix.startsWith('Payment')) lbl = 'type';
+    const name = prefix ? prefix + ' ' + lbl : lbl.charAt(0).toUpperCase() + lbl.slice(1);
+    out.push(`${name}: ${(a && typeof a === 'object') || (b && typeof b === 'object') ? 'changed' : qcV(k, a, x) + ' -> ' + qcV(k, b, y)}`);
+  });
+}
+function qcLineShown(q, l){ if(l.costOverride !== '' && l.costOverride != null) return { v: Number(l.costOverride), sid: '' }; const s = qSelected(q, l); return s ? { v: Number(s.price), sid: s.supplierId } : { v: null, sid: '' }; }
+function qeDiff(a, b){
+  const out = [], P = (name, x, y) => out.push(`${name}: ${x} -> ${y}`), H = ['customer', 'address', 'project', 'notes', 'date', 'mode', 'viewMode', 'recoverUnpaid', 'unpaidOverride'];
+  const pick = q => { const o = {}; H.forEach(k => { o[k] = q[k]; }); return o; };
+  qcObjDiff('', pick(a), pick(b), [], out);
+  const la = (a.linkedIds || []).join(', '), lb = (b.linkedIds || []).join(', '); if(la !== lb) P('Linked lead / project', la || 'not linked', lb || 'not linked');
+  const oa = (a.optIncluded || []).join(', '), ob = (b.optIncluded || []).join(', '); if(oa !== ob) P('Optional groups in the total', oa || 'none', ob || 'none');
+  const sa = (a.supplierCols || []).map(qbSupName).join(', '), sb = (b.supplierCols || []).map(qbSupName).join(', '); if(sa !== sb) P('Supplier columns', sa || 'none', sb || 'none');
+  let ca, cb; try{ ca = qCalc(a); cb = qCalc(b); }catch(e){ ca = cb = null; }
+  const vlA = qValidUntil(a) || '', vlB = qValidUntil(b) || ''; if(vlA !== vlB) P('Valid until', dShow(vlA) || 'blank', dShow(vlB) || 'blank');
+  const lineSkip = ['id', 'prices', 'selectedSupplierId', 'costOverride', 'unitId', 'categoryId', 'deliveryDropId', 'wastageManual', 'hireSupplierId'];
+  b.lines.forEach((l, i) => {
+    const o = a.lines.find(x => x.id === l.id), n = `Line ${i + 1}`;
+    if(!o){ out.push(`Added line: ${l.description || '(no description)'} x${l.qty}`); return; }
+    if(String(o.description) !== String(l.description)) P(`${n} description`, qcV('description', o.description), qcV('description', l.description));
+    const pa = qcLineShown(a, o), pb = qcLineShown(b, l);
+    if(pa.sid !== pb.sid) P(`${n} price source`, pa.sid === '' ? (pa.v == null ? 'none' : 'typed cost') : qbSupName(pa.sid), pb.sid === '' ? (pb.v == null ? 'none' : 'typed cost') : qbSupName(pb.sid));
+    if(pa.v !== pb.v) P(`${n} price`, pa.v == null ? 'none' : qm(pa.v), pb.v == null ? 'none' : qm(pb.v));
+    new Set(o.prices.map(p => p.supplierId).concat(l.prices.map(p => p.supplierId))).forEach(sid => {
+      const x = o.prices.find(p => p.supplierId === sid), y = l.prices.find(p => p.supplierId === sid), vx = x ? Number(x.price) : null, vy = y ? Number(y.price) : null;
+      if(vx === vy || (pa.sid === sid && pb.sid === sid)) return;
+      P(`${n} price from ${qbSupName(sid)}`, vx == null ? 'none' : qm(vx), vy == null ? 'none' : qm(vy));
+    });
+    if(qUnitName(o) !== qUnitName(l)) P(`${n} unit`, qUnitName(o) || 'blank', qUnitName(l) || 'blank');
+    if(o.categoryId !== l.categoryId){ const nm = id => { const c = (state.lineCategories || []).find(x => x.id === id); return c ? c.name : 'blank'; }; P(`${n} category`, nm(o.categoryId), nm(l.categoryId)); }
+    if(String(o.deliveryDropId || '') !== String(l.deliveryDropId || '')){ const nm = (q, id) => { const d = q.drops.find(x => x.id === id); return d ? (d.label || 'a delivery') : 'none'; }; P(`${n} delivery`, nm(a, o.deliveryDropId), nm(b, l.deliveryDropId)); }
+    if(String(o.hireSupplierId || '') !== String(l.hireSupplierId || '')) P(`${n} hire supplier`, o.hireSupplierId ? qbSupName(o.hireSupplierId) : 'blank', l.hireSupplierId ? qbSupName(l.hireSupplierId) : 'blank');
+    qcObjDiff(n, o, l, lineSkip, out);
+  });
+  a.lines.forEach(o => { if(!b.lines.some(x => x.id === o.id)) out.push(`Removed line: ${o.description || '(no description)'} x${o.qty}`); });
+  { const ia = a.lines.filter(x => b.lines.some(y => y.id === x.id)).map(x => x.id).join(), ib = b.lines.filter(x => a.lines.some(y => y.id === x.id)).map(x => x.id).join(); if(ia !== ib) out.push('Line order changed'); }
+  [['labour', 'Labour', r => r.description || 'Labour'], ['drops', 'Delivery', r => r.label || 'Delivery'], ['payments', 'Payment', r => r.label || 'Payment']].forEach(([key, name, nm]) => {
+    b[key].forEach((r, i) => { const o = a[key].find(x => x.id === r.id); if(!o){ out.push(`Added ${name.toLowerCase()}: ${nm(r)}`); return; } qcObjDiff(`${name} ${i + 1}`, o, r, ['id'], out); });
+    a[key].forEach(o => { if(!b[key].some(x => x.id === o.id)) out.push(`Removed ${name.toLowerCase()}: ${nm(o)}`); });
+  });
+  const handled = H.concat(['lines', 'labour', 'drops', 'payments', 'timeline', 'changeLog', 'lastEdited', 'editBase', 'status', 'linkedIds', 'optIncluded', 'supplierCols', 'id', 'sentSnapshot', 'asSold', 'refOverride', 'jobNumber', 'version', 'supersededBy', 'prevVersionId', 'firstAcceptedDate', 'acceptedDate', 'sentAt', 'sentTo', 'approval']);
+  new Set(Object.keys(a).concat(Object.keys(b))).forEach(k => {
+    if(handled.includes(k) || (qcEmpty(a[k]) && qcEmpty(b[k])) || JSON.stringify(a[k]) === JSON.stringify(b[k])) return;
+    const x = a[k], y = b[k], sc = v => v == null || typeof v !== 'object', w = qcWords(k);
+    out.push(`${w.charAt(0).toUpperCase() + w.slice(1)}: ${sc(x) && sc(y) ? qcV(k, x) + ' -> ' + qcV(k, y) : 'changed'}`);
+  });
+  return { lines: out, before: ca ? { exVat: ca.totalEx, incVat: ca.totalInc } : { exVat: 0, incVat: 0 } };
+}
+async function qeAskReason(lines, iss){
+  const e = escHtml, list = lines.slice(0, 40).map(l => `<li>${e(l)}</li>`).join('') + (lines.length > 40 ? `<li>…and ${lines.length - 40} more</li>` : '');
+  let keep = '';
+  for(;;){
+    const ok = await showConfirmLabel('Reason for this change', `This quotation has been ${qcList(iss)}. Changes will not update documents already issued. Type a short reason to save.`, 'Save changes',
+      `<ul class="chg-list" style="max-height:160px;overflow:auto;margin:6px 0 10px">${list}</ul><div class="lp-f"><label>Reason (required)</label><textarea id="qeReason" rows="3" maxlength="300" placeholder="Short reason, e.g. customer asked for a different post size" style="width:100%">${e(keep)}</textarea></div>`);
+    if(!ok) return null; keep = String(_confirmExtraNote || '').trim(); if(keep) return keep;
+    showToast('A reason is needed to save changes to this quotation.');
+  }
+}
+function qeClose(q){ delete q.editBase; saveState(); qbRender(); }
+let qe_busy = false;
+async function qeSave(q){
+  if(!qEditOpen(q) || qe_busy) return; qe_busy = true;
+  try{
+    const d = qeDiff(q.editBase, q);
+    if(!d.lines.length){ qeClose(q); showToast('No changes to save'); return; }
+    const iss = qcIssued(q); let reason = '';
+    if(iss.length){ reason = await qeAskReason(d.lines, iss); if(reason === null) return; }
+    if(!qEditOpen(q)) return;
+    const by = whoName(), at = new Date().toISOString(), c = qCalc(q);
+    q.changeLog = q.changeLog || [];
+    q.changeLog.push({ id: qRand('cl_'), at, by, reason, issued: qcList(iss), changes: d.lines, before: d.before, after: { exVat: c.totalEx, incVat: c.totalInc } });
+    q.timeline.push({ date: fmt(new Date()), note: `Quotation edited by ${by}${reason ? ` (reason: ${reason})` : ''}: ${d.lines.length} change${d.lines.length === 1 ? '' : 's'}. Total ex VAT ${qm(d.before.exVat)} -> ${qm(c.totalEx)}. See Change log.`, created: Date.now(), kind: 'changelog' });
+    q.lastEdited = { by, at }; qeClose(q); showToast('Changes saved and logged');
+  } finally { qe_busy = false; }
+}
+async function qeCancel(q){
+  if(!qEditOpen(q)) return;
+  const d = qeDiff(q.editBase, q);
+  if(d.lines.length){ const ok = await showConfirmLabel('Discard your changes?', `${d.lines.length} change${d.lines.length === 1 ? '' : 's'} will be thrown away and the quotation put back as it was when you started editing.`, 'Discard changes'); if(!ok) return; }
+  if(!qEditOpen(q)) return;
+  const b = q.editBase, keep = ['editBase', 'timeline', 'changeLog', 'lastEdited'];
+  Object.keys(q).forEach(k => { if(!keep.includes(k) && !(k in b)) delete q[k]; });
+  Object.keys(b).forEach(k => { if(!keep.includes(k)) q[k] = JSON.parse(JSON.stringify(b[k])); });   // same quote object, so every reference to it still holds
+  const was = new Set((b.timeline || []).map(t => t.created + '|' + t.note)); q.timeline = q.timeline.filter(t => was.has(t.created + '|' + t.note) || t.kind === 'note');
+  qeClose(q); showToast('Changes discarded');
+}
+function qbChangeLogHtml(q){
+  const log = (q.changeLog || []).slice().reverse(); if(!log.length) return '';
+  const vat = qVatOn();
+  return `<div class="card qb-cl" id="qbChangeLog"><div class="qb-sec-h"><h3>Change log</h3></div><p class="q-help">Changes made to this quotation after it was created. Entries are permanent.</p>${log.map(e => `<div class="qb-cl-e"><div class="qb-cl-h">${escHtml(qcWhen(e.at))} · ${escHtml(e.by)}</div>
+    ${e.reason ? `<div><b>Reason:</b> ${escHtml(e.reason)}</div>` : ''}<ul>${e.changes.map(c => `<li>${escHtml(c)}</li>`).join('')}</ul>
+    <div class="qb-cl-h">Total ex VAT ${qm(e.before.exVat)} -> ${qm(e.after.exVat)}${vat ? ` · inc VAT ${qm(e.before.incVat)} -> ${qm(e.after.incVat)}` : ''}</div></div>`).join('')}</div>`;
 }
 /* what differs between two versions, in plain words (used before a new version is accepted) */
 function qVersionChanges(a, b){
@@ -9850,6 +10015,7 @@ function qbLock(q){
   box.querySelectorAll('[data-qb]').forEach(el => { if(el.dataset.f === 'status' || el.dataset.f === 'viewMode' || el.dataset.f === 'openVersion' || el.closest('#lpBody')) return; el.disabled = lock; });
   box.querySelectorAll('[data-qba]').forEach(b => { if(['add-line', 'line-up', 'line-down', 'line-dup', 'line-del', 'del-supcol', 'add-lab', 'add-allowance', 'lab-del', 'add-drop', 'drop-del', 'add-pay', 'pay-del', 'use-new', 'unpaid-reset', 'pay-ov-reset'].includes(b.dataset.qba)) b.disabled = lock; });
   const sp = document.getElementById('qbAddSup'); if(sp) sp.disabled = lock;
+  if(qEditOpen(q)) box.querySelectorAll('[data-qb="hdr"]').forEach(el => { if(['status', 'refOverride', 'date'].includes(el.dataset.f)) el.disabled = true; });   // admin edit session: status, reference and created date stay as they are
   box.classList.toggle('qb-locked', lock);
 }
 
