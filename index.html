@@ -2774,6 +2774,25 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 }
 @media (max-width: 1100px){ .rp-tabs button { min-width: 44px; padding: 0 var(--bt-s2); } }
 /* BT:css-template end */
+  /* ---------- Monthly summary (new page + Today card), msum- prefix ---------- */
+  .tab[hidden] { display: none; }
+  .msum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-s3) var(--bt-s4); }
+  .msum-fig { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .msum-fig b { font-family: var(--serif); font-size: var(--bt-fs-lg); font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; color: var(--bt-brand-text); overflow-wrap: anywhere; }
+  .msum-fig span { font-size: var(--bt-fs-xs); color: var(--text-muted); }
+  .msum-none { font-size: var(--bt-fs-sm); color: var(--text-muted); } .msum-empty { padding: var(--bt-s6) 0; }
+  .msum-head { display: flex; align-items: flex-start; flex-wrap: wrap; gap: var(--bt-s3) var(--bt-s4); margin-bottom: var(--bt-s4); }
+  .msum-title { flex: 1 1 280px; min-width: 0; } .msum-title h2 { margin: 0 0 4px; font-family: var(--serif); font-size: var(--bt-fs-xl); color: var(--bt-brand-text); } .msum-title .desc { font-size: var(--bt-fs-sm); color: var(--text-muted); max-width: 62ch; }
+  .msum-step { display: flex; gap: var(--bt-s2); flex-wrap: wrap; }
+  .msum-blocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: var(--bt-s3); align-items: start; }
+  .msum-card { margin-bottom: 0; min-width: 0; }
+  .msum-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--bt-s2); }
+  .msum-tile { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; background: var(--bt-surface-2); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .msum-tile .k, .msum-list .k { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; }
+  .msum-tile b { font-size: 18px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; } .msum-tile .s { font-size: var(--bt-fs-xs); color: var(--text-muted); overflow-wrap: anywhere; }
+  .msum-tile.bad b { color: var(--bt-bad-fg); } .msum-tile.warn b { color: var(--bt-warn-fg); }
+  .msum-list { margin-top: var(--bt-s3); } .msum-list ul { margin: 4px 0 0; padding-left: 18px; font-size: var(--bt-fs-sm); } .msum-list li { overflow-wrap: anywhere; }
+  .msum-pots { display: grid; gap: 2px; margin-top: 4px; font-size: var(--bt-fs-sm); } .msum-pots > div { display: flex; justify-content: space-between; gap: var(--bt-s3); border-bottom: 1px solid var(--line); padding: 3px 0; } .msum-pots b { font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -2802,6 +2821,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="nav-items" id="gp-command" role="group" aria-labelledby="gh-command">
       <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
       <button type="button" class="tab g-command" data-tab="capacity">Calendar and capacity</button>
+      <button type="button" class="tab g-command" data-tab="monthsummary" hidden>Month summary</button>
       <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
       <button type="button" class="tab g-command" data-tab="reports">Reports</button>
     </div>
@@ -2961,6 +2981,9 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <section class="db-card" id="dbForecast" aria-label="Forecast and actuals"></section>
   </div>
   <div class="db-tip" id="dbTip" role="tooltip" hidden></div>
+
+  <!-- MONTH SUMMARY (reached from Today; not in the menu) -->
+  <div class="panel pg" id="panel-monthsummary"><div id="msumRoot"></div></div>
 
   <!-- CALENDAR AND CAPACITY -->
   <div class="panel" id="panel-capacity">
@@ -14697,6 +14720,7 @@ function render(){
   renderDashboard();
   if(typeof renderCapacity === 'function' && document.getElementById('panel-capacity').classList.contains('active')) renderCapacity();
   if(typeof renderLostBars === 'function') renderLostBars();
+  if(typeof renderMonthSummary === 'function' && document.getElementById('panel-monthsummary').classList.contains('active')) try{ renderMonthSummary(); }catch(e){ console.error(e); }
   renderBusinessPlan();
   renderLeads();
   renderSuppliers();
@@ -15478,6 +15502,7 @@ function activateTab(name){
   panel.classList.add('active');
   if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
   if(name === 'capacity') try{ renderCapacity(); }catch(e){ console.error(e); }
+  if(name === 'monthsummary') try{ renderMonthSummary(); }catch(e){ console.error(e); }
   try{ pjOnTab(name); }catch(e){}   // the Projects overview draws when shown and closes its panel when left
   updateScrollCues();
   try{ bttTouch(); }catch(e){}   // tables on the page just shown are measured
@@ -21339,6 +21364,199 @@ function msHtml(key){
     <h4 class="u-margin-14px-0-6px">Pipeline against break-even</h4>${repPipeHtml()}`;
 }
 /* BT:js-finance end */
+
+/* BT:js-msum start
+   ---------- MONTHLY SUMMARY (new page + Today card). Read-only: every figure comes from a function the app already has.
+   Not to be confused with the older Reports "Monthly summary" (msHtml). Everything here is prefixed msum / .msum-.
+   A figure the app does not hold is undefined / null and is left out; a block with nothing in it is not drawn.
+   Hours are logged per stage line and per ticked phase, with no person on them, so "hours by person" shows each person's AVAILABLE hours (from Settings > People). */
+const msumUi = { key: '' };
+navExtra('msum', () => ({ k: msumUi.key }), o => { if(o) msumUi.key = o.k || ''; });
+function msumMonthKey(){ const d = fmt(new Date()); return Number(d.slice(8, 10)) <= 5 ? prevMonthKey(d.slice(0, 7)) : d.slice(0, 7); }
+function msumNextKey(key){ const [y, m] = key.split('-').map(Number); return monthKey(new Date(y, m, 1)); }
+function msumLabel(key){ const [y, m] = String(key).split('-').map(Number); return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'long' }); }
+function msumLabelFull(key){ const [y, m] = String(key).split('-').map(Number); return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }); }
+const msumIn = (d, key) => typeof d === 'string' && d.slice(0, 7) === key;
+const msumDay = iso => iso ? toDate(iso.slice(0, 10)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+const msumH = n => (Math.round(n * 10) / 10).toLocaleString('en-GB') + ' h';
+function msumSafe(fn){ try{ return fn(); }catch(e){ console.error('msum', e); return undefined; } }
+
+/* tasks: CRM tasks (as listed on Today and the CRM tab) plus the business actions the person may see */
+function msumTaskRows(){
+  const crm = (state.crmTasks || []).filter(t => taskVisible(t) && !taskOnLostLead(t)).map(t => ({ raised: String(t.dateRaised || t.createdAt || '').slice(0, 10), done: t.status === 'done', doneAt: String(t.completedAt || '').slice(0, 10), due: t.dueDate || '', title: t.title }));
+  const acts = canSeeBusiness() ? (state.actions || []).map(a => ({ raised: String(a.dateRaised || '').slice(0, 10), done: a.status === 'Done', doneAt: '', due: a.deadline || '', title: a.action })) : [];
+  return { crm, all: crm.concat(acts) };
+}
+function msumTasks(key){
+  const { crm, all } = msumTaskRows(), today = fmt(new Date()), o = {};
+  if(crm.length){ const raised = crm.filter(t => msumIn(t.raised, key)).length, done = crm.filter(t => t.done && msumIn(t.doneAt, key)).length; if(raised || done){ o.raised = raised; o.done = done; } }
+  const open = all.filter(t => !t.done);
+  const aged = open.filter(t => t.raised && t.raised <= today);
+  if(aged.length) o.avgAge = Math.round(aged.reduce((a, t) => a + daysBetween(t.raised, today), 0) / aged.length);
+  if(open.length){ const od = open.filter(t => t.due && t.due < today).sort((a, b) => a.due.localeCompare(b.due)); if(open.some(t => t.due)){ o.overdueN = od.length; if(od.length){ o.longest = daysBetween(od[0].due, today); o.longestTitle = od[0].title; } } }
+  return o;
+}
+function msumHours(key){
+  let logged = 0, any = false;
+  (state.projects || []).forEach(p => {
+    (p.stages || []).forEach(s => (s.log || []).forEach(x => { any = true; if(msumIn(x.date, key)) logged += Number(x.hours) || 0; }));
+    sfPhases(p).forEach(ph => { if(phIsDone(ph)){ any = true; if(msumIn(ph.done.date, key)) logged += phNum(ph.done.hours); } });
+  });
+  let plan = 0; const a = key + '-01', b = monthEnd(key);
+  msumSafe(() => capItems({ projects: true }).forEach(it => { for(let d = a; d <= b; d = addDaysIso(d, 1)) plan += it.days[d] || 0; }));
+  return { any, logged, plan };
+}
+function msumMoney(key){
+  const o = {}, a = key + '-01', b = monthEnd(key), rows = invRows();
+  if(rows.length){
+    o.invoiced = r2(rows.filter(r => msumIn(r.invoicedDate, key)).reduce((s, r) => s + r.amount, 0));
+    o.paid = r2(rows.filter(r => msumIn(r.paidDate, key)).reduce((s, r) => s + (r.paidAmount > 0 ? r.paidAmount : r.amount), 0));
+  }
+  const tx = (state.transactions || []).filter(txCounted);
+  if(tx.length){ const m = tx.filter(t => msumIn(txCashDate(t), key)); o.cashIn = r2(m.reduce((s, t) => s + (Number(t.moneyIn) || 0), 0)); o.cashOut = r2(m.reduce((s, t) => s + (Number(t.moneyOut) || 0), 0)); }
+  const rt = retainedTotals();
+  if(rt.rows.some(x => x.r && x.r.plan && x.r.plan.retained)){
+    const end = retainedBy(b), start = retainedBy(monthEnd(prevMonthKey(key)));
+    o.retained = r2(end - start);
+    if(end > 0){ const pp = potPositions(end, b); o.pots = pp.rows.map(r => ({ name: r.b[1], amt: r.amt, note: r.method === 'fixed' ? money(r.perMonth) + ' a month' : Math.round(r.pct / pp.sum * 100) + '%' })); o.potsTotal = end; }
+  }
+  return o;
+}
+function msumJobs(key){
+  const o = {}, ps = (state.projects || []).filter(p => !p.lost);
+  if(!ps.length) return o;
+  const at = k => ps.filter(p => { const a = projMsActual(p, k); return a && msumIn(a.date, key); });
+  o.started = at('onSiteStart').length; o.delivered = at('buildComplete').length; o.signedOff = at('signOff').length;
+  const live = ps.filter(p => !projArchived(p)), behind = live.filter(p => rpStatus(p).k === 'bad');
+  o.behind = behind.length; o.behindNames = behind.slice(0, 4).map(p => p.name);
+  const h = msumHours(key); if(h.any || h.plan > 0){ o.hours = h.logged; if(h.plan > 0) o.plan = h.plan; }
+  return o;
+}
+function msumSales(key){
+  const o = {}, today = fmt(new Date()), range = { start: key + '-01', end: monthEnd(key) };
+  if((state.leads || []).some(l => leadCreatedDate(l))) o.leads = state.leads.filter(l => msumIn(leadCreatedDate(l), key)).length;
+  if((state.quotes || []).some(q => q.sentAt)) o.quotes = state.quotes.filter(q => msumIn(q.sentAt, key)).length;
+  if((state.pipeline || []).length || (state.projects || []).length){ const w = dashWon(range, today); o.won = w.count; o.wonValue = w.value; }
+  if((state.pipeline || []).length) o.weighted = state.pipeline.filter(r => !r.lost).reduce((s, r) => s + (Number(r.quoteValue) || 0) * effectiveProb(r), 0);
+  return o;
+}
+function msumTeam(key){
+  const o = {}, a = key + '-01', b = monthEnd(key), ppl = capPeople();
+  if(!ppl.length) return o;
+  o.byPerson = ppl.map(x => { let h = 0; for(let d = a; d <= b; d = addDaysIso(d, 1)) h += capPersonDay(x, d); return { name: x.name, hours: h }; }).filter(x => x.hours > 0);
+  o.available = capRange(a, b);
+  const h = msumHours(key);
+  if(h.any && o.available > 0){ o.logged = h.logged; o.usedPct = Math.round(h.logged / o.available * 100); }
+  return o;
+}
+function msumNext(key){
+  const o = {}, nk = msumNextKey(key), a = nk + '-01', b = monthEnd(nk), live = liveProjects();
+  if(live.length){
+    const due = live.filter(p => !projMsActual(p, 'buildComplete') && msumIn(rpDates(p).complete, nk));
+    o.jobsDue = due.length; o.jobsDueNames = due.slice(0, 4).map(p => p.name + ' (' + msumDay(rpDates(p).complete) + ')');
+    const drops = []; live.forEach(p => msumSafe(() => projDeliveries(p).drops.forEach(x => { if(!x.delivered && msumIn(x.date, nk)) drops.push({ p, x }); })));
+    o.deliveries = drops.length; o.deliveryNames = drops.slice(0, 4).map(z => z.p.name + ' · ' + z.x.supplier + ' (' + msumDay(z.x.date) + ')');
+  }
+  const rows = invRows();
+  if(rows.length){
+    const todo = rows.filter(r => !r.invoicedDate && !r.blocked && r.status !== 'Lost project' && r.status !== 'Written off' && r.amount > 0 && msumIn(r.raiseBy || r.dueDate, nk));
+    o.invoices = todo.length; o.invoicesValue = r2(todo.reduce((s, r) => s + r.amount, 0)); o.invoiceNames = todo.slice(0, 4).map(r => r.code + ' ' + r.pname + ' · ' + qm(r.amount));
+  }
+  if(capFull() > 0){
+    const wk = capWeekRows(capItems({ projects: true }), a, b).filter(r => r.cap > 0 && r.end >= a && r.mon <= b);
+    const gaps = wk.filter(r => r.total < r.cap * 0.5 && msumIn(addDaysIso(r.mon, 3), nk));   // weeks that are mostly in the month
+    o.gaps = gaps.length; o.gapNames = gaps.slice(0, 5).map(r => 'w/c ' + msumDay(r.mon) + ' · ' + msumH(r.total) + ' of ' + msumH(r.cap));
+  }
+  return o;
+}
+function msumData(key){
+  key = key || msumMonthKey();
+  return { key, label: msumLabel(key), labelFull: msumLabelFull(key), nextLabel: msumLabel(msumNextKey(key)),
+    money: msumSafe(() => msumMoney(key)) || {}, jobs: msumSafe(() => msumJobs(key)) || {}, sales: msumSafe(() => msumSales(key)) || {},
+    tasks: msumSafe(() => msumTasks(key)) || {}, team: msumSafe(() => msumTeam(key)) || {}, next: msumSafe(() => msumNext(key)) || {} };
+}
+function msumCardData(key){
+  key = key || msumMonthKey();
+  const m = msumSafe(() => msumMoney(key)) || {}, j = msumSafe(() => msumJobs(key)) || {}, s = msumSafe(() => msumSales(key)) || {}, t = msumSafe(() => msumTasks(key)) || {};
+  const n = v => typeof v === 'number' && isFinite(v) ? v : null;
+  return { invoiced: n(m.invoiced), signedOff: n(j.signedOff), tasksDone: n(t.done), tasksRaised: n(t.raised), won: n(s.wonValue) };
+}
+function msumCardHtml(key){
+  key = key || msumMonthKey();
+  const d = msumCardData(key), f = (big, label) => `<div class="msum-fig"><b>${big}</b><span>${label}</span></div>`, out = [];
+  if(d.invoiced !== null) out.push(f(money(d.invoiced), 'invoiced'));
+  if(d.signedOff !== null) out.push(f(String(d.signedOff), 'jobs signed off'));
+  if(d.tasksDone !== null && d.tasksRaised !== null) out.push(f(d.tasksDone + ' of ' + d.tasksRaised, 'tasks done'));
+  if(d.won !== null) out.push(f(money(d.won), 'won in sales'));
+  return out.length ? `<div class="msum-grid">${out.join('')}</div>` : `<div class="msum-none">Nothing to show for ${escHtml(msumLabel(key))} yet.</div>`;
+}
+function msumOpen(){ navGo(() => { msumUi.key = ''; activateTab('monthsummary'); window.scrollTo(0, 0); }); }
+
+/* ---- the page ---- */
+const msumHas = v => v !== undefined && v !== null && !(typeof v === 'number' && !isFinite(v));
+function msumTile(k, v, s, cls){ return msumHas(v) ? `<div class="msum-tile${cls ? ' ' + cls : ''}"><span class="k">${escHtml(k)}</span><b>${v}</b>${s ? `<span class="s">${s}</span>` : ''}</div>` : ''; }
+function msumList(title, items){ return items && items.length ? `<div class="msum-list"><div class="k">${escHtml(title)}</div><ul>${items.map(x => `<li>${escHtml(x)}</li>`).join('')}</ul></div>` : ''; }
+function msumBlock(title, tiles, extra){
+  const t = tiles.filter(Boolean), e = (extra || []).filter(Boolean);
+  return t.length || e.length ? `<section class="rp-card msum-card"><h4>${escHtml(title)}</h4>${t.length ? `<div class="msum-tiles">${t.join('')}</div>` : ''}${e.join('')}</section>` : '';
+}
+function msumPageHtml(key){
+  const d = msumData(key), m = d.money, j = d.jobs, s = d.sales, t = d.tasks, tm = d.team, nx = d.next, N = n => String(n);
+  const cap = k => d.label + ' ' + k;
+  const blocks = [
+    msumBlock('Money', [
+      msumTile('Invoiced', msumHas(m.invoiced) ? money(m.invoiced) : undefined, 'invoices raised in ' + d.label),
+      msumTile('Paid', msumHas(m.paid) ? money(m.paid) : undefined, 'received on invoices'),
+      msumTile('Cash in', msumHas(m.cashIn) ? money(m.cashIn) : undefined, 'bank transactions'),
+      msumTile('Cash out', msumHas(m.cashOut) ? money(m.cashOut) : undefined, 'bank transactions'),
+      msumTile('Retained profit', msumHas(m.retained) ? money(m.retained) : undefined, 'earned on invoices in ' + d.label, msumHas(m.retained) && m.retained < 0 ? 'bad' : '')
+    ], [m.pots ? `<div class="msum-list"><div class="k">Set-aside pots at the end of ${escHtml(d.label)} (of ${money(m.potsTotal)} retained to date)</div><div class="msum-pots">${m.pots.map(p => `<div><span>${escHtml(p.name)} · ${escHtml(p.note)}</span><b>${money(p.amt)}</b></div>`).join('')}</div></div>` : '']),
+    msumBlock('Jobs', [
+      msumTile('Started', msumHas(j.started) ? N(j.started) : undefined, 'on site in ' + d.label),
+      msumTile('Delivered', msumHas(j.delivered) ? N(j.delivered) : undefined, 'build complete'),
+      msumTile('Signed off', msumHas(j.signedOff) ? N(j.signedOff) : undefined, 'customer sign-off'),
+      msumTile('Behind', msumHas(j.behind) ? N(j.behind) : undefined, 'open jobs behind now', j.behind > 0 ? 'bad' : ''),
+      msumTile('Hours logged', msumHas(j.hours) ? msumH(j.hours) : undefined, msumHas(j.plan) ? 'against ' + msumH(j.plan) + ' planned' : 'no plan hours set')
+    ], [msumList('Behind now', j.behindNames)]),
+    msumBlock('Sales', [
+      msumTile('New leads', msumHas(s.leads) ? N(s.leads) : undefined, 'created in ' + d.label),
+      msumTile('Quotes sent', msumHas(s.quotes) ? N(s.quotes) : undefined, 'sent to customers'),
+      msumTile('Deals won', msumHas(s.won) ? N(s.won) : undefined, msumHas(s.wonValue) ? money(s.wonValue) + ' of work' : ''),
+      msumTile('Weighted pipeline', msumHas(s.weighted) ? money(s.weighted) : undefined, 'open deals at their stage chance, as it stands now')
+    ]),
+    msumBlock('Tasks', [
+      msumTile('Done of raised', msumHas(t.raised) ? t.done + ' of ' + t.raised : undefined, 'tasks completed against tasks raised'),
+      msumTile('Average age of open', msumHas(t.avgAge) ? t.avgAge + (t.avgAge === 1 ? ' day' : ' days') : undefined, 'since raised, as it stands now'),
+      msumTile('Longest overdue', msumHas(t.overdueN) ? (t.overdueN ? t.longest + (t.longest === 1 ? ' day' : ' days') : 'None') : undefined, t.longestTitle ? escHtml(t.longestTitle) : (t.overdueN === 0 ? 'nothing overdue' : ''), t.overdueN > 0 ? 'bad' : '')
+    ]),
+    msumBlock('Team', [
+      msumTile('Hours logged', msumHas(tm.logged) ? msumH(tm.logged) : undefined, 'on jobs in ' + d.label),
+      msumTile('Capacity used', msumHas(tm.usedPct) ? tm.usedPct + '%' : undefined, msumHas(tm.available) ? 'of ' + msumH(tm.available) + ' available' : '')
+    ], [tm.byPerson && tm.byPerson.length ? `<div class="msum-list"><div class="k">Hours available by person</div><div class="msum-pots">${tm.byPerson.map(x => `<div><span>${escHtml(x.name)}</span><b>${msumH(x.hours)}</b></div>`).join('')}</div></div>` : '']),
+    msumBlock('Next month: ' + d.nextLabel, [
+      msumTile('Jobs due', msumHas(nx.jobsDue) ? N(nx.jobsDue) : undefined, 'planned build complete'),
+      msumTile('Deliveries expected', msumHas(nx.deliveries) ? N(nx.deliveries) : undefined, 'materials not yet delivered'),
+      msumTile('Invoices to raise', msumHas(nx.invoices) ? N(nx.invoices) : undefined, msumHas(nx.invoicesValue) ? money(nx.invoicesValue) : ''),
+      msumTile('Diary gaps', msumHas(nx.gaps) ? N(nx.gaps) : undefined, 'weeks under half booked', nx.gaps > 0 ? 'warn' : '')
+    ], [msumList('Jobs due', nx.jobsDueNames), msumList('Deliveries', nx.deliveryNames), msumList('Invoices to raise', nx.invoiceNames), msumList('Quiet weeks', nx.gapNames)])
+  ].filter(Boolean);
+  return `<div class="msum-head">${nav.stack.length ? '' : '<div><button type="button" class="btn secondary msum-back" data-msum="back">← Back</button></div>'}
+      <div class="msum-title"><h2>${escHtml(d.labelFull)} summary</h2><div class="desc">What the month came to, from the figures the tracker already holds. Nothing here can be edited.</div></div>
+      <div class="msum-step" role="group" aria-label="Choose month"><button type="button" class="btn secondary" data-msum="prev" aria-label="Previous month">‹ ${escHtml(msumLabel(prevMonthKey(d.key)))}</button><button type="button" class="btn secondary" data-msum="next" aria-label="Next month">${escHtml(msumLabel(msumNextKey(d.key)))} ›</button></div></div>
+    ${blocks.length ? `<div class="msum-blocks">${blocks.join('')}</div>` : `<div class="msum-none msum-empty">Nothing to show for ${escHtml(d.labelFull)} yet.</div>`}`;
+}
+function renderMonthSummary(){
+  const el = document.getElementById('msumRoot'); if(!el || !state) return;
+  if(!msumUi.key) msumUi.key = msumMonthKey();
+  el.innerHTML = msumPageHtml(msumUi.key);
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-msum]'); if(!b || !state) return; const a = b.dataset.msum;
+  if(a === 'prev' || a === 'next'){ msumUi.key = a === 'prev' ? prevMonthKey(msumUi.key || msumMonthKey()) : msumNextKey(msumUi.key || msumMonthKey()); renderMonthSummary(); }
+  else if(a === 'back'){ if(nav.stack.length) navBack(); else { activateTab('today'); window.scrollTo(0, 0); } }
+  else if(a === 'open') msumOpen();
+});
+/* BT:js-msum end */
 
 /* ---------- init ---------- */
 (async () => {
