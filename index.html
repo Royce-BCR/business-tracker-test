@@ -18694,6 +18694,7 @@ function rpLeftHtml(p){
     ${rpRO('Reference', escHtml(code), 'Never changes', 'locked')}
     ${rpEdit(p, 'jobTypeId', { select: [['', 'Not set']].concat(state.jobTypes.map(j => [j.id, j.name + (j.notFit ? ' (not a fit)' : '')])), hint: jobNotFit(Object.assign({}, p, { jobTypeId: rpVal(p, 'jobTypeId') })) ? 'Marked as not a fit in Settings.' : 'The kind of job. The list is in Settings, Selling.' })}
     ${rpEdit(p, 'jobType', { label: 'Job detail', ph: 'e.g. Oak pergola' })}
+    ${rpEdit(p, 'site', { label: 'Site', ph: 'e.g. 12 Oak Road, Leeds', hint: 'Short name of where the work is. The Calendar uses it to warn when two projects are booked on the same day at different sites. Blank: the first line of the address is used.' })}
     ${rpRO('Value (ex VAT)', ct.live ? `<b>${qm(ct.value)}</b>` : (ct.value ? `<b>${qm(ct.value)}</b>` : ''), ct.live ? `Edit the value in Quote ${quoteLink}` : 'No accepted quote yet: the value is typed in the full workspace')}
     <div class="rp-f rp-calc"><div class="rp-lab"><span>Margin</span><span class="rp-tag">Calculated</span></div><div class="rp-two"><div class="rp-ro"><small>Sold</small>${mg && mg.hasSold ? `<b>${qm(mg.soldAfter)}</b> <span class="rp-dim">${qpct(mg.soldPct)}</span>` : '<span class="rp-dash">—</span>'}</div><div class="rp-ro"><small>Now</small>${mg ? `<b>${qm(mg.now)}</b> <span class="rp-dim">${qpct(mg.nowPct)}</span>` : '<span class="rp-dash">—</span>'}</div></div><div class="rp-hint">${mg ? 'Calculated from the quote and the costs' : 'Needs an accepted quote'}</div></div>
     ${rpRO('Agreed', sold ? escHtml(pwD(sold)) : '', 'Set when the contract is marked agreed')}
@@ -18933,7 +18934,7 @@ function rpSyncDraftUi(p){
   const bar = root.querySelector('#rpBar'); if(!bar) return; const has = !!(rpDraft(p) && Object.keys(rpDraft(p).f).length);
   bar.hidden = !has; bar.innerHTML = has ? rpBarInner(p) : '';
 }
-const RP_PLAIN = ['jobType', 'jobTypeId', 'prefStart', 'deadline', 'owner', 'source', 'contact', 'company', 'phone', 'email', 'address', 'postcode'];
+const RP_PLAIN = ['site', 'jobType', 'jobTypeId', 'prefStart', 'deadline', 'owner', 'source', 'contact', 'company', 'phone', 'email', 'address', 'postcode'];
 /* write the non-date fields onto the project (called when the bar is saved, or when a schedule is confirmed or kept as tentative) */
 function rpApplyPlain(p, f){
   const done = [];
