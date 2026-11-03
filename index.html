@@ -14038,6 +14038,41 @@ function tdMsHtml(sel, real){
     <div class="tdp-main"><button class="tdp-ttl" type="button" data-td="ms" data-id="${escAttr(m.id)}"${m.done ? ' style="color:var(--td-muted)"' : ''}>${escHtml(m.name)}</button><div class="tdp-sub">${tdProjTile(m.p)}</div></div>
     <button class="tdp-btn sm" type="button" data-td="ms" data-id="${escAttr(m.id)}" aria-label="Open milestone ${escAttr(m.name)}">Open</button></div>`).join('')}</div>`;
 }
+/* ---- Projects today and Ready to turn into a job (brought back at your request) ----
+   Projects today: stage starts, supplier payments due and money in waiting for payment on live projects, from the same project timeline as before (milestones are
+   in their own section above and deliveries / invoices to raise are rows in the lists, so nothing shows twice). Overdue ones sit with them, marked "N days late".
+   Ready to turn into a job: accepted quotes with no linked project. Undated, so only on today. */
+function tdProjectEvents(day){
+  const rows = [], real = tdReal();
+  liveProjects().forEach(p => projEventsUnique(p).forEach(e => {
+    if(e.kind === 'milestone' || e.planned || e.done || e.kind === 'delivery' || (e.kind === 'in' && !e.invoiced)) return;
+    if((e.overdue && day === real) || (!e.overdue && e.date === day)) rows.push({ p, e, late: !!e.overdue });
+  }));
+  return rows.sort((a, b) => cmpText(a.e.date, b.e.date) || cmpText(a.p.name, b.p.name));
+}
+function tdReadyQuotes(){
+  const hasProject = q => (q.linkedIds || []).some(c => state.projects.some(p => p.id === linkedRoot(c)));
+  const jobs = new Map();
+  state.quotes.forEach(q => { const j = jobs.get(q.jobNumber) || { linked: false, best: null }; if(hasProject(q)) j.linked = true; if(q.status === 'Accepted' && (!j.best || q.version > j.best.version)) j.best = q; jobs.set(q.jobNumber, j); });
+  return [...jobs.values()].filter(j => j.best && !j.linked).map(j => j.best).sort((a, b) => b.id - a.id);
+}
+function tdExtraHtml(sel, real){
+  let h = '';
+  const pe = tdProjectEvents(sel);
+  if(pe.length){
+    h += `<div class="tdp-sec"><h3>Projects ${sel === real ? 'today' : 'on ' + escHtml(tdShort(sel))}</h3><span class="n">${pe.length}</span></div><div class="tdp-panel tdp-rows">${pe.map(x => { const e = x.e, money = e.kind === 'in' || e.kind === 'out';
+      return `<div class="tdp-mrow tdp-prow"><span class="tdp-mtype ${e.kind === 'in' ? 'site' : e.kind === 'out' ? 'order' : 'del'}">${escHtml(PW_KIND[e.kind] || e.kind)}</span>
+        <div class="tdp-main"><button class="tdp-ttl" type="button" data-td="proj" data-id="${x.p.id}" data-money="${money ? 1 : 0}">${escHtml(e.title)}</button><div class="tdp-sub">${tdProjTile(x.p)}${x.late ? `<span class="tdp-late">${tdLateTxt(e.date)}</span>` : ''}${e.amount !== undefined ? `<span class="tdp-pill">${e.kind === 'out' ? '−' : ''}${qm(e.amount)}</span>` : ''}</div></div>
+        <button class="tdp-btn sm" type="button" data-td="proj" data-id="${x.p.id}" data-money="${money ? 1 : 0}" aria-label="Open project ${escAttr(x.p.name)}">Open</button></div>`; }).join('')}</div>`;
+  }
+  const rq = sel === real ? tdReadyQuotes() : [];
+  if(rq.length){
+    h += `<div class="tdp-sec"><h3>Ready to turn into a job</h3><span class="n">${rq.length}</span><span class="n">accepted, no job yet</span></div><div class="tdp-panel tdp-rows">${rq.map(q => `<div class="tdp-mrow tdp-prow"><span class="tdp-mtype sign">Accepted</span>
+      <div class="tdp-main"><button class="tdp-ttl" type="button" data-td="quote" data-id="${q.id}">${escHtml(qRef(q))} · ${escHtml(q.customer || '—')}</button><div class="tdp-sub">${q.project ? `<span class="tdp-sub2" style="margin:0">${escHtml(q.project)}</span>` : ''}${ltChip(`quote:${q.id}`, qRef(q))}</div></div>
+      <button class="tdp-btn sm" type="button" data-td="quote" data-id="${q.id}" aria-label="Open quote ${escAttr(qRef(q))}">Open</button></div>`).join('')}</div>`;
+  }
+  return h;
+}
 function tdListHtml(sel, real, late, today){
   let h = tdMsHtml(sel, real);
   if(sel === real){
@@ -14045,12 +14080,14 @@ function tdListHtml(sel, real, late, today){
     if(todayUi.fold.over) h += late.length ? `<div class="tdp-panel tdp-rows">${late.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>All clear.</b><span>Nothing is overdue.</span></div>';
     h += tdFoldHead('today', 'Today', today.length, '', '');
     if(todayUi.fold.today) h += today.length ? `<div class="tdp-panel tdp-rows">${today.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing is scheduled for today.</b></div>';
+    h += tdExtraHtml(sel, real);
     const bl = tdBacklog();
     h += `<button class="tdp-fold" type="button" data-td="fold" data-k="backlog" aria-expanded="${todayUi.fold.backlog}"><span>Backlog · ${tdPlural(bl.length, 'task', 'tasks')} with no date</span><span>${todayUi.fold.backlog ? 'Hide ‹' : 'Show ›'}</span></button>`;
     if(todayUi.fold.backlog) h += bl.length ? `<div class="tdp-panel tdp-rows">${bl.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing without a date.</b></div>';
   } else {
     const n = today.length;
     h += `<div class="tdp-sec"><h3>${escHtml(tdShort(sel))}</h3><span class="n">${tdPlural(n, 'item', 'items')}</span></div>` + (n ? `<div class="tdp-panel tdp-rows">${today.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing is planned for this day.</b><span>Give a task this date from its details, or from Focus.</span></div>');
+    h += tdExtraHtml(sel, real);
   }
   return h;
 }
@@ -14059,7 +14096,7 @@ function tdBoardHtml(sel, real, late, today){
     return `<div class="tdp-panel tdp-card" style="border-left:3px solid var(${it.biz ? '--td-slate' : '--td-oak'})"><div class="tdp-cardtop">${lt ? `<span class="tdp-pill red">${tdLateTxt(it.date)}</span>` : `<span class="tdp-pill${it.time ? ' oak' : ''}">${escHtml(it.time || 'Any time')}</span>`}<span class="tdp-pill ${it.biz ? 'slate' : 'oak'}">${ts ? (it.biz ? 'Business' : 'Job') : 'Job'}</span></div>
       ${it.open ? `<button class="tdp-ttl" type="button" ${it.open}>${escHtml(it.short)}</button>` : `<div class="tdp-ttl tdp-static">${escHtml(it.short)}</div>`}<div class="tdp-sub" style="margin:0">${it.rec || ''}${ts ? `<span class="tdp-av" title="${escAttr(it.owner)}">${escHtml(String(it.owner).charAt(0).toUpperCase())}</span>` : ''}</div></div>`; };
   const col = (title, cls, list, empty) => `<div><div class="tdp-sec ${cls}" style="margin-bottom:8px"><h3>${title}</h3><span class="n">${list.length}</span></div><div class="tdp-stack">${list.map(card).join('') || `<div class="tdp-empty">${empty}</div>`}</div></div>`;
-  return tdMsHtml(sel, real) + `<div class="tdp-boardgrid">${sel === real ? col('Overdue', 'red', late, 'All clear.') : ''}${col(sel === real ? 'Today' : escHtml(tdShort(sel)), '', today, 'Nothing planned.')}</div>`;
+  return tdMsHtml(sel, real) + `<div class="tdp-boardgrid">${sel === real ? col('Overdue', 'red', late, 'All clear.') : ''}${col(sel === real ? 'Today' : escHtml(tdShort(sel)), '', today, 'Nothing planned.')}</div>` + tdExtraHtml(sel, real);
 }
 
 /* ---- right panel ---- */
@@ -14250,6 +14287,8 @@ document.getElementById('panel-today').addEventListener('click', (e) => {
   else if(a === 'resched'){ const x = tdItemByKey(b.dataset.key); if(!x) return; if(x.kind === 'task') openTaskPanel(x.o.id); else openActionPanel(x.o); setTimeout(() => { const f = document.getElementById('tkpDue'); if(f) f.focus(); }, 40); }
   else if(a === 'tick'){ toggleTaskTick(b.dataset.id); }
   else if(a === 'task-open') openTaskPanel(b.dataset.id);
+  else if(a === 'proj') navGo(() => navOpen('project:' + b.dataset.id + (b.dataset.money === '1' ? ':money' : '')));
+  else if(a === 'quote') navGo(() => navOpen('quote:' + b.dataset.id));
   else if(a === 'act-open') openActionPanel(state.actions[Number(b.dataset.idx)]);
   else if(a === 'del-open') dcOpen(Number(b.dataset.pid), b.dataset.did);
   else if(a === 'del-all') dcQuick(Number(b.dataset.pid), b.dataset.did);
