@@ -141,3 +141,11 @@ New stored fields, all optional: payment line and variation `writtenOff`, `lande
 7. **Polish and the tablet and phone pass**: final menu order with dividers, one tab bar with a More menu on every record page, one page template across the list and board areas, the Reports library tidied, a warning on the old Mark paid when a bank transaction already matches, touch targets and one-handed delivery sign-off on a phone.
 
 Stage 7 adds no stored fields and no Settings keys. See `docs/whats-new.md` (what changed, for the team) and `docs/go-live-notes.md` (new fields, data-dependent behaviour, backups and the order of a push to live).
+
+## Stage 9: Today page, quote editing, settings access (test site)
+
+- **Today** is rebuilt as a calm daily hub: greeting and one-line summary, a sticky controls row (List/Board, swipeable date block, side panel, Focus, "more" menu), Milestones, Overdue, Today and Backlog, and a collapsible right panel (this week, schedule, jobs behind, cash today, month summary, month calendar). List/Board, the panel and fold states are remembered per device (`bt-test-business-tracker-today-ui`).
+- **Tasks and actions** gain optional `dueTime` and `durationMins`, plus a locked `dateRaised` (stamped at creation, back-filled from `createdAt`, never edited). Settings > CRM & tasks > Task defaults holds the default due time (00:00) and default duration (None).
+- **Monthly summary** page (Today > more menu) and the month card read figures the app already holds; unavailable figures are hidden.
+- **Admins can edit a quotation** ("Edit quotation") with a warning and reason for sent, accepted or invoiced quotes, and an append-only Change log everyone can read.
+- **API keys and connection details** (Settings > Admin) are only built for admins.
