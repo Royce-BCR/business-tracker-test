@@ -1584,7 +1584,7 @@
   .tdp-ib:hover { background: var(--td-sunk); }
   .tdp-ib[aria-pressed="true"] { background: var(--td-ink); color: var(--td-bg); border-color: var(--td-ink); }
   .tdp-vs { display: inline-flex; background: var(--td-sunk); border-radius: 8px; padding: 2px; gap: 2px; }
-  .tdp-vs button { font: inherit; font-size: 13px; border: 0; background: none; color: var(--td-muted); padding: 6px 12px; border-radius: 6px; cursor: pointer; min-height: 32px; }
+  .tdp-vs button { white-space: nowrap; font: inherit; font-size: 13px; border: 0; background: none; color: var(--td-muted); padding: 6px 12px; border-radius: 6px; cursor: pointer; min-height: 32px; }
   .tdp-vs button[aria-pressed="true"] { background: var(--td-surface); color: var(--td-ink); box-shadow: 0 1px 2px rgba(0,0,0,.1); }
   .tdp-fbtn { font: inherit; font-size: 13.5px; font-weight: 500; border: 0; background: var(--td-ink); color: var(--td-bg); padding: 7px 14px; border-radius: 8px; cursor: pointer; min-height: 36px; white-space: nowrap; }
   .tdp-fbtn b { font-weight: 600; margin-left: 6px; opacity: .8; }
@@ -2745,28 +2745,126 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   .gt-legend .gt-bar { position: static; width: 18px; height: 10px; min-width: 0; } .gt-legend .gt-ms, .gt-legend .gt-dl { position: static; margin: 0; } .gt-legend .gt-off { position: static; display: inline-block; width: 14px; height: 10px; } .gt-capsw { display: inline-block; width: 16px; border-top: 2px dashed var(--bt-ink); }
   #phSched .rp-s-f { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; } #phSched .rp-s-f input[type=date] { width: 138px; } #phSched .rp-s-d { flex: 1 1 100%; }
   @media (max-width: 700px) { #phSched .rp-s-f .rp-s-was { flex: 1 1 100%; } #phSched .rp-s-f input[type=date] { flex: 1 1 0; width: auto; min-width: 0; } }
-  .cv-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 0 0 var(--bt-s3); }
-  .cv-layers { display: flex; flex-wrap: wrap; gap: 6px; } .cv-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--bt-card); color: var(--text-muted); border-radius: 999px; padding: 5px 12px; font-size: var(--bt-fs-xs); font-weight: 600; cursor: pointer; min-height: 32px; } .cv-chip.on { background: var(--bt-ink); color: var(--bt-on-dark); border-color: var(--bt-ink); }
-  .cv-sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--muted); } .cv-sw.oak { background: var(--bt-oak-600); } .cv-sw.slate { background: var(--slate); } .cv-sw.green { background: var(--bt-green-600); } .cv-sw.bad { background: var(--bt-bad-fg); } .cv-sw.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 3px, transparent 3px 6px); } .cv-sw.deliveries { background: var(--bt-card); border: 1.5px solid var(--bt-oak-500); } .cv-sw.tasks { background: var(--bt-info-fg); border-radius: 50%; }
-  .cv-nav { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; } .cv-go { display: inline-flex; align-items: center; gap: 6px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin: 0; } .cv-go input, .cv-go select { width: auto; }
-  .cv-leg { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin: 0 0 8px; } .cv-leg span { display: inline-flex; align-items: center; gap: 5px; } .cv-capsw { display: inline-block; width: 16px; border-top: 2px dashed var(--bt-ink); }
-  .cv-wk { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bt-card); padding: 4px 10px; margin-bottom: 4px; } .cv-wk.cur { border-color: var(--bt-oak-500); } .cv-wk.over { background: color-mix(in srgb, var(--bt-bad-fg) 7%, var(--bt-card)); border-color: var(--bt-bad-bd); }
-  .cv-wh { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 10px 14px; align-items: center; }
-  .cv-wl { text-align: left; background: none; border: 0; padding: 2px 0; cursor: pointer; font: inherit; display: flex; flex-direction: column; min-height: 28px; justify-content: center; } .cv-wl b { font-size: 13px; } .cv-wl span { font-size: var(--bt-fs-2xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
-  .cv-bar { min-width: 0; } .cv-track { position: relative; height: 12px; background: var(--bt-surface-2); border-radius: 4px; overflow: visible; display: flex; } .cv-seg { display: block; height: 100%; flex: none; } .cv-seg:first-child { border-radius: 4px 0 0 4px; } .cv-seg.project { background: var(--bt-oak-600); } .cv-seg.sales { background: var(--slate); } .cv-seg.lead { background: var(--bt-green-600); } .cv-seg.tent { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 4px, transparent 4px 8px); }
-  .cv-cap { position: absolute; top: -3px; bottom: -3px; border-left: 2px dashed var(--bt-ink); } .cv-num { font-size: 12px; font-variant-numeric: tabular-nums; display: inline-block; margin-top: 3px; } .cv-num.bad { color: var(--bt-bad-fg); font-weight: 700; }
-  .cv-days { display: grid; grid-template-columns: repeat(7, 40px); gap: 3px; }
-  .cv-d { display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 4px; background: var(--bt-card); padding: 1px 0; min-height: 34px; cursor: pointer; font: inherit; color: var(--ink); } .cv-d:hover { border-color: var(--bt-oak-500); }
-  .cv-d.off { background: var(--bt-surface-2); color: var(--text-muted); } .cv-d.hol { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--bt-warn-fg) 18%, transparent) 0 3px, transparent 3px 6px); } .cv-d.hot { border-color: var(--bt-bad-fg); background: var(--bt-bad-bg); } .cv-d.today { outline: 2px solid var(--bt-bad-fg); outline-offset: -1px; }
-  .cv-dn { font-size: 9.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--text-muted); } .cv-dh { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 14px; } .cv-de { display: flex; gap: 2px; min-height: 12px; align-items: center; }
-  .cv-ic { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; } .cv-ic.del svg { width: 12px; height: 12px; color: var(--bt-oak-700); } .cv-ic.tsk { background: var(--bt-info-fg); color: var(--bt-on-dark); border-radius: 50%; font-size: 8px; font-style: normal; }
-  .cv-more { margin-top: 6px; } .cv-list { margin-top: 6px; border-top: 1px dashed var(--line); padding-top: 6px; }
-  .cv-c { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; padding: 3px 0; font-size: 13px; } .cv-c b { margin-left: auto; font-variant-numeric: tabular-nums; } .cv-cw { color: var(--text-muted); font-size: var(--bt-fs-xs); }
-  .cv-ck { width: 10px; height: 10px; border-radius: 2px; background: var(--muted); flex: none; } .cv-ck.project { background: var(--bt-oak-600); } .cv-ck.sales { background: var(--slate); } .cv-ck.lead { background: var(--bt-green-600); } .cv-ck.del { background: var(--bt-card); border: 1.5px solid var(--bt-oak-500); }
+  /* ---------- Stage 10: Calendar, set-a-day pop-up, capacity report, day types ---------- */
+  :root { --cv-blue-fg:#1f4e8c; --cv-blue-bg:#e2ecf8; --cv-blue-bd:#b6cbe8; --cv-blue-bar:#4f84c7; --cv-ok-bar:#3f8a5c; --cv-warn-bar:#d9a02e; --cv-bad-bar:#c4453d; --cv-hatch:rgba(28,31,34,.16); }
+  /* dark: the app has no theme switch yet; these apply when <html data-theme="dark"> is set, and only inside the calendar, report and pop-up */
+  :root[data-theme="dark"] #panel-capacity, :root[data-theme="dark"] #panel-capreport, :root[data-theme="dark"] .cv-modal-bg {
+    --bt-card:#22262b; --bt-surface-2:#1b1e22; --bt-ink:#eceae4; --text-muted:#a9a69d; --line:#3a3f45; --bt-text:#eceae4; --bt-paper:#16181b;
+    --bt-ok-fg:#8fd1a7; --bt-ok-bg:#1d3326; --bt-ok-bd:#2f5a40; --bt-warn-fg:#f0c373; --bt-warn-bg:#3a2d12; --bt-warn-bd:#6b5121; --bt-bad-fg:#f2a29c; --bt-bad-bg:#40201e; --bt-bad-bd:#7a3a36;
+    --cv-blue-fg:#9cc2f2; --cv-blue-bg:#1c2b40; --cv-blue-bd:#34527c; --cv-blue-bar:#6a9ee0; --cv-ok-bar:#58b07c; --cv-warn-bar:#e0b04e; --cv-bad-bar:#e0675f; --cv-hatch:rgba(236,234,228,.2); color: var(--bt-text); }
+  :root[data-theme="dark"] .cv-modal input, :root[data-theme="dark"] .cv-modal select, :root[data-theme="dark"] #panel-capacity input, :root[data-theme="dark"] #panel-capacity select { background: var(--bt-surface-2); color: var(--bt-ink); border-color: var(--line); }
+  :root[data-theme="dark"] .cv-modal .btn.secondary, :root[data-theme="dark"] #panel-capacity .btn.secondary, :root[data-theme="dark"] #panel-capreport .btn.secondary { background: var(--bt-card); color: var(--bt-ink); border-color: var(--text-muted); }
+  :root[data-theme="dark"] .cv-modal .btn.primary, :root[data-theme="dark"] #panel-capacity .btn.primary { background: var(--bt-ink); color: var(--bt-card); border-color: var(--bt-ink); }
+  :root[data-theme="dark"] #panel-capacity .page-head h2, :root[data-theme="dark"] #panel-capreport .page-head h2, :root[data-theme="dark"] #panel-capacity .desc, :root[data-theme="dark"] #panel-capreport .desc { color: var(--bt-ink); }
+  :root[data-theme="dark"] #panel-capacity .lt, :root[data-theme="dark"] #panel-capacity [data-nav] { background: var(--bt-surface-2); color: var(--bt-ink); border-color: var(--line); }
+  /* Stage 10 Part B: bar handles, ghost, side sheet */
+  .cv-pbar { position: relative; touch-action: pan-y; } .cv-pbar.drag { cursor: grab; } .cv-pbar.drag:active, .cv-pbar.dragging { cursor: grabbing; } .cv-pbar.dragging { opacity: .85; z-index: 3; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+  .cv-pbar.ghost { background: transparent; color: var(--text-muted); border: 2px dashed var(--bt-oak-500); box-sizing: border-box; pointer-events: none; opacity: .75; z-index: 0; } .cv-pbar.drag { z-index: 1; }
+  .cv-hdl { position: absolute; top: 0; bottom: 0; width: 9px; cursor: ew-resize; background: rgba(255,255,255,.35); } .cv-hdl.l { left: 0; border-radius: 6px 0 0 6px; } .cv-hdl.r { right: 0; border-radius: 0 6px 6px 0; } .cv-hdl::after { content: ''; position: absolute; top: 7px; bottom: 7px; left: 3px; width: 3px; border-left: 1px solid rgba(255,255,255,.9); border-right: 1px solid rgba(255,255,255,.9); }
+  .ch-tip { position: fixed; z-index: 300; background: var(--bt-ink); color: var(--bt-card); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; pointer-events: none; white-space: nowrap; } .ch-tip[hidden] { display: none; }
+  .ch-sheet { z-index: 66; } #chBackdrop { z-index: 65; } .ch-body { display: grid; gap: 14px; align-content: start; }
+  .ch-sum { padding: 10px 12px; border: 1px solid var(--bt-warn-bd); background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-radius: var(--bt-r-btn); display: grid; gap: 4px; } .ch-sum .qb-dim { color: inherit; opacity: .85; }
+  .ch-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } .ch-dates label span { display: block; font-size: var(--bt-fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); margin-bottom: 4px; } .ch-dates input { width: 100%; box-sizing: border-box; }
+  .ch-prev { padding: 10px 12px; border: 1px solid var(--line); background: var(--bt-surface-2); border-radius: var(--bt-r-btn); display: grid; gap: 2px; } .ch-snap { color: var(--bt-warn-fg); font-size: var(--bt-fs-xs); }
+  .ch-sec h4 { margin: 0 0 6px; } .ch-row { display: grid; grid-template-columns: 22px minmax(110px, 1fr) minmax(0, 2fr); gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--line); font-size: 13px; } .ch-row.keep, .ch-row.ok { color: var(--text-muted); } .ch-row input[type=checkbox] { width: 18px; height: 18px; }
+  .ch-conf { display: flex; gap: 10px; justify-content: space-between; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--bt-bad-bd); border-radius: var(--bt-r-btn); margin-bottom: 6px; background: var(--bt-bad-bg); } .ch-conf > div { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; min-width: 0; }
+  .ch-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tdc-sec { border: 1px solid var(--bt-warn-bd); border-left-width: 5px; background: var(--bt-card); border-radius: var(--radius-sm); padding: 8px 12px; } .tdc-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); } .tdc-row:last-child { border-bottom: 0; } .tdc-nums { display: flex; flex-wrap: wrap; gap: 4px 8px; font-size: var(--bt-fs-xs); margin-top: 3px; }
+  @media (max-width: 520px) { .ch-dates { grid-template-columns: 1fr; } .ch-row { grid-template-columns: 22px minmax(0, 1fr); } .ch-row .ch-dt { grid-column: 2; } }
+  /* Stage 10 Part C: task kinds, section heads, milestone line */
+  .tdp-row.tdp-todo { grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; padding: 8px 14px; border-left: 4px solid var(--td-oak); } .tdp-tick.big { width: 28px; height: 28px; border-width: 2.5px; margin: 0; } .tdp-tick.big svg { width: 15px; height: 15px; }
+  .tdp-row.tdp-crm { border-left: 4px solid var(--td-slate); background: color-mix(in srgb, var(--td-slate-bg) 38%, transparent); padding: 12px 14px; }
+  .tdp-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; } .tdp-todo .tdp-line { flex-wrap: nowrap; } .tdp-todo .tdp-ttl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 0 1 auto; }
+  .tdp-kt { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 1px 8px; border-radius: 5px; flex: none; } .tdp-kt.todo { background: var(--td-oak-bg); color: var(--td-oak); border: 1px solid var(--td-oak); } .tdp-kt.crm { background: var(--td-slate); color: var(--bt-card); }
+  .tdp-contact { font-weight: 600; margin-right: 6px; }
+  .tdp-mrow.tdp-ms1 { display: grid; grid-template-columns: auto minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 14px; cursor: pointer; border-top: 1px solid var(--td-line); } .tdp-ms1:hover, .tdp-ms1:focus-visible { background: color-mix(in srgb, var(--td-sunk) 55%, transparent); } .tdp-ms1.done { opacity: .6; }
+  .tdp-ms-p { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .tdp-ms-c { color: var(--td-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tdp-fhw { display: flex; align-items: center; gap: 6px; border: 1px dashed var(--td-muted); border-radius: 8px; padding: 2px 6px; margin: 6px 0; background: var(--td-sunk); } .tdp-fhw .tdp-fh { flex: 1; margin: 0; } .tdp-grip { cursor: grab; color: var(--td-muted); font-weight: 800; letter-spacing: -2px; padding: 0 4px; user-select: none; } .tdp-mv { display: inline-flex; gap: 4px; } .tdp-mv .tdp-btn[disabled] { opacity: .35; cursor: default; }
+  .tdp-dayrow { padding: 6px 14px 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--td-muted); }
+  @media (max-width: 700px) { .tdp-mrow.tdp-ms1 { grid-template-columns: auto minmax(0, 1fr) auto; } .tdp-ms-c { display: none; } .tdp-row.tdp-todo .tdp-acts { display: none; } }
+  .cv-bar2 { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 0 0 var(--bt-s3); }
+  .cv-seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--bt-r-btn); overflow: hidden; } .cv-seg button { border: 0; background: var(--bt-card); color: var(--bt-ink); padding: 6px 14px; font: inherit; font-weight: 600; cursor: pointer; min-height: 34px; } .cv-seg button + button { border-left: 1px solid var(--line); } .cv-seg button.on { background: var(--bt-ink); color: var(--bt-card); }
+  .cv-nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; } .cv-ml { min-width: 130px; text-align: center; }
+  .cv-layers { display: flex; flex-wrap: wrap; gap: 6px; } .cv-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--bt-card); color: var(--text-muted); border-radius: var(--bt-r-pill); padding: 3px 11px; font: inherit; font-size: var(--bt-fs-xs); cursor: pointer; } .cv-chip.on { color: var(--bt-ink); border-color: var(--bt-ink); font-weight: 600; }
+  .cv-sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--muted); } .cv-sw.oak, .cv-sw.projects { background: var(--bt-oak-500); } .cv-sw.slate, .cv-sw.sales { background: var(--bt-slate-blue); } .cv-sw.green, .cv-sw.leads { background: var(--bt-green-600); } .cv-sw.deliveries { background: var(--bt-info-fg); border-radius: 50%; }
+  .cv-leg { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--bt-fs-xs); color: var(--text-muted); margin: 0 0 var(--bt-s3); align-items: center; } .cv-leg span { display: inline-flex; align-items: center; gap: 5px; }
+  .cv-lg { display: inline-block; width: 14px; height: 12px; border-radius: 3px; border: 1px solid transparent; box-sizing: border-box; }
+  .cv-lg.st-red { background: var(--cv-bad-bar); } .cv-lg.st-green { background: var(--cv-ok-bar); } .cv-lg.st-amber { background: var(--cv-warn-bar); } .cv-lg.st-blue { background: var(--cv-blue-bar); }
+  .cv-lg.day-amber { background: var(--bt-warn-bg); border-color: var(--bt-warn-fg); } .cv-lg.day-red { background: var(--bt-bad-bg); border-color: var(--bt-bad-fg); } .cv-lg.day-err { background: var(--bt-bad-bg); border: 3px double var(--bt-bad-fg); }
+  .cv-lg.hatch { background: repeating-linear-gradient(45deg, transparent 0 3px, var(--cv-hatch) 3px 5px); border-color: var(--line); } .cv-lg.tentb { background: repeating-linear-gradient(45deg, var(--bt-oak-500) 0 3px, transparent 3px 6px); border-color: var(--bt-oak-500); }
+  .cv-wk { border: 1px solid var(--line); border-left-width: 5px; border-radius: var(--radius-sm); background: var(--bt-card); margin-bottom: 6px; } .cv-wk.st-red { border-left-color: var(--cv-bad-bar); } .cv-wk.st-green { border-left-color: var(--cv-ok-bar); } .cv-wk.st-amber { border-left-color: var(--cv-warn-bar); } .cv-wk.st-blue { border-left-color: var(--cv-blue-bar); } .cv-wk.st-none { border-left-color: var(--line); }
+  .cv-wk.cur { box-shadow: 0 0 0 2px color-mix(in srgb, var(--bt-ink) 22%, transparent); }
+  .cv-wh { display: grid; grid-template-columns: 28px 128px minmax(80px, 1fr) auto auto auto; gap: 8px 12px; align-items: center; padding: 6px 10px; cursor: pointer; }
+  .cv-arr { border: 0; background: none; padding: 4px; cursor: pointer; color: var(--bt-ink); display: inline-flex; border-radius: 6px; min-width: 28px; min-height: 28px; align-items: center; justify-content: center; } .cv-arr svg { width: 16px; height: 16px; transition: transform .15s; } .cv-wk.open .cv-arr svg { transform: rotate(90deg); }
+  .cv-wl { display: flex; flex-direction: column; line-height: 1.25; } .cv-wl span { font-size: var(--bt-fs-xs); color: var(--text-muted); }
+  .cv-track { position: relative; height: 12px; background: var(--bt-surface-2); border: 1px solid var(--line); border-radius: 6px; overflow: visible; } .cv-fill { display: block; height: 100%; border-radius: 6px; } .cv-fill.st-red { background: var(--cv-bad-bar); } .cv-fill.st-green { background: var(--cv-ok-bar); } .cv-fill.st-amber { background: var(--cv-warn-bar); } .cv-fill.st-blue { background: var(--cv-blue-bar); } .cv-fill.st-none { background: var(--line); }
+  .cv-cap { position: absolute; top: -3px; bottom: -3px; border-left: 2px dashed var(--bt-ink); }
+  .cv-num { font-size: var(--bt-fs-xs); font-variant-numeric: tabular-nums; white-space: nowrap; } .cv-stw { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; min-width: 0; }
+  .cv-st { display: inline-block; font-size: var(--bt-fs-xs); font-weight: 600; padding: 2px 10px; border-radius: var(--bt-r-pill); border: 1px solid; white-space: nowrap; }
+  .cv-st.st-red { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); } .cv-st.st-green { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); } .cv-st.st-amber { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); } .cv-st.st-blue { background: var(--cv-blue-bg); color: var(--cv-blue-fg); border-color: var(--cv-blue-bd); }
+  .cv-fl { font-size: var(--bt-fs-xs); font-weight: 600; color: var(--bt-bad-fg); } .cv-fl::before { content: '\26A0\00a0'; }
+  .cv-days { display: grid; grid-template-columns: repeat(7, 42px); gap: 3px; }
+  .cv-d { display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 6px; background: var(--bt-card); color: var(--bt-ink); height: 46px; padding: 2px 1px; font: inherit; cursor: pointer; position: relative; min-width: 0; }
+  .cv-d:hover, .cv-mc:hover, .cv-dhd:hover { border-color: var(--bt-ink); }
+  .cv-d.off, .cv-mc.off, .cv-dhd.off { background: repeating-linear-gradient(45deg, var(--bt-surface-2) 0 4px, var(--cv-hatch) 4px 6px); color: var(--text-muted); }
+  .cv-d.mk, .cv-mc.mk, .cv-dhd.mk { background: repeating-linear-gradient(45deg, var(--bt-surface-2) 0 4px, var(--cv-hatch) 4px 6px); border-color: var(--bt-border-strong); }
+  .cv-d.lv-amber, .cv-mc.lv-amber { background: var(--bt-warn-bg); border-color: var(--bt-warn-fg); color: var(--bt-warn-fg); } .cv-d.lv-red, .cv-mc.lv-red { background: var(--bt-bad-bg); border-color: var(--bt-bad-fg); color: var(--bt-bad-fg); }
+  .cv-d.lv-err, .cv-mc.lv-err { background: var(--bt-bad-bg); border: 3px double var(--bt-bad-fg); color: var(--bt-bad-fg); padding: 0; } .cv-d.acc, .cv-mc.acc { border-color: var(--bt-ok-fg); }
+  .cv-d.today, .cv-mc.today { outline: 2px solid var(--bt-oak-600); outline-offset: 1px; }
+  .cv-dn { font-size: 9.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--text-muted); } .cv-dh { font-size: 13px; font-weight: 700; line-height: 1; min-height: 13px; font-variant-numeric: tabular-nums; }
+  .cv-de { display: inline-flex; gap: 2px; align-items: center; min-height: 12px; } .cv-ic { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; } .cv-ic svg { width: 12px; height: 12px; } .cv-ic.x { font-style: normal; font-weight: 800; font-size: 11px; color: var(--bt-bad-fg); }
+  .cv-tag { font-style: normal; font-size: 9px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; padding: 0 3px; border-radius: 3px; background: var(--bt-ink); color: var(--bt-card); line-height: 12px; max-width: 100%; overflow: hidden; text-overflow: clip; white-space: nowrap; }
+  .cv-open { border-top: 1px solid var(--line); padding: 8px 10px 10px 14px; }
+  .cv-pr { display: grid; grid-template-columns: minmax(170px, 1.3fr) minmax(0, 3.6fr) 58px 34px; gap: 6px 10px; align-items: center; padding: 4px 0; border-bottom: 1px dashed var(--line); } .cv-pr:last-child { border-bottom: 0; }
+  .cv-prh { border-bottom: 1px solid var(--line); align-items: end; }
+  .cv-pi { display: flex; flex-direction: column; gap: 3px; min-width: 0; } .cv-pm { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: var(--bt-fs-xs); }
+  .cv-site { background: var(--bt-surface-2); border: 1px solid var(--line); border-radius: var(--bt-r-pill); padding: 0 8px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .cv-site.none { color: var(--text-muted); font-style: italic; }
+  .cv-pill { display: inline-block; font-size: var(--bt-fs-xs); font-weight: 600; padding: 0 8px; border-radius: var(--bt-r-pill); border: 1px solid var(--line); background: var(--bt-surface-2); } .cv-pill.ok { background: var(--bt-ok-bg); color: var(--bt-ok-fg); border-color: var(--bt-ok-bd); } .cv-pill.tent { background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-color: var(--bt-warn-bd); }
+  .cv-pg { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; align-items: center; min-height: 28px; }
+  .cv-dhd { border: 1px solid var(--line); border-radius: 6px; background: var(--bt-card); color: var(--bt-ink); font: inherit; font-size: var(--bt-fs-xs); font-weight: 600; padding: 4px 2px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 1px; min-height: 36px; } .cv-dhd.today { outline: 2px solid var(--bt-oak-600); outline-offset: 1px; }
+  .cv-pbar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border-radius: 6px; height: 26px; align-items: center; text-align: center; font-size: 12px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; background: var(--bt-oak-600); overflow: hidden; } .cv-pbar.sales { background: var(--bt-slate-blue); } .cv-pbar.lead { background: var(--bt-green-600); }
+  .cv-pbar.tent { background: repeating-linear-gradient(45deg, var(--bt-oak-600) 0 6px, color-mix(in srgb, var(--bt-oak-600) 55%, #fff) 6px 12px); outline: 1px dashed var(--bt-oak-700); } .cv-pc.gap { opacity: .4; }
+  .cv-pt { text-align: right; font-variant-numeric: tabular-nums; } .cv-pe { width: 32px; height: 32px; } .cv-pe svg { width: 16px; height: 16px; }
+  .cv-chks { margin-top: 10px; display: grid; gap: 8px; } .cv-chks-t { font-size: var(--bt-fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
+  .cv-chk { border: 1px solid var(--bt-warn-bd); border-left-width: 5px; border-radius: var(--radius-sm); background: var(--bt-card); padding: 8px 12px; display: grid; gap: 6px; } .cv-chk.amber { border-color: var(--bt-warn-fg); } .cv-chk.red, .cv-chk.err { border-color: var(--bt-bad-fg); } .cv-chk.err { border-style: double; border-width: 3px 3px 3px 6px; } .cv-chk.acc { border-color: var(--bt-ok-bd); border-left-color: var(--bt-ok-fg); background: var(--bt-ok-bg); opacity: .9; }
+  .cv-chk-h, .cv-chk-p, .cv-chk-a { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+  .cv-rs { display: inline-block; max-width: 100%; white-space: normal; overflow-wrap: anywhere; font-size: var(--bt-fs-xs); font-weight: 600; padding: 2px 10px; border-radius: 12px; border: 1px solid var(--bt-bad-bd); background: var(--bt-bad-bg); color: var(--bt-bad-fg); } .cv-rs.ok { border-color: var(--bt-ok-bd); background: var(--bt-ok-bg); color: var(--bt-ok-fg); }
+  .cv-chip2 { font-size: var(--bt-fs-xs); background: var(--bt-surface-2); border: 1px solid var(--line); border-radius: var(--bt-r-pill); padding: 2px 10px; }
+  .cv-none { padding: 6px 0; }
+  /* month */
+  .cv-mhead, .cv-mrow { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 6px; } .cv-mhead { margin-bottom: 4px; font-size: var(--bt-fs-xs); font-weight: 700; color: var(--text-muted); } .cv-mhead span:not(:first-child) { display: inline-block; } .cv-mhead { grid-template-columns: 92px repeat(7, minmax(0, 1fr)); }
+  .cv-mw { border: 1px solid var(--line); border-left-width: 5px; border-radius: var(--radius-sm); background: var(--bt-card); margin-bottom: 6px; padding: 4px; } .cv-mw.st-red { border-left-color: var(--cv-bad-bar); } .cv-mw.st-green { border-left-color: var(--cv-ok-bar); } .cv-mw.st-amber { border-left-color: var(--cv-warn-bar); } .cv-mw.st-blue { border-left-color: var(--cv-blue-bar); }
+  .cv-mrow { cursor: pointer; } .cv-mg { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; background: none; border: 0; padding: 4px; font: inherit; cursor: pointer; text-align: left; color: var(--bt-ink); } .cv-mg span { font-size: var(--bt-fs-xs); color: var(--text-muted); }
+  .cv-gb { display: block; position: relative; width: 14px; height: 34px; border: 1px solid var(--line); border-radius: 4px; background: var(--bt-surface-2); overflow: hidden; } .cv-gb .cv-fill { position: absolute; bottom: 0; left: 0; right: 0; height: 0; border-radius: 0; }
+  .cv-mcol { display: grid; gap: 3px; min-width: 0; } .cv-mcells { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+  .cv-mc { border: 1px solid var(--line); border-radius: 6px; background: var(--bt-card); color: var(--bt-ink); min-height: 48px; padding: 3px 4px; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; position: relative; min-width: 0; } .cv-mc.out { opacity: .5; } .cv-mn { font-weight: 700; font-size: 12px; } .cv-mh { position: absolute; right: 4px; bottom: 2px; font-size: 11px; font-weight: 700; } .cv-mc .cv-ic { position: absolute; right: 3px; top: 3px; }
+  .cv-mbars { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px 3px; } .cv-mb { height: 17px; line-height: 17px; padding: 0 6px; font-size: 11px; font-weight: 600; color: #fff; border-radius: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--bt-oak-600); } .cv-mb.sales { background: var(--bt-slate-blue); } .cv-mb.lead { background: var(--bt-green-600); } .cv-mb.tent { background: repeating-linear-gradient(45deg, var(--bt-oak-600) 0 6px, color-mix(in srgb, var(--bt-oak-600) 55%, #fff) 6px 12px); } .cv-mmore { grid-column: 1 / -1; font-size: 11px; color: var(--text-muted); }
   .cv-unp { margin-top: var(--bt-s4); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; background: var(--bt-card); } .cv-unp h4 { margin: 0 0 4px; }
+  .cv-c { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; padding: 3px 0; font-size: 13px; } .cv-cw { color: var(--text-muted); font-size: var(--bt-fs-xs); } .cv-ck { width: 10px; height: 10px; border-radius: 2px; background: var(--muted); flex: none; } .cv-ck.project { background: var(--bt-oak-500); } .cv-ck.sales { background: var(--bt-slate-blue); } .cv-ck.lead { background: var(--bt-green-600); }
+  @media (max-width: 1100px) { .cv-wh { grid-template-columns: 28px 120px minmax(60px, 1fr) auto; } .cv-days { grid-column: 1 / -1; } .cv-stw { grid-column: 2 / -1; } }
+  @media (max-width: 760px) { .cv-days { display: none; } .cv-wh { grid-template-columns: 28px minmax(0, 1fr) auto; } .cv-bar { grid-column: 2 / -1; grid-row: 2; } .cv-stw { grid-column: 2 / -1; } .cv-pr { grid-template-columns: minmax(0, 1fr) 54px 34px; } .cv-pi { grid-column: 1 / -1; } .cv-pg { grid-column: 1 / 2; } .cv-prh .cv-pi { display: none; }
+    .cv-mhead, .cv-mrow { grid-template-columns: 56px minmax(0, 1fr); } .cv-mhead { grid-template-columns: 56px repeat(7, minmax(0, 1fr)); } .cv-mc { min-height: 42px; } .cv-mb { font-size: 0; padding: 0; } .cv-open { padding-left: 8px; } }
+  /* set-a-day pop-up */
+  .cv-modal-bg { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, #0b0c0d 55%, transparent); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .cv-modal { background: var(--bt-card); color: var(--bt-text); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.35); width: min(520px, 100%); max-height: calc(100vh - 32px); overflow: auto; padding: 18px 20px; } .cv-modal h3 { margin: 0; } .cv-modal-st { color: var(--text-muted); margin: 2px 0 14px; font-size: var(--bt-fs-sm, 13px); }
+  .cv-modal-f { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; } .cv-modal-f label span { display: block; font-size: var(--bt-fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); margin-bottom: 4px; } .cv-modal-f input, .cv-modal-f select { width: 100%; box-sizing: border-box; }
+  .cv-modal-w { margin-top: 12px; padding: 8px 12px; border: 1px solid var(--bt-warn-bd); background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-radius: var(--bt-r-btn); font-size: 13px; line-height: 1.45; } .cv-modal-w[hidden] { display: none; }
+  .cv-modal-a { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; } .cv-modal-back { margin-left: auto; }
+  @media (max-width: 520px) { .cv-modal-f { grid-template-columns: 1fr; } .cv-modal-back { margin-left: 0; } }
+  /* settings cards */
+  .cs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 16px; margin-bottom: 10px; } .cs-f { display: flex; flex-direction: column; gap: 4px; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--text-muted); } .cs-f input, .cs-f select { font-weight: 400; color: var(--bt-ink); } .cs-derived { color: var(--bt-ink); font-size: 15px; padding: 6px 0; }
+  .cs-sub { font-weight: 700; margin: 12px 0 6px; }
+  .dt-row, .md-row { display: grid; gap: 8px; align-items: center; margin-bottom: 6px; } .dt-row { grid-template-columns: minmax(120px, 1.5fr) 90px minmax(160px, auto) 36px; } .md-row { grid-template-columns: 150px minmax(140px, 1fr) minmax(140px, 1.4fr) 36px; } .dt-tag { text-transform: none; }
+  @media (max-width: 700px) { .dt-row, .md-row { grid-template-columns: 1fr 1fr; } }
+  /* capacity report */
+  .cr-card { margin-bottom: var(--bt-s3); } .cr-wrap { width: 100%; } .cr-svg { width: 100%; height: auto; display: block; }
+  .cr-b.blue { fill: var(--cv-blue-bg); } .cr-b.amber { fill: var(--bt-warn-bg); } .cr-b.green { fill: var(--bt-ok-bg); } .cr-b.red { fill: var(--bt-bad-bg); }
+  .cr-bar.st-blue { fill: var(--cv-blue-bar); } .cr-bar.st-amber { fill: var(--cv-warn-bar); } .cr-bar.st-green { fill: var(--cv-ok-bar); } .cr-bar.st-red { fill: var(--cv-bad-bar); } .cr-bar.st-none { fill: var(--line); }
+  .cr-cap { stroke: var(--bt-ink); stroke-width: 2; stroke-dasharray: 5 3; } .cr-g { stroke: var(--line); stroke-width: 1; } .cr-x { fill: var(--text-muted); font-size: 12px; } .cr-x.s { font-size: 11px; } .cr-v { fill: var(--bt-ink); font-size: 12px; font-weight: 700; }
+  .cr-capsw { display: inline-block; width: 18px; border-top: 2px dashed var(--bt-ink); }
+  .db-mini.info b { color: var(--cv-blue-fg); }
   .db-mini.bad b { color: var(--bt-bad-fg); }
   .pot-setup { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: var(--bt-s3); padding: var(--bt-s2) var(--bt-s3); border: 1px solid var(--bt-warn-bd); background: var(--bt-warn-bg); color: var(--bt-warn-fg); border-radius: var(--bt-r-btn); font-size: var(--bt-fs-sm); }
-  @media (max-width: 860px) { .cv-wh { grid-template-columns: minmax(0, 1fr); } .cv-days { grid-template-columns: repeat(7, minmax(0, 1fr)); } .cv-wl { flex-direction: row; gap: 8px; align-items: baseline; justify-content: flex-start; } }
   .ph-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .ph-card .ph-btns { margin-top: 10px; }
   .pt-head, .pt-row { grid-template-columns: 58px minmax(0, 1fr) 80px 70px 80px 34px; }
@@ -2918,7 +3016,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <button type="button" class="nav-label nav-gbtn" id="gh-command" aria-expanded="false" aria-controls="gp-command"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="gl">Command</span><span class="tab-count grp-count" hidden></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="nav-items" id="gp-command" role="group" aria-labelledby="gh-command">
       <button type="button" class="tab g-command active" data-tab="today" aria-current="page">Today <span class="tab-count" id="todayBadge" hidden></span></button>
-      <button type="button" class="tab g-command" data-tab="capacity">Calendar and capacity</button>
+      <button type="button" class="tab g-command" data-tab="capacity">Calendar</button>
+      <button type="button" class="tab g-command" data-tab="capreport">Capacity</button>
       <button type="button" class="tab g-command" data-tab="monthsummary" hidden>Month summary</button>
       <button type="button" class="tab g-command" data-tab="dashboard">Dashboard</button>
       <button type="button" class="tab g-command" data-tab="reports">Reports</button>
@@ -3080,12 +3179,21 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <!-- CALENDAR AND CAPACITY -->
   <div class="panel" id="panel-capacity">
     <div class="page-head">
-      <h2>Calendar and capacity</h2>
-      <div class="desc">What is planned in each week against the hours the team has. Switch layers on and off to see confirmed work on its own, or with the weighted sales deals and leads on top. Click a week or a day to open it on Today.</div>
+      <h2>Calendar</h2>
+      <div class="desc">What is planned in each week against the hours available. Open a week to see each project across its days and the days to check; click any day to mark it as a holiday, team day or other type. Capacity has its own report.</div>
     </div>
     <div id="cvSum"></div>
     <div class="cv-controls" id="cvControls"></div>
     <div id="cvBody"></div>
+  </div>
+
+  <!-- CAPACITY REPORT -->
+  <div class="panel" id="panel-capreport">
+    <div class="page-head">
+      <h2>Capacity</h2>
+      <div class="desc">The next 8 weeks: hours planned against the hours available. Blue weeks have scope to fill, green are on capacity, amber are slightly under and red are over.</div>
+    </div>
+    <div id="capRepBody"></div>
   </div>
 
   <!-- BUSINESS PLAN -->
@@ -3624,6 +3732,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
   <div class="dr-body" id="tkBody"></div>
 </aside>
 <div class="pj-backdrop" id="pjBackdrop" hidden></div>
+<div class="pj-backdrop" id="chBackdrop" hidden></div>
+<aside class="pj-panel ch-sheet" id="chSheet" role="dialog" aria-modal="true" aria-labelledby="chTitle" hidden></aside>
 <aside class="pj-panel" id="pjPanel" role="dialog" aria-modal="true" aria-labelledby="pjPanelTitle" hidden></aside>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button class="toast-btn" id="toastUndo" type="button">Undo</button></div>
 <div class="gantt-tip" id="ganttTip" hidden></div>
@@ -13133,6 +13243,7 @@ function createTask(f){
   };
   t.linkedIds = migrateLinkedIds({ linkedIds: Array.isArray(f.linkedIds) ? f.linkedIds : (f.linkedId ? [f.linkedId] : []) });
   t.linkedId = t.linkedIds[0] || '';   // the old single field, kept in step only when the task is created (safety net)
+  t.kind = f.kind === 'crm' || f.kind === 'todo' ? f.kind : tkDerivedKind(t);   // Stage 10: CRM (linked to a client, lead or deal) or a to-do
   t.dateRaised = fmt(new Date());   // Stage 9: stamped here, never edited
   if(validTime(f.dueTime)) t.dueTime = f.dueTime; else if(t.dueDate) t.dueTime = taskDefaultTime();
   const du = f.durationMins === undefined || f.durationMins === '' ? taskDefaultDuration() : Math.floor(Number(f.durationMins)); if(du > 0 && du <= 1440) t.durationMins = du;
@@ -13489,6 +13600,7 @@ function tkPropsHtml(){
   const o = tkObj();
   if(taskPanel) return `<div class="tk-props">
       <div><label for="tkpType">Type</label><select id="tkpType" data-tf="typeId">${optionsHtml(typeList(), o.typeId)}</select></div>
+      <div><label for="tkpKind">Kind</label><select id="tkpKind" data-tf="kind"><option value="crm"${taskKind(o) === 'crm' ? ' selected' : ''}>CRM task (a client, lead or deal)</option><option value="todo"${taskKind(o) === 'todo' ? ' selected' : ''}>To-do</option></select></div>
       <div><label for="tkpPrio">Priority</label><select id="tkpPrio" data-tf="priorityId">${optionsHtml(prioList(), o.priorityId)}</select></div>
       <div><label for="tkpOwner">Assigned to</label><select id="tkpOwner" data-tf="owner">${userOptions(o.owner)}</select></div>
       <div><label for="tkpDue">Due date</label><input id="tkpDue" type="date" data-tf="dueDate" value="${escAttr(o.dueDate)}"></div>
@@ -13897,7 +14009,7 @@ function todayOrderData(today){
    invoices to raise, prices to confirm, due phases and supplier quote chasers. Nothing new is stored for the list itself; ticking, snoozing and the buttons call the
    existing actions. Milestones come from the project milestone dates the project pages and Calendar read (projMsInfo).
    Only per-device display choices are kept, in localStorage (STORAGE_PREFIX aware): List/Board, the right panel, and which sections are folded. */
-const todayUi = { scope: 'mine', date: '', key: '', view: 'list', panel: null, fold: { over: true, today: true, backlog: false }, focus: false, fkeys: [], fi: 0, menu: false, ms: null, stuck: false, dir: 0 };
+const todayUi = { scope: 'mine', date: '', key: '', view: 'list', panel: null, fold: { over: true, today: true, backlog: false, ms: true, chg: true, week: true }, filter: 'all', order: null, arrange: false, prefUser: null, focus: false, fkeys: [], fi: 0, menu: false, ms: null, stuck: false, dir: 0 };
 const TD_PREF_KEY = STORAGE_PREFIX + 'business-tracker-today-ui';
 (function tdLoadPrefs(){
   try{
@@ -13907,7 +14019,25 @@ const TD_PREF_KEY = STORAGE_PREFIX + 'business-tracker-today-ui';
     ['over', 'today', 'backlog'].forEach(k => { if(typeof (o.fold || {})[k] === 'boolean') todayUi.fold[k] = o.fold[k]; });
   }catch(e){}
 })();
-function tdSavePrefs(){ try{ localStorage.setItem(TD_PREF_KEY, JSON.stringify({ view: todayUi.view, panel: todayUi.panel, fold: todayUi.fold })); }catch(e){} }
+/* Stage 10: the filter, the fold state and the order of the sections are kept per user. There is no per-user store in the app, so they sit in this browser's localStorage under the signed-in username. */
+const TD_SECS = ['chg', 'ms', 'over', 'today', 'week'], TD_SEC_NAME = { chg: 'Timeline changes to confirm', ms: 'Milestones', over: 'Overdue', today: 'Today', week: 'This week' };
+const tdUserName = () => (typeof session !== 'undefined' && session && session.username) || 'local';
+function tdLoadUser(){
+  todayUi.prefUser = tdUserName();
+  try{ const o = JSON.parse(localStorage.getItem(TD_PREF_KEY) || 'null'), u = o && o.u && o.u[todayUi.prefUser];
+    todayUi.filter = u && u.filter === 'todo' ? 'todo' : 'all'; todayUi.order = u && Array.isArray(u.order) && u.order.length === TD_SECS.length && TD_SECS.every(k => u.order.includes(k)) ? u.order.slice() : null;
+    ['over', 'today', 'backlog', 'ms', 'chg', 'week'].forEach(k => { if(u && u.fold && typeof u.fold[k] === 'boolean') todayUi.fold[k] = u.fold[k]; }); }catch(e){}
+}
+function tdSavePrefs(){ try{ let o = {}; try{ o = JSON.parse(localStorage.getItem(TD_PREF_KEY) || '{}') || {}; }catch(e){} o.view = todayUi.view; o.panel = todayUi.panel; o.fold = todayUi.fold; o.u = o.u || {}; o.u[todayUi.prefUser || tdUserName()] = { filter: todayUi.filter, order: todayUi.order, fold: todayUi.fold }; localStorage.setItem(TD_PREF_KEY, JSON.stringify(o)); }catch(e){} }
+const tdOrder = () => todayUi.order || TD_SECS.slice();
+/* task kind: crm (linked to a client, lead or deal) or todo. Anything without a saved kind is worked out the same way, so nothing breaks before the one-off migration runs */
+const TK_CRM_REFS = ['company', 'contact', 'client', 'lead', 'deal', 'sale', 'project', 'quote'];   // a link to a page, a purchase order or a supplier does not make a task a CRM task
+const tkDerivedKind = t => ((t.linkedIds || []).length || t.linkedId || (t.refs || []).some(r => TK_CRM_REFS.includes(r.kind)) || Number(t.quoteId) > 0) ? 'crm' : 'todo';
+const taskKind = t => t && (t.kind === 'crm' || t.kind === 'todo') ? t.kind : (t ? tkDerivedKind(t) : 'todo');
+const tdKindOf = it => it.kind === 'task' ? taskKind(it.ref) : it.kind === 'action' ? 'todo' : 'business';
+const tdFilt = list => todayUi.filter === 'todo' ? list.filter(x => tdKindOf(x) === 'todo') : list;
+function ensureTaskKinds(o){ if(typeof ENV_LABEL !== 'undefined' && ENV_LABEL === 'TEST' && !o.taskKindV){ (o.crmTasks || []).forEach(t => { if(t && t.kind !== 'crm' && t.kind !== 'todo') t.kind = tkDerivedKind(t); }); o.taskKindV = 1; } }   // one-off, test data only, adds a field and removes nothing
+(function(){ const o = ensureSellingModel6; ensureSellingModel6 = function(x){ o(x); ensureTaskKinds(x); }; })();
 const tdPanelOpen = () => todayUi.panel === null ? window.matchMedia('(min-width: 1100px)').matches : todayUi.panel;   // hidden by default on phone and tablet
 const tdReal = () => fmt(new Date());
 const tdSel = () => isoOk(todayUi.date) || tdReal();
@@ -14018,7 +14148,7 @@ function tdSummary(sel, real, late, today){
 }
 
 /* ---- rows ---- */
-function tdRow(it, ctx){
+function tdRowBiz(it, ctx){
   const late = it.date && it.date < tdReal() && !it.done, ts = it.kind === 'task' || it.kind === 'action';
   const when = !it.date ? '<span class="tdp-pill">No date</span>' : late ? `<span class="tdp-late">${tdLateTxt(it.date)}</span>` : (it.time ? `<span class="tdp-pill oak">${escHtml(it.time)}</span>` : '<span class="tdp-pill">Any time</span>');
   const jb = ts ? `<span class="tdp-pill ${it.biz ? 'slate' : 'oak'}">${it.biz ? 'Business' : 'Job'}</span>` : '<span class="tdp-pill oak">Job</span>';
@@ -14030,13 +14160,53 @@ function tdRow(it, ctx){
       ${it.lines ? `<div class="tdp-sub2">${escHtml(it.lines)}</div>` : ''}${ts ? `<div class="tdp-sub2">${escHtml('Owner ' + it.owner + (it.dur ? ' · Duration ' + durShort(it.dur) : ''))}</div>` : ''}</div>
     <div class="tdp-acts${ts && !it.done ? ' hov' : ''}">${acts}</div></div>`;
 }
-const tdFoldHead = (k, title, n, hint, cls) => { const open = todayUi.fold[k];
-  return `<button class="tdp-fh${cls ? ' ' + cls : ''}" type="button" data-td="fold" data-k="${k}" aria-expanded="${open}"><span class="tdp-chev" aria-hidden="true">${open ? '▾' : '▸'}</span><span class="tdp-ft">${title}</span><span class="tdp-cnt">${n}</span><span class="tdp-hint">${open ? hint : (n ? tdPlural(n, 'item', 'items') + ' hidden' : 'none')}</span></button>`; };
+const tdFoldHead = (k, title, n, hint, cls) => { const open = todayUi.fold[k], btn = `<button class="tdp-fh${cls ? ' ' + cls : ''}" type="button" data-td="fold" data-k="${k}" aria-expanded="${open}"><span class="tdp-chev" aria-hidden="true">${open ? '▾' : '▸'}</span><span class="tdp-ft">${title}</span><span class="tdp-cnt">${n}</span><span class="tdp-hint">${open ? hint : (n ? tdPlural(n, 'item', 'items') + ' hidden' : 'none')}</span></button>`;
+  if(!todayUi.arrange || !TD_SECS.includes(k)) return btn;
+  const ord = tdOrder(), i = ord.indexOf(k);
+  return `<div class="tdp-fhw arr" data-sec="${k}" draggable="true"><span class="tdp-grip" title="Drag to move" aria-hidden="true">⋮⋮</span>${btn}<span class="tdp-mv"><button type="button" class="tdp-btn sm" data-td="secup" data-k="${k}" aria-label="Move ${escAttr(TD_SEC_NAME[k])} up"${i === 0 ? ' disabled' : ''}>↑</button><button type="button" class="tdp-btn sm" data-td="secdown" data-k="${k}" aria-label="Move ${escAttr(TD_SEC_NAME[k])} down"${i === ord.length - 1 ? ' disabled' : ''}>↓</button></span></div>`; };
+const tdWhen = it => { const late = it.date && it.date < tdReal() && !it.done; return !it.date ? '<span class="tdp-pill">No date</span>' : late ? `<span class="tdp-late">${tdLateTxt(it.date)}</span>` : (it.time ? `<span class="tdp-pill oak">${escHtml(it.time)}</span>` : '<span class="tdp-pill">Any time</span>'); };
+const tdTaskActs = it => it.done ? '' : `<button class="tdp-btn" type="button" data-td="snooze" data-key="${escAttr(it.key)}" title="Move to the next working day">Snooze</button><button class="tdp-btn" type="button" data-td="resched" data-key="${escAttr(it.key)}">Reschedule</button>`;
+/* a to-do: one plain line, oak bar, large checkbox, "To-do" tag */
+function tdTodoLine(it){
+  const title = it.open ? `<button class="tdp-ttl" type="button" ${it.open}>${escHtml(it.title)}</button>` : `<span class="tdp-ttl tdp-static">${escHtml(it.title)}</span>`;
+  return `<div class="tdp-row tdp-todo${it.done ? ' done' : ''}"><button class="tdp-tick big" type="button" ${it.tick.attrs} aria-label="${escAttr(it.tick.label)}" title="${escAttr(it.tick.label)}">${CHECK_SVG}</button>
+    <div class="tdp-main tdp-line"><span class="tdp-kt todo">To-do</span>${title}${tdWhen(it)}</div><div class="tdp-acts hov">${tdTaskActs(it)}</div></div>`;
+}
+/* a CRM task: a card with a blue-slate bar and a "CRM" tag, the contact and the deal under the title */
+function tdCrmCard(it){
+  const t = it.ref, info = linkedInfos(t).find(i => i.d), rec = info && info.d && info.d.rec, contact = rec ? (rec.contact || rec.company || '') : '';
+  const title = it.open ? `<button class="tdp-ttl" type="button" ${it.open}>${escHtml(it.title)}</button>` : `<span class="tdp-ttl tdp-static">${escHtml(it.title)}</span>`;
+  return `<div class="tdp-row tdp-crm${it.done ? ' done' : ''}"><button class="tdp-tick" type="button" ${it.tick.attrs} aria-label="${escAttr(it.tick.label)}" title="${escAttr(it.tick.label)}">${CHECK_SVG}</button>
+    <div class="tdp-main"><div class="tdp-line"><span class="tdp-kt crm">CRM</span>${title}${tdWhen(it)}</div><div class="tdp-sub">${contact ? `<span class="tdp-contact">${escHtml(contact)}</span>` : ''}${it.rec || ''}</div><div class="tdp-sub2">${escHtml('Owner ' + it.owner + (it.dur ? ' · Duration ' + durShort(it.dur) : ''))}</div></div><div class="tdp-acts hov">${tdTaskActs(it)}</div></div>`;
+}
+function tdRow(it, ctx){ const k = tdKindOf(it); return k === 'todo' ? tdTodoLine(it) : k === 'crm' ? tdCrmCard(it) : tdRowBiz(it, ctx); }
 function tdMsHtml(sel, real){
-  const ms = tdMilestones(sel); if(!ms.length) return '';
-  return `<div class="tdp-sec"><h3>Milestones</h3><span class="n">key dates ${sel === real ? 'today' : 'on ' + escHtml(tdShort(sel))}</span></div><div class="tdp-panel tdp-rows">${ms.map(m => `<div class="tdp-mrow"><span class="tdp-mtype ${m.cls}">${escHtml(m.type)}</span>
-    <div class="tdp-main"><button class="tdp-ttl" type="button" data-td="ms" data-id="${escAttr(m.id)}"${m.done ? ' style="color:var(--td-muted)"' : ''}>${escHtml(m.name)}</button><div class="tdp-sub">${tdProjTile(m.p)}</div></div>
-    <button class="tdp-btn sm" type="button" data-td="ms" data-id="${escAttr(m.id)}" aria-label="Open milestone ${escAttr(m.name)}">Open</button></div>`).join('')}</div>`;
+  if(todayUi.filter === 'todo') return '';
+  const ms = tdMilestones(sel); if(!ms.length && !todayUi.arrange) return '';
+  const head = tdFoldHead('ms', 'Milestones', ms.length, 'key dates ' + (sel === real ? 'today' : 'on ' + tdShort(sel)), '');
+  const body = ms.length ? ms.map(m => { const cu = projCustomer(m.p), cli = (cu && (cu.company || cu.name)) || '';
+    return `<div class="tdp-mrow tdp-ms1${m.done ? ' done' : ''}" role="button" tabindex="0" data-td="ms" data-id="${escAttr(m.id)}" aria-label="Open milestone ${escAttr(m.name)}, ${escAttr(boardTitle('project', m.p))}"><span class="tdp-mtype ${m.cls}">${escHtml(m.type)}</span><span class="tdp-ms-p">${escHtml(boardTitle('project', m.p))}</span><span class="tdp-ms-c">${escHtml(cli)}</span>${m.done ? '<span class="tdp-pill">Done</span>' : `<button class="tdp-btn pri sm" type="button" data-td="ms-done" data-id="${escAttr(m.id)}">Done</button>`}</div>`; }).join('') : '<div class="tdp-empty"><b>No milestones.</b></div>';
+  return head + (todayUi.fold.ms ? `<div class="tdp-panel tdp-rows">${body}</div>` : '');
+}
+/* B6: Timeline changes to confirm (only when something is pending) */
+function tdChgHtml(){
+  if(todayUi.filter === 'todo') return '';
+  const list = chProjects().filter(chPending); if(!list.length) return '';
+  const head = tdFoldHead('chg', 'Timeline changes to confirm', list.length, 'a change to a project\u2019s dates', 'amber');
+  const rows = list.map(p => { const c = p.chg, nd = chLinkRows(p).filter(r => r.moves).length, cf = chConflicts(p).length;
+    return `<div class="tdc-row"><div><b>${escHtml(boardTitle('project', p))}</b> <span class="qb-dim">${escHtml(recordCode(p.id, 'project'))}</span><div>${escHtml(chPhrase(p))}</div><div class="tdc-nums"><span class="cv-pill tent">${c.status === 'tentative' ? '1 schedule to confirm' : 'Schedule confirmed'}</span><span class="cv-pill">+${nd} date${nd === 1 ? '' : 's'} to update</span><span class="cv-rs${cf ? '' : ' ok'}">${cf} conflict${cf === 1 ? '' : 's'}</span></div></div><button class="tdp-btn pri" type="button" data-td="chg-review" data-id="${escAttr(p.id)}">Review</button></div>`; }).join('');
+  return head + (todayUi.fold.chg ? `<div class="tdc-sec">${rows}</div>` : '');
+}
+/* This week: dated after today, up to the end of this week */
+function tdWeekItems(real){ const end = addDaysIso(capWeekStart(real), 6); return tdFilt(tdAll(end).filter(x => x.date > real && !x.done)).sort((a, b) => cmpText(a.date, b.date) || tdByTime(a, b)); }
+function tdSecHtml(k, sel, real, late, today){
+  if(k === 'chg') return tdChgHtml();
+  if(k === 'ms') return tdMsHtml(sel, real);
+  if(sel !== real) return '';
+  if(k === 'over') return tdFoldHead('over', 'Overdue', late.length, 'oldest first', 'red') + (todayUi.fold.over ? (late.length ? `<div class="tdp-panel tdp-rows">${late.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>All clear.</b><span>Nothing is overdue.</span></div>') : '');
+  if(k === 'today') return tdFoldHead('today', 'Today', today.length, '', '') + (todayUi.fold.today ? (today.length ? `<div class="tdp-panel tdp-rows">${today.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing is scheduled for today.</b></div>') : '');
+  if(k === 'week'){ const w = tdWeekItems(real); return tdFoldHead('week', 'This week', w.length, 'still to come this week', '') + (todayUi.fold.week ? (w.length ? `<div class="tdp-panel tdp-rows">${w.map(x => `<div class="tdp-dayrow">${escHtml(tdShort(x.date))}</div>` + tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing else this week.</b></div>') : ''); }
+  return '';
 }
 /* ---- Projects today and Ready to turn into a job (brought back at your request) ----
    Projects today: stage starts, supplier payments due and money in waiting for payment on live projects, from the same project timeline as before (milestones are
@@ -14074,20 +14244,16 @@ function tdExtraHtml(sel, real){
   return h;
 }
 function tdListHtml(sel, real, late, today){
-  let h = tdMsHtml(sel, real);
+  let h = tdOrder().map(k => '<div class="tdp-secw" data-sec="' + k + '">' + tdSecHtml(k, sel, real, late, today) + '</div>').join('').replace(/<div class="tdp-secw" data-sec="\w+"><\/div>/g, '');
   if(sel === real){
-    h += tdFoldHead('over', 'Overdue', late.length, 'oldest first', 'red');
-    if(todayUi.fold.over) h += late.length ? `<div class="tdp-panel tdp-rows">${late.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>All clear.</b><span>Nothing is overdue.</span></div>';
-    h += tdFoldHead('today', 'Today', today.length, '', '');
-    if(todayUi.fold.today) h += today.length ? `<div class="tdp-panel tdp-rows">${today.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing is scheduled for today.</b></div>';
-    h += tdExtraHtml(sel, real);
-    const bl = tdBacklog();
+    if(todayUi.filter !== 'todo') h += tdExtraHtml(sel, real);
+    const bl = tdFilt(tdBacklog());
     h += `<button class="tdp-fold" type="button" data-td="fold" data-k="backlog" aria-expanded="${todayUi.fold.backlog}"><span>Backlog · ${tdPlural(bl.length, 'task', 'tasks')} with no date</span><span>${todayUi.fold.backlog ? 'Hide ‹' : 'Show ›'}</span></button>`;
     if(todayUi.fold.backlog) h += bl.length ? `<div class="tdp-panel tdp-rows">${bl.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing without a date.</b></div>';
   } else {
     const n = today.length;
     h += `<div class="tdp-sec"><h3>${escHtml(tdShort(sel))}</h3><span class="n">${tdPlural(n, 'item', 'items')}</span></div>` + (n ? `<div class="tdp-panel tdp-rows">${today.map(x => tdRow(x)).join('')}</div>` : '<div class="tdp-panel tdp-empty"><b>Nothing is planned for this day.</b><span>Give a task this date from its details, or from Focus.</span></div>');
-    h += tdExtraHtml(sel, real);
+    if(todayUi.filter !== 'todo') h += tdExtraHtml(sel, real);
   }
   return h;
 }
@@ -14096,7 +14262,7 @@ function tdBoardHtml(sel, real, late, today){
     return `<div class="tdp-panel tdp-card" style="border-left:3px solid var(${it.biz ? '--td-slate' : '--td-oak'})"><div class="tdp-cardtop">${lt ? `<span class="tdp-pill red">${tdLateTxt(it.date)}</span>` : `<span class="tdp-pill${it.time ? ' oak' : ''}">${escHtml(it.time || 'Any time')}</span>`}<span class="tdp-pill ${it.biz ? 'slate' : 'oak'}">${ts ? (it.biz ? 'Business' : 'Job') : 'Job'}</span></div>
       ${it.open ? `<button class="tdp-ttl" type="button" ${it.open}>${escHtml(it.short)}</button>` : `<div class="tdp-ttl tdp-static">${escHtml(it.short)}</div>`}<div class="tdp-sub" style="margin:0">${it.rec || ''}${ts ? `<span class="tdp-av" title="${escAttr(it.owner)}">${escHtml(String(it.owner).charAt(0).toUpperCase())}</span>` : ''}</div></div>`; };
   const col = (title, cls, list, empty) => `<div><div class="tdp-sec ${cls}" style="margin-bottom:8px"><h3>${title}</h3><span class="n">${list.length}</span></div><div class="tdp-stack">${list.map(card).join('') || `<div class="tdp-empty">${empty}</div>`}</div></div>`;
-  return tdMsHtml(sel, real) + `<div class="tdp-boardgrid">${sel === real ? col('Overdue', 'red', late, 'All clear.') : ''}${col(sel === real ? 'Today' : escHtml(tdShort(sel)), '', today, 'Nothing planned.')}</div>` + tdExtraHtml(sel, real);
+  return tdChgHtml() + tdMsHtml(sel, real) + `<div class="tdp-boardgrid">${sel === real ? col('Overdue', 'red', late, 'All clear.') : ''}${col(sel === real ? 'Today' : escHtml(tdShort(sel)), '', today, 'Nothing planned.')}</div>` + tdExtraHtml(sel, real);
 }
 
 /* ---- right panel ---- */
@@ -14189,9 +14355,9 @@ function tdCloseMs(){ todayUi.ms = null; const el = document.getElementById('tdp
 /* ---- render ---- */
 function tdControls(sel, real, lateN){
   const L = document.getElementById('tdpLeft'), R = document.getElementById('tdpRight'); if(!L || !R) return;
-  L.innerHTML = todayUi.focus ? '' : `<div class="tdp-vs" role="group" aria-label="View"><button type="button" data-td="view" data-v="list" aria-pressed="${todayUi.view === 'list'}">List</button><button type="button" data-td="view" data-v="board" aria-pressed="${todayUi.view === 'board'}">Board</button></div>`;
+  L.innerHTML = todayUi.focus ? '' : `<div class="tdp-vs" role="group" aria-label="View"><button type="button" data-td="view" data-v="list" aria-pressed="${todayUi.view === 'list'}">List</button><button type="button" data-td="view" data-v="board" aria-pressed="${todayUi.view === 'board'}">Board</button></div><div class="tdp-vs" role="group" aria-label="Show"><button type="button" data-td="filter" data-v="all" aria-pressed="${todayUi.filter === 'all'}">All</button><button type="button" data-td="filter" data-v="todo" aria-pressed="${todayUi.filter === 'todo'}">To-dos</button></div>`;
   const open = tdPanelOpen();
-  R.innerHTML = (todayUi.focus ? '' : `<button class="tdp-ib" type="button" data-td="panel" aria-pressed="${open}" aria-expanded="${open}" aria-label="${open ? 'Hide' : 'Show'} the side panel" title="Week, schedule and summary"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>`)
+  R.innerHTML = (todayUi.focus || todayUi.view === 'board' ? '' : `<button class="tdp-btn" type="button" data-td="arrange" aria-pressed="${todayUi.arrange}">${todayUi.arrange ? 'Done arranging' : 'Arrange'}</button>${todayUi.arrange ? '<button class="tdp-btn" type="button" data-td="resetorder">Reset order</button>' : ''}`) + (todayUi.focus ? '' : `<button class="tdp-ib" type="button" data-td="panel" aria-pressed="${open}" aria-expanded="${open}" aria-label="${open ? 'Hide' : 'Show'} the side panel" title="Week, schedule and summary"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>`)
     + `<button class="tdp-fbtn" type="button" data-td="${todayUi.focus ? 'exitfocus' : 'focus'}"${!todayUi.focus && !lateN ? ' disabled' : ''}>${todayUi.focus ? 'Exit Focus' : 'Focus<b>' + lateN + '</b>'}</button>`
     + (todayUi.focus ? '' : `<span class="tdp-more"><button class="tdp-ib" type="button" data-td="more" aria-haspopup="menu" aria-expanded="${todayUi.menu}" aria-label="More" title="More"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>${todayUi.menu ? '<div class="tdp-menu" role="menu"><button type="button" role="menuitem" data-td="summary">Monthly summary</button><button type="button" role="menuitem" data-td="settings">Task settings</button></div>' : ''}</span>`);
   const d = toDate(sel), b = document.getElementById('tdpDate');
@@ -14202,10 +14368,10 @@ function tdControls(sel, real, lateN){
 }
 function renderToday(){
   if(!state) return;
-  const real = tdReal(), sel = tdSel(), tp = document.getElementById('tdp'); todayUi.key = real;
-  const late = tdLate(), todayItems = tdOn(sel), dueNow = tdOn(real).filter(x => !x.done).length;
+  const real = tdReal(), sel = tdSel(), tp = document.getElementById('tdp'); todayUi.key = real; if(todayUi.prefUser !== tdUserName()) tdLoadUser();
+  const lateAll = tdLate(), late = tdFilt(lateAll), todayItems = tdFilt(tdOn(sel)), dueNow = tdOn(real).filter(x => !x.done).length;
   const badge = document.getElementById('todayBadge');
-  if(badge){ badge.textContent = dueNow + late.length; badge.hidden = !(dueNow + late.length); badge.classList.toggle('over', late.length > 0); badge.title = dueNow + ' due today, ' + late.length + ' overdue'; }
+  if(badge){ badge.textContent = dueNow + lateAll.length; badge.hidden = !(dueNow + lateAll.length); badge.classList.toggle('over', lateAll.length > 0); badge.title = dueNow + ' due today, ' + lateAll.length + ' overdue'; }
   if(!tp) return;
   if(todayUi.focus && !late.length && !todayUi.fkeys.length) todayUi.focus = false;
   updateGreeting();
@@ -14274,11 +14440,25 @@ function tdOpenMsInProject(id){
     setTimeout(() => { const li = document.querySelector(`#projectWorkspace .rp-ms[data-mk="${key}"]`); if(li){ li.scrollIntoView({ block: 'center' }); li.classList.add('tdp-flash'); setTimeout(() => li.classList.remove('tdp-flash'), 2400); } }, 80);
   });
 }
+function tdMoveSec(k, dir){ const o = tdOrder().slice(), i = o.indexOf(k), j = i + dir; if(i < 0 || j < 0 || j >= o.length) return; o.splice(i, 1); o.splice(j, 0, k); todayUi.order = o; tdSavePrefs(); renderToday(); }
+(function(){ const root = document.getElementById('panel-today'); let from = '';
+  root.addEventListener('dragstart', (e) => { const w = e.target.closest && e.target.closest('.tdp-fhw'); if(!w) return; from = w.dataset.sec; e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', from); }catch(x){} });
+  root.addEventListener('dragover', (e) => { const w = e.target.closest && e.target.closest('.tdp-secw'); if(from && w) e.preventDefault(); });
+  root.addEventListener('drop', (e) => { const w = e.target.closest && e.target.closest('.tdp-secw'); if(!from || !w) return; e.preventDefault(); const to = w.dataset.sec; if(to && to !== from){ const o = tdOrder().slice(); o.splice(o.indexOf(from), 1); o.splice(o.indexOf(to), 0, from); todayUi.order = o; tdSavePrefs(); renderToday(); } from = ''; });
+  root.addEventListener('dragend', () => { from = ''; });
+  root.addEventListener('keydown', (e) => { const r = e.target.closest && e.target.closest('.tdp-ms1'); if(r && e.target === r && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); r.click(); } });
+})();
 document.getElementById('panel-today').addEventListener('click', (e) => {
   const b = e.target.closest('[data-td]'); if(!b || !state) return; const a = b.dataset.td;
   if(a === 'view'){ todayUi.view = b.dataset.v === 'board' ? 'board' : 'list'; tdSavePrefs(); renderToday(); }
   else if(a === 'panel'){ todayUi.panel = !tdPanelOpen(); tdSavePrefs(); renderToday(); }
   else if(a === 'fold'){ todayUi.fold[b.dataset.k] = !todayUi.fold[b.dataset.k]; tdSavePrefs(); renderToday(); }
+  else if(a === 'filter'){ todayUi.filter = b.dataset.v === 'todo' ? 'todo' : 'all'; tdSavePrefs(); renderToday(); }
+  else if(a === 'arrange'){ todayUi.arrange = !todayUi.arrange; renderToday(); }
+  else if(a === 'resetorder'){ todayUi.order = null; tdSavePrefs(); renderToday(); showToast('Section order reset'); }
+  else if(a === 'secup' || a === 'secdown'){ tdMoveSec(b.dataset.k, a === 'secup' ? -1 : 1); const n = document.querySelector(`.tdp-fhw[data-sec="${b.dataset.k}"] [data-td="${a}"]`); if(n && !n.disabled) n.focus(); else { const o = document.querySelector(`.tdp-fhw[data-sec="${b.dataset.k}"] [data-td]:not([disabled])[data-td^="sec"]`); if(o) o.focus(); } }
+  else if(a === 'chg-review') chOpenSheet(b.dataset.id, true);
+  else if(a === 'ms-done'){ e.stopPropagation(); const m = tdMsFind(b.dataset.id); if(m && !m.done){ projMsConfirm(m.p, m.key, tdReal(), 'Marked done on Today'); saveState(); render(); } }
   else if(a === 'day') tdSetDay(b.dataset.day, 0);
   else if(a === 'focus') tdStartFocus();
   else if(a === 'exitfocus') tdExitFocus();
@@ -15212,6 +15392,7 @@ function render(){
   undoBadge(); projSyncValues(); navMetrics();
   renderDashboard();
   if(typeof renderCapacity === 'function' && document.getElementById('panel-capacity').classList.contains('active')) renderCapacity();
+  if(typeof renderCapReport === 'function' && document.getElementById('panel-capreport').classList.contains('active')) try{ renderCapReport(); }catch(e){ console.error(e); }
   if(typeof renderLostBars === 'function') renderLostBars();
   if(typeof renderMonthSummary === 'function' && document.getElementById('panel-monthsummary').classList.contains('active')) try{ renderMonthSummary(); }catch(e){ console.error(e); }
   renderBusinessPlan();
@@ -15995,6 +16176,7 @@ function activateTab(name){
   panel.classList.add('active');
   if(name === 'suppliers') try{ supFitPills(); }catch(e){}   // measured only while the tab is showing
   if(name === 'capacity') try{ renderCapacity(); }catch(e){ console.error(e); }
+  if(name === 'capreport') try{ renderCapReport(); }catch(e){ console.error(e); }
   if(name === 'monthsummary') try{ renderMonthSummary(); }catch(e){ console.error(e); }
   try{ pjOnTab(name); }catch(e){}   // the Projects overview draws when shown and closes its panel when left
   updateScrollCues();
@@ -18554,7 +18736,7 @@ function rpDates(p){
 }
 function rpOrig(p){
   const cu = projCustomer(p), s = p.site || {}, d = rpDates(p);
-  return { stageId: projStage6(p).id, jobType: p.jobType || '', jobTypeId: p.jobTypeId || '', estValue: p.estValue === undefined || p.estValue === '' || p.estValue === null ? '' : String(p.estValue), estDays: p.estDays === undefined || p.estDays === '' || p.estDays === null ? '' : String(p.estDays), prefStart: sfIso(p.prefStart), deadline: sfIso(p.deadline), owner: p.owner || '', source: p.source || cu.source || '', start: d.start, complete: d.complete, dur: d.dur ? String(d.dur) : '',
+  return { siteName: p.siteName || '', stageId: projStage6(p).id, jobType: p.jobType || '', jobTypeId: p.jobTypeId || '', estValue: p.estValue === undefined || p.estValue === '' || p.estValue === null ? '' : String(p.estValue), estDays: p.estDays === undefined || p.estDays === '' || p.estDays === null ? '' : String(p.estDays), prefStart: sfIso(p.prefStart), deadline: sfIso(p.deadline), owner: p.owner || '', source: p.source || cu.source || '', start: d.start, complete: d.complete, dur: d.dur ? String(d.dur) : '',
     address: cu.address || '', postcode: cu.postcode || '', access: s.access || '', services: s.services || '', lastVisited: s.lastVisited || '',
     contact: cu.name || '', company: cu.company || '', phone: cu.phone || '', email: cu.email || '' };
 }
@@ -18609,6 +18791,7 @@ function rpLeftHtml(p){
     ${rpRO('Reference', escHtml(code), 'Never changes', 'locked')}
     ${rpEdit(p, 'jobTypeId', { select: [['', 'Not set']].concat(state.jobTypes.map(j => [j.id, j.name + (j.notFit ? ' (not a fit)' : '')])), hint: jobNotFit(Object.assign({}, p, { jobTypeId: rpVal(p, 'jobTypeId') })) ? 'Marked as not a fit in Settings.' : 'The kind of job. The list is in Settings, Selling.' })}
     ${rpEdit(p, 'jobType', { label: 'Job detail', ph: 'e.g. Oak pergola' })}
+    ${rpEdit(p, 'siteName', { label: 'Site', ph: 'e.g. 12 Oak Road, Leeds', hint: 'Short name of where the work is. The Calendar uses it to warn when two projects are booked on the same day at different sites. Blank: the first line of the address is used.' })}
     ${rpRO('Value (ex VAT)', ct.live ? `<b>${qm(ct.value)}</b>` : (ct.value ? `<b>${qm(ct.value)}</b>` : ''), ct.live ? `Edit the value in Quote ${quoteLink}` : 'No accepted quote yet: the value is typed in the full workspace')}
     <div class="rp-f rp-calc"><div class="rp-lab"><span>Margin</span><span class="rp-tag">Calculated</span></div><div class="rp-two"><div class="rp-ro"><small>Sold</small>${mg && mg.hasSold ? `<b>${qm(mg.soldAfter)}</b> <span class="rp-dim">${qpct(mg.soldPct)}</span>` : '<span class="rp-dash">—</span>'}</div><div class="rp-ro"><small>Now</small>${mg ? `<b>${qm(mg.now)}</b> <span class="rp-dim">${qpct(mg.nowPct)}</span>` : '<span class="rp-dash">—</span>'}</div></div><div class="rp-hint">${mg ? 'Calculated from the quote and the costs' : 'Needs an accepted quote'}</div></div>
     ${rpRO('Agreed', sold ? escHtml(pwD(sold)) : '', 'Set when the contract is marked agreed')}
@@ -18848,7 +19031,7 @@ function rpSyncDraftUi(p){
   const bar = root.querySelector('#rpBar'); if(!bar) return; const has = !!(rpDraft(p) && Object.keys(rpDraft(p).f).length);
   bar.hidden = !has; bar.innerHTML = has ? rpBarInner(p) : '';
 }
-const RP_PLAIN = ['jobType', 'jobTypeId', 'prefStart', 'deadline', 'owner', 'source', 'contact', 'company', 'phone', 'email', 'address', 'postcode'];
+const RP_PLAIN = ['siteName', 'jobType', 'jobTypeId', 'prefStart', 'deadline', 'owner', 'source', 'contact', 'company', 'phone', 'email', 'address', 'postcode'];
 /* write the non-date fields onto the project (called when the bar is saved, or when a schedule is confirmed or kept as tentative) */
 function rpApplyPlain(p, f){
   const done = [];
@@ -20163,16 +20346,66 @@ function ensurePlanModel(o){
   if(typeof ensurePlanModel2 === 'function') ensurePlanModel2(o);
 }
 (function(){ const o = ensureSellingModel6; ensureSellingModel6 = function(x){ o(x); ensurePlanModel(x); }; })();
-let _holCache = { sig: null, set: null, names: null };
-function holCache(){
-  const l = (typeof state !== 'undefined' && state && Array.isArray(state.holidays)) ? state.holidays : [], sig = l.map(h => h.date + '~' + (h.end || '') + '~' + (h.name || '')).join('|');
-  if(sig !== _holCache.sig){
-    const set = new Set(), names = {};
-    l.forEach(h => { let d = h.date, g = 0; const e = h.end && h.end > h.date ? h.end : h.date; while(d <= e && g < 400){ set.add(d); if(!names[d]) names[d] = h.name || (h.kind === 'off' ? 'Unavailable' : 'Bank holiday'); d = addDaysIso(d, 1); g++; } });
-    _holCache = { sig, set, names };
+/* =====================================================================
+   STAGE 10, PART A: DAY TYPES, MARKED DAYS AND THE ONE WORKING-DAY RULE
+   state.dayTypes: [{ id, name, tag (up to 6 characters), off (true = takes the day off capacity) }]
+   state.markedDays: [{ id, date, typeId, title }]   (one entry per day; the same list is edited in Settings and from the Calendar)
+   state.acceptedDays: ['projectId:hours|projectId:hours', ...]  (an accepted day is remembered by what is booked on it, not by its date)
+   settings: weekStart (0 Sunday, 1 Monday), hoursPerDay (existing), capRedMult (1.5), capMaxDay (24), capGreenPct (95), capAmberPct (85)
+   One-off migration (dayModelV 1): the old bank holidays and unavailable days become Public holiday / Blackout marked days, and the Pipelines blackout
+   dates become Blackout days. The old lists are left in place, untouched.
+   ===================================================================== */
+const DAY_TYPE_SEED = [['dt_hol', 'Public holiday', 'Hol'], ['dt_team', 'Team day', 'Team'], ['dt_off', 'Day off', 'Off'], ['dt_office', 'Office day', 'Office'], ['dt_out', 'Blackout', 'Out']];
+function ensureDayModel(o){
+  const str = v => v == null ? '' : String(v), ok = v => /^\d{4}-\d{2}-\d{2}$/.test(v || ''), st = o.settings = o.settings || {};
+  let t = Array.isArray(o.dayTypes) ? o.dayTypes.filter(x => x && typeof x === 'object' && str(x.name).trim()) : null;
+  if(!t || !t.length) t = DAY_TYPE_SEED.map(([id, name, tag]) => ({ id, name, tag, off: true }));
+  o.dayTypes = t.map(x => ({ id: str(x.id) || 'dt_' + Math.random().toString(36).slice(2, 8), name: str(x.name).trim(), tag: str(x.tag).trim().slice(0, 6), off: x.off !== false }));
+  const seen = new Set(); o.markedDays = (Array.isArray(o.markedDays) ? o.markedDays : []).filter(m => m && typeof m === 'object' && ok(m.date) && !seen.has(m.date) && seen.add(m.date))
+    .map(m => ({ id: str(m.id) || 'md_' + m.date, date: m.date, typeId: o.dayTypes.some(x => x.id === m.typeId) ? m.typeId : o.dayTypes[0].id, title: str(m.title) }));
+  if(!o.dayModelV){
+    const have = new Set(o.markedDays.map(m => m.date)), add = (date, typeId, title) => { if(ok(date) && !have.has(date)){ have.add(date); o.markedDays.push({ id: 'md_' + date, date, typeId, title: str(title) }); } };
+    (o.holidays || []).forEach(h => { const e = ok(h.end) && h.end > h.date ? h.end : h.date; let d = h.date, g = 0; while(d <= e && g < 400){ add(d, h.kind === 'off' ? 'dt_out' : 'dt_hol', h.name); d = addDaysIso(d, 1); g++; } });
+    (o.blackouts || []).forEach(b => { let d = b.start, g = 0; while(d <= b.end && g < 400){ add(d, 'dt_out', b.label); d = addDaysIso(d, 1); g++; } });
+    o.dayModelV = 1;
   }
-  return _holCache;
+  o.markedDays.sort((a, b) => a.date.localeCompare(b.date));
+  o.acceptedDays = (Array.isArray(o.acceptedDays) ? o.acceptedDays : []).filter(x => typeof x === 'string');
+  const num = (v, d, lo, hi) => { const n = Number(v); return v === '' || v == null || isNaN(n) || n < lo || n > hi ? d : n; };
+  st.weekStart = Number(st.weekStart) === 1 ? 1 : 0;
+  st.capRedMult = num(st.capRedMult, 1.5, 1, 10); st.capMaxDay = num(st.capMaxDay, 24, 1, 48);
+  st.capGreenPct = num(st.capGreenPct, 95, 1, 100); st.capAmberPct = num(st.capAmberPct, 85, 1, 100); if(st.capAmberPct > st.capGreenPct) st.capAmberPct = st.capGreenPct;
+  if(typeof ensureTentModel === 'function') ensureTentModel(o);
 }
+(function(){ const o = ensureSellingModel6; ensureSellingModel6 = function(x){ o(x); ensureDayModel(x); }; })();
+const dayTypeOf = id => ((typeof state !== 'undefined' && state && state.dayTypes) || []).find(t => t.id === id) || null;
+const capCfg = () => { const s = state.settings; return { red: s.capRedMult || 1.5, max: s.capMaxDay || 24, green: s.capGreenPct || 95, amber: s.capAmberPct || 85 }; };
+let _holCache2 = { sig: null, set: null, names: null, marks: null };
+function holCache(){
+  const types = (typeof state !== 'undefined' && state && state.dayTypes) || [], l = (typeof state !== 'undefined' && state && state.markedDays) || [];
+  const sig = types.map(t => t.id + (t.off ? 1 : 0)).join(',') + '|' + l.map(m => m.date + m.typeId + m.title).join('|');
+  if(sig !== _holCache2.sig){
+    const set = new Set(), names = {}, marks = {}, tm = {}; types.forEach(t => { tm[t.id] = t; });
+    l.forEach(m => { const t = tm[m.typeId]; if(!t) return; marks[m.date] = { type: t, title: m.title || t.name, id: m.id }; if(t.off){ set.add(m.date); names[m.date] = m.title || t.name; } });
+    _holCache2 = { sig, set, names, marks };
+  }
+  return _holCache2;
+}
+const dayMark = iso => holCache().marks[iso] || null;
+/* ---- the one working-day rule: not a weekend (the working week) and not marked with a day type that takes the day off ---- */
+const isWorkingDay = d => wdIsWork(d);
+const snapToWorking = (iso, dir) => wdSnap(iso, dir || 1);
+function shiftByWorkingDays(iso, n){ const step = n < 0 ? -1 : 1, d = toDate(iso); let k = Math.abs(Math.round(n)), g = 0; while(k > 0 && g < 4000){ d.setDate(d.getDate() + step); if(wdIsWork(d)) k--; g++; } return fmt(d); }
+/* signed working days to get from a to b: the working days after a up to and including b (negative when b is earlier) */
+function workingDaysBetween(a, b){ if(!a || !b || a === b) return 0; return a < b ? wdCount(addDaysIso(a, 1), b) : -wdCount(addDaysIso(b, 1), a); }
+/* the day's hours: the hours per working day setting; 0 on a day that is not a working day */
+const capDay = iso => wdIsWork(iso) ? hpd() : 0;
+const capFull = () => hpd() * workingWeek().length;   // capacity is hours per working day times the working days
+const capWeekStart = iso => { const d = toDate(iso), ws = Number(state && state.settings && state.settings.weekStart) === 1 ? 1 : 0; return fmt(addCalendarDays(d, -((d.getDay() - ws + 7) % 7))); };
+function isoWeekNo(iso){ const d = toDate(iso), t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); return Math.ceil(((t - new Date(Date.UTC(t.getUTCFullYear(), 0, 1))) / 86400000 + 1) / 7); }
+/* the week number of the week starting on this date (a Sunday week takes the number of the Monday that follows) */
+const weekNoOf = start => isoWeekNo(toDate(start).getDay() === 0 ? addDaysIso(start, 1) : start);
+
 const holidaySet = () => holCache().set;
 function holidayName(iso){ return holCache().names[iso] || ''; }
 function workingWeek(){ const w = (typeof state !== 'undefined' && state && state.settings && state.settings.workingWeek); return Array.isArray(w) && w.length ? w : [1, 2, 3, 4, 5]; }
@@ -20193,37 +20426,75 @@ function renderPlanningSettings(){
   const el = document.getElementById('planCards'); if(!el) return;
   el.innerHTML = PLAN_SET_CARDS.map(([label, fn], i) => `<div class="section-label">${label}</div><div class="card" data-plancard="${i}">${fn()}</div>`).join('');
 }
-PLAN_SET_CARDS.push(['Bank holidays and unavailable days', () => {
-  const l = state.holidays.slice().sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)), wk = workingWeek(), dn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  return `<p class="q-help u-margin-0-0-8px" >Everywhere the tracker counts working days it skips these dates as well as the weekend: duration and complete date on a project, the quote follow-up gap, days since contact and the reschedule review. Dates already saved are never moved. The England and Wales bank holidays for 2026 and 2027 are listed to start with: please check them. Use <b>Unavailable</b> for a day the whole business is shut; a person's own leave is set under People and capacity.</p>
-    <div class="hd-wk" role="group" aria-label="Working week"><span class="hd-wk-l">Working week</span>${[1, 2, 3, 4, 5, 6, 0].map(n => `<label class="q-check"><input type="checkbox" data-hd="wk" data-d="${n}"${wk.includes(n) ? ' checked' : ''}> ${dn[n]}</label>`).join('')}</div>
-    <div class="hd-list">${l.map(h => `<div class="hd-row">
-      <input type="date" data-hd="date" data-id="${escAttr(h.id)}" value="${escAttr(h.date)}" aria-label="Date">
-      <input type="date" data-hd="end" data-id="${escAttr(h.id)}" value="${escAttr(h.end || '')}" aria-label="Last day, if it runs over several days" title="Last day (leave empty for one day)">
-      <input type="text" data-hd="name" data-id="${escAttr(h.id)}" value="${escAttr(h.name)}" placeholder="Name" aria-label="Name">
-      <select data-hd="kind" data-id="${escAttr(h.id)}" aria-label="Kind">${PLAN_KINDS.map(([k, n]) => `<option value="${k}"${h.kind === k ? ' selected' : ''}>${n}</option>`).join('')}</select>
-      <button type="button" class="icon-btn" data-hd="del" data-id="${escAttr(h.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('') || '<div class="q-help">No days listed: only the weekend is skipped.</div>'}</div>
-    <button type="button" class="btn secondary u-margin-top-10px"  data-hd="add">+ Add a day</button>
-    <p class="q-help u-margin-10px-0-0" >The “Blackout dates” under Pipelines only shade the Gantt; they do not change any counting.</p>`;
+/* ---------- Settings > Planning and capacity: Calendar and hours, Day types, Marked days ---------- */
+const dtUsed = id => state.markedDays.some(m => m.typeId === id);
+PLAN_SET_CARDS.push(['Calendar and hours', () => {
+  const wk = workingWeek(), dn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], s = state.settings, c = capCfg();
+  const f = (label, key, val, o) => `<label class="cs-f"><span>${label}</span><input type="number" inputmode="decimal" data-cs="${key}" value="${escAttr(val)}" min="${o.min}" max="${o.max}" step="${o.step}" aria-label="${escAttr(label)}"></label>`;
+  return `<p class="q-help u-margin-0-0-8px" >These settings drive every calendar and capacity figure. Hours per working day is the same figure as in Settings, Quotes and pricing: weekly capacity is the hours per day times the working days in that week, so a bank holiday or a team day takes its hours away.</p>
+    <div class="cs-grid">
+      <label class="cs-f"><span>First day of the week</span><select data-cs="weekStart" aria-label="First day of the week"><option value="0"${s.weekStart === 0 ? ' selected' : ''}>Sunday</option><option value="1"${s.weekStart === 1 ? ' selected' : ''}>Monday</option></select></label>
+      ${f('Hours per working day', 'hoursPerDay', hpd(), { min: 1, max: 24, step: 1 })}
+      <div class="cs-f"><span>Weekly capacity</span><b class="cs-derived" id="csWeekly">= ${Math.round(capFull() * 10) / 10} h a week</b></div>
+    </div>
+    <div class="cs-sub">When a day or week changes colour</div>
+    <div class="cs-grid">
+      ${f('Day turns red at (× the day’s hours)', 'capRedMult', c.red, { min: 1, max: 10, step: 0.1 })}
+      ${f('Impossible above (hours in a day)', 'capMaxDay', c.max, { min: 1, max: 48, step: 1 })}
+      ${f('Week is green from (% of capacity)', 'capGreenPct', c.green, { min: 1, max: 100, step: 1 })}
+      ${f('Week is amber from (% of capacity)', 'capAmberPct', c.amber, { min: 1, max: 100, step: 1 })}
+    </div>
+    <p class="q-help u-margin-8px-0-0" >Over 100% is red. At or above the green figure is green (on capacity). At or above the amber figure is amber (slightly under). Below amber is blue: there is scope to fill.</p>
+    <div class="hd-wk" role="group" aria-label="Working week"><span class="hd-wk-l">Working week</span>${[1, 2, 3, 4, 5, 6, 0].map(n => `<label class="q-check"><input type="checkbox" data-cs="wk" data-d="${n}"${wk.includes(n) ? ' checked' : ''}> ${dn[n]}</label>`).join('')}</div>`;
 }]);
+PLAN_SET_CARDS.push(['Day types', () => {
+  return `<p class="q-help u-margin-0-0-8px" >A day type labels a day on the Calendar. Tick <b>Takes the day off capacity</b> and a day with that type is not a working day: it has no hours, projects skip it and every working-day count skips it. An unticked type only labels the day. A type cannot be removed while a day uses it.</p>
+    <div class="dt-list">${state.dayTypes.map(t => { const used = dtUsed(t.id), n = state.markedDays.filter(m => m.typeId === t.id).length;
+      return `<div class="dt-row"><input type="text" data-dt="name" data-id="${escAttr(t.id)}" value="${escAttr(t.name)}" aria-label="Name"><input type="text" maxlength="6" data-dt="tag" data-id="${escAttr(t.id)}" value="${escAttr(t.tag)}" aria-label="Short tag (up to 6 characters)" placeholder="Tag" class="dt-tag">
+        <label class="q-check"><input type="checkbox" data-dt="off" data-id="${escAttr(t.id)}"${t.off ? ' checked' : ''}> Takes the day off capacity</label>
+        <button type="button" class="icon-btn" data-dt="del" data-id="${escAttr(t.id)}" ${used ? `disabled title="In use on ${n} day${n === 1 ? '' : 's'}: change those days first"` : 'title="Remove"'} aria-label="Remove ${escAttr(t.name)}">${X_SVG}</button></div>`; }).join('')}</div>
+    <button type="button" class="btn secondary u-margin-top-10px" data-dt="add">+ Add a day type</button>`;
+}]);
+PLAN_SET_CARDS.push(['Marked days', () => {
+  return `<p class="q-help u-margin-0-0-8px" >The days marked on the Calendar. Marking a day here or by clicking it on the Calendar edits this same list. Dates already saved on projects are never moved.</p>
+    <div class="md-list">${state.markedDays.map(m => `<div class="md-row"><input type="date" data-md="date" data-id="${escAttr(m.id)}" value="${escAttr(m.date)}" aria-label="Day">
+      <select data-md="type" data-id="${escAttr(m.id)}" aria-label="Type of day">${state.dayTypes.map(t => `<option value="${escAttr(t.id)}"${t.id === m.typeId ? ' selected' : ''}>${escHtml(t.name)}</option>`).join('')}</select>
+      <input type="text" data-md="title" data-id="${escAttr(m.id)}" value="${escAttr(m.title)}" placeholder="Title" aria-label="Title">
+      <button type="button" class="icon-btn" data-md="del" data-id="${escAttr(m.id)}" title="Remove" aria-label="Remove">${X_SVG}</button></div>`).join('') || '<div class="q-help">No days are marked: only the weekend is skipped.</div>'}</div>
+    <button type="button" class="btn secondary u-margin-top-10px" data-md="add">+ Mark a day</button>
+    <p class="q-help u-margin-10px-0-0" >The “Blackout dates” under Pipelines still only shade the Gantt. Your existing ones were copied here once as Blackout days.</p>`;
+}]);
+const mdSave = () => { state.markedDays.sort((a, b) => a.date.localeCompare(b.date)); saveState(); render(); };
 document.addEventListener('click', (e) => {
-  const b = e.target.closest && e.target.closest('[data-hd]'); if(!b || !state || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
-  const a = b.dataset.hd, list = state.holidays;
-  if(a === 'add'){
-    const last = list.map(h => h.end || h.date).sort().pop() || fmt(new Date()), h = { id: selId('hd_'), date: addDaysIso(last, 1), end: '', name: '', kind: 'bank' }; list.push(h);
-    saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-hd="name"][data-id="${h.id}"]`); if(el) el.focus(); }, 30); return; }
-  if(a === 'del'){ const i = list.findIndex(x => x.id === b.dataset.id); if(i < 0) return; const gone = list.splice(i, 1)[0]; undoDeleted('Day deleted: ' + String(gone.name || gone.date).slice(0, 40), ['holidays'], i, gone); saveState(); render(); }
+  const b = e.target.closest && e.target.closest('[data-dt],[data-md]'); if(!b || !state || b.tagName === 'SELECT' || b.tagName === 'INPUT' || b.disabled) return;
+  if(b.dataset.dt){
+    if(b.dataset.dt === 'add'){ const t = { id: selId('dt_'), name: 'New type', tag: 'New', off: true }; state.dayTypes.push(t); saveState(); render(); setTimeout(() => { const el = document.querySelector(`[data-dt="name"][data-id="${t.id}"]`); if(el){ el.focus(); el.select(); } }, 30); }
+    else if(b.dataset.dt === 'del'){ const i = state.dayTypes.findIndex(x => x.id === b.dataset.id); if(i < 0 || dtUsed(b.dataset.id)) return; if(state.dayTypes.length <= 1){ showToast('Keep at least one day type'); return; } const gone = state.dayTypes.splice(i, 1)[0]; undoDeleted('Day type removed: ' + gone.name, ['dayTypes'], i, gone); saveState(); render(); }
+    return; }
+  const a = b.dataset.md;
+  if(a === 'add'){ const last = state.markedDays.map(m => m.date).sort().pop(), d = last && last >= fmt(new Date()) ? addDaysIso(last, 1) : fmt(new Date()); let day = d, g = 0; while(state.markedDays.some(m => m.date === day) && g++ < 400) day = addDaysIso(day, 1); const m = { id: selId('md_'), date: day, typeId: state.dayTypes[0].id, title: '' }; state.markedDays.push(m); mdSave(); setTimeout(() => { const el = document.querySelector(`[data-md="title"][data-id="${m.id}"]`); if(el) el.focus(); }, 30); }
+  else if(a === 'del'){ const i = state.markedDays.findIndex(x => x.id === b.dataset.id); if(i < 0) return; const gone = state.markedDays.splice(i, 1)[0]; undoDeleted('Day cleared: ' + (gone.title || gone.date).slice(0, 40), ['markedDays'], i, gone); saveState(); render(); }
 });
 document.addEventListener('change', (e) => {
-  const el = e.target, d = el.dataset; if(!d || !d.hd || !state) return;
-  if(d.hd === 'wk'){ const w = new Set(workingWeek()), n = Number(d.d); if(el.checked) w.add(n); else w.delete(n); if(!w.size){ showToast('At least one day has to be a working day'); render(); return; } state.settings.workingWeek = [...w].sort((a, b) => a - b); saveState(); render(); return; }
-  const h = state.holidays.find(x => x.id === d.id); if(!h) return;
-  if(d.hd === 'date'){ if(!isoOk(el.value)){ render(); return; } h.date = el.value; if(h.end && h.end <= h.date) h.end = ''; }
-  else if(d.hd === 'end'){ h.end = isoOk(el.value) && el.value > h.date ? el.value : ''; }
-  else if(d.hd === 'name') h.name = el.value.trim();
-  else if(d.hd === 'kind') h.kind = el.value === 'off' ? 'off' : 'bank';
-  else return;
-  saveState(); render();
+  const el = e.target, d = el.dataset; if(!d || !state || !(d.cs || d.dt || d.md)) return;
+  if(d.cs){
+    const s = state.settings;
+    if(d.cs === 'wk'){ const w = new Set(workingWeek()), n = Number(d.d); if(el.checked) w.add(n); else w.delete(n); if(!w.size){ showToast('At least one day has to be a working day'); render(); return; } s.workingWeek = [...w].sort((a, b) => a - b); }
+    else if(d.cs === 'weekStart') s.weekStart = Number(el.value) === 1 ? 1 : 0;
+    else { const n = Number(el.value); if(el.value === '' || isNaN(n)){ render(); return; }
+      if(d.cs === 'hoursPerDay') s.hoursPerDay = Math.min(24, Math.max(1, Math.round(n)));
+      else if(d.cs === 'capRedMult') s.capRedMult = Math.min(10, Math.max(1, n));
+      else if(d.cs === 'capMaxDay') s.capMaxDay = Math.min(48, Math.max(1, n));
+      else if(d.cs === 'capGreenPct'){ s.capGreenPct = Math.min(100, Math.max(1, n)); if(s.capAmberPct > s.capGreenPct) s.capAmberPct = s.capGreenPct; }
+      else if(d.cs === 'capAmberPct'){ s.capAmberPct = Math.min(100, Math.max(1, n)); if(s.capAmberPct > s.capGreenPct){ s.capAmberPct = s.capGreenPct; showToast('Amber cannot be above green'); } } }
+    saveState(); render(); return; }
+  if(d.dt){ const t = state.dayTypes.find(x => x.id === d.id); if(!t) return;
+    if(d.dt === 'name'){ const v = el.value.trim(); if(v) t.name = v; } else if(d.dt === 'tag') t.tag = el.value.trim().slice(0, 6); else if(d.dt === 'off') t.off = el.checked; else return;
+    saveState(); render(); return; }
+  const m = state.markedDays.find(x => x.id === d.id); if(!m) return;
+  if(d.md === 'date'){ if(!isoOk(el.value) || state.markedDays.some(x => x !== m && x.date === el.value)){ showToast(isoOk(el.value) ? 'That day is already marked' : 'Pick a valid date'); render(); return; } m.date = el.value; }
+  else if(d.md === 'type') m.typeId = el.value; else if(d.md === 'title') m.title = el.value.trim(); else return;
+  mdSave();
 });
 
 /* =====================================================================
@@ -20481,15 +20752,12 @@ function capPersonDay(person, iso){
   return w / Math.max(1, workingWeek().length);
 }
 const capPeople = () => state.people.filter(x => Number(x.weeklyHours) > 0);
-function capDay(iso){ return capPeople().reduce((a, x) => a + capPersonDay(x, iso), 0); }
 /* the hours the business has between two dates, both counted (people with no weekly hours filled in have none) */
 function capRange(a, b){ let t = 0, d = a, g = 0; while(d <= b && g < 4000){ t += capDay(d); d = addDaysIso(d, 1); g++; } return t; }
-const capWeekStart = iso => { const d = toDate(iso); return fmt(addCalendarDays(d, -((d.getDay() + 6) % 7))); };
 const capWeek = monday => capRange(monday, addDaysIso(monday, 6));
-const capFull = () => capPeople().reduce((a, x) => a + Number(x.weeklyHours), 0);
 PLAN_SET_CARDS.push(['People and capacity', () => {
   const l = state.people, hp = hpd();
-  return `<p class="q-help u-margin-0-0-8px" >The people who do the work and the hours each has in a week. Everything on the capacity view is measured against these hours, so a person with no hours filled in adds nothing to capacity. A week with a bank holiday or someone's leave has fewer hours. Adding a person here does not give them a login.</p>
+  return `<p class="q-help u-margin-0-0-8px" >The people who do the work. From Stage 10 the Calendar and Capacity report measure against the hours per working day times the working days (see Calendar and hours above), not against these weekly hours, which are kept for reference. Adding a person here does not give them a login.</p>
     <div class="assumptions-grid two" style="max-width:560px;margin-bottom:12px;"><div><label for="capHpd">Hours in a working day</label><input id="capHpd" type="number" min="1" max="24" step="1" inputmode="numeric" data-cap="hpd" value="${hp}"><div class="q-help">The same figure as Hours per day in Quotes and pricing. It turns a duration in days into hours.</div></div>
       <div><label for="capLw">Default lead weighting (%)</label><input id="capLw" type="number" min="0" max="100" step="1" inputmode="numeric" data-cap="leadw" value="${Math.round(capLeadWeight() * 100)}"><div class="q-help">The share of a lead's hours counted on the capacity view, because a lead may not turn into work. A sales stage uses its own probability; a project counts in full. Default 20.</div></div></div>
     <div class="cap-list">${l.map(x => `<div class="cap-row"><div class="cap-main"><input type="text" data-cap="name" data-id="${escAttr(x.id)}" value="${escAttr(x.name)}" aria-label="Name">
@@ -20499,7 +20767,7 @@ PLAN_SET_CARDS.push(['People and capacity', () => {
         ${x.leave.slice().sort((a, b) => a.start.localeCompare(b.start)).map(v => `<div class="cap-lv"><input type="date" data-cap="lstart" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.start)}" aria-label="First day"><input type="date" data-cap="lend" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.end)}" aria-label="Last day"><input type="text" data-cap="lnote" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" value="${escAttr(v.note)}" placeholder="Leave, training…" aria-label="Note"><button type="button" class="icon-btn" data-cap="ldel" data-id="${escAttr(x.id)}" data-lid="${escAttr(v.id)}" title="Delete" aria-label="Delete">${X_SVG}</button></div>`).join('')}
         <button type="button" class="btn secondary qb-sm" data-cap="ladd" data-id="${escAttr(x.id)}">+ Add unavailable days</button></details></div>`).join('') || '<div class="q-help">Nobody listed.</div>'}</div>
     <button type="button" class="btn secondary u-margin-top-10px"  data-cap="add">+ Add a person</button>
-    <p class="q-help u-margin-10px-0-0" >Business capacity: <b>${capFull()} hours a week</b> (${capPeople().map(x => escHtml(x.name)).join(', ') || 'nobody has hours filled in yet'}). Bank holidays and unavailable days for the whole business are in the list above.</p>`;
+    <p class="q-help u-margin-10px-0-0" >Calendar capacity: <b>${capFull()} hours a week</b> (${hpd()} h a working day). People's weekly hours listed here add up to <b>${capPeople().reduce((a, x) => a + Number(x.weeklyHours), 0)} h</b> and are for reference only.</p>`;
 }]);
 document.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-cap]'); if(!b || !state || b.tagName === 'INPUT' || b.tagName === 'SELECT') return;
@@ -20563,10 +20831,11 @@ function capSpans(kind, r){
   }
   return { spans, unplaced: un };
 }
-function capItem(kind, r){
-  const sp = capSpans(kind, r), w = kind === 'project' ? 1 : kind === 'sales' ? effectiveProb(r) : capLeadWeight(), days = {};
+function capItem(kind, r, noOv){
+  const sp = capSpans(kind, r), w = kind === 'project' ? 1 : kind === 'sales' ? effectiveProb(r) : capLeadWeight(); let days = {}, ghost = null;
   sp.spans.forEach(s => capSpread(s.start, s.end, s.hours).forEach(([d, h]) => { days[d] = (days[d] || 0) + h * (s.done ? 1 : w); }));
-  return { kind, r, id: r.id, name: boardTitle(kind, r), code: recordCode(r.id, kind), weight: w, tentative: kind === 'project' && !!r.tentative, days, spans: sp.spans, unplaced: sp.unplaced, total: Object.values(days).reduce((a, b) => a + b, 0) };
+  if(kind === 'project' && !noOv && typeof pjOverrideDays === 'function'){ const ov = pjOverrideDays(r); if(ov){ days = Object.assign({}, ov); if(r.chg && r.chg.status === 'tentative') ghost = r.chg.orig.days; } }   // Stage 10: a Calendar change or day plan replaces the phase spread
+  return { ghost, kind, r, id: r.id, name: boardTitle(kind, r), code: recordCode(r.id, kind), weight: w, tentative: kind === 'project' && !!r.tentative, days, spans: sp.spans, unplaced: sp.unplaced, total: Object.values(days).reduce((a, b) => a + b, 0) };
 }
 /* which records, by layer. A project counts while it is live; a sale or lead while it is open */
 function capItems(layers){
@@ -20626,7 +20895,7 @@ function phGanttHtml(p){
   /* hours against capacity, week by week, on the same axis */
   const me = capItem('project', capTentativeView(p)), others = capItems({ projects: true }).filter(it => it.id !== p.id), rows = capWeekRows([me].concat(others), lo, hi), scale = Math.max(8, ...rows.map(r => Math.max(r.cap, r.total))) * 1.12;
   const cap = rows.map(r => { const mine = r.parts.filter(q => q.item === me).reduce((a, q) => a + q.hours, 0), oth = r.total - mine, over = r.cap > 0 ? r.total > r.cap + 0.05 : r.total > 0.05, ix = daysBetween(lo, r.mon);
-    return `<div class="gt-wk${over ? ' over' : ''}" data-cv="go" data-mon="${r.mon}" role="button" tabindex="0" style="left:${ix / span * 100}%;width:${7 / span * 100}%" title="${escAttr('Week of ' + pwD(r.mon) + ': ' + capH(r.total) + ' of ' + capH(r.cap) + ' capacity (this project ' + capH(mine) + ', other projects ' + capH(oth) + '). Open this week in Calendar and capacity')}"><div class="gt-stack"><i class="oth" style="height:${oth / scale * 100}%"></i><i class="mine${tent ? ' tent' : ''}" style="height:${mine / scale * 100}%"></i></div><i class="gt-capl" style="bottom:${r.cap / scale * 100}%"></i><span class="gt-wv">${r.total > 0.05 || r.cap > 0 ? Math.round(r.total) + '/' + Math.round(r.cap) : ''}</span></div>`; }).join('');
+    return `<div class="gt-wk${over ? ' over' : ''}" data-cv="go" data-mon="${r.mon}" role="button" tabindex="0" style="left:${ix / span * 100}%;width:${7 / span * 100}%" title="${escAttr('Week of ' + pwD(r.mon) + ': ' + capH(r.total) + ' of ' + capH(r.cap) + ' capacity (this project ' + capH(mine) + ', other projects ' + capH(oth) + '). Open this week in Calendar')}"><div class="gt-stack"><i class="oth" style="height:${oth / scale * 100}%"></i><i class="mine${tent ? ' tent' : ''}" style="height:${mine / scale * 100}%"></i></div><i class="gt-capl" style="bottom:${r.cap / scale * 100}%"></i><span class="gt-wv">${r.total > 0.05 || r.cap > 0 ? Math.round(r.total) + '/' + Math.round(r.cap) : ''}</span></div>`; }).join('');
   const overWeeks = rows.filter(r => r.total > r.cap + 0.05 && r.parts.some(q => q.item === me));
   const unp = me.unplaced.hours > 0 ? `<div class="rp-hint">${escHtml(phFmtH(me.unplaced.hours))} of phase hours have no dates yet, so they are not in the chart.</div>` : '';
   return `<section class="rp-card gt-card" id="phGantt"><div class="gt-head"><h4>Gantt</h4><span class="gt-sub">Phases with their hours, milestones, deliveries and today${tent ? ' · <b>tentative</b>' : ''}</span></div>
@@ -20638,7 +20907,7 @@ function phGanttHtml(p){
     <div class="gt-legend"><span><i class="gt-bar gt-ph"></i>Phase</span><span><i class="gt-bar gt-ph sell"></i>Selling time</span><span><i class="gt-bar gt-ph done"></i>Done, confirmed</span><span><i class="gt-bar gt-ph done ass"></i>Done, assumed</span><span><i class="gt-bar gt-ph tent"></i>Tentative</span><span><i class="gt-ms ms-future"></i>Milestone</span><span><i class="gt-dl">${DROP_SVG}</i>Delivery</span><span><i class="gt-off hol"></i>Weekend or holiday</span><span><i class="gt-capsw"></i>Capacity</span></div>
     ${overWeeks.length ? `<div class="rp-warn" role="status"><b>Over capacity:</b> ${overWeeks.length === 1 ? 'one week' : overWeeks.length + ' weeks'} with this project in it ${overWeeks.length === 1 ? 'is' : 'are'} above the hours the team has (${overWeeks.slice(0, 4).map(r => escHtml(pwD(r.mon)) + ' ' + Math.round(r.total) + '/' + Math.round(r.cap) + ' h').join(', ')}${overWeeks.length > 4 ? '…' : ''}).</div>` : ''}
     ${undated.length ? `<div class="rp-hint">No dates yet: ${undated.map(q => escHtml(q.name || 'Phase')).join(', ')}.</div>` : ''}${unp}
-    <div class="rp-hint">Dates are changed in the Phases list below and go through a review: nothing linked moves until you confirm. <button type="button" class="sp-link" data-cv="go" data-mon="">Open Calendar and capacity</button> to see every project, deal and lead against capacity.</div></section>`;
+    <div class="rp-hint">Dates are changed in the Phases list below and go through a review: nothing linked moves until you confirm. <button type="button" class="sp-link" data-cv="go" data-mon="">Open Calendar</button> to see every project, deal and lead against capacity.</div></section>`;
 }
 
 /* ---------- editing a phase date: the same flow as the project dates (Confirm, Tentative or Cancel) ----------
@@ -20702,85 +20971,393 @@ document.addEventListener('click', (e) => {
 
 
 /* =====================================================================
-   STEP 6: CALENDAR AND CAPACITY (Command menu)
-   A weekly view of demand against capacity across the business, from the engine above (the same hours as the Gantt on each project).
-   Layers you switch on and off: confirmed projects, sales opportunities (weighted by probability), leads (weighted), deliveries, business tasks.
-   Choices are kept per browser. Clicking a week or a day opens that day on Today; every name opens its own record, and Back returns here.
+   STEP 6 (Stage 10): CALENDAR (Command menu)
+   Week view (a vertical scroll of weeks, the current week is the second line and open) and Month view. Demand comes from the engine above (the same
+   hours as the Gantt on each project); capacity is hours per working day times the working days in the week. Colours: over 100% red, at or above the
+   green figure green, at or above the amber figure amber, below it blue (scope to fill). Under and over never share a colour.
+   Click any day to set its type (a pop-up). Accepted day checks are remembered by what is booked on the day, not by its date.
    ===================================================================== */
 const CV_KEY = STORAGE_PREFIX + 'business-tracker-capacity-view';
-const CV_LAYERS = [['projects', 'Confirmed projects', 'oak'], ['sales', 'Sales opportunities (weighted)', 'slate'], ['leads', 'Leads (weighted)', 'green'], ['deliveries', 'Deliveries', ''], ['tasks', 'Business tasks', '']];
-const capUi = { layers: { projects: true, sales: true, leads: true, deliveries: true, tasks: false }, start: '', weeks: 8, open: {} };
-(function(){ try{ const o = JSON.parse(localStorage.getItem(CV_KEY) || 'null'); if(o && typeof o === 'object'){ CV_LAYERS.forEach(([k]) => { if(typeof (o.layers || {})[k] === 'boolean') capUi.layers[k] = o.layers[k]; }); if([8, 12, 26].includes(o.weeks)) capUi.weeks = o.weeks; } }catch(e){} })();
-function capSave(){ try{ localStorage.setItem(CV_KEY, JSON.stringify({ layers: capUi.layers, weeks: capUi.weeks })); }catch(e){} }
-navExtra('cap', () => ({ s: capUi.start, o: Object.keys(capUi.open) }), v => { capUi.start = (v && v.s) || ''; capUi.open = {}; ((v && v.o) || []).forEach(k => { capUi.open[k] = true; }); });
+const CV_LAYERS = [['projects', 'Confirmed projects', 'oak'], ['sales', 'Sales opportunities (weighted)', 'slate'], ['leads', 'Leads (weighted)', 'green'], ['deliveries', 'Deliveries', '']];
+const capUi = { layers: { projects: true, sales: true, leads: true, deliveries: true }, anchor: '', view: 'week', month: '', open: {}, weeks: 20 };
+(function(){ try{ const o = JSON.parse(localStorage.getItem(CV_KEY) || 'null'); if(o && typeof o === 'object'){ CV_LAYERS.forEach(([k]) => { if(typeof (o.layers || {})[k] === 'boolean') capUi.layers[k] = o.layers[k]; }); if(o.view === 'month') capUi.view = 'month'; } }catch(e){} })();
+function capSave(){ try{ localStorage.setItem(CV_KEY, JSON.stringify({ layers: capUi.layers, view: capUi.view })); }catch(e){} }
+navExtra('cap', () => ({ s: capUi.anchor, o: Object.keys(capUi.open) }), v => { capUi.anchor = (v && v.s) || ''; capUi.open = {}; ((v && v.o) || []).forEach(k => { capUi.open[k] = true; }); });
 const capLayerName = { project: 'Project', sales: 'Sales', lead: 'Lead' };
 const capShortDay = iso => toDate(iso).toLocaleDateString('en-GB', { weekday: 'short' });
+const CV_PEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const CV_CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
+const capSiteOf = r => { const s = String((r && r.siteName) || '').trim(); return s || String((r && r.address) || '').split('\n')[0].trim(); };
+const capSiteKey = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+const capR1 = n => Math.round(n * 10) / 10;
+/* the colour of a week: over is red, then green, amber, blue (scope to fill). Under and over never share one */
+function capStatus(total, cap){
+  const c = capCfg();
+  if(!(cap > 0)) return { k: total > 0.05 ? 'red' : 'none', label: total > 0.05 ? 'No capacity' : 'Off', pct: 0 };
+  const pct = total / cap * 100;
+  if(total > cap + 0.05) return { k: 'red', label: 'Over by ' + capH(total - cap), pct };
+  if(pct >= c.green) return { k: 'green', label: 'On capacity', pct };
+  if(pct >= c.amber) return { k: 'amber', label: 'Slightly under', pct };
+  return { k: 'blue', label: 'Scope to fill, ' + capH(cap - total) + ' free', pct };
+}
+/* what is booked on one day, and how it should be flagged */
+function capDayInfoFor(items){
+  const cache = {};
+  return iso => cache[iso] || (cache[iso] = (() => {
+    const parts = items.map(it => ({ it, h: it.days[iso] || 0 })).filter(x => x.h > 0.05).sort((a, b) => b.h - a.h), h = parts.reduce((a, x) => a + x.h, 0), cap = capDay(iso), c = capCfg();
+    const sites = new Set(parts.filter(x => x.it.kind === 'project').map(x => capSiteKey(capSiteOf(x.it.r))).filter(Boolean)), diff = sites.size > 1;
+    const sig = parts.map(x => x.it.kind + x.it.id + ':' + capR1(x.h)).sort().join('|'), accepted = !!sig && state.acceptedDays.includes(sig);
+    const over = h > cap + 0.05, flagged = over || diff;
+    const level = !flagged || accepted ? '' : (h > c.max || diff) ? 'err' : (cap > 0 && h >= cap * c.red - 0.001) ? 'red' : 'amber';
+    const reason = over ? (cap > 0 ? `${capR1(h)} h booked on a ${capR1(cap)} h day (+${capR1(h - cap)} h)` : `${capR1(h)} h booked on a day that is not a working day`) : '';
+    return { iso, parts, h, cap, diff, sig, accepted, over, flagged, level, reason };
+  })());
+}
+/* the colours and the layout live in the stylesheet; this is the markup */
+function cvChipHtml(d, info, ctx){
+  const mk = dayMark(d), off = !wdIsWork(d), n = toDate(d).getDate(), de = (ctx.ev.del[d] || []).length, h = info.h;
+  const cls = ['cv-d', off ? 'off' : '', mk ? 'mk' : '', info.level ? 'lv-' + info.level : '', info.flagged && info.accepted ? 'acc' : '', d === ctx.real ? 'today' : ''].filter(Boolean).join(' ');
+  const tip = `${capShortDay(d)} ${pwD(d)}${mk ? ' · ' + mk.type.name + (mk.title !== mk.type.name ? ': ' + mk.title : '') : off ? ' · weekend' : ''} · ${capH(h)} of ${capH(info.cap)}${info.reason ? ' · ' + info.reason : ''}${info.diff ? ' · different sites' : ''}${de ? ' · ' + de + ' deliver' + (de === 1 ? 'y' : 'ies') : ''}. Click to set this day`;
+  return `<button type="button" class="${cls}" data-cv="day" data-d="${d}" title="${escAttr(tip)}" aria-label="${escAttr(tip)}"><span class="cv-dn">${capShortDay(d).slice(0, 2)} ${n}</span><span class="cv-dh">${h > 0.05 ? capR1(h) : ''}</span><span class="cv-de">${mk && mk.type.tag ? `<i class="cv-tag">${escHtml(mk.type.tag)}</i>` : ''}${de ? `<i class="cv-ic del">${DROP_SVG}</i>` : ''}${info.level === 'err' ? '<i class="cv-ic x">!</i>' : ''}</span></button>`;
+}
+function cvStatusPill(st){ return st.k === 'none' ? '' : `<span class="cv-st st-${st.k}">${escHtml(st.label)}</span>`; }
+function cvItemStatus(it){ return it.kind === 'project' ? (it.tentative ? '<span class="cv-pill tent">Tentative</span>' : '<span class="cv-pill ok">Confirmed</span>') : `<span class="cv-pill">${escHtml(capLayerName[it.kind])} ${Math.round(it.weight * 100)}%</span>`; }
+/* the open week: a row per record with a bar over the 7 days, then the day checks */
+function cvOpenHtml(r, ctx){
+  const days = [0, 1, 2, 3, 4, 5, 6].map(i => addDaysIso(r.mon, i));
+  const head = `<div class="cv-pr cv-prh"><span class="cv-pi q-help">Set a day from its heading</span><div class="cv-pg">${days.map(d => { const mk = dayMark(d), off = !wdIsWork(d); return `<button type="button" class="cv-dhd${off ? ' off' : ''}${mk ? ' mk' : ''}${d === ctx.real ? ' today' : ''}" data-cv="day" data-d="${d}" title="${escAttr(capShortDay(d) + ' ' + pwD(d) + (mk ? ' · ' + mk.type.name : '') + '. Click to set this day')}">${capShortDay(d).slice(0, 3)} ${toDate(d).getDate()}${mk && mk.type.tag ? `<i class="cv-tag">${escHtml(mk.type.tag)}</i>` : ''}</button>`; }).join('')}</div><span class="cv-pt q-help">Total</span><span></span></div>`;
+  const ghostOnly = ctx.items.filter(it => it.ghost && !r.parts.some(q => q.item === it) && days.some(d => (it.ghost[d] || 0) > 0.05)).map(it => ({ item: it, hours: 0 }));
+  const rows = r.parts.concat(ghostOnly).sort((a, b) => b.hours - a.hours).map(q => { const it = q.item, site = capSiteOf(it.r), hrs = days.map(d => it.days[d] || 0), first = hrs.findIndex(x => x > 0.05), last = hrs.length - 1 - hrs.slice().reverse().findIndex(x => x > 0.05);
+    const pb = it.kind === 'project' ? chBounds(it.days) : null, hasL = pb && first >= 0 && days[first] === pb.start, hasR = pb && first >= 0 && days[last] === pb.end;
+    const ghost = it.ghost ? (() => { const gh = days.map(d => it.ghost[d] || 0), ga = gh.findIndex(x => x > 0.05), gz = gh.length - 1 - gh.slice().reverse().findIndex(x => x > 0.05); return ga < 0 ? '' : `<div class="cv-pbar ghost" style="grid-column:${ga + 1} / ${gz + 2};grid-row:1" aria-hidden="true" title="Original dates">${gh.slice(ga, gz + 1).map(x => `<span class="cv-pc">${x > 0.05 ? capR1(x) : ''}</span>`).join('')}</div>`; })() : '';
+    const bar = ghost + (first < 0 ? '' : `<div class="cv-pbar ${it.kind}${it.tentative || it.ghost ? ' tent' : ''}${it.kind === 'project' ? ' drag' : ''}" style="grid-column:${first + 1} / ${last + 2};grid-row:1" data-pid="${escAttr(it.id)}" data-kind="${it.kind}"${it.kind === 'project' ? ` title="Click to edit, drag to move, drag an end to change it"` : ''}>${hasL ? '<i class="cv-hdl l" data-edge="start"></i>' : ''}${hrs.slice(first, last + 1).map((x, i) => `<span class="cv-pc${x > 0.05 ? '' : ' gap'}">${x > 0.05 ? capR1(x) : ''}</span>`).join('')}${hasR ? '<i class="cv-hdl r" data-edge="end"></i>' : ''}</div>`);
+    return `<div class="cv-pr"><div class="cv-pi">${ltChip(`deal2:${it.id}`, it.name)}<span class="cv-pm"><span class="qb-dim">${escHtml(it.code)}</span>${site ? `<span class="cv-site" title="Site">${escHtml(site)}</span>` : (it.kind === 'project' ? '<span class="cv-site none" title="Fill in the Site on the project to check for clashes">Site not set</span>' : '')}${cvItemStatus(it)}</span></div>
+      <div class="cv-pg">${bar}</div><b class="cv-pt">${capH(q.hours)}</b><button type="button" class="icon-btn cv-pe" data-cv="edit" data-kind="${it.kind}" data-id="${escAttr(it.id)}" title="Edit ${escAttr(it.name)}" aria-label="Edit ${escAttr(it.name)}">${CV_PEN}</button></div>`; }).join('') || '<div class="qb-dim cv-none">Nothing is planned in this week.</div>';
+  const flagged = days.map(ctx.info).filter(x => x.flagged);
+  const cards = flagged.map(x => `<div class="cv-chk${x.accepted ? ' acc' : ' ' + (x.level || 'amber')}"><div class="cv-chk-h"><b>${escHtml(capShortDay(x.iso))} ${escHtml(pwD(x.iso))}</b>${x.accepted ? '<span class="cv-rs ok">Accepted</span>' : ''}${x.over ? `<span class="cv-rs${x.accepted ? ' ok' : ' bad'}">${escHtml(x.reason)}</span>` : ''}${x.diff ? `<span class="cv-rs${x.accepted ? ' ok' : ' bad'}">Different sites: confirm both can be attended</span>` : ''}</div>
+      <div class="cv-chk-p">${x.parts.map(p => `<span class="cv-chip2">${escHtml(p.it.name)} <b>${capR1(p.h)} h</b></span>`).join('')}</div>
+      <div class="cv-chk-a"><button type="button" class="btn ${x.accepted ? 'secondary' : 'primary'} qb-sm" data-cv="${x.accepted ? 'unaccept' : 'accept'}" data-d="${x.iso}">${x.accepted ? 'Undo accept' : 'Accept'}</button><button type="button" class="btn secondary qb-sm" data-cv="day" data-d="${x.iso}">Set this day</button></div></div>`).join('');
+  return `<div class="cv-open">${head}${rows}${cards ? `<div class="cv-chks"><div class="cv-chks-t">Day checks</div>${cards}</div>` : ''}</div>`;
+}
+function cvLegend(){ return `<div class="cv-leg" aria-label="Legend"><span><i class="cv-lg st-red"></i>Over capacity</span><span><i class="cv-lg st-green"></i>On capacity</span><span><i class="cv-lg st-amber"></i>Slightly under</span><span><i class="cv-lg st-blue"></i>Scope to fill</span><span><i class="cv-lg day-amber"></i>Day above its hours</span><span><i class="cv-lg day-red"></i>Day at the red level</span><span><i class="cv-lg day-err"></i>Error: over the day limit, or different sites</span><span><i class="cv-lg hatch"></i>Not a working day</span><span><i class="cv-lg tentb"></i>Tentative</span></div>`; }
+function cvContext(){
+  const L = capUi.layers, real = fmt(new Date()), items = capItems({ projects: L.projects, sales: L.sales, leads: L.leads });
+  return { L, real, items, info: capDayInfoFor(items) };
+}
+function cvWeekLine(r, ctx, open){
+  const st = capStatus(r.total, r.cap), cur = r.mon === capWeekStart(ctx.real), days = [0, 1, 2, 3, 4, 5, 6].map(i => addDaysIso(r.mon, i)), infos = days.map(ctx.info), nflag = infos.filter(x => x.flagged && !x.accepted).length;
+  const scale = Math.max(r.cap * 1.25, r.total, 1), fill = Math.min(100, r.total / scale * 100), capAt = Math.min(100, r.cap / scale * 100);
+  const tent = r.parts.filter(q => q.item.tentative).reduce((a, q) => a + q.hours, 0);
+  return `<div class="cv-wk st-${st.k}${open ? ' open' : ''}${cur ? ' cur' : ''}" data-mon="${r.mon}"><div class="cv-wh" data-cv="open" data-mon="${r.mon}">
+      <button type="button" class="cv-arr" data-cv="open" data-mon="${r.mon}" aria-expanded="${open}" aria-label="${open ? 'Close' : 'Open'} the week of ${escAttr(pwD(r.mon))}">${CV_CHEV}</button>
+      <span class="cv-wl"><b>${escHtml(pwD(r.mon))}</b><span>Week ${weekNoOf(r.mon)}${cur ? ' · this week' : ''}</span></span>
+      <div class="cv-bar" title="${escAttr(capH(r.total) + ' planned of ' + capH(r.cap) + ' available')}"><div class="cv-track"><i class="cv-fill st-${st.k}" style="width:${fill}%"></i><i class="cv-cap" style="left:${capAt}%"></i></div></div>
+      <span class="cv-num">${capR1(r.total)} / ${capR1(r.cap)} h · ${Math.round(st.pct)}%${tent > 0.05 ? ` <span class="cv-pill tent" title="Tentative project hours, counted in full">${capH(tent)} tentative</span>` : ''}</span>
+      <span class="cv-stw">${cvStatusPill(st)}${nflag ? `<span class="cv-fl" title="${nflag} day${nflag === 1 ? '' : 's'} to check">${nflag} to check</span>` : ''}</span>
+      <div class="cv-days">${days.map((d, i) => cvChipHtml(d, infos[i], ctx)).join('')}</div></div>
+    ${open ? cvOpenHtml(r, ctx) : ''}</div>`;
+}
+function cvWeekView(ctx){
+  const real = ctx.real, thisWk = capWeekStart(real), start = capUi.anchor ? capWeekStart(capUi.anchor) : addDaysIso(thisWk, -7), end = addDaysIso(start, 7 * capUi.weeks - 1);
+  const rows = capWeekRows(ctx.items, start, end);
+  return rows.map(r => cvWeekLine(r, ctx, !!capUi.open[r.mon])).join('');
+}
+function cvMonthView(ctx){
+  const real = ctx.real, base = capUi.month || real.slice(0, 7), first = base + '-01';
+  const nm = (() => { const d = toDate(first); d.setMonth(d.getMonth() + 1); return fmt(d); })(), last = addDaysIso(nm, -1), rows = capWeekRows(ctx.items, capWeekStart(first), last).filter(r => r.mon <= last);
+  const ws = Number(state.settings.weekStart) === 1 ? 1 : 0, hd = [0, 1, 2, 3, 4, 5, 6].map(i => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][(ws + i) % 7]);
+  const body = rows.map(r => {
+    const st = capStatus(r.total, r.cap), days = [0, 1, 2, 3, 4, 5, 6].map(i => addDaysIso(r.mon, i)), open = !!capUi.open[r.mon], scale = Math.max(r.cap * 1.25, r.total, 1);
+    const cells = days.map(d => { const info = ctx.info(d), mk = dayMark(d), off = !wdIsWork(d), inM = d.slice(0, 7) === base, de = (ctx.ev.del[d] || []).length;
+      return `<button type="button" class="cv-mc${off ? ' off' : ''}${mk ? ' mk' : ''}${inM ? '' : ' out'}${info.level ? ' lv-' + info.level : ''}${info.flagged && info.accepted ? ' acc' : ''}${d === real ? ' today' : ''}" data-cv="day" data-d="${d}" title="${escAttr(capShortDay(d) + ' ' + pwD(d) + (mk ? ' · ' + mk.type.name + (mk.title !== mk.type.name ? ': ' + mk.title : '') : '') + ' · ' + capH(info.h) + ' of ' + capH(info.cap) + '. Click to set this day')}"><span class="cv-mn">${toDate(d).getDate()}</span>${mk && mk.type.tag ? `<i class="cv-tag">${escHtml(mk.type.tag)}</i>` : ''}${info.h > 0.05 ? `<span class="cv-mh">${capR1(info.h)}</span>` : ''}${de ? `<i class="cv-ic del">${DROP_SVG}</i>` : ''}</button>`; }).join('');
+    const bars = r.parts.slice().sort((a, b) => b.hours - a.hours).slice(0, 4).map(q => { const hrs = days.map(d => q.item.days[d] || 0), a = hrs.findIndex(x => x > 0.05), z = hrs.length - 1 - hrs.slice().reverse().findIndex(x => x > 0.05); return a < 0 ? '' : `<div class="cv-mb ${q.item.kind}${q.item.tentative ? ' tent' : ''}" style="grid-column:${a + 1} / ${z + 2}" title="${escAttr(q.item.name + ' · ' + capH(q.hours))}">${escHtml(q.item.name)}</div>`; }).join('');
+    const more = r.parts.length > 4 ? `<div class="cv-mmore">+${r.parts.length - 4} more</div>` : '';
+    return `<div class="cv-mw st-${st.k}${open ? ' open' : ''}" data-mon="${r.mon}"><div class="cv-mrow" data-cv="open" data-mon="${r.mon}"><button type="button" class="cv-mg" data-cv="open" data-mon="${r.mon}" aria-expanded="${open}" title="Open the week of ${escAttr(pwD(r.mon))}"><b>Wk ${weekNoOf(r.mon)}</b><span>${capR1(r.total)} / ${capR1(r.cap)} h</span><i class="cv-gb"><i class="cv-fill st-${st.k}" style="height:${Math.min(100, r.total / scale * 100)}%"></i></i></button>
+      <div class="cv-mcol"><div class="cv-mcells">${cells}</div><div class="cv-mbars">${bars}${more}</div></div></div>${open ? cvOpenHtml(r, ctx) : ''}</div>`; }).join('');
+  return `<div class="cv-mhead"><span></span>${hd.map(x => `<span>${x}</span>`).join('')}</div>${body}`;
+}
+function renderCapacity(){
+  const panel = document.getElementById('panel-capacity'); if(!panel || !state) return;
+  const ctx = cvContext(), L = ctx.L, real = ctx.real, thisWk = capWeekStart(real);
+  const start = capUi.anchor ? capWeekStart(capUi.anchor) : addDaysIso(thisWk, -7), end = addDaysIso(start, 7 * capUi.weeks - 1);
+  ctx.ev = { del: {}, tasks: {} };
+  if(L.deliveries){ const from = capUi.view === 'month' ? addDaysIso(capWeekStart((capUi.month || real.slice(0, 7)) + '-01'), 0) : start, to = capUi.view === 'month' ? addDaysIso(from, 45) : end; ctx.ev = capDayEvents(from, to); }
+  const base = capUi.month || real.slice(0, 7), mlabel = toDate(base + '-01').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  document.getElementById('cvControls').innerHTML = `<div class="cv-bar2"><div class="cv-seg" role="group" aria-label="View"><button type="button" class="${capUi.view === 'week' ? 'on' : ''}" data-cv="view" data-v="week" aria-pressed="${capUi.view === 'week'}">Week</button><button type="button" class="${capUi.view === 'month' ? 'on' : ''}" data-cv="view" data-v="month" aria-pressed="${capUi.view === 'month'}">Month</button></div>
+    ${capUi.view === 'week' ? `<div class="cv-nav"><button type="button" class="btn secondary qb-sm" data-cv="prev" aria-label="Four weeks earlier">‹ 4 weeks</button><button type="button" class="btn secondary qb-sm" data-cv="this">This week</button><button type="button" class="btn secondary qb-sm" data-cv="next" aria-label="Four weeks later">4 weeks ›</button></div>`
+      : `<div class="cv-nav"><button type="button" class="btn secondary qb-sm" data-cv="mprev" aria-label="Previous month">‹</button><b class="cv-ml">${escHtml(mlabel)}</b><button type="button" class="btn secondary qb-sm" data-cv="mnext" aria-label="Next month">›</button><button type="button" class="btn secondary qb-sm" data-cv="mthis">This month</button></div>`}
+    <div class="cv-layers" role="group" aria-label="Layers">${CV_LAYERS.map(([k, name, c]) => `<button type="button" class="cv-chip${L[k] ? ' on' : ''}" data-cv="layer" data-k="${k}" aria-pressed="${!!L[k]}"><i class="cv-sw ${c || k}"></i>${escHtml(name)}</button>`).join('')}</div></div>`;
+  const unp = capItems({ projects: true, sales: true, leads: true }).filter(it => it.unplaced.hours > 0 || (it.kind !== 'project' && !it.spans.length && sfDays(it.r) > 0));
+  document.getElementById('cvSum').innerHTML = hpd() > 0 && capFull() > 0 ? '' : '<div class="rp-warn" role="status"><b>No capacity is set.</b> Set the hours per working day in Settings, Planning and capacity.</div>';
+  document.getElementById('cvBody').innerHTML = cvLegend() + `<div class="cv-weeks">${capUi.view === 'week' ? cvWeekView(ctx) : cvMonthView(ctx)}</div>`
+    + (unp.length ? `<div class="cv-unp"><h4>Not placed on the calendar</h4><p class="q-help u-margin-0-0-6px" >These have hours or a duration but nothing to place them by: give them a preferred start, a deadline or phase dates.</p>${unp.map(it => `<div class="cv-c"><span class="cv-ck ${it.kind}"></span>${ltChip(`deal2:${it.id}`, it.name)}<span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span><span class="cv-cw">${escHtml(it.unplaced.what || 'no preferred start or deadline')}</span><b>${capH(it.unplaced.hours || sfDays(it.r) * hpd())}</b></div>`).join('')}</div>` : '');
+}
 function capDayEvents(from, to){
   const del = {}, tasks = {};
   if(capUi.layers.deliveries) liveProjects().forEach(p => projDeliveries(p).drops.forEach(x => { if(x.date && x.date >= from && x.date <= to && !x.delivered) (del[x.date] = del[x.date] || []).push({ p, x }); }));
-  if(capUi.layers.tasks && canSeeBusiness()) state.crmTasks.filter(t => t.status === 'open' && t.scope === 'business' && t.dueDate && t.dueDate >= from && t.dueDate <= to && taskVisible(t)).forEach(t => (tasks[t.dueDate] = tasks[t.dueDate] || []).push(t));
   return { del, tasks };
 }
-/* the hours a record puts on a week, for the list under it */
-function capWhy(it){
-  if(it.kind === 'project') return it.tentative ? 'tentative, full hours' : 'confirmed';
-  return Math.round(it.weight * 100) + '% ' + (it.kind === 'sales' ? 'probability' : 'lead weighting');
+/* ---------- SET A DAY: a centred pop-up ---------- */
+let cvDlgFrom = '';
+function cvCloseDay(){ const bg = document.getElementById('cvDlgBg'); if(bg) bg.remove(); document.removeEventListener('keydown', cvDlgKey, true); }
+function cvDlgKey(e){
+  const bg = document.getElementById('cvDlgBg'); if(!bg) return;
+  if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); cvCloseDay(); cvRefocus(); return; }
+  if(e.key === 'Tab'){ const f = [...bg.querySelectorAll('input,select,button:not([disabled])')].filter(x => x.offsetParent !== null); if(!f.length) return; const i = f.indexOf(document.activeElement);
+    if(e.shiftKey && (i <= 0)){ e.preventDefault(); f[f.length - 1].focus(); } else if(!e.shiftKey && (i === f.length - 1 || i < 0)){ e.preventDefault(); f[0].focus(); } }
 }
-function capOverNames(row){ return row.parts.slice().sort((a, b) => b.hours - a.hours).map(q => q.item); }
-function renderCapacity(){
-  const panel = document.getElementById('panel-capacity'); if(!panel || !state) return;
-  const real = fmt(new Date()), start = capUi.start ? capWeekStart(capUi.start) : capWeekStart(real), n = capUi.weeks, end = addDaysIso(start, 7 * n - 1), L = capUi.layers;
-  const items = capItems({ projects: L.projects, sales: L.sales, leads: L.leads }), rows = capWeekRows(items, start, end), full = capFull(), noCap = full <= 0;
-  const ev = capDayEvents(start, end), scale = Math.max(8, ...rows.map(r => Math.max(r.cap, r.total))) * 1.1, over = r => !noCap && r.total > r.cap + 0.05;
-  const overRows = rows.filter(over), peak = rows.slice().sort((a, b) => (b.total - b.cap) - (a.total - a.cap))[0];
-  const unp = capItems({ projects: true, sales: true, leads: true }).filter(it => it.unplaced.hours > 0 || (it.kind !== 'project' && !it.spans.length && sfDays(it.r) > 0));
-  const unpHours = unp.reduce((a, it) => a + it.unplaced.hours, 0);
-  const tile = (k, v, sub, cls) => `<div class="db-mini${cls ? ' ' + cls : ''}"><span class="k">${k}</span><b>${v}</b>${sub ? `<span class="s">${sub}</span>` : ''}</div>`;
-  document.getElementById('cvSum').innerHTML = (noCap ? `<div class="rp-warn" role="status"><b>No capacity is set.</b> Fill in the weekly hours for at least one person in Settings, Planning and capacity, or every week would look over capacity.</div>` : '')
-    + `<div class="db-minis">${tile('Team capacity', capH(full) + ' a week', capPeople().map(x => escHtml(x.name)).join(', ') || 'nobody yet')}${tile('Weeks over capacity', String(overRows.length), overRows.length ? 'first: week of ' + escHtml(pwD(overRows[0].mon)) : 'in the next ' + n + ' weeks', overRows.length ? 'bad' : '')}${tile('Busiest week', peak && peak.total > 0 ? Math.round(peak.total) + ' / ' + Math.round(peak.cap) + ' h' : '—', peak && peak.total > 0 ? 'week of ' + escHtml(pwD(peak.mon)) : '')}${tile('Not placed yet', capH(unpHours), unp.length ? unp.length + ' record' + (unp.length === 1 ? '' : 's') + ' without dates' : 'everything has dates')}</div>`;
-  document.getElementById('cvControls').innerHTML = `<div class="cv-layers" role="group" aria-label="Layers">${CV_LAYERS.map(([k, name, c]) => `<button type="button" class="cv-chip${L[k] ? ' on' : ''}" data-cv="layer" data-k="${k}" aria-pressed="${!!L[k]}">${c ? `<i class="cv-sw ${c}"></i>` : `<i class="cv-sw ${k}"></i>`}${escHtml(name)}</button>`).join('')}</div>
-    <div class="cv-nav"><button type="button" class="btn secondary qb-sm" data-cv="prev" aria-label="Four weeks earlier">← 4 weeks</button><button type="button" class="btn secondary qb-sm" data-cv="this">This week</button><button type="button" class="btn secondary qb-sm" data-cv="next" aria-label="Four weeks later">4 weeks →</button>
-      <label class="cv-go">Go to <input type="date" data-cv="goto" value="${escAttr(start)}" aria-label="Show the week containing"></label>
-      <label class="cv-go">Show <select data-cv="weeks" aria-label="Number of weeks">${[8, 12, 26].map(x => `<option value="${x}"${x === n ? ' selected' : ''}>${x} weeks</option>`).join('')}</select></label></div>`;
-  const dayCell = (d, r) => { let h = 0; items.forEach(it => { h += it.days[d] || 0; }); const off = !wdIsWork(d), dayCap = capDay(d), de = (ev.del[d] || []).length, te = (ev.tasks[d] || []).length, dn = toDate(d).getDate(), hot = !noCap && dayCap > 0 && h > dayCap + 0.05, name = holidayName(d);
-    const tip = `${capShortDay(d)} ${pwD(d)}${name ? ' · ' + name : off ? ' · weekend' : ''} · ${capH(h)} of ${capH(dayCap)}${de ? ' · ' + de + ' deliver' + (de === 1 ? 'y' : 'ies') : ''}${te ? ' · ' + te + ' task' + (te === 1 ? '' : 's') : ''}. Open this day on Today`;
-    return `<button type="button" class="cv-d${off ? ' off' : ''}${name ? ' hol' : ''}${hot ? ' hot' : ''}${d === real ? ' today' : ''}" data-cv="day" data-d="${d}" title="${escAttr(tip)}" aria-label="${escAttr(tip)}"><span class="cv-dn">${capShortDay(d).slice(0, 2)} ${dn}</span><span class="cv-dh">${h > 0.05 ? Math.round(h * 10) / 10 : ''}</span><span class="cv-de">${de ? `<i class="cv-ic del">${DROP_SVG}</i>` : ''}${te ? `<i class="cv-ic tsk">${te}</i>` : ''}</span></button>`; };
-  const seg = (h, cls) => h > 0.001 ? `<i class="cv-seg ${cls}" style="width:${h / scale * 100}%"></i>` : '';
-  const body = rows.map(r => {
-    const parts = { project: 0, sales: 0, lead: 0 }, tent = r.parts.filter(q => q.item.tentative).reduce((a, q) => a + q.hours, 0); r.parts.forEach(q => { parts[q.item.kind] += q.hours; }); parts.project -= tent;
-    const isOver = over(r), open = isOver || capUi.open[r.mon], days = [0, 1, 2, 3, 4, 5, 6].map(i => addDaysIso(r.mon, i)), dels = days.reduce((a, d) => a + (ev.del[d] || []).length, 0), tks = days.reduce((a, d) => a + (ev.tasks[d] || []).length, 0), cur = r.mon === capWeekStart(real);
-    const list = r.parts.length ? capOverNames(r).map(it => { const h = r.parts.find(q => q.item === it).hours; return `<div class="cv-c"><span class="cv-ck ${it.kind}"></span>${ltChip(`deal2:${it.id}`, it.name)}<span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span>${it.tentative ? '<span class="sf-chip warn">Tentative</span>' : ''}<span class="cv-cw">${escHtml(capWhy(it))}</span><b>${capH(h)}</b></div>`; }).join('') : '<div class="qb-dim">Nothing is planned in this week.</div>';
-    const dl = days.flatMap(d => (ev.del[d] || []).map(x => `<div class="cv-c"><span class="cv-ck del"></span><span>Delivery · ${escHtml(x.x.supplier)}</span>${ltChip(`deal2:${x.p.id}`, boardTitle('project', x.p))}<span class="cv-cw">${escHtml(pwD(d))}</span></div>`)).join('');
-    return `<div class="cv-wk${isOver ? ' over' : ''}${cur ? ' cur' : ''}"><div class="cv-wh"><button type="button" class="cv-wl" data-cv="day" data-d="${r.mon}" title="Open Monday ${escAttr(pwD(r.mon))} on Today"><b>${escHtml(pwD(r.mon))}</b><span>${r.cap < full - 0.01 ? 'reduced week' : 'week'}</span></button>
-        <div class="cv-bar" title="${escAttr(capH(r.total) + ' planned of ' + capH(r.cap) + ' available')}"><div class="cv-track">${seg(parts.project, 'project')}${seg(tent, 'project tent')}${seg(parts.sales, 'sales')}${seg(parts.lead, 'lead')}<i class="cv-cap" style="left:${r.cap / scale * 100}%"></i></div><span class="cv-num${isOver ? ' bad' : ''}">${Math.round(r.total * 10) / 10} / ${Math.round(r.cap * 10) / 10} h${isOver ? ' · over by ' + (Math.round((r.total - r.cap) * 10) / 10) : ''}${tent > 0.05 ? ` <span class="sf-chip warn" title="Tentative project hours, counted in full">${capH(tent)} tentative</span>` : ''}</span></div>
-        <div class="cv-days">${days.map(d => dayCell(d, r)).join('')}</div></div>
-      ${(r.parts.length || dels) ? `<div class="cv-more"><button type="button" class="link-btn" data-cv="open" data-mon="${r.mon}" aria-expanded="${!!open}">${open ? 'Hide' : 'Show'} what makes up this week (${r.parts.length}${dels ? ' · ' + dels + ' deliver' + (dels === 1 ? 'y' : 'ies') : ''}${tks ? ' · ' + tks + ' task' + (tks === 1 ? '' : 's') : ''})</button>${open ? `<div class="cv-list">${list}${dl}</div>` : ''}</div>` : ''}</div>`;
-  }).join('');
-  document.getElementById('cvBody').innerHTML = `<div class="cv-leg"><span><i class="cv-sw oak"></i>Projects</span><span><i class="cv-sw slate"></i>Sales (weighted)</span><span><i class="cv-sw green"></i>Leads (weighted)</span><span><i class="cv-sw oak tent"></i>Tentative project</span><span><i class="cv-capsw"></i>Capacity that week</span><span><i class="cv-sw bad"></i>Over capacity</span></div>${body}
-    ${unp.length ? `<div class="cv-unp"><h4>Not placed on the calendar</h4><p class="q-help u-margin-0-0-6px" >These have hours or a duration but nothing to place them by: give them a preferred start, a deadline or phase dates.</p>${unp.map(it => `<div class="cv-c"><span class="cv-ck ${it.kind}"></span>${ltChip(`deal2:${it.id}`, it.name)}<span class="qb-dim">${escHtml(capLayerName[it.kind])} ${escHtml(it.code)}</span><span class="cv-cw">${escHtml(it.unplaced.what || 'no preferred start or deadline')}</span><b>${capH(it.unplaced.hours || sfDays(it.r) * hpd())}</b></div>`).join('')}</div>` : ''}`;
+function cvRefocus(){ if(!cvDlgFrom) return; const el = document.querySelector(`#panel-capacity [data-cv="day"][data-d="${cvDlgFrom}"]`); if(el) el.focus(); }
+function cvBookedOn(iso){ return capItems({ projects: true, sales: true, leads: true }).map(it => ({ it, h: it.days[iso] || 0 })).filter(x => x.h > 0.05).sort((a, b) => b.h - a.h); }
+function cvOpenDay(iso){
+  cvCloseDay(); cvDlgFrom = iso;
+  const mk = dayMark(iso), mrec = state.markedDays.find(m => m.date === iso), weekend = !workingWeek().includes(toDate(iso).getDay()), booked = cvBookedOn(iso);
+  const status = mrec ? `${dayTypeOf(mrec.typeId).name}${mrec.title && mrec.title !== dayTypeOf(mrec.typeId).name ? ': ' + mrec.title : ''}` : weekend ? 'Weekend' : 'Normal working day';
+  const bg = document.createElement('div'); bg.id = 'cvDlgBg'; bg.className = 'cv-modal-bg';
+  bg.innerHTML = `<div class="cv-modal" role="dialog" aria-modal="true" aria-labelledby="cvDlgH"><h3 id="cvDlgH">${escHtml(capShortDay(iso))} ${escHtml(pwD(iso))}</h3><div class="cv-modal-st">${escHtml(status)}</div>
+    <div class="cv-modal-f"><label><span>Title</span><input type="text" id="cvDlgTitle" value="${escAttr(mrec ? mrec.title : '')}" placeholder="Defaults to the type" autocomplete="off"></label>
+    <label><span>Type of day</span><select id="cvDlgType">${state.dayTypes.map(t => `<option value="${escAttr(t.id)}" data-off="${t.off ? 1 : 0}"${(mrec ? mrec.typeId : state.dayTypes[0].id) === t.id ? ' selected' : ''}>${escHtml(t.name)}${t.tag ? ' (' + escHtml(t.tag) + ')' : ''}</option>`).join('')}</select></label></div>
+    ${booked.length ? `<div class="cv-modal-w" id="cvDlgWarn" role="status"><b>Hours are booked on this day:</b> ${booked.map(x => `${escHtml(x.it.name)} ${capR1(x.h)} h`).join(', ')}. If the type takes the day off capacity, those hours are re-spread over the working days left in each phase, and the day checks show where that creates a clash.</div>` : ''}
+    <div class="cv-modal-a"><button type="button" class="btn primary" id="cvDlgSave">Save day</button><button type="button" class="btn secondary" id="cvDlgCancel">Cancel</button>${mrec ? '<button type="button" class="btn secondary cv-modal-back" id="cvDlgBack">Back to a working day</button>' : ''}</div></div>`;
+  document.body.appendChild(bg);
+  const t = bg.querySelector('#cvDlgTitle'), ty = bg.querySelector('#cvDlgType'), warn = bg.querySelector('#cvDlgWarn');
+  const sync = () => { if(warn) warn.hidden = !(ty.selectedOptions[0] && ty.selectedOptions[0].dataset.off === '1'); }; sync(); ty.addEventListener('change', sync);
+  const save = () => { const tp = state.dayTypes.find(x => x.id === ty.value); if(!tp) return; const title = t.value.trim() || tp.name; const m = state.markedDays.find(x => x.date === iso); if(m){ m.typeId = tp.id; m.title = title; } else state.markedDays.push({ id: selId('md_'), date: iso, typeId: tp.id, title }); state.markedDays.sort((a, b) => a.date.localeCompare(b.date)); saveState(); cvCloseDay(); render(); cvRefocus(); showToast(`${capShortDay(iso)} ${pwD(iso)} set to ${tp.name}`); };
+  bg.addEventListener('mousedown', (e) => { if(e.target === bg){ cvCloseDay(); cvRefocus(); } });
+  bg.querySelector('#cvDlgSave').addEventListener('click', save); bg.querySelector('#cvDlgCancel').addEventListener('click', () => { cvCloseDay(); cvRefocus(); });
+  t.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); save(); } });
+  const back = bg.querySelector('#cvDlgBack'); if(back) back.addEventListener('click', () => { const i = state.markedDays.findIndex(x => x.date === iso); if(i >= 0){ const gone = state.markedDays.splice(i, 1)[0]; undoDeleted('Day back to a working day: ' + pwD(iso), ['markedDays'], i, gone); } saveState(); cvCloseDay(); render(); cvRefocus(); });
+  document.addEventListener('keydown', cvDlgKey, true); t.focus(); t.select();
 }
-function capOpenDay(iso){
-  navGo(() => { todayUi.date = iso === fmt(new Date()) ? '' : iso; activateTab('today'); render(); window.scrollTo(0, 0); });
+function cvEditRecord(kind, id){
+  if(kind === 'project'){ chOpenSheet(id); return; }
+  const chip = document.querySelector(`#panel-capacity .lt[data-nav="deal2:${id}"], #panel-capacity [data-nav="deal2:${id}"]`); if(chip) chip.click();
 }
 document.addEventListener('click', (e) => {
-  const b = e.target.closest && e.target.closest('[data-cv]'); if(!b || !state || b.tagName === 'INPUT' || b.tagName === 'SELECT') return; const a = b.dataset.cv;
-  if(a === 'day') return capOpenDay(b.dataset.d);
-  if(a === 'go'){ navGo(() => { capUi.start = b.dataset.mon || ''; activateTab('capacity'); window.scrollTo(0, 0); }); return; }
+  if(!state) return; const dayEl = e.target.closest && e.target.closest('[data-cv="day"]'); if(dayEl){ cvOpenDay(dayEl.dataset.d); return; }
+  const b = e.target.closest && e.target.closest('[data-cv]'); if(!b || b.tagName === 'INPUT' || b.tagName === 'SELECT') return; const a = b.dataset.cv;
+  if(a === 'open' && e.target !== b && e.target.closest('button:not(.cv-arr):not(.cv-mg),a,.lt,[data-nav]')) return;
+  if(a === 'go'){ navGo(() => { const m = b.dataset.mon || ''; capUi.view = 'week'; capUi.anchor = m ? addDaysIso(capWeekStart(m), -7) : ''; if(m) capUi.open[capWeekStart(m)] = true; activateTab('capacity'); window.scrollTo(0, 0); }); return; }
+  if(a === 'edit') return cvEditRecord(b.dataset.kind, b.dataset.id);
   if(a === 'layer'){ capUi.layers[b.dataset.k] = !capUi.layers[b.dataset.k]; capSave(); }
-  else if(a === 'prev' || a === 'next'){ capUi.start = addDaysIso(capUi.start ? capWeekStart(capUi.start) : capWeekStart(fmt(new Date())), a === 'prev' ? -28 : 28); }
-  else if(a === 'this') capUi.start = '';
+  else if(a === 'view'){ capUi.view = b.dataset.v === 'month' ? 'month' : 'week'; capSave(); }
+  else if(a === 'prev' || a === 'next'){ capUi.anchor = addDaysIso(capUi.anchor ? capWeekStart(capUi.anchor) : addDaysIso(capWeekStart(fmt(new Date())), -7), a === 'prev' ? -28 : 28); }
+  else if(a === 'this'){ capUi.anchor = ''; capUi.open[capWeekStart(fmt(new Date()))] = true; }
+  else if(a === 'mprev' || a === 'mnext'){ const d = toDate((capUi.month || fmt(new Date()).slice(0, 7)) + '-01'); d.setMonth(d.getMonth() + (a === 'mprev' ? -1 : 1)); capUi.month = fmt(d).slice(0, 7); }
+  else if(a === 'mthis') capUi.month = '';
   else if(a === 'open'){ capUi.open[b.dataset.mon] = !capUi.open[b.dataset.mon]; }
+  else if(a === 'accept'){ const info = cvContext().info(b.dataset.d); if(info.sig && !state.acceptedDays.includes(info.sig)) state.acceptedDays.push(info.sig); saveState(); render(); return; }
+  else if(a === 'unaccept'){ const info = cvContext().info(b.dataset.d); state.acceptedDays = state.acceptedDays.filter(x => x !== info.sig); saveState(); render(); return; }
   else return;
   renderCapacity();
-});
-document.addEventListener('change', (e) => {
-  const el = e.target, a = el.dataset && el.dataset.cv; if(!a || !state) return;
-  if(a === 'goto'){ if(isoOk(el.value)) capUi.start = capWeekStart(el.value); }
-  else if(a === 'weeks'){ capUi.weeks = [8, 12, 26].includes(Number(el.value)) ? Number(el.value) : 8; capSave(); }
-  else return;
-  renderCapacity();
+  if(a === 'this'){ const el = document.querySelector('#cvBody .cv-wk.cur'); if(el) el.scrollIntoView({ block: 'nearest' }); }
 });
 
+/* ---------- CAPACITY REPORT (its own page): the next 8 weeks of hours against capacity ---------- */
+function renderCapReport(){
+  const el = document.getElementById('capRepBody'); if(!el || !state) return;
+  const real = fmt(new Date()), start = capWeekStart(real), n = 8, end = addDaysIso(start, 7 * n - 1), items = capItems({ projects: true, sales: true, leads: true });
+  const rows = capWeekRows(items, start, end).map(r => Object.assign(r, { st: capStatus(r.total, r.cap) })).slice(0, n);
+  const tot = rows.reduce((a, r) => a + r.total, 0), cap = rows.reduce((a, r) => a + r.cap, 0), over = rows.filter(r => r.st.k === 'red'), fill = rows.filter(r => r.st.k === 'blue'), spare = rows.reduce((a, r) => a + Math.max(0, r.cap - r.total), 0);
+  const busiest = rows.slice().sort((a, b) => (b.cap > 0 ? b.total / b.cap : 0) - (a.cap > 0 ? a.total / a.cap : 0))[0], c = capCfg();
+  const tile = (k, v, sub, cls) => `<div class="db-mini${cls ? ' ' + cls : ''}"><span class="k">${k}</span><b>${v}</b>${sub ? `<span class="s">${sub}</span>` : ''}</div>`;
+  const W = 800, H = 300, L = 46, B = 46, T = 14, plotW = W - L - 10, plotH = H - B - T, top = Math.max(1, ...rows.map(r => Math.max(r.cap, r.total))) * 1.15, y = h => T + plotH - h / top * plotH, bw = plotW / n;
+  const bands = rows.map((r, i) => { const x = L + i * bw + 2, w = bw - 4, a = r.cap * c.amber / 100, g = r.cap * c.green / 100, seg = (lo, hi, k) => hi > lo ? `<rect x="${x}" y="${y(hi)}" width="${w}" height="${y(lo) - y(hi)}" class="cr-b ${k}"/>` : '';
+    return seg(0, a, 'blue') + seg(a, g, 'amber') + seg(g, r.cap, 'green') + seg(r.cap, top, 'red'); }).join('');
+  const bars = rows.map((r, i) => { const x = L + i * bw + bw * 0.22, w = bw * 0.56; return r.total > 0 ? `<rect x="${x}" y="${y(r.total)}" width="${w}" height="${y(0) - y(r.total)}" class="cr-bar st-${r.st.k}"><title>${escHtml(pwD(r.mon))}: ${capH(r.total)} of ${capH(r.cap)} · ${escHtml(r.st.label)}</title></rect><text x="${x + w / 2}" y="${y(r.total) - 5}" text-anchor="middle" class="cr-v">${capR1(r.total)}</text>` : ''; }).join('');
+  const caps = rows.map((r, i) => `<line x1="${L + i * bw + 2}" x2="${L + i * bw + bw - 2}" y1="${y(r.cap)}" y2="${y(r.cap)}" class="cr-cap"/>`).join('');
+  const lbl = rows.map((r, i) => `<text x="${L + i * bw + bw / 2}" y="${H - 26}" text-anchor="middle" class="cr-x">${escHtml(toDate(r.mon).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }))}</text><text x="${L + i * bw + bw / 2}" y="${H - 11}" text-anchor="middle" class="cr-x s">Wk ${weekNoOf(r.mon)}</text>`).join('');
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map(f => { const v = top * f; return `<line x1="${L}" x2="${W - 10}" y1="${y(v)}" y2="${y(v)}" class="cr-g"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end" class="cr-x">${Math.round(v)}</text>`; }).join('');
+  el.innerHTML = `<div class="db-minis">${tile('Hours against capacity', `${capR1(tot)} / ${capR1(cap)} h`, cap > 0 ? Math.round(tot / cap * 100) + '% of capacity over 8 weeks' : 'no capacity set')}${tile('Weeks over capacity', String(over.length), over.length ? 'first: week of ' + escHtml(pwD(over[0].mon)) : 'none in the next 8 weeks', over.length ? 'bad' : '')}${tile('Weeks to fill', String(fill.length), fill.length ? 'below ' + c.amber + '% of capacity' : 'none', fill.length ? 'info' : '')}${tile('Spare hours', capH(spare), 'free across the 8 weeks')}${tile('Busiest week', busiest && busiest.total > 0 ? Math.round(busiest.cap > 0 ? busiest.total / busiest.cap * 100 : 0) + '%' : '—', busiest && busiest.total > 0 ? 'week of ' + escHtml(pwD(busiest.mon)) + ' · ' + capR1(busiest.total) + ' / ' + capR1(busiest.cap) + ' h' : '')}</div>
+    <div class="card cr-card"><div class="cr-wrap"><svg viewBox="0 0 ${W} ${H}" class="cr-svg" role="img" aria-label="Hours planned against capacity for the next 8 weeks. ${rows.map(r => 'Week of ' + escAttr(pwD(r.mon)) + ': ' + capR1(r.total) + ' of ' + capR1(r.cap) + ' hours, ' + escAttr(r.st.label)).join('. ')}.">${ticks}${bands}${caps}${bars}${lbl}<text x="12" y="${T + plotH / 2}" transform="rotate(-90 12 ${T + plotH / 2})" text-anchor="middle" class="cr-x">Hours</text></svg></div>
+    <div class="cv-leg"><span><i class="cv-lg st-blue"></i>Scope to fill (below ${c.amber}%)</span><span><i class="cv-lg st-amber"></i>Slightly under (${c.amber}% to ${c.green}%)</span><span><i class="cv-lg st-green"></i>On capacity (${c.green}% to 100%)</span><span><i class="cv-lg st-red"></i>Over capacity</span><span><i class="cr-capsw"></i>Capacity that week</span></div></div>
+    <div class="card cr-card"><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Week of</th><th>Planned</th><th>Capacity</th><th>%</th><th>Status</th></tr></thead><tbody>${rows.map(r => `<tr><td><button type="button" class="sp-link" data-cv="go" data-mon="${r.mon}">${escHtml(pwD(r.mon))}</button> <span class="qb-dim">Wk ${weekNoOf(r.mon)}</span></td><td class="qb-calc">${capH(r.total)}</td><td class="qb-calc">${capH(r.cap)}</td><td class="qb-calc">${Math.round(r.st.pct)}%</td><td>${cvStatusPill(r.st)}</td></tr>`).join('')}</tbody></table></div></div>
+    <p class="q-help">Capacity is ${hpd()} h a working day times the working days in each week (Settings, Planning and capacity). Sales and leads count at their weighting. <button type="button" class="sp-link" data-nav-tab="capacity">Open the Calendar →</button></p>`;
+}
+
+
+/* =====================================================================
+   STAGE 10, PART B: EDITING AND TENTATIVE CHANGES
+   A project's day-by-day hours are worked out from its phases (Step 5). A change made on the Calendar (drag the bar, drag an end, or the side sheet) is saved on
+   the project as p.chg = { status: 'tentative' | 'confirmed', orig: { start, end, days }, next: { start, end, days }, sel: { dateKey: bool }, applied: { dateKey: true }, since, by }.
+   While tentative the Calendar shows next.days (hatched) with orig.days ghosted. Confirming saves next.days as p.dayPlan (a day-by-day override that the
+   Calendar then uses for this project), shifts the dated phases by the same working days, and leaves the linked key dates for the review sheet.
+   If next equals orig the change is removed. Linked dates move by WORKING days (marked days and weekends skipped); dates that are done or in the past are kept.
+   ===================================================================== */
+const chRound = n => Math.round(n * 100) / 100;
+function chBounds(days){ const k = Object.keys(days).filter(d => days[d] > 0.05).sort(); return { start: k[0] || '', end: k[k.length - 1] || '' }; }
+function chSame(a, b){ const k = new Set(Object.keys(a).concat(Object.keys(b))); for(const x of k){ if(Math.abs((a[x] || 0) - (b[x] || 0)) > 0.05) return false; } return true; }
+function chCopy(d){ const o = {}; Object.keys(d).forEach(k => { if(d[k] > 0.0001) o[k] = chRound(d[k]); }); return o; }
+/* the days the Calendar uses for a project instead of the phase spread: a tentative change, else a confirmed day plan */
+function pjOverrideDays(p){
+  if(p.chg && p.chg.status === 'tentative' && p.chg.next) return p.chg.next.days;
+  if(p.dayPlan && Object.keys(p.dayPlan).length) return p.dayPlan;
+  return null;
+}
+const chBase = p => chCopy(capItem('project', p, true).days);                       // worked out from the phases, ignoring any override
+const chCurrent = p => p.dayPlan && Object.keys(p.dayPlan).length ? chCopy(p.dayPlan) : chBase(p);   // the confirmed days
+function chFill(days){ const h = Object.values(days).filter(x => x > 0.05).sort((a, b) => a - b); if(!h.length) return hpd(); const m = h.length % 2 ? h[(h.length - 1) / 2] : (h[h.length / 2 - 1] + h[h.length / 2]) / 2; return chRound(Math.min(m, hpd())); }
+/* move every day by n working days */
+function chMove(days, n){ if(!n) return chCopy(days); const o = {}; Object.keys(days).sort().forEach(d => { const t = shiftByWorkingDays(d, n); o[t] = (o[t] || 0) + days[d]; }); return chCopy(o); }
+/* move one end to a date: shorter drops days, longer adds one normal working day for each new working day (never a copy of a one-off big day) */
+function chResize(days, edge, target){
+  const b = chBounds(days); if(!b.start) return chCopy(days); const fill = chFill(days), o = {};
+  if(edge === 'end'){
+    let ne = snapToWorking(target, -1); if(ne < b.start) ne = snapToWorking(b.start, 1);
+    Object.keys(days).forEach(d => { if(d <= ne) o[d] = days[d]; });
+    for(let d = addDaysIso(b.end, 1), g = 0; d <= ne && g < 800; d = addDaysIso(d, 1), g++) if(wdIsWork(d) && !o[d]) o[d] = fill;
+  } else {
+    let ns = snapToWorking(target, 1); if(ns > b.end) ns = snapToWorking(b.end, -1);
+    Object.keys(days).forEach(d => { if(d >= ns) o[d] = days[d]; });
+    for(let d = ns, g = 0; d < b.start && g < 800; d = addDaysIso(d, 1), g++) if(wdIsWork(d) && !o[d]) o[d] = fill;
+  }
+  return chCopy(o);
+}
+/* from / until dates (the side sheet): a move of the whole thing when both ends shift the same working days, otherwise each end is resized */
+function chFromRange(days, from, until){
+  const b = chBounds(days); if(!b.start) return chCopy(days); const ns = snapToWorking(from || b.start, 1), ne = snapToWorking(until || b.end, -1);
+  const sS = workingDaysBetween(b.start, ns), eS = workingDaysBetween(b.end, ne);
+  if(sS === eS) return chMove(days, sS);
+  let o = chResize(days, 'start', ns); o = chResize(o, 'end', ne); return o;
+}
+const chSummaryOf = days => { const b = chBounds(days), n = Object.keys(days).filter(d => days[d] > 0.05).length, h = Object.values(days).reduce((a, x) => a + x, 0); return Object.assign(b, { n, h }); };
+function chSet(p, nextDays){
+  nextDays = chCopy(nextDays); const cur = p.chg && p.chg.orig ? p.chg.orig : (() => { const d = chCurrent(p), b = chBounds(d); return { start: b.start, end: b.end, days: d }; })();
+  if(chSame(nextDays, cur.days)){ if(p.chg && p.chg.status === 'tentative') p.chg = null; return null; }   // the same as the original: no change
+  const nb = chBounds(nextDays), prev = p.chg || {};
+  p.chg = { status: 'tentative', orig: cur, next: { start: nb.start, end: nb.end, days: nextDays }, sel: prev.sel || {}, applied: prev.applied || {}, since: prev.since || fmt(new Date()), by: whoName() };
+  return p.chg;
+}
+/* ---- linked dates ---- */
+function chLinkRows(p){
+  const c = p.chg; if(!c) return []; const today = fmt(new Date()), os = c.orig.start, oe = c.orig.end, ns = c.next.start, ne = c.next.end;
+  const sS = workingDaysBetween(os, ns), eS = workingDaysBetween(oe, ne);
+  return MILESTONE_ORDER.map(([key, label]) => {
+    const info = projMsInfo(p, key), date = info.planned; if(!date) return null;
+    const done = info.status === 'done', past = date < today, keep = done || past, shift = date <= os ? sS : eS, nd = shift ? shiftByWorkingDays(date, shift) : date, applied = !!(c.applied || {})[key];
+    const moves = !keep && shift !== 0 && nd !== date && !applied;
+    return { key, label, old: date, nu: nd, shift, keep, why: done ? 'Done' : past ? 'In the past' : '', moves, applied, checked: moves && ((c.sel || {})[key] !== false) };
+  }).filter(Boolean);
+}
+function chConflicts(p){
+  const items = capItems({ projects: true, sales: true, leads: true }), info = capDayInfoFor(items), c = p.chg, out = [];
+  const b = c ? chBounds(c.next.days) : chBounds(p.dayPlan || {}); if(!b.start) return out;
+  for(let d = b.start, g = 0; d <= b.end && g < 800; d = addDaysIso(d, 1), g++){ const x = info(d); if(x.flagged && !x.accepted && x.parts.some(q => String(q.it.id) === String(p.id) && q.it.kind === 'project')) out.push(x); }
+  return out;
+}
+const chPending = p => !!(p.chg && (p.chg.status === 'tentative' || chLinkRows(p).some(r => r.moves)));
+const chProjects = () => liveProjects().filter(p => p.chg);
+function chPhrase(p){
+  const c = p.chg, os = c.orig.start, oe = c.orig.end, ns = c.next.start, ne = c.next.end, sS = workingDaysBetween(os, ns), eS = workingDaysBetween(oe, ne), d = x => pwD(x);
+  if(os === ns && oe === ne) return 'Hours changed within the same dates';
+  if(sS === eS) return `Moved ${sS > 0 ? 'later' : 'earlier'}: ${d(os)} → ${d(ns)} (${sS > 0 ? '+' : ''}${sS} working day${Math.abs(sS) === 1 ? '' : 's'})`;
+  const a = []; if(os !== ns) a.push(`start ${d(os)} → ${d(ns)} (${sS > 0 ? '+' : ''}${sS})`); if(oe !== ne) a.push(`end ${d(oe)} → ${d(ne)} (${eS > 0 ? '+' : ''}${eS})`);
+  return (eS > 0 && sS === 0 ? 'Longer: ' : eS < 0 && sS === 0 ? 'Shorter: ' : 'Changed: ') + a.join(', ');
+}
+/* ---- actions ---- */
+function chConfirmSchedule(p){
+  const c = p.chg; if(!c) return; const sS = workingDaysBetween(c.orig.start, c.next.start), eS = workingDaysBetween(c.orig.end, c.next.end), lines = [chPhrase(p)];
+  p.dayPlan = chCopy(c.next.days);
+  (p.phases || []).forEach(q => { if(!q || typeof q !== 'object' || phIsDone(q)) return; if(sfIso(q.start)) q.start = shiftByWorkingDays(q.start, sS); if(sfIso(q.end)) q.end = shiftByWorkingDays(q.end, eS); if(q.start && q.end && q.end < q.start) q.end = q.start; });
+  c.status = 'confirmed'; chgLog(p, 'reschedule', { cause: '', reason: 'Timeline change confirmed on the Calendar' }, lines);
+}
+function chApplyDates(p, keys){
+  const rows = chLinkRows(p), done = [];
+  rows.filter(r => keys.includes(r.key) && r.moves).forEach(r => { p.milestones = p.milestones || {}; p.milestones[r.key] = r.nu; p.chg.applied[r.key] = true; done.push(`${r.label} ${pwD(r.old)} → ${pwD(r.nu)} (${r.shift > 0 ? '+' : ''}${r.shift} working days)`); });
+  if(done.length) chgLog(p, 'reschedule', { cause: '', reason: 'Linked dates updated after a timeline change' }, done);
+  return done.length;
+}
+function chFinish(p){ if(p.chg && p.chg.status === 'confirmed' && !chLinkRows(p).some(r => r.moves)) p.chg = null; }
+function chReset(p){ if(p.chg && p.chg.status === 'tentative') p.chg = null; }
+/* ---- the side sheet (also the review sheet) ---- */
+const chUi = { id: null, from: '', until: '', review: false };
+function chCloseSheet(){ chUi.id = null; const el = document.getElementById('chSheet'), bd = document.getElementById('chBackdrop'); if(el) el.hidden = true; if(bd) bd.hidden = true; document.removeEventListener('keydown', chKey, true); }
+function chKey(e){ if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); chCloseSheet(); } }
+function chProj(){ return chUi.id == null ? null : state.projects.find(x => String(x.id) === String(chUi.id)); }
+function chOpenSheet(id, review){
+  const p = state.projects.find(x => String(x.id) === String(id)); if(!p) return;
+  chUi.id = p.id; chUi.review = !!review; const b = p.chg ? p.chg.next : chBounds(chCurrent(p)); chUi.from = b.start; chUi.until = b.end; chRenderSheet();
+  const el = document.getElementById('chSheet'), bd = document.getElementById('chBackdrop'); el.hidden = false; bd.hidden = false; document.addEventListener('keydown', chKey, true);
+  const t = document.getElementById('chTitle'); if(t) t.focus({ preventScroll: true });
+}
+function chDraftDays(p){ return chFromRange(p.chg ? p.chg.next.days : chCurrent(p), chUi.from, chUi.until); }
+function chPreviewHtml(p){
+  const base = p.chg ? p.chg.orig.days : chCurrent(p), draft = chDraftDays(p), s = chSummaryOf(draft), o = chSummaryOf(base), same = chSame(draft, base);
+  const snapped = chUi.from && snapToWorking(chUi.from, 1) !== chUi.from || chUi.until && snapToWorking(chUi.until, -1) !== chUi.until;
+  return `<div class="ch-prev" id="chPrev" aria-live="polite"><b>${s.start ? escHtml(capShortDay(s.start)) + ' ' + escHtml(pwD(s.start)) + ' → ' + escHtml(capShortDay(s.end)) + ' ' + escHtml(pwD(s.end)) : 'No days'}</b><span>${s.n} working day${s.n === 1 ? '' : 's'} · ${capR1(s.h)} h${same ? ' · same as the original' : s.h !== o.h ? ` · ${s.h > o.h ? '+' : ''}${capR1(s.h - o.h)} h` : ''}</span>${snapped ? '<span class="ch-snap">A weekend or non-working day was moved to the nearest working day.</span>' : ''}</div>`;
+}
+function chRenderSheet(){
+  const el = document.getElementById('chSheet'); if(!el) return; const p = chProj(); if(!p){ chCloseSheet(); return; }
+  const c = p.chg, rows = c ? chLinkRows(p) : [], review = c && (chUi.review || c.status === 'confirmed'), site = capSiteOf(p);
+  const head = `<div class="pj-head"><div class="pj-head-main"><span class="cv-pill ${c ? 'tent' : ''}">${c ? (c.status === 'tentative' ? 'Tentative change' : 'Confirmed: dates to update') : 'Schedule'}</span><h3 id="chTitle" tabindex="-1">${escHtml(boardTitle('project', p))}</h3><div class="qb-dim">${escHtml(recordCode(p.id, 'project'))}${site ? ' · ' + escHtml(site) : ''}</div></div><button type="button" class="icon-btn" data-ch="close" aria-label="Close">${X_SVG}</button></div>`;
+  let body = '';
+  if(c){ body += `<div class="ch-sum"><b>${escHtml(chPhrase(p))}</b><div class="qb-dim">Original: ${escHtml(pwD(c.orig.start))} to ${escHtml(pwD(c.orig.end))} · ${capR1(chSummaryOf(c.orig.days).h)} h over ${chSummaryOf(c.orig.days).n} working days</div></div>`; }
+  if(!c || c.status === 'tentative'){
+    body += `<div class="ch-dates"><label><span>From</span><input type="date" id="chFrom" value="${escAttr(chUi.from)}"></label><label><span>Until</span><input type="date" id="chUntil" value="${escAttr(chUi.until)}"></label></div>${chPreviewHtml(p)}`;
+    body += `<p class="q-help">Moves snap to working days. Days added by making it longer are filled as one normal working day (the lower of this project's typical day and ${hpd()} h). Nothing else changes until you confirm.</p>`;
+  }
+  if(review){
+    const conf = chConflicts(p), n = rows.filter(r => r.moves).length;
+    body += `<div class="ch-sec"><h4>Linked dates</h4>${rows.length ? rows.map(r => `<label class="ch-row${r.keep ? ' keep' : ''}${r.applied ? ' ok' : ''}"><input type="checkbox" data-ch="sel" data-key="${r.key}"${r.checked ? ' checked' : ''}${r.moves ? '' : ' disabled'}><span class="ch-lab">${escHtml(r.label)}</span><span class="ch-dt">${r.applied ? 'Updated' : r.moves ? `${escHtml(pwD(r.old))} → <b>${escHtml(pwD(r.nu))}</b> <span class="qb-dim">(${r.shift > 0 ? '+' : ''}${r.shift} working day${Math.abs(r.shift) === 1 ? '' : 's'})</span>` : escHtml(pwD(r.old)) + (r.keep ? ` kept (${escHtml(r.why.toLowerCase())})` : ' unchanged')}</span></label>`).join('') : '<div class="qb-dim">This project has no key dates set.</div>'}</div>`;
+    body += `<div class="ch-sec"><h4>Conflicts</h4>${conf.length ? conf.map(x => `<div class="ch-conf"><div><b>${escHtml(capShortDay(x.iso))} ${escHtml(pwD(x.iso))}</b> ${x.parts.map(q => `<span class="cv-chip2">${escHtml(q.it.name)} <b>${capR1(q.h)} h</b></span>`).join(' ')}${x.reason ? `<div class="cv-rs bad">${escHtml(x.reason)}</div>` : ''}${x.diff ? '<div class="cv-rs bad">Different sites: confirm both can be attended</div>' : ''}</div><button type="button" class="btn secondary qb-sm" data-ch="accept" data-d="${x.iso}">Accept</button></div>`).join('') : '<div class="qb-dim">No conflicts.</div>'}</div>`;
+    var eS = workingDaysBetween(c.orig.end, c.next.end), sS = workingDaysBetween(c.orig.start, c.next.start);
+    body += `<div class="ch-btns">${n ? `<button type="button" class="btn" data-ch="pushall">${sS === eS ? `Push all dates ${sS > 0 ? '+' : ''}${sS} working days` : 'Push all dates by the proposed shift'}</button><button type="button" class="btn secondary" data-ch="applysel">Apply selected dates</button>` : ''}${c.status === 'tentative' ? '<button type="button" class="btn secondary" data-ch="schedonly">Confirm schedule only</button>' : ''}<button type="button" class="btn secondary danger" data-ch="discard">Discard change</button>${c.status === 'confirmed' ? '<button type="button" class="btn secondary" data-ch="later">Close</button>' : ''}</div>`;
+  } else if(c){
+    body += `<div class="ch-btns"><button type="button" class="btn" data-ch="confirm">Confirm change</button><button type="button" class="btn secondary" data-ch="update">Update tentative</button><button type="button" class="btn secondary" data-ch="reset">Reset to original</button><button type="button" class="btn secondary" data-ch="close">Cancel</button></div>`;
+  } else {
+    body += `<div class="ch-btns"><button type="button" class="btn" data-ch="savetent">Save as tentative</button><button type="button" class="btn secondary" data-ch="confirm">Confirm change</button><button type="button" class="btn secondary" data-ch="close">Cancel</button></div>`;
+  }
+  el.innerHTML = head + `<div class="pj-body ch-body">${body}</div>`;
+}
+function chDone(msg){ saveState(); render(); if(msg) showToast(msg); }
+document.addEventListener('input', (e) => {
+  const el = e.target; if(!chUi.id || (el.id !== 'chFrom' && el.id !== 'chUntil')) return; const p = chProj(); if(!p) return;
+  if(el.id === 'chFrom' && isoOk(el.value)) chUi.from = el.value; if(el.id === 'chUntil' && isoOk(el.value)) chUi.until = el.value;
+  const prev = document.getElementById('chPrev'); if(prev) prev.outerHTML = chPreviewHtml(p);
+});
+document.addEventListener('click', (e) => {
+  if(!state) return; const bd = e.target.closest && e.target.closest('#chBackdrop'); if(bd){ chCloseSheet(); return; }
+  const b = e.target.closest && e.target.closest('[data-ch]'); if(!b) return; const a = b.dataset.ch, p = chProj();
+  if(a === 'close'){ chCloseSheet(); return; } if(!p) return;
+  if(a === 'sel'){ if(!p.chg.sel) p.chg.sel = {}; p.chg.sel[b.dataset.key] = b.checked; saveState(); return; }
+  if(a === 'accept'){ const x = capDayInfoFor(capItems({ projects: true, sales: true, leads: true }))(b.dataset.d); if(x.sig && !state.acceptedDays.includes(x.sig)) state.acceptedDays.push(x.sig); saveState(); chRenderSheet(); render(); return; }
+  if(a === 'savetent' || a === 'update'){ const c = chSet(p, chDraftDays(p)); chDone(c ? 'Saved as a tentative change' : 'That is the same as the original, so there is no change'); chUi.review = false; if(c) chRenderSheet(); else chCloseSheet(); return; }
+  if(a === 'confirm'){ chSet(p, chDraftDays(p)); if(!p.chg){ chDone('No change to confirm'); chCloseSheet(); return; } chUi.review = true; if(!chLinkRows(p).some(r => r.moves)){ chConfirmSchedule(p); chFinish(p); chDone('Schedule confirmed'); chCloseSheet(); return; } saveState(); render(); chRenderSheet(); return; }
+  if(a === 'reset'){ chReset(p); chDone('Back to the original dates'); chCloseSheet(); return; }
+  if(a === 'schedonly'){ chConfirmSchedule(p); chFinish(p); chDone('Schedule confirmed. The key dates were not moved.'); chRenderSheet(); if(!p.chg) chCloseSheet(); return; }
+  if(a === 'pushall' || a === 'applysel'){
+    const rows = chLinkRows(p), keys = rows.filter(r => r.moves && (a === 'pushall' || r.checked)).map(r => r.key); if(p.chg.status === 'tentative') chConfirmSchedule(p);
+    const n = chApplyDates(p, keys); chFinish(p); chDone(`Schedule confirmed. ${n} date${n === 1 ? '' : 's'} updated.`); if(p.chg) chRenderSheet(); else chCloseSheet(); return; }
+  if(a === 'discard'){ if(p.chg.status === 'tentative') chReset(p); else p.chg = null; chDone('Change discarded'); chCloseSheet(); return; }
+  if(a === 'later'){ chCloseSheet(); }
+});
+/* ---- drag a bar on the Calendar: move the whole thing, or drag either end ---- */
+let chDrag = null; const chTip = () => { let t = document.getElementById('chDragTip'); if(!t){ t = document.createElement('div'); t.id = 'chDragTip'; t.className = 'ch-tip'; document.body.appendChild(t); } return t; };
+function chDragCompute(p, d, dCols){
+  const days = p.chg ? p.chg.next.days : chCurrent(p), b = chBounds(days);
+  if(d.mode === 'move'){ const t = snapToWorking(addDaysIso(b.start, dCols), 1), n = workingDaysBetween(b.start, t); return { days: chMove(days, n), text: n ? `Move to ${capShortDay(t)} ${pwD(t)} (${n > 0 ? '+' : ''}${n} working day${Math.abs(n) === 1 ? '' : 's'})` : 'No change' }; }
+  if(d.mode === 'end'){ const t = snapToWorking(addDaysIso(b.end, dCols), -1), r = chResize(days, 'end', t), nb = chBounds(r); return { days: r, text: `Ends ${capShortDay(nb.end)} ${pwD(nb.end)}` }; }
+  const t = snapToWorking(addDaysIso(b.start, dCols), 1), r = chResize(days, 'start', t), nb = chBounds(r); return { days: r, text: `Starts ${capShortDay(nb.start)} ${pwD(nb.start)}` };
+}
+document.addEventListener('pointerdown', (e) => {
+  const bar = e.target.closest && e.target.closest('.cv-pbar[data-kind="project"]'); if(!bar || e.button !== 0 || e.pointerType === 'touch' || !state) return;
+  const h = e.target.closest('.cv-hdl'), grid = bar.parentElement; if(!grid) return; e.preventDefault();
+  chDrag = { bar, pid: bar.dataset.pid, mode: h ? h.dataset.edge : 'move', x0: e.clientX, colW: grid.getBoundingClientRect().width / 7, moved: false, d: 0, id: e.pointerId };
+  try{ bar.setPointerCapture(e.pointerId); }catch(x){}
+});
+document.addEventListener('pointermove', (e) => {
+  if(!chDrag) return; const dx = e.clientX - chDrag.x0; if(Math.abs(dx) > 4) chDrag.moved = true; if(!chDrag.moved) return;
+  const p = state.projects.find(x => String(x.id) === String(chDrag.pid)); if(!p) return; chDrag.d = Math.round(dx / chDrag.colW);
+  const r = chDragCompute(p, chDrag, chDrag.d), t = chTip(); t.textContent = r.text; t.style.left = (e.clientX + 14) + 'px'; t.style.top = (e.clientY + 14) + 'px'; t.hidden = false;
+  chDrag.bar.classList.add('dragging'); if(chDrag.mode === 'move') chDrag.bar.style.transform = `translateX(${chDrag.d * chDrag.colW}px)`;
+});
+function chDragEnd(e, cancel){
+  if(!chDrag) return; const d = chDrag; chDrag = null; const t = document.getElementById('chDragTip'); if(t) t.hidden = true; d.bar.classList.remove('dragging'); d.bar.style.transform = '';
+  const p = state.projects.find(x => String(x.id) === String(d.pid)); if(!p || cancel) return;
+  if(!d.moved){ chOpenSheet(p.id); return; }
+  if(p.chg && p.chg.status === 'confirmed'){ showToast('Review the linked dates for the confirmed change first'); chOpenSheet(p.id, true); return; }
+  const r = chDragCompute(p, d, d.d), c = chSet(p, r.days); chDone(c ? 'Saved as a tentative change. Open the project bar to confirm it.' : 'Back to the original dates, so there is no change');
+}
+document.addEventListener('pointerup', (e) => chDragEnd(e, false)); document.addEventListener('pointercancel', (e) => chDragEnd(e, true));
 
 /* =====================================================================
    STEP 7: OVERLAP WARNINGS USE CAPACITY
@@ -20824,7 +21401,7 @@ function capCheck(p, prop){
 function capWarnWeeks(p, weeks){
   if(!weeks.length) return '';
   const names = w => w.others.length ? w.others.map(q => `${rpLink('project:' + q.item.id, q.item.code + ' ' + q.item.name)} (${capH(q.hours)}${q.item.tentative ? ', tentative' : ''})`).join(', ') : 'no other project';
-  return `<div class="rp-warn" role="alert"><b>⚠ These dates push ${weeks.length === 1 ? 'a week' : weeks.length + ' weeks'} over capacity.</b>${weeks.slice(0, 4).map(w => `<div>Week of ${escHtml(pwD(w.mon))}: <b>${capH(w.total)}</b> planned against ${capH(w.cap)} available (this project ${capH(w.mine)}). Shared with ${names(w)}.</div>`).join('')}${weeks.length > 4 ? `<div>and ${weeks.length - 4} more week${weeks.length - 4 === 1 ? '' : 's'}.</div>` : ''}<div>Speak to them first. <b>Keep as tentative</b> is the safer choice until you have: it stays on the calendar in full, striped, until you confirm or go back. <button type="button" class="sp-link" data-cv="go" data-mon="${escAttr(weeks[0].mon)}">See it in Calendar and capacity</button></div></div>`;
+  return `<div class="rp-warn" role="alert"><b>⚠ These dates push ${weeks.length === 1 ? 'a week' : weeks.length + ' weeks'} over capacity.</b>${weeks.slice(0, 4).map(w => `<div>Week of ${escHtml(pwD(w.mon))}: <b>${capH(w.total)}</b> planned against ${capH(w.cap)} available (this project ${capH(w.mine)}). Shared with ${names(w)}.</div>`).join('')}${weeks.length > 4 ? `<div>and ${weeks.length - 4} more week${weeks.length - 4 === 1 ? '' : 's'}.</div>` : ''}<div>Speak to them first. <b>Keep as tentative</b> is the safer choice until you have: it stays on the calendar in full, striped, until you confirm or go back. <button type="button" class="sp-link" data-cv="go" data-mon="${escAttr(weeks[0].mon)}">See it in Calendar</button></div></div>`;
 }
 const capWarnHtml = p => capWarnWeeks(p, capCheck(p, capProposalFromDraft(p)));
 
@@ -21778,7 +22355,7 @@ function repPipeHtml(){
 }
 function repCapHtml(){
   const rows = capWeekRows(capItems(), repUi.from, repUi.to).filter(r => r.total > 0 || r.cap > 0);
-  return `<div class="card"><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Week of</th><th>Wanted</th><th>Available</th><th>Left</th><th>Biggest</th></tr></thead><tbody>${rows.map(r => { const left = r.cap - r.total, big = r.parts.slice().sort((a, b) => b.hours - a.hours)[0]; return `<tr><td><button type="button" class="sp-link" data-nav-tab="capacity">${escHtml(pwD(r.mon))}</button></td><td class="qb-calc">${capH(r.total)}</td><td class="qb-calc">${capH(r.cap)}</td><td class="qb-calc ${left < 0 ? 'over' : ''}">${left < 0 ? '−' : ''}${capH(Math.abs(left))}</td><td>${big ? `${ltChip(`${big.item.kind === 'project' ? 'project:' + big.item.id + ':plan' : 'deal2:' + big.item.id}`, big.item.name)}` : '—'}</td></tr>`; }).join('') || '<tr><td colspan="5"><span class="qb-dim">Nothing is dated in this range.</span></td></tr>'}</tbody></table></div></div><p class="q-help">Wanted hours come from dated phases, weighted for sales and leads; the page that works them out is <button type="button" class="sp-link" data-nav-tab="capacity">Calendar and capacity →</button></p>`;
+  return `<div class="card"><div class="qb-scroll"><table class="qb-table qb-narrow"><thead><tr><th>Week of</th><th>Wanted</th><th>Available</th><th>Left</th><th>Biggest</th></tr></thead><tbody>${rows.map(r => { const left = r.cap - r.total, big = r.parts.slice().sort((a, b) => b.hours - a.hours)[0]; return `<tr><td><button type="button" class="sp-link" data-nav-tab="capacity">${escHtml(pwD(r.mon))}</button></td><td class="qb-calc">${capH(r.total)}</td><td class="qb-calc">${capH(r.cap)}</td><td class="qb-calc ${left < 0 ? 'over' : ''}">${left < 0 ? '−' : ''}${capH(Math.abs(left))}</td><td>${big ? `${ltChip(`${big.item.kind === 'project' ? 'project:' + big.item.id + ':plan' : 'deal2:' + big.item.id}`, big.item.name)}` : '—'}</td></tr>`; }).join('') || '<tr><td colspan="5"><span class="qb-dim">Nothing is dated in this range.</span></td></tr>'}</tbody></table></div></div><p class="q-help">Wanted hours come from dated phases, weighted for sales and leads; the page that works them out is <button type="button" class="sp-link" data-nav-tab="capacity">Calendar →</button></p>`;
 }
 function repBody(k){
   const m0 = repUi.from.slice(0, 7), m1 = repUi.to.slice(0, 7);
