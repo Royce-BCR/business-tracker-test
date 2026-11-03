@@ -149,3 +149,13 @@ Stage 7 adds no stored fields and no Settings keys. See `docs/whats-new.md` (wha
 - **Monthly summary** page (Today > more menu) and the month card read figures the app already holds; unavailable figures are hidden.
 - **Admins can edit a quotation** ("Edit quotation") with a warning and reason for sent, accepted or invoiced quotes, and an append-only Change log everyone can read.
 - **API keys and connection details** (Settings > Admin) are only built for admins.
+
+
+## Stage 10: Calendar, planning and Today task types (test site)
+
+- **Calendar** (was "Calendar and capacity"): a Week view (vertical scroll of weeks, "This week" puts the current week second and open) and a Month view. Each week has a capacity bar, status (red over, green on capacity, amber slightly under, **blue scope to fill**), seven day chips, and when opened a row per project with its bar, site, status and a pencil. **Day checks** list days over their hours or with projects at different sites; **Accept** is remembered by the projects and hours on the day, not the date.
+- **Set a day**: click any day for a centred pop-up (title and type of day). Day types, marked days, first day of the week, hours per working day and the red/green/amber thresholds are in Settings > Planning and capacity. Capacity = hours per working day x working days in the week. One working-day rule (`isWorkingDay`, `snapToWorking`, `shiftByWorkingDays`, `workingDaysBetween`) is used everywhere.
+- **Capacity** is its own report: the next 8 weeks as a banded chart, with KPIs.
+- **Tentative changes**: click a project bar to open the side sheet; drag a bar to move it and drag either end to change it (working days only). The change is tentative until confirmed, with the original ghosted; confirming opens a review of the linked key dates (moved by working days, past/done dates kept) and conflicts. Pending changes show on Today under "Timeline changes to confirm".
+- **Today**: tasks are CRM tasks or to-dos (milestones and project dates are business items); an All / To-dos toggle; every section collapsible; "Arrange" to reorder the sections (saved per user, with Reset order). New "This week" section. Per-user choices are kept in the browser (localStorage), keyed by username.
+- **Project Site** text field (defaults to the first line of the address).
