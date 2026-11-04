@@ -16245,7 +16245,7 @@ const MENU_ICONS = {
 };
 const MENU_FAV_MAX = 5;
 const MENU_GROUP_ICON = { crm: 'contacts', commercial: 'revenue', business: 'organisation', settings: 'settings' };
-const menuPrefs = { mode: '', open: [], phone: 'bottom', bottom: MENU_BOTTOM_DEFAULT.slice(), fav: [], fold: true };   // fold: moving to another page folds the other groups (on by default)
+const menuPrefs = { mode: '', open: [], phone: 'bottom', bottom: MENU_BOTTOM_DEFAULT.slice(), fav: [], fold: false, foldSet: false };   // fold: moving to another page folds the other groups (off by default; a saved value only counts once someone has chosen it in Menu settings, foldSet)
 const menuMQ = window.matchMedia('(max-width: 700px)');
 const menuUi = { sig: '', pop: null, hoverT: 0, sheetFrom: null, built: false };
 const menuEl = id => document.getElementById(id);
@@ -16273,7 +16273,7 @@ function menuLoad(){
       if(Array.isArray(o.fav)) menuPrefs.fav = o.fav.map(String);
       if(['bottom', 'top', 'burger'].includes(o.phone)) menuPrefs.phone = o.phone;
       if(Array.isArray(o.bottom)) menuPrefs.bottom = o.bottom;
-      if(typeof o.fold === 'boolean') menuPrefs.fold = o.fold;
+      if(o.foldSet === true && typeof o.fold === 'boolean'){ menuPrefs.fold = o.fold; menuPrefs.foldSet = true; }
     }
   }catch(e){}
   menuPrefs.bottom = menuCleanBottom(menuPrefs.bottom);
@@ -16558,7 +16558,7 @@ function menuSettingsRender(){
       ${opt('pmPhone', 'top', menuPrefs.phone, 'Top bar menu', 'Group tabs across the top, each with a drop-down list of pages.')}
       ${opt('pmPhone', 'burger', menuPrefs.phone, 'Hamburger icon only', 'The menu icon opens the folding menu as a drawer.')}
     </fieldset>
-    <label class="pm-opt"><input type="checkbox" id="pmFold"${menuPrefs.fold ? ' checked' : ''}><span>Fold other groups when I move to another page<small>On: only the group you are in stays open. Off: groups stay as you leave them.</small></span></label>
+    <label class="pm-opt"><input type="checkbox" id="pmFold"${menuPrefs.fold ? ' checked' : ''}><span>Fold other groups when I move to another page<small>On: only the group you are in stays open. Off (default): groups stay open until you close them.</small></span></label>
     <fieldset class="pm-opts"><legend>Laptop and tablet menu (700px and wider)</legend>
       ${opt('pmLap', '', menuPrefs.mode, 'Automatic', 'Icon rail on tablets such as a Surface Pro, pinned menu on a laptop.')}
       ${opt('pmLap', 'pinned', menuPrefs.mode, 'Pinned folding menu', 'Group headings fold open one at a time.')}
@@ -16576,7 +16576,7 @@ function menuSettingsRender(){
 (function(){
   const card = menuEl('phoneMenuCard'); if(!card) return;
   card.addEventListener('change', (e) => {
-    const t = e.target; if(t.id === 'pmFold'){ menuPrefs.fold = t.checked; if(t.checked){ const g = menuGroupOf(menuCurrent()); menuPrefs.open = g ? [g] : []; } menuSave(); menuRenderOpen(); }
+    const t = e.target; if(t.id === 'pmFold'){ menuPrefs.fold = t.checked; menuPrefs.foldSet = true; if(t.checked){ const g = menuGroupOf(menuCurrent()); menuPrefs.open = g ? [g] : []; } menuSave(); menuRenderOpen(); }
     else if(t.name === 'pmPhone'){ menuPrefs.phone = t.value; menuSave(); menuApply(true); }
     else if(t.name === 'pmLap'){ menuPrefs.mode = t.value; menuSave(); menuApply(true); }
   });
