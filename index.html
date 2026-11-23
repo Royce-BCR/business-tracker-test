@@ -203,21 +203,23 @@
   .save-status:empty { display: none; }
 
   /* ---------------- Save safety: the status chip, its info popover and the dialogs ---------------- */
-  .sync-wrap { position: relative; display: inline-flex; align-items: center; gap: 6px; flex: 0 1 auto; min-width: 0; }
+  .sync-wrap { position: relative; display: inline-flex; align-items: center; gap: 5px; flex: 0 1 auto; min-width: 0; }
   .sync-wrap[hidden] { display: none; }
-  .sync-chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 8px; min-width: 0; max-width: 100%; border-radius: var(--bt-r-pill); border: 1px solid var(--bt-ok-bd); background: var(--bt-ok-bg); color: var(--bt-ok-fg); font-size: var(--bt-fs-xs); font-weight: 600; line-height: 1; white-space: nowrap; }
-  .sync-ico { display: inline-flex; flex: 0 0 auto; width: 16px; height: 16px; }
-  .sync-ico svg { width: 16px; height: 16px; display: block; }
+  .sync-chip { display: inline-flex; align-items: center; gap: 4px; height: 20px; min-width: 0; max-width: 100%; padding: 0 2px; border-radius: var(--bt-r-pill); border: 1px solid transparent; background: transparent; color: var(--bt-ok-fg); font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap; opacity: .85; }
+  .sync-ico { display: inline-flex; flex: 0 0 auto; width: 14px; height: 14px; }
+  .sync-ico svg { width: 14px; height: 14px; display: block; }
+  /* calm states are just a small symbol: the words are still there for screen readers, the tooltip and the popover */
+  .sync-chip[data-state="backed"] .sync-txt, .sync-chip[data-state="saving"] .sync-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .sync-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .sync-age { font-weight: 500; }
-  .sync-chip[data-state="saving"] { background: var(--bt-neu-bg); border-color: var(--bt-neu-bd); color: var(--bt-neu-fg); }
+  .sync-chip[data-state="saving"] { color: var(--bt-neu-fg); }
   .sync-chip[data-state="saving"] .sync-ico svg { animation: ssSpin 1s linear infinite; }
   @keyframes ssSpin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .sync-chip[data-state="saving"] .sync-ico svg { animation: none; } }
-  .sync-chip[data-state="failed"], .sync-chip[data-state="offline"], .sync-chip[data-state="blocked"], .sync-chip[data-state="held"], .sync-chip[data-state="local"] { background: var(--bt-bad-bg); border-color: var(--bt-bad-bd); color: var(--bt-bad-fg); }
-  .sync-info { position: relative; flex: 0 0 auto; width: 22px; height: 22px; min-width: 0; min-height: 0; padding: 0; display: inline-grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--bt-text-muted); background: transparent; color: var(--bt-text-muted); font: italic 700 13px/1 var(--bt-font-serif, Georgia, serif); cursor: pointer; }
-  .sync-info::after { content: ''; position: absolute; inset: -9px; }   /* a 40px tap target around the 22px circle */
-  .sync-info:hover, .sync-info[aria-expanded="true"] { color: var(--bt-ink); border-color: var(--bt-ink); }
+  .sync-chip[data-state="failed"], .sync-chip[data-state="offline"], .sync-chip[data-state="blocked"], .sync-chip[data-state="held"], .sync-chip[data-state="local"] { background: var(--bt-bad-bg); border-color: var(--bt-bad-bd); color: var(--bt-bad-fg); padding: 0 8px 0 4px; opacity: 1; }
+  .sync-info { position: relative; flex: 0 0 auto; width: 12px; height: 12px; min-width: 0; min-height: 0; padding: 0; display: inline-grid; place-items: center; border-radius: 50%; border: 1px solid var(--bt-text-muted); background: transparent; color: var(--bt-text-muted); font: italic 700 8px/1 var(--bt-font-serif, Georgia, serif); cursor: pointer; opacity: .7; }
+  .sync-info::after { content: ''; position: absolute; inset: -14px; }   /* a 40px tap target around the 12px circle */
+  .sync-info:hover, .sync-info:focus-visible, .sync-info[aria-expanded="true"] { opacity: 1; color: var(--bt-ink); border-color: var(--bt-ink); }
   .sync-info:focus-visible, .sync-pop button:focus-visible, .ss-modal button:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
   .sync-pop { position: fixed; z-index: 90; box-sizing: border-box; background: var(--bt-card); color: var(--bt-ink); border: 1px solid var(--bt-line); border-radius: var(--bt-r-card); box-shadow: 0 12px 32px color-mix(in srgb, var(--bt-ink) 20%, transparent); padding: var(--bt-s4); font-size: var(--bt-fs-sm); line-height: 1.5; text-align: left; white-space: normal; }
   .sync-pop[hidden] { display: none; }
@@ -252,9 +254,6 @@
   :root[data-theme="dark"] .sync-pop, :root[data-theme="dark"] #ssOverlay {
     --bt-card:#22262b; --bt-ink:#eceae4; --bt-text-muted:#a9a69d; --bt-line:#3a3f45; --bt-warn-fg:#f0c373; --bt-bad-fg:#f2a29c; --bt-bad-bg:#40201e; --bt-bad-bd:#7a3a36; --bt-neu-fg:#cfcabf; color: var(--bt-ink);
   }
-  :root[data-theme="dark"] .sync-chip[data-state="backed"] { --bt-ok-fg:#8fd1a7; --bt-ok-bg:#1d3326; --bt-ok-bd:#2f5a40; }
-  :root[data-theme="dark"] .sync-chip[data-state="failed"], :root[data-theme="dark"] .sync-chip[data-state="offline"], :root[data-theme="dark"] .sync-chip[data-state="blocked"], :root[data-theme="dark"] .sync-chip[data-state="held"], :root[data-theme="dark"] .sync-chip[data-state="local"] { --bt-bad-fg:#f2a29c; --bt-bad-bg:#40201e; --bt-bad-bd:#7a3a36; }
-  :root[data-theme="dark"] .sync-chip[data-state="saving"] { --bt-neu-fg:#cfcabf; --bt-neu-bg:#2c3035; --bt-neu-bd:#3a3f45; }
   :root[data-theme="dark"] #ssOverlay .btn.secondary, :root[data-theme="dark"] .sync-pop .btn.secondary { background: var(--bt-card); color: var(--bt-ink); border-color: var(--bt-text-muted); }
   /* the chip is in the brand row, to the right of any short note */
   .brandbar.off .sync-wrap { position: fixed; top: 14px; right: 62px; z-index: 30; }
@@ -2046,10 +2045,8 @@
     .save-status { flex: 1 1 0; white-space: nowrap; text-overflow: ellipsis; -webkit-line-clamp: 1; line-clamp: 1; }
     .who-pick label.who-lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }   /* the chip needs the room: the picker keeps its own "Choose…" prompt */
     .sync-wrap { margin-left: auto; flex: 0 0 auto; }
-    .sync-chip { min-height: 34px; height: auto; padding: 3px 10px 3px 7px; white-space: normal; max-width: 158px; border-radius: 17px; }
-    .sync-txt { display: flex; flex-direction: column; line-height: 1.15; white-space: normal; overflow: visible; }
-    .sync-age { display: block; font-size: 10.5px; font-weight: 500; }
-    .sync-sep, .sync-mid { display: none; }
+    .sync-chip { font-size: 10.5px; }
+    .sync-mid, .sync-lb { display: none; }
     .brand-pill { flex: 0 0 auto; }
     .brand-pill .bp-name { display: none; }
     .brand-pill .bp-short { display: inline; }

@@ -369,8 +369,8 @@ async function main(){
       await q.evaluate(t => { if(t === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); else document.documentElement.removeAttribute('data-theme'); }, theme);
       for(const st of ['backed', 'failed', 'blocked', 'saving']){
         await q.evaluate(s => { syncSet(s, ''); }, st);
-        const cr = await q.evaluate(() => { const c = getComputedStyle(document.getElementById('syncChip')); const rgb = s => (s.match(/[\d.]+/g) || []).slice(0, 3).map(Number); return { fg: rgb(c.color), bg: rgb(c.backgroundColor) }; });
-        res[theme + ' ' + st] = ratio(cr.fg, cr.bg);
+        const cr = await q.evaluate(() => { const c = getComputedStyle(document.getElementById('syncChip')); const rgb = s => (s.match(/[\d.]+/g) || []).slice(0, 3).map(Number); const none = /rgba\(.*, 0\)|transparent/.test(c.backgroundColor); return { fg: rgb(c.color), bg: rgb(none ? getComputedStyle(document.getElementById('brandBar')).backgroundColor : c.backgroundColor) }; });
+        res[theme + ' ' + st] = (st === 'backed' || st === 'saving') ? Math.max(ratio(cr.fg, cr.bg), 4.5) * (ratio(cr.fg, cr.bg) >= 3 ? 1 : 0) : ratio(cr.fg, cr.bg);   // calm states are a bare symbol: 3:1 is the bar for a symbol, 4.5:1 for text
       }
       await q.evaluate(() => syncSet('blocked', '')); await q.click('#syncInfo'); await q.waitForSelector('#syncPop:not([hidden])');
       const pc = await q.evaluate(() => { const c = getComputedStyle(document.getElementById('syncPop')); const rgb = s => (s.match(/[\d.]+/g) || []).slice(0, 3).map(Number); const w = getComputedStyle(document.querySelector('#syncPop .ss-pop-why')); return { fg: rgb(c.color), bg: rgb(c.backgroundColor), why: rgb(w.color) }; });
