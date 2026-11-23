@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://dunbyxxpgpfewvelwtpv.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Business Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -216,7 +219,7 @@
   .sync-chip[data-state="saving"] .sync-ico svg { animation: ssSpin 1s linear infinite; }
   @keyframes ssSpin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .sync-chip[data-state="saving"] .sync-ico svg { animation: none; } }
-  .sync-chip[data-state="failed"], .sync-chip[data-state="offline"], .sync-chip[data-state="blocked"], .sync-chip[data-state="held"], .sync-chip[data-state="local"] { background: var(--bt-bad-bg); border-color: var(--bt-bad-bd); color: var(--bt-bad-fg); padding: 0 8px 0 4px; opacity: 1; }
+  .sync-chip[data-state="failed"], .sync-chip[data-state="offline"], .sync-chip[data-state="blocked"], .sync-chip[data-state="held"], .sync-chip[data-state="local"], .sync-chip[data-state="signedout"] { background: var(--bt-bad-bg); border-color: var(--bt-bad-bd); color: var(--bt-bad-fg); padding: 0 8px 0 4px; opacity: 1; }
   .sync-info { position: relative; flex: 0 0 auto; width: 12px; height: 12px; min-width: 0; min-height: 0; padding: 0; display: inline-grid; place-items: center; border-radius: 50%; border: 1px solid var(--bt-text-muted); background: transparent; color: var(--bt-text-muted); font: italic 700 8px/1 var(--bt-font-serif, Georgia, serif); cursor: pointer; opacity: .7; }
   .sync-info::after { content: ''; position: absolute; inset: -14px; }   /* a 40px tap target around the 12px circle */
   .sync-info:hover, .sync-info:focus-visible, .sync-info[aria-expanded="true"] { opacity: 1; color: var(--bt-ink); border-color: var(--bt-ink); }
@@ -941,6 +944,15 @@
   .login-err { color: var(--bt-bad-fg); font-size: 12px; min-height: 16px; margin-top: 10px; text-align: center; }
   .logout-bar { margin-top: auto; padding: 14px var(--bt-s3) 2px; border-top: 1px solid color-mix(in srgb, var(--bt-on-dark) 12%, transparent); display: flex; align-items: center; justify-content: space-between; gap: var(--bt-s2); }
   .logout-bar:empty { display: none; }
+  .logout-bar { flex-wrap: wrap; row-gap: 6px; }
+  .logout-bar .chpw-link { background: none; border: 0; padding: 0; color: var(--bt-on-dark-dim); font-size: var(--bt-fs-xs); text-decoration: underline; cursor: pointer; flex-basis: 100%; text-align: left; }
+  .logout-bar .chpw-link:hover { color: var(--bt-on-dark); }
+  .login-note { min-height: 0; margin: 0 0 var(--bt-s3); font-size: var(--bt-fs-sm); font-weight: 600; color: var(--bt-warn-fg); background: var(--bt-warn-bg); border: 1px solid var(--bt-warn-bd); border-radius: var(--bt-r-chip); padding: 8px 10px; line-height: 1.45; }
+  .login-note:empty { display: none; }
+  .login-overlay.login-expired { z-index: 120; }
+  .login-expired-acts { display: flex; flex-direction: column; gap: var(--bt-s2); margin-top: var(--bt-s4); }
+  .login-expired-acts[hidden] { display: none; }
+  .mem-act { display: inline-flex; align-items: center; gap: 6px; font-size: var(--bt-fs-xs); }
   .logout-bar .who { font-size: var(--bt-fs-xs); color: var(--bt-on-dark-muted); }
   .logout-bar .role { font-size: var(--bt-fs-2xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--bt-on-dark-dim); border: 1px solid var(--bt-ink-2); padding: 1px 6px; border-radius: var(--bt-r-pill); margin-left: 6px; }
   .logout-bar .logout-link { background: none; border: 1px solid var(--bt-on-dark-dim); border-radius: var(--bt-r-btn); color: var(--bt-on-dark-muted); font-size: var(--bt-fs-xs); cursor: pointer; font-family: inherit; padding: 2px 10px; min-height: 26px; }
@@ -3205,17 +3217,38 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
 <div class="more-sheet" id="moreSheet" role="dialog" aria-modal="true" aria-label="All pages" tabindex="-1"></div>
 
-<div class="login-overlay hidden" id="loginOverlay">
+<div class="login-overlay hidden" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
   <div class="login-stack">
   <div class="login-brand" id="loginBrand"></div>
-  <div class="login-box">
-    <h1>Business Tracker</h1>
+  <form class="login-box" id="loginForm" autocomplete="on" novalidate>
+    <h1 id="loginTitle">Business Tracker</h1>
     <div class="sub">Sign in</div>
-    <div class="login-field"><label>Username</label><input id="loginUser" autocomplete="username"></div>
-    <div class="login-field"><label>Password</label><input id="loginPass" type="password" autocomplete="current-password"></div>
-    <button class="login-btn" data-action="do-login">Log in</button>
-    <div class="login-err" id="loginErr"></div>
+    <div class="login-note" id="loginNote" role="status"></div>
+    <div class="login-field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false"></div>
+    <div class="login-field"><label for="loginPass">Password</label><input id="loginPass" type="password" autocomplete="current-password"></div>
+    <button class="login-btn" type="submit">Sign in</button>
+    <div class="login-err" id="loginErr" role="alert"></div>
+    <div class="login-expired-acts" id="loginExpiredActs" hidden>
+      <button type="button" class="btn secondary" data-action="auth-download">Download my data (.json)</button>
+      <button type="button" class="btn secondary" data-action="auth-later">Not now, keep my work on screen</button>
+    </div>
+  </form>
   </div>
+</div>
+
+<div class="modal-overlay" id="authPwOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authPwTitle">
+    <div class="modal-title" id="authPwTitle">Change your password</div>
+    <div class="modal-msg">Use at least 12 characters. A few random words is a good password.</div>
+    <div class="modal-extra">
+      <div class="lp-f"><label for="authPw1">New password</label><input id="authPw1" type="password" autocomplete="new-password"></div>
+      <div class="lp-f"><label for="authPw2">New password again</label><input id="authPw2" type="password" autocomplete="new-password"></div>
+      <div class="login-err" id="authPwErr" role="alert"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" type="button" data-action="authpw-cancel">Cancel</button>
+      <button class="btn" type="button" data-action="authpw-save">Change password</button>
+    </div>
   </div>
 </div>
 
@@ -4450,7 +4483,7 @@ function loadCloudConfig(){
 }
 function saveCloudConfig(){ try{ localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cloud)); }catch(e){} }
 function cloudBase(){ return (cloud.url || '').replace(/\/+$/, ''); }
-function sbHeaders(extra){ return Object.assign({ 'apikey': cloud.key, 'Authorization': 'Bearer ' + cloud.key, 'Content-Type': 'application/json' }, extra || {}); }
+function sbHeaders(extra){ return Object.assign({ 'apikey': cloud.key, 'Content-Type': 'application/json' }, extra || {}); }   // the signed-in member's token is added by ssFetch
 async function sbGetRow(){
   const cols = sync.noVersion ? 'doc,updated_at' : 'doc,updated_at,version';
   const r = await ssFetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=${cols}`, { headers: sbHeaders() });
@@ -4460,7 +4493,7 @@ async function sbGetRow(){
 }
 /* saving is ssCloudSave / syncRun (compare-and-swap on the row version): see BT:js-savesafety */
 async function sbTest(){
-  const r = await fetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=id`, { headers: sbHeaders() });
+  const r = await ssFetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=id`, { headers: sbHeaders() }, 15000);
   if(!r.ok) throw new Error('HTTP ' + r.status + ' — ' + (await r.text()).slice(0,160));
   return true;
 }
@@ -4499,7 +4532,7 @@ function saveState(){
   sync.editSeq++; sync.lastLocalAt = Date.now(); ssSetDirty(true); ssMetaWrite();
   sync.retryCount = 0; sync.nextRetryAt = 0; clearTimeout(sync.retryTimer);   // a new edit starts the backoff over
   try{ lr.lastSaveCall = Date.now(); }catch(e){}
-  if(sync.status !== 'blocked' && sync.status !== 'held' && sync.status !== 'local') syncSet('saving');
+  if(sync.status !== 'blocked' && sync.status !== 'held' && sync.status !== 'local' && sync.status !== 'signedout') syncSet('saving');
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => { syncRun({}); }, 500);
 }
@@ -4630,6 +4663,7 @@ const ssStamp = d => { d = d || new Date(); return d.getFullYear() + '-' + ssP2(
 function ssMetaRead(){ try{ const m = JSON.parse(localStorage.getItem(SS_META_KEY) || 'null'); return ssIsObj(m) ? m : null; }catch(e){ return null; } }
 function ssHash(str){ let h = 0x811c9dc5; for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(36) + ':' + str.length; }   // a cheap fingerprint of the local copy: tells us the copy is still exactly what we last wrote
 function ssMetaWrite(localStr){
+  if(sync.leaving) return;   // signing out with nothing unsaved: nothing of the data may be written back on the way out
   try{
     const old = ssMetaRead();
     localStorage.setItem(SS_META_KEY, JSON.stringify({ localSavedAt: sync.lastLocalAt || Date.now(), lastCloudConfirmAt: sync.lastConfirmedAt || 0, cloudVersion: sync.cloudVersion, cloudUpdatedAt: sync.cloudUpdatedAt || '', dirty: !!sync.dirty, localHash: typeof localStr === 'string' ? ssHash(localStr) : (old ? old.localHash : null) }));
@@ -4645,10 +4679,23 @@ function ssGuard(on){
 
 /* ---------- cloud calls ---------- */
 async function ssFetch(url, opts, ms){
-  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms || 45000);
-  try{ return await fetch(url, Object.assign({}, opts || {}, { signal: ctl.signal })); }
-  catch(e){ if(e && e.name === 'AbortError') throw new Error('The cloud did not answer in time'); throw e; }
-  finally{ clearTimeout(to); }
+  opts = opts || {};
+  const send = async (token) => {
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms || 45000);
+    try{ return await fetch(url, Object.assign({}, opts, { headers: Object.assign({}, opts.headers || {}, { 'apikey': cloud.key, 'Authorization': 'Bearer ' + token }), signal: ctl.signal })); }
+    catch(e){ if(e && e.name === 'AbortError') throw new Error('The cloud did not answer in time'); throw e; }
+    finally{ clearTimeout(to); }
+  };
+  let token = await authAccess();   // no session: nothing is sent at all
+  let r = await send(token);
+  if(r.status === 401){   // the token was refused: one refresh and one retry, then the save engine pauses instead of losing anything
+    const ok = await authRefresh(token);
+    if(ok === false){ authSignedOut(); throw new AuthError('session ended'); }
+    if(ok === 'network') throw new TypeError('network');
+    r = await send(auth.tok.access_token);
+    if(r.status === 401){ authSignedOut(); throw new AuthError('session rejected'); }
+  }
+  return r;
 }
 const ssMissingVersion = t => /42703|column[^"]*version[^"]*does not exist|"version"/i.test(t || '') && /version/i.test(t || '');
 function ssNoVersion(){
@@ -4695,7 +4742,7 @@ function syncSet(status, detail){
   ssGuard(sync.dirty);
   ssRender(); ssLpRefresh();
 }
-const SS_RED = { failed: 1, offline: 1, blocked: 1, held: 1, local: 1 };
+const SS_RED = { failed: 1, offline: 1, blocked: 1, held: 1, local: 1, signedout: 1 };
 const SS_ICONS = {
   sync: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
   cross: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>',
@@ -4710,6 +4757,7 @@ function ssChipHtml(){
   if(s === 'failed' || s === 'offline') return 'Not backing up' + lb;
   if(s === 'blocked') return 'Paused<span class="sync-age sync-mid"><span class="sync-sep"> · </span>newer changes elsewhere</span>' + lb;
   if(s === 'held') return 'Paused<span class="sync-age sync-mid"><span class="sync-sep"> · </span>save held back for your OK</span>' + lb;
+  if(s === 'signedout') return 'Signed out' + lb;
   if(s === 'local') return 'Saved on this device only';
   return '';
 }
@@ -4746,6 +4794,7 @@ function ssPopHtml(){
   const s = sync.status, red = !!SS_RED[s];
   let why = '';
   if(s === 'failed') why = `The last save to the cloud did not go through${sync.detail ? ' (' + escHtml(sync.detail) + ')' : ''}. Your work is still on this screen and saved on this device. The portal is trying again by itself${sync.nextRetryAt ? ' (next try in about ' + Math.max(1, Math.round((sync.nextRetryAt - Date.now()) / 1000)) + ' s)' : ''}.`;
+  else if(s === 'signedout') why = 'You are signed out, so nothing can be saved to the cloud right now. Sign in again. Your work is kept.';
   else if(s === 'offline') why = 'This device looks to be offline. Your work is kept on this device, and the portal will try again as soon as the connection is back.';
   else if(s === 'blocked') why = 'Someone else (another device or another tab) has saved newer changes to the cloud. Saving is paused so that their work is not overwritten. Your changes on this screen are kept.';
   else if(s === 'held') why = sync.detail === 'sample' ? 'Sample data can never be saved over your real cloud data, so this save was stopped.' : 'This save would remove a lot of records from the cloud copy, so it was held back for your OK.';
@@ -4753,7 +4802,7 @@ function ssPopHtml(){
   const btn = (k, label, cls) => `<button type="button" class="btn ${cls || 'secondary'} ss-pop-btn" data-ss="${k}">${label}</button>`;
   let acts = '';
   if(red){
-    acts = btn('retry', s === 'held' ? 'Review and save' : 'Retry now', '') + btn('download', 'Download my data (.json)');
+    acts = (s === 'signedout' ? btn('signin', 'Sign in again', '') : btn('retry', s === 'held' ? 'Review and save' : 'Retry now', '')) + btn('download', 'Download my data (.json)');
     if(s === 'blocked') acts += btn('reload', 'Reload to get the latest');
   }
   return `<p class="ss-pop-p">Your work saves to the cloud as you edit, and the portal checks every 30 minutes. This shows the last time the cloud copy was confirmed to match your screen.</p>
@@ -4801,12 +4850,13 @@ function ssPopSet(open){
     const a = b.dataset.ss;
     if(a === 'download') exportData();
     else if(a === 'retry') ssRetryNow();
+    else if(a === 'signin') authShowLogin({ expired: true });
     else if(a === 'reload') ssReloadLatest();
   });
 })();
 
 /* ---------- saving ---------- */
-function ssWriteLocalSoon(){ try{ if(sync.dirty && state) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+function ssWriteLocalSoon(){ try{ if(sync.dirty && state && !sync.leaving) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 window.addEventListener('pagehide', () => { ssWriteLocalSoon(); ssMetaWrite(); });   // an edit still waiting for its half-second never misses the local copy
 function ssScheduleRetry(){
   clearTimeout(sync.retryTimer);
@@ -4867,6 +4917,7 @@ async function syncRun(opts){
   opts = opts || {};
   if(sync.running){ sync.again = true; return; }
   if(!state || !sync.dirty) return;
+  if(auth.signedOut && !opts.recheck){ syncSet('signedout'); return; }   // signed out: nothing is sent, nothing is overwritten, the edits stay marked unsaved and stored on this device
   sync.running = true; sync.again = false;
   try{
     const seq = sync.editSeq, body = JSON.stringify(state);
@@ -4895,7 +4946,7 @@ async function syncRun(opts){
     syncSet('saving');
     const sum = ssSummary(state, body.length);
     const res = await ssCloudSave(body);
-    if(res.blocked){ ssBlock(); return; }
+    if(res.blocked){ if(await authStillMember() === false){ authRevoked(); return; } ssBlock(); return; }   // 0 rows can also mean the account was turned off: check before calling it "someone else saved"
     ssBaseFromRow(res.row); sync.gen++;
     alCommit(alp); if(al.hadFail){ al.hadFail = false; alSystem('Cloud save recovered: backed up again'); }
     sync.confirmed = sum; sync.cloudHasDoc = true; sync.held = null; sync.heldKey = ''; sync.allowShrink = false; sync.retryCount = 0; sync.nextRetryAt = 0; clearTimeout(sync.retryTimer);
@@ -4905,6 +4956,7 @@ async function syncRun(opts){
     syncSet(sync.dirty ? 'saving' : 'backed');
     if(!sync.dirty){ try{ if(lr.deferred || lr.remoteAt) lrSchedule(LR_RETRY_MS); }catch(e){} }
   }catch(e){
+    if(e && e.authError){ sync.retryCount = 0; clearTimeout(sync.retryTimer); syncSet('signedout'); return; }   // the save engine pauses; the sign-in dialog does the rest
     sync.retryCount++;
     const off = (typeof navigator !== 'undefined' && navigator.onLine === false) || (e instanceof TypeError);
     if(sync.retryCount === 1){ al.hadFail = true; alSystem('Cloud save failed: ' + (off ? 'offline' : alTrunc((e && e.message) || 'unknown error', 120))); }
@@ -4918,6 +4970,7 @@ async function syncRun(opts){
 function ssRetryNow(){
   const s = sync.status;
   clearTimeout(sync.retryTimer);
+  if(s === 'signedout'){ authShowLogin({ expired: true }); return; }
   if(!usingCloud || !cloud.enabled){ ssTryReconnect(); return; }
   if(s === 'blocked'){ ssRetryBlocked(); return; }
   if(sync.dirty){ syncSet('saving'); syncRun({ manual: true }); } else ssHeartbeat();
@@ -4933,7 +4986,7 @@ async function ssRetryBlocked(){
 }
 /* ---------- heartbeat, visibility, online ---------- */
 async function ssHeartbeat(){
-  if(!usingCloud || !cloud.enabled || sync.running || !state || !session || sync.status === 'blocked') return;
+  if(!usingCloud || !cloud.enabled || sync.running || !state || !session || sync.status === 'blocked' || auth.signedOut) return;
   const gen = sync.gen;
   try{
     const p = await sbPeek();
@@ -4943,6 +4996,7 @@ async function ssHeartbeat(){
     else if(sync.dirty) ssBlock();
     else lrSchedule(0);   // nothing unsaved: the existing live refresh applies their changes
   }catch(e){
+    if(e && e.authError){ if(sync.dirty) syncSet('signedout'); return; }
     if(sync.dirty){ sync.retryCount++; const off = navigator.onLine === false || (e instanceof TypeError); syncSet(off ? 'offline' : 'failed', off ? '' : (e.message || '')); ssScheduleRetry(); }
     /* clean: nothing is at risk, and the "Backed up · X ago" wording simply keeps ageing */
   }
@@ -4966,7 +5020,7 @@ window.addEventListener('offline', () => { if(sync.started && sync.dirty && usin
 /* ---------- local-only mode: keep trying to reach the cloud ---------- */
 function ssStartReconnect(){ if(sync.reconTimer) return; sync.reconTimer = setInterval(ssTryReconnect, SS_RECONNECT_MS); }
 async function ssTryReconnect(){
-  if(usingCloud || !cloud.enabled || !cloudBase() || !cloud.key || !state || sync.reconBusy || !session) return;
+  if(usingCloud || !cloud.enabled || !cloudBase() || !cloud.key || !state || sync.reconBusy || !session || auth.signedOut) return;
   sync.reconBusy = true;
   try{
     const row = await sbGetRow();
@@ -4974,7 +5028,7 @@ async function ssTryReconnect(){
     usingCloud = true; try{ renderCloudStatus(); }catch(e){}
     try{ await ssReconcile(row, { live: true, source: 'reconnect' }); }catch(e){ usingCloud = false; throw e; }
     clearInterval(sync.reconTimer); sync.reconTimer = null;
-  }catch(e){ sync.detail = (e && e.message) || ''; if(!usingCloud) syncSet('local', sync.detail); }
+  }catch(e){ if(e && e.authError) return; sync.detail = (e && e.message) || ''; if(!usingCloud) syncSet('local', sync.detail); }
   finally{ sync.reconBusy = false; }
 }
 
@@ -5060,6 +5114,10 @@ async function ssReconcile(row, opts){
   let localObj = null, localRaw = null;
   if(opts.live && state){ localObj = state; localRaw = JSON.stringify(state); }
   else { try{ localRaw = await Store.get(STORAGE_KEY); localObj = localRaw ? JSON.parse(localRaw) : null; }catch(e){ localObj = null; } if(!ssIsObj(localObj)) localObj = null; }
+  if(opts.source === 'signin' && opts.live && sync.dirty && !sync.sample){   // the session ended mid-edit: if the cloud has not moved since our last confirmed save, nothing can be lost by simply resuming
+    const same = (!sync.noVersion && row.version != null && sync.cloudVersion != null) ? Number(row.version) === Number(sync.cloudVersion) : !!(sync.cloudUpdatedAt && row.updated_at === sync.cloudUpdatedAt);
+    if(same){ ssBaseFromRow(row); syncSet('saving'); await syncRun({ manual: true, recheck: true }); return 'resume'; }
+  }
   const cleanMeta = !!(meta && !meta.dirty && (meta.localHash == null || !localRaw || meta.localHash === ssHash(localRaw)));
   let decision;
   if(!localObj) decision = 'cloud';
@@ -5068,7 +5126,7 @@ async function ssReconcile(row, opts){
   else if(cleanMeta) decision = 'cloud';                                          // clean here, and the cloud moved on
   else decision = (cloudDoc ? ssSameDoc(localObj, cloudDoc) : (ssCounts(localObj).contacts + ssCounts(localObj).leads + ssCounts(localObj).projects + ssCounts(localObj).quotes + ssCounts(localObj).invoices === 0 && ssCanon(localObj) === ssCanon(mergeDefaults({})))) ? 'cloud-identical' : 'dialog';
   if(decision === 'cloud-sample' && sync.dirty){ ssStoreRescue(localRaw); }
-  if(decision === 'cloud' && opts.source === 'reconnect'){
+  if(decision === 'cloud' && (opts.source === 'reconnect' || opts.source === 'signin')){
     ssBaseFromRow({ updated_at: sync.cloudUpdatedAt, version: sync.cloudVersion });   // the base stays the one we last confirmed, so the live refresh sees the cloud as newer and applies it when it is safe
     syncSet('backed'); try{ lrSchedule(0); }catch(e){} return 'live';
   }
@@ -5142,7 +5200,7 @@ function ssStart(){
 /* ---------- version history (Settings) ---------- */
 let ssHistLoaded = false;
 async function ssHistLoad(force){
-  const box = document.getElementById('ssHistBody'); if(!box) return;
+  const box = document.getElementById('ssHistBody'); if(!box || !isAdmin()) return;   // admin only: a member never asks for the history (and the database refuses)
   if(ssHistLoaded && !force) return;
   box.innerHTML = '<div class="ss-hist-msg" role="status">Loading…</div>';
   try{
@@ -5164,7 +5222,7 @@ async function ssHistFetchDoc(id){
 }
 (function ssHistInit(){
   const d = document.getElementById('ssHist'); if(!d) return;
-  d.addEventListener('toggle', () => { if(d.open) ssHistLoad(); });
+  d.addEventListener('toggle', () => { if(d.open && isAdmin()) ssHistLoad(); });
   d.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-ss-hist]'); if(!b) return;
     const id = b.dataset.id, act = b.dataset.ssHist; b.disabled = true;
@@ -5394,22 +5452,26 @@ function alEnqueue(events){
 function alSystem(summary, extra){ try{ alEnqueue([alMk('system', 'system', null, null, summary, extra || null)]); alFlushSoon(); }catch(e){} }
 const alTableMissing = (status, t) => status === 404 || /PGRST205|42P01|does not exist|Could not find the table/i.test(t || '');
 function alFlushSoon(){ if(al.timer || al.flushing) return; al.timer = setTimeout(() => { al.timer = null; alFlush(); }, 1500); }
+/* a plain insert: the row id is a uuid, so a repeat of a stored row is refused by the primary key (409) and counts as "already stored".
+   (ON CONFLICT ... DO NOTHING is not used: a member cannot read activity_log, and Postgres refuses it when the existing row is invisible.) */
+const alPost = rows => ssFetch(`${cloudBase()}/rest/v1/activity_log`, { method: 'POST', headers: sbHeaders({ 'Prefer': 'return=minimal' }), body: JSON.stringify(rows) }, 20000);
+const AL_ROW_FINAL = st => st === 400 || st === 403 || st === 409 || st === 422;   // this row can never be accepted (or is already there): drop it, never block the rest
 async function alFlush(){
-  if(al.flushing || !usingCloud || !cloud.enabled || !cloud.key || !cloudBase()) return;
+  if(al.flushing || !usingCloud || !cloud.enabled || !cloudBase() || (typeof auth !== 'undefined' && auth.signedOut)) return;
   if(sync.status === 'failed' || sync.status === 'offline') return;   // the main save is not getting through: nothing is logged until it does, so the log matches the cloud
   let q = alQueueRead(); if(!q.length) return;
   al.flushing = true;
   try{
     while(q.length){
       const batch = q.slice(0, AL_BATCH);
-      const r = await ssFetch(`${cloudBase()}/rest/v1/activity_log?on_conflict=id`, { method: 'POST', headers: sbHeaders({ 'Prefer': 'resolution=ignore-duplicates,return=minimal' }), body: JSON.stringify(batch) }, 20000);
+      const r = await alPost(batch);
       if(r.ok){ q = alQueueRead().filter(e => !batch.some(b => b.id === e.id)); alQueueWrite(q); al.retry = 0; continue; }
       const t = await r.text();
       if(alTableMissing(r.status, t)){ al.noTable = true; q = alQueueRead(); if(q.length > AL_QUEUE_MAX_NO_TABLE){ q = q.slice(q.length - AL_QUEUE_MAX_NO_TABLE); alQueueWrite(q); } clearTimeout(al.noTableTimer); al.noTableTimer = setTimeout(() => { al.noTable = false; alFlush(); }, AL_NO_TABLE_RECHECK_MS); return; }
-      if(r.status === 400 || r.status === 422){   // a row the table will never accept must not block the rest: try one by one and drop the bad ones
+      if(AL_ROW_FINAL(r.status)){   // part of the batch is already stored, or one row is bad: go one by one
         for(const ev of batch){
-          const r1 = await ssFetch(`${cloudBase()}/rest/v1/activity_log?on_conflict=id`, { method: 'POST', headers: sbHeaders({ 'Prefer': 'resolution=ignore-duplicates,return=minimal' }), body: JSON.stringify([ev]) }, 20000);
-          if(r1.ok || r1.status === 400 || r1.status === 422){ q = alQueueRead().filter(e => e.id !== ev.id); alQueueWrite(q); } else throw new Error('HTTP ' + r1.status);
+          const r1 = await alPost([ev]);
+          if(r1.ok || AL_ROW_FINAL(r1.status)){ q = alQueueRead().filter(e => e.id !== ev.id); alQueueWrite(q); } else throw new Error('HTTP ' + r1.status);
         }
         continue;
       }
@@ -5417,6 +5479,7 @@ async function alFlush(){
     }
     al.noTable = false; try{ if(al.ui && al.ui.open) alRefreshSoon(); }catch(e){}
   }catch(e){
+    if(e && e.authError) return;   // signed out: the queue waits, and is flushed again after sign-in
     al.retry++; clearTimeout(al.timer); const d = SS_RETRY_MS[Math.min(al.retry - 1, SS_RETRY_MS.length - 1)]; al.timer = setTimeout(() => { al.timer = null; alFlush(); }, d);   // the save engine's own backoff
   }finally{ al.flushing = false; }
 }
@@ -5491,7 +5554,7 @@ function alUrl(cursor){
   return u;
 }
 async function alLoad(more){
-  const u = al.ui; if(u.state === 'loading' && more) return;
+  const u = al.ui; if(!isAdmin()) return; if(u.state === 'loading' && more) return;   // admin only
   const my = ++u.req; u.state = 'loading'; if(!more){ u.rows = []; u.done = false; } alRender();
   try{
     if(!cloud.enabled || !cloudBase() || !usingCloud) throw new Error('not connected');
@@ -5536,53 +5599,219 @@ function alBuild(){
     if(e.target.closest('[data-al="retry"]')) alLoad(false);
   });
 }
-function alShowSection(first){ alBuild(); const u = al.ui; if(!u) return; const pn = document.getElementById('panel-settings'); if(!pn || !pn.classList.contains('active')) return; u.open = true; if(first || u.state === 'idle') alLoad(false); }
+function alShowSection(first){ if(!isAdmin()) return; alBuild(); const u = al.ui; if(!u) return; const pn = document.getElementById('panel-settings'); if(!pn || !pn.classList.contains('active')) return; u.open = true; if(first || u.state === 'idle') alLoad(false); }
 function alHideSection(){ if(al.ui) al.ui.open = false; }
 /* BT:js-activitylog end */
 
 
-/* ---------- auth: Option A client-side gate ---------- */
-let session = null;
-const SESSION_KEY = STORAGE_PREFIX + 'business-tracker-session';
-function loadSession(){ try{ session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }catch(e){ session = null; } }
-function saveSession(){ try{ localStorage.setItem(SESSION_KEY, JSON.stringify(session)); }catch(e){} }
-function clearSession(){ session = null; try{ localStorage.removeItem(SESSION_KEY); }catch(e){} }
+/* BT:js-auth begin */
+/* =====================================================================
+   SIGN-IN (Supabase Auth, email + password). The database refuses anyone who is not a signed-in, approved member (see supabase/auth-stage-*.sql);
+   this block is the portal's side: sign in, keep the session fresh, send the token with every data request, and NEVER lose work when the
+   session ends (the save engine pauses in a red "Signed out" state and resumes after sign-in). No password is ever stored; no key that can
+   create users is in the page. The tokens live in their own localStorage key, separate from the data document, and never appear in a URL,
+   the console, the backup file or the activity log. */
+const AUTH_KEY = STORAGE_PREFIX + 'business-tracker-auth';
+const AUTH_LOCK_KEY = AUTH_KEY + '-lock';
+let session = null;   // { username: display name, role: 'admin' | 'user', userId, email }: in memory only, rebuilt from app_members at every sign-in
+const auth = { tok: null, refreshing: null, timer: null, signedOut: false, lastEmail: '', offlineBoot: false };
+class AuthError extends Error { constructor(m){ super(m); this.authError = true; } }
+const authNow = () => Math.floor(Date.now() / 1000);
+const authSleep = ms => new Promise(r => setTimeout(r, ms));
+const authEl = id => document.getElementById(id);
+function authRead(){ try{ const t = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); return t && t.access_token && t.refresh_token ? t : null; }catch(e){ return null; } }
+function authWrite(t){ try{ localStorage.setItem(AUTH_KEY, JSON.stringify(t)); return true; }catch(e){ return false; } }   // one write for the whole pair: tokens rotate, so they must change together
+function authClear(){ try{ localStorage.removeItem(AUTH_KEY); localStorage.removeItem(AUTH_LOCK_KEY); }catch(e){} auth.tok = null; clearTimeout(auth.timer); }
 function isAdmin(){ return !!(session && session.role === 'admin'); }
-async function sbRpc(fn, args){
-  const r = await fetch(`${cloudBase()}/rest/v1/rpc/${fn}`, { method: 'POST', headers: sbHeaders(), body: JSON.stringify(args || {}) });
-  if(!r.ok) throw new Error('HTTP ' + r.status + ' — ' + (await r.text()).slice(0,160));
-  return await r.json();
+function authTokensFrom(j, prev){
+  return { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || (authNow() + (Number(j.expires_in) || 3600)),
+    user_id: (j.user && j.user.id) || (prev && prev.user_id) || '', email: (j.user && j.user.email) || (prev && prev.email) || '', member: (prev && prev.member) || null };
 }
-async function attemptLogin(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  const err = document.getElementById('loginErr');
-  if(!u || !p){ err.textContent = 'Enter your username and password.'; return; }
-  if(!cloud.key || !cloudBase()){ err.textContent = 'This device isn\'t connected to the database yet.'; return; }
-  err.textContent = 'Checking…';
-  try{
-    const rows = await sbRpc('app_login', { p_username: u, p_password: p });
-    if(Array.isArray(rows) && rows.length){
-      session = { username: rows[0].username, role: rows[0].role };
-      saveSession();
-      err.textContent = '';
-      document.getElementById('loginPass').value = '';
-      await startApp();
-    } else {
-      err.textContent = 'Incorrect username or password.';
+async function authCall(path, method, body, token){   // the auth endpoints take the publishable key as apikey; nothing secret goes in the URL
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 20000);
+  try{ return await fetch(cloudBase() + '/auth/v1/' + path, { method, headers: Object.assign({ 'apikey': cloud.key, 'Content-Type': 'application/json' }, token ? { 'Authorization': 'Bearer ' + token } : {}), body: body ? JSON.stringify(body) : undefined, signal: ctl.signal }); }
+  finally{ clearTimeout(to); }
+}
+async function authSignIn(email, password){
+  let r; try{ r = await authCall('token?grant_type=password', 'POST', { email, password }); }
+  catch(e){ const x = new Error('network'); x.userMsg = 'Couldn’t reach the sign-in service. Check your connection and try again.'; throw x; }
+  if(!r.ok){ const x = new Error('rejected'); x.userMsg = r.status === 429 ? 'Too many attempts. Wait a minute and try again.' : 'That email and password don’t match.'; throw x; }   // always the same plain message: it never says which half was wrong
+  return authTokensFrom(await r.json(), null);
+}
+/* ---- a simple lock so two tabs never spend the same (rotating) refresh token ---- */
+async function authLockAcquire(){
+  const id = Math.random().toString(36).slice(2), t0 = Date.now();
+  while(Date.now() - t0 < 10000){
+    let l = null; try{ l = JSON.parse(localStorage.getItem(AUTH_LOCK_KEY) || 'null'); }catch(e){}
+    if(!l || l.until < Date.now()){
+      try{ localStorage.setItem(AUTH_LOCK_KEY, JSON.stringify({ id, until: Date.now() + 15000 })); }catch(e){ return null; }
+      await authSleep(30);
+      let l2 = null; try{ l2 = JSON.parse(localStorage.getItem(AUTH_LOCK_KEY) || 'null'); }catch(e){}
+      if(l2 && l2.id === id) return id;
     }
+    await authSleep(80 + Math.random() * 80);
+  }
+  return null;   // could not get it in time: carry on, but the storage is re-read first
+}
+function authLockRelease(id){ if(!id) return; try{ const l = JSON.parse(localStorage.getItem(AUTH_LOCK_KEY) || 'null'); if(l && l.id === id) localStorage.removeItem(AUTH_LOCK_KEY); }catch(e){} }
+/* resolves true (we hold a fresh pair), false (the session is really over) or 'network' (could not reach the service: the session is NOT over) */
+function authRefresh(badAccess){
+  if(auth.refreshing) return auth.refreshing;
+  auth.refreshing = (async () => {
+    const lock = await authLockAcquire();
+    try{
+      const cur = authRead(); if(!cur) return false;
+      const left = cur.expires_at - authNow();
+      if(badAccess ? (cur.access_token !== badAccess && left > 20) : left > 75){ auth.tok = cur; authSchedule(); return true; }   // another tab already refreshed: use its pair
+      let r; try{ r = await authCall('token?grant_type=refresh_token', 'POST', { refresh_token: cur.refresh_token }); }catch(e){ return 'network'; }
+      if(r.ok){ const nt = authTokensFrom(await r.json(), cur); authWrite(nt); auth.tok = nt; authSchedule(); return true; }
+      if(r.status >= 500 || r.status === 429) return 'network';
+      const again = authRead(); if(again && again.refresh_token !== cur.refresh_token && again.expires_at - authNow() > 20){ auth.tok = again; authSchedule(); return true; }   // rotated a moment ago by another tab
+      return false;
+    } finally { authLockRelease(lock); }
+  })().finally(() => { auth.refreshing = null; });
+  return auth.refreshing;
+}
+async function authTimerFire(){ const r = await authRefresh(); if(r === false) authSignedOut(); else if(r === 'network') auth.timer = setTimeout(authTimerFire, 20000); }
+function authSchedule(){   // refresh about 60 seconds before the token runs out
+  clearTimeout(auth.timer); const t = auth.tok || authRead(); if(!t) return;
+  auth.timer = setTimeout(authTimerFire, Math.max(3000, (t.expires_at - authNow() - 60) * 1000));
+}
+window.addEventListener('storage', (e) => {   // another tab refreshed or signed out
+  if(e.key !== AUTH_KEY) return;
+  const t = authRead();
+  if(t){ auth.tok = t; authSchedule(); if(auth.signedOut && session){ auth.signedOut = false; try{ authHideLogin(); authResume(); }catch(x){} } }
+  else if(session && !auth.signedOut) authSignedOut();
+});
+/* a valid access token for the next request (refreshing first when it is about to run out); throws AuthError when there is no session */
+async function authAccess(){
+  if(auth.signedOut) throw new AuthError('signed out');
+  let t = authRead(); if(!t){ authSignedOut(); throw new AuthError('signed out'); }
+  auth.tok = t;
+  if(t.expires_at - authNow() < 20){ const r = await authRefresh(); if(r === false){ authSignedOut(); throw new AuthError('session ended'); } if(r === 'network') throw new TypeError('network'); t = auth.tok; }
+  return t.access_token;
+}
+/* the session ended: never discard work. The save engine pauses (red "Signed out"), and a sign-in dialog opens over the page. */
+function authSignedOut(){
+  if(auth.signedOut) return;
+  auth.signedOut = true; authClear();
+  try{ if(typeof sync !== 'undefined' && sync.started) syncSet('signedout'); }catch(e){}
+  try{ authShowLogin({ expired: !!(typeof sync !== 'undefined' && sync.started) }); }catch(e){}
+}
+/* ---- the sign-in screen (full page at start-up; a dialog over the page when a session ends mid-edit, so nothing on screen is reset) ---- */
+function authShowLogin(o){
+  o = o || {}; const ov = authEl('loginOverlay'); if(!ov) return;
+  ov.classList.remove('hidden'); ov.classList.toggle('login-expired', !!o.expired);
+  if(!o.expired) document.body.classList.add('logged-out');
+  const xa = authEl('loginExpiredActs'); if(xa) xa.hidden = !o.expired;
+  const n = authEl('loginNote'); if(n) n.textContent = o.expired ? 'Your session has ended. Sign in again. Your work is kept.' : (o.note || '');
+  const e = authEl('loginEmail'); if(e){ if(!e.value && auth.lastEmail) e.value = auth.lastEmail; setTimeout(() => { try{ (e.value ? authEl('loginPass') : e).focus(); }catch(x){} }, 50); }
+}
+function authHideLogin(){ const o = authEl('loginOverlay'); if(o){ o.classList.add('hidden'); o.classList.remove('login-expired'); } document.body.classList.remove('logged-out'); }
+function showLogin(){ authShowLogin({}); }
+function hideLoginShowApp(){ authHideLogin(); }
+async function authWhoami(){   // who am I: display name, role and active flag, in one request
+  const r = await ssFetch(`${cloudBase()}/rest/v1/rpc/app_whoami`, { method: 'POST', headers: sbHeaders(), body: '{}' }, 20000);
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  const rows = await r.json(); return (Array.isArray(rows) ? rows[0] : rows) || null;
+}
+function authApply(me, tok){
+  session = { username: String(me.display_name || '').trim(), role: me.role === 'admin' ? 'admin' : 'user', userId: (tok && tok.user_id) || '', email: (tok && tok.email) || '' };
+  const t = authRead(); if(t){ t.member = { display_name: session.username, role: me.role === 'admin' ? 'admin' : 'member' }; authWrite(t); }   // a non-secret cache so the portal can open offline
+}
+async function authSignInFlow(email, pw){
+  const tok = await authSignIn(email, pw); auth.lastEmail = email;
+  authWrite(tok); auth.tok = tok; auth.signedOut = false;
+  let me = null;
+  try{ me = await authWhoami(); }
+  catch(e){ authClear(); const x = new Error('whoami'); x.userMsg = (e && e.authError) ? 'That email and password don’t match.' : 'Signed in, but your account could not be checked. Try again.'; throw x; }
+  if(!me || me.active === false || !String(me.display_name || '').trim()){ authRemoteSignOut(tok.access_token); authClear(); const x = new Error('not approved'); x.userMsg = 'Your account isn’t approved for this portal. Ask Royce.'; throw x; }
+  authApply(me, tok); authSchedule();
+}
+function authRemoteSignOut(token){ try{ authCall('logout?scope=local', 'POST', null, token).catch(() => {}); }catch(e){} }
+async function attemptLogin(){
+  const email = (authEl('loginEmail').value || '').trim(), pw = authEl('loginPass').value, err = authEl('loginErr'), btn = document.querySelector('#loginForm .login-btn');
+  if(!email || !pw){ err.textContent = 'Enter your email and password.'; return; }
+  if(!cloud.key || !cloudBase()){ err.textContent = 'This device isn’t connected to the database yet.'; return; }
+  err.textContent = 'Signing in…'; if(btn) btn.disabled = true;
+  const mid = !!(typeof sync !== 'undefined' && sync.started && state);   // a session that ended mid-edit: the page and its data stay as they are
+  try{
+    await authSignInFlow(email, pw);
+    err.textContent = ''; authEl('loginPass').value = '';
+    if(mid){ authHideLogin(); await authResume(); } else { await startApp(); }
+  }catch(e){ err.textContent = (e && e.userMsg) || 'Couldn’t sign in. Try again.'; authEl('loginPass').value = ''; }
+  finally{ if(btn) btn.disabled = false; }
+}
+/* signed in again after a session ended: resume by itself, load check first (Save Safety), then flush the save and the activity queue */
+async function authResume(){
+  authHideLogin(); auth.signedOut = false;
+  try{ renderAuthUI(); renderWho(); }catch(e){}
+  try{ const row = await sbGetRow(); if(row){ usingCloud = true; await ssReconcile(row, { live: true, source: 'signin' }); } }
+  catch(e){ if(e && e.authError) return; sync.retryCount++; syncSet('failed', (e && e.message) || ''); ssScheduleRetry(); }
+  if(sync.status === 'signedout') syncSet(sync.dirty ? 'saving' : 'backed');
+  try{ alFlush(); }catch(e){} try{ lr.fails = 0; lrSchedule(0); }catch(e){}
+  if(sync.dirty) syncRun({});
+}
+/* false only when the database says this account is no longer an active member (unknown, e.g. offline, counts as still a member) */
+async function authStillMember(){ try{ const me = await authWhoami(); return !!(me && me.active !== false && String(me.display_name || '').trim()); }catch(e){ return true; } }
+function authRevoked(){   // turned off while signed in: nothing is saved, nothing is lost; the work stays on this device
+  if(auth.signedOut) return;
+  auth.signedOut = true; const t = authRead(); if(t) authRemoteSignOut(t.access_token); authClear();
+  try{ if(sync.started) syncSet('signedout'); }catch(e){}
+  authShowLogin({ expired: true }); const n = authEl('loginNote'); if(n) n.textContent = 'Your account isn’t approved for this portal. Ask Royce. Your work is kept on this device.';
+}
+async function authBoot(){   // at page load: is there a session we can use?
+  try{ localStorage.removeItem(STORAGE_PREFIX + 'business-tracker-session'); }catch(e){}   // the old client-side login claim is gone for good
+  const t = authRead(); if(!t) return false;
+  auth.tok = t; if(t.member) auth.lastEmail = t.email || '';
+  if(t.expires_at - authNow() < 60){
+    const r = await authRefresh();
+    if(r === false){ authClear(); return false; }
+    if(r === 'network'){ if(t.member){ authApply(t.member, t); auth.offlineBoot = true; return true; } return false; }
+  }
+  try{
+    const me = await authWhoami();
+    if(!me || me.active === false || !String(me.display_name || '').trim()){ authRemoteSignOut((authRead() || {}).access_token); authClear(); authShowLogin({ note: 'Your account isn’t approved for this portal. Ask Royce.' }); authEl('loginErr').textContent = 'Your account isn’t approved for this portal. Ask Royce.'; return 'refused'; }
+    authApply(me, authRead() || t); authSchedule(); return true;
   }catch(e){
-    const m = (e.message || '');
-    err.textContent = (m.includes('app_login') || m.includes('404') || m.includes('PGRST202'))
-      ? 'Login system not set up yet — run the Users setup SQL in Supabase.'
-      : 'Could not reach the login service. ' + m;
+    if(e && e.authError) return false;
+    const c = (authRead() || {}).member; if(c){ authApply(c, authRead() || t); auth.offlineBoot = true; authSchedule(); return true; }   // offline: open with the cached name so the local copy is usable
+    return false;
   }
 }
-function logout(){ clearSession(); showLogin(); }
-function showLogin(){ const o = document.getElementById('loginOverlay'); if(o) o.classList.remove('hidden'); document.body.classList.add('logged-out'); const lu = document.getElementById('loginUser'); if(lu) setTimeout(()=>lu.focus(), 50); }
-function hideLoginShowApp(){ const o = document.getElementById('loginOverlay'); if(o) o.classList.add('hidden'); document.body.classList.remove('logged-out'); }
-/* Stage 9: the Admin settings section (cloud connection details, API key, user accounts) is built only when the signed-in role is admin.
-   For anyone else the section stays an empty element: no heading, fields, placeholders or buttons, and no key or URL is ever written to the page. */
+/* ---- sign out ---- */
+async function logout(){
+  if(sync.dirty && state){
+    const c = await ssDialog({ title: 'You have changes that are not saved to the cloud', cancelKey: 'cancel', focusKey: 'download', html: '<p>Signing out now would leave them only on this device. A rescue copy is kept on this device either way, and it is offered back to you the next time you sign in. You can also download your data first.</p>', buttons: [
+      { key: 'download', label: 'Download my data, then sign out', cls: 'primary' }, { key: 'out', label: 'Sign out anyway (keep the rescue copy)' }, { key: 'cancel', label: 'Cancel, stay signed in' }] });
+    if(c === 'cancel' || !c) return;
+    if(c === 'download') exportData();
+    try{ ssStoreRescue(JSON.stringify(state)); }catch(e){}   // the local copy and its "unsaved" mark are NOT deleted
+  } else {
+    try{ await Promise.race([alFlush(), authSleep(4000)]); }catch(e){}   // send any waiting activity rows first
+    sync.leaving = true; try{ localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(SS_META_KEY); }catch(e){}   // everything is in the cloud: nothing of the data stays in this browser
+  }
+  const tok = authRead(); if(tok) authRemoteSignOut(tok.access_token);
+  authClear(); ssGuard(false);
+  try{ location.reload(); }catch(e){ session = null; showLogin(); }
+}
+/* ---- change password (Supabase PUT /auth/v1/user), minimum 12 characters ---- */
+function authPwOpen(){
+  const o = authEl('authPwOverlay'); if(!o) return; authEl('authPwErr').textContent = ''; authEl('authPw1').value = ''; authEl('authPw2').value = ''; o.hidden = false; setTimeout(() => authEl('authPw1').focus(), 30);
+}
+function authPwClose(){ const o = authEl('authPwOverlay'); if(o) o.hidden = true; authEl('authPw1').value = ''; authEl('authPw2').value = ''; }
+async function authPwSave(){
+  const a = authEl('authPw1').value, b = authEl('authPw2').value, err = authEl('authPwErr');
+  if(a.length < 12){ err.textContent = 'Use at least 12 characters.'; return; }
+  if(a !== b){ err.textContent = 'The two passwords don’t match.'; return; }
+  err.textContent = 'Saving…';
+  try{
+    const r = await ssFetch(`${cloudBase()}/auth/v1/user`, { method: 'PUT', headers: sbHeaders(), body: JSON.stringify({ password: a }) }, 20000);
+    if(!r.ok){ err.textContent = r.status === 422 ? 'That password isn’t accepted. Try a longer or less common one.' : 'Couldn’t change the password just now. Try again.'; return; }
+    authPwClose(); showToast('Password changed.', null, 6000);
+  }catch(e){ err.textContent = (e && e.authError) ? 'You are signed out. Sign in, then try again.' : 'Couldn’t reach the service. Try again.'; }
+}
+/* ---- Admin: the people who can sign in (a list from app_members; accounts are made in the Supabase dashboard, never in the browser) ---- */
 function adminSectionHtml(){
   return `
     <div class="section-label">Cloud database — multi-device sync</div>
@@ -5590,7 +5819,7 @@ function adminSectionHtml(){
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
         <span id="cloudStatus"></span>
       </div>
-      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Connect to your Supabase database so the tracker syncs across devices and is backed up server-side, instead of living only in this browser. <strong>First-time setup:</strong> run the SQL below once in Supabase, then paste your Project URL and publishable key and hit Connect. (Logins come in the next step — for now, keep the link private.)</p>
+      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">The Supabase project this portal saves to. The publishable key is the only key that belongs in the page; it cannot read or change anything on its own. Everyone signs in with their own email and password, and the database refuses anyone who is not an approved member.</p>
       <div class="assumptions-grid two" style="max-width:640px;">
         <div><label>Project URL</label><input id="cloudUrl" placeholder="https://xxxx.supabase.co"></div>
         <div><label>Publishable key (sb_publishable_…)</label><input id="cloudKey" type="password" placeholder="sb_publishable_…"></div>
@@ -5602,28 +5831,11 @@ function adminSectionHtml(){
         <button class="btn secondary" data-action="cloud-disconnect" style="margin-left:auto;">Disconnect</button>
       </div>
       <div id="cloudMsg" class="cloud-msg"></div>
-      <details class="u-margin-top-14px">
-        <summary style="cursor:pointer;font-size:12px;font-weight:600;color:var(--slate);">Show one-time setup SQL</summary>
-        <p style="font-size:12px;color:var(--text-muted);margin:8px 0;">In Supabase: left sidebar → <strong>SQL Editor</strong> → <strong>New query</strong> → paste this → <strong>Run</strong>. You only do this once.</p>
-        <pre class="sql-block" id="setupSql">create table if not exists tracker_data (
-  id int primary key default 1,
-  doc jsonb not null default '{}'::jsonb,
-  updated_at timestamptz not null default now(),
-  constraint single_row check (id in (1, 2))   -- row 1 = live site, row 2 = test site
-);
-insert into tracker_data (id, doc) values (1, '{}'::jsonb), (2, '{}'::jsonb)
-  on conflict (id) do nothing;
-alter table tracker_data enable row level security;
-create policy "app read"   on tracker_data for select using (true);
-create policy "app insert" on tracker_data for insert with check (true);
-create policy "app update" on tracker_data for update using (true) with check (true);</pre>
-        <button class="btn secondary u-margin-top-8px" data-action="copy-sql" >Copy SQL</button>
-      </details>
     </div>
 
-    <div class="section-label">User accounts</div>
+    <div class="section-label">People who can sign in</div>
     <div class="card">
-      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Add team members, reset passwords, or remove access. Each person logs in with their own username and password. (Only admins see this panel.)</p>
+      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Everyone here has their own login. Turn someone off to stop them signing in (their name stays on past activity). The name shown is the one recorded against every change they make.</p>
       <div id="usersWrap"></div>
     </div>
     `;
@@ -5643,33 +5855,47 @@ function renderAdminSection(){
 function renderAuthUI(){
   const lb = document.getElementById('logoutBar');
   if(lb) lb.innerHTML = session
-    ? `<div class="who">${escAttr(session.username)}<span class="role">${session.role==='admin'?'admin':(session.role==='approver'?'approver':'user')}</span></div><button class="logout-link" data-action="logout">Log out</button>`
+    ? `<div class="who">${escAttr(session.username)}<span class="role">${session.role === 'admin' ? 'admin' : (session.role === 'approver' ? 'approver' : 'member')}</span></div><button class="logout-link" data-action="logout">Sign out</button><button type="button" class="chpw-link" data-action="chpw">Change password</button>`
     : '';
+  const h = document.getElementById('ssHist'); if(h) h.hidden = !isAdmin();   // Version history is for the admin only (and the database refuses everyone else)
   renderAdminSection();
 }
 async function renderUsers(){
   const wrap = document.getElementById('usersWrap'); if(!wrap || !isAdmin()) return;
-  wrap.innerHTML = '<div class="bt-tbl-state bt-tbl-loading" role="status">Loading users…</div>';
+  wrap.innerHTML = '<div class="bt-tbl-state bt-tbl-loading" role="status">Loading people…</div>';
   try{
-    const users = await sbRpc('app_list_users', {});
-    const rows = (users || []).map(u => `<tr>
-      <td>${escAttr(u.username)}</td>
-      <td style="width:90px">${u.role==='admin'?'<span class="lyr committed">admin</span>':'<span class="lyr weighted">user</span>'}</td>
-      <td style="width:210px;text-align:right;">
-        <button class="btn secondary" style="padding:4px 10px;font-size:var(--bt-fs-xs);" data-action="reset-user" data-user="${escAttr(u.username)}">Reset password</button>
-        <button class="icon-btn" data-action="delete-user" data-user="${escAttr(u.username)}" title="Delete user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      </td></tr>`).join('');
-    wrap.innerHTML = `<div class="table-scroll fitmode" style="margin-bottom:14px;"><table><thead><tr><th>Username</th><th>Role</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
-      <div class="stage-label-row">Add a new user</div>
-      <div class="assumptions-grid" style="grid-template-columns:1fr 1fr 110px auto;align-items:end;gap:10px;max-width:640px;">
-        <div><label>Username</label><input id="newUser" placeholder="username"></div>
-        <div><label>Password</label><input id="newPass" type="text" placeholder="set a password"></div>
-        <div><label>Role</label><select id="newRole"><option value="user">user</option><option value="admin">admin</option></select></div>
-        <div><button class="btn" data-action="add-user">+ Add</button></div>
-      </div>
-      <div id="usersMsg" class="cloud-msg u-margin-top-8px" ></div>`;
-  }catch(e){ wrap.innerHTML = `<div class="cloud-msg err">Couldn't load users: ${escAttr(e.message||'')} — has the Users setup SQL been run?</div>`; }
+    const r = await ssFetch(`${cloudBase()}/rest/v1/app_members?select=user_id,email,display_name,role,active&order=display_name`, { headers: sbHeaders() }, 20000);
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const rows = await r.json();
+    const body = (rows || []).map(m => { const me = session && m.user_id === session.userId; return `<tr>
+      <td><input class="mem-name" type="text" maxlength="40" value="${escAttr(m.display_name)}" data-uid="${escAttr(m.user_id)}" data-was="${escAttr(m.display_name)}" aria-label="Display name for ${escAttr(m.email)}"></td>
+      <td>${escHtml(m.email)}</td>
+      <td style="width:130px;white-space:nowrap">${m.role === 'admin' ? '<span class="lyr committed">admin</span>' : '<span class="lyr weighted">member</span>'}</td>
+      <td style="width:120px;white-space:nowrap"><label class="mem-act"><input class="mem-active" type="checkbox" data-uid="${escAttr(m.user_id)}"${m.active ? ' checked' : ''}${me ? ' disabled' : ''} aria-label="Active: ${escAttr(m.display_name)}"> ${me ? 'you' : (m.active ? 'on' : 'off')}</label></td></tr>`; }).join('');
+    wrap.innerHTML = `<div class="table-scroll fitmode" style="margin-bottom:14px;"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Can sign in</th></tr></thead><tbody>${body}</tbody></table></div>
+      <div class="stage-label-row">Add a person</div>
+      <p class="q-help">New accounts are made in the Supabase dashboard, not here: <strong>Authentication → Users → Add user</strong> (email and a first password). Then ask the assistant to approve the account. They will then appear in this list.</p>
+      <div id="usersMsg" class="cloud-msg u-margin-top-8px" role="status"></div>`;
+  }catch(e){ wrap.innerHTML = `<div class="cloud-msg err">Couldn’t load the list${e && e.authError ? ' (you are signed out)' : ''}. ${escHtml((e && e.message) || '')}</div>`; }
 }
+async function authMemberPatch(uid, patch, msgOk){
+  const msg = document.getElementById('usersMsg');
+  try{
+    const r = await ssFetch(`${cloudBase()}/rest/v1/app_members?user_id=eq.${encodeURIComponent(uid)}`, { method: 'PATCH', headers: sbHeaders({ 'Prefer': 'return=minimal' }), body: JSON.stringify(patch) }, 20000);
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    if(msg){ msg.textContent = msgOk; msg.className = 'cloud-msg ok'; }
+    try{ alSystem('Changed a sign-in account: ' + msgOk); }catch(e){}
+    renderUsers();
+  }catch(e){ if(msg){ msg.textContent = 'That change was refused or failed.'; msg.className = 'cloud-msg err'; } renderUsers(); }
+}
+document.addEventListener('change', (e) => {
+  const t = e.target; if(!t || !isAdmin()) return;
+  if(t.classList && t.classList.contains('mem-active')) authMemberPatch(t.dataset.uid, { active: !!t.checked }, t.checked ? 'Turned a person on' : 'Turned a person off');
+  else if(t.classList && t.classList.contains('mem-name')){ const v = t.value.trim(); if(!v || v.length > 40){ t.value = t.dataset.was; return; } if(v !== t.dataset.was) authMemberPatch(t.dataset.uid, { display_name: v }, 'Changed a display name'); }
+});
+document.addEventListener('submit', (e) => { if(e.target && e.target.id === 'loginForm'){ e.preventDefault(); attemptLogin(); } });
+/* BT:js-auth end */
+
 async function startApp(){
   hideLoginShowApp();
   await loadState();
@@ -11898,7 +12124,7 @@ function qSeedGroups(o){   // the Guy Nunn sample: group its lines (only if the 
    Two independent approval lanes live in Settings > Approvals (state.settings.approvalLanes, all OFF by default). A quote that a lane applies to is submitted for approval
    (q.approval = { round, status, lanes[{ id, name, mode, approvers, rule, reasons, decisions[] }], parts, submittedBy, submittedAt, reason, returned }).
    Gateway lanes block sending until approved; Notify-only lanes never block. A material change after approval resets the decisions.
-   Identity: the login username when it matches a name in the team list (#ownersList), otherwise the "Who are you?" picker (remembered on this device).
+   Identity: the signed-in member's display name (from app_members).
    Approvals are a team process, not security. */
 const AP_DEFAULT_SUBJECT = 'Quotation {ref} - {project}';
 const AP_DEFAULT_BODY = "Hi {customerName},\n\nThank you for the opportunity to quote for {project}. Please find our quotation {ref} attached. It is valid until {validUntil}.\n\nIf you have any questions, or would like to go ahead, just reply to this email or give me a call on {phone}.\n\nKind regards,\n{businessName}";
@@ -11906,7 +12132,6 @@ const AP_LANE_DEFS = [
   { id: 'l1', name: 'Pricing and margin', enabled: false, mode: 'gateway', approvers: [], rule: 'any', marginBelow: '', totalOver: '' },
   { id: 'l2', name: 'Cash flow and timeline', enabled: false, mode: 'gateway', approvers: [], rule: 'any', negativeMonth: false, totalOver: '', deliveryBeforePayment: false }
 ];
-const AP_WHO_KEY = STORAGE_PREFIX + 'business-tracker-who-are-you';
 const AP_LABELS = { pending: 'Pending', approved: 'Approved', changes: 'Changes requested', rejected: 'Rejected', seen: 'Seen', concern: 'Concern raised' };
 function apNormLanes(arr){
   const numOrBlank = v => (v === '' || v == null || isNaN(Number(v)) || Number(v) < 0) ? '' : Number(v);
@@ -11921,24 +12146,14 @@ function apNormLanes(arr){
   });
 }
 function apTeam(){ return [...document.querySelectorAll('#ownersList option')].map(o => o.value).filter(v => v && v !== 'TBC'); }
-function whoAmI(){
-  const u = String((session && session.username) || '').toLowerCase(), team = apTeam();
-  const hit = u && team.find(n => u === n.toLowerCase() || u.startsWith(n.toLowerCase()));
-  if(hit) return { name: hit, source: 'login' };
-  let p = ''; try{ p = localStorage.getItem(AP_WHO_KEY) || ''; }catch(e){}
-  return { name: team.includes(p) ? p : '', source: 'picker' };
+function whoAmI(){   // the signed-in member's display name (read-only): the old "Who are you?" picker is gone
+  return session && session.username ? { name: session.username, source: 'login' } : { name: '', source: 'login' };
 }
 function renderWho(){
   const el = document.getElementById('whoPick'); if(!el || !state) return;
   const w = whoAmI();
-  if(w.source === 'login'){ el.innerHTML = `<span class="who-lbl" title="Taken from your login">Acting as <b>${escHtml(w.name)}</b></span>`; return; }
-  el.innerHTML = `<label class="who-lbl" for="whoSel">Who are you?</label><select id="whoSel" aria-label="Who are you?"><option value="">Choose…</option>${apTeam().map(n => `<option${n === w.name ? ' selected' : ''}>${escHtml(n)}</option>`).join('')}</select>`;
+  el.innerHTML = w.name ? `<span class="who-lbl" title="From your sign-in">Acting as <b>${escHtml(w.name)}</b></span>` : '';
 }
-document.addEventListener('change', (e) => {
-  if(e.target.id !== 'whoSel') return;
-  try{ localStorage.setItem(AP_WHO_KEY, e.target.value); }catch(err){}
-  render();
-});
 
 /* ---- which lanes apply to a quote ---- */
 function apCashFacts(q, c){
@@ -12107,7 +12322,7 @@ function qPastValid(q){ return q.status === 'Sent' && qIsExpired(q); }
 
 /* ---- submit dialog ---- */
 function apOpenSubmit(q){
-  if(!whoAmI().name){ showToast('Choose who you are (top of the page) first.'); return; }
+  if(!whoAmI().name){ showToast('You need to be signed in to do that.'); return; }
   const app = apApplicable(q), team = apTeam(), o = document.getElementById('apprOverlay');
   o.dataset.qid = q.id;
   document.getElementById('apprBody').innerHTML = app.map(x => `<div class="ap-sub" data-lane="${x.lane.id}"><label class="q-check"><input type="checkbox" data-ap-inc checked> <b>${escHtml(x.lane.name)}</b></label>
@@ -13995,15 +14210,6 @@ function resolveConfirm(val){
   if(_confirmResolver){ _confirmResolver(val); _confirmResolver = null; }
 }
 
-/* asks for a new password in the app's own dialog (replaces the browser's prompt box); resolves to the typed text, or '' if cancelled */
-async function askNewPassword(u){
-  const btn = document.querySelector('#modalOverlay [data-modal="confirm"]'), old = btn.textContent; btn.textContent = 'Reset password';
-  const asked = showConfirm('Reset password', 'Enter a new password for "' + u + '":', '<div class="lp-f"><input type="text" id="newPwModal" autocomplete="off" aria-label="New password"></div>');
-  const inp = document.getElementById('newPwModal');
-  if(inp){ inp.focus(); inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); resolveConfirm(true); } }); }
-  const ok = await asked; btn.textContent = old;
-  return ok ? (_confirmExtraNote || '') : '';
-}
 function statusStyle(s){ return chipStyle(ACTION_STATUS_CHIP[s] || 'neutral'); }
 function renderActions(){
   const today = new Date(); today.setHours(0,0,0,0);
@@ -14277,9 +14483,10 @@ function linkSummaryHtml(o, attrs, cls){
 /* ---- users (owner dropdown): the app's logins when they can be read, else whoever is already known ---- */
 let appUsers = null, appUsersLoading = false;
 async function ensureAppUsers(){
-  if(appUsers !== null || appUsersLoading || !cloudBase() || !cloud.key) return;
+  if(appUsers !== null || appUsersLoading || !cloudBase() || !cloud.key || !session) return;
+  if(!isAdmin()){ appUsers = []; return; }   // a member cannot read the member list (the database refuses it), so no request is made
   appUsersLoading = true;
-  try{ const rows = await sbRpc('app_list_users', {}); appUsers = (rows || []).map(u => u.username).filter(Boolean); }
+  try{ const r = await ssFetch(`${cloudBase()}/rest/v1/app_members?select=display_name&active=eq.true`, { headers: sbHeaders() }, 20000); appUsers = r.ok ? (await r.json()).map(u => u.display_name).filter(Boolean) : []; }
   catch(e){ appUsers = []; }
   appUsersLoading = false; renderCrm();
 }
@@ -14287,6 +14494,7 @@ function taskUsers(extra){
   const set = new Set();
   if(meName()) set.add(meName());
   (appUsers || []).forEach(u => set.add(u));
+  apTeam().forEach(u => set.add(u));   // the team list on the Actions page (Royce, Lynton, Gerry, Peter, Mike)
   state.crmTasks.forEach(t => { if(t.owner) set.add(t.owner); });
   if(extra) set.add(extra);
   return [...set].sort((a, b) => a.localeCompare(b));
@@ -16033,7 +16241,7 @@ const SET_SECTIONS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'phonemenu', label: 'Phone menu' },
   { id: 'data',      label: 'Data' },
-  { id: 'activity',  label: 'Activity' },
+  { id: 'activity',  label: 'Activity', admin: true },   // admin only (hidden here, refused by the database)
   { id: 'admin',     label: 'Admin', admin: true }   // same admin-only gating as the cards inside it
 ];
 const SET_SECTION_KEY = STORAGE_PREFIX + 'business-tracker-settings-section';
@@ -16736,36 +16944,12 @@ document.addEventListener('click', (e) => {
     if(navigator.clipboard){ navigator.clipboard.writeText(sql).then(()=>setCloudMsg('SQL copied to clipboard ✓','ok'), ()=>setCloudMsg('Copy failed — select the text manually','err')); }
     else setCloudMsg('Select the text manually to copy','');
   }
-  else if(action === 'do-login'){ attemptLogin(); }
   else if(action === 'logout'){ logout(); }
-  else if(action === 'add-user'){
-    const u = document.getElementById('newUser').value.trim();
-    const p = document.getElementById('newPass').value;
-    const role = document.getElementById('newRole').value;
-    const msg = document.getElementById('usersMsg');
-    if(!u || !p){ msg.textContent = 'Enter a username and password.'; msg.className = 'cloud-msg err'; return; }
-    msg.textContent = 'Adding…'; msg.className = 'cloud-msg';
-    (async () => {
-      try{
-        const res = await sbRpc('app_create_user', { p_username: u, p_password: p, p_role: role });
-        if(res === 'exists'){ msg.textContent = 'That username already exists.'; msg.className = 'cloud-msg err'; }
-        else { msg.textContent = 'User added ✓'; msg.className = 'cloud-msg ok'; renderUsers(); }
-      }catch(e){ msg.textContent = 'Failed: ' + (e.message||''); msg.className = 'cloud-msg err'; }
-    })();
-  }
-  else if(action === 'reset-user'){
-    const u = btn.dataset.user;
-    askNewPassword(u).then(np => {
-      if(np){ (async () => { try{ await sbRpc('app_reset_password', { p_username: u, p_password: np }); showToast('Password reset for ' + u + '.'); }catch(e){ showToast('Reset failed: ' + (e.message||''), null, 9000); } })(); }
-    });
-  }
-  else if(action === 'delete-user'){
-    const u = btn.dataset.user;
-    if(session && u === session.username){ showToast("You can't delete the account you're logged in as.", null, 8000); return; }
-    showConfirm('Remove user "' + u + '"?', 'This deletes their login. It cannot be undone.').then(async ok => {
-      if(ok){ try{ await sbRpc('app_delete_user', { p_username: u }); renderUsers(); }catch(e){ showToast('Delete failed: ' + (e.message||''), null, 9000); } }
-    });
-  }
+  else if(action === 'chpw'){ authPwOpen(); }
+  else if(action === 'auth-download'){ exportData(); }
+  else if(action === 'auth-later'){ authHideLogin(); }
+  else if(action === 'authpw-cancel'){ authPwClose(); }
+  else if(action === 'authpw-save'){ authPwSave(); }
   else if(action === 'reset-data'){
     showConfirm('Reset everything to sample data?', 'This clears all your current entries. Export a backup first if you want to keep them.').then(ok => { if(ok) resetData(); });
   }
@@ -17437,7 +17621,7 @@ function menuGroupBtns(cat){ return cat.map(g => `<button type="button" class="r
 function menuBuild(){
   const cat = menuCatalog();
   menuEl('rail').innerHTML = `<div class="rail-mark" id="railMark"></div><button type="button" class="rail-btn rail-top" id="railPin" data-mact="pin" aria-label="Expand the menu" title="Expand the menu">${menuSvg('chevR')}</button><div class="rail-favs" id="railFavs" role="group" aria-label="Favourite pages" hidden></div>` + menuGroupBtns(cat) + '<div class="rail-sep"></div>'
-    + `<button type="button" class="rail-btn" data-mact="undo" title="Undo history">${menuSvg('undo')}<span>Undo</span>${menuPill('data-bundo', 'rb-badge')}</button><button type="button" class="rail-btn" data-mact="logout" title="Log out" hidden>${menuSvg('logout')}<span>Log out</span></button>`;
+    + `<button type="button" class="rail-btn" data-mact="undo" title="Undo history">${menuSvg('undo')}<span>Undo</span>${menuPill('data-bundo', 'rb-badge')}</button><button type="button" class="rail-btn" data-mact="logout" title="Sign out" hidden>${menuSvg('logout')}<span>Sign out</span></button>`;
   menuEl('topMenu').innerHTML = menuGroupBtns(cat);
   document.querySelectorAll('#sidebar .nav-group').forEach(g => { const gi = g.querySelector('.gi'); if(gi) gi.innerHTML = MENU_ICONS[MENU_GROUP_ICON[g.dataset.group] || g.dataset.group] || ''; const c = g.querySelector('.grp-count'); if(c) c.setAttribute('data-bgroup', g.dataset.group); });
   menuBuildBottom(); menuFavRender(); applyBrandMarks();
@@ -17494,7 +17678,7 @@ function menuPopOpen(gid, btn, o){
   if(top && gid === 'settings'){
     const ue = menuEl('undoBadge'), un = ue && !ue.hidden ? (parseInt(ue.textContent, 10) || 0) : 0;
     html += '<div class="mp-sep"></div>' + `<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="undo"><span>Undo history</span>${un ? `<span class="tab-count">${un}</span>` : ''}</button>`;
-    if(document.querySelector('#logoutBar .logout-link')) html += '<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="logout"><span>Log out</span></button>';
+    if(document.querySelector('#logoutBar .logout-link')) html += '<button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="chpw"><span>Change password</span></button><button type="button" class="mp-item" role="menuitem" tabindex="-1" data-mact="logout"><span>Sign out</span></button>';
   }
   pop.innerHTML = html; pop.className = 'menu-pop g-' + gid + (top ? ' pop-top' : ''); pop.setAttribute('aria-label', g.label + ' pages'); pop.hidden = false;
   if(top){ const bar = menuEl('topMenu').getBoundingClientRect(); pop.style.top = bar.bottom + 'px'; pop.style.left = ''; pop.style.maxHeight = Math.max(160, window.innerHeight - bar.bottom - 8) + 'px'; }
@@ -17516,7 +17700,7 @@ function menuSheetOpen(){
   const cat = menuCatalog(), cur = menuCurrent(), u = menuEl('undoBadge'), un = u && !u.hidden ? (parseInt(u.textContent, 10) || 0) : 0;
   menuEl('moreSheet').innerHTML = `<div class="ms-head"><h2>All pages</h2><button type="button" class="btn secondary" data-mact="sheetclose" aria-label="Close the page list">Close</button></div><div class="ms-grid ms-favs" id="msFavs" role="group" aria-label="Favourite pages" hidden></div>`
     + cat.map(g => `<div class="ms-group g-${g.id}"><h3>${escHtml(g.label)}</h3><div class="ms-grid">${g.tabs.map(t => { const c = menuBadge(t.tab); return (t.sep ? '<span class="ms-sep" role="separator"></span>' : '') + `<button type="button" class="ms-item g-${g.id}" data-go="${t.tab}"${t.tab === cur ? ' aria-current="page"' : ''}><span>${escHtml(t.label)}</span>${c.n ? `<span class="tab-count${c.over ? ' over' : ''}">${c.n}</span>` : ''}</button>`; }).join('')}</div></div>`).join('')
-    + `<div class="ms-foot"><button type="button" class="btn secondary" data-mact="editbar">Edit bottom bar</button><button type="button" class="btn secondary" data-mact="undo">Undo history${un ? ' (' + un + ')' : ''}</button>${document.querySelector('#logoutBar .logout-link') ? '<button type="button" class="btn secondary" data-mact="logout">Log out</button>' : ''}</div>`;
+    + `<div class="ms-foot"><button type="button" class="btn secondary" data-mact="editbar">Edit bottom bar</button><button type="button" class="btn secondary" data-mact="undo">Undo history${un ? ' (' + un + ')' : ''}</button>${document.querySelector('#logoutBar .logout-link') ? '<button type="button" class="btn secondary" data-mact="chpw">Change password</button><button type="button" class="btn secondary" data-mact="logout">Sign out</button>' : ''}</div>`;
   menuFavRender();
   menuUi.sheetFrom = document.activeElement;
   document.body.classList.add('sheet-open');
@@ -17547,6 +17731,7 @@ function menuAct(a){
   else if(a === 'more') menuSheetOpen();
   else if(a === 'sheetclose') menuSheetClose(true);
   else if(a === 'undo'){ menuPopClose(false); menuSheetClose(false); const b = document.querySelector('.undo-hist-btn'); if(b) b.click(); }
+  else if(a === 'chpw'){ menuPopClose(false); menuSheetClose(false); authPwOpen(); }
   else if(a === 'logout'){ menuPopClose(false); menuSheetClose(false); const b = document.querySelector('#logoutBar .logout-link'); if(b) b.click(); }
   else if(a === 'editbar'){ menuSheetClose(false); navClear(); activateTab('settings'); settingsShow('phonemenu', true); window.scrollTo(0, 0); const f = document.querySelector('#phoneMenuCard .bbe-list button:not([disabled])'); if(f) f.focus(); }
 }
@@ -19657,7 +19842,7 @@ function lrBusy(manual){
   return '';
 }
 function lrCanPoll(){
-  return !!(session && state && usingCloud && cloud.enabled && cloud.key && cloudBase() && document.visibilityState === 'visible' && navigator.onLine !== false && !cloudConflict && !lr.applying);
+  return !!(session && state && usingCloud && cloud.enabled && cloud.key && cloudBase() && document.visibilityState === 'visible' && navigator.onLine !== false && !cloudConflict && !lr.applying && !auth.signedOut);
 }
 function lrSchedule(ms){ clearTimeout(lr.timer); lr.timer = setTimeout(lrTick, ms); }
 function lrNextDelay(){ return lr.fails ? Math.min(LR_MAX_MS, LR_BASE_MS * Math.pow(2, lr.fails - 1)) : LR_BASE_MS; }   // 30s, then after failures 30s, 60s, 120s, 240s, 5 min
@@ -23678,11 +23863,9 @@ document.addEventListener('click', (e) => {
 /* ---------- init ---------- */
 (async () => {
   loadCloudConfig();
-  loadSession();
-  const lp = document.getElementById('loginPass');
-  if(lp) lp.addEventListener('keydown', e => { if(e.key === 'Enter') attemptLogin(); });
-  if(session){ await startApp(); }
-  else { showLogin(); }
+  const ok = await authBoot();
+  if(ok === true){ await startApp(); }
+  else if(ok !== 'refused'){ showLogin(); }
 })();
 </script>
 </body>

@@ -27,7 +27,6 @@ async function main(){
   await guard('1', 'Field edit, added contact, deleted lead and project stage move each give the right row and summary', async () => {
     let notes = [], ok = true; const chk = (c, t) => { if(!c) ok = false; notes.push((c ? '✓ ' : '✗ ') + t); };
     const m = mk(), p = await newPage(browser, m); await open(p, url);
-    const team = await p.evaluate(() => apTeam()); const whoA = team[0] || '';
     const leadName = await p.evaluate(() => boardTitle('lead', state.leads[0])), pStage0 = await p.evaluate(() => projStage6(state.projects[0]).name);
     await p.evaluate(() => { state.quotes[0].project = 'Step Replacement v2'; saveState(); }); await waitState(p, 'backed'); await flushed(m, 1);
     await p.evaluate(() => { cxNewContact({ firstName: 'John', lastName: 'Davies' }); saveState(); }); await waitState(p, 'backed'); await flushed(m, 2);
@@ -39,9 +38,8 @@ async function main(){
     chk(by('leads', 'deleted') && by('leads', 'deleted').summary === 'Deleted lead: ' + leadName, 'deleted lead: "' + (by('leads', 'deleted') || {}).summary + '"');
     chk(by('projects', 'moved') && by('projects', 'moved').summary === 'Changed stage: ' + pStage0 + ' → On site', 'project stage move: "' + (by('projects', 'moved') || {}).summary + '"');
     chk(a.length === 4, 'exactly one row per change (' + a.length + ' rows)');
-    chk(a.every(x => x.by === 'Unknown'), 'no person picked: shown as "Unknown"');
+    chk(a.every(x => x.by === 'Test Admin'), 'the person is the signed-in display name ("Test Admin"), exactly');
     chk(new Set(m.activity.map(x => x.session)).size === 1 && /^[0-9a-f]{8}$/.test(m.activity[0].session) && m.activity.every(x => /^[0-9a-f-]{36}$/.test(x.id)), 'one per-browser session id; row ids are browser-made uuids');
-    if(whoA){ await p.evaluate(n => { localStorage.setItem(AP_WHO_KEY, n); state.quotes[0].project = 'Step Replacement v3'; saveState(); }, whoA); await waitState(p, 'backed'); await flushed(m, 5); chk(m.activity[m.activity.length - 1].by === whoA, 'the "who" picker value is used (' + whoA + ')'); }
     chk(m.activity.every(x => String(x.doc_id) === String(H.DOCID)), 'every row carries doc_id ' + H.DOCID);
     rec('1', 'Field edit, added contact, deleted lead and project stage move each give the right row and summary', ok, notes.join('; '));
     await p.context().close();
