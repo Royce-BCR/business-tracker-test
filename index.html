@@ -3688,7 +3688,7 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
         <section class="set-sec" data-sec="data">
     <div class="section-label">Data &amp; backup</div>
     <div class="card">
-      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Your changes save automatically to <strong>this browser on this device</strong>. They stay put when you close and reopen — but they don't yet sync across devices (that's the next upgrade). Export a backup regularly so nothing can be lost; Import restores a backup or moves your data to another device.</p>
+      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.55;">Your changes save to the cloud as you edit (and the portal checks every 30 minutes), and a copy is also kept in <strong>this browser</strong>. The chip at the top of the page shows whether what is on your screen is backed up. It syncs across devices when the cloud is connected. Export a backup regularly as an extra safeguard; Import restores a backup or moves your data to another device.</p>
       <div class="btn-row u-margin-bottom-0" >
         <button class="btn" data-action="export-data">↓ Export backup (.json)</button>
         <button class="btn secondary" data-action="import-data">↑ Import backup</button>
@@ -5200,9 +5200,9 @@ function adminSectionHtml(){
   id int primary key default 1,
   doc jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now(),
-  constraint single_row check (id = 1)
+  constraint single_row check (id in (1, 2))   -- row 1 = live site, row 2 = test site
 );
-insert into tracker_data (id, doc) values (1, '{}'::jsonb)
+insert into tracker_data (id, doc) values (1, '{}'::jsonb), (2, '{}'::jsonb)
   on conflict (id) do nothing;
 alter table tracker_data enable row level security;
 create policy "app read"   on tracker_data for select using (true);

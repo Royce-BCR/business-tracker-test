@@ -17,8 +17,8 @@
 --        b. snapshots the OLD document into tracker_snapshots when there is no snapshot for that doc in the last
 --           30 minutes (reason 'interval'), or when the new document is more than 15% smaller (reason 'shrink')
 --        c. first snapshot of each calendar day (Europe/London) is marked keep = true
---        d. retention, done cheaply inside the trigger: non-keep snapshots older than 14 days and keep snapshots older
---           than 90 days are deleted (only when a snapshot has just been taken)
+--        d. retention, done cheaply inside the trigger: non-keep snapshots older than 7 days and keep snapshots older
+--           than 60 days are deleted (only when a snapshot has just been taken)
 --   3. tracker_snapshots(id, doc_id, taken_at, reason, bytes, counts, keep, doc) + index (doc_id, taken_at desc)
 --   4. RLS on tracker_snapshots: anon gets SELECT only. Rows are inserted only by the security-definer trigger.
 --
@@ -108,8 +108,8 @@ begin
     -- (d) retention (cheap: the index is on doc_id, taken_at)
     delete from public.tracker_snapshots s
      where s.doc_id = old.id
-       and ((not s.keep and s.taken_at < now() - interval '14 days')
-         or (s.keep     and s.taken_at < now() - interval '90 days'));
+       and ((not s.keep and s.taken_at < now() - interval '7 days')
+         or (s.keep     and s.taken_at < now() - interval '60 days'));
   end if;
   return new;
 end $$;
@@ -123,13 +123,17 @@ create trigger tracker_data_before_update
 notify pgrst, 'reload schema';
 
 -- =====================================================================================================
--- STORAGE ESTIMATE
---   Today's document is about 755 KB. jsonb is stored compressed (TOAST), usually 3 to 5 times smaller on disk, so budget with the raw size.
---   At most about 16 snapshots a day (a snapshot at most every 30 minutes of active editing, plus shrink snapshots) x 14 days
---   = about 224 snapshots x 755 KB = about 170 MB at the very most (roughly 35 to 55 MB once compressed). Normal use is far less,
---   because snapshots only happen while someone is editing. The keep = true snapshots (one a day) add up to 90 x 755 KB = about 68 MB at most.
---   Worst case total: about 240 MB raw (probably 50 to 80 MB on disk). That fits the 500 MB Free plan but would use about half of it, so check
---   the database size in Supabase after a week; the Pro plan (8 GB) has no concern. If it is too much, shorten the 14 days in section (d).
+-- STORAGE ESTIMATE (measured on the real document, not guessed)
+--   Measured: 779,086 JSON characters are stored as 582,168 bytes, so jsonb saves only about 25%, not the 3 to 5 times
+--   I first assumed. Budget about 0.58 MB (570 KB) per snapshot.
+--   Retention is 7 days for ordinary snapshots and 60 days for the one-a-day keep = true snapshots.
+--   At most about 16 snapshots a day (one per 30 minutes of active editing, plus shrink snapshots) x 7 days = about 112 snapshots,
+--   plus one keep snapshot a day for the 53 older days (days 8 to 60) = about 165 snapshots in total
+--   x 0.58 MB = about 96 MB, so budget about 100 MB WORST CASE per document. Normal use is far less, because snapshots only happen
+--   while someone is editing. Live (row 1) and test (row 2) share the table, but test normally has far fewer edits.
+--   The Supabase Free plan allows 500 MB for the whole database, so this fits, using up to about a fifth of it at the very worst.
+--   If the document grows, the estimate grows with it: check the database size in Supabase after a week, and shorten the periods
+--   in section (d) if needed.
 --
 -- ROLLBACK (run these if you ever need to undo it; the portal keeps working, it falls back to the old updated_at check)
 --   drop trigger if exists tracker_data_before_update on public.tracker_data;
