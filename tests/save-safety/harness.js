@@ -11,8 +11,9 @@ function serve(){
   return new Promise(res => { const srv = http.createServer((q, r) => { r.writeHead(200, { 'content-type': 'text/html' }); r.end(fs.readFileSync(HTML)); }).listen(0, '127.0.0.1', () => res({ srv, url: 'http://127.0.0.1:' + srv.address().port + '/' })); });
 }
 /* an in-memory stand-in for the tracker_data row, with the same compare-and-swap behaviour as the real trigger */
+const allMocks = [];
 class Mock {
-  constructor(doc, opts){ opts = opts || {}; this.doc = doc; this.version = 1; this.hasVersion = opts.hasVersion !== false; this.hasSnapshots = !!opts.snapshots; this.snapshots = opts.snapshots || [];
+  constructor(doc, opts){ opts = opts || {}; allMocks.push(this); this.ids = new Set(); this.doc = doc; this.version = 1; this.hasVersion = opts.hasVersion !== false; this.hasSnapshots = !!opts.snapshots; this.snapshots = opts.snapshots || [];
     this.updated_at = new Date().toISOString(); this.failPatch = 0; this.down = false; this.log = []; this.patchBodies = []; this.patchUrls = []; this.peeks = 0; this.fullGets = 0; this.snapUrls = []; }
   other(mutator){ const d = JSON.parse(JSON.stringify(this.doc)); mutator(d); this.doc = d; this.version++; this.updated_at = new Date(Date.now() + 1000).toISOString(); }   // another writer saved
   row(cols){ const o = {}; cols.split(',').forEach(c => { if(c === 'doc') o.doc = this.doc; else if(c === 'updated_at') o.updated_at = this.updated_at; else if(c === 'version') o.version = this.version; else if(c === 'id') o.id = DOCID; }); return o; }
@@ -23,6 +24,7 @@ class Mock {
     if(this.down) return route.abort('failed');
     const p = u.pathname.replace('/rest/v1/', '');
     if(p === 'tracker_data'){
+      this.ids.add(u.searchParams.get('id'));
       const sel = u.searchParams.get('select') || 'doc,updated_at', ver = (u.searchParams.get('version') || '').replace(/^eq\./, '') || null;
       if((!this.hasVersion) && (/version/.test(sel) || ver)) return send(400, { code: '42703', message: 'column tracker_data.version does not exist' });
       if(m === 'GET'){ if(sel === 'doc,updated_at' || sel === 'doc,updated_at,version') this.fullGets++; else this.peeks++; this.log.push('GET ' + sel); return send(200, [this.row(sel)]); }
@@ -66,4 +68,4 @@ function baseDoc(n){   // a document made from the app's own defaults plus n con
     const doc = await pg.evaluate(count => { for(let i = 1; i <= count; i++) cxNewContact({ firstName: 'Seed', lastName: 'Contact ' + i, email: 'seed' + i + '@example.com' }); return JSON.parse(JSON.stringify(state)); }, n || 40);
     await b.close(); srv.close(); return doc; })();
 }
-module.exports = { serve, Mock, newPage, chip, waitState, open, baseDoc, DOCID, PREFIX, SB, HTML, chromium };
+module.exports = { allMocks, serve, Mock, newPage, chip, waitState, open, baseDoc, DOCID, PREFIX, SB, HTML, chromium };

@@ -383,6 +383,9 @@ async function main(){
     await q.context().close();
   });
 
+  { const ids = new Set(); H.allMocks.forEach(m => m.ids.forEach(i => ids.add(i))); const bad = [...ids].filter(i => i !== 'eq.' + H.DOCID);
+    const env = await (async () => { const pg = await newPage(browser, new Mock({})); await pg.goto(url); await sleep(300); const o = await pg.evaluate(() => ({ label: ENV_LABEL, id: DOC_ID, prefix: STORAGE_PREFIX, banner: !!document.querySelector('[class*="test-banner"], #testBanner') })); await pg.context().close(); return o; })();
+    rec('ENV', 'Only this build\'s own row is ever touched (DOC_ID ' + H.DOCID + '); environment block as expected', bad.length === 0 && env.id === H.DOCID && env.prefix === H.PREFIX, `every tracker_data request in this whole run used id ${[...ids].join(', ')} (${H.allMocks.length} mock sessions); ENV_LABEL ${env.label}, DOC_ID ${env.id}, STORAGE_PREFIX '${env.prefix}'`); }
   await browser.close(); srv.close();
   const pass = rows.filter(r => r.pass).length;
   const md = '| # | Test | Result | Evidence |\n|---|---|---|---|\n' + rows.map(r => `| ${r.id} | ${r.name} | ${r.pass ? 'PASS' : '**FAIL**'} | ${String(r.note || '').replace(/\|/g, '/')} |`).join('\n') + `\n\n${pass}/${rows.length} passed\n`;
