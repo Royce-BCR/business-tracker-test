@@ -14,7 +14,7 @@ function serve(){
 const allMocks = [];
 class Mock {
   constructor(doc, opts){ opts = opts || {}; allMocks.push(this); this.ids = new Set(); this.doc = doc; this.version = 1; this.hasVersion = opts.hasVersion !== false; this.hasSnapshots = !!opts.snapshots; this.snapshots = opts.snapshots || [];
-    this.updated_at = new Date().toISOString(); this.failPatch = 0; this.down = false; this.log = []; this.patchBodies = []; this.patchUrls = []; this.peeks = 0; this.fullGets = 0; this.snapUrls = []; }
+    this.updated_at = new Date().toISOString(); this.failPatch = 0; this.down = false; this.log = []; this.patchBodies = []; this.patchUrls = []; this.peeks = 0; this.fullGets = 0; this.snapUrls = []; this.hasActivity = opts.activity !== false; this.activity = []; this.failActivity = 0; this.loseAck = 0; this.activityPosts = []; this.activityGets = []; this.actDocIds = new Set(); }
   other(mutator){ const d = JSON.parse(JSON.stringify(this.doc)); mutator(d); this.doc = d; this.version++; this.updated_at = new Date(Date.now() + 1000).toISOString(); }   // another writer saved
   row(cols){ const o = {}; cols.split(',').forEach(c => { if(c === 'doc') o.doc = this.doc; else if(c === 'updated_at') o.updated_at = this.updated_at; else if(c === 'version') o.version = this.version; else if(c === 'id') o.id = DOCID; }); return o; }
   async handle(route){
@@ -34,6 +34,29 @@ class Mock {
         if(ver !== null && Number(ver) !== this.version) return send(200, []);
         this.doc = body.doc; if(this.hasVersion){ this.version++; this.updated_at = new Date().toISOString(); } else this.updated_at = body.updated_at || this.updated_at;
         return send(200, [this.row(sel)]);
+      }
+    }
+    if(p === 'activity_log'){
+      if(!this.hasActivity) return send(404, { code: 'PGRST205', message: "Could not find the table 'public.activity_log' in the schema cache" });
+      if(m === 'GET') this.actDocIds.add(u.searchParams.get('doc_id'));
+      if(m === 'POST'){
+        const rows = JSON.parse(req.postData()); rows.forEach(r => this.actDocIds.add('eq.' + r.doc_id)); this.activityPosts.push(rows.map(r => r.id));
+        if(this.failActivity) return send(typeof this.failActivity === 'number' ? this.failActivity : 500, { message: 'mock log failure' });
+        rows.forEach(r => { if(!this.activity.some(a => a.id === r.id)) this.activity.push(Object.assign({ at: new Date().toISOString() }, r)); });
+        if(this.loseAck > 0){ this.loseAck--; return send(500, { message: 'ack lost after insert' }); }
+        return route.fulfill({ status: 201, headers: CORS, body: '' });
+      }
+      if(m === 'GET'){
+        this.activityGets.push(req.url());
+        const sp = u.searchParams, lim = Number(sp.get('limit') || 1000); let rs = this.activity.filter(a => String(a.doc_id) === (sp.get('doc_id') || '').replace('eq.', ''));
+        const eqv = k => (sp.get(k) || '').replace(/^eq\./, ''), by = sp.get('by'), area = sp.get('area'), act = sp.get('action'), at = sp.get('at');
+        if(by) rs = rs.filter(a => a.by === eqv('by')); if(area) rs = rs.filter(a => a.area === eqv('area')); if(act && /^neq\./.test(act)) rs = rs.filter(a => a.action !== act.replace('neq.', ''));
+        if(at && /^gte\./.test(at)) rs = rs.filter(a => Date.parse(a.at) >= Date.parse(at.replace('gte.', '')));
+        const and = sp.get('and') || '';
+        let mm = and.match(/summary\.ilike\."\*(.*?)\*",record_label\.ilike\."\*(.*?)\*"/); if(mm){ const q = mm[1].toLowerCase(); rs = rs.filter(a => String(a.summary || '').toLowerCase().includes(q) || String(a.record_label || '').toLowerCase().includes(q)); }
+        mm = and.match(/at\.lt\."([^"]+)",and\(at\.eq\."[^"]+",id\.lt\."([^"]+)"/); if(mm){ const t = Date.parse(mm[1]), id = mm[2]; rs = rs.filter(a => Date.parse(a.at) < t || (Date.parse(a.at) === t && a.id < id)); }
+        rs.sort((a, b) => Date.parse(b.at) - Date.parse(a.at) || (a.id < b.id ? 1 : -1));
+        return send(200, rs.slice(0, lim));
       }
     }
     if(p === 'tracker_snapshots'){

@@ -255,6 +255,50 @@
     --bt-card:#22262b; --bt-ink:#eceae4; --bt-text-muted:#a9a69d; --bt-line:#3a3f45; --bt-warn-fg:#f0c373; --bt-bad-fg:#f2a29c; --bt-bad-bg:#40201e; --bt-bad-bd:#7a3a36; --bt-neu-fg:#cfcabf; color: var(--bt-ink);
   }
   :root[data-theme="dark"] #ssOverlay .btn.secondary, :root[data-theme="dark"] .sync-pop .btn.secondary { background: var(--bt-card); color: var(--bt-ink); border-color: var(--bt-text-muted); }
+
+  /* ---------------- Activity log (Settings > Activity) ---------------- */
+  .al-intro { font-size: var(--bt-fs-sm); color: var(--bt-text-muted); margin: 0 0 var(--bt-s3); line-height: 1.5; }
+  .al-filters { display: flex; flex-wrap: wrap; gap: var(--bt-s3); align-items: flex-end; margin-bottom: var(--bt-s4); }
+  .al-f { display: flex; flex-direction: column; gap: 3px; font-size: var(--bt-fs-xs); color: var(--bt-text-muted); font-weight: 600; min-width: 0; }
+  .al-f select, .al-f input { font: inherit; font-weight: 400; font-size: var(--bt-fs-sm); color: var(--bt-ink); background: var(--bt-card); border: 1px solid var(--bt-border-strong); border-radius: var(--bt-r-chip); padding: 7px 10px; min-height: 36px; min-width: 0; }
+  .al-f-q { flex: 1 1 220px; } .al-f-q input { width: 100%; box-sizing: border-box; }
+  .al-chk { display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; width: auto; margin: 0; font-size: var(--bt-fs-sm); color: var(--bt-ink); min-height: 36px; cursor: pointer; }
+  .al-chk input { margin: 0; flex: 0 0 auto; }   /* size comes from the app's checkbox rules (a 48px tap area on phones) */
+  .al-chk span { display: inline; }
+  #setActivitySec label.al-chk.al-chk, #setActivitySec label.al-chk.al-chk:has(> input[type=checkbox]) { display: inline-flex; align-items: center; justify-content: flex-start; gap: 8px; padding: 0; margin: 0; font-size: var(--bt-fs-sm); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .al-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .al-msg { padding: var(--bt-s6) var(--bt-s4); text-align: center; color: var(--bt-text-muted); font-size: var(--bt-fs-sm); }
+  .al-err { color: var(--bt-bad-fg); } .al-err .btn { margin-left: var(--bt-s2); }
+  .al-day-sec { margin: 0; }
+  .al-day { position: sticky; top: 44px; z-index: 5; margin: 0; padding: 6px 2px; background: var(--bt-card); border-bottom: 1px solid var(--bt-line); font-size: var(--bt-fs-xs); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--bt-text-muted); }
+  .al-ol { list-style: none; margin: 0; padding: 0; }
+  .al-row { display: grid; grid-template-columns: 46px 92px 84px minmax(0, 1fr) 28px; column-gap: var(--bt-s3); align-items: start; padding: 9px 2px; border-bottom: 1px solid var(--bt-line); font-size: var(--bt-fs-sm); line-height: 1.45; }
+  .al-time { font-variant-numeric: tabular-nums; color: var(--bt-text-muted); }
+  .al-who { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .al-area { justify-self: start; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: var(--bt-r-pill); background: var(--bt-neu-bg); color: var(--bt-neu-fg); border: 1px solid var(--bt-neu-bd); white-space: nowrap; }
+  .al-a-system { background: var(--bt-info-bg); color: var(--bt-info-fg); border-color: var(--bt-info-bd); }
+  .al-act-deleted .al-area { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border-color: var(--bt-bad-bd); }
+  .al-sum { min-width: 0; overflow-wrap: anywhere; }
+  .al-link { font: inherit; padding: 0; border: 0; background: none; color: var(--bt-oak-600); text-decoration: underline; cursor: pointer; text-align: left; }
+  .al-link:hover { color: var(--bt-oak-700); }
+  .al-exp { width: 28px; height: 28px; min-height: 0; min-width: 0; padding: 0; border: 1px solid var(--bt-line); border-radius: var(--bt-r-chip); background: var(--bt-card); color: var(--bt-text-muted); cursor: pointer; line-height: 1; }
+  .al-exp:hover { color: var(--bt-ink); border-color: var(--bt-border-strong); }
+  .al-link:focus-visible, .al-exp:focus-visible, .al-f select:focus-visible, .al-f input:focus-visible, .al-chk input:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+  .al-detail { grid-column: 4 / 6; margin-top: var(--bt-s2); overflow-x: auto; }
+  .al-tbl { border-collapse: collapse; width: 100%; font-size: var(--bt-fs-xs); }
+  .al-tbl th, .al-tbl td { background: transparent; text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--bt-line); vertical-align: top; overflow-wrap: anywhere; font-weight: 400; }
+  .al-tbl thead th { color: var(--bt-text-muted); font-weight: 600; } .al-tbl tbody th { font-weight: 600; white-space: nowrap; }
+  .al-foot { display: flex; justify-content: center; padding-top: var(--bt-s4); }
+  .al-foot .btn[hidden], .al-list [hidden] { display: none !important; }   /* .btn sets display, which would override the hidden attribute */
+  @media (max-width: 700px) {
+    .al-day { top: 96px; }
+    .al-row { grid-template-columns: 42px minmax(0, 1fr) auto 28px; grid-template-areas: "time who area exp" "sum sum sum sum"; row-gap: 3px; }
+    .al-time { grid-area: time; } .al-who { grid-area: who; } .al-area { grid-area: area; } .al-exp { grid-area: exp; } .al-sum { grid-area: sum; }
+    .al-detail { grid-column: 1 / -1; }
+    .al-f { flex: 1 1 140px; } .al-f select { width: 100%; } .al-f-q, #setActivitySec label.al-chk { flex: 1 1 100%; }
+  }
+  :root[data-theme="dark"] #setActivitySec .al-card { --bt-card:#22262b; --bt-ink:#eceae4; --bt-text-muted:#a9a69d; --bt-line:#3a3f45; --bt-border-strong:#555b62; --bt-neu-bg:#2c3035; --bt-neu-fg:#cfcabf; --bt-neu-bd:#3a3f45; --bt-info-bg:#1c2b40; --bt-info-fg:#9cc2f2; --bt-info-bd:#34527c; --bt-bad-bg:#40201e; --bt-bad-fg:#f2a29c; --bt-bad-bd:#7a3a36; --bt-oak-600:#e0b27a; --bt-oak-700:#f0c28a; background: var(--bt-card); border-color: var(--bt-line); color: var(--bt-ink); }
+  :root[data-theme="dark"] #setActivitySec .al-card .btn.secondary { background: var(--bt-card); color: var(--bt-ink); border-color: var(--bt-text-muted); }
   /* the chip is in the brand row, to the right of any short note */
   .brandbar.off .sync-wrap { position: fixed; top: 14px; right: 62px; z-index: 30; }
 
@@ -3703,6 +3747,8 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     </div>
         </section>
 
+        <section class="set-sec" data-sec="activity" id="setActivitySec"></section>
+
         <section class="set-sec" data-sec="admin" id="setAdminSec"></section>   <!-- Stage 9: filled in by renderAdminSection() for an admin only; nothing is written here for anyone else -->
       </div>
     </div>
@@ -4643,7 +4689,9 @@ async function ssCloudSave(body){
 
 /* ---------- the one place that drives the screen ---------- */
 function syncSet(status, detail){
+  const prevStatus = sync.status;
   sync.status = status; sync.detail = detail || '';
+  if(SS_RED[status] && !SS_RED[prevStatus] && status !== 'failed'){ try{ alSystem('Status went red: ' + ({ offline: 'offline, not backing up', blocked: 'paused, newer changes elsewhere', held: 'save held back for approval', local: 'saved on this device only' }[status] || status)); }catch(e){} }
   ssGuard(sync.dirty);
   ssRender(); ssLpRefresh();
 }
@@ -4783,7 +4831,7 @@ function ssAdopt(row, norm){
   const s = JSON.stringify(norm);
   sync.confirmed = ssSummary(norm, s.length);
   sync.cloudHasDoc = !!(row && row.doc && Object.keys(row.doc).length);
-  sync.sample = false; sync.held = null; sync.heldKey = ''; sync.allowShrink = false; sync.gen++;
+  sync.sample = false; sync.held = null; sync.heldKey = ''; sync.allowShrink = false; sync.gen++; alBase(norm);
   sync.lastConfirmedAt = Date.now(); sync.lastLocalAt = Date.now(); ssSetDirty(false);
   cloudConflict = false; sync.retryCount = 0; clearTimeout(sync.retryTimer);
   try{ localStorage.setItem(STORAGE_KEY, s); }catch(e){}
@@ -4822,6 +4870,7 @@ async function syncRun(opts){
   sync.running = true; sync.again = false;
   try{
     const seq = sync.editSeq, body = JSON.stringify(state);
+    const alp = alPrepare(state);   // Activity log: compare with the last cloud-confirmed copy now, while the document still matches what is being sent
     const localOk = await Store.set(STORAGE_KEY, body); sync.localOk = localOk; ssMetaWrite(body);   // the local copy is always written before any cloud attempt
     if(!(usingCloud && cloud.enabled && cloud.key)){
       syncSet('local', localOk ? (cloud.enabled ? sync.detail : '') : 'this browser could not store it either: download your data'); return;
@@ -4848,6 +4897,7 @@ async function syncRun(opts){
     const res = await ssCloudSave(body);
     if(res.blocked){ ssBlock(); return; }
     ssBaseFromRow(res.row); sync.gen++;
+    alCommit(alp); if(al.hadFail){ al.hadFail = false; alSystem('Cloud save recovered: backed up again'); }
     sync.confirmed = sum; sync.cloudHasDoc = true; sync.held = null; sync.heldKey = ''; sync.allowShrink = false; sync.retryCount = 0; sync.nextRetryAt = 0; clearTimeout(sync.retryTimer);
     if(seq === sync.editSeq){ sync.lastConfirmedAt = Date.now(); ssSetDirty(false); try{ lr.dirty.clear(); }catch(e){} }
     ssMetaWrite(body);
@@ -4857,6 +4907,7 @@ async function syncRun(opts){
   }catch(e){
     sync.retryCount++;
     const off = (typeof navigator !== 'undefined' && navigator.onLine === false) || (e instanceof TypeError);
+    if(sync.retryCount === 1){ al.hadFail = true; alSystem('Cloud save failed: ' + (off ? 'offline' : alTrunc((e && e.message) || 'unknown error', 120))); }
     syncSet(off ? 'offline' : 'failed', off ? '' : (e && e.message) || '');
     ssScheduleRetry();
   }finally{
@@ -4941,8 +4992,9 @@ function ssStoreRescue(raw){   // keeps the last 3; when the browser is full, a 
     localStorage.setItem(SS_RESCUE_PREFIX + new Date().toISOString(), raw);
     const keys = []; for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.indexOf(SS_RESCUE_PREFIX) === 0) keys.push(k); }
     keys.sort(); while(keys.length > 3) localStorage.removeItem(keys.shift());
+    try{ alSystem('Rescue copy of this browser’s data created'); }catch(e){}
     return true;
-  }catch(e){ ssDownloadText(raw, 'business-tracker-rescue-browser'); return false; }
+  }catch(e){ ssDownloadText(raw, 'business-tracker-rescue-browser'); try{ alSystem('Rescue copy downloaded as a file (browser storage was full)'); }catch(x){} return false; }
 }
 
 /* ---------- the dialog (the one place a blocking dialog is right) ---------- */
@@ -5037,7 +5089,8 @@ async function ssReconcile(row, opts){
     if(cloudDoc) ssDownloadText(JSON.stringify(cloudDoc, null, 2), 'business-tracker-cloud-copy');
     state = mergeDefaults(ssClone(localObj));
     if(opts.live){ ensurePipelineIds(); render(); }
-    sync.confirmed = ssSummary(mergeDefaults(ssClone(cloudDoc || {})), JSON.stringify(cloudDoc || {}).length);
+    sync.confirmed = ssSummary(mergeDefaults(ssClone(cloudDoc || {})), JSON.stringify(cloudDoc || {}).length); alBase(mergeDefaults(ssClone(cloudDoc || {})));
+    alSystem('Load check: kept this browser’s version and saved it to the cloud');
     sync.cloudHasDoc = !!cloudDoc; sync.sample = false; sync.allowShrink = true; sync.lastLocalAt = Date.now(); ssSetDirty(true); sync.editSeq++; ssMetaWrite();
     cloudConflict = false; syncSet('saving');
     await syncRun({ manual: true, recheck: true });
@@ -5047,13 +5100,14 @@ async function ssReconcile(row, opts){
     ssDownloadText(localRaw, 'business-tracker-browser-copy');
     state = mergeDefaults(cloudDoc ? ssClone(cloudDoc) : {});
     if(opts.live){ ensurePipelineIds(); render(); }
-    ssAdopt(row, state);
+    ssAdopt(row, state); alSystem('Load check: used the cloud version (this browser’s copy was downloaded first)');
     return 'cloud';
   }
   const m = ssAdditiveMerge(cloudDoc, localObj);
   state = mergeDefaults(m.merged);
   if(opts.live){ ensurePipelineIds(); render(); }
-  sync.confirmed = ssSummary(mergeDefaults(ssClone(cloudDoc || {})), JSON.stringify(cloudDoc || {}).length);
+  sync.confirmed = ssSummary(mergeDefaults(ssClone(cloudDoc || {})), JSON.stringify(cloudDoc || {}).length); alBase(mergeDefaults(ssClone(cloudDoc || {})));
+  alSystem('Load check: added ' + m.added.length + ' record' + (m.added.length === 1 ? '' : 's') + ' that existed only in this browser to the cloud version');
   sync.cloudHasDoc = !!cloudDoc; sync.sample = false; sync.lastLocalAt = Date.now(); ssSetDirty(true); sync.editSeq++; ssMetaWrite();
   cloudConflict = false; syncSet('saving');
   await syncRun({ manual: true, recheck: true });
@@ -5070,7 +5124,7 @@ async function ssReloadLatest(opts){
     if(sync.dirty && state) ssStoreRescue(JSON.stringify(state));
     if(opts && opts.skipBlockedCheck){
       ssDownloadText(JSON.stringify(state), 'business-tracker-browser-copy');
-      state = mergeDefaults(ssClone(row.doc || {})); ensurePipelineIds(); render(); ssAdopt(row, state); return;
+      state = mergeDefaults(ssClone(row.doc || {})); ensurePipelineIds(); render(); ssAdopt(row, state); alSystem('Reloaded from the cloud (this browser’s copy was downloaded first)'); return;
     }
     await ssReconcile(row, { live: true, source: 'reload' });
   }catch(e){ showToast('Could not reload from the cloud: ' + ((e && e.message) || ''), null, 7000); }
@@ -5123,7 +5177,7 @@ async function ssHistFetchDoc(id){
       const tbl = ['contacts', 'leads', 'quotes', 'projects', 'invoices'].map(k => `<tr><th scope="row">${SS_COLL_NAMES[k]}</th><td>${cur[k]}</td><td>${old[k]}</td></tr>`).join('');
       const ok = await ssDialog({ title: 'Restore this version?', cancelKey: 'cancel', focusKey: 'cancel', html: `<p>Restore the version from <strong>${escHtml(ssExact(new Date(row.taken_at).getTime()).replace(/:\d\d$/, ''))}</strong>? It replaces what is on your screen and saves to the cloud like any other change, so the current cloud copy is snapshotted by the database first. A copy of your current data is also downloaded now.</p><table class="ss-tbl"><thead><tr><th></th><th>Now</th><th>That version</th></tr></thead><tbody>${tbl}</tbody></table>`, buttons: [{ key: 'cancel', label: 'Cancel' }, { key: 'restore', label: 'Restore this version', cls: 'danger' }] });
       if(ok !== 'restore') return;
-      ssDownloadText(JSON.stringify(state, null, 2), 'business-tracker-before-restore');
+      ssDownloadText(JSON.stringify(state, null, 2), 'business-tracker-before-restore'); al.forceBulk = 'restore'; alSystem('Restored the version from ' + ssExact(new Date(row.taken_at).getTime()).replace(/:\d\d$/, ''));
       state = mergeDefaults(ssClone(row.doc)); sync.sample = false; ensurePipelineIds(); render();
       sync.allowShrink = true; saveState(); showToast('Version restored. It is saving to the cloud now.', null, 6000);
     }catch(err){ showToast('Could not get that version: ' + ((err && err.message) || ''), null, 7000); }
@@ -5131,6 +5185,361 @@ async function ssHistFetchDoc(id){
   });
 })();
 /* BT:js-savesafety end */
+/* BT:js-activitylog begin */
+/* =====================================================================
+   ACTIVITY LOG (Settings > Activity). A visibility tool: who changed what, and when. It is NOT a backup (Save Safety's snapshots are).
+   At each save the Save Safety engine hands us the document; we compare it with the last cloud-confirmed copy and make one event per changed
+   record. Events are queued and flushed in one batch AFTER the cloud save succeeded, so the log matches what is really in the cloud.
+   A failed log write never blocks or delays saving the main data. Nothing here is stored in the saved document. */
+const AL_QUEUE_KEY = STORAGE_KEY + '-actlog-queue';
+const AL_SESSION_KEY = STORAGE_PREFIX + 'business-tracker-activity-session';
+const AL_BATCH = 200, AL_QUEUE_MAX = 2000, AL_QUEUE_MAX_NO_TABLE = 500, AL_BULK_AT = 6, AL_MAX_CHANGES = 25, AL_VAL_MAX = 200, AL_PAGE = 20;
+const AL_NO_TABLE_RECHECK_MS = 10 * 60 * 1000;
+/* record collections: one event per changed record. area = the label shown on screen */
+const AL_COLLS = {
+  contacts: { area: 'contacts', one: 'contact' }, companies: { area: 'companies', one: 'company' }, leads: { area: 'leads', one: 'lead', stage: 'lead' },
+  pipeline: { area: 'deals', one: 'deal', stage: 'sales' }, projects: { area: 'projects', one: 'project', stage: 'project' }, quotes: { area: 'quotes', one: 'quote' },
+  invoices: { area: 'invoices', one: 'invoice' }, crmTasks: { area: 'tasks', one: 'task' }, actions: { area: 'actions', one: 'action' },
+  transactions: { area: 'finance', one: 'transaction' }, suppliers: { area: 'suppliers', one: 'supplier' }, purchaseOrders: { area: 'purchasing', one: 'purchase order' }
+};
+const AL_AREAS = ['contacts', 'companies', 'leads', 'deals', 'projects', 'quotes', 'invoices', 'tasks', 'actions', 'finance', 'suppliers', 'purchasing', 'settings', 'system'];
+const AL_AREA_NAMES = { contacts: 'Contacts', companies: 'Companies', leads: 'Leads', deals: 'Deals', projects: 'Projects', quotes: 'Quotes', invoices: 'Invoices', tasks: 'Tasks', actions: 'Actions', finance: 'Finance', suppliers: 'Suppliers', purchasing: 'Purchasing', settings: 'Settings', system: 'System' };
+/* top-level keys that are UI state, bookkeeping or reports: never logged */
+const AL_SKIP_TOP = new Set(['undoLog', 'tableModes', 'colWidths', 'crmPrefs', 'actionPrefs', 'cx', 'cxLinks', 'poNextNo', 'taskKindV', 'dayModelV', 'archivedActions']);
+const AL_NOISE_KEY = /^(_.*|at|by|touched\w*|updated\w*|modified\w*|lastModified|stageAuto|seq|rev|planLog|changeLog|msPlanLog|timeline|history|undo\w*|\w*Seeded|migratedAt|notesMigrated|descNoteIds|autoKey|next[A-Z]\w*)$/;
+const AL_NOVALUE_KEY = /^(image|images|logo|logos|photo|photos|attachment|attachments|file|files|signature|pdf|data)$/i;
+const AL_LONGTEXT_KEY = /(notes?|description|desc|comment|body|message|terms|text|details|reason)$/i;
+const AL_SETTING_NAMES = { settings: 'General settings', dayTypes: 'Day types', holidays: 'Holidays', markedDays: 'Marked days', people: 'People and capacity', phaseTemplate: 'Phase template', assumptions: 'Assumptions', businessPlan: 'Business plan', goals: 'Goals',
+  pricingTiers: 'Pricing tiers', branding: 'Branding', jobTypes: 'Job types', lifecycle: 'Customer lifecycle', qualQuestions: 'Qualification questions', lostReasons: 'Lost reasons', supplyCategories: 'Supply categories', quoteUnits: 'Quote units',
+  lineCategories: 'Line categories', stageLineTypes: 'Stage line types', pipelineStages: 'Pipeline stages', taskOptions: 'Task options', recon: 'Bank reconciliation', blackouts: 'Blackout dates', assets: 'Assets', assetPlan: 'Asset plan',
+  businessCosts: 'Business costs', capability: 'Capability', network: 'Network', milestones: 'Milestones', admin: 'Admin list', startingCash: 'Starting cash', tiers: 'Tiers' };
+const AL_HIDE_VALUES = new Set(['branding', 'recon']);   // logged as "changed", never with values (logos are base64, reconciliation history is large)
+
+const al = { forceBulk: '', prevOk: false, lastMs: 0, flushing: false, retry: 0, timer: null, noTable: false, noTableTimer: null, session: '', ui: null, redLogged: false, hadFail: false };
+const alIsObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+const alTrunc = (s, n) => { s = String(s); return s.length > (n || AL_VAL_MAX) ? s.slice(0, n || AL_VAL_MAX) + '…' : s; };
+const alHuman = k => String(k).replace(/\[.*$/, m => m).replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').toLowerCase();
+function alUuid(){ try{ if(window.crypto && crypto.randomUUID) return crypto.randomUUID(); }catch(e){} const h = n => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join(''); return h(8) + '-' + h(4) + '-4' + h(3) + '-a' + h(3) + '-' + h(12); }
+function alSession(){
+  if(al.session) return al.session;
+  try{ let s = localStorage.getItem(AL_SESSION_KEY); if(!s){ s = alUuid().slice(0, 8); localStorage.setItem(AL_SESSION_KEY, s); } al.session = s; }catch(e){ al.session = alUuid().slice(0, 8); }
+  return al.session;
+}
+function alWho(){ try{ return (whoAmI().name || '').trim() || 'Unknown'; }catch(e){ return 'Unknown'; } }
+/* a value as shown: never a file, truncated to 200 characters */
+function alIsFile(v){ return typeof v === 'string' && (/^data:/i.test(v) || (v.length > 1000 && /^[A-Za-z0-9+/=\s]+$/.test(v.slice(0, 2000)))); }
+function alShow(v){
+  if(v === undefined || v === null || v === '') return '(empty)';
+  if(typeof v === 'string'){ return alIsFile(v) ? '(file)' : alTrunc(v); }
+  if(typeof v === 'boolean') return v ? 'yes' : 'no';
+  if(typeof v === 'number') return String(v);
+  if(Array.isArray(v)) return v.every(x => x === null || ['string', 'number', 'boolean'].includes(typeof x)) ? alTrunc(v.map(alShow).join(', ')) : v.length + ' items';
+  return '(details)';
+}
+const alKey = r => (r && r.id !== undefined && r.id !== null && r.id !== '') ? 'id:' + r.id : (r && r.uid !== undefined && r.uid !== null && r.uid !== '') ? 'uid:' + r.uid : null;
+function alLabel(coll, r){
+  if(!alIsObj(r)) return String(r);
+  try{
+    if(coll === 'contacts') return ctName(r);
+    if(coll === 'leads') return boardTitle('lead', r);
+    if(coll === 'pipeline') return boardTitle('sales', r);
+    if(coll === 'projects') return boardTitle('project', r);
+    if(coll === 'quotes') return (typeof qRef === 'function' && qRef(r)) || r.refOverride || ('Quote ' + r.id);
+    if(coll === 'invoices') return r.number || ('Invoice ' + r.id);
+    if(coll === 'crmTasks') return r.title || ('Task ' + r.id);
+    if(coll === 'actions') return r.action || 'Action';
+    if(coll === 'transactions') return r.description || 'Transaction';
+    if(coll === 'purchaseOrders') return r.ref || ('PO ' + r.id);
+  }catch(e){}
+  return alTrunc(r.name || r.title || r.number || r.ref || r.label || r.id || '(unnamed)', 80);
+}
+/* ---------- snapshots: one string per record, so a save costs one stringify pass and string compares ---------- */
+function alSnapshot(doc){
+  const s = { c: {}, t: {} };
+  Object.keys(AL_COLLS).forEach(k => {
+    const a = Array.isArray(doc[k]) ? doc[k] : [], keyed = new Map(), loose = [];
+    for(let i = 0; i < a.length; i++){
+      const r = a[i], str = JSON.stringify(r), key = alKey(r);
+      if(key === null){ loose.push(str); continue; }
+      let kk = key; while(keyed.has(kk)) kk += '~';
+      keyed.set(kk, str);
+    }
+    s.c[k] = { keyed, loose };
+  });
+  Object.keys(doc).forEach(k => { if(AL_COLLS[k] || AL_SKIP_TOP.has(k) || /^next[A-Z]/.test(k)) return; s.t[k] = JSON.stringify(doc[k]); });
+  return s;
+}
+/* ---------- field-level diff ---------- */
+function alItemKey(x){ return alIsObj(x) ? (x.id !== undefined ? 'id:' + x.id : x.uid !== undefined ? 'uid:' + x.uid : x.key !== undefined ? 'k:' + x.key : x.name !== undefined ? 'n:' + x.name : null) : null; }
+function alItemLabel(x){ return (alIsObj(x) ? alTrunc(x.name || x.title || x.desc || x.description || x.label || x.date || x.id || x.key || 'item', 60) : alTrunc(x, 60)).replace(/\./g, '·'); }
+function alDiffVal(path, a, b, out, depth){
+  if(out.length > AL_MAX_CHANGES + 5) return;
+  const key = path.split('.').pop().replace(/\[.*$/, '');
+  if(AL_NOISE_KEY.test(key)) return;
+  if(JSON.stringify(a) === JSON.stringify(b)) return;
+  if(AL_NOVALUE_KEY.test(key) || alIsFile(a) || alIsFile(b)){ out.push({ field: path, from: '(file)', to: '(file changed)' }); return; }
+  if(AL_LONGTEXT_KEY.test(key) && (Array.isArray(a) || Array.isArray(b))){ out.push({ field: path, from: '(text)', to: '(edited)', longText: true }); return; }   // a list of note entries: "notes edited", never the text
+  if(key === 'comms' && Array.isArray(a) && Array.isArray(b)){ out.push({ field: path, from: a.length + ' entries', to: b.length + ' entries' }); return; }
+  const prim = v => v === null || v === undefined || ['string', 'number', 'boolean'].includes(typeof v);
+  if(prim(a) && prim(b)){
+    if((typeof a === 'string' && a.length > 200 && /\s/.test(a)) || (typeof b === 'string' && b.length > 200 && /\s/.test(b)) || (AL_LONGTEXT_KEY.test(key) && ((a || '').length > 60 || (b || '').length > 60))){ out.push({ field: path, from: '(text)', to: '(edited)', longText: true }); return; }
+    out.push({ field: path, from: alShow(a), to: alShow(b) }); return;
+  }
+  if(alIsObj(a) && alIsObj(b) && depth < 5){ new Set(Object.keys(a).concat(Object.keys(b))).forEach(k => alDiffVal(path + '.' + k, a[k], b[k], out, depth + 1)); return; }
+  if(Array.isArray(a) && Array.isArray(b) && depth < 5){
+    if(a.every(x => !alIsObj(x) && !Array.isArray(x)) && b.every(x => !alIsObj(x) && !Array.isArray(x))){ out.push({ field: path, from: alShow(a), to: alShow(b) }); return; }
+    const ma = new Map(), mb = new Map(); let keyed = true;
+    a.forEach(x => { const k = alItemKey(x); if(k === null) keyed = false; else ma.set(k, x); }); b.forEach(x => { const k = alItemKey(x); if(k === null) keyed = false; else mb.set(k, x); });
+    if(keyed){
+      mb.forEach((x, k) => { if(!ma.has(k)) out.push({ field: path + '[+]', from: '', to: alItemLabel(x) }); });
+      ma.forEach((x, k) => { if(!mb.has(k)) out.push({ field: path + '[-]', from: alItemLabel(x), to: '' }); });
+      mb.forEach((x, k) => { if(ma.has(k)) alDiffVal(path + '[' + alItemLabel(x) + ']', ma.get(k), x, out, depth + 1); });
+      return;
+    }
+    out.push({ field: path, from: a.length + ' items', to: b.length + ' items' }); return;
+  }
+  out.push({ field: path, from: alShow(a), to: alShow(b) });
+}
+function alChanges(a, b){
+  const out = []; new Set(Object.keys(a || {}).concat(Object.keys(b || {}))).forEach(k => alDiffVal(k, (a || {})[k], (b || {})[k], out, 0));
+  const extra = out.length - AL_MAX_CHANGES; const kept = out.slice(0, AL_MAX_CHANGES);
+  if(extra > 0) kept.push({ field: '…', from: '', to: 'and ' + extra + ' more changes' });
+  return kept.map(c => { const o = { field: alTrunc(c.field, 80), from: alTrunc(c.from, AL_VAL_MAX), to: alTrunc(c.to, AL_VAL_MAX) }; if(c.longText) Object.defineProperty(o, 'longText', { value: true }); return o; });   // longText is only a hint for the summary, never stored
+}
+const alFieldName = f => String(f).replace(/\.(\d+)\./g, ' ').split('.').slice(-2).join(' ').replace(/\[([+-])\]/, (m, s) => s === '+' ? ' added' : ' removed').replace(/[\[\]]/g, ' ').replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/\s+/g, ' ').trim().toLowerCase();
+function alStageName(pl, rec){
+  try{ if(pl === 'project') return projStage6(rec).name; const st = stageById(pl, rec.stageId); return st ? st.name : ''; }catch(e){ return ''; }
+}
+/* ---------- events ---------- */
+function alMk(area, action, recId, recLabel, summary, changes){
+  return { id: alUuid(), doc_id: DOC_ID, at: new Date().toISOString(), by: alWho(), area, record_id: recId === null || recId === undefined ? null : alTrunc(recId, 80), record_label: recLabel ? alTrunc(recLabel, 120) : null, action,
+    summary: alTrunc(summary, 300), changes: changes && changes.length ? changes.map(c => ({ field: c.field, from: c.from, to: c.to })) : null, session: alSession() };
+}
+function alEditSummary(noun, label, ch, moved){
+  if(moved) return 'Changed stage: ' + moved.from + ' → ' + moved.to;
+  const real = ch.filter(c => c.field !== '…');
+  if(!real.length) return 'Edited ' + noun + ' ' + label;
+  if(real.length === 1){ const c = real[0]; return 'Edited ' + noun + ' ' + label + ': ' + (c.longText ? alFieldName(c.field) + ' edited' : alFieldName(c.field) + ' ' + c.from + ' → ' + c.to); }
+  const names = [...new Set(real.map(c => alFieldName(c.field) + (c.longText ? ' edited' : '')))]; return 'Edited ' + noun + ' ' + label + ': ' + real.length + ' fields (' + names.slice(0, 3).join(', ') + (names.length > 3 ? ', …' : '') + ')';
+}
+function alDiffColl(coll, P, C, curArr, out){
+  const meta = AL_COLLS[coll], area = meta.area, noun = meta.one;
+  const curByKey = new Map(); { const seen = new Map(); curArr.forEach(r => { const k = alKey(r); if(k === null) return; let kk = k; while(curByKey.has(kk)) kk += '~'; curByKey.set(kk, r); }); }
+  const ev = [];
+  const recId = r => (r && r.id !== undefined && r.id !== null) ? r.id : (r && r.uid !== undefined ? r.uid : null);
+  const editEvent = (prevRec, curRec) => {
+    if(coll === 'crmTasks' && (curRec.autoKey || prevRec.autoKey)) return;   // the rolling "Classify transactions" task is made by the portal, not a person
+    const ch = alChanges(prevRec, curRec); if(!ch.length) return;
+    let moved = null;
+    if(meta.stage){ const a = alStageName(meta.stage, prevRec), b = alStageName(meta.stage, curRec); if(a && b && a !== b) moved = { from: a, to: b }; }
+    const label = alLabel(coll, curRec);
+    const ch2 = moved ? [{ field: 'stage', from: moved.from, to: moved.to }].concat(ch.filter(c => !/^(stageId|stageHand|dropState)\b/.test(c.field))) : ch;
+    ev.push({ e: alMk(area, moved ? 'moved' : 'edited', recId(curRec), label, alEditSummary(noun, label, ch2, moved), ch2), kind: moved ? 'moved' : 'edited' });
+  };
+  curByKey.forEach((rec, k) => {
+    const cs = C.keyed.get(k), ps = P.keyed.get(k);
+    if(ps === undefined){ const label = alLabel(coll, rec); ev.push({ e: alMk(area, 'added', recId(rec), label, 'Added ' + noun + ': ' + label, null), kind: 'added' }); }
+    else if(ps !== cs){ let prevRec = null; try{ prevRec = JSON.parse(ps); }catch(e){} if(prevRec) editEvent(prevRec, rec); }
+  });
+  P.keyed.forEach((ps, k) => { if(!curByKey.has(k)){ let prevRec = null; try{ prevRec = JSON.parse(ps); }catch(e){} const label = prevRec ? alLabel(coll, prevRec) : '(record)'; ev.push({ e: alMk(area, 'deleted', prevRec ? recId(prevRec) : null, label, 'Deleted ' + noun + ': ' + label, null), kind: 'deleted' }); } });
+  /* records without an id (transactions, actions): compare as lists; one removed + one added is an edit */
+  if(P.loose.length || C.loose.length){
+    const left = P.loose.slice(), added = [];
+    C.loose.forEach(s => { const i = left.indexOf(s); if(i >= 0) left.splice(i, 1); else added.push(s); });
+    const pair = Math.min(left.length, added.length) <= 5 ? Math.min(left.length, added.length) : 0;
+    for(let i = 0; i < pair; i++){ try{ editEvent(JSON.parse(left[i]), JSON.parse(added[i])); }catch(e){} }
+    left.slice(pair).forEach(s => { try{ const r = JSON.parse(s), label = alLabel(coll, r); ev.push({ e: alMk(area, 'deleted', null, label, 'Deleted ' + noun + ': ' + label, null), kind: 'deleted' }); }catch(e){} });
+    added.slice(pair).forEach(s => { try{ const r = JSON.parse(s), label = alLabel(coll, r); ev.push({ e: alMk(area, 'added', null, label, 'Added ' + noun + ': ' + label, null), kind: 'added' }); }catch(e){} });
+  }
+  /* a bulk change (Build contacts, import, restore) is one readable row, not hundreds */
+  const groups = {}; ev.forEach(x => { (groups[x.kind] = groups[x.kind] || []).push(x); });
+  Object.keys(groups).forEach(kind => {
+    const g = groups[kind];
+    if(g.length < (al.forceBulk ? 2 : AL_BULK_AT)){ g.forEach(x => out.push(x.e)); return; }   // a named bulk operation (Build contacts, import, restore) always collapses
+    const verb = kind === 'added' ? 'Added' : kind === 'deleted' ? 'Deleted' : kind === 'moved' ? 'Moved' : 'Edited';
+    const plural = noun === 'company' ? 'companies' : noun === 'purchase order' ? 'purchase orders' : noun + 's';
+    const names = g.slice(0, 3).map(x => x.e.record_label).filter(Boolean);
+    const fields = kind === 'edited' || kind === 'moved' ? [...new Set([].concat(...g.map(x => (x.e.changes || []).map(c => alFieldName(c.field)))))].slice(0, 4) : [];
+    const sample = g.slice(0, 10).map(x => ({ field: x.e.record_label || '', from: '', to: x.kind }));
+    out.push(alMk(area, kind, null, null, verb + ' ' + g.length + ' ' + plural + (fields.length ? ' (' + fields.join(', ') + ')' : '') + ': ' + names.join(', ') + (g.length > 3 ? ' and ' + (g.length - 3) + ' more' : ''),
+      sample.concat(g.length > 10 ? [{ field: '…', from: '', to: 'and ' + (g.length - 10) + ' more' }] : [])));
+  });
+}
+function alDiffSettings(key, ps, cs, out){
+  let a, b; try{ a = ps === undefined ? undefined : JSON.parse(ps); b = cs === undefined ? undefined : JSON.parse(cs); }catch(e){ return; }
+  const name = AL_SETTING_NAMES[key] || alHuman(key), hide = AL_HIDE_VALUES.has(key);
+  const ch = hide ? [{ field: key, from: '', to: '(changed)' }] : alChanges({ [key]: a }, { [key]: b }).map(c => Object.assign({}, c, { field: c.field.replace(new RegExp('^' + key + '\\.?'), '') || key }));
+  if(!ch.length) return;
+  const real = ch.filter(c => c.field !== '…'); let summary;
+  if(hide) summary = 'Changed setting: ' + name;
+  else if(real.length === 1){ const c = real[0]; summary = /\[\+\]$/.test(c.field) ? 'Added to ' + name + ': ' + c.to : /\[-\]$/.test(c.field) ? 'Removed from ' + name + ': ' + c.from : c.longText ? 'Edited ' + name + ': ' + alFieldName(c.field) + ' edited' : 'Changed setting ' + name + ': ' + alFieldName(c.field) + ' ' + c.from + ' → ' + c.to; }
+  else summary = 'Edited ' + name + ': ' + real.length + ' changes (' + [...new Set(real.map(c => alFieldName(c.field)))].slice(0, 3).join(', ') + ')';
+  out.push(alMk('settings', a === undefined ? 'added' : b === undefined ? 'deleted' : 'edited', key, name, summary, ch));
+}
+function alDiff(P, C, doc){
+  const out = [];
+  Object.keys(AL_COLLS).forEach(k => { const p = P.c[k], c = C.c[k]; if(!p || !c) return; if(c.keyed.size === p.keyed.size && c.loose.length === p.loose.length){ let same = true; for(const [kk, v] of c.keyed){ if(p.keyed.get(kk) !== v){ same = false; break; } } if(same && c.loose.join('\u0001') === p.loose.join('\u0001')) return; } alDiffColl(k, p, c, Array.isArray(doc[k]) ? doc[k] : [], out); });
+  new Set(Object.keys(P.t).concat(Object.keys(C.t))).forEach(k => { if(P.t[k] !== C.t[k]) alDiffSettings(k, P.t[k], C.t[k], out); });
+  return out;
+}
+/* ---------- queue and flush ---------- */
+function alQueueRead(){ try{ const q = JSON.parse(localStorage.getItem(AL_QUEUE_KEY) || '[]'); return Array.isArray(q) ? q : []; }catch(e){ return []; } }
+function alQueueWrite(q){ try{ if(q.length) localStorage.setItem(AL_QUEUE_KEY, JSON.stringify(q)); else localStorage.removeItem(AL_QUEUE_KEY); }catch(e){} }
+function alEnqueue(events){
+  if(!events || !events.length) return;
+  let q = alQueueRead().concat(events); const cap = al.noTable ? AL_QUEUE_MAX_NO_TABLE : AL_QUEUE_MAX; if(q.length > cap) q = q.slice(q.length - cap);
+  alQueueWrite(q);
+}
+/* system events (cloud save failed, rescue copy, import, restore...): queued like the rest and flushed with the next batch */
+function alSystem(summary, extra){ try{ alEnqueue([alMk('system', 'system', null, null, summary, extra || null)]); alFlushSoon(); }catch(e){} }
+const alTableMissing = (status, t) => status === 404 || /PGRST205|42P01|does not exist|Could not find the table/i.test(t || '');
+function alFlushSoon(){ if(al.timer || al.flushing) return; al.timer = setTimeout(() => { al.timer = null; alFlush(); }, 1500); }
+async function alFlush(){
+  if(al.flushing || !usingCloud || !cloud.enabled || !cloud.key || !cloudBase()) return;
+  if(sync.status === 'failed' || sync.status === 'offline') return;   // the main save is not getting through: nothing is logged until it does, so the log matches the cloud
+  let q = alQueueRead(); if(!q.length) return;
+  al.flushing = true;
+  try{
+    while(q.length){
+      const batch = q.slice(0, AL_BATCH);
+      const r = await ssFetch(`${cloudBase()}/rest/v1/activity_log?on_conflict=id`, { method: 'POST', headers: sbHeaders({ 'Prefer': 'resolution=ignore-duplicates,return=minimal' }), body: JSON.stringify(batch) }, 20000);
+      if(r.ok){ q = alQueueRead().filter(e => !batch.some(b => b.id === e.id)); alQueueWrite(q); al.retry = 0; continue; }
+      const t = await r.text();
+      if(alTableMissing(r.status, t)){ al.noTable = true; q = alQueueRead(); if(q.length > AL_QUEUE_MAX_NO_TABLE){ q = q.slice(q.length - AL_QUEUE_MAX_NO_TABLE); alQueueWrite(q); } clearTimeout(al.noTableTimer); al.noTableTimer = setTimeout(() => { al.noTable = false; alFlush(); }, AL_NO_TABLE_RECHECK_MS); return; }
+      if(r.status === 400 || r.status === 422){   // a row the table will never accept must not block the rest: try one by one and drop the bad ones
+        for(const ev of batch){
+          const r1 = await ssFetch(`${cloudBase()}/rest/v1/activity_log?on_conflict=id`, { method: 'POST', headers: sbHeaders({ 'Prefer': 'resolution=ignore-duplicates,return=minimal' }), body: JSON.stringify([ev]) }, 20000);
+          if(r1.ok || r1.status === 400 || r1.status === 422){ q = alQueueRead().filter(e => e.id !== ev.id); alQueueWrite(q); } else throw new Error('HTTP ' + r1.status);
+        }
+        continue;
+      }
+      throw new Error('HTTP ' + r.status);
+    }
+    al.noTable = false; try{ if(al.ui && al.ui.open) alRefreshSoon(); }catch(e){}
+  }catch(e){
+    al.retry++; clearTimeout(al.timer); const d = SS_RETRY_MS[Math.min(al.retry - 1, SS_RETRY_MS.length - 1)]; al.timer = setTimeout(() => { al.timer = null; alFlush(); }, d);   // the save engine's own backoff
+  }finally{ al.flushing = false; }
+}
+window.addEventListener('online', () => { try{ alFlush(); }catch(e){} });
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible'){ try{ alFlush(); }catch(e){} } });
+/* the Save Safety engine calls these */
+function alBase(norm){ try{ sync.alPrev = alSnapshot(norm); }catch(e){ sync.alPrev = null; } }
+function alPrepare(doc){   // right after the document is serialised, before any network wait
+  if(!sync.alPrev) return null;
+  const t0 = performance.now();
+  try{ const snap = alSnapshot(doc), ev = alDiff(sync.alPrev, snap, doc); al.lastMs = Math.round((performance.now() - t0) * 10) / 10; return { snap, ev }; }catch(e){ return { snap: null, ev: [] }; }
+}
+function alCommit(p){   // after the cloud confirmed the save
+  if(!p) return;
+  try{ if(p.snap) sync.alPrev = p.snap; alEnqueue(p.ev); al.forceBulk = ''; alFlushSoon(); }catch(e){}
+}
+
+/* ---------- Settings > Activity ---------- */
+function alDayLabel(d){
+  const n = new Date(), t0 = new Date(n.getFullYear(), n.getMonth(), n.getDate()), y0 = new Date(t0.getTime() - 86400000), x0 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if(x0.getTime() === t0.getTime()) return 'Today'; if(x0.getTime() === y0.getTime()) return 'Yesterday';
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) + (d.getFullYear() !== n.getFullYear() ? ' ' + d.getFullYear() : '');
+}
+function alExists(area, id){
+  if(id === null || id === undefined || id === '') return false;
+  const m = { contacts: 'contacts', companies: 'companies', leads: 'leads', deals: 'pipeline', projects: 'projects', quotes: 'quotes', invoices: 'invoices', tasks: 'crmTasks', suppliers: 'suppliers', purchasing: 'purchaseOrders' }[area];
+  return !!(m && state && Array.isArray(state[m]) && state[m].some(r => String(r.id) === String(id)));
+}
+function alOpenRecord(area, id){
+  try{
+    if(area === 'contacts') navOpen('contact:' + id); else if(area === 'companies') navOpen('company:' + id);
+    else if(area === 'leads'){ activateTab('leads'); openDetail('lead', Number(id)); } else if(area === 'deals'){ activateTab('salespipeline'); openDetail('sales', Number(id)); }
+    else if(area === 'projects') navOpen('project:' + id); else if(area === 'quotes') navOpen('quote:' + id); else if(area === 'suppliers') navOpen('supplier:' + id);
+    else if(area === 'purchasing') navOpen('po:' + id); else if(area === 'tasks') openTaskPanel(id);
+    else if(area === 'invoices'){ const b = document.createElement('button'); b.hidden = true; b.dataset.iv = 'open'; b.dataset.id = id; document.body.appendChild(b); b.click(); b.remove(); }
+  }catch(e){}
+}
+function alRowHtml(r, i){
+  const t = new Date(r.at), hm = ssP2(t.getHours()) + ':' + ssP2(t.getMinutes()), sum = escHtml(r.summary || ''), label = r.record_label ? escHtml(r.record_label) : '';
+  let body = sum;
+  if(r.action !== 'system' && alExists(r.area, r.record_id)){
+    const link = `<button type="button" class="al-link" data-al-open="${escAttr(r.area)}" data-id="${escAttr(r.record_id)}" aria-label="Open ${escAttr(r.record_label || 'record')}">${label}</button>`;
+    body = label && sum.indexOf(label) >= 0 ? sum.replace(label, link) : sum + ' — ' + link;
+  }
+  const ch = Array.isArray(r.changes) ? r.changes : [];
+  const det = ch.length ? `<div class="al-detail" id="alD${i}" hidden><table class="al-tbl"><thead><tr><th scope="col">Field</th><th scope="col">Before</th><th scope="col">After</th></tr></thead><tbody>${ch.map(c => `<tr><th scope="row">${escHtml(c.field)}</th><td>${escHtml(c.from)}</td><td>${escHtml(c.to)}</td></tr>`).join('')}</tbody></table></div>` : '';
+  return `<li class="al-row al-act-${escAttr(r.action || '')}"><span class="al-time"><time datetime="${escAttr(r.at)}">${hm}</time></span><span class="al-who">${escHtml(r.by || 'Unknown')}</span><span class="al-area al-a-${escAttr(r.area || '')}">${escHtml(AL_AREA_NAMES[r.area] || r.area || '')}</span><span class="al-sum">${body}</span>${ch.length ? `<button type="button" class="al-exp" aria-expanded="false" aria-controls="alD${i}" aria-label="Show the before and after of ${ch.length} change${ch.length === 1 ? '' : 's'}"><span aria-hidden="true">▸</span></button>` : '<span></span>'}${det}</li>`;
+}
+function alRender(){
+  const u = al.ui, box = document.getElementById('alList'); if(!box) return;
+  if(u.state === 'notable'){ box.innerHTML = '<div class="al-msg">Activity will appear once the database update is applied.</div>'; }
+  else if(u.state === 'error'){ box.innerHTML = '<div class="al-msg al-err" role="alert">Couldn’t load activity. <button type="button" class="btn secondary" data-al="retry">Retry</button></div>'; }
+  else if(u.state === 'loading' && !u.rows.length){ box.innerHTML = '<div class="al-msg" role="status">Loading activity…</div>'; }
+  else if(!u.rows.length){ box.innerHTML = '<div class="al-msg">' + (u.f.by || u.f.area || u.f.q || u.f.today || u.f.hideSys ? 'No activity matches these filters.' : 'No activity recorded yet. Edits appear here after they are saved.') + '</div>'; }
+  else {
+    let html = '', day = '', n = 0;
+    u.rows.forEach(r => { const d = new Date(r.at), lbl = alDayLabel(d), dk = d.toDateString(); if(dk !== day){ if(day) html += '</ol></section>'; day = dk; html += `<section class="al-day-sec"><h3 class="al-day">${escHtml(lbl)}</h3><ol class="al-ol">`; } html += alRowHtml(r, n++); });
+    box.innerHTML = html + '</ol></section>';
+  }
+  const more = document.getElementById('alMore'); if(more){ more.hidden = !(u.rows.length && !u.done && u.state !== 'notable' && u.state !== 'error'); more.disabled = u.state === 'loading'; more.textContent = u.state === 'loading' ? 'Loading…' : 'Load more'; }
+  const st = document.getElementById('alStatus'); if(st) st.textContent = u.state === 'loading' ? 'Loading activity' : (u.rows.length ? u.rows.length + ' shown' + (u.done ? ', that is everything' : '') : '');
+  const ps = document.getElementById('alBy'); if(ps){ const cur = u.f.by; const names = [...u.people].sort(); ps.innerHTML = '<option value="">Everyone</option>' + names.map(n => `<option value="${escAttr(n)}"${n === cur ? ' selected' : ''}>${escHtml(n)}</option>`).join(''); }
+}
+function alUrl(cursor){
+  const f = al.ui.f, e = encodeURIComponent; let u = `${cloudBase()}/rest/v1/activity_log?doc_id=eq.${DOC_ID}&select=id,at,by,area,record_id,record_label,action,summary,changes,session&order=at.desc,id.desc&limit=${AL_PAGE}`;
+  if(f.by) u += '&by=eq.' + e(f.by); if(f.area) u += '&area=eq.' + e(f.area); if(f.hideSys) u += '&action=neq.system';
+  if(f.today){ const n = new Date(); u += '&at=gte.' + e(new Date(n.getFullYear(), n.getMonth(), n.getDate()).toISOString()); }
+  const parts = [], q = String(f.q || '').replace(/[*,()%\\"]/g, ' ').trim();
+  if(q) parts.push(`or(summary.ilike."*${q}*",record_label.ilike."*${q}*")`);
+  if(cursor) parts.push(`or(at.lt."${cursor.at}",and(at.eq."${cursor.at}",id.lt."${cursor.id}"))`);
+  if(parts.length) u += '&and=' + e('(' + parts.join(',') + ')');
+  return u;
+}
+async function alLoad(more){
+  const u = al.ui; if(u.state === 'loading' && more) return;
+  const my = ++u.req; u.state = 'loading'; if(!more){ u.rows = []; u.done = false; } alRender();
+  try{
+    if(!cloud.enabled || !cloudBase() || !usingCloud) throw new Error('not connected');
+    const last = more && u.rows.length ? u.rows[u.rows.length - 1] : null;
+    const r = await ssFetch(alUrl(last ? { at: last.at, id: last.id } : null), { headers: sbHeaders() }, 20000);
+    if(my !== u.req) return;
+    if(!r.ok){ const t = await r.text(); if(alTableMissing(r.status, t)){ u.state = 'notable'; alRender(); return; } throw new Error('HTTP ' + r.status); }
+    const rows = await r.json(); if(my !== u.req) return;
+    rows.forEach(x => { if(x.by) u.people.add(x.by); });
+    u.rows = u.rows.concat(rows); u.done = rows.length < AL_PAGE; u.state = 'ok'; alRender();
+  }catch(e){ if(my !== u.req) return; u.state = 'error'; alRender(); }
+}
+let alRefreshT = null; function alRefreshSoon(){ clearTimeout(alRefreshT); alRefreshT = setTimeout(() => { if(al.ui && al.ui.open && al.ui.state !== 'loading' && al.ui.rows.length <= AL_PAGE) alLoad(false); }, 800); }
+function alBuild(){
+  const sec = document.getElementById('setActivitySec'); if(!sec || sec.dataset.built) return; sec.dataset.built = '1';
+  al.ui = { rows: [], done: false, state: 'idle', req: 0, open: false, people: new Set(), f: { by: '', area: '', q: '', today: false, hideSys: false } };
+  try{ apTeam().forEach(n => al.ui.people.add(n)); }catch(e){}
+  sec.innerHTML = `<div class="section-label">Activity</div>
+    <div class="card al-card">
+      <p class="al-intro">What has been changed in the portal, by whom and when. Newest first. This is for visibility, not a backup: the saved versions are under Data &amp; backup.</p>
+      <div class="al-filters" role="group" aria-label="Filter the activity">
+        <label class="al-f"><span>Person</span><select id="alBy"><option value="">Everyone</option></select></label>
+        <label class="al-f"><span>Area</span><select id="alArea"><option value="">All areas</option>${AL_AREAS.map(a => `<option value="${a}">${AL_AREA_NAMES[a]}</option>`).join('')}</select></label>
+        <label class="al-f al-f-q"><span>Search</span><input id="alQ" type="search" placeholder="Search the summary or record name" autocomplete="off"></label>
+        <label class="al-chk"><input type="checkbox" id="alToday"> <span>Today only</span></label>
+        <label class="al-chk"><input type="checkbox" id="alHideSys"> <span>Hide system events</span></label>
+      </div>
+      <div id="alStatus" class="al-sr" role="status" aria-live="polite"></div>
+      <div id="alList" class="al-list"></div>
+      <div class="al-foot"><button type="button" class="btn secondary" id="alMore" hidden>Load more</button></div>
+    </div>`;
+  const u = al.ui, $ = id => document.getElementById(id), reload = () => alLoad(false);
+  $('alBy').addEventListener('change', e => { u.f.by = e.target.value; reload(); });
+  $('alArea').addEventListener('change', e => { u.f.area = e.target.value; reload(); });
+  let qt = null; $('alQ').addEventListener('input', e => { clearTimeout(qt); qt = setTimeout(() => { u.f.q = e.target.value; reload(); }, 300); });
+  $('alToday').addEventListener('change', e => { u.f.today = e.target.checked; reload(); });
+  $('alHideSys').addEventListener('change', e => { u.f.hideSys = e.target.checked; reload(); });
+  $('alMore').addEventListener('click', () => alLoad(true));
+  sec.addEventListener('click', e => {
+    const x = e.target.closest('.al-exp'); if(x){ const d = x.closest('.al-row').querySelector('.al-detail'), on = x.getAttribute('aria-expanded') !== 'true'; x.setAttribute('aria-expanded', on ? 'true' : 'false'); d.hidden = !on; x.firstChild.textContent = on ? '▾' : '▸'; return; }
+    const l = e.target.closest('[data-al-open]'); if(l){ alOpenRecord(l.dataset.alOpen, l.dataset.id); return; }
+    if(e.target.closest('[data-al="retry"]')) alLoad(false);
+  });
+}
+function alShowSection(first){ alBuild(); const u = al.ui; if(!u) return; const pn = document.getElementById('panel-settings'); if(!pn || !pn.classList.contains('active')) return; u.open = true; if(first || u.state === 'idle') alLoad(false); }
+function alHideSection(){ if(al.ui) al.ui.open = false; }
+/* BT:js-activitylog end */
+
 
 /* ---------- auth: Option A client-side gate ---------- */
 let session = null;
@@ -5276,6 +5685,7 @@ async function startApp(){
   if(!window._tablesInit){ initTableControls(); window._tablesInit = true; }
   renderAuthUI();
   ssStart();   // the status chip, the 30-minute check and the wording refresh
+  try{ alFlush(); }catch(e){}   // activity events still waiting from an earlier session
   try{ ssLpRefresh(true); }catch(e){}
 }
 
@@ -5283,7 +5693,7 @@ async function startApp(){
 function exportData(){   // exports exactly what is on screen (state), changes not yet in the cloud included; the file format is unchanged
   try{
     if(!ssDownloadText(JSON.stringify(state, null, 2), 'business-tracker-backup')) throw new Error('download');
-    setSaveStatus('Backup downloaded');
+    setSaveStatus('Backup downloaded'); alSystem('Exported a backup (.json)');
   }catch(e){ setSaveStatus('Export failed'); }
 }
 function importData(file){
@@ -5297,7 +5707,7 @@ function importData(file){
     const when = file.lastModified ? new Date(file.lastModified).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'unknown';
     const c = await ssDialog({ title: 'Replace everything with this backup?', cancelKey: 'cancel', focusKey: 'cancel', html: `<p>The file <strong>${escHtml(file.name || 'backup')}</strong> is dated <strong>${escHtml(when)}</strong>. Importing replaces <em>everything</em> on your screen, and then saves to the cloud like any other change. A copy of your current data is downloaded first.</p><table class="ss-tbl"><thead><tr><th></th><th>Now</th><th>In the file</th></tr></thead><tbody>${rows}</tbody></table>`, buttons: [{ key: 'cancel', label: 'Cancel' }, { key: 'import', label: 'Import and replace', cls: 'danger' }] });
     if(c !== 'import'){ setSaveStatus('Import cancelled'); return; }
-    ssDownloadText(JSON.stringify(state, null, 2), 'business-tracker-before-import');
+    ssDownloadText(JSON.stringify(state, null, 2), 'business-tracker-before-import'); alSystem('Imported backup file ' + alTrunc(file.name || 'backup', 80)); al.forceBulk = 'import';
     try{
       state = mergeDefaults(loaded);
       sync.sample = false; sync.allowShrink = true;
@@ -15623,14 +16033,16 @@ const SET_SECTIONS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'phonemenu', label: 'Phone menu' },
   { id: 'data',      label: 'Data' },
+  { id: 'activity',  label: 'Activity' },
   { id: 'admin',     label: 'Admin', admin: true }   // same admin-only gating as the cards inside it
 ];
 const SET_SECTION_KEY = STORAGE_PREFIX + 'business-tracker-settings-section';
 let setCurrent = null, setMenuSig = '';
 function settingsVisible(){ return SET_SECTIONS.filter(s => !s.admin || isAdmin()); }
 function settingsShow(id, byUser){
-  const vis = settingsVisible(), sec = vis.find(s => s.id === id) || vis[0];
+  const vis = settingsVisible(), sec = vis.find(s => s.id === id) || vis[0], wasCur = setCurrent;
   setCurrent = sec.id;
+  try{ if(sec.id === 'activity') alShowSection(wasCur !== 'activity'); else alHideSection(); }catch(e){}
   document.querySelectorAll('#setContent > .set-sec').forEach(el => el.classList.toggle('active', el.dataset.sec === sec.id));
   document.querySelectorAll('#setMenu button').forEach(b => { const on = b.dataset.sec === sec.id; b.classList.toggle('active', on); if(on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   const sel = document.getElementById('setMenuSelect'); if(sel) sel.value = sec.id;
@@ -18370,6 +18782,7 @@ function cxUnmigratedCount(){
   return n;
 }
 function cxMigrate(){
+  try{ alSystem('“Build contacts” was run'); al.forceBulk = 'build'; }catch(e){}
   state.cx.reportHidden = false; const rep = { contacts: 0, companies: 0, deals: 0, quotes: 0, extra: 0, skipped: 0, flagged: 0, skippedList: [] };
   const one = (pl, rec) => {
     if((rec.contactIds && rec.contactIds.length) || rec.companyId) return;
