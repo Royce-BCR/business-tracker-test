@@ -202,6 +202,63 @@
   }
   .save-status:empty { display: none; }
 
+  /* ---------------- Save safety: the status chip, its info popover and the dialogs ---------------- */
+  .sync-wrap { position: relative; display: inline-flex; align-items: center; gap: 6px; flex: 0 1 auto; min-width: 0; }
+  .sync-wrap[hidden] { display: none; }
+  .sync-chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 8px; min-width: 0; max-width: 100%; border-radius: var(--bt-r-pill); border: 1px solid var(--bt-ok-bd); background: var(--bt-ok-bg); color: var(--bt-ok-fg); font-size: var(--bt-fs-xs); font-weight: 600; line-height: 1; white-space: nowrap; }
+  .sync-ico { display: inline-flex; flex: 0 0 auto; width: 16px; height: 16px; }
+  .sync-ico svg { width: 16px; height: 16px; display: block; }
+  .sync-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .sync-age { font-weight: 500; }
+  .sync-chip[data-state="saving"] { background: var(--bt-neu-bg); border-color: var(--bt-neu-bd); color: var(--bt-neu-fg); }
+  .sync-chip[data-state="saving"] .sync-ico svg { animation: ssSpin 1s linear infinite; }
+  @keyframes ssSpin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .sync-chip[data-state="saving"] .sync-ico svg { animation: none; } }
+  .sync-chip[data-state="failed"], .sync-chip[data-state="offline"], .sync-chip[data-state="blocked"], .sync-chip[data-state="held"], .sync-chip[data-state="local"] { background: var(--bt-bad-bg); border-color: var(--bt-bad-bd); color: var(--bt-bad-fg); }
+  .sync-info { position: relative; flex: 0 0 auto; width: 22px; height: 22px; min-width: 0; min-height: 0; padding: 0; display: inline-grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--bt-text-muted); background: transparent; color: var(--bt-text-muted); font: italic 700 13px/1 var(--bt-font-serif, Georgia, serif); cursor: pointer; }
+  .sync-info::after { content: ''; position: absolute; inset: -9px; }   /* a 40px tap target around the 22px circle */
+  .sync-info:hover, .sync-info[aria-expanded="true"] { color: var(--bt-ink); border-color: var(--bt-ink); }
+  .sync-info:focus-visible, .sync-pop button:focus-visible, .ss-modal button:focus-visible { outline: 2px solid var(--bt-focus); outline-offset: 2px; }
+  .sync-pop { position: fixed; z-index: 90; box-sizing: border-box; background: var(--bt-card); color: var(--bt-ink); border: 1px solid var(--bt-line); border-radius: var(--bt-r-card); box-shadow: 0 12px 32px color-mix(in srgb, var(--bt-ink) 20%, transparent); padding: var(--bt-s4); font-size: var(--bt-fs-sm); line-height: 1.5; text-align: left; white-space: normal; }
+  .sync-pop[hidden] { display: none; }
+  .sync-pop p { margin: 0 0 var(--bt-s2); }
+  .ss-pop-when, .ss-pop-small { font-size: var(--bt-fs-xs); color: var(--bt-text-muted); }
+  .ss-pop-why { color: var(--bt-bad-fg); font-weight: 600; }
+  .ss-pop-warn { color: var(--bt-bad-fg); }
+  .ss-pop-acts { display: flex; flex-wrap: wrap; gap: var(--bt-s2); margin: var(--bt-s3) 0 var(--bt-s2); }
+  .ss-pop-btn { padding: 6px 12px; font-size: var(--bt-fs-xs); }
+  .sync-pop .link-btn { font-size: var(--bt-fs-xs); }
+  .ss-modal { max-width: 560px; width: calc(100vw - 32px); max-height: calc(100vh - 32px); overflow: auto; }
+  .ss-dlg-body p { margin: 0 0 var(--bt-s3); font-size: var(--bt-fs-sm); line-height: 1.5; }
+  .ss-lead { font-weight: 600; }
+  .ss-sub { font-weight: 600; margin-bottom: var(--bt-s1) !important; }
+  .ss-note { font-size: var(--bt-fs-xs) !important; color: var(--bt-text-muted); }
+  .ss-ul { margin: 0 0 var(--bt-s3); padding-left: 20px; font-size: var(--bt-fs-sm); }
+  .ss-ul ul { padding-left: 18px; font-size: var(--bt-fs-xs); }
+  .ss-tbl { border-collapse: collapse; width: 100%; margin: 0 0 var(--bt-s3); font-size: var(--bt-fs-sm); }
+  .ss-tbl th, .ss-tbl td { padding: 4px 8px; border-bottom: 1px solid var(--bt-line); text-align: right; font-weight: 500; }
+  .ss-tbl th:first-child { text-align: left; }
+  .ss-tbl thead th { font-size: var(--bt-fs-xs); color: var(--bt-text-muted); }
+  .ss-diff { font-weight: 700; color: var(--bt-warn-fg); }
+  .ss-dlg-acts { display: flex; flex-direction: column; gap: var(--bt-s2); margin-top: var(--bt-s3); }
+  .ss-dlg-acts .btn { text-align: left; white-space: normal; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .ss-dlg-acts .btn.primary { background: var(--bt-oak-600); color: #fff; border-color: var(--bt-oak-600); }
+  .ss-dlg-acts .btn.ss-danger { background: var(--bt-bad-bg); color: var(--bt-bad-fg); border: 1px solid var(--bt-bad-bd); }
+  .ss-btn-sub { font-size: var(--bt-fs-xs); font-weight: 400; opacity: .85; }
+  .ss-hist { margin-top: var(--bt-s3); }
+  .ss-hist summary { cursor: pointer; font-size: var(--bt-fs-xs); font-weight: 600; color: var(--bt-neu-fg); }
+  .ss-hist-msg { padding: var(--bt-s3) 0; font-size: var(--bt-fs-sm); color: var(--bt-text-muted); }
+  /* dark: the app has no theme switch yet; when <html data-theme="dark"> is set the pop-over and dialogs use the same dark tokens as the calendar pop-ups */
+  :root[data-theme="dark"] .sync-pop, :root[data-theme="dark"] #ssOverlay {
+    --bt-card:#22262b; --bt-ink:#eceae4; --bt-text-muted:#a9a69d; --bt-line:#3a3f45; --bt-warn-fg:#f0c373; --bt-bad-fg:#f2a29c; --bt-bad-bg:#40201e; --bt-bad-bd:#7a3a36; --bt-neu-fg:#cfcabf; color: var(--bt-ink);
+  }
+  :root[data-theme="dark"] .sync-chip[data-state="backed"] { --bt-ok-fg:#8fd1a7; --bt-ok-bg:#1d3326; --bt-ok-bd:#2f5a40; }
+  :root[data-theme="dark"] .sync-chip[data-state="failed"], :root[data-theme="dark"] .sync-chip[data-state="offline"], :root[data-theme="dark"] .sync-chip[data-state="blocked"], :root[data-theme="dark"] .sync-chip[data-state="held"], :root[data-theme="dark"] .sync-chip[data-state="local"] { --bt-bad-fg:#f2a29c; --bt-bad-bg:#40201e; --bt-bad-bd:#7a3a36; }
+  :root[data-theme="dark"] .sync-chip[data-state="saving"] { --bt-neu-fg:#cfcabf; --bt-neu-bg:#2c3035; --bt-neu-bd:#3a3f45; }
+  :root[data-theme="dark"] #ssOverlay .btn.secondary, :root[data-theme="dark"] .sync-pop .btn.secondary { background: var(--bt-card); color: var(--bt-ink); border-color: var(--bt-text-muted); }
+  /* the chip is in the brand row, to the right of any short note */
+  .brandbar.off .sync-wrap { position: fixed; top: 14px; right: 62px; z-index: 30; }
+
   /* ---------------- Main ---------------- */
   .main {
     --px: 44px;
@@ -817,7 +874,7 @@
   .sql-block { background: var(--bt-ink); color: var(--bt-stone); border-radius: var(--bt-r-btn); padding: 14px var(--bt-s4); font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: var(--bt-fs-xs); line-height: 1.5; overflow-x: auto; white-space: pre; margin: var(--bt-s1) 0; }
 
   /* auth */
-  body.logged-out .sidebar, body.logged-out .main, body.logged-out .save-status, body.logged-out .mobile-bar, body.logged-out .sidebar-backdrop { display: none !important; }
+  body.logged-out .sidebar, body.logged-out .main, body.logged-out .save-status, body.logged-out .sync-wrap, body.logged-out .mobile-bar, body.logged-out .sidebar-backdrop { display: none !important; }
   .login-overlay { --stone-deep:var(--bt-neu-bd); --line:var(--bt-line); --radius:var(--bt-r-card); --shadow:var(--bt-shadow-1); --ink:var(--bt-ink); --oak:var(--bt-brand-2-line); --serif:var(--bt-font-brand); position: fixed; inset: 0; background: var(--bt-brand-surface); display: flex; overflow-y: auto; z-index: 200; }
   .login-stack { margin: auto; padding: 24px 0; display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; }
   .login-brand { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: calc(100% - 32px); color: var(--bt-on-dark); text-align: center; }
@@ -1201,6 +1258,7 @@
     .brandbar { top: 52px; }
     .brandbar.off { margin-bottom: var(--bt-s5); }
     .brandbar.off .save-status { top: 62px; right: 12px; }
+    .brandbar.off .sync-wrap { top: 62px; right: 12px; }
   }
   @media (max-width: 860px) {
     .page-head h2 { font-size: 23px; }
@@ -1986,6 +2044,12 @@
     .who-pick .who-lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .who-pick select { max-width: 110px; }
     .save-status { flex: 1 1 0; white-space: nowrap; text-overflow: ellipsis; -webkit-line-clamp: 1; line-clamp: 1; }
+    .who-pick label.who-lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }   /* the chip needs the room: the picker keeps its own "Choose…" prompt */
+    .sync-wrap { margin-left: auto; flex: 0 0 auto; }
+    .sync-chip { min-height: 34px; height: auto; padding: 3px 10px 3px 7px; white-space: normal; max-width: 158px; border-radius: 17px; }
+    .sync-txt { display: flex; flex-direction: column; line-height: 1.15; white-space: normal; overflow: visible; }
+    .sync-age { display: block; font-size: 10.5px; font-weight: 500; }
+    .sync-sep, .sync-mid { display: none; }
     .brand-pill { flex: 0 0 auto; }
     .brand-pill .bp-name { display: none; }
     .brand-pill .bp-short { display: inline; }
@@ -2229,11 +2293,12 @@ body.logged-out .rail, body.logged-out .topmenu, body.logged-out .bottombar, bod
 .fav-btn[aria-pressed="true"] { color: var(--bt-oak-600); }
 .fav-btn[aria-pressed="true"] svg { fill: currentColor; }
 .brandbar.off .fav-btn { position: fixed; top: calc(var(--bt-banner-h, 0px) + 4px); right: 10px; z-index: 30; background: color-mix(in srgb, var(--bt-on-dark) 82%, transparent); border: 1px solid var(--line); }
-.brandbar.off .save-status { right: 62px; }
+.brandbar.off .save-status { right: 62px; top: 52px; }
 @media (max-width: 700px) {
   .brand-tools { display: none; }
   .brandbar.off .fav-btn { top: calc(var(--bt-banner-h, 0px) + 56px); }
-  .brandbar.off .save-status { right: 62px; top: 62px; }
+  .brandbar.off .save-status { right: 62px; top: 116px; }
+  .brandbar.off .sync-wrap { right: 62px; top: 62px; }
 }
 body.logged-out .fav-btn { display: none; }
 
@@ -3119,6 +3184,11 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
     <div class="brandbar-in" id="brandBarIn">
       <div class="who-pick" id="whoPick"></div>
       <div class="save-status" id="saveStatus"></div>
+      <div class="sync-wrap" id="syncWrap" hidden>
+        <div class="sync-chip" id="syncChip" data-state="saving"><span class="sync-ico" id="syncIco" aria-hidden="true"></span><span class="sync-txt" id="syncTxt" aria-live="polite"></span></div>
+        <button type="button" class="sync-info" id="syncInfo" aria-label="About the backup status" aria-describedby="syncPop" aria-expanded="false">i</button>
+        <div class="sync-pop" id="syncPop" role="tooltip" hidden></div>
+      </div>
       <div class="brand-pill" id="brandPill"></div>
       <button type="button" class="fav-btn" id="favBtn" aria-pressed="false" aria-label="Add this page to favourites" title="Add this page to favourites"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 3 14.9 8.9 21.4 9.8 16.7 14.4 17.8 20.9 12 17.8 6.2 20.9 7.3 14.4 2.6 9.8 9.1 8.9"/></svg></button>
     </div>
@@ -3628,6 +3698,11 @@ th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--bt-text); }
         <button class="btn secondary" data-action="reset-data" style="margin-left:auto;color:var(--bt-bad-fg);border-color:var(--bt-bad-bd);">Reset to sample data</button>
       </div>
       <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+      <p style="font-size:12.5px;color:var(--text-muted);margin:12px 0 0;line-height:1.55;">Export saves exactly what is on your screen, including changes not yet in the cloud.</p>
+      <details class="ss-hist" id="ssHist">
+        <summary>Version history (last 30 days)</summary>
+        <div id="ssHistBody"><div class="ss-hist-msg">Open this to load the saved versions.</div></div>
+      </details>
     </div>
         </section>
 
@@ -4334,18 +4409,13 @@ function saveCloudConfig(){ try{ localStorage.setItem(CLOUD_CONFIG_KEY, JSON.str
 function cloudBase(){ return (cloud.url || '').replace(/\/+$/, ''); }
 function sbHeaders(extra){ return Object.assign({ 'apikey': cloud.key, 'Authorization': 'Bearer ' + cloud.key, 'Content-Type': 'application/json' }, extra || {}); }
 async function sbGetRow(){
-  const r = await fetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=doc,updated_at`, { headers: sbHeaders() });
-  if(!r.ok) throw new Error('HTTP ' + r.status + ' — ' + (await r.text()).slice(0,160));
+  const cols = sync.noVersion ? 'doc,updated_at' : 'doc,updated_at,version';
+  const r = await ssFetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=${cols}`, { headers: sbHeaders() });
+  if(!r.ok){ const t = await r.text(); if(!sync.noVersion && ssMissingVersion(t)){ ssNoVersion(); return sbGetRow(); } throw new Error('HTTP ' + r.status + ' — ' + t.slice(0,160)); }
   const rows = await r.json();
   return rows[0] || null;
 }
-async function sbSaveRow(doc){
-  const body = JSON.stringify({ doc: doc, updated_at: new Date().toISOString() });
-  const r = await fetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}`, { method: 'PATCH', headers: sbHeaders({ 'Prefer': 'return=representation' }), body });
-  if(!r.ok) throw new Error('HTTP ' + r.status + ' — ' + (await r.text()).slice(0,160));
-  const rows = await r.json();
-  return rows[0];
-}
+/* saving is ssCloudSave / syncRun (compare-and-swap on the row version): see BT:js-savesafety */
 async function sbTest(){
   const r = await fetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=id`, { headers: sbHeaders() });
   if(!r.ok) throw new Error('HTTP ' + r.status + ' — ' + (await r.text()).slice(0,160));
@@ -4354,25 +4424,26 @@ async function sbTest(){
 
 async function loadState(){
   loadCloudConfig();
+  const m = ssMetaRead();
+  if(m){ sync.dirty = !!m.dirty; sync.cloudVersion = m.cloudVersion != null ? Number(m.cloudVersion) : null; sync.cloudUpdatedAt = m.cloudUpdatedAt || ''; cloudLoadedAt = sync.cloudUpdatedAt || null; sync.lastConfirmedAt = Number(m.lastCloudConfirmAt) || 0; sync.lastLocalAt = Number(m.localSavedAt) || 0; ssGuard(sync.dirty); }
+  let why = '';
   if(cloud.enabled && cloudBase() && cloud.key){
     try{
       const row = await sbGetRow();
       if(row){
-        state = mergeDefaults(row.doc && Object.keys(row.doc).length ? row.doc : {});
-        cloudLoadedAt = row.updated_at; usingCloud = true;
-        try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-        setSaveStatus('Loaded from cloud');
+        usingCloud = true;
+        await ssReconcile(row, { live: false, source: 'load' });   // never overwrites unsaved work in this browser: see Part D
         return;
       }
-      setSaveStatus('Cloud row missing — run the setup SQL. Using local for now.');
-    }catch(e){ usingCloud = false; setSaveStatus('Cloud unavailable — using local copy'); }
+      why = 'the cloud row is missing: run the setup SQL';
+    }catch(e){ usingCloud = false; why = (e && e.message) || 'could not reach the cloud'; }
   }
   try{
     const value = await Store.get(STORAGE_KEY);
-    if(value){ state = mergeDefaults(JSON.parse(value)); setSaveStatus('Loaded your saved data (local)'); return; }
+    if(value){ state = mergeDefaults(JSON.parse(value)); sync.detail = why; syncSet('local', why); if(cloud.enabled) ssStartReconnect(); return; }
   }catch(e){}
-  state = defaultState();
-  setSaveStatus('Starting from sample data');
+  state = defaultState(); sync.sample = true;
+  syncSet('local', why); if(cloud.enabled) ssStartReconnect();
 }
 
 let saveTimer = null;
@@ -4381,29 +4452,15 @@ function saveState(){
   try{ finEnsureReceipts(); }catch(e){}
   try{ clsSyncTask(); }catch(e){}   // Stage 5: the one rolling task for costs with no class
   if(typeof cxDirty === 'function') cxDirty();
-  setSaveStatus('Saving…');
+  /* mark it unsaved and write the local bookkeeping BEFORE any cloud attempt; dirty clears only when the cloud confirms */
+  sync.editSeq++; sync.lastLocalAt = Date.now(); ssSetDirty(true); ssMetaWrite();
+  sync.retryCount = 0; sync.nextRetryAt = 0; clearTimeout(sync.retryTimer);   // a new edit starts the backoff over
+  try{ lr.lastSaveCall = Date.now(); }catch(e){}
+  if(sync.status !== 'blocked' && sync.status !== 'held' && sync.status !== 'local') syncSet('saving');
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}   // local backup always
-    if(usingCloud && cloud.enabled && cloud.key){
-      try{
-        const row = await sbGetRow();   // conflict guard — don't clobber a newer remote
-        if(row && cloudLoadedAt && row.updated_at && row.updated_at !== cloudLoadedAt && new Date(row.updated_at) > new Date(cloudLoadedAt)){
-          cloudConflict = true; renderCloudStatus();
-          setSaveStatus('⚠ Changed on another device — reload before saving');
-          return;
-        }
-        const saved = await sbSaveRow(state);
-        cloudLoadedAt = saved.updated_at; cloudConflict = false; renderCloudStatus();
-        setSaveStatus('Saved to cloud ✓');
-      }catch(e){ setSaveStatus('Cloud save failed (saved locally): ' + (e.message||'')); }
-    } else {
-      const ok = await Store.set(STORAGE_KEY, JSON.stringify(state));
-      setSaveStatus(ok ? 'All changes saved (local)' : 'Save failed — export a backup to be safe');
-    }
-  }, 500);
+  saveTimer = setTimeout(() => { syncRun({}); }, 500);
 }
-function setSaveStatus(msg){ const el = document.getElementById('saveStatus'); if(el) el.textContent = msg; lpSaveStatus(msg); }
+/* setSaveStatus (brief transient notes) lives in BT:js-savesafety */
 
 /* connect / disconnect / reload */
 async function connectCloud(){
@@ -4415,24 +4472,27 @@ async function connectCloud(){
   try{
     await sbTest();
     const row = await sbGetRow();
-    if(row && row.doc && Object.keys(row.doc).length){
-      state = mergeDefaults(row.doc); cloudLoadedAt = row.updated_at;
-      setCloudMsg('Connected — adopted the data already in the cloud ✓', 'ok');
+    if(!row) throw new Error('the cloud row is missing: run the setup SQL');
+    usingCloud = true; cloudConflict = false;
+    if(row.doc && Object.keys(row.doc).length){
+      await ssReconcile(row, { live: true, source: 'connect' });   // adopts the cloud copy unless this browser has unsaved work, in which case you choose
+      setCloudMsg('Connected — the cloud and this screen are in step ✓', 'ok');
     } else {
-      const saved = await sbSaveRow(state); cloudLoadedAt = saved.updated_at;
+      ssBaseFromRow(row); sync.cloudHasDoc = false; sync.confirmed = null; sync.allowShrink = true; ssSetDirty(true); sync.editSeq++; ssMetaWrite();
+      await syncRun({ manual: true, recheck: true });
       setCloudMsg('Connected — pushed your current data up to the cloud ✓', 'ok');
     }
-    usingCloud = true; cloudConflict = false;
+    if(sync.reconTimer){ clearInterval(sync.reconTimer); sync.reconTimer = null; }
     ensurePipelineIds(); render(); renderCloudStatus();
   }catch(e){
-    usingCloud = false; renderCloudStatus();
+    usingCloud = false; renderCloudStatus(); syncSet('local', (e && e.message) || '');
     setCloudMsg('Could not connect: ' + (e.message || 'check the URL, key, and that you ran the setup SQL.'), 'err');
   }
 }
 function disconnectCloud(){
   cloud.enabled = false; usingCloud = false; saveCloudConfig();
   renderCloudStatus(); setCloudMsg('Disconnected — now saving locally on this device only.', '');
-  setSaveStatus('Local mode');
+  syncSet('local', 'you disconnected the cloud');
 }
 async function testCloud(){
   const u = document.getElementById('cloudUrl').value.trim();
@@ -4447,7 +4507,7 @@ async function reloadFromCloud(){
   if(!usingCloud){ setCloudMsg('Not connected to the cloud.', 'err'); return; }
   try{
     const row = await sbGetRow();
-    if(row){ state = mergeDefaults(row.doc && Object.keys(row.doc).length ? row.doc : {}); cloudLoadedAt = row.updated_at; cloudConflict = false; ensurePipelineIds(); render(); renderCloudStatus(); setSaveStatus('Reloaded from cloud'); setCloudMsg('Reloaded the latest from the cloud ✓', 'ok'); }
+    if(row){ await ssReconcile(row, { live: true, source: 'reload' }); ensurePipelineIds(); render(); renderCloudStatus(); setSaveStatus('Reloaded from cloud'); setCloudMsg('Reloaded the latest from the cloud ✓ (unsaved changes in this browser are never discarded without asking)', 'ok'); }
   }catch(e){ setCloudMsg('Reload failed: ' + (e.message||''), 'err'); }
 }
 function setCloudMsg(msg, kind){ const el = document.getElementById('cloudMsg'); if(el){ el.textContent = msg; el.className = 'cloud-msg' + (kind==='ok'?' ok':kind==='err'?' err':''); } }
@@ -4461,6 +4521,619 @@ function renderCloudStatus(){
     el.innerHTML = `<span class="cloud-badge off">● Local only (this device)</span>`;
   }
 }
+
+/* BT:js-savesafety begin */
+/* =====================================================================
+   SAVE SAFETY. One sync state object, one function (syncSet) that drives the status chip, compare-and-swap cloud saves,
+   retry with backoff, a 30-minute heartbeat, leave-page protection, a load check that never silently discards unsaved
+   browser work (rescue copy + three-way dialog), a shrink guard, import confirm and version history.
+   Nothing here is stored in the saved document. Local bookkeeping lives in localStorage under STORAGE_KEY + '-meta' and '-rescue-<time>'. */
+const SS_META_KEY = STORAGE_KEY + '-meta';
+const SS_RESCUE_PREFIX = STORAGE_KEY + '-rescue-';
+const SS_RETRY_MS = [10000, 30000, 60000, 300000];   // then every 5 minutes
+const SS_HEARTBEAT_MS = 30 * 60 * 1000;
+const SS_RECONNECT_MS = 60000;
+const SS_HIDDEN_RECHECK_MS = 5 * 60 * 1000;
+const SS_COUNT_COLLS = ['contacts', 'leads', 'quotes', 'projects', 'invoices', 'crmTasks', 'transactions'];
+const SS_GUARD_COLLS = ['contacts', 'leads', 'quotes', 'projects', 'invoices', 'crmTasks', 'transactions', 'suppliers'];
+const SS_ADD_COLLS = ['contacts', 'leads', 'quotes', 'projects', 'invoices', 'crmTasks', 'transactions', 'actions', 'pipeline', 'companies', 'suppliers'];   // the spec's eight, plus the sales deals and the companies and suppliers they point at
+const SS_COUNTERS = ['nextQuoteId', 'nextRecordId', 'nextTaskNo', 'nextJobNumber', 'nextPipelineId', 'nextSupplierId'];
+const SS_COLL_NAMES = { contacts: 'Contacts', leads: 'Leads', quotes: 'Quotes', projects: 'Projects', invoices: 'Invoices', crmTasks: 'CRM tasks', transactions: 'Transactions', suppliers: 'Suppliers', actions: 'Actions', pipeline: 'Deals', companies: 'Companies' };
+const SS_ONE_NAMES = { contacts: 'Contact', leads: 'Lead', quotes: 'Quote', projects: 'Project', invoices: 'Invoice', crmTasks: 'Task', transactions: 'Transaction', suppliers: 'Supplier', actions: 'Action', pipeline: 'Deal', companies: 'Company' };
+
+const sync = { lastConfirmedAt: 0, dirty: false, status: 'idle', detail: '', cloudVersion: null, cloudUpdatedAt: '', retryCount: 0,
+  noVersion: false, warnedNoVersion: false, running: false, again: false, editSeq: 0, gen: 0, sample: false, cloudHasDoc: false, confirmed: null, allowShrink: false,
+  held: null, heldKey: '', retryTimer: null, nextRetryAt: 0, lastLocalAt: 0, started: false, hiddenAt: 0, guardOn: false, reconTimer: null, reconBusy: false, noteTimer: null, popOpen: false, localOk: true };
+
+const ssClone = o => JSON.parse(JSON.stringify(o));
+const ssP2 = n => String(n).padStart(2, '0');
+const ssIsObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+function ssCanon(v){ if(Array.isArray(v)) return '[' + v.map(ssCanon).join(',') + ']'; if(ssIsObj(v)) return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + ssCanon(v[k])).join(',') + '}'; return JSON.stringify(v === undefined ? null : v); }
+function ssKey(r){ return (r && r.id !== undefined && r.id !== null && r.id !== '') ? 'id:' + r.id : 'j:' + ssCanon(r); }
+function ssLabel(r){
+  if(!ssIsObj(r)) return String(r);
+  const nm = [r.firstName, r.lastName].filter(Boolean).join(' ');
+  const cu = typeof r.customer === 'string' ? r.customer : (r.customer && r.customer.name) || '';
+  return String(r.name || nm || r.title || r.ref || r.number || r.quoteRef || r.projectName || r.project || cu || r.description || r.desc || r.action || r.text || r.id || '(unnamed)').slice(0, 60);
+}
+const ssArr = (doc, k) => (doc && Array.isArray(doc[k])) ? doc[k] : [];
+function ssCounts(doc){ const o = {}; SS_COUNT_COLLS.forEach(k => { o[k] = ssArr(doc, k).length; }); return o; }
+function ssSummary(doc, bytes){
+  const counts = {}, recs = {};
+  SS_GUARD_COLLS.forEach(k => { const a = ssArr(doc, k); counts[k] = a.length; recs[k] = a.map(r => ({ k: ssKey(r), l: ssLabel(r), hasId: !!(r && r.id !== undefined && r.id !== null && r.id !== '') })); });
+  return { counts, recs, bytes };
+}
+/* time wording */
+function ssClock(ts){
+  if(!ts) return '';
+  const d = new Date(ts), n = new Date(), hm = ssP2(d.getHours()) + ':' + ssP2(d.getMinutes());
+  const y = new Date(n.getFullYear(), n.getMonth(), n.getDate() - 1);
+  if(d.toDateString() === n.toDateString()) return hm;
+  if(d.toDateString() === y.toDateString()) return 'yesterday ' + hm;
+  return d.getDate() + ' ' + d.toLocaleString('en-GB', { month: 'short' }) + ' ' + hm;
+}
+function ssAgo(ts){
+  if(!ts) return '';
+  const s = (Date.now() - ts) / 1000; if(s < 60) return 'Now';
+  const m = Math.floor(s / 60); if(m < 60) return m + ' min ago';
+  const d = new Date(ts), n = new Date();
+  if(d.toDateString() === n.toDateString()) return Math.floor(m / 60) + ' h ago';
+  return ssClock(ts);
+}
+const ssExact = ts => ts ? new Date(ts).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'not yet this session';
+const ssStamp = d => { d = d || new Date(); return d.getFullYear() + '-' + ssP2(d.getMonth() + 1) + '-' + ssP2(d.getDate()) + '-' + ssP2(d.getHours()) + ssP2(d.getMinutes()); };
+
+/* ---------- local meta ---------- */
+function ssMetaRead(){ try{ const m = JSON.parse(localStorage.getItem(SS_META_KEY) || 'null'); return ssIsObj(m) ? m : null; }catch(e){ return null; } }
+function ssHash(str){ let h = 0x811c9dc5; for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(36) + ':' + str.length; }   // a cheap fingerprint of the local copy: tells us the copy is still exactly what we last wrote
+function ssMetaWrite(localStr){
+  try{
+    const old = ssMetaRead();
+    localStorage.setItem(SS_META_KEY, JSON.stringify({ localSavedAt: sync.lastLocalAt || Date.now(), lastCloudConfirmAt: sync.lastConfirmedAt || 0, cloudVersion: sync.cloudVersion, cloudUpdatedAt: sync.cloudUpdatedAt || '', dirty: !!sync.dirty, localHash: typeof localStr === 'string' ? ssHash(localStr) : (old ? old.localHash : null) }));
+  }catch(e){}
+}
+function ssSetDirty(v){ sync.dirty = !!v; ssGuard(sync.dirty); }
+/* leave-page protection: the handler exists only while there are unsaved changes */
+function ssBeforeUnload(e){ if(!sync.dirty) return; e.preventDefault(); e.returnValue = ''; return ''; }
+function ssGuard(on){
+  if(on && !sync.guardOn){ window.addEventListener('beforeunload', ssBeforeUnload); sync.guardOn = true; }
+  else if(!on && sync.guardOn){ window.removeEventListener('beforeunload', ssBeforeUnload); sync.guardOn = false; }
+}
+
+/* ---------- cloud calls ---------- */
+async function ssFetch(url, opts, ms){
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms || 45000);
+  try{ return await fetch(url, Object.assign({}, opts || {}, { signal: ctl.signal })); }
+  catch(e){ if(e && e.name === 'AbortError') throw new Error('The cloud did not answer in time'); throw e; }
+  finally{ clearTimeout(to); }
+}
+const ssMissingVersion = t => /42703|column[^"]*version[^"]*does not exist|"version"/i.test(t || '') && /version/i.test(t || '');
+function ssNoVersion(){
+  sync.noVersion = true;
+  if(!sync.warnedNoVersion){ sync.warnedNoVersion = true; try{ console.warn('[save safety] tracker_data.version is missing (database update not applied yet). Falling back to updated_at comparison. Apply supabase/save-safety.sql to switch on compare-and-swap saving and server-side history.'); }catch(e){} }
+}
+async function sbPeek(){   // the cheap check: one small row, no document
+  const cols = sync.noVersion ? 'updated_at' : 'updated_at,version';
+  const r = await ssFetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=${cols}`, { headers: sbHeaders() }, 15000);
+  if(!r.ok){ const t = await r.text(); if(!sync.noVersion && ssMissingVersion(t)){ ssNoVersion(); return sbPeek(); } throw new Error('HTTP ' + r.status + ' — ' + t.slice(0, 160)); }
+  return (await r.json())[0] || null;
+}
+/* is the cloud copy newer than the one this browser last confirmed? Versions when we have them, else the old updated_at comparison. */
+function ssCloudNewer(p){
+  if(!p) return false;
+  if(!sync.noVersion && p.version != null && sync.cloudVersion != null) return Number(p.version) > Number(sync.cloudVersion);
+  return !cloudLoadedAt || (p.updated_at !== cloudLoadedAt && new Date(p.updated_at) > new Date(cloudLoadedAt));
+}
+/* compare-and-swap save. { ok, row } or { blocked } (someone else saved first); throws on any failure. */
+async function ssCloudSave(body){
+  const base = cloudBase();
+  if(!sync.noVersion && sync.cloudVersion != null){
+    const r = await ssFetch(`${base}/rest/v1/tracker_data?id=eq.${DOC_ID}&version=eq.${sync.cloudVersion}&select=version,updated_at`, { method: 'PATCH', headers: sbHeaders({ 'Prefer': 'return=representation' }), body: '{"doc":' + body + '}' });
+    if(!r.ok){ const t = await r.text(); if(ssMissingVersion(t)){ ssNoVersion(); return ssCloudSave(body); } throw new Error('HTTP ' + r.status + ' — ' + t.slice(0, 160)); }
+    const rows = await r.json();
+    if(!rows.length) return { blocked: true };   // nothing matched: the version moved on, so we never overwrite
+    return { ok: true, row: rows[0] };
+  }
+  const p = await sbPeek();   // fallback (migration not applied): today's updated_at comparison, and the browser clock stamps updated_at
+  if(!p) throw new Error('Cloud row missing');
+  if(cloudLoadedAt && p.updated_at && p.updated_at !== cloudLoadedAt && new Date(p.updated_at) > new Date(cloudLoadedAt)) return { blocked: true };
+  const r = await ssFetch(`${base}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=updated_at`, { method: 'PATCH', headers: sbHeaders({ 'Prefer': 'return=representation' }), body: '{"doc":' + body + ',"updated_at":' + JSON.stringify(new Date().toISOString()) + '}' });
+  if(!r.ok) throw new Error('HTTP ' + r.status + ' — ' + (await r.text()).slice(0, 160));
+  const rows = await r.json();
+  if(!rows.length) throw new Error('Cloud row missing');
+  return { ok: true, row: rows[0] };
+}
+
+/* ---------- the one place that drives the screen ---------- */
+function syncSet(status, detail){
+  sync.status = status; sync.detail = detail || '';
+  ssGuard(sync.dirty);
+  ssRender(); ssLpRefresh();
+}
+const SS_RED = { failed: 1, offline: 1, blocked: 1, held: 1, local: 1 };
+const SS_ICONS = {
+  sync: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>',
+  wave: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M4.5 12.5q1.4-3 2.8 0t2.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M13.9 11.5q1.4 3 2.8 0t2.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M6.5 6.5l6 6M12.5 6.5l-6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><rect x="13.4" y="12.6" width="2.3" height="6.4" rx=".6" fill="#fff"/><rect x="17.2" y="12.6" width="2.3" height="6.4" rx=".6" fill="#fff"/></svg>'
+};
+function ssIconFor(s){ return s === 'saving' || s === 'backed' ? SS_ICONS.sync : s === 'offline' ? SS_ICONS.wave : s === 'blocked' ? SS_ICONS.pause : SS_ICONS.cross; }
+function ssChipHtml(){
+  const s = sync.status, lb = `<span class="sync-age"><span class="sync-sep"> · </span><span class="sync-lb">last backed up </span>${escHtml(sync.lastConfirmedAt ? ssClock(sync.lastConfirmedAt) : 'not yet')}</span>`;
+  if(s === 'saving') return 'Saving…';
+  if(s === 'backed') return `Backed up<span class="sync-age" aria-hidden="true"><span class="sync-sep"> · </span><span class="sync-ago">${escHtml(ssAgo(sync.lastConfirmedAt))}</span></span>`;
+  if(s === 'failed' || s === 'offline') return 'Not backing up' + lb;
+  if(s === 'blocked') return 'Paused<span class="sync-age sync-mid"><span class="sync-sep"> · </span>newer changes elsewhere</span>' + lb;
+  if(s === 'held') return 'Paused<span class="sync-age sync-mid"><span class="sync-sep"> · </span>save held back for your OK</span>' + lb;
+  if(s === 'local') return 'Saved on this device only';
+  return '';
+}
+function ssRender(){
+  const wrap = document.getElementById('syncWrap'); if(!wrap) return;
+  const s = sync.status, show = sync.started && s !== 'idle' && s !== 'loading';
+  wrap.hidden = !show; if(!show) return;
+  const chip = document.getElementById('syncChip'), txt = document.getElementById('syncTxt'), ico = document.getElementById('syncIco');
+  chip.dataset.state = s;
+  const html = ssChipHtml();
+  if(s === 'backed' && txt.dataset.k === 'backed' && txt.querySelector('.sync-ago')){ txt.querySelector('.sync-ago').textContent = ssAgo(sync.lastConfirmedAt); }   // a clock tick only changes the (screen-reader-hidden) age, never the announced words
+  else if(txt.dataset.h !== html){ txt.innerHTML = html; }
+  txt.dataset.h = html; txt.dataset.k = s;
+  const ik = ico.dataset.k; if(ik !== s){ ico.innerHTML = ssIconFor(s); ico.dataset.k = s; }
+  chip.title = (s === 'saving' ? 'Saving to the cloud… Last confirmed: ' : s === 'backed' ? 'The cloud copy matched your screen at: ' : 'Last confirmed backed up: ') + ssExact(sync.lastConfirmedAt);
+  if(sync.popOpen) ssPopRender();
+}
+/* the lead panel's own little "Saved" label follows the same state */
+function ssLpRefresh(onlyWarn){
+  if(typeof lp === 'undefined' || !lp || typeof lpSaveStatus !== 'function') return;
+  const s = sync.status;
+  if(onlyWarn && !SS_RED[s]) return;
+  lpSaveStatus(s === 'saving' ? 'Saving…' : s === 'backed' ? 'Saved to cloud ✓' : s === 'blocked' ? '⚠ Changed on another device' : (s === 'idle' || s === 'loading') ? 'Saved' : 'Cloud save failed');
+}
+/* brief transient messages (a backup was downloaded, etc.). The chip is the state; this is only a short note beside it. */
+function setSaveStatus(msg){
+  const el = document.getElementById('saveStatus'); if(!el) return;
+  el.textContent = msg || ''; clearTimeout(sync.noteTimer);
+  if(msg) sync.noteTimer = setTimeout(() => { el.textContent = ''; }, 4500);
+}
+
+/* ---------- the info popover ---------- */
+function ssPopHtml(){
+  const s = sync.status, red = !!SS_RED[s];
+  let why = '';
+  if(s === 'failed') why = `The last save to the cloud did not go through${sync.detail ? ' (' + escHtml(sync.detail) + ')' : ''}. Your work is still on this screen and saved on this device. The portal is trying again by itself${sync.nextRetryAt ? ' (next try in about ' + Math.max(1, Math.round((sync.nextRetryAt - Date.now()) / 1000)) + ' s)' : ''}.`;
+  else if(s === 'offline') why = 'This device looks to be offline. Your work is kept on this device, and the portal will try again as soon as the connection is back.';
+  else if(s === 'blocked') why = 'Someone else (another device or another tab) has saved newer changes to the cloud. Saving is paused so that their work is not overwritten. Your changes on this screen are kept.';
+  else if(s === 'held') why = sync.detail === 'sample' ? 'Sample data can never be saved over your real cloud data, so this save was stopped.' : 'This save would remove a lot of records from the cloud copy, so it was held back for your OK.';
+  else if(s === 'local') why = 'The cloud is not connected, or could not be reached when the portal opened, so your work is saved in this browser only. The portal keeps trying to reconnect every minute.' + (sync.detail ? ' (' + escHtml(sync.detail) + ')' : '');
+  const btn = (k, label, cls) => `<button type="button" class="btn ${cls || 'secondary'} ss-pop-btn" data-ss="${k}">${label}</button>`;
+  let acts = '';
+  if(red){
+    acts = btn('retry', s === 'held' ? 'Review and save' : 'Retry now', '') + btn('download', 'Download my data (.json)');
+    if(s === 'blocked') acts += btn('reload', 'Reload to get the latest');
+  }
+  return `<p class="ss-pop-p">Your work saves to the cloud as you edit, and the portal checks every 30 minutes. This shows the last time the cloud copy was confirmed to match your screen.</p>
+    <p class="ss-pop-when">Last confirmed: <strong>${escHtml(ssExact(sync.lastConfirmedAt))}</strong></p>
+    ${red ? `<p class="ss-pop-why" id="ssPopWhy">${why}</p>` : ''}
+    ${s === 'blocked' ? '<p class="ss-pop-small">Reload keeps your unsaved changes as a rescue copy first, then lets you choose what to keep.</p>' : ''}
+    ${red ? `<div class="ss-pop-acts">${acts}</div><p class="ss-pop-small ss-pop-warn">If this stays red, don’t close this tab. Download your data and tell Royce.</p>` : ''}
+    <p class="ss-pop-small"><button type="button" class="link-btn" data-ss="download">Download what is on my screen (.json)</button></p>`;
+}
+function ssPopRender(){ const p = document.getElementById('syncPop'); if(p) p.innerHTML = ssPopHtml(); }
+function ssPopPlace(){
+  const p = document.getElementById('syncPop'), i = document.getElementById('syncInfo'); if(!p || !i) return;
+  const r = i.getBoundingClientRect(), w = Math.min(340, window.innerWidth - 24);
+  p.style.width = w + 'px';
+  p.style.left = Math.max(12, Math.min(window.innerWidth - w - 12, r.right - w)) + 'px';
+  p.style.top = (r.bottom + 8) + 'px';
+}
+function ssPopSet(open){
+  const p = document.getElementById('syncPop'), i = document.getElementById('syncInfo'); if(!p || !i) return;
+  if(open === sync.popOpen) { if(open) ssPopPlace(); return; }
+  sync.popOpen = open; i.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if(open){ ssPopRender(); p.hidden = false; ssPopPlace(); } else { p.hidden = true; }
+}
+(function ssPopInit(){
+  const wrap = document.getElementById('syncWrap'), info = document.getElementById('syncInfo'), pop = document.getElementById('syncPop'); if(!wrap || !info || !pop) return;
+  let pinned = false, hover = false, focusOpen = false, closeT = null;
+  const sync_ = () => { clearTimeout(closeT); ssPopSet(pinned || hover || focusOpen); };
+  const later = () => { clearTimeout(closeT); closeT = setTimeout(sync_, 220); };
+  const canHover = () => window.matchMedia && window.matchMedia('(hover: hover)').matches;
+  wrap.addEventListener('mouseenter', () => { if(canHover()){ hover = true; sync_(); } });
+  wrap.addEventListener('mouseleave', () => { hover = false; later(); });
+  pop.addEventListener('mouseenter', () => { if(canHover()){ hover = true; sync_(); } });
+  pop.addEventListener('mouseleave', () => { hover = false; later(); });
+  let quiet = false;   // true while Escape hands focus back to the ⓘ, so that does not re-open the popover
+  wrap.addEventListener('focusin', (e) => { if(quiet) return; let fv = false; try{ fv = e.target.matches(':focus-visible'); }catch(x){} if(fv){ focusOpen = true; sync_(); } });
+  wrap.addEventListener('focusout', () => { setTimeout(() => { if(!wrap.contains(document.activeElement) && !pop.contains(document.activeElement)){ focusOpen = false; later(); } }, 0); });
+  pop.addEventListener('focusin', () => { focusOpen = true; sync_(); });
+  pop.addEventListener('focusout', () => { setTimeout(() => { if(!wrap.contains(document.activeElement) && !pop.contains(document.activeElement)){ focusOpen = false; later(); } }, 0); });
+  info.addEventListener('click', () => { pinned = !pinned; if(!pinned){ hover = false; focusOpen = false; } sync_(); });   // tap / click toggles
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && sync.popOpen){ const inside = wrap.contains(document.activeElement) || pop.contains(document.activeElement); pinned = hover = focusOpen = false; sync_(); if(inside){ quiet = true; info.focus({ preventScroll: true }); quiet = false; } } });
+  document.addEventListener('click', (e) => { if(sync.popOpen && !wrap.contains(e.target) && !pop.contains(e.target)){ pinned = hover = focusOpen = false; sync_(); } });
+  window.addEventListener('resize', () => { if(sync.popOpen) ssPopPlace(); });
+  pop.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-ss]'); if(!b) return;
+    const a = b.dataset.ss;
+    if(a === 'download') exportData();
+    else if(a === 'retry') ssRetryNow();
+    else if(a === 'reload') ssReloadLatest();
+  });
+})();
+
+/* ---------- saving ---------- */
+function ssWriteLocalSoon(){ try{ if(sync.dirty && state) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+window.addEventListener('pagehide', () => { ssWriteLocalSoon(); ssMetaWrite(); });   // an edit still waiting for its half-second never misses the local copy
+function ssScheduleRetry(){
+  clearTimeout(sync.retryTimer);
+  const d = SS_RETRY_MS[Math.min(Math.max(sync.retryCount, 1) - 1, SS_RETRY_MS.length - 1)];
+  sync.nextRetryAt = Date.now() + d;
+  sync.retryTimer = setTimeout(() => { syncRun({}); }, d);
+}
+function ssBlock(){
+  clearTimeout(sync.retryTimer); sync.retryCount = 0; sync.nextRetryAt = 0;
+  cloudConflict = true; try{ lrHideBanner(); }catch(e){}
+  try{ renderCloudStatus(); }catch(e){}
+  syncSet('blocked');
+}
+function ssClearBlock(){ cloudConflict = false; try{ renderCloudStatus(); }catch(e){} if(sync.status === 'blocked') syncSet('saving'); }
+function ssBaseFromRow(row){
+  if(!sync.noVersion && row && row.version != null) sync.cloudVersion = Number(row.version);
+  sync.cloudUpdatedAt = (row && row.updated_at) || ''; cloudLoadedAt = sync.cloudUpdatedAt || null;
+}
+/* the screen now equals the cloud row: remember its version, summary and time */
+function ssAdopt(row, norm){
+  ssBaseFromRow(row);
+  const s = JSON.stringify(norm);
+  sync.confirmed = ssSummary(norm, s.length);
+  sync.cloudHasDoc = !!(row && row.doc && Object.keys(row.doc).length);
+  sync.sample = false; sync.held = null; sync.heldKey = ''; sync.allowShrink = false; sync.gen++;
+  sync.lastConfirmedAt = Date.now(); sync.lastLocalAt = Date.now(); ssSetDirty(false);
+  cloudConflict = false; sync.retryCount = 0; clearTimeout(sync.retryTimer);
+  try{ localStorage.setItem(STORAGE_KEY, s); }catch(e){}
+  ssMetaWrite(s);
+  try{ if(typeof lr !== 'undefined') lr.dirty.clear(); }catch(e){}
+  syncSet('backed');
+}
+/* the cloud is unchanged and nothing is unsaved: the cloud copy matches the screen right now */
+function ssConfirmClean(){
+  if(sync.dirty || sync.running || !usingCloud) return;
+  sync.lastConfirmedAt = Date.now(); ssMetaWrite();
+  if(sync.status !== 'backed') syncSet('backed'); else ssRender();
+}
+function ssShrinkCheck(bytes){
+  const c = sync.confirmed; if(!c || !state) return null;
+  const hits = [];
+  SS_GUARD_COLLS.forEach(k => {
+    const cur = ssArr(state, k), was = c.counts[k] || 0, d = was - cur.length;
+    if(d >= 3 && d / was > 0.2){
+      const have = new Set(cur.map(ssKey)), gone = (c.recs[k] || []).filter(x => x.hasId && !have.has(x.k));
+      hits.push({ coll: k, was, now: cur.length, gone });
+    }
+  });
+  const sizeHit = c.bytes > 0 && bytes < c.bytes * 0.7;
+  return (hits.length || sizeHit) ? { hits, sizeHit, was: c.bytes, now: bytes } : null;
+}
+function ssShrinkHtml(g){
+  const kb = n => Math.round(n / 1024) + ' KB';
+  const rows = g.hits.map(h => `<li><strong>${escHtml(SS_COLL_NAMES[h.coll])}</strong>: ${h.was} in the cloud, ${h.now} on your screen (${h.was - h.now} fewer)${h.gone.length ? '<ul>' + h.gone.slice(0, 10).map(x => '<li>' + escHtml(x.l) + '</li>').join('') + (h.gone.length > 10 ? `<li>and ${h.gone.length - 10} more</li>` : '') + '</ul>' : ''}</li>`).join('');
+  return `<p>Saving now would remove these from the cloud copy:</p><ul class="ss-ul">${rows || ''}${g.sizeHit ? `<li>The document would shrink from ${kb(g.was)} to ${kb(g.now)} (more than 30% smaller).</li>` : ''}</ul><p class="ss-note">Deleting one record at a time never triggers this check. If this was on purpose, choose Save anyway.</p>`;
+}
+async function syncRun(opts){
+  opts = opts || {};
+  if(sync.running){ sync.again = true; return; }
+  if(!state || !sync.dirty) return;
+  sync.running = true; sync.again = false;
+  try{
+    const seq = sync.editSeq, body = JSON.stringify(state);
+    const localOk = await Store.set(STORAGE_KEY, body); sync.localOk = localOk; ssMetaWrite(body);   // the local copy is always written before any cloud attempt
+    if(!(usingCloud && cloud.enabled && cloud.key)){
+      syncSet('local', localOk ? (cloud.enabled ? sync.detail : '') : 'this browser could not store it either: download your data'); return;
+    }
+    if(sync.status === 'blocked' && !opts.recheck) return;   // never auto-save while paused
+    if(sync.sample && sync.cloudHasDoc){ syncSet('held', 'sample'); return; }   // sample data never goes over a real cloud document
+    if(!sync.allowShrink){
+      const g = ssShrinkCheck(body.length);
+      if(g){
+        const key = JSON.stringify([g.hits.map(h => [h.coll, h.now]), Math.round(g.now / 1024)]);
+        sync.held = g;
+        if(key !== sync.heldKey || opts.manual){
+          sync.heldKey = key; syncSet('held');
+          const c = await ssDialog({ title: 'Save fewer records to the cloud?', html: ssShrinkHtml(g), cancelKey: 'keep', buttons: [
+            { key: 'save', label: 'Save anyway', cls: 'danger' }, { key: 'keep', label: 'Don’t save, keep editing' }, { key: 'reload', label: 'Reload from cloud', sub: 'Your screen is downloaded and kept as a rescue copy first' }] });
+          if(c === 'reload'){ sync.running = false; await ssReloadLatest({ skipBlockedCheck: true }); return; }
+          if(c !== 'save'){ syncSet('held'); return; }
+          sync.allowShrink = true;
+        } else { syncSet('held'); return; }
+      }
+    }
+    syncSet('saving');
+    const sum = ssSummary(state, body.length);
+    const res = await ssCloudSave(body);
+    if(res.blocked){ ssBlock(); return; }
+    ssBaseFromRow(res.row); sync.gen++;
+    sync.confirmed = sum; sync.cloudHasDoc = true; sync.held = null; sync.heldKey = ''; sync.allowShrink = false; sync.retryCount = 0; sync.nextRetryAt = 0; clearTimeout(sync.retryTimer);
+    if(seq === sync.editSeq){ sync.lastConfirmedAt = Date.now(); ssSetDirty(false); try{ lr.dirty.clear(); }catch(e){} }
+    ssMetaWrite(body);
+    cloudConflict = false; try{ renderCloudStatus(); }catch(e){}
+    syncSet(sync.dirty ? 'saving' : 'backed');
+    if(!sync.dirty){ try{ if(lr.deferred || lr.remoteAt) lrSchedule(LR_RETRY_MS); }catch(e){} }
+  }catch(e){
+    sync.retryCount++;
+    const off = (typeof navigator !== 'undefined' && navigator.onLine === false) || (e instanceof TypeError);
+    syncSet(off ? 'offline' : 'failed', off ? '' : (e && e.message) || '');
+    ssScheduleRetry();
+  }finally{
+    sync.running = false;
+    if(sync.again){ sync.again = false; if(sync.dirty && sync.status !== 'blocked') syncRun({}); }
+  }
+}
+function ssRetryNow(){
+  const s = sync.status;
+  clearTimeout(sync.retryTimer);
+  if(!usingCloud || !cloud.enabled){ ssTryReconnect(); return; }
+  if(s === 'blocked'){ ssRetryBlocked(); return; }
+  if(sync.dirty){ syncSet('saving'); syncRun({ manual: true }); } else ssHeartbeat();
+}
+async function ssRetryBlocked(){
+  try{
+    const p = await sbPeek();
+    if(p && !ssCloudNewer(p)){ ssClearBlock(); syncRun({}); return; }
+    const row = await sbGetRow();
+    if(row && ssCanon(mergeDefaults(ssClone(row.doc || {}))) === ssCanon(mergeDefaults(ssClone(state)))){ ssAdopt(row, state); return; }   // someone saved exactly what we have
+    showToast('Still paused: newer changes are in the cloud. Use “Reload to get the latest”, or download your data.', null, 7000);
+  }catch(e){ showToast('Could not reach the cloud just now.', null, 5000); }
+}
+/* ---------- heartbeat, visibility, online ---------- */
+async function ssHeartbeat(){
+  if(!usingCloud || !cloud.enabled || sync.running || !state || !session || sync.status === 'blocked') return;
+  const gen = sync.gen;
+  try{
+    const p = await sbPeek();
+    if(!p) throw new Error('Cloud row missing');
+    if(sync.running || gen !== sync.gen) return;   // a save finished while we asked: this answer is stale
+    if(!ssCloudNewer(p)){ if(sync.dirty) await syncRun({ manual: false }); else ssConfirmClean(); }
+    else if(sync.dirty) ssBlock();
+    else lrSchedule(0);   // nothing unsaved: the existing live refresh applies their changes
+  }catch(e){
+    if(sync.dirty){ sync.retryCount++; const off = navigator.onLine === false || (e instanceof TypeError); syncSet(off ? 'offline' : 'failed', off ? '' : (e.message || '')); ssScheduleRetry(); }
+    /* clean: nothing is at risk, and the "Backed up · X ago" wording simply keeps ageing */
+  }
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'hidden'){ sync.hiddenAt = Date.now(); ssWriteLocalSoon(); ssMetaWrite(); return; }
+  if(!sync.started) return;
+  const away = sync.hiddenAt ? Date.now() - sync.hiddenAt : 0; sync.hiddenAt = 0;
+  if(!usingCloud){ ssTryReconnect(); return; }
+  if(sync.dirty && (sync.status === 'failed' || sync.status === 'offline')){ syncRun({}); return; }
+  if(away > SS_HIDDEN_RECHECK_MS) ssHeartbeat();
+  ssRender();
+});
+window.addEventListener('online', () => {
+  if(!sync.started) return;
+  if(!usingCloud){ ssTryReconnect(); return; }
+  if(sync.dirty && (sync.status === 'failed' || sync.status === 'offline')){ clearTimeout(sync.retryTimer); syncRun({}); }
+});
+window.addEventListener('offline', () => { if(sync.started && sync.dirty && usingCloud && !SS_RED[sync.status] ) syncSet('offline'); });
+
+/* ---------- local-only mode: keep trying to reach the cloud ---------- */
+function ssStartReconnect(){ if(sync.reconTimer) return; sync.reconTimer = setInterval(ssTryReconnect, SS_RECONNECT_MS); }
+async function ssTryReconnect(){
+  if(usingCloud || !cloud.enabled || !cloudBase() || !cloud.key || !state || sync.reconBusy || !session) return;
+  sync.reconBusy = true;
+  try{
+    const row = await sbGetRow();
+    if(!row){ sync.detail = 'the cloud row is missing: run the setup SQL'; ssRender(); return; }
+    usingCloud = true; try{ renderCloudStatus(); }catch(e){}
+    try{ await ssReconcile(row, { live: true, source: 'reconnect' }); }catch(e){ usingCloud = false; throw e; }
+    clearInterval(sync.reconTimer); sync.reconTimer = null;
+  }catch(e){ sync.detail = (e && e.message) || ''; if(!usingCloud) syncSet('local', sync.detail); }
+  finally{ sync.reconBusy = false; }
+}
+
+/* ---------- download / rescue ---------- */
+function ssDownloadText(text, stem){
+  try{
+    const blob = new Blob([text], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = stem + '-' + ssStamp() + '.json';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return true;
+  }catch(e){ return false; }
+}
+function ssStoreRescue(raw){   // keeps the last 3; when the browser is full, a .json download instead
+  try{
+    localStorage.setItem(SS_RESCUE_PREFIX + new Date().toISOString(), raw);
+    const keys = []; for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.indexOf(SS_RESCUE_PREFIX) === 0) keys.push(k); }
+    keys.sort(); while(keys.length > 3) localStorage.removeItem(keys.shift());
+    return true;
+  }catch(e){ ssDownloadText(raw, 'business-tracker-rescue-browser'); return false; }
+}
+
+/* ---------- the dialog (the one place a blocking dialog is right) ---------- */
+let ssDlgChain = Promise.resolve();
+function ssDialog(cfg){
+  const run = () => new Promise(resolve => {
+    let ov = document.getElementById('ssOverlay');
+    if(!ov){ ov = document.createElement('div'); ov.className = 'modal-overlay'; ov.id = 'ssOverlay'; ov.hidden = true; document.body.appendChild(ov); }
+    const opener = document.activeElement;
+    ov.innerHTML = `<div class="modal ss-modal" role="dialog" aria-modal="true" aria-labelledby="ssDlgT"><div class="modal-title" id="ssDlgT">${escHtml(cfg.title)}</div><div class="ss-dlg-body">${cfg.html || ''}</div><div class="ss-dlg-acts">${cfg.buttons.map(b => `<button type="button" class="btn ${b.cls === 'danger' ? 'ss-danger' : (b.cls || '')}" data-k="${escAttr(b.key)}">${escHtml(b.label)}${b.sub ? `<span class="ss-btn-sub">${escHtml(b.sub)}</span>` : ''}</button>`).join('')}</div></div>`;
+    const done = (k) => { ov.removeEventListener('click', onClick); ov.removeEventListener('keydown', onKey); ov.hidden = true; ov.innerHTML = ''; try{ if(opener && opener.focus) opener.focus({ preventScroll: true }); }catch(e){} resolve(k); };
+    const onClick = (e) => { const b = e.target.closest('[data-k]'); if(b) done(b.dataset.k); };
+    const onKey = (e) => {
+      if(e.key === 'Escape' && cfg.cancelKey){ e.stopPropagation(); done(cfg.cancelKey); return; }
+      if(e.key === 'Tab'){ const f = ov.querySelectorAll('button'); if(!f.length) return; const first = f[0], last = f[f.length - 1]; if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); } }
+    };
+    ov.addEventListener('click', onClick); ov.addEventListener('keydown', onKey);
+    ov.hidden = false;
+    const fb = ov.querySelector('[data-k="' + (cfg.focusKey || cfg.buttons[0].key) + '"]'); if(fb) fb.focus();
+  });
+  const p = ssDlgChain.then(run, run); ssDlgChain = p.catch(() => {}); return p;
+}
+
+/* ---------- load check and rescue ---------- */
+const ssSameDoc = (a, b) => ssCanon(mergeDefaults(ssClone(a || {}))) === ssCanon(mergeDefaults(ssClone(b || {})));
+function ssBaseMatches(meta, row){
+  if(!sync.noVersion && meta.cloudVersion != null && row.version != null) return Number(meta.cloudVersion) === Number(row.version);
+  return !!(meta.cloudUpdatedAt && meta.cloudUpdatedAt === row.updated_at);
+}
+function ssOnlyHere(localObj, cloudDoc){
+  const out = [];
+  SS_ADD_COLLS.forEach(k => {
+    const have = new Set(ssArr(cloudDoc, k).map(ssKey));
+    ssArr(localObj, k).forEach(r => { if(!have.has(ssKey(r))) out.push({ coll: k, rec: r, label: SS_ONE_NAMES[k] + ': ' + ssLabel(r) }); });
+  });
+  return out;
+}
+function ssLoadDialogHtml(localObj, cloudDoc, meta, rescueOk, only){
+  const lc = ssCounts(localObj), cc = ssCounts(cloudDoc);
+  const when = meta && meta.localSavedAt ? ssExact(meta.localSavedAt).replace(/:\d\d$/, '') : '';
+  const rows = ['contacts', 'leads', 'quotes', 'projects', 'invoices'].map(k => `<tr><th scope="row">${SS_COLL_NAMES[k]}</th><td class="${lc[k] !== cc[k] ? 'ss-diff' : ''}">${lc[k]}</td><td class="${lc[k] !== cc[k] ? 'ss-diff' : ''}">${cc[k]}</td></tr>`).join('');
+  const list = only.slice(0, 10).map(x => '<li>' + escHtml(x.label) + '</li>').join('') + (only.length > 10 ? `<li>and ${only.length - 10} more</li>` : '');
+  return `<p class="ss-lead">${when ? `This browser has changes from <strong>${escHtml(when)}</strong> that were never saved to the cloud.` : 'This browser has a saved copy that is different from the cloud copy, and the portal cannot tell whether it has changes that were never saved.'}</p>
+    <table class="ss-tbl"><thead><tr><th></th><th>This browser</th><th>In the cloud</th></tr></thead><tbody>${rows}</tbody></table>
+    ${only.length ? `<p class="ss-sub">Only in this browser (${only.length}):</p><ul class="ss-ul">${list}</ul>` : '<p class="ss-sub">Every record in this browser also exists in the cloud, but some details differ.</p>'}
+    <p class="ss-note">${rescueOk ? 'A rescue copy of this browser’s data has been stored on this device first, so nothing is lost until you choose.' : 'This browser was too full to keep a rescue copy, so one was downloaded as a file instead.'}</p>`;
+}
+/* the additive merge: only records whose ids are missing from the cloud are appended; cloud records are never edited or removed */
+function ssAdditiveMerge(cloudDoc, localObj){
+  const merged = ssClone(cloudDoc || {}), added = [];
+  SS_ADD_COLLS.forEach(k => {
+    const have = new Set(ssArr(merged, k).map(ssKey));
+    ssArr(localObj, k).forEach(r => { if(!have.has(ssKey(r))){ if(!Array.isArray(merged[k])) merged[k] = []; merged[k].push(ssClone(r)); have.add(ssKey(r)); added.push({ coll: k, label: SS_ONE_NAMES[k] + ': ' + ssLabel(r) }); } });
+  });
+  SS_COUNTERS.forEach(k => { const a = Number(merged[k]) || 0, b = Number(localObj && localObj[k]) || 0; if(a || b) merged[k] = Math.max(a, b); });
+  return { merged, added };
+}
+/* Part D. Decide what to do with this browser's copy versus the cloud row. Never overwrites unsaved local work. */
+async function ssReconcile(row, opts){
+  opts = opts || {};
+  const cloudDoc = (row.doc && Object.keys(row.doc).length) ? row.doc : null;
+  const meta = ssMetaRead();
+  let localObj = null, localRaw = null;
+  if(opts.live && state){ localObj = state; localRaw = JSON.stringify(state); }
+  else { try{ localRaw = await Store.get(STORAGE_KEY); localObj = localRaw ? JSON.parse(localRaw) : null; }catch(e){ localObj = null; } if(!ssIsObj(localObj)) localObj = null; }
+  const cleanMeta = !!(meta && !meta.dirty && (meta.localHash == null || !localRaw || meta.localHash === ssHash(localRaw)));
+  let decision;
+  if(!localObj) decision = 'cloud';
+  else if(opts.live && sync.sample) decision = 'cloud-sample';
+  else if(cleanMeta && ssBaseMatches(meta, row)) decision = 'cloud-identical';   // this browser holds exactly what it last confirmed, and the cloud has not moved
+  else if(cleanMeta) decision = 'cloud';                                          // clean here, and the cloud moved on
+  else decision = (cloudDoc ? ssSameDoc(localObj, cloudDoc) : (ssCounts(localObj).contacts + ssCounts(localObj).leads + ssCounts(localObj).projects + ssCounts(localObj).quotes + ssCounts(localObj).invoices === 0 && ssCanon(localObj) === ssCanon(mergeDefaults({})))) ? 'cloud-identical' : 'dialog';
+  if(decision === 'cloud-sample' && sync.dirty){ ssStoreRescue(localRaw); }
+  if(decision === 'cloud' && opts.source === 'reconnect'){
+    ssBaseFromRow({ updated_at: sync.cloudUpdatedAt, version: sync.cloudVersion });   // the base stays the one we last confirmed, so the live refresh sees the cloud as newer and applies it when it is safe
+    syncSet('backed'); try{ lrSchedule(0); }catch(e){} return 'live';
+  }
+  if(decision !== 'dialog'){
+    state = mergeDefaults(cloudDoc ? ssClone(cloudDoc) : {});
+    if(opts.live){ ensurePipelineIds(); render(); }
+    ssAdopt(row, state);
+    return decision;
+  }
+  const rescueOk = ssStoreRescue(localRaw);
+  const only = ssOnlyHere(localObj, cloudDoc || {});
+  ssBaseFromRow(row);   // from here a "keep" or "merge" save is checked against this cloud version
+  const choice = await ssDialog({ title: 'Unsaved changes found in this browser', html: ssLoadDialogHtml(localObj, cloudDoc, meta, rescueOk, only), focusKey: 'merge', buttons: [
+    { key: 'keep', label: 'Keep this browser’s version and save it to the cloud', sub: 'The cloud copy is downloaded first, and the database keeps a snapshot of it' },
+    { key: 'cloud', label: 'Use the cloud version', sub: 'This browser’s copy is downloaded as a .json first' },
+    { key: 'merge', label: 'Add the records that exist only in this browser to the cloud version', sub: 'Nothing in the cloud is edited or removed', cls: 'primary' }] });
+  if(choice === 'keep'){
+    if(cloudDoc) ssDownloadText(JSON.stringify(cloudDoc, null, 2), 'business-tracker-cloud-copy');
+    state = mergeDefaults(ssClone(localObj));
+    if(opts.live){ ensurePipelineIds(); render(); }
+    sync.confirmed = ssSummary(mergeDefaults(ssClone(cloudDoc || {})), JSON.stringify(cloudDoc || {}).length);
+    sync.cloudHasDoc = !!cloudDoc; sync.sample = false; sync.allowShrink = true; sync.lastLocalAt = Date.now(); ssSetDirty(true); sync.editSeq++; ssMetaWrite();
+    cloudConflict = false; syncSet('saving');
+    await syncRun({ manual: true, recheck: true });
+    return 'keep';
+  }
+  if(choice === 'cloud'){
+    ssDownloadText(localRaw, 'business-tracker-browser-copy');
+    state = mergeDefaults(cloudDoc ? ssClone(cloudDoc) : {});
+    if(opts.live){ ensurePipelineIds(); render(); }
+    ssAdopt(row, state);
+    return 'cloud';
+  }
+  const m = ssAdditiveMerge(cloudDoc, localObj);
+  state = mergeDefaults(m.merged);
+  if(opts.live){ ensurePipelineIds(); render(); }
+  sync.confirmed = ssSummary(mergeDefaults(ssClone(cloudDoc || {})), JSON.stringify(cloudDoc || {}).length);
+  sync.cloudHasDoc = !!cloudDoc; sync.sample = false; sync.lastLocalAt = Date.now(); ssSetDirty(true); sync.editSeq++; ssMetaWrite();
+  cloudConflict = false; syncSet('saving');
+  await syncRun({ manual: true, recheck: true });
+  const byColl = {}; m.added.forEach(a => { byColl[a.coll] = (byColl[a.coll] || 0) + 1; });
+  const sumTxt = Object.keys(byColl).map(k => byColl[k] + ' ' + SS_COLL_NAMES[k].toLowerCase()).join(', ');
+  await ssDialog({ title: 'Records added to the cloud version', html: `<p>${m.added.length ? `Added <strong>${m.added.length}</strong> record${m.added.length === 1 ? '' : 's'} that existed only in this browser (${escHtml(sumTxt)}).` : 'There were no records to add: the cloud already had every record from this browser.'}</p>${m.added.length ? '<ul class="ss-ul">' + m.added.slice(0, 10).map(a => '<li>' + escHtml(a.label) + '</li>').join('') + (m.added.length > 10 ? `<li>and ${m.added.length - 10} more</li>` : '') + '</ul>' : ''}<p class="ss-note">Nothing in the cloud was edited or removed. Counters were set to the higher of the two.</p>`, buttons: [{ key: 'ok', label: 'OK', cls: 'primary' }] });
+  return 'merge';
+}
+/* "Reload to get the latest" (paused) and "Reload from cloud" (shrink guard): the browser's changes are kept as a rescue copy first, then Part D decides */
+async function ssReloadLatest(opts){
+  try{
+    const row = await sbGetRow();
+    if(!row){ showToast('The cloud row could not be found.', null, 6000); return; }
+    if(sync.dirty && state) ssStoreRescue(JSON.stringify(state));
+    if(opts && opts.skipBlockedCheck){
+      ssDownloadText(JSON.stringify(state), 'business-tracker-browser-copy');
+      state = mergeDefaults(ssClone(row.doc || {})); ensurePipelineIds(); render(); ssAdopt(row, state); return;
+    }
+    await ssReconcile(row, { live: true, source: 'reload' });
+  }catch(e){ showToast('Could not reload from the cloud: ' + ((e && e.message) || ''), null, 7000); }
+}
+
+/* ---------- start (called once after the first load) ---------- */
+function ssStart(){
+  if(sync.started) return;
+  sync.started = true;
+  setInterval(ssRender, 30000);                 // refresh the "x min ago" wording
+  setInterval(ssHeartbeat, SS_HEARTBEAT_MS);    // the 30-minute check
+  ssRender();
+}
+
+/* ---------- version history (Settings) ---------- */
+let ssHistLoaded = false;
+async function ssHistLoad(force){
+  const box = document.getElementById('ssHistBody'); if(!box) return;
+  if(ssHistLoaded && !force) return;
+  box.innerHTML = '<div class="ss-hist-msg" role="status">Loading…</div>';
+  try{
+    if(!cloud.enabled || !cloudBase()) throw new Error('not connected');
+    const since = new Date(Date.now() - 30 * 86400000).toISOString();
+    const r = await ssFetch(`${cloudBase()}/rest/v1/tracker_snapshots?doc_id=eq.${DOC_ID}&taken_at=gte.${encodeURIComponent(since)}&select=id,taken_at,reason,bytes,counts&order=taken_at.desc`, { headers: sbHeaders() }, 20000);
+    if(!r.ok){ const t = await r.text(); if(r.status === 404 || /PGRST205|42P01|does not exist|Could not find the table/i.test(t)){ box.innerHTML = '<div class="ss-hist-msg">Version history will appear once the database update is applied.</div>'; return; } throw new Error('HTTP ' + r.status); }
+    const rows = await r.json(); ssHistLoaded = true;
+    if(!rows.length){ box.innerHTML = '<div class="ss-hist-msg">No saved versions yet. They appear here after the next few saves.</div>'; return; }
+    const cnt = c => c ? ['contacts', 'leads', 'quotes', 'projects', 'invoices'].map(k => (c[k] != null ? c[k] : 0) + ' ' + SS_COLL_NAMES[k].toLowerCase()).join(' · ') : '';
+    box.innerHTML = `<div class="table-scroll fitmode"><table><thead><tr><th>Saved</th><th>Why</th><th>Records</th><th>Size</th><th></th></tr></thead><tbody>${rows.map(s => `<tr><td>${escHtml(new Date(s.taken_at).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))}</td><td>${escHtml(s.reason || '')}</td><td>${escHtml(cnt(s.counts))}</td><td>${Math.round((s.bytes || 0) / 1024)} KB</td><td style="white-space:nowrap"><button class="btn secondary" style="padding:4px 10px;font-size:var(--bt-fs-xs);" data-ss-hist="download" data-id="${escAttr(s.id)}">Download this version (.json)</button> <button class="btn secondary" style="padding:4px 10px;font-size:var(--bt-fs-xs);" data-ss-hist="restore" data-id="${escAttr(s.id)}" data-at="${escAttr(s.taken_at)}">Restore this version</button></td></tr>`).join('')}</tbody></table></div>`;
+  }catch(e){ box.innerHTML = '<div class="ss-hist-msg">Could not load the version history just now (' + escHtml((e && e.message) || '') + ').</div>'; }
+}
+async function ssHistFetchDoc(id){
+  const r = await ssFetch(`${cloudBase()}/rest/v1/tracker_snapshots?id=eq.${encodeURIComponent(id)}&doc_id=eq.${DOC_ID}&select=doc,taken_at`, { headers: sbHeaders() }, 45000);
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  const rows = await r.json(); if(!rows[0]) throw new Error('that version was not found');
+  return rows[0];
+}
+(function ssHistInit(){
+  const d = document.getElementById('ssHist'); if(!d) return;
+  d.addEventListener('toggle', () => { if(d.open) ssHistLoad(); });
+  d.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-ss-hist]'); if(!b) return;
+    const id = b.dataset.id, act = b.dataset.ssHist; b.disabled = true;
+    try{
+      const row = await ssHistFetchDoc(id), stamp = ssStamp(new Date(row.taken_at));
+      if(act === 'download'){ ssDownloadText(JSON.stringify(row.doc, null, 2), 'business-tracker-version-' + stamp.slice(0, 10) + '-' + stamp.slice(11)); return; }
+      if(!usingCloud){ showToast('Restore needs the cloud to be connected.', null, 6000); return; }
+      if(sync.status === 'blocked'){ showToast('Saving is paused because of newer changes elsewhere. Reload to get the latest first.', null, 8000); return; }
+      const cur = ssCounts(state), old = ssCounts(row.doc);
+      const tbl = ['contacts', 'leads', 'quotes', 'projects', 'invoices'].map(k => `<tr><th scope="row">${SS_COLL_NAMES[k]}</th><td>${cur[k]}</td><td>${old[k]}</td></tr>`).join('');
+      const ok = await ssDialog({ title: 'Restore this version?', cancelKey: 'cancel', focusKey: 'cancel', html: `<p>Restore the version from <strong>${escHtml(ssExact(new Date(row.taken_at).getTime()).replace(/:\d\d$/, ''))}</strong>? It replaces what is on your screen and saves to the cloud like any other change, so the current cloud copy is snapshotted by the database first. A copy of your current data is also downloaded now.</p><table class="ss-tbl"><thead><tr><th></th><th>Now</th><th>That version</th></tr></thead><tbody>${tbl}</tbody></table>`, buttons: [{ key: 'cancel', label: 'Cancel' }, { key: 'restore', label: 'Restore this version', cls: 'danger' }] });
+      if(ok !== 'restore') return;
+      ssDownloadText(JSON.stringify(state, null, 2), 'business-tracker-before-restore');
+      state = mergeDefaults(ssClone(row.doc)); sync.sample = false; ensurePipelineIds(); render();
+      sync.allowShrink = true; saveState(); showToast('Version restored. It is saving to the cloud now.', null, 6000);
+    }catch(err){ showToast('Could not get that version: ' + ((err && err.message) || ''), null, 7000); }
+    finally{ b.disabled = false; }
+  });
+})();
+/* BT:js-savesafety end */
 
 /* ---------- auth: Option A client-side gate ---------- */
 let session = null;
@@ -4605,27 +5278,32 @@ async function startApp(){
   navResume();   // after a refresh: back to the view you were on, with the way back still there
   if(!window._tablesInit){ initTableControls(); window._tablesInit = true; }
   renderAuthUI();
+  ssStart();   // the status chip, the 30-minute check and the wording refresh
+  try{ ssLpRefresh(true); }catch(e){}
 }
 
 /* ---------- backup: export / import / reset ---------- */
-function exportData(){
+function exportData(){   // exports exactly what is on screen (state), changes not yet in the cloud included; the file format is unchanged
   try{
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'business-tracker-backup-' + fmt(new Date()) + '.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    if(!ssDownloadText(JSON.stringify(state, null, 2), 'business-tracker-backup')) throw new Error('download');
     setSaveStatus('Backup downloaded');
   }catch(e){ setSaveStatus('Export failed'); }
 }
 function importData(file){
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
+    let loaded;
+    try{ loaded = JSON.parse(e.target.result); if(!ssIsObj(loaded)) throw new Error('not a backup'); }
+    catch(err){ setSaveStatus('Could not read that file'); showToast('That file could not be read as a valid backup.', null, 8000); return; }
+    const cur = ssCounts(state), inc = ssCounts(loaded);
+    const rows = ['contacts', 'leads', 'quotes', 'projects', 'invoices'].map(k => `<tr><th scope="row">${SS_COLL_NAMES[k]}</th><td>${cur[k]}</td><td class="${cur[k] !== inc[k] ? 'ss-diff' : ''}">${inc[k]}</td></tr>`).join('');
+    const when = file.lastModified ? new Date(file.lastModified).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'unknown';
+    const c = await ssDialog({ title: 'Replace everything with this backup?', cancelKey: 'cancel', focusKey: 'cancel', html: `<p>The file <strong>${escHtml(file.name || 'backup')}</strong> is dated <strong>${escHtml(when)}</strong>. Importing replaces <em>everything</em> on your screen, and then saves to the cloud like any other change. A copy of your current data is downloaded first.</p><table class="ss-tbl"><thead><tr><th></th><th>Now</th><th>In the file</th></tr></thead><tbody>${rows}</tbody></table>`, buttons: [{ key: 'cancel', label: 'Cancel' }, { key: 'import', label: 'Import and replace', cls: 'danger' }] });
+    if(c !== 'import'){ setSaveStatus('Import cancelled'); return; }
+    ssDownloadText(JSON.stringify(state, null, 2), 'business-tracker-before-import');
     try{
-      const loaded = JSON.parse(e.target.result);
       state = mergeDefaults(loaded);
+      sync.sample = false; sync.allowShrink = true;
       ensurePipelineIds();
       render();
       saveState();
@@ -4635,7 +5313,8 @@ function importData(file){
   reader.readAsText(file);
 }
 function resetData(){
-  state = defaultState();
+  if(usingCloud){ showToast('Reset is switched off while the cloud is connected, so sample data can never be saved over your real data. To go back, use Version history in Settings.', null, 9000); return; }
+  state = defaultState(); sync.sample = true;
   ensurePipelineIds();
   render();
   saveState();
@@ -6257,7 +6936,7 @@ function lpOpen(next, cfg){
   lp = Object.assign(next, { opener });
   panel.className = 'lp-panel ' + cfg.cls; panel.setAttribute('aria-label', cfg.label);
   lpEl('lpCode').textContent = cfg.code;
-  lpEl('lpSaved').textContent = ''; lpEl('lpSaved').classList.remove('warn');
+  lpEl('lpSaved').textContent = ''; lpEl('lpSaved').classList.remove('warn'); try{ ssLpRefresh(true); }catch(e){}
   lpEl('lpChips').innerHTML = cfg.chips.map(([k, n]) => `<button type="button" data-lp="jump" data-sec="${k}">${n}</button>`).join('');
   lpEl('lpHeadInfo').innerHTML = cfg.head;
   lpEl('lpBody').innerHTML = cfg.body;
@@ -18544,35 +19223,20 @@ function ivDocsHtml(){
    Every 30 seconds (and the moment the tab becomes visible again) ask Supabase for ONLY the row's updated_at. Same as cloudLoadedAt = do nothing.
    Newer = fetch the document with the existing sbGetRow, and apply it only when that is safe (see lrBusy). Applying uses the same path as loadState
    (mergeDefaults, replace state, set cloudLoadedAt, refresh the local backup) and then re-renders in place: same page, scroll, filters, open panel, focus.
-   This block READS and APPLIES only. It never calls saveState and does not touch how saves or the conflict guard work: it watches the save-status text
-   ("Saving…" is written by every saveState call) to know when a save is pending or running. Nothing here is stored in the saved document. */
+   This block READS and APPLIES only. It never calls saveState. Save safety (BT:js-savesafety) owns the sync state: this block asks it (sync.dirty / sync.running)
+   whether a save is pending, and it never applies cloud changes over unsaved work (the chip goes to Paused instead). Nothing here is stored in the saved document. */
 const LR_BASE_MS = 30000, LR_MAX_MS = 300000, LR_RETRY_MS = 1500, LR_TYPING_MS = 4000, LR_BANNER_AFTER = 3;
 const lr = { timer: null, running: false, applying: false, fails: 0, deferred: 0, remoteAt: '', badAt: '', dismissedFor: '', saving: false, lastSaveCall: 0, lastTyping: 0, dirty: new Set(), mine: '', obs: null };
 const lrHHMM = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 const lrIsField = el => !!el && el.nodeType === 1 && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable);
 const lrIgnore = el => !el || !el.closest || !!el.closest('#loginOverlay,[data-lr-ignore],.pj-controls,.crm-filters,.cx-filters') || el.type === 'search' || el.id === 'cloudUrl' || el.id === 'cloudKey';
-/* the save-status text is how we know a save is pending or running: every saveState call writes "Saving…" first, every finished save writes something else */
-(function lrWatchStatus(){
-  const el = document.getElementById('saveStatus'); if(!el || !window.MutationObserver) return;
-  lr.obs = new MutationObserver(() => {
-    const t = el.textContent;
-    if(t === 'Saving…'){ lr.saving = true; lr.lastSaveCall = Date.now(); }
-    else{
-      // a save that ended less than half a second after the latest "Saving…" belongs to an EARLIER call: the latest call's own timer is still waiting
-      const was = lr.saving; lr.saving = Date.now() - lr.lastSaveCall < 500;
-      if(was && !lr.saving){ lr.dirty.clear(); if(lr.deferred || lr.remoteAt) lrSchedule(LR_RETRY_MS); }   // the person's own save just finished: try again straight after
-      if(cloudConflict && /^⚠ Changed on another device/.test(t)) lrShowBanner('Newer changes from someone else are available. Your last edit was not saved, and Apply now will replace it.');   // the existing conflict handling is untouched; this only adds a one-click way to take their version
-    }
-  });
-  lr.obs.observe(el, { childList: true, characterData: true, subtree: true });
-})();
 document.addEventListener('input', (e) => { const el = e.target; if(!lrIsField(el) || lrIgnore(el)) return; lr.dirty.add(el); lr.lastTyping = Date.now(); }, true);
-document.addEventListener('change', (e) => { const el = e.target; if(!lr.dirty.has(el)) return; setTimeout(() => { if(!lr.saving && Date.now() - lr.lastSaveCall > 1500) lr.dirty.delete(el); }, 60); }, true);   // a change that started no save was screen-only
+document.addEventListener('change', (e) => { const el = e.target; if(!lr.dirty.has(el)) return; setTimeout(() => { if(!sync.dirty && !sync.running && Date.now() - lr.lastSaveCall > 1500) lr.dirty.delete(el); }, 60); }, true);   // a change that started no save was screen-only
 /* why NOT to apply right now ('' = safe). Hard reasons also stop the "Apply now" button, because they would lose something the person has not saved. */
 function lrBusy(manual){
   if(!state) return 'not loaded';
   if(cloudConflict && !manual) return 'conflict';
-  if(lr.saving) return 'a save is running';
+  if(sync.dirty || sync.running) return 'you have changes that are not saved yet';   // hard: applying would replace them
   lr.dirty.forEach(el => { if(!el.isConnected) lr.dirty.delete(el); });
   if(lr.dirty.size) return 'you are in the middle of typing';
   const a = document.activeElement; if(lrIsField(a) && !lrIgnore(a) && Date.now() - lr.lastTyping < LR_TYPING_MS) return 'you are in the middle of typing';
@@ -18597,28 +19261,25 @@ async function lrTick(){
   finally{ lr.running = false; lrSchedule(lrNextDelay()); }
 }
 async function lrCheck(){
-  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000); let row = null;
-  try{
-    const r = await fetch(`${cloudBase()}/rest/v1/tracker_data?id=eq.${DOC_ID}&select=updated_at`, { headers: sbHeaders(), signal: ctl.signal });   // the cheap check: one small column
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    row = (await r.json())[0] || null;
-  } finally { clearTimeout(to); }
-  if(!row || !row.updated_at || !lrNewer(row.updated_at)){ lr.deferred = 0; lr.remoteAt = ''; lrHideBanner(); lrLive(); return; }
+  const gen = sync.gen; let row = null;
+  row = await sbPeek();   // the cheap check: one small row (version and updated_at), no document
+  if(sync.running || gen !== sync.gen) return;   // one of our own saves finished while we asked: that answer is stale
+  if(!row || !row.updated_at || !ssCloudNewer(row)){ lr.deferred = 0; lr.remoteAt = ''; lrHideBanner(); lrLive(); return; }
   if(row.updated_at === lr.badAt) return;   // that version could not be loaded once already: wait for a newer one
   lr.remoteAt = row.updated_at;
+  if(sync.dirty){ ssBlock(); return; }   // newer in the cloud AND unsaved changes here: never auto-apply, the chip says Paused and offers next steps
   if(lrBusy(false)){ lrDeferred(); return; }
-  const full = await sbGetRow();   // the existing helper, unchanged
+  const full = await sbGetRow();   // the existing helper
   if(!full) return;
+  if(sync.dirty){ ssBlock(); return; }
   if(lrBusy(false)){ lrDeferred(); return; }   // something may have started while we waited for the answer
   lrApply(full, false);
 }
-const lrNewer = u => !cloudLoadedAt || (u !== cloudLoadedAt && new Date(u) > new Date(cloudLoadedAt));
 function lrDeferred(){ lr.deferred++; if(lr.deferred >= LR_BANNER_AFTER && lr.remoteAt !== lr.dismissedFor) lrShowBanner('Newer changes from someone else are available'); }
 /* ---------- status text ---------- */
-function lrSay(text){ setSaveStatus(text); if(lr.obs) lr.obs.takeRecords(); lr.mine = text; }   // our own words are never mistaken for a save
-function lrStatusFree(){ const t = (document.getElementById('saveStatus') || {}).textContent || ''; return !lr.saving && !cloudConflict && (t === lr.mine || /^(Saved to cloud|Loaded from cloud|Reloaded from cloud|All changes saved|Loaded your saved data|Starting from sample|Live ·|Updated by someone else|Offline)/.test(t)); }
-function lrLive(){ if(lrStatusFree()) lrSay('Live · updated ' + lrHHMM()); }
-function lrOffline(){ if(lrStatusFree()) lrSay('Offline – will keep trying'); }
+function lrSay(text){ setSaveStatus(text); }   // a brief note beside the status chip; the chip itself is driven by syncSet
+function lrLive(){ ssConfirmClean(); }          // the cloud is unchanged and nothing here is unsaved: the cloud copy matches the screen right now
+function lrOffline(){ /* nothing unsaved is at risk while the quiet check cannot reach the cloud; the chip's "Backed up · x ago" simply ages */ }
 /* ---------- the small banner (never a pop-up or alert) ---------- */
 function lrShowBanner(msg, action){
   const b = document.getElementById('lrBanner'); if(!b) return;
@@ -18678,8 +19339,7 @@ function lrApply(row, manual){
     const next = mergeDefaults(row.doc);   // the same path as loadState (a bad document throws here, before anything is replaced)
     const gone = open.filter(t => !t.test(next));
     gone.forEach(t => t.clear());           // what was open no longer exists: step out of it before drawing, instead of drawing a missing record
-    state = next; cloudLoadedAt = row.updated_at; cloudConflict = false;   // (reloadFromCloud does the same)
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}   // the local backup, exactly as loadState does
+    state = next; ssAdopt(row, next);   // remembers the version, refreshes the local copy and marks the screen as matching the cloud
     ensurePipelineIds();
     render(); renderCloudStatus();
     // put the screen back the way it was
